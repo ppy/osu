@@ -48,35 +48,32 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
+        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the currently-selected ruleset and mods.
+        /// </summary>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
+        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
+        /// <returns>A bindable that is updated to contain the star difficulty when it becomes available.</returns>
+        public IBindable<StarDifficulty> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
+        {
+            var bindable = createBindable(beatmapInfo, currentRuleset.Value, currentMods.Value, cancellationToken);
+            trackedBindables.Add(bindable);
+            return bindable;
+        }
+
+        /// <summary>
         /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> with a given <see cref="RulesetInfo"/> and <see cref="Mod"/> combination.
         /// </summary>
         /// <remarks>
         /// The bindable will not update to follow the currently-selected ruleset and mods.
         /// </remarks>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
-        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to get the difficulty with.</param>
-        /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with.</param>
+        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to get the difficulty with. If <c>null</c>, the difficulty will change along with the game-wide ruleset and mods.</param>
+        /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with. If <c>null</c>, the difficulty will change along with the game-wide mods.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
         /// <returns>A bindable that is updated to contain the star difficulty when it becomes available.</returns>
-        public IBindable<StarDifficulty> GetUntrackedBindable([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IEnumerable<Mod> mods = null,
-                                                              CancellationToken cancellationToken = default)
+        public IBindable<StarDifficulty> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, [NotNull] RulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods,
+                                                               CancellationToken cancellationToken = default)
             => createBindable(beatmapInfo, rulesetInfo, mods, cancellationToken);
-
-        /// <summary>
-        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the user's currently-selected ruleset and mods.
-        /// </summary>
-        /// <remarks>
-        /// Ensure to hold a local reference of the returned bindable in order to receive value-changed events.
-        /// </remarks>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
-        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
-        /// <returns>A bindable that is updated to contain the star difficulty when it becomes available, or when the currently-selected ruleset and mods change.</returns>
-        public IBindable<StarDifficulty> GetTrackedBindable([NotNull] BeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
-        {
-            var bindable = createBindable(beatmapInfo, currentRuleset.Value, currentMods.Value, cancellationToken);
-            trackedBindables.Add(bindable);
-            return bindable;
-        }
 
         /// <summary>
         /// Retrieves the difficulty of a <see cref="BeatmapInfo"/>.
