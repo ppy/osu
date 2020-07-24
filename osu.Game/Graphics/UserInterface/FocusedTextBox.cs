@@ -67,6 +67,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool OnPressed(GlobalAction action)
         {
+            if (!HasFocus) return false;
+
             if (action == GlobalAction.Back)
             {
                 if (Text.Length > 0)
