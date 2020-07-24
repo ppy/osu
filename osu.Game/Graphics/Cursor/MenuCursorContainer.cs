@@ -58,10 +58,11 @@ namespace osu.Game.Graphics.Cursor
 
             foreach (var d in inputManager.HoveredDrawables)
             {
-                if (!(d is IProvideCursor p) || !p.ProvidingUserCursor) continue;
-
-                newTarget = p;
-                break;
+                if (d is IProvideCursor p && p.ProvidingUserCursor)
+                {
+                    newTarget = p;
+                    break;
+                }
             }
 
             if (currentTarget == newTarget)
