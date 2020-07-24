@@ -63,7 +63,8 @@ namespace osu.Game
 
         private ChannelManager channelManager;
 
-        private NotificationOverlay notifications;
+        [NotNull]
+        private readonly NotificationOverlay notifications = new NotificationOverlay();
 
         private NowPlayingOverlay nowPlaying;
 
@@ -82,7 +83,7 @@ namespace osu.Game
 
         public virtual Storage GetStorageForStableInstall() => null;
 
-        public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
+        public float ToolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
         private IdleTracker idleTracker;
 
@@ -250,7 +251,7 @@ namespace osu.Game
                 case LinkAction.OpenEditorTimestamp:
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
-                    waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
+                    waitForReady(() => notifications, _ => notifications.Post(new SimpleNotification
                     {
                         Text = @"This link type is not yet supported!",
                         Icon = FontAwesome.Solid.LifeRing,
@@ -536,14 +537,14 @@ namespace osu.Game
             MenuCursorContainer.CanShowCursor = menuScreen?.CursorVisible ?? false;
 
             // todo: all archive managers should be able to be looped here.
-            SkinManager.PostNotification = n => notifications?.Post(n);
+            SkinManager.PostNotification = n => notifications.Post(n);
             SkinManager.GetStableStorage = GetStorageForStableInstall;
 
-            BeatmapManager.PostNotification = n => notifications?.Post(n);
+            BeatmapManager.PostNotification = n => notifications.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
-            ScoreManager.PostNotification = n => notifications?.Post(n);
+            ScoreManager.PostNotification = n => notifications.Post(n);
             ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
@@ -615,12 +616,12 @@ namespace osu.Game
 
             loadComponentSingleFile(MusicController = new MusicController(), Add, true);
 
-            loadComponentSingleFile(notifications = new NotificationOverlay
+            loadComponentSingleFile(notifications.With(d =>
             {
-                GetToolbarHeight = () => ToolbarOffset,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
+                d.GetToolbarHeight = () => ToolbarOffset;
+                d.Anchor = Anchor.TopRight;
+                d.Origin = Anchor.TopRight;
+            }), rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(screenshotManager, Add);
 

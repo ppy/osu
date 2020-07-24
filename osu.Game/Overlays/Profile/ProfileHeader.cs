@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
+            ContentSidePadding = UserProfileOverlay.CONTENT_X_MARGIN;
+
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem("info");
