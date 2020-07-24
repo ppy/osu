@@ -31,11 +31,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Screenshot format",
                     Bindable = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
                 },
-                new SettingsSlider<int>
-                {
-                    LabelText = "JPEG Screenshot quality",
-                    Bindable = config.GetBindable<int>(OsuSetting.ScreenshotJpegQuality)
-                },
                 new SettingsCheckbox
                 {
                     LabelText = "Show menu cursor in screenshots",
