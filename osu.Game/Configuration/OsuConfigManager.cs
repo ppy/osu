@@ -106,7 +106,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Version, string.Empty);
 
             Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
-            Set(OsuSetting.ScreenshotJpegQuality, 75, 0, 100);
             Set(OsuSetting.ScreenshotCaptureMenuCursor, false);
 
             Set(OsuSetting.SongSelectRightMouseScroll, false);
@@ -213,7 +212,6 @@ namespace osu.Game.Configuration
         ShowConvertedBeatmaps,
         Skin,
         ScreenshotFormat,
-        ScreenshotJpegQuality,
         ScreenshotCaptureMenuCursor,
         SongSelectRightMouseScroll,
         BeatmapSkins,
