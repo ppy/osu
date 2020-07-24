@@ -101,7 +101,7 @@ namespace osu.Desktop
             LoadComponentAsync(new DiscordRichPresence(), Add);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
-                LoadComponentAsync(new GameplayWinKeyHandler(ScreenStack), Add);
+                LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)

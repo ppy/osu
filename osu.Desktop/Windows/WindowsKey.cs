@@ -21,7 +21,7 @@ namespace osu.Desktop.Windows
         private static IntPtr keyHook;
 
         [StructLayout(LayoutKind.Explicit)]
-        private struct KdDllHookStruct
+        private readonly struct KdDllHookStruct
         {
             [FieldOffset(0)]
             public readonly int VkCode;
