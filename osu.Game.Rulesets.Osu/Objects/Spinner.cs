@@ -29,16 +29,21 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// <summary>
         /// Number of spins available to give bonus, beyond <see cref="SpinsRequired"/>.
         /// </summary>
-        public int MaximumBonusSpins => (int)(SpinsRequired * 1.8f); // roughly matches stable
+        public int MaximumBonusSpins { get; protected set; } = 1;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            SpinsRequired = (int)(Duration / 1000 * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5));
+            double secondsDuration = Duration / 1000;
 
             // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
-            SpinsRequired = (int)Math.Max(1, SpinsRequired * 0.6);
+            double minimumRotationsPerSecond = 0.6 * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
+
+            const double maximum_rotations_per_second = 8; // close to 477rpm.
+
+            SpinsRequired = (int)Math.Max(1, (secondsDuration * minimumRotationsPerSecond));
+            MaximumBonusSpins = (int)(maximum_rotations_per_second / minimumRotationsPerSecond * secondsDuration);
         }
 
         protected override void CreateNestedHitObjects()
