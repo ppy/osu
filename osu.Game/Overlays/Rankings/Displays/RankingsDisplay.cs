@@ -29,12 +29,16 @@ namespace osu.Game.Overlays.Rankings.Displays
             set => current.Current = value;
         }
 
+        /// <summary>
+        /// Whether we should create content on request success.
+        /// </summary>
+        protected virtual bool CreateContentOnSucess => true;
+
         private CancellationTokenSource cancellationToken;
+        protected Container Content;
 
-        private readonly Container content;
-        private readonly Box headerBackground;
-
-        protected RankingsDisplay()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             InternalChild = new FillFlowContainer
             {
@@ -50,14 +54,15 @@ namespace osu.Game.Overlays.Rankings.Displays
                         Depth = -float.MaxValue,
                         Children = new[]
                         {
-                            headerBackground = new Box
+                            new Box
                             {
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colourProvider.Dark3
                             },
                             CreateHeader()
                         }
                     },
-                    content = new Container
+                    Content = new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -68,12 +73,6 @@ namespace osu.Game.Overlays.Rankings.Displays
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            headerBackground.Colour = colourProvider.Dark3;
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -82,32 +81,35 @@ namespace osu.Game.Overlays.Rankings.Displays
 
         protected override void PerformFetch()
         {
-            startLoading();
+            InvokeStartLoading();
             base.PerformFetch();
         }
 
         protected override void OnSuccess(T response)
         {
-            LoadComponentAsync(CreateContent(response), loaded =>
+            if (CreateContentOnSucess)
             {
-                content.Child = loaded;
-                finishLoading();
-            }, (cancellationToken = new CancellationTokenSource()).Token);
+                LoadComponentAsync(CreateContent(response), loaded =>
+                {
+                    Content.Child = loaded;
+                    InvokeFinishLoading();
+                }, (cancellationToken = new CancellationTokenSource()).Token);
+            }
         }
 
         protected virtual Drawable CreateHeader() => Empty();
 
-        protected abstract Drawable CreateContent(T response);
+        protected virtual Drawable CreateContent(T response) => Empty();
 
-        private void startLoading()
+        protected void InvokeStartLoading()
         {
-            content.FadeColour(OsuColour.Gray(0.5f), 500, Easing.OutQuint);
+            Content.FadeColour(OsuColour.Gray(0.5f), 500, Easing.OutQuint);
             StartLoading?.Invoke();
         }
 
-        private void finishLoading()
+        protected void InvokeFinishLoading()
         {
-            content.FadeColour(Color4.White, 500, Easing.OutQuint);
+            Content.FadeColour(Color4.White, 500, Easing.OutQuint);
             FinishLoading?.Invoke();
         }
 

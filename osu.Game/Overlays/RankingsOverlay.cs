@@ -13,7 +13,6 @@ using System.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Rankings.Displays;
 using System;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API;
 
 namespace osu.Game.Overlays
@@ -33,7 +32,6 @@ namespace osu.Game.Overlays
         private readonly RankingsOverlayHeader header;
         private readonly OverlayScrollContainer scrollFlow;
 
-        private GetSpotlightsRequest spotlightsRequest;
         private CancellationTokenSource cancellationToken;
 
         private PerformanceRankingsDisplay performanceDisplay;
@@ -143,7 +141,6 @@ namespace osu.Game.Overlays
         {
             performanceDisplay = null;
             cancellationToken?.Cancel();
-            spotlightsRequest?.Cancel();
 
             loading.Show();
 
@@ -153,30 +150,7 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            if (Scope.Value == RankingsScope.Spotlights)
-            {
-                loadSpotlightsDisplay();
-                return;
-            }
-
             loadDisplayAsync(selectDisplay());
-        }
-
-        private void loadSpotlightsDisplay()
-        {
-            spotlightsRequest = new GetSpotlightsRequest();
-            spotlightsRequest.Success += response => Schedule(() =>
-            {
-                var display = new SpotlightsRankingsDisplay
-                {
-                    Current = ruleset,
-                    StartLoading = loading.Show,
-                    FinishLoading = loading.Hide,
-                    Spotlights = response.Spotlights
-                };
-                loadDisplayAsync(display);
-            });
-            API.Queue(spotlightsRequest);
         }
 
         private void loadDisplayAsync(Drawable display)
@@ -217,6 +191,14 @@ namespace osu.Game.Overlays
                         StartLoading = loading.Show,
                         FinishLoading = loading.Hide
                     };
+
+                case RankingsScope.Spotlights:
+                    return new SpotlightsRankingsDisplay
+                    {
+                        Current = ruleset,
+                        StartLoading = loading.Show,
+                        FinishLoading = loading.Hide
+                    };
             }
 
             throw new NotImplementedException($"Display for {Scope.Value} is not implemented.");
@@ -232,7 +214,6 @@ namespace osu.Game.Overlays
 
         protected override void Dispose(bool isDisposing)
         {
-            spotlightsRequest?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
