@@ -159,10 +159,10 @@ namespace osu.Game.Screens.Select.Details
             if (Beatmap == null)
                 return;
 
-            var ourSource = starDifficultyCancellationSource = new CancellationTokenSource();
+            starDifficultyCancellationSource = new CancellationTokenSource();
 
-            normalStarDifficulty = difficultyManager.GetBindableDifficulty(Beatmap, ruleset.Value, null, cancellationToken: ourSource.Token);
-            moddedStarDifficulty = difficultyManager.GetBindableDifficulty(Beatmap, ruleset.Value, mods.Value, ourSource.Token);
+            normalStarDifficulty = difficultyManager.GetBindableDifficulty(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            moddedStarDifficulty = difficultyManager.GetBindableDifficulty(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
 
             normalStarDifficulty.BindValueChanged(_ => updateDisplay());
             moddedStarDifficulty.BindValueChanged(_ => updateDisplay(), true);
