@@ -35,15 +35,18 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
+            // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
+            const double stable_matching_fudge = 0.6;
+
+            // close to 477rpm
+            const double maximum_rotations_per_second = 8;
+
             double secondsDuration = Duration / 1000;
 
-            // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
-            double minimumRotationsPerSecond = 0.6 * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
-
-            const double maximum_rotations_per_second = 8; // close to 477rpm.
+            double minimumRotationsPerSecond = stable_matching_fudge * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
 
             SpinsRequired = (int)Math.Max(1, (secondsDuration * minimumRotationsPerSecond));
-            MaximumBonusSpins = (int)(maximum_rotations_per_second / minimumRotationsPerSecond * secondsDuration);
+            MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration);
         }
 
         protected override void CreateNestedHitObjects()
