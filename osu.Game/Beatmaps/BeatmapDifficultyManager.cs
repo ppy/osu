@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps
         // Too many simultaneous updates can lead to stutters. One thread seems to work fine for song select display purposes.
         private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyManager));
 
-        // A cache that keeps references to BeatmapInfos for 60sec.
+        // A permanent cache to prevent re-computations.
         private readonly ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty> difficultyCache = new ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty>();
 
         // All bindables that should be updated along with the current ruleset + mods.
@@ -48,29 +48,29 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Retrieves an <see cref="IBindable{StarDifficulty}"/> containing the star difficulty of a <see cref="BeatmapInfo"/> with a given <see cref="RulesetInfo"/> and <see cref="Mod"/> combination.
+        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> with a given <see cref="RulesetInfo"/> and <see cref="Mod"/> combination.
         /// </summary>
         /// <remarks>
-        /// This <see cref="Bindable{StarDifficulty}"/> will not update to follow the currently-selected ruleset and mods.
+        /// The bindable will not update to follow the currently-selected ruleset and mods.
         /// </remarks>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
         /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to get the difficulty with.</param>
         /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
-        /// <returns>An <see cref="IBindable{StarDifficulty}"/> that is updated to contain the star difficulty when it becomes available.</returns>
+        /// <returns>A bindable that is updated to contain the star difficulty when it becomes available.</returns>
         public IBindable<StarDifficulty> GetUntrackedBindable([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IReadOnlyList<Mod> mods = null,
                                                               CancellationToken cancellationToken = default)
             => createBindable(beatmapInfo, rulesetInfo, mods, cancellationToken);
 
         /// <summary>
-        /// Retrieves a <see cref="IBindable{StarDifficulty}"/> containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the user's currently-selected ruleset and mods.
+        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the user's currently-selected ruleset and mods.
         /// </summary>
         /// <remarks>
-        /// Ensure to hold a local reference of the returned <see cref="Bindable{StarDifficulty}"/> in order to receive value-changed events.
+        /// Ensure to hold a local reference of the returned bindable in order to receive value-changed events.
         /// </remarks>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
-        /// <returns>An <see cref="IBindable{StarDifficulty}"/> that is updated to contain the star difficulty when it becomes available, or when the currently-selected ruleset and mods change.</returns>
+        /// <returns>A bindable that is updated to contain the star difficulty when it becomes available, or when the currently-selected ruleset and mods change.</returns>
         public IBindable<StarDifficulty> GetTrackedBindable([NotNull] BeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
         {
             var bindable = createBindable(beatmapInfo, currentRuleset.Value, currentMods.Value, cancellationToken);
@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps
         public async Task<StarDifficulty> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IReadOnlyList<Mod> mods = null,
                                                              CancellationToken cancellationToken = default)
         {
-            if (tryGetGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
+            if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
                 return existing;
 
             return await Task.Factory.StartNew(() => computeDifficulty(key, beatmapInfo, rulesetInfo), cancellationToken,
@@ -105,7 +105,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
         public StarDifficulty GetDifficulty([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IReadOnlyList<Mod> mods = null)
         {
-            if (tryGetGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
+            if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
                 return existing;
 
             return computeDifficulty(key, beatmapInfo, rulesetInfo);
@@ -204,7 +204,7 @@ namespace osu.Game.Beatmaps
         /// <param name="existingDifficulty">The existing difficulty value, if present.</param>
         /// <param name="key">The <see cref="DifficultyCacheLookup"/> key that was used to perform this lookup. This can be further used to query <see cref="computeDifficulty"/>.</param>
         /// <returns>Whether an existing difficulty was found.</returns>
-        private bool tryGetGetExisting(BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo, IReadOnlyList<Mod> mods, out StarDifficulty existingDifficulty, out DifficultyCacheLookup key)
+        private bool tryGetExisting(BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo, IReadOnlyList<Mod> mods, out StarDifficulty existingDifficulty, out DifficultyCacheLookup key)
         {
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
             rulesetInfo ??= beatmapInfo.Ruleset;
