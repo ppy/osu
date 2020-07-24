@@ -9,7 +9,7 @@ using osu.Game.Graphics.Sprites;
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     /// <summary>
-    /// A component that tracks spinner spins and add bonus score for it.
+    /// Shows incremental bonus score achieved for a spinner.
     /// </summary>
     public class SpinnerBonusDisplay : CompositeDrawable
     {
