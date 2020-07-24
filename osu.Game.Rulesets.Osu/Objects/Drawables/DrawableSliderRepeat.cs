@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Drawable scaleContainer;
 
+        public override bool DisplayResult => false;
+
         public DrawableSliderRepeat(SliderRepeat sliderRepeat, DrawableSlider drawableSlider)
             : base(sliderRepeat)
         {
