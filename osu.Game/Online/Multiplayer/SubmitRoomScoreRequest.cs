@@ -4,11 +4,12 @@
 using System.Net.Http;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
+using osu.Game.Online.API;
 using osu.Game.Scoring;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.Multiplayer
 {
-    public class SubmitRoomScoreRequest : APIRequest<RoomScore>
+    public class SubmitRoomScoreRequest : APIRequest<MultiplayerScore>
     {
         private readonly int scoreId;
         private readonly int roomId;
