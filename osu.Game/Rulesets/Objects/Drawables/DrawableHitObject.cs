@@ -129,9 +129,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             LoadSamples();
         }
 
-        protected override void LoadComplete()
+        protected override void LoadAsyncComplete()
         {
-            base.LoadComplete();
+            base.LoadAsyncComplete();
 
             HitObject.DefaultsApplied += onDefaultsApplied;
 
@@ -148,6 +148,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged += (_, __) => LoadSamples();
 
             apply(HitObject);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             updateState(ArmedState.Idle, true);
         }
