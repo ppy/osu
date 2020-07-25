@@ -18,11 +18,6 @@ namespace osu.Game.Overlays
     public abstract class OverlayView<T> : CompositeDrawable, IOnlineComponent
         where T : class
     {
-        /// <summary>
-        /// Whether we should perform fetch on api state change to online (true by default).
-        /// </summary>
-        protected virtual bool PerformFetchOnApiStateChange => true;
-
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
@@ -38,10 +33,6 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
             API.Register(this);
-
-            // If property is true - fetch will be triggered automatically by APIStateChanged and if not - we need to manually call it.
-            if (!PerformFetchOnApiStateChange)
-                PerformFetch();
         }
 
         /// <summary>
@@ -73,8 +64,7 @@ namespace osu.Game.Overlays
             switch (state)
             {
                 case APIState.Online:
-                    if (PerformFetchOnApiStateChange)
-                        PerformFetch();
+                    PerformFetch();
                     break;
             }
         }

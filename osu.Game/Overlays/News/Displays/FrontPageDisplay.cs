@@ -13,16 +13,15 @@ using osuTK;
 
 namespace osu.Game.Overlays.News.Displays
 {
-    public class FrontPageDisplay : OverlayView<GetNewsResponse>
+    public class FrontPageDisplay : CompositeDrawable
     {
-        protected override bool PerformFetchOnApiStateChange => false;
-
-        protected override APIRequest<GetNewsResponse> CreateRequest() => new GetNewsRequest();
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private FillFlowContainer content;
         private ShowMoreButton showMore;
 
-        private GetNewsRequest olderPostsRequest;
+        private GetNewsRequest request;
         private Cursor lastCursor;
 
         [BackgroundDependencyLoader]
@@ -62,16 +61,27 @@ namespace osu.Game.Overlays.News.Displays
                         {
                             Top = 15
                         },
-                        Action = fetchOlderPosts,
+                        Action = performFetch,
                         Alpha = 0
                     }
                 }
             };
+
+            performFetch();
+        }
+
+        private void performFetch()
+        {
+            request?.Cancel();
+
+            request = new GetNewsRequest(lastCursor);
+            request.Success += response => Schedule(() => onSuccess(response));
+            api.PerformAsync(request);
         }
 
         private CancellationTokenSource cancellationToken;
 
-        protected override void OnSuccess(GetNewsResponse response)
+        private void onSuccess(GetNewsResponse response)
         {
             cancellationToken?.Cancel();
 
@@ -94,18 +104,9 @@ namespace osu.Game.Overlays.News.Displays
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
-        private void fetchOlderPosts()
-        {
-            olderPostsRequest?.Cancel();
-
-            olderPostsRequest = new GetNewsRequest(lastCursor);
-            olderPostsRequest.Success += response => Schedule(() => OnSuccess(response));
-            API.PerformAsync(olderPostsRequest);
-        }
-
         protected override void Dispose(bool isDisposing)
         {
-            olderPostsRequest?.Cancel();
+            request?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
