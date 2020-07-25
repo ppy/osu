@@ -13,7 +13,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 using System.Linq;
 using osu.Game.Overlays.BeatmapListing.Panels;
-using System.Threading;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
@@ -52,13 +51,11 @@ namespace osu.Game.Overlays.Rankings.Displays
         };
 
         private GetSpotlightRankingsRequest getSpotlightRankingsRequest;
-        private CancellationTokenSource cancellationToken;
 
         private void performSpotlightFetch()
         {
             InvokeStartLoading();
             getSpotlightRankingsRequest?.Cancel();
-            cancellationToken?.Cancel();
 
             getSpotlightRankingsRequest = new GetSpotlightRankingsRequest(Current.Value, selectedSpotlight.Value.Id, sort.Value);
             getSpotlightRankingsRequest.Success += response => Schedule(() => loadNewTable(response));
@@ -67,12 +64,8 @@ namespace osu.Game.Overlays.Rankings.Displays
 
         private void loadNewTable(GetSpotlightRankingsResponse response)
         {
-            LoadComponentAsync(createTable(response), loaded =>
-            {
-                selector.ShowInfo(response);
-                Content.Child = loaded;
-                InvokeFinishLoading();
-            }, (cancellationToken = new CancellationTokenSource()).Token);
+            selector.ShowInfo(response);
+            AddContentAsync(createTable(response));
         }
 
         private Drawable createTable(GetSpotlightRankingsResponse response) => new FillFlowContainer
@@ -101,7 +94,6 @@ namespace osu.Game.Overlays.Rankings.Displays
         protected override void Dispose(bool isDisposing)
         {
             getSpotlightRankingsRequest?.Cancel();
-            cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
     }

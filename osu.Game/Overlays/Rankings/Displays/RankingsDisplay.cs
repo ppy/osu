@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Rankings.Displays
         protected virtual bool CreateContentOnSucess => true;
 
         private CancellationTokenSource cancellationToken;
-        protected Container Content;
+        private Container content;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Rankings.Displays
                             CreateHeader()
                         }
                     },
-                    Content = new Container
+                    content = new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -88,13 +88,18 @@ namespace osu.Game.Overlays.Rankings.Displays
         protected override void OnSuccess(T response)
         {
             if (CreateContentOnSucess)
+                AddContentAsync(CreateContent(response));
+        }
+
+        protected void AddContentAsync(Drawable contentToLoad)
+        {
+            cancellationToken?.Cancel();
+
+            LoadComponentAsync(contentToLoad, loaded =>
             {
-                LoadComponentAsync(CreateContent(response), loaded =>
-                {
-                    Content.Child = loaded;
-                    InvokeFinishLoading();
-                }, (cancellationToken = new CancellationTokenSource()).Token);
-            }
+                content.Child = loaded;
+                invokeFinishLoading();
+            }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         protected virtual Drawable CreateHeader() => Empty();
@@ -103,13 +108,13 @@ namespace osu.Game.Overlays.Rankings.Displays
 
         protected void InvokeStartLoading()
         {
-            Content.FadeColour(OsuColour.Gray(0.5f), 500, Easing.OutQuint);
+            content.FadeColour(OsuColour.Gray(0.5f), 500, Easing.OutQuint);
             StartLoading?.Invoke();
         }
 
-        protected void InvokeFinishLoading()
+        private void invokeFinishLoading()
         {
-            Content.FadeColour(Color4.White, 500, Easing.OutQuint);
+            content.FadeColour(Color4.White, 500, Easing.OutQuint);
             FinishLoading?.Invoke();
         }
 
