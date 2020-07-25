@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Objects
         public virtual double StartTime
         {
             get => StartTimeBindable.Value;
-            set => StartTimeBindable.Value = value;
+            set => StartTimeBindable.Value = Math.Max(0, value);
         }
 
         public readonly BindableList<HitSampleInfo> SamplesBindable = new BindableList<HitSampleInfo>();
