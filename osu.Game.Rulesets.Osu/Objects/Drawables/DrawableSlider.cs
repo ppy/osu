@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -11,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
@@ -81,6 +83,42 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
+
+            Tracking.BindValueChanged(updateSlidingSample);
+        }
+
+        private SkinnableSound slidingSample;
+
+        protected override void LoadSamples()
+        {
+            base.LoadSamples();
+
+            slidingSample?.Expire();
+            slidingSample = null;
+
+            var firstSample = HitObject.Samples.FirstOrDefault();
+
+            if (firstSample != null)
+            {
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
+                clone.Name = "sliderslide";
+
+                AddInternal(slidingSample = new SkinnableSound(clone)
+                {
+                    Looping = true
+                });
+            }
+        }
+
+        private void updateSlidingSample(ValueChangedEvent<bool> tracking)
+        {
+            // note that samples will not start playing if exiting a seek operation in the middle of a slider.
+            // may be something we want to address at a later point, but not so easy to make happen right now
+            // (SkinnableSound would need to expose whether the sample is already playing and this logic would need to run in Update).
+            if (tracking.NewValue && ShouldPlaySamples)
+                slidingSample?.Play();
+            else
+                slidingSample?.Stop();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -155,6 +193,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.Update();
 
             Tracking.Value = Ball.Tracking;
+
+            if (Tracking.Value && slidingSample != null)
+                // keep the sliding sample playing at the current tracking position
+                slidingSample.Balance.Value = CalculateSamplePlaybackBalance(Ball.X / OsuPlayfield.BASE_SIZE.X);
 
             double completionProgress = Math.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 

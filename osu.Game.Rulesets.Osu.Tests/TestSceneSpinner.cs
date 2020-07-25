@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void testSingle(float circleSize, bool auto = false)
         {
-            var spinner = new Spinner { StartTime = Time.Current + 1000, EndTime = Time.Current + 4000 };
+            var spinner = new Spinner { StartTime = Time.Current + 2000, EndTime = Time.Current + 5000 };
 
             spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
 

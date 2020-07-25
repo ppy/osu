@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private UserPanel panel;
+        private UserGridPanel panel;
         private UserDropdown dropdown;
 
         /// <summary>
