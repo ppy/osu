@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             };
 
         [Test]
-        public void TestSpinnerDoesNotFail()
+        public void TestSpinnerDoesFail()
         {
             bool judged = false;
             AddStep("Setup judgements", () =>
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Player.ScoreProcessor.NewJudgement += b => judged = true;
             });
             AddUntilStep("swell judged", () => judged);
-            AddAssert("not failed", () => !Player.HasFailed);
+            AddAssert("failed", () => Player.HasFailed);
         }
     }
 }
