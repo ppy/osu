@@ -13,18 +13,18 @@ using osuTK;
 
 namespace osu.Game.Overlays.News.Displays
 {
-    public class FrontPageDisplay : CompositeDrawable
+    public class FrontPageDisplay : OverlayView<GetNewsResponse>
     {
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        protected override APIRequest<GetNewsResponse> CreateRequest() => new GetNewsRequest();
 
-        private readonly FillFlowContainer content;
-        private readonly ShowMoreButton showMore;
+        private FillFlowContainer content;
+        private ShowMoreButton showMore;
 
-        private GetNewsRequest request;
+        private GetNewsRequest olderPostsRequest;
         private Cursor lastCursor;
 
-        public FrontPageDisplay()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -60,32 +60,19 @@ namespace osu.Game.Overlays.News.Displays
                         {
                             Top = 15
                         },
-                        Action = fetchPage,
+                        Action = fetchOlderPosts,
                         Alpha = 0
                     }
                 }
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            fetchPage();
-        }
-
-        private void fetchPage()
-        {
-            request?.Cancel();
-
-            request = new GetNewsRequest(lastCursor);
-            request.Success += response => Schedule(() => createContent(response));
-            api.PerformAsync(request);
-        }
-
         private CancellationTokenSource cancellationToken;
 
-        private void createContent(GetNewsResponse response)
+        protected override void OnSuccess(GetNewsResponse response)
         {
+            cancellationToken?.Cancel();
+
             lastCursor = response.Cursor;
 
             var flow = new FillFlowContainer<NewsCard>
@@ -105,9 +92,18 @@ namespace osu.Game.Overlays.News.Displays
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
+        private void fetchOlderPosts()
+        {
+            olderPostsRequest?.Cancel();
+
+            olderPostsRequest = new GetNewsRequest(lastCursor);
+            olderPostsRequest.Success += response => Schedule(() => OnSuccess(response));
+            API.PerformAsync(olderPostsRequest);
+        }
+
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
+            olderPostsRequest?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
