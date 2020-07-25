@@ -15,6 +15,8 @@ namespace osu.Game.Overlays.News.Displays
 {
     public class FrontPageDisplay : OverlayView<GetNewsResponse>
     {
+        protected override bool PerformFetchOnApiStateChange => false;
+
         protected override APIRequest<GetNewsResponse> CreateRequest() => new GetNewsRequest();
 
         private FillFlowContainer content;
