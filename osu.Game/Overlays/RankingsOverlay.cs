@@ -92,7 +92,7 @@ namespace osu.Game.Overlays
                 if (scope.NewValue != RankingsScope.Performance)
                     lastRequested = null;
 
-                Scheduler.AddOnce(selectDisplayToLoad);
+                Scheduler.AddOnce(changeDisplay);
             });
         }
 
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        private void selectDisplayToLoad()
+        private void changeDisplay()
         {
             performanceDisplay = null;
             cancellationToken?.Cancel();
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            loadDisplayAsync(selectDisplay());
+            loadDisplayAsync(createDisplay());
         }
 
         private void loadDisplayAsync(Drawable display)
@@ -163,7 +163,7 @@ namespace osu.Game.Overlays
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
-        private Drawable selectDisplay()
+        private Drawable createDisplay()
         {
             switch (Scope.Value)
             {

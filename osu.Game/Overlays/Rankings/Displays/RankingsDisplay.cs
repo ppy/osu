@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Rankings.Displays
         /// <summary>
         /// Whether we should create content on request success.
         /// </summary>
-        protected virtual bool CreateContentOnSucess => true;
+        protected virtual bool CreateContentOnSuccess => true;
 
         private CancellationTokenSource cancellationToken;
         private Container content;
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Rankings.Displays
 
         protected override void OnSuccess(T response)
         {
-            if (CreateContentOnSucess)
+            if (CreateContentOnSuccess)
                 AddContentAsync(CreateContent(response));
         }
 
