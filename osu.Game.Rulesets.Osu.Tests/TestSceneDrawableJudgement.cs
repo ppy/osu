@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             showResult(HitResult.Great);
 
             AddUntilStep("judgements shown", () => this.ChildrenOfType<TestDrawableOsuJudgement>().Any());
+            AddAssert("judgement body immediately visible",
+                () => this.ChildrenOfType<TestDrawableOsuJudgement>().All(judgement => judgement.JudgementBody.Alpha == 1));
             AddAssert("hit lighting hidden",
                 () => this.ChildrenOfType<TestDrawableOsuJudgement>().All(judgement => judgement.Lighting.Alpha == 0));
         }
@@ -55,6 +57,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             showResult(HitResult.Great);
 
             AddUntilStep("judgements shown", () => this.ChildrenOfType<TestDrawableOsuJudgement>().Any());
+            AddAssert("judgement body not immediately visible",
+                () => this.ChildrenOfType<TestDrawableOsuJudgement>().All(judgement => judgement.JudgementBody.Alpha > 0 && judgement.JudgementBody.Alpha < 1));
             AddAssert("hit lighting shown",
                 () => this.ChildrenOfType<TestDrawableOsuJudgement>().All(judgement => judgement.Lighting.Alpha > 0));
         }
@@ -102,6 +106,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private class TestDrawableOsuJudgement : DrawableOsuJudgement
         {
             public new SkinnableSprite Lighting => base.Lighting;
+            public new Container JudgementBody => base.JudgementBody;
         }
     }
 }
