@@ -29,11 +29,6 @@ namespace osu.Game.Overlays.Rankings.Displays
             set => current.Current = value;
         }
 
-        /// <summary>
-        /// Whether we should create content on request success.
-        /// </summary>
-        protected virtual bool CreateContentOnSuccess => true;
-
         private CancellationTokenSource cancellationToken;
         private Container content;
 
@@ -91,11 +86,7 @@ namespace osu.Game.Overlays.Rankings.Displays
             base.PerformFetch();
         }
 
-        protected override void OnSuccess(T response)
-        {
-            if (CreateContentOnSuccess)
-                AddContentAsync(CreateContent(response));
-        }
+        protected override void OnSuccess(T response) => AddContentAsync(CreateContent(response));
 
         protected void AddContentAsync(Drawable contentToLoad)
         {

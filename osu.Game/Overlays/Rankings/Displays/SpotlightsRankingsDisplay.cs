@@ -26,8 +26,6 @@ namespace osu.Game.Overlays.Rankings.Displays
 
         private SpotlightSelector selector;
 
-        protected override bool CreateContentOnSuccess => false;
-
         protected override APIRequest<SpotlightsCollection> CreateRequest() => new GetSpotlightsRequest();
 
         protected override void LoadComplete()
@@ -40,7 +38,6 @@ namespace osu.Game.Overlays.Rankings.Displays
 
         protected override void OnSuccess(SpotlightsCollection response)
         {
-            base.OnSuccess(response);
             selector.Spotlights = response.Spotlights;
         }
 
