@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Bindable<Color4> lightingColour;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         public DrawableOsuJudgement(JudgementResult result, DrawableHitObject judgedObject)
             : base(result, judgedObject)
         {
@@ -30,18 +33,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
-            if (config.Get<bool>(OsuSetting.HitLighting))
+            AddInternal(Lighting = new SkinnableSprite("lighting")
             {
-                AddInternal(Lighting = new SkinnableSprite("lighting")
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Blending = BlendingParameters.Additive,
-                    Depth = float.MaxValue
-                });
-            }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Blending = BlendingParameters.Additive,
+                Depth = float.MaxValue,
+                Alpha = 0
+            });
         }
 
         public override void Apply(JudgementResult result, DrawableHitObject judgedObject)
@@ -61,19 +62,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             lightingColour?.UnbindAll();
 
-            if (Lighting != null)
-            {
-                Lighting.ResetAnimation();
+            Lighting.ResetAnimation();
 
-                if (JudgedObject != null)
-                {
-                    lightingColour = JudgedObject.AccentColour.GetBoundCopy();
-                    lightingColour.BindValueChanged(colour => Lighting.Colour = Result.Type == HitResult.Miss ? Color4.Transparent : colour.NewValue, true);
-                }
-                else
-                {
-                    Lighting.Colour = Color4.White;
-                }
+            if (JudgedObject != null)
+            {
+                lightingColour = JudgedObject.AccentColour.GetBoundCopy();
+                lightingColour.BindValueChanged(colour => Lighting.Colour = Result.Type == HitResult.Miss ? Color4.Transparent : colour.NewValue, true);
+            }
+            else
+            {
+                Lighting.Colour = Color4.White;
             }
         }
 
@@ -81,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void ApplyHitAnimations()
         {
-            if (Lighting != null)
+            if (config.Get<bool>(OsuSetting.HitLighting))
             {
                 JudgementBody.FadeIn().Delay(FadeInDuration).FadeOut(400);
 
