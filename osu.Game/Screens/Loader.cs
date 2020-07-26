@@ -93,18 +93,20 @@ namespace osu.Game.Screens
             }, _ =>
             {
                 AddInternal(spinner);
-                spinnerShow = Scheduler.AddDelayed(spinner.Show, 200);
+                spinnerShow = Scheduler.AddDelayed(spinner.Show, (200 + 300));
             });
 
             LoadComponentAsync(logoContainer = new Container
             {
+                Size = new Vector2(400),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Children = new Drawable[]
                 {
                     new Sprite
                     {
-                        Size = new Vector2(400),
+                        RelativeSizeAxes = Axes.Both,
+                        FillMode = FillMode.Fill,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = textures.Get("avatarlogo"),
@@ -113,7 +115,7 @@ namespace osu.Game.Screens
             }, _ => 
             {
                 AddInternal(logoContainer);
-                Scheduler.AddDelayed(logoContainer.Show, 0);
+                logoContainer.FadeInFromZero(300);
             });
 
             checkIfLoaded();
@@ -129,16 +131,19 @@ namespace osu.Game.Screens
 
             spinnerShow?.Cancel();
 
+            var logoFadeOutDelay = (textures.Get("avatarlogo") == null) ? 0 : 1500; //淡出前在屏幕上逗留的时间，如果没有则为D
+            var pushDelay = (logoFadeOutDelay == 0) ? 0 : (logoFadeOutDelay + LoadingSpinner.TRANSITION_DURATION); //推送下一个屏幕前的延时，若逗留时间为0则为0
+
+            logoContainer.Delay(logoFadeOutDelay).FadeOut(LoadingSpinner.TRANSITION_DURATION, Easing.OutQuint);
+
             if (spinner.State.Value == Visibility.Visible)
             {
                 spinner.Hide();
-                logoContainer.Delay(1000).FadeOut(LoadingSpinner.TRANSITION_DURATION, Easing.OutQuint);
-                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION + 1000);
+                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION + pushDelay);
             }
             else
             {
-                logoContainer.FadeTo(1).Then().Delay(1000).FadeOut(LoadingSpinner.TRANSITION_DURATION, Easing.OutQuint);
-                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION + 1000);
+                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION + pushDelay);
             }
         }
 
