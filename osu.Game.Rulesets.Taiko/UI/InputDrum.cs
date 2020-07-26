@@ -25,11 +25,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         private const float middle_split = 0.025f;
 
         [Cached]
-        private DrumSampleMapping sampleMapping;
+        private DrumSampleContainer sampleContainer;
 
         public InputDrum(ControlPointInfo controlPoints)
         {
-            sampleMapping = new DrumSampleMapping(controlPoints);
+            sampleContainer = new DrumSampleContainer(controlPoints);
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 }
             });
 
-            AddRangeInternal(sampleMapping.Sounds);
+            AddRangeInternal(sampleContainer.Sounds);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             private readonly Sprite centreHit;
 
             [Resolved]
-            private DrumSampleMapping sampleMappings { get; set; }
+            private DrumSampleContainer sampleContainer { get; set; }
 
             public TaikoHalfDrum(bool flipped)
             {
@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 Drawable target = null;
                 Drawable back = null;
 
-                var drumSample = sampleMappings.SampleAt(Time.Current);
+                var drumSample = sampleContainer.SampleAt(Time.Current);
 
                 if (action == CentreAction)
                 {
