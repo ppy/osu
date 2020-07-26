@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Drawable scaleContainer;
 
+        public override bool DisplayResult => false;
+
         public DrawableSliderRepeat(SliderRepeat sliderRepeat, DrawableSlider drawableSlider)
             : base(sliderRepeat)
         {
@@ -31,7 +33,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
-            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
             InternalChild = scaleContainer = new ReverseArrowPiece();

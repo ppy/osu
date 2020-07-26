@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
@@ -54,8 +55,18 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "生命值低时游戏区域泛红",
+                    Bindable = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "总是显示按键框",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "立体音效",
+                    Bindable = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
                 },
                 new SettingsEnumDropdown<ScoreMeterType>
                 {
@@ -68,6 +79,15 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Bindable = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
                 }
             };
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+            {
+                Add(new SettingsCheckbox
+                {
+                    LabelText = "在游戏时禁用Win键",
+                    Bindable = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
+                });
+            }
         }
     }
 }

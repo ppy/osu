@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         /// <param name="combo">The combo to be displayed.</param>
         /// <param name="isPerfect">Whether this is a perfect combo.</param>
         public ComboStatistic(int combo, bool isPerfect)
-            : base("连击", combo)
+            : base("最大连击", combo)
         {
             this.isPerfect = isPerfect;
         }

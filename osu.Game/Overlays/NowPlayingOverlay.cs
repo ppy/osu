@@ -70,9 +70,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            optUI = config.GetBindable<bool>(OsuSetting.OptUI);
+            optUI = config.GetBindable<bool>(MfSetting.OptUI);
             Children = new Drawable[]
             {
                 dragContainer = new DragContainer
@@ -264,7 +264,7 @@ namespace osu.Game.Overlays
                 // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
                 Task.Run(() =>
                 {
-                    if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
+                    if (beatmap?.Beatmap == null) // this is not needed if a placeholder exists
                     {
                         title.Text = @"什么东西都没有呢(´・ω・`)";
                         artist.Text = @"什么东西都没有呢(´・ω・`)";
@@ -288,7 +288,7 @@ namespace osu.Game.Overlays
                                     newBackground.MoveToX(0, 500, Easing.OutCubic);
                                     background.MoveToY(0, 500, Easing.OutCubic);
                                     break;
-                            
+
                                 case TrackChangeDirection.Prev:
                                     newBackground.Position = new Vector2(400, 0);
                                     newBackground.MoveToX(0, 500, Easing.OutCubic);

@@ -3,16 +3,13 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 using System;
 
 namespace osu.Game.Overlays.News
 {
     public class NewsHeader : BreadcrumbControlOverlayHeader
     {
-        private const string front_page_string = "frontpage";
-
-        private NewsHeaderTitle title;
+        private const string front_page_string = "首页";
 
         public readonly Bindable<string> Post = new Bindable<string>(null);
 
@@ -40,35 +37,24 @@ namespace osu.Game.Overlays.News
             {
                 TabControl.AddItem(e.NewValue);
                 Current.Value = e.NewValue;
-
-                title.IsReadingPost = true;
             }
             else
             {
                 Current.Value = front_page_string;
-                title.IsReadingPost = false;
             }
         }
 
         protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/news");
-        protected override ScreenTitle CreateTitle() => title = new NewsHeaderTitle();
 
-        private class NewsHeaderTitle : ScreenTitle
+        protected override OverlayTitle CreateTitle() => new NewsHeaderTitle();
+
+        private class NewsHeaderTitle : OverlayTitle
         {
-            private const string post_string = "post";
-
-            public bool IsReadingPost
-            {
-                set => Section = value ? post_string : front_page_string;
-            }
-
             public NewsHeaderTitle()
             {
-                Title = "news";
-                IsReadingPost = false;
+                Title = "新闻";
+                IconTexture = "Icons/news";
             }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/news");
         }
     }
 }

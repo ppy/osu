@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 
 namespace osu.Game.Audio
 {
@@ -25,12 +26,16 @@ namespace osu.Game.Audio
         public event Action Started;
 
         protected Track Track { get; private set; }
+        protected MfConfigManager mfConfig;
 
         private bool hasStarted;
 
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(MfConfigManager mfconfig)
         {
+            this.mfConfig = mfconfig;
+
             Track = GetTrack();
             if (Track != null)
                 Track.Completed += Stop;

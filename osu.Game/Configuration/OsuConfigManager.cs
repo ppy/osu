@@ -49,6 +49,7 @@ namespace osu.Game.Configuration
             };
 
             Set(OsuSetting.ExternalLinkWarning, true);
+            Set(OsuSetting.PreferNoVideo, false);
 
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
@@ -87,7 +88,10 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.ShowProgressGraph, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
+            Set(OsuSetting.FadePlayfieldWhenHealthLow, true);
             Set(OsuSetting.KeyOverlay, false);
+            Set(OsuSetting.PositionalHitSounds, true);
+            Set(OsuSetting.AlwaysPlayFirstComboBreak, true);
             Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
             Set(OsuSetting.FloatingComments, false);
@@ -95,6 +99,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
+            Set(OsuSetting.GameplayDisableWinKey, true);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -122,9 +127,15 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
 
-            //Optimize Settings
             Set(OsuSetting.OptUI, true);
             Set(OsuSetting.TrianglesEnabled, true);
+
+            Set(OsuSetting.MvisParticleAmount, 350, 0, 350);
+            Set(OsuSetting.MvisContentAlpha, 1f, 0f, 1f);
+            Set(OsuSetting.MvisBgBlur, 0.2f, 0f, 1f);
+            Set(OsuSetting.MvisEnableStoryboard, false);
+            Set(OsuSetting.MvisUseOsuLogoVisualisation, false);
+            Set(OsuSetting.MvisIdleBgDim, 0.3f, 0f, 1f);
         }
 
         public OsuConfigManager(Storage storage)
@@ -180,11 +191,14 @@ namespace osu.Game.Configuration
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
+        PositionalHitSounds,
+        AlwaysPlayFirstComboBreak,
         ScoreMeter,
         FloatingComments,
         ShowInterface,
         ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
+        FadePlayfieldWhenHealthLow,
         MouseDisableButtons,
         MouseDisableWheel,
         AudioOffset,
@@ -216,6 +230,7 @@ namespace osu.Game.Configuration
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
         ExternalLinkWarning,
+        PreferNoVideo,
         Scaling,
         ScalingPositionX,
         ScalingPositionY,
@@ -228,5 +243,12 @@ namespace osu.Game.Configuration
         MenuBackgroundSource,
         OptUI,
         TrianglesEnabled,
+        MvisParticleAmount,
+        MvisBgBlur,
+        MvisUseOsuLogoVisualisation,
+        MvisEnableStoryboard,
+        MvisIdleBgDim,
+        MvisContentAlpha,
+        GameplayDisableWinKey
     }
 }

@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.Solid.Poo,
+                    Icon = FontAwesome.Solid.Flask,
                     Size = new Vector2(icon_size),
                     Y = icon_y,
                 },
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Menu
 
                 if (e.NewValue.IsSupporter)
                 {
-                    supportFlow.AddText("永远感谢您支持osu!", format);
+                    supportFlow.AddText("感谢支持osu!", format);
                 }
                 else
                 {
@@ -207,6 +207,7 @@ namespace osu.Game.Screens.Menu
                 "看看多人游戏中的“时移”玩法，他具备房间排行榜和游玩列表的功能！",
                 "您可以在游戏中按Ctrl+F11来切换高级fps显示功能！",
                 "深入了解性能计数器，并使用Ctrl+F2启用详细的性能记录！",//本句机翻(*懒*)
+                "owo"
             };
 
             return tips[RNG.Next(0, tips.Length)];

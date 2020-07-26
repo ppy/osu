@@ -38,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Editors
             });
         }
 
-        protected override TeamRow CreateDrawable(TournamentTeam model) => new TeamRow(model);
+        protected override TeamRow CreateDrawable(TournamentTeam model) => new TeamRow(model, this);
 
         private void addAllCountries()
         {
@@ -63,7 +63,7 @@ namespace osu.Game.Tournament.Screens.Editors
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
 
-            public TeamRow(TournamentTeam team)
+            public TeamRow(TournamentTeam team, TournamentScreen parent)
             {
                 Model = team;
 
@@ -118,13 +118,13 @@ namespace osu.Game.Tournament.Screens.Editors
                             },
                             new SettingsTextBox
                             {
-                                LabelText = "种子",
+                                LabelText = "排名",
                                 Width = 0.2f,
                                 Bindable = Model.Seed
                             },
                             new SettingsSlider<int>
                             {
-                                LabelText = "去年的位置(Last Year Placement)",
+                                LabelText = "上次比赛中的排名",
                                 Width = 0.33f,
                                 Bindable = Model.LastYearPlacing
                             },
@@ -154,7 +154,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Text = "编辑选手介绍信息",
                                 Action = () =>
                                 {
-                                    sceneManager?.SetScreen(new SeedingEditorScreen(team));
+                                    sceneManager?.SetScreen(new SeedingEditorScreen(team, parent));
                                 }
                             },
                         }

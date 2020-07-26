@@ -7,8 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 
@@ -20,17 +18,19 @@ namespace osu.Game.Overlays.Profile
 
         public Bindable<User> User = new Bindable<User>();
 
-        private CentreHeaderContainer centreHeaderContainer;
+        //private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
 
         public ProfileHeader()
         {
+            ContentSidePadding = UserProfileOverlay.CONTENT_X_MARGIN;
+
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem("信息");
             TabControl.AddItem("摸图");
 
-            centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
+            detailHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
 
         protected override Drawable CreateBackground() =>
@@ -65,11 +65,6 @@ namespace osu.Game.Overlays.Profile
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
                 },
-                centreHeaderContainer = new CentreHeaderContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    User = { BindTarget = User },
-                },
                 detailHeaderContainer = new DetailHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -88,19 +83,17 @@ namespace osu.Game.Overlays.Profile
             }
         };
 
-        protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
+        protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
         private void updateDisplay(User user) => coverContainer.User = user;
 
-        private class ProfileHeaderTitle : ScreenTitle
+        private class ProfileHeaderTitle : OverlayTitle
         {
             public ProfileHeaderTitle()
             {
-                Title = "玩家";
-                Section = "信息";
+                Title = "玩家信息";
+                IconTexture = "Icons/profile";
             }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");
         }
     }
 }

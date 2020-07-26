@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -43,25 +42,34 @@ namespace osu.Game.Overlays.Dialog
             set => icon.Icon = value;
         }
 
-        private string text;
+        private string headerText;
 
         public string HeaderText
         {
-            get => text;
+            get => headerText;
             set
             {
-                if (text == value)
+                if (headerText == value)
                     return;
 
-                text = value;
-
+                headerText = value;
                 header.Text = value;
             }
         }
 
+        private string bodyText;
+
         public string BodyText
         {
-            set => body.Text = value;
+            get => bodyText;
+            set
+            {
+                if (bodyText == value)
+                    return;
+
+                bodyText = value;
+                body.Text = value;
+            }
         }
 
         public IEnumerable<PopupDialogButton> Buttons

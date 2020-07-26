@@ -13,10 +13,11 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "完美";
         public override string Acronym => "PF";
         public override IconUsage? Icon => OsuIcon.ModPerfect;
-        public override string Description => "不SS,便重试";
+        public override string Description => "不SS, 便重试";
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
-    => !(result.Judgement is IgnoreJudgement)
-       && result.Type != result.Judgement.MaxResult;
+            => !(result.Judgement is IgnoreJudgement)
+               && result.Judgement.AffectsCombo
+               && result.Type != result.Judgement.MaxResult;
     }
 }

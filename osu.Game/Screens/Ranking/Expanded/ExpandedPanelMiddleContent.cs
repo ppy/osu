@@ -4,11 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -35,6 +33,8 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         private RollingCounter<long> scoreCounter;
 
+        private const float padding = 10;
+
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelMiddleContent"/>.
         /// </summary>
@@ -46,14 +46,14 @@ namespace osu.Game.Screens.Ranking.Expanded
             RelativeSizeAxes = Axes.Both;
             Masking = true;
 
-            Padding = new MarginPadding { Vertical = 10, Horizontal = 10 };
+            Padding = new MarginPadding(padding);
         }
 
         [BackgroundDependencyLoader]
-        private void load(Bindable<WorkingBeatmap> working)
+        private void load()
         {
-            var beatmap = working.Value.BeatmapInfo;
-            var metadata = beatmap.Metadata;
+            var beatmap = score.Beatmap;
+            var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             var creator = metadata.Author?.Username;
 
             var topStatistics = new List<StatisticDisplay>
@@ -92,13 +92,17 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Origin = Anchor.TopCentre,
                                 Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
+                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                                Truncate = true,
                             },
                             new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
-                                Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold)
+                                Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
+                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                                Truncate = true,
                             },
                             new Container
                             {
@@ -152,7 +156,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Text = beatmap.Version,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
                                     },
-                                    new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
+                                    new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 16))
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
@@ -171,7 +175,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
-                                        Text = $"于 {score.Date.ToLocalTime():g} 游玩"
+                                        Text = $"于 {score.Date.ToLocalTime():d MMMM yyyy HH:mm} 游玩"
                                     }
                                 }
                             },
@@ -182,7 +186,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 5),
+                        Spacing = new Vector2(0, 2.5f),
                         Children = new Drawable[]
                         {
                             new GridContainer

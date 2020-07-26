@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                         summary = new OsuSpriteText
                         {
                             Text = "0 人参与",
-                            Font = OsuFont.GetFont(size: 14)
+                            Font = OsuFont.GetFont(size: 16)
                         }
                     },
                 },

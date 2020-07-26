@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -13,6 +14,8 @@ namespace osu.Game.Screens.Ranking
 {
     public class ReplayDownloadButton : DownloadTrackingComposite<ScoreInfo, ScoreManager>
     {
+        public Bindable<ScoreInfo> Score => Model;
+
         private DownloadButton button;
         private ShakeContainer shakeContainer;
 
@@ -23,7 +26,7 @@ namespace osu.Game.Screens.Ranking
                 if (State.Value == DownloadState.LocallyAvailable)
                     return ReplayAvailability.Local;
 
-                if (!string.IsNullOrEmpty(Model.Value.Hash))
+                if (!string.IsNullOrEmpty(Model.Value?.Hash))
                     return ReplayAvailability.Online;
 
                 return ReplayAvailability.NotAvailable;
@@ -53,11 +56,11 @@ namespace osu.Game.Screens.Ranking
                 switch (State.Value)
                 {
                     case DownloadState.LocallyAvailable:
-                        game?.PresentScore(Model.Value);
+                        game?.PresentScore(Model.Value, ScorePresentType.Gameplay);
                         break;
 
                     case DownloadState.NotDownloaded:
-                        scores.Download(Model.Value);
+                        scores.Download(Model.Value, false);
                         break;
 
                     case DownloadState.Downloaded:

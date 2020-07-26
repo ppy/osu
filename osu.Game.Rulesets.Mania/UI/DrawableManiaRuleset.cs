@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -21,7 +23,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -48,6 +49,10 @@ namespace osu.Game.Rulesets.Mania.UI
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
+        private readonly Bindable<double> configTimeRange = new BindableDouble();
+
+        // Stores the current speed adjustment active in gameplay.
+        private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
 
         public DrawableManiaRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
@@ -58,6 +63,9 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load()
         {
+            foreach (var mod in Mods.OfType<IApplicableToTrack>())
+                mod.ApplyToTrack(speedAdjustmentTrack);
+
             bool isForCurrentRuleset = Beatmap.BeatmapInfo.Ruleset.Equals(Ruleset.RulesetInfo);
 
             foreach (var p in ControlPoints)
@@ -76,7 +84,7 @@ namespace osu.Game.Rulesets.Mania.UI
             Config.BindWith(ManiaRulesetSetting.ScrollDirection, configDirection);
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
-            Config.BindWith(ManiaRulesetSetting.ScrollTime, TimeRange);
+            Config.BindWith(ManiaRulesetSetting.ScrollTime, configTimeRange);
         }
 
         protected override void AdjustScrollSpeed(int amount)
@@ -86,16 +94,18 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private double relativeTimeRange
         {
-            get => MAX_TIME_RANGE / TimeRange.Value;
-            set => TimeRange.Value = MAX_TIME_RANGE / value;
+            get => MAX_TIME_RANGE / configTimeRange.Value;
+            set => configTimeRange.Value = MAX_TIME_RANGE / value;
         }
 
-        /// <summary>
-        /// Retrieves the column that intersects a screen-space position.
-        /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
-        public Column GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
+        protected override void Update()
+        {
+            base.Update();
+
+            updateTimeRange();
+        }
+
+        private void updateTimeRange() => TimeRange.Value = configTimeRange.Value * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value;
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
 

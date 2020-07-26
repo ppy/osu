@@ -9,6 +9,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Settings;
@@ -25,7 +26,18 @@ namespace osu.Game.Tournament.Screens.Editors
 
         private FillFlowContainer<TDrawable> flow;
 
+        [Resolved(canBeNull: true)]
+        private TournamentSceneManager sceneManager { get; set; }
+
         protected ControlPanel ControlPanel;
+
+        private readonly TournamentScreen parentScreen;
+        private BackButton backButton;
+
+        protected TournamentEditorScreen(TournamentScreen parentScreen = null)
+        {
+            this.parentScreen = parentScreen;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -47,7 +59,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(20)
+                        Spacing = new Vector2(20),
                     },
                 },
                 ControlPanel = new ControlPanel
@@ -57,18 +69,31 @@ namespace osu.Game.Tournament.Screens.Editors
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "添加新的",
+                            Text = "添加新的项目",
                             Action = () => Storage.Add(new TModel())
                         },
                         new DangerousSettingsButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "删除所有",
+                            Text = "删除所有项目",
                             Action = Storage.Clear
                         },
                     }
                 }
             });
+
+            if (parentScreen != null)
+            {
+                AddInternal(backButton = new BackButton
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    State = { Value = Visibility.Visible },
+                    Action = () => sceneManager?.SetScreen(parentScreen.GetType())
+                });
+
+                flow.Padding = new MarginPadding { Bottom = backButton.Height * 2 };
+            }
 
             Storage.CollectionChanged += (_, args) =>
             {

@@ -16,9 +16,9 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(CustomMenuOverlay custommenu)
+        private void load(MfMenuOverlay mfoverlay)
         {
-            StateContainer = custommenu;
+            StateContainer = mfoverlay;
         }
     }
 }

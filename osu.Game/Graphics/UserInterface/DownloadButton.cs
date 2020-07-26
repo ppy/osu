@@ -63,16 +63,19 @@ namespace osu.Game.Graphics.UserInterface
                     background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
                     icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
+                    TooltipText = "下载";
                     break;
 
                 case DownloadState.Downloading:
                     background.FadeColour(colours.Blue, 500, Easing.InOutExpo);
                     icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
+                    TooltipText = "下载中...";
                     break;
 
                 case DownloadState.Downloaded:
                     background.FadeColour(colours.Yellow, 500, Easing.InOutExpo);
+                    TooltipText = "导入中";
                     break;
 
                 case DownloadState.LocallyAvailable:

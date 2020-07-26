@@ -78,13 +78,13 @@ namespace osu.Game.Online.Chat
                 {
                     result.Text = result.Text.Remove(index, m.Length).Insert(index, displayText);
 
-                    //since we just changed the line display text, offset any already processed links.
+                    // since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
                     var details = GetLinkDetails(linkText);
                     result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.Action, details.Argument));
 
-                    //adjust the offset for processing the current matches group.
+                    // adjust the offset for processing the current matches group.
                     captureOffset += m.Length - displayText.Length;
                 }
             }
@@ -131,6 +131,9 @@ namespace osu.Game.Online.Chat
                             case "beatmapsets":
                             case "d":
                                 return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
+
+                            case "ss":
+                                return new LinkDetails(LinkAction.OpenPictureURL, url );
 
                             case "u":
                             case "users":
@@ -279,7 +282,8 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
-        Custom
+        Custom,
+        OpenPictureURL
     }
 
     public class Link : IComparable<Link>

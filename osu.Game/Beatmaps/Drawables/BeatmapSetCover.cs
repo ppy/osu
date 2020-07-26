@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Configuration;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -24,22 +25,45 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures)
+        private void load(LargeTextureStore textures, MfConfigManager mfconfig)
         {
             string resource = null;
 
-            switch (type)
+            switch (mfconfig.Get<bool>(MfSetting.UseSayobot))
             {
-                case BeatmapSetCoverType.Cover:
-                    resource = set.OnlineInfo.Covers.Cover;
+                case true:
+                    switch (type)
+                    {
+                        case BeatmapSetCoverType.Cover:
+                            resource = $"https://a.sayobot.cn/beatmaps/{set?.OnlineBeatmapSetID}/covers/cover.jpg";
+                            break;
+
+                        case BeatmapSetCoverType.Card:
+                            resource = $"https://a.sayobot.cn/beatmaps/{set?.OnlineBeatmapSetID}/covers/cover.jpg";
+                            break;
+
+                        case BeatmapSetCoverType.List:
+                            resource = $"https://a.sayobot.cn/beatmaps/{set?.OnlineBeatmapSetID}/covers/cover.jpg";
+                            break;
+                    }
                     break;
 
-                case BeatmapSetCoverType.Card:
-                    resource = set.OnlineInfo.Covers.Card;
-                    break;
+                case false:
+                default:
+                    switch (type)
+                    {
+                        case BeatmapSetCoverType.Cover:
+                            resource = set.OnlineInfo.Covers.Cover;
+                            break;
 
-                case BeatmapSetCoverType.List:
-                    resource = set.OnlineInfo.Covers.List;
+                        case BeatmapSetCoverType.Card:
+                            resource = set.OnlineInfo.Covers.Card;
+                            break;
+
+                        case BeatmapSetCoverType.List:
+                            resource = set.OnlineInfo.Covers.List;
+                            break;
+                    }
                     break;
             }
 

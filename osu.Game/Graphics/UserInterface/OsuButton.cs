@@ -31,6 +31,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public FontUsage Font
+        {
+            get => SpriteText.Font;
+            set => SpriteText.Font = value;
+        }
+
         private Color4? backgroundColour;
 
         public Color4 BackgroundColour
@@ -140,7 +146,6 @@ namespace osu.Game.Graphics.UserInterface
             Depth = -1,
             Origin = Anchor.Centre,
             Anchor = Anchor.Centre,
-            Font = OsuFont.GetFont(weight: FontWeight.Bold)
         };
 
         private void enabledChanged(ValueChangedEvent<bool> e)

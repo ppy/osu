@@ -73,8 +73,7 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader(true)]
         private void load(ChannelManager manager)
         {
-            if (ChannelManager == null)
-                ChannelManager = manager;
+            ChannelManager ??= manager;
         }
 
         protected virtual StandAloneDrawableChannel CreateDrawableChannel(Channel channel) =>

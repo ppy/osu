@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModSuddenDeath : Mod, IApplicableToHealthProcessor, IApplicableFailOverride
     {
-        public override string Name => "无伤";
+        public override string Name => "全连";
         public override string Acronym => "SD";
         public override IconUsage? Icon => OsuIcon.ModSuddendeath;
         public override ModType Type => ModType.DifficultyIncrease;
@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
 
-        public bool AllowFail => true;
+        public bool PerformFail() => true;
+
         public bool RestartOnFail => true;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)

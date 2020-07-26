@@ -15,6 +15,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,16 +26,22 @@ namespace osu.Game.Tournament.Screens
         private FillFlowContainer fillFlow;
 
         private LoginOverlay loginOverlay;
-        private ActionableInfo resolution;
+        private ResolutionSelector resolution;
 
         [Resolved]
         private MatchIPCInfo ipc { get; set; }
+
+        [Resolved]
+        private StableInfo stableInfo { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private TournamentSceneManager sceneManager { get; set; }
 
         private Bindable<Size> windowSize;
 
@@ -53,6 +60,7 @@ namespace osu.Game.Tournament.Screens
             };
 
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
+            stableInfo.OnStableInfoSaved += () => Schedule(reload);
             reload();
         }
 
@@ -62,21 +70,16 @@ namespace osu.Game.Tournament.Screens
         private void reload()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
-
             fillFlow.Children = new Drawable[]
             {
                 new ActionableInfo
                 {
                     Label = "当前的IPC源",
-                    ButtonText = "刷新",
-                    Action = () =>
-                    {
-                        fileBasedIpc?.LocateStableStorage();
-                        reload();
-                    },
-                    Value = fileBasedIpc?.Storage?.GetFullPath(string.Empty) ?? "未找到",
-                    Failing = fileBasedIpc?.Storage == null,
-                    Description = "将使用osu！stable安装目录作为IPC的数据源。 如果找不到源，请确保在osu!stable的最新cutting-edge中创建了一个空的ipc.txt，并将其注册为默认的osu！安装目录。"
+                    ButtonText = "更改",
+                    Action = () => sceneManager?.SetScreen(new StablePathSelectScreen()),
+                    Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "未找到",
+                    Failing = fileBasedIpc?.IPCStorage == null,
+                    Description = "将使用osu！stable安装目录作为IPC的数据源。 如果没找到，请确保在osu!stable的最新cutting-edge中创建了一个空的ipc.txt，并将其设置为默认的osu！安装目录。"
                 },
                 new ActionableInfo
                 {
@@ -108,17 +111,19 @@ namespace osu.Game.Tournament.Screens
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },
-                resolution = new ActionableInfo
+                resolution = new ResolutionSelector
                 {
                     Label = "推流区分辨率",
-                    ButtonText = "设置为1080p",
-                    Action = () =>
+                    ButtonText = "设置高度",
+                    Action = height =>
                     {
-                        windowSize.Value = new Size((int)(1920 / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), 1080);
+                        windowSize.Value = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
                     }
                 },
             };
         }
+
+        private const float aspect_ratio = 16f / 9f;
 
         protected override void Update()
         {
@@ -174,6 +179,7 @@ namespace osu.Game.Tournament.Screens
             public Action Action;
 
             private TournamentSpriteText valueText;
+            protected FillFlowContainer FlowContainer;
 
             protected override Drawable CreateComponent() => new Container
             {
@@ -186,15 +192,67 @@ namespace osu.Game.Tournament.Screens
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },
-                    button = new TriangleButton
+                    FlowContainer = new FillFlowContainer
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Size = new Vector2(100, 30),
-                        Action = () => Action?.Invoke()
-                    },
+                        AutoSizeAxes = Axes.Both,
+                        Spacing = new Vector2(10, 0),
+                        Children = new Drawable[]
+                        {
+                            button = new TriangleButton
+                            {
+                                Size = new Vector2(100, 40),
+                                Action = () => Action?.Invoke()
+                            }
+                        }
+                    }
                 }
             };
+        }
+
+        private class ResolutionSelector : ActionableInfo
+        {
+            private const int minimum_window_height = 480;
+            private const int maximum_window_height = 2160;
+
+            public new Action<int> Action;
+
+            private OsuNumberBox numberBox;
+
+            protected override Drawable CreateComponent()
+            {
+                var drawable = base.CreateComponent();
+                FlowContainer.Insert(-1, numberBox = new OsuNumberBox
+                {
+                    Text = "1080",
+                    Width = 100
+                });
+
+                base.Action = () =>
+                {
+                    if (string.IsNullOrEmpty(numberBox.Text))
+                        return;
+
+                    // box contains text
+                    if (!int.TryParse(numberBox.Text, out var number))
+                    {
+                        // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
+                        // so clamp to max allowed value
+                        number = maximum_window_height;
+                    }
+                    else
+                    {
+                        number = Math.Clamp(number, minimum_window_height, maximum_window_height);
+                    }
+
+                    // in case number got clamped, reset number in numberBox
+                    numberBox.Text = number.ToString();
+
+                    Action?.Invoke(number);
+                };
+                return drawable;
+            }
         }
     }
 }

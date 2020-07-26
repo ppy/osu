@@ -380,3 +380,312 @@
 *   翻译改进
     *   RankArchived: "达成的排名" -> "取得的成绩"
 *   更新framework至2020.407.0以修复storyboard尺寸问题
+
+### 2020/04/08
+*   合并上游pr
+    *   [m] [Fix legacy skin texture fallback logic #8669]
+    *   [m] [Increase size of default osu!mania skin's keys to allow clearance with HUD #8674]
+    *   [m] [Fix dragging tournament ladder too far causing it to disappear #8673]
+    *   [m] [Add osu!taiko drum skinning support #8598]
+
+### 2020/04/09
+*   合并上游pr
+    *   [m] [!未合并tests] [Fix TestSceneColumn columns not getting a width #8679]
+    *   [m] [Fix slider ball and follow circle blending for legacy skins #8680]
+    *   [m] [!未合并tests] [Fix osu!taiko input drum alignment for old skin versions #8681]
+    *   [m] [!未合并tests] [Fix hidden notes due to 0 minimum width #8677]
+    *   [m] [Add top rank to the beatmap carousel #7639]
+    *   [m] [Don't allow new transformations for reverse arrow after it's hit #8626]
+    *   [m] [Implement mania stage bottom/left/right images #8676]
+    *   [m] [Update overlay header elements to match osu-web #8454]
+
+*   翻译调整
+*   界面bug修复
+
+### 2020/04/11
+*   合并上游pr
+    *   [m] [Fix possible legacy beatmap encoder nullref #8694]
+    *   [m] [Fix crash when trying to edit long beatmaps #8695]
+    *   [m] [!未合并tests] [Cleanup handling of hitobject updates #8693]
+    *   [m] [!未合并tests] [Fix EditorBeatmap potentially not updating hitobjects #8703]
+
+### 2020/04/12
+*   合并上游pr
+    *   [m] [Update framework #8712]
+    *   [m] [!未合并tests] [Block out-of-order judgements from occurring (aka "note lock") #8337]
+
+*   使[OsuButton](osu.Game/Graphics/UserInterface/OsuButton.cs)可以使用自定义字体大小
+*   多人联机按钮细节修改
+*   缓解了多人联机房间列表的对齐问题
+
+### 2020/04/13
+*   合并上游pr
+    *   [m] [Remove unused changelog comments class #8733]
+    *   [m] [Make beatmap info overlay present selected difficulty #8731]
+    *   [m] [Implement OverlayScrollContainer component #8471]
+    *   [m] [Add stereo shifted hitsound playback support #8699]
+    *   [m] [Bump BenchmarkDotNet from 0.12.0 to 0.12.1 #8739]
+    *   [m] [Add undo/redo support to the Editor #8696]
+    *   [m] [Add basic taiko "hit" skinning support #8711]
+    *   [m] [Fix connections hidden due to overlapping controlpoints #8737]
+    *   [m] [Add change state support to more Editor components #8697]
+    *   [m] [Use OverlayScrollContainer for overlays #8740]
+    *   [m] [Limit upper number of editor beatmap states saved to 50 #8741]
+    *   [m] [Rework slider control point placement to improve path progression #8736]
+
+*   Mf自定义UI
+    *   新增 : 优化歌曲加载界面效果
+        *   **!!! 需要想办法让`LogoTrackingContainer`在`bg`不可见时追踪他 !!!**
+        *   更新 : 使`LogoTrackContainer`不再瞬移
+
+*   翻译文本优化
+
+### 2020/4/14
+*   `Triangles`兼容性修复
+*   修复`Triangles`在未给定`IgnoreSettings`时透明度不正确的问题
+*   修复`三角形粒子动画`设置无效的问题
+*   继续调整歌曲加载界面动画
+
+
+*   合并上游pr
+    *   [m] [Fix scoring in classic mode not awarding exact numerical value for judgement #8750]
+    *   [m] [Implement "prefer no-video" option #8716]
+    *   [m] [Fix beatmap background not displaying when video is present #8751]
+    *   [m] [Add support for testing arbitrary API requests/responses via Dummy API #8714]
+    *   [m] [Make beatmap carousel select recommended difficulties #8444]
+    *   [m] [Fade playfield to red when player health is low #8312]
+
+*   暂不合并
+    *   [m] [Mark dummy api test scene as headless #8752]
+
+### 2020/4/15
+*   继续调整动画
+*   翻译补全
+
+*   合并上游pr
+    *   [m] [Fix typo in DrawableTaikoHitObject #8761]
+    *   [m] [Fix osu!mania replays actuating incorrect keys when multiple stages are involved #8755]
+
+### 2020/4/17
+*   合并上游pr
+    *   [m] [Fix 0 custom sample bank not falling back to user skin #8756]
+    *   [m] [Hide edit context menu item in multiplayer song select #8768]
+    *   [m] [Disable undo/redo menu items when they can't be performed #8764]
+    *   [o] [Replace SocialOverlay with DashboardOverlay #8771]
+        *   #8051 -> #8771
+*   **添加了Mvis播放器界面**
+
+### 2020/4/18
+*   合并上游pr
+    *   [m] [Update framework #8781]
+    *   [m] [Adjust TimingControlPoint equivalency #8672]
+*   使Mvis播放器可以通过Enter键将当前播放的谱面于歌曲选择中显示
+
+### 2020/4/19
+*   合并上游pr
+    *   [o] [Fix hard crash in editor on legacy modes without encoder implementation #8788]
+
+*   修复了在Mvis播放器界面导入并查看谱面会导致游戏崩溃的问题
+
+### 2020/4/20
+*   合并上游pr
+    *   [m] [Add support for custom hyper-dash legacy fruit colouring #8446]
+    *   [m] [Fix slider heads not being blocked when hit out-of-order #8777]
+    *   [m] [Fix typo in exception #8808]
+    *   [m] [Fix DatabasedKeyBindingContainer not using defaults for non-databased ruleset #8806]
+    *   [m] [Add /np (now playing) command support in chat #8801]
+    *   [m] [Fix hard crash in editor on legacy modes without encoder implementation #8788]
+    *   [m] [Fix presenting new ruleset and beatmap at once causing wedge display desync #8779]
+
+### 2020/4/21
+*   合并上游pr
+    *   [m] [Bump Humanizer from 2.7.9 to 2.8.2 #8811]
+    *   [m] [Fix spinners being considered the "first object" for increased visibility in hidden #8769]
+    *   [m] [Replace SocialOverlay with DashboardOverlay #8771]
+    *   [m] [Fix inline executions of APIRequest.Perform not getting result populated early enough #8810]
+    *   [m] [Let beatmap carousel scroll to screen middle #8728]
+    *   [m] [Allow 10k to be played on a single stage #8809]
+    *   [m] [Add taiko drumroll skinning support #8766]
+    *   [m] [Fix results screen pushed after rewinding in-between push delay #8800]
+    *   [m] [Don't serialise AllControlPoints #8814]
+    *   [m] [Fix carousel not correctly updating when selection changes to a new beatmap from a child screen #8772]
+    *   [m] [Fix control point overriding working incorrectly #8815]
+    *   [m] [Implement sorting by genre and language in BeatmapListingOverlay #7924]
+    *   [m] [Implement ColumnLineWidth skinning #8822]
+    *   [m] [Fix relax replays playing back incorrectly #8819]
+    *   [m] [Fix BeatmapListingOverlay not taking focus #8820]
+    *   [m] [Add support for taiko hit target skinning #8824]
+    *   [m] [Replace direct overlay with new beatmaplisting overlay #8821]
+    *   [m] [Update framework #8825]
+
+*   实现了Mvis播放器的键位绑定、单曲循环、锁定以及在选歌界面中查看歌曲的功能
+
+### 2020/4/22
+*   合并上游pr
+    *   [m] [Fix beatmap string output having empty brackets when pieces are missing #8828]
+    *   [m] [Fix beatmap encoder by enabling untested test cases #8818]
+    *   [m] [Load user rulesets from the game data directory #8607]
+    *   [m] [Add static internal catcher calculation methods for CatchDifficultyCalculator #8830]
+    *   [m] [Use platform bindings for editor actions #8832]
+    *   [m] [Remove obsolete nested hitobject methods #8833]
+
+### 2020/4/24
+*   合并上游pr
+    *   [m] [Fix editor crashing when entering with no beatmap selected #8856]
+    *   [m] [Make osu! ruleset placements happen on mouse down #8842]
+    *   [m] [Fix mania editor placement not working correctly #8843]
+    *   [m] [Rename editor tests namespace from "Editor" to "Editing" #8849]
+    *   [m] [Fix TestBeatmap not setting appropriate ruleset ID #8834]
+    *   [m] [Implement legacy beatmap encoding for all rulesets #8823]
+
+*   更新readme
+
+### 2020/4/25
+*   合并上游pr
+    *   [m] [Fix crash on switching comments page at an inopportune time #8858]
+    *   [m] [Refactor osu!taiko playfield and add background skinning support #8846]
+    *   [m] [Fix null reference while hiding toolbar on tests #8862]
+
+*   翻译改进
+*   关于界面代码优化
+
+### 2020/4/27
+*   合并上游pr
+    *   [m] [Fix ruleset selector not receiving key input on toolbar absence #8863]
+    *   [m] [Fix custom rulesets not showing correct icons in key binding settings #8864]
+    *   [m] [Add background video for the Showcase Scene to the tournament client #8859]
+    *   [m] [Adjust editor timeline current marker to promote tick visibility #8873]
+    *   [m] [Add osu!taiko bar line skinning support #8848]
+
+### 2020/4/28
+*   合并上游pr
+    *   [m] [Show visual feedback for taiko drumrolls #8675]
+    *   [m] [Bump ppy.osu.Game.Resources from 2020.412.0 to 2020.427.0 #8875]
+    *   [m] [Bump Microsoft.NET.Test.Sdk from 16.5.0 to 16.6.1 #8874]
+    *   [m] [Fix taiko hit target alpha on legacy skins #8876]
+    *   [m] [Add taiko hit explosion skinning support #8877]
+    *   [m] [Fix score multiplier being cut off in mod select at higher ui scales #8860]
+    *   [m] [Avoid calls on MusicController executing before it may have finished loading #8881]
+
+### 2020/4/29
+*   合并上游pr
+    *   [m] [Reduce database includes where possible #8889]
+    *   [m] [Avoid using internal EF methods in tests #8883]
+    *   [m] [Fix speed adjustment mods affecting mania scroll speed #8887]
+    *   [m] [Fix mania selection blueprints not moving/moving incorrectly #8886]
+    *   [m] [Change taiko hit explosion animation to match stable for skins #8896]
+    *   [m] [Further improve beatmap carousel load performance by avoiding incorrect query construction #8895]
+    *   [m] [Reduce initial channel load overhead by only loading history on active channel #8893]
+
+### 2020/5/1
+*   合并上游pr
+    *   [m] [Move taiko additive blending locally to avoid applying to legacy skins #8901]
+    *   [m] [Allow closing the game during intro #8905]
+    *   [m] [Add kiai support to osu!taiko skinned playfields #8910]
+    *   [m] [Fix skinned taiko hit explosions not being removed on rewind #8909]
+    *   [m] [Fix mania crashing on undo/redo #8913]
+    *   [m] [Show loading spinner when carousel is not ready to be displayed #8903]
+    *   [m] [Fix undo/redo behaving poorly with simultaneous objects #8914]
+    *   [m] [Use DisplayModes rather than AvailableResolutions #8623]
+
+### 2020/5/3
+*   合并上游pr
+    *   [m] [Truncate beatmap title and artist on score panel #8919]
+    *   [m] [Update framework #8925]
+    *   [m] [Add local beatmap lookup cache to improve performance of imports #8924]
+
+### 2020/5/5
+*   合并上游pr
+    *   [m] [Implement period-tracking component #8701]
+    *   [m] [Fix song select tests potentially failing due to difficulty panels not yet displayed #8932]
+    *   [m] [Fix hard crash when changing ruleset while presenting a score #8933]
+    *   [m] [Bump Humanizer from 2.8.2 to 2.8.11 #8939]
+    *   [m] [Bump Microsoft.CodeAnalysis.FxCopAnalyzers from 2.9.8 to 3.0.0 #8937]
+    *   [m] [Bump Microsoft.CodeAnalysis.BannedApiAnalyzers from 2.9.8 to 3.0.0 #8938]
+
+*   暂不合并
+    *   [m] [Fix typo and add spaces to comments #8944]
+
+### 2020/5/8
+*   合并上游pr
+    *   [m] [Implement Sorcerer's osu!catch difficulty calculation adjustments #8934]
+    *   [m] [Fix date tooltip not showing in 24-hour format #8960]
+    *   [m] [Add support for 3v3 tournament chroma key layout #8961]
+    *   [m] [Fix catch crashing when finishing maps #8959]
+    *   [m] [Fix potential nullref in song select filtering #8958]
+    *   [m] [Update framework #8966]
+    *   [m] [Commit autogenerated rider VCS settings update #8968]
+    *   [m] [Revert "Commit autogenerated rider VCS settings update" #8971]
+    *   [m] [Fix android usage of obsoleted VersionCode #8970]
+    *   [m] [Update framework #8969]
+
+### 2020/5/9
+*   合并上游pr
+    *   [m] [Fix loading a ruleset with a new version specification causing a crash #8972]
+
+### 2020/5/10
+*   合并上游pr
+    *   [m] [Check local availability of beatmap before disabling download buttons #8980]
+    *   [m] [Fix null reference causing hard freeze if game is forcefully closed during disclaimer #8982]
+*   [Mvis播放器] 在不启用故事版时换图将不再加载故事版直到故事版被启用
+
+### 2020/5/12
+*   合并上游pr
+    *   [m] [Fix hold note selection pieces disappearing on movement #8973]
+    *   [m] [Add ability for a ruleset to disable gameplay overlays from displaying #8945]
+    *   [m] [Add taiko scroller #8920]
+    *   [m] [Add basic custom data directory support #8935]
+    *   [m] [Don't timeout on long beatmap load when debugging #8988]
+    *   [m] [Fix hardrock potentially taking a long time to load #8990]
+    *   [m] [Fix taiko sample mapping for strong hits #8989]
+    *   [m] [Refactor beatmap encoder test to be a bit easier to understand #8993]
+    *   [m] [Implement midi keybindings #8986]
+    *   [m] [Fix version-dependent skin elements looking incorrect when beatmap skins are enabled #9000]
+    *   [m] [Fix null reference in difficulty recommender #9001]
+
+### 2020/5/14
+*   合并上游pr
+    *   [m] [Use strongly-typed JsonConverter #8981]
+    *   [m] [Use CacheAs for caching game-wide components #9002]
+    *   [m] [Fix crashes when pressing right-click while placing hold notes #9009]
+    *   [m] [Storage directory migration support #8962]
+    *   [m] [Add support for custom hyper-dash catcher colouring #8448]
+    *   [m] [Add taiko mascot display for legacy skins #8857]
+    *   [m] [Add a basic directory chooser component #9011]
+    *   [o] [Add ability to change data folder path #9020]
+
+### 2020/5/15
+*   合并上游pr
+    *   [m] [不完全合并] [Add test for osu!catch skin configuration colour decoding #8622]
+    *   [m] [BeatmapListingOverlay auto-pagination reimplementation #8999]
+    *   [m] [Fix taiko scroller not correctly adhering to gameplay time movement #9003]
+    *   [m] [Reposition taiko playfield closer to top of screen #9005]
+    *   [m] [Fix mod failure checks executing actual game logic #9007]
+    *   [m] [Use unique video in map pool scene of tournament client #9024]
+    *   [m] [Fix mute button falling off the screen when UI scaling is used #9029]
+    *   [m] [Add more safeties to storage migration #9027]
+    *   [m] [Fix applied platform/user offsets being incorrect when rate adjust mods are active #9036]
+
+*   更新上游pr
+    *   [m] [Add ability to change data folder path #9020]
+
+### 2020/5/18
+*   合并上游pr
+    *   [m] [Remove all RequiredTypes usages #9042]
+    *   [m] [Avoid disabling a host-level bindable from osu! code #9031]
+    *   [m] [Add a back button to sub screens in the Tournament Client #9041]
+    *   [m] [Update framework #9052]
+    *   [m] [Disallow catch-specific judgements in mania #9048]
+
+### 2020/5/19
+*   合并上游pr
+    *   [m] [Fix possible exceptions in performance calculators #9053]
+    *   [m] [Fix overlay section display highlighting wrong section #9023]
+    *   [m] [Unify number types in performance calculators #9055]
+    *   [m] [Fix being able to press enter to create matches #9061]
+    *   [m] [Allow disabling SkipOverlay through AllowGameplayOverlays. #9018]
+
+
+### 2020/5/21
+*   合并上游pr
+    *   [m] [Convert dangerous events to IBindables #9062]

@@ -15,6 +15,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.States;
 using osu.Game.Audio;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -35,10 +36,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
 
-        private Drawable outline;
+        private Drawable content;
+
+        private OsuSpriteText selectionDetailsText;
 
         [Resolved(CanBeNull = true)]
-        private EditorBeatmap editorBeatmap { get; set; }
+        protected EditorBeatmap EditorBeatmap { get; private set; }
+
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
 
         public SelectionHandler()
         {
@@ -52,16 +58,42 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InternalChild = outline = new Container
+            InternalChild = content = new Container
             {
-                Masking = true,
-                BorderThickness = BORDER_RADIUS,
-                BorderColour = colours.Yellow,
-                Child = new Box
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    AlwaysPresent = true,
-                    Alpha = 0
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        BorderThickness = BORDER_RADIUS,
+                        BorderColour = colours.YellowDark,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            AlwaysPresent = true,
+                            Alpha = 0
+                        }
+                    },
+                    new Container
+                    {
+                        Name = "info text",
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Colour = colours.YellowDark,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            selectionDetailsText = new OsuSpriteText
+                            {
+                                Padding = new MarginPadding(2),
+                                Colour = colours.Gray0,
+                                Font = OsuFont.Default.With(size: 11)
+                            }
+                        }
+                    }
                 }
             };
         }
@@ -71,9 +103,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
         /// </summary>
+        /// <remarks>
+        /// Just returning true is enough to allow <see cref="HitObject.StartTime"/> updates to take place.
+        /// Custom implementation is only required if other attributes are to be considered, like changing columns.
+        /// </remarks>
         /// <param name="moveEvent">The move event.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s were moved.</returns>
-        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => false;
+        /// <returns>
+        /// Whether any <see cref="DrawableHitObject"/>s could be moved.
+        /// Returning true will also propagate StartTime changes provided by the closest <see cref="IPositionSnapProvider.SnapScreenSpacePositionToValidTime"/>.
+        /// </returns>
+        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => true;
 
         public bool OnPressed(PlatformAction action)
         {
@@ -107,7 +146,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleSelected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Add(blueprint);
-            editorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+            EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
 
             UpdateVisibility();
         }
@@ -119,11 +158,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleDeselected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Remove(blueprint);
-            editorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
+            EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
-            // We don't want to update visibility if > 0, since we may be deselecting blueprints during drag-selection
-            if (selectedBlueprints.Count == 0)
-                UpdateVisibility();
+            UpdateVisibility();
         }
 
         /// <summary>
@@ -152,8 +189,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void deleteSelected()
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in selectedBlueprints.ToList())
-                editorBeatmap.Remove(h.HitObject);
+                EditorBeatmap?.Remove(h.HitObject);
+
+            changeHandler?.EndChange();
         }
 
         #endregion
@@ -165,7 +206,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         internal void UpdateVisibility()
         {
-            if (selectedBlueprints.Count > 0)
+            int count = selectedBlueprints.Count;
+
+            selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
+
+            if (count > 0)
                 Show();
             else
                 Hide();
@@ -191,8 +236,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             topLeft -= new Vector2(5);
             bottomRight += new Vector2(5);
 
-            outline.Size = bottomRight - topLeft;
-            outline.Position = topLeft;
+            content.Size = bottomRight - topLeft;
+            content.Position = topLeft;
         }
 
         #endregion
@@ -205,6 +250,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in SelectedHitObjects)
             {
                 // Make sure there isn't already an existing sample
@@ -213,6 +260,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 h.Samples.Add(new HitSampleInfo { Name = sampleName });
             }
+
+            changeHandler?.EndChange();
         }
 
         /// <summary>
@@ -221,41 +270,57 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in SelectedHitObjects)
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+
+            changeHandler?.EndChange();
         }
 
         #endregion
 
         #region Context Menu
 
-        public virtual MenuItem[] ContextMenuItems
+        public MenuItem[] ContextMenuItems
         {
             get
             {
                 if (!selectedBlueprints.Any(b => b.IsHovered))
                     return Array.Empty<MenuItem>();
 
-                var items = new List<MenuItem>
+                var items = new List<MenuItem>();
+
+                items.AddRange(GetContextMenuItemsForSelection(selectedBlueprints));
+
+                if (selectedBlueprints.Count == 1)
+                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
+
+                items.AddRange(new[]
                 {
                     new OsuMenuItem("音效")
                     {
                         Items = new[]
                         {
                             createHitSampleMenuItem("口哨", HitSampleInfo.HIT_WHISTLE),
-                            createHitSampleMenuItem("拍掌", HitSampleInfo.HIT_CLAP),
+                            createHitSampleMenuItem("击掌", HitSampleInfo.HIT_CLAP),
                             createHitSampleMenuItem("重音", HitSampleInfo.HIT_FINISH)
                         }
                     },
                     new OsuMenuItem("删除", MenuItemType.Destructive, deleteSelected),
-                };
-
-                if (selectedBlueprints.Count == 1)
-                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
+                });
 
                 return items.ToArray();
             }
         }
+
+        /// <summary>
+        /// Provide context menu items relevant to current selection. Calling base is not required.
+        /// </summary>
+        /// <param name="selection">The current selection.</param>
+        /// <returns>The relevant menu items.</returns>
+        protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)
+            => Enumerable.Empty<MenuItem>();
 
         private MenuItem createHitSampleMenuItem(string name, string sampleName)
         {

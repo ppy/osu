@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
@@ -16,14 +17,7 @@ namespace osu.Game.Online.API
     {
         protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result => ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
-
-        protected APIRequest()
-        {
-            base.Success += onSuccess;
-        }
-
-        private void onSuccess() => Success?.Invoke(Result);
+        public T Result { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
@@ -31,6 +25,27 @@ namespace osu.Game.Online.API
         /// </summary>
         public new event APISuccessHandler<T> Success;
 
+        protected override void PostProcess()
+        {
+            base.PostProcess();
+            Result = ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
+        }
+
+        internal void TriggerSuccess(T result)
+        {
+            if (Result != null)
+                throw new InvalidOperationException("Attempted to trigger success more than once");
+
+            Result = result;
+
+            TriggerSuccess();
+        }
+
+        internal override void TriggerSuccess()
+        {
+            base.TriggerSuccess();
+            Success?.Invoke(Result);
+        }
     }
 
     /// <summary>
@@ -46,6 +61,11 @@ namespace osu.Game.Online.API
 
         protected APIAccess API;
         protected WebRequest WebRequest;
+
+        /// <summary>
+        /// The currently logged in user. Note that this will only be populated during <see cref="Perform"/>.
+        /// </summary>
+        protected User User { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
@@ -72,6 +92,7 @@ namespace osu.Game.Online.API
             }
 
             API = apiAccess;
+            User = apiAccess.LocalUser.Value;
 
             if (checkAndScheduleFailure())
                 return;
@@ -84,7 +105,7 @@ namespace osu.Game.Online.API
             if (checkAndScheduleFailure())
                 return;
 
-            if (!WebRequest.Aborted) //could have been aborted by a Cancel() call
+            if (!WebRequest.Aborted) // could have been aborted by a Cancel() call
             {
                 Logger.Log($@"Performing request {this}", LoggingTarget.Network);
                 WebRequest.Perform();
@@ -93,12 +114,26 @@ namespace osu.Game.Online.API
             if (checkAndScheduleFailure())
                 return;
 
+            PostProcess();
+
             API.Schedule(delegate
             {
                 if (cancelled) return;
 
-                Success?.Invoke();
+                TriggerSuccess();
             });
+        }
+
+        /// <summary>
+        /// Perform any post-processing actions after a successful request.
+        /// </summary>
+        protected virtual void PostProcess()
+        {
+        }
+
+        internal virtual void TriggerSuccess()
+        {
+            Success?.Invoke();
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
@@ -153,7 +188,6 @@ namespace osu.Game.Online.API
             [JsonProperty("error")]
             public string ErrorMessage { get; set; }
         }
-
     }
 
     public class APIException : InvalidOperationException

@@ -40,13 +40,15 @@ namespace osu.Game.Screens.Menu
 
         public Action OnEdit;
         public Action OnExit;
-        public Action OnDirect;
         public Action OnSolo;
         public Action OnSettings;
         public Action OnMulti;
         public Action OnChart;
         public Action OnBeatmapListing;
-        public Action OnCustomMenuButton;
+        public Action OnMvisButton;
+        public Action OnPurcashe;
+        public Action OnPurePlayerButton;
+        public Action OnMfMenuButton;
 
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
@@ -133,10 +135,12 @@ namespace osu.Game.Screens.Menu
         private LoginOverlay loginOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, OsuConfigManager config)
+        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, MfConfigManager config)
         {
-            buttonsCustom.Add(new Button(@"关于Mf-osu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnCustomMenuButton?.Invoke(), WEDGE_WIDTH));
-            buttonsCustom.Add(new Button(@"谱面在线列表", @"button-generic-select", FontAwesome.Solid.FileDownload, new Color4(0, 86, 73, 255), () => OnBeatmapListing?.Invoke()));
+            buttonsCustom.Add(new Button(@"关于Mf-osu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnMfMenuButton?.Invoke(), WEDGE_WIDTH));
+            buttonsCustom.Add(new Button(@"Mvis播放器", @"button-generic-select", FontAwesome.Solid.QuoteLeft, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
+            buttonsCustom.Add(new Button(@"抽卡模拟器", @"button-generic-select", FontAwesome.Solid.SdCard, new Color4(0, 86, 73, 255), () => OnPurcashe?.Invoke()));
+            buttonsCustom.Add(new Button(@"音乐播放器", @"button-generic-select", FontAwesome.Solid.QuoteRight, new Color4(0, 86, 73, 255), () => OnPurePlayerButton?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
 
             buttonsPlay.Add(new Button(@"单人游戏", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
@@ -149,7 +153,7 @@ namespace osu.Game.Screens.Menu
 
             buttonsTopLevel.Add(new Button(@"游玩", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
             buttonsTopLevel.Add(new Button(@"osu!编辑器", @"button-generic-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
+            buttonsTopLevel.Add(new Button(@"谱面列表", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
 
             if (host.CanExit)
                 buttonsTopLevel.Add(new Button(@"退出", string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
@@ -174,7 +178,7 @@ namespace osu.Game.Screens.Menu
 
             sampleBack = audio.Samples.Get(@"Menu/button-back-select");
 
-            config.BindWith(OsuSetting.OptUI, Optui);
+            config.BindWith(MfSetting.OptUI, Optui);
 
             Optui.ValueChanged += _ => UpdateButtons();
             StateChanged += _ => UpdateButtons();
@@ -255,7 +259,9 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public void OnReleased(GlobalAction action) { }
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private bool goBack()
         {
@@ -351,15 +357,15 @@ namespace osu.Game.Screens.Menu
                 case ButtonSystemState.Initial:
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
-                        {
-                            logoTrackingContainer.StopTracking();
+                    {
+                        logoTrackingContainer.StopTracking();
 
-                            game?.Toolbar.Hide();
+                        game?.Toolbar.Hide();
 
-                            logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                            logo.ScaleTo(1, 800, Easing.OutExpo);
-                        }, buttonArea.Alpha * 150);
+                        logo.ClearTransforms(targetMember: nameof(Position));
+                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                    }, buttonArea.Alpha * 150);
                     break;
 
                 case ButtonSystemState.TopLevel:

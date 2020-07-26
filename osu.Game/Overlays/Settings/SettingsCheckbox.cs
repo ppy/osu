@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsCheckbox : SettingsItem<bool>
+    public class SettingsCheckbox : SettingsItem<bool>, IHasTooltip
     {
         private string labelText;
 
@@ -17,5 +18,7 @@ namespace osu.Game.Overlays.Settings
             get => labelText;
             set => ((OsuCheckbox)Control).LabelText = labelText = value;
         }
+        
+        public virtual string TooltipText { get; set; }
     }
 }

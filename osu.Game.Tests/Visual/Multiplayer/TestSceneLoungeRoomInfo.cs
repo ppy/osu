@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online.Multiplayer;
@@ -14,15 +13,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneLoungeRoomInfo : MultiplayerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(RoomInfo)
-        };
-
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Room.CopyFrom(new Room());
+            Room = new Room();
 
             Child = new RoomInfo
             {

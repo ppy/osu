@@ -230,7 +230,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     background = new Container
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(background_size),
                         Masking = true,
                         CornerRadius = 4,
                         Child = backgroundBox = new Box
@@ -324,7 +324,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold, italics: true)
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold, italics: true),
                     },
                 };
             }

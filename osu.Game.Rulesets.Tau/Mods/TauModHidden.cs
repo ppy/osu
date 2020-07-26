@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModHidden : ModHidden
     {
-        public override string Description => @"Play with no beats and fading sliders.";
+        public override string Description => @"颗粒渐隐！";
         public override double ScoreMultiplier => 1.06;
 
         public override Type[] IncompatibleMods => new[] { typeof(TauModAutoHold) };
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Tau.Mods
         {
             static void adjustFadeIn(TauHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
 
-            foreach (var d in drawables.OfType<DrawabletauHitObject>())
+            foreach (var d in drawables.OfType<DrawableTauHitObject>())
             {
                 adjustFadeIn(d.HitObject);
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 
         protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawabletauHitObject d))
+            if (!(drawable is DrawableTauHitObject d))
                 return;
 
             var h = d.HitObject;
@@ -49,12 +49,12 @@ namespace osu.Game.Rulesets.Tau.Mods
             var fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
-            var longFadeDuration = (h as IHasEndTime)?.EndTime ?? h.StartTime - fadeOutStartTime;
+            var longFadeDuration = (h as IHasDuration)?.EndTime ?? h.StartTime - fadeOutStartTime;
 
             // future proofing yet again.
             switch (drawable)
             {
-                case DrawabletauHitObject beat:
+                case DrawableTauHitObject beat:
                     using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
                         beat.FadeOut(fadeOutDuration);
 

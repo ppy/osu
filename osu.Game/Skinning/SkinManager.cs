@@ -13,6 +13,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
@@ -43,12 +44,15 @@ namespace osu.Game.Skinning
             this.audio = audio;
             this.legacyDefaultResources = legacyDefaultResources;
 
-            ItemRemoved += removedInfo =>
+            ItemRemoved.BindValueChanged(weakRemovedInfo =>
             {
-                // check the removed skin is not the current user choice. if it is, switch back to default.
-                if (removedInfo.ID == CurrentSkinInfo.Value.ID)
-                    CurrentSkinInfo.Value = SkinInfo.Default;
-            };
+                if (weakRemovedInfo.NewValue.TryGetTarget(out var removedInfo))
+                {
+                    // check the removed skin is not the current user choice. if it is, switch back to default.
+                    if (removedInfo.ID == CurrentSkinInfo.Value.ID)
+                        CurrentSkinInfo.Value = SkinInfo.Default;
+                }
+            });
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
             CurrentSkin.ValueChanged += skin =>
@@ -127,7 +131,7 @@ namespace osu.Game.Skinning
 
         public Drawable GetDrawableComponent(ISkinComponent component) => CurrentSkin.Value.GetDrawableComponent(component);
 
-        public Texture GetTexture(string componentName) => CurrentSkin.Value.GetTexture(componentName);
+        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => CurrentSkin.Value.GetTexture(componentName, wrapModeS, wrapModeT);
 
         public SampleChannel GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
 

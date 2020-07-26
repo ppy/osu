@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -31,8 +33,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly FillFlowContainer content;
         private readonly IconButton button;
 
-        private bool optUIEnabled = false;
         private bool expanded = true;
+        public bool IgnoreOptUI = true;
+        private BindableBool OptUI = new BindableBool();
 
         public bool Expanded
         {
@@ -54,17 +57,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
 
                 updateExpanded();
-            }
-        }
-
-        public bool OptUIEnabled
-        {
-            get => optUIEnabled;
-            set
-            {
-                if (optUIEnabled == value) return;
-
-                optUIEnabled = value;
             }
         }
 
@@ -146,8 +138,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if (optUIEnabled == true)
-                this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+            OptUI.BindValueChanged( _ => OnOptUIChanged() );
+            this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -163,11 +155,31 @@ namespace osu.Game.Screens.Play.PlayerSettings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, MfConfigManager config)
         {
+            config.BindWith(MfSetting.OptUI, OptUI);
+
             expandedColour = colours.Yellow;
 
             updateExpanded();
+        }
+
+        private void OnOptUIChanged()
+        {
+            if ( IgnoreOptUI )
+                return;
+
+            var v = OptUI.Value;
+            switch(v)
+            {
+                case true:
+                    this.FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+                    break;
+
+                case false:
+                    this.FadeOut(fade_duration, Easing.OutQuint);
+                    break;
+            }
         }
 
         private void updateExpanded() => button.FadeColour(expanded ? expandedColour : Color4.White, 200, Easing.InOutQuint);

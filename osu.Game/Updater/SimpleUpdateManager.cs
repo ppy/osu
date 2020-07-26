@@ -28,12 +28,9 @@ namespace osu.Game.Updater
         private void load(OsuGameBase game)
         {
             version = game.Version;
-
-            if (game.IsDeployedBuild)
-                Schedule(() => Task.Run(checkForUpdateAsync));
         }
 
-        private async void checkForUpdateAsync()
+        protected override async Task PerformUpdateCheck()
         {
             try
             {
@@ -81,7 +78,7 @@ namespace osu.Game.Updater
                     break;
 
                 case RuntimeInfo.Platform.Linux:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".tar.xz"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage"));
                     break;
 
                 case RuntimeInfo.Platform.Android:

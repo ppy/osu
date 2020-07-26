@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
@@ -22,7 +23,7 @@ namespace osu.Game.Tournament.Components
     {
         private BeatmapInfo beatmap;
 
-        private const float height = 145;
+        public const float HEIGHT = 145 / 2f;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
@@ -65,6 +66,9 @@ namespace osu.Game.Tournament.Components
                 flow.Direction = expanded ? FillDirection.Full : FillDirection.Vertical;
             }
         }
+
+        // Todo: This is a hack for https://github.com/ppy/osu-framework/issues/3617 since this container is at the very edge of the screen and potentially initially masked away.
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -157,7 +161,7 @@ namespace osu.Game.Tournament.Components
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = height / 2,
+                    Height = HEIGHT,
                     Width = 0.5f,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -229,7 +233,7 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.X,
                     Width = 0.5f,
-                    Height = height / 2,
+                    Height = HEIGHT,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                 }

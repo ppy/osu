@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 
 namespace osu.Game.Audio
 {
@@ -102,7 +103,19 @@ namespace osu.Game.Audio
                 this.trackManager = trackManager;
             }
 
-            protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");
+            private string TrackURI()
+            {
+                switch ( mfConfig.Get<bool>(MfSetting.UseSayobot) )
+                {
+                    case true:
+                        return $@"https://a.sayobot.cn/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3";
+
+                    case false:
+                        return $@"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3";
+                }
+            }
+
+            protected override Track GetTrack() => trackManager.Get($@"{TrackURI()}");
         }
 
         private class PreviewTrackStore : AudioCollectionManager<AdjustableAudioComponent>, ITrackStore

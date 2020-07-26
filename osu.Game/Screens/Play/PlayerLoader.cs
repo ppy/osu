@@ -29,6 +29,9 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
+        private float extra_delay = 750;
+        private readonly Bindable<bool> Optui = new Bindable<bool>();
+
         protected const float BACKGROUND_BLUR = 15;
 
         public override bool HideOverlaysOnEnter => hideOverlays;
@@ -105,9 +108,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics)
+        private void load(SessionStatics sessionStatics, MfConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
+            config.BindWith(MfSetting.OptUI, Optui);
 
             InternalChild = (content = new LogoTrackingContainer
             {
@@ -118,7 +122,7 @@ namespace osu.Game.Screens.Play
             {
                 MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, Mods, content.LogoFacade)
                 {
-                    Alpha = 0,
+                    Alpha = 0.001f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
@@ -138,6 +142,22 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750)
             });
+
+            Optui.ValueChanged += _ => UpdateExtraDelay();
+        }
+
+        private void UpdateExtraDelay()
+        {
+            switch ( Optui.Value )
+            {
+                case true:
+                    extra_delay = 750;
+                    break;
+                
+                case false:
+                    extra_delay = 0;
+                    break;
+            }
         }
 
         protected override void LoadComplete()
@@ -306,16 +326,16 @@ namespace osu.Game.Screens.Play
 
                 scheduledPushPlayer = Scheduler.AddDelayed(() =>
                 {
-                    contentOut();
+                    this.Delay(extra_delay).Schedule( () => contentOut() );
 
-                    this.Delay(250).Schedule(() =>
+                    this.Delay(250 + extra_delay).Schedule(() =>
                     {
                         if (!this.IsCurrentScreen()) return;
 
                         LoadTask = null;
 
-                        //By default, we want to load the player and never be returned to.
-                        //Note that this may change if the player we load requested a re-run.
+                        // By default, we want to load the player and never be returned to.
+                        // Note that this may change if the player we load requested a re-run.
                         ValidForResume = false;
 
                         if (player.LoadedBeatmapSuccessfully)
@@ -360,7 +380,7 @@ namespace osu.Game.Screens.Play
         {
             if (!muteWarningShownOnce.Value)
             {
-                //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
+                // Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
                 if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
                 {
                     notificationOverlay?.Post(new MutedNotification());

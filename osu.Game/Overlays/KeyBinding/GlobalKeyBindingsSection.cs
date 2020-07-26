@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
@@ -9,16 +10,30 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class GlobalKeyBindingsSection : SettingsSection
     {
-        public override IconUsage Icon => FontAwesome.Solid.Globe;
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.Globe
+        };
+
         public override string Header => "全局";
 
         public GlobalKeyBindingsSection(GlobalActionContainer manager)
         {
             Add(new DefaultBindingsSubsection(manager));
             Add(new AudioControlKeyBindingsSubsection(manager));
+            Add(new MvisBindingsSection(manager));
             Add(new InGameKeyBindingsSubsection(manager));
         }
+        private class MvisBindingsSection : KeyBindingsSubsection
+        {
+            protected override string Header => "Mvis播放器";
 
+            public MvisBindingsSection(GlobalActionContainer manager)
+                : base(null)
+            {
+                Defaults = manager.MvisControlKeyBindings;
+            }
+        }
         private class DefaultBindingsSubsection : KeyBindingsSubsection
         {
             protected override string Header => string.Empty;

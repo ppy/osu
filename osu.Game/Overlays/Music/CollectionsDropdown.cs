@@ -29,14 +29,8 @@ namespace osu.Game.Overlays.Music
         {
             public CollectionsMenu()
             {
+                Masking = true;
                 CornerRadius = 5;
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(0.3f),
-                    Radius = 3,
-                    Offset = new Vector2(0f, 1f),
-                };
             }
 
             [BackgroundDependencyLoader]
@@ -56,18 +50,12 @@ namespace osu.Game.Overlays.Music
 
             public CollectionsHeader()
             {
+                Masking = true;
                 CornerRadius = 5;
                 Height = 30;
                 Icon.Size = new Vector2(14);
                 Icon.Margin = new MarginPadding(0);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 10, Right = 10 };
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(0.3f),
-                    Radius = 3,
-                    Offset = new Vector2(0f, 1f),
-                };
             }
         }
     }

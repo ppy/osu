@@ -7,6 +7,12 @@ namespace osu.Game.Beatmaps.ControlPoints
 {
     public class EffectControlPoint : ControlPoint
     {
+        public static readonly EffectControlPoint DEFAULT = new EffectControlPoint
+        {
+            KiaiModeBindable = { Disabled = true },
+            OmitFirstBarLineBindable = { Disabled = true }
+        };
+
         /// <summary>
         /// Whether the first bar line of this control point is ignored.
         /// </summary>
@@ -35,8 +41,10 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => KiaiModeBindable.Value = value;
         }
 
-        public override bool EquivalentTo(ControlPoint other) =>
-            other is EffectControlPoint otherTyped &&
-            KiaiMode == otherTyped.KiaiMode && OmitFirstBarLine == otherTyped.OmitFirstBarLine;
+        public override bool IsRedundant(ControlPoint existing)
+            => !OmitFirstBarLine
+               && existing is EffectControlPoint existingEffect
+               && KiaiMode == existingEffect.KiaiMode
+               && OmitFirstBarLine == existingEffect.OmitFirstBarLine;
     }
 }

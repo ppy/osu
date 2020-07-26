@@ -21,7 +21,19 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings);
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(MvisControlKeyBindings);
+
+        public IEnumerable<KeyBinding> MvisControlKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.Left, GlobalAction.MvisMusicPrev),
+            new KeyBinding(InputKey.Right, GlobalAction.MvisMusicNext),
+            new KeyBinding(InputKey.Space, GlobalAction.MvisTogglePause),
+            new KeyBinding(InputKey.Tab, GlobalAction.MvisToggleOverlayLock),
+            new KeyBinding(InputKey.Menu, GlobalAction.MvisTogglePlayList),
+            new KeyBinding(InputKey.L, GlobalAction.MvisToggleTrackLoop),
+            new KeyBinding(InputKey.Enter, GlobalAction.MvisOpenInSongSelect),
+            new KeyBinding(InputKey.H, GlobalAction.MvisForceLockOverlayChanges),
+        };
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -35,9 +47,12 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleDirect),
+            new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
+
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
 
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
@@ -54,6 +69,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
+            new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -150,5 +166,30 @@ namespace osu.Game.Input.Bindings
 
         [Description("音量减")]
         SelectNext,
+
+        [Description("上一首")]
+        MvisMusicPrev,
+        [Description("下一首")]
+        MvisMusicNext,
+        [Description("暂停/播放")]
+        MvisTogglePause,
+        [Description("切换锁定")]
+        MvisToggleOverlayLock,
+        [Description("切换播放列表")]
+        MvisTogglePlayList,
+        [Description("切换单曲循环")]
+        MvisToggleTrackLoop,
+        [Description("在歌曲选择中打开")]
+        MvisOpenInSongSelect,
+        [Description("返回主页")]
+        Home,
+
+        [Description("切换通知栏是否可见")]
+        ToggleNotifications,
+
+        [Description("暂停游戏")]
+        PauseGameplay,
+        [Description("切换强制锁定")]
+        MvisForceLockOverlayChanges,
     }
 }

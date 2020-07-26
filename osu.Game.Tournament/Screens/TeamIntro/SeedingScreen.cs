@@ -203,13 +203,14 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = TournamentGame.TEXT_COLOUR,
+                                            Colour = TournamentGame.ELEMENT_BACKGROUND_COLOUR,
                                         },
                                         new TournamentSpriteText
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Text = seeding.ToString("#,0"),
+                                            Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR
                                         },
                                     }
                                 },
@@ -241,8 +242,8 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         {
                             new TeamDisplay(team) { Margin = new MarginPadding { Bottom = 30 } },
                             new RowDisplay("平均排名:", $"#{team.AverageRank:#,0}"),
-                            new RowDisplay("种子:", team.Seed.Value),
-                            new RowDisplay("去年的位置:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "0"),
+                            new RowDisplay("排名:", team.Seed.Value),
+                            new RowDisplay("上次比赛中的排名:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "0"),
                             new Container { Margin = new MarginPadding { Bottom = 30 } },
                         }
                     },

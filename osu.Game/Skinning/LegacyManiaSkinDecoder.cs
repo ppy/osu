@@ -74,7 +74,7 @@ namespace osu.Game.Skinning
                 switch (pair.Key)
                 {
                     case "ColumnLineWidth":
-                        parseArrayValue(pair.Value, currentConfig.ColumnLineWidth);
+                        parseArrayValue(pair.Value, currentConfig.ColumnLineWidth, false);
                         break;
 
                     case "ColumnSpacing":
@@ -102,18 +102,20 @@ namespace osu.Game.Skinning
                         break;
 
                     case "WidthForNoteHeightScale":
-                        currentConfig.MinimumColumnWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        float minWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        if (minWidth > 0)
+                            currentConfig.MinimumColumnWidth = minWidth;
                         break;
 
                     case string _ when pair.Key.StartsWith("Colour"):
                         HandleColours(currentConfig, line);
                         break;
 
+                    // Custom sprite paths
                     case string _ when pair.Key.StartsWith("NoteImage"):
-                        currentConfig.ImageLookups[pair.Key] = pair.Value;
-                        break;
-
                     case string _ when pair.Key.StartsWith("KeyImage"):
+                    case string _ when pair.Key.StartsWith("Hit"):
+                    case string _ when pair.Key.StartsWith("Stage"):
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }
@@ -122,7 +124,7 @@ namespace osu.Game.Skinning
             pendingLines.Clear();
         }
 
-        private void parseArrayValue(string value, float[] output)
+        private void parseArrayValue(string value, float[] output, bool applyScaleFactor = true)
         {
             string[] values = value.Split(',');
 
@@ -131,7 +133,7 @@ namespace osu.Game.Skinning
                 if (i >= output.Length)
                     break;
 
-                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
             }
         }
     }

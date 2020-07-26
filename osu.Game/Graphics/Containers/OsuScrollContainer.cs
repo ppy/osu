@@ -158,7 +158,7 @@ namespace osu.Game.Graphics.Containers
             {
                 if (!base.OnMouseDown(e)) return false;
 
-                //note that we are changing the colour of the box here as to not interfere with the hover effect.
+                // note that we are changing the colour of the box here as to not interfere with the hover effect.
                 box.FadeColour(highlightColour, 100);
                 return true;
             }

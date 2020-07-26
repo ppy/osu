@@ -13,8 +13,10 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
     public class TestSceneCatchModPerfect : ModPerfectTestScene
     {
+        protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
+
         public TestSceneCatchModPerfect()
-            : base(new CatchRuleset(), new CatchModPerfect())
+            : base(new CatchModPerfect())
         {
         }
 
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
         public void TestDroplet(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Droplet { StartTime = 1000 }), shouldMiss);
 
         // We only care about testing misses, hits are tested via JuiceStream
-        [TestCase(true)]
+        [TestCase(false)]
         public void TestTinyDroplet(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new TinyDroplet { StartTime = 1000 }), shouldMiss);
     }
 }

@@ -51,7 +51,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             AddRangeInternal(new[]
             {
-                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece())
+                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                {
+                    RelativeSizeAxes = Axes.Both
+                })
                 {
                     RelativeSizeAxes = Axes.X
                 },
@@ -127,6 +130,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Anchor = bodyPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
 
+        public override void PlaySamples()
+        {
+            // Samples are played by the head/tail notes.
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -157,6 +165,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return false;
 
             if (action != Action.Value)
+                return false;
+
+            // The tail has a lenience applied to it which is factored into the miss window (i.e. the miss judgement will be delayed).
+            // But the hold cannot ever be started within the late-lenience window, so we should skip trying to begin the hold during that time.
+            // Note: Unlike below, we use the tail's start time to determine the time offset.
+            if (Time.Current > Tail.HitObject.StartTime && !Tail.HitObject.HitWindows.CanBeHit(Time.Current - Tail.HitObject.StartTime))
                 return false;
 
             beginHoldAt(Time.Current - Head.HitObject.StartTime);

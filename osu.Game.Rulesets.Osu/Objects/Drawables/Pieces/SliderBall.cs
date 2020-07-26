@@ -33,14 +33,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private readonly Slider slider;
         private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
-        private readonly CircularContainer ball;
+        private readonly Drawable ball;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
             this.drawableSlider = drawableSlider;
             this.slider = slider;
 
-            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -55,19 +54,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Alpha = 0,
                     Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle()),
                 },
-                ball = new CircularContainer
+                ball = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
                 {
-                    Masking = true,
-                    RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Alpha = 1,
-                    Child = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall()),
-                    }
-                }
+                    Origin = Anchor.Centre,
+                },
             };
         }
 
@@ -188,12 +179,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 return;
 
             Position = newPos;
-            Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
+            ball.Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
 
             lastPosition = newPos;
         }
 
-        private class FollowCircleContainer : Container
+        private class FollowCircleContainer : CircularContainer
         {
             public override bool HandlePositionalInput => true;
         }
@@ -241,6 +232,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Scale = new Vector2(radius / OsuHitObject.OBJECT_RADIUS),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Blending = BlendingParameters.Additive,
                     BorderThickness = 10,
                     BorderColour = Color4.White,
                     Alpha = 1,

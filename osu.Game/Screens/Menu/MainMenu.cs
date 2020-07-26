@@ -1,22 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
@@ -39,6 +38,9 @@ namespace osu.Game.Screens.Menu
         public override bool AllowRateAdjustments => false;
 
         private Screen songSelect;
+
+        private Screen mvisScreen;
+        private Screen purePlayerScreen;
 
         private MenuSideFlashes sideFlashes;
 
@@ -63,6 +65,8 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => background;
 
+        internal Track Track { get; private set; }
+
         private Bindable<float> holdDelay;
         private Bindable<bool> loginDisplayed;
 
@@ -72,7 +76,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(CustomMenuOverlay custom,BeatmapListingOverlay beatmapListing,DirectOverlay direct, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
+        private void load(MfMenuOverlay mfoverlay,BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -102,6 +106,9 @@ namespace osu.Game.Screens.Menu
                         {
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
+                            OnMvisButton = onMvis,
+                            OnPurcashe = onPurcashe,
+                            OnPurePlayerButton = onPurePlayer,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = confirmAndExit,
                         }
@@ -133,14 +140,17 @@ namespace osu.Game.Screens.Menu
             };
 
             buttons.OnSettings = () => settings?.ToggleVisibility();
-            buttons.OnDirect = () => direct?.ToggleVisibility();
             buttons.OnChart = () => rankings?.ShowSpotlights();
             buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
-            buttons.OnCustomMenuButton = () => custom?.ToggleVisibility();
+            buttons.OnMfMenuButton = () => mfoverlay?.ToggleVisibility();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
-            preloadSongSelect();
+            LoadComponentAsync(mvisScreen = new MvisScreen());
+            LoadComponentAsync(purcasheScreen = new PurcasheScreen());
+            LoadComponentAsync(purePlayerScreen = new PurePlayerScreen());
+            preloadScreens();
         }
+
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
@@ -152,15 +162,30 @@ namespace osu.Game.Screens.Menu
             game?.PerformFromScreen(menu => menu.Exit());
         }
 
-        private void preloadSongSelect()
+        private void preloadScreens()
         {
             if (songSelect == null)
                 LoadComponentAsync(songSelect = new PlaySongSelect());
+
+            if (purcasheScreen == null)
+                LoadComponentAsync(purcasheScreen = new PurcasheScreen());
+
+            if (mvisScreen == null)
+                LoadComponentAsync(mvisScreen = new MvisScreen());
+
+            if (purePlayerScreen == null)
+                LoadComponentAsync(purePlayerScreen = new PurePlayerScreen());
         }
 
         public void LoadToSolo() => Schedule(onSolo);
 
         private void onSolo() => this.Push(consumeSongSelect());
+
+        private void onMvis() => this.Push(consumeMvis());
+
+        private void onPurePlayer() => this.Push(consumePurePlayer());
+
+        private void onPurcashe() => this.Push(consumePurcashe());
 
         private Screen consumeSongSelect()
         {
@@ -169,25 +194,53 @@ namespace osu.Game.Screens.Menu
             return s;
         }
 
+        private Screen consumeMvis()
+        {
+            var s = mvisScreen;
+            mvisScreen = null;
+            return s;
+        }
+
+        private Screen consumePurePlayer()
+        {
+            var s = purePlayerScreen;
+            purePlayerScreen = null;
+            return s;
+        }
+
+        private Screen consumePurcashe()
+        {
+            var s = purcasheScreen;
+            purcasheScreen = null;
+            return s;
+        }
+
+        [Resolved]
+        private Storage storage { get; set; }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
 
-            var track = Beatmap.Value.Track;
+            Track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is IntroScreen && track != null)
+            if (last is IntroScreen && Track != null)
             {
-                if (!track.IsRunning)
+                if (!Track.IsRunning)
                 {
-                    track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * track.Length);
-                    track.Start();
+                    Track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * Track.Length);
+                    Track.Start();
                 }
             }
+
+            if (storage is OsuStorage osuStorage && osuStorage.Error != OsuStorageError.None)
+                dialogOverlay?.Push(new StorageErrorDialog(osuStorage, osuStorage.Error));
         }
 
         private bool exitConfirmed;
+        private PurcasheScreen purcasheScreen;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
@@ -251,11 +304,10 @@ namespace osu.Game.Screens.Menu
 
             (Background as BackgroundScreenDefault)?.Next();
 
-            //we may have consumed our preloaded instance, so let's make another.
-            preloadSongSelect();
+            // we may have consumed our preloaded instance, so let's make another.
+            preloadScreens();
 
-            if (Beatmap.Value.Track != null && music?.IsUserPaused != true)
-                Beatmap.Value.Track.Start();
+            music.EnsurePlayingSomething();
         }
 
         public override bool OnExiting(IScreen next)
@@ -280,31 +332,6 @@ namespace osu.Game.Screens.Menu
 
             this.FadeOut(3000);
             return base.OnExiting(next);
-        }
-
-        private class ConfirmExitDialog : PopupDialog
-        {
-            public ConfirmExitDialog(Action confirm, Action cancel)
-            {
-                HeaderText = "真的要退出吗?";
-                BodyText = "这是最后一次确认的机会了";
-
-                Icon = FontAwesome.Solid.ExclamationTriangle;
-
-                Buttons = new PopupDialogButton[]
-                {
-                    new PopupDialogOkButton
-                    {
-                        Text = @"再见",
-                        Action = confirm
-                    },
-                    new PopupDialogCancelButton
-                    {
-                        Text = @"再玩一会",
-                        Action = cancel
-                    },
-                };
-            }
         }
     }
 }

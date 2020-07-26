@@ -140,9 +140,9 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            OptUIEnabled = config.GetBindable<bool>(OsuSetting.OptUI);
+            OptUIEnabled = config.GetBindable<bool>(MfSetting.OptUI);
         }
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 

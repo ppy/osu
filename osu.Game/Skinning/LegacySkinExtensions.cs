@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 
@@ -14,6 +15,11 @@ namespace osu.Game.Skinning
     public static class LegacySkinExtensions
     {
         public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
+                                            bool startAtCurrentTime = true, double? frameLength = null)
+            => source.GetAnimation(componentName, default, default, animatable, looping, applyConfigFrameRate, animationSeparator, startAtCurrentTime, frameLength);
+
+        public static Drawable GetAnimation(this ISkin source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, bool looping, bool applyConfigFrameRate = false,
+                                            string animationSeparator = "-",
                                             bool startAtCurrentTime = true, double? frameLength = null)
         {
             Texture texture;
@@ -38,7 +44,7 @@ namespace osu.Game.Skinning
             }
 
             // if an animation was not allowed or not found, fall back to a sprite retrieval.
-            if ((texture = source.GetTexture(componentName)) != null)
+            if ((texture = source.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
                 return new Sprite { Texture = texture };
 
             return null;
@@ -47,7 +53,7 @@ namespace osu.Game.Skinning
             {
                 for (int i = 0; true; i++)
                 {
-                    if ((texture = source.GetTexture($"{componentName}{animationSeparator}{i}")) == null)
+                    if ((texture = source.GetTexture($"{componentName}{animationSeparator}{i}", wrapModeS, wrapModeT)) == null)
                         break;
 
                     yield return texture;

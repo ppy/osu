@@ -4,11 +4,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Audio;
 
 namespace osu.Game.Skinning
@@ -17,24 +19,59 @@ namespace osu.Game.Skinning
     {
         private readonly ISampleInfo[] hitSamples;
 
-        private List<(AdjustableProperty property, BindableDouble bindable)> adjustments;
-
-        private SampleChannel[] channels;
-
         [Resolved]
         private ISampleStore samples { get; set; }
+
+        public SkinnableSound(ISampleInfo hitSamples)
+            : this(new[] { hitSamples })
+        {
+        }
 
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
             this.hitSamples = hitSamples.ToArray();
-        }
-
-        public SkinnableSound(ISampleInfo hitSamples)
-        {
-            this.hitSamples = new[] { hitSamples };
+            InternalChild = samplesContainer = new AudioContainer<DrawableSample>();
         }
 
         private bool looping;
+
+        private readonly AudioContainer<DrawableSample> samplesContainer;
+
+        public BindableNumber<double> Volume => samplesContainer.Volume;
+
+        public BindableNumber<double> Balance => samplesContainer.Balance;
+
+        public BindableNumber<double> Frequency => samplesContainer.Frequency;
+
+        public BindableNumber<double> Tempo => samplesContainer.Tempo;
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="Volume"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public TransformSequence<DrawableAudioWrapper> VolumeTo(double newVolume, double duration = 0, Easing easing = Easing.None) =>
+            samplesContainer.VolumeTo(newVolume, duration, easing);
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="Balance"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public TransformSequence<DrawableAudioWrapper> BalanceTo(double newBalance, double duration = 0, Easing easing = Easing.None) =>
+            samplesContainer.BalanceTo(newBalance, duration, easing);
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="Frequency"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public TransformSequence<DrawableAudioWrapper> FrequencyTo(double newFrequency, double duration = 0, Easing easing = Easing.None) =>
+            samplesContainer.FrequencyTo(newFrequency, duration, easing);
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="Tempo"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public TransformSequence<DrawableAudioWrapper> TempoTo(double newTempo, double duration = 0, Easing easing = Easing.None) =>
+            samplesContainer.TempoTo(newTempo, duration, easing);
 
         public bool Looping
         {
@@ -45,33 +82,25 @@ namespace osu.Game.Skinning
 
                 looping = value;
 
-                channels?.ForEach(c => c.Looping = looping);
+                samplesContainer.ForEach(c => c.Looping = looping);
             }
         }
 
-        public void Play() => channels?.ForEach(c => c.Play());
-
-        public void Stop() => channels?.ForEach(c => c.Stop());
-
-        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
+        public void Play() => samplesContainer.ForEach(c =>
         {
-            if (adjustments == null) adjustments = new List<(AdjustableProperty, BindableDouble)>();
+            if (c.AggregateVolume.Value > 0)
+                c.Play();
+        });
 
-            adjustments.Add((type, adjustBindable));
-            channels?.ForEach(c => c.AddAdjustment(type, adjustBindable));
-        }
-
-        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
-        {
-            adjustments?.Remove((type, adjustBindable));
-            channels?.ForEach(c => c.RemoveAdjustment(type, adjustBindable));
-        }
+        public void Stop() => samplesContainer.ForEach(c => c.Stop());
 
         public override bool IsPresent => Scheduler.HasPendingTasks;
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            channels = hitSamples.Select(s =>
+            bool wasPlaying = samplesContainer.Any(s => s.Playing);
+
+            var channels = hitSamples.Select(s =>
             {
                 var ch = skin.GetSample(s);
 
@@ -88,27 +117,15 @@ namespace osu.Game.Skinning
                 {
                     ch.Looping = looping;
                     ch.Volume.Value = s.Volume / 100.0;
-
-                    if (adjustments != null)
-                    {
-                        foreach (var (property, bindable) in adjustments)
-                            ch.AddAdjustment(property, bindable);
-                    }
                 }
 
                 return ch;
-            }).Where(c => c != null).ToArray();
-        }
+            }).Where(c => c != null);
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
+            samplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
 
-            if (channels != null)
-            {
-                foreach (var c in channels)
-                    c.Dispose();
-            }
+            if (wasPlaying)
+                Play();
         }
     }
 }

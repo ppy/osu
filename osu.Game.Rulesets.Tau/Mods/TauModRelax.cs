@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TauHitObject>
     {
-        public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
-
         public void Update(Playfield playfield)
         {
             bool requiresHold = false;
@@ -26,7 +24,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
-                if (!(drawable is DrawabletauHitObject tauHit))
+                if (!(drawable is DrawableTauHitObject tauHit))
                     continue;
 
                 double time = tauHit.Clock.CurrentTime;
@@ -34,10 +32,10 @@ namespace osu.Game.Rulesets.Tau.Mods
 
                 if (time < tauHit.HitObject.StartTime + relax_leniency) continue;
 
-                if (tauHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime || tauHit.IsHit)
+                if (tauHit.HitObject is IHasDuration hasEnd && time > hasEnd.EndTime || tauHit.IsHit)
                     continue;
 
-                if (tauHit is DrawabletauHitObject)
+                if (tauHit is DrawableTauHitObject)
                 {
                     Debug.Assert(tauHit.HitObject.HitWindows != null);
 

@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Play
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
 
-            if (breaks == null) return; //we need breaks.
+            if (breaks == null) return; // we need breaks.
 
             foreach (var b in breaks)
             {
@@ -169,8 +169,6 @@ namespace osu.Game.Screens.Play
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
         {
-            BreakSettingsOverlay.ReplayLoaded = e.NewValue;
-
             if (e.NewValue)
             {
                 BreakSettingsOverlay.Hide();

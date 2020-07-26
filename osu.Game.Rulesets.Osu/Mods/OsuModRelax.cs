@@ -11,11 +11,12 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
 
@@ -32,15 +33,30 @@ namespace osu.Game.Rulesets.Osu.Mods
         private ReplayState<OsuAction> state;
         private double lastStateChangeTime;
 
+        private bool hasReplay;
+
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
             osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+        }
+
+        public void ApplyToPlayer(Player player)
+        {
+            if (osuInputManager.ReplayInputHandler != null)
+            {
+                hasReplay = true;
+                return;
+            }
+
             osuInputManager.AllowUserPresses = false;
         }
 
         public void Update(Playfield playfield)
         {
+            if (hasReplay)
+                return;
+
             bool requiresHold = false;
             bool requiresHit = false;
 
@@ -53,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 // already hit or beyond the hittable end time.
-                if (h.IsHit || (h.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime))
+                if (h.IsHit || (h.HitObject is IHasDuration hasEnd && time > hasEnd.EndTime))
                     continue;
 
                 switch (h)

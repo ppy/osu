@@ -64,6 +64,9 @@ namespace osu.Game.Online.Leaderboards
         [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private SongSelect songSelect { get; set; }
+
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true, bool isSongSelect = false)
         {
             this.score = score;
@@ -76,11 +79,11 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour, OsuConfigManager config)
+        private void load(IAPIProvider api, OsuColour colour, MfConfigManager config)
         {
             var user = score.User;
 
-            config.BindWith(OsuSetting.OptUI, Optui);
+            config.BindWith(MfSetting.OptUI, Optui);
 
             Optui.ValueChanged += _ => UpdateTooltip();
             UpdateTooltip();
@@ -400,6 +403,9 @@ namespace osu.Game.Online.Leaderboards
             get
             {
                 List<MenuItem> items = new List<MenuItem>();
+
+                if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                    items.Add(new OsuMenuItem("使用这些mod游玩", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
 
                 if (score.ID != 0)
                     items.Add(new OsuMenuItem("删除", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));

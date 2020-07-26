@@ -30,15 +30,14 @@ namespace osu.Game.Overlays.Toolbar
         private ToolbarUserButton userButton;
         private ToolbarRulesetSelector rulesetSelector;
         private FillFlowContainer LeftSideToolbar;
+        private ToolbarBackground toolbarBg;
 
         private const double transition_time = 500;
-        private float anim_time = 0;
-        private bool OnLaunch = true;
-
-        private const float alpha_hovering = 0.8f;
-        private const float alpha_normal = 0.6f;
 
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+
+        // Toolbar components like RulesetSelector should receive keyboard input events even when the toolbar is hidden.
+        public override bool PropagateNonPositionalInputSubTree => true;
 
         public Toolbar()
         {
@@ -47,19 +46,19 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset, OsuConfigManager config)
+        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset, MfConfigManager config)
         {
-            optUI = config.GetBindable<bool>(OsuSetting.OptUI);
+            optUI = config.GetBindable<bool>(MfSetting.OptUI);
 
             Children = new Drawable[]
             {
-                new ToolbarBackground(),
+                toolbarBg = new ToolbarBackground(),
                 LeftSideToolbar = new FillFlowContainer
                 {
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    LayoutDuration = anim_time,
+                    LayoutDuration = 600,
                     LayoutEasing = Easing.OutBounce,
                     Children = new Drawable[]
                     {
@@ -84,7 +83,7 @@ namespace osu.Game.Overlays.Toolbar
                         ToolbarTimeButton = new ToolbarTimeButton(),
                         new ToolbarChangelogButton(),
                         new ToolbarRankingsButton(),
-                        new ToolbarDirectButton(),
+                        new ToolbarBeatmapListingButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
@@ -110,20 +109,12 @@ namespace osu.Game.Overlays.Toolbar
             if (osuGame != null)
                 overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
-            UpdateIcons();
+            optUI.BindValueChanged(UpdateIcons, true);
         }
 
-        protected override void LoadComplete()
+        private void UpdateIcons(ValueChangedEvent<bool> v)
         {
-            base.LoadComplete();
-
-            optUI.ValueChanged += _ => UpdateIcons();
-        }
-
-        private void UpdateIcons()
-        {
-            if (!OnLaunch) LeftSideToolbar.LayoutDuration = 600f;
-            switch (optUI.Value)
+            switch (v.NewValue)
             {
                 case true:
                     ToolbarMfButton.FadeTo(1f, 250);
@@ -139,7 +130,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public class ToolbarBackground : Container
         {
-            private readonly Box solidBackground;
             private readonly Box gradientBackground;
 
             public ToolbarBackground()
@@ -147,11 +137,10 @@ namespace osu.Game.Overlays.Toolbar
                 RelativeSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    solidBackground = new Box
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(0.1f),
-                        Alpha = alpha_normal,
                     },
                     gradientBackground = new Box
                     {
@@ -167,14 +156,12 @@ namespace osu.Game.Overlays.Toolbar
 
             protected override bool OnHover(HoverEvent e)
             {
-                solidBackground.FadeTo(alpha_hovering, transition_time, Easing.OutQuint);
                 gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                solidBackground.FadeTo(alpha_normal, transition_time, Easing.OutQuint);
                 gradientBackground.FadeOut(transition_time, Easing.OutQuint);
             }
         }
@@ -182,16 +169,15 @@ namespace osu.Game.Overlays.Toolbar
         protected override void PopIn()
         {
             this.MoveToY(0, transition_time, Easing.OutQuint);
-            this.FadeIn(transition_time / 2, Easing.OutQuint);
-            OnLaunch = false;
+            this.FadeIn(transition_time / 4, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            userButton?.StateContainer.Hide();
+            userButton.StateContainer?.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
-            this.FadeOut(transition_time);
+            this.FadeOut(transition_time, Easing.InQuint);
         }
     }
 }

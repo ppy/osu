@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestCancelDownloadFromRequest()
         {
-            AddStep("download beatmap", () => beatmaps.Download(test_model));
+            AddStep("download beatmap", () => beatmaps.Download(test_model, false));
 
             AddStep("cancel download from request", () => beatmaps.GetExistingDownload(test_model).Cancel());
 
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestCancelDownloadFromNotification()
         {
-            AddStep("download beatmap", () => beatmaps.Download(test_model));
+            AddStep("download beatmap", () => beatmaps.Download(test_model, false));
 
             AddStep("cancel download from notification", () => recentNotification.Close());
 

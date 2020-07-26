@@ -33,15 +33,18 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        private readonly ColumnHitObjectArea hitObjectArea;
+        public readonly ColumnHitObjectArea HitObjectArea;
 
         internal readonly Container TopLevelContainer;
+
+        public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
         public Column(int index)
         {
             Index = index;
 
             RelativeSizeAxes = Axes.Y;
+            Width = COLUMN_WIDTH;
 
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground, Index), _ => new DefaultColumnBackground())
             {
@@ -52,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                hitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
+                HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
                 new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, Index), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both
@@ -61,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
-            TopLevelContainer.Add(hitObjectArea.Explosions.CreateProxy());
+            TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
@@ -111,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 RelativeSizeAxes = Axes.Both
             };
 
-            hitObjectArea.Explosions.Add(explosion);
+            HitObjectArea.Explosions.Add(explosion);
 
             explosion.Delay(200).Expire(true);
         }
@@ -138,6 +141,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
-            => DrawRectangle.Inflate(new Vector2(ManiaStage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
+            => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
     }
 }

@@ -66,9 +66,9 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config)
+        private void load(OsuColour colours, MfConfigManager config)
         {
-            config.BindWith(OsuSetting.OptUI, Optui);
+            config.BindWith(MfSetting.OptUI, Optui);
 
             Children = new Drawable[]
             {
@@ -152,7 +152,10 @@ namespace osu.Game.Screens.Play
                     Margin = new MarginPadding(25),
                     Children = new PlayerSettingsGroup[]
                     {
-                        VisualSettings = new VisualSettings(),
+                        VisualSettings = new VisualSettings
+                        {
+                            IgnoreOptUI = false,
+                        },
                     }
                 },
             };
@@ -175,7 +178,6 @@ namespace osu.Game.Screens.Play
                     VisualSettings.FadeOut(250);
                     break;
             }
-
         }
 
         private int retries;
@@ -301,7 +303,6 @@ namespace osu.Game.Screens.Play
 
         private void BreakSettingsOverlayContainer()
         {
-
         }
 
         private class Button : DialogButton

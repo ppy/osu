@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private void bindEvents(DrawableOsuHitObject drawableObject)
         {
             drawableObject.HitObject.PositionBindable.BindValueChanged(_ => scheduleRefresh());
-            drawableObject.HitObject.DefaultsApplied += scheduleRefresh;
+            drawableObject.HitObject.DefaultsApplied += _ => scheduleRefresh();
         }
 
         private void scheduleRefresh()
@@ -116,6 +116,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             int point = 0;
 
+            ClearInternal();
+
             for (int d = (int)(spacing * 1.5); d < distance - spacing; d += spacing)
             {
                 float fraction = (float)d / distance;
@@ -126,21 +128,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                 FollowPoint fp;
 
-                if (InternalChildren.Count > point)
-                {
-                    fp = (FollowPoint)InternalChildren[point];
-                    fp.ClearTransforms();
-                }
-                else
-                    AddInternal(fp = new FollowPoint());
+                AddInternal(fp = new FollowPoint());
 
                 fp.Position = pointStartPosition;
                 fp.Rotation = rotation;
                 fp.Alpha = 0;
                 fp.Scale = new Vector2(1.5f * osuEnd.Scale);
 
-                if (firstTransformStartTime == null)
-                    firstTransformStartTime = fadeInTime;
+                firstTransformStartTime ??= fadeInTime;
+
+                fp.AnimationStartTime = fadeInTime;
 
                 using (fp.BeginAbsoluteSequence(fadeInTime))
                 {

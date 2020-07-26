@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Online.API;
 using System;
+using osu.Game.Online.API;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Database
 {
@@ -17,13 +18,13 @@ namespace osu.Game.Database
         /// Fired when a <typeparamref name="TModel"/> download begins.
         /// This is NOT run on the update thread and should be scheduled.
         /// </summary>
-        event Action<ArchiveDownloadRequest<TModel>> DownloadBegan;
+        IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadBegan { get; }
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> download is interrupted, either due to user cancellation or failure.
         /// This is NOT run on the update thread and should be scheduled.
         /// </summary>
-        event Action<ArchiveDownloadRequest<TModel>> DownloadFailed;
+        IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadFailed { get; }
 
         /// <summary>
         /// Checks whether a given <typeparamref name="TModel"/> is already available in the local store.
@@ -35,10 +36,12 @@ namespace osu.Game.Database
         /// <summary>
         /// Begin a download for the requested <typeparamref name="TModel"/>.
         /// </summary>
-        /// <param name="model">The <stypeparamref name="TModel"/> to be downloaded.</param>
-        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle..</param>
+        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
+        /// <param name="UseSayobot">Decides whether to use sayobot to download</param>
+        /// <param name="noVideo">Whether this download should be optimised for slow connections. Generally means Videos are not included in the download bundle.</param>
+        /// <param name="IsMini">Whether this downlaod should be optimised for very slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>Whether the download was started.</returns>
-        bool Download(TModel model, bool minimiseDownloadSize);
+        bool Download(TModel model, bool UseSayobot, bool noVideo, bool IsMini);
 
         /// <summary>
         /// Gets an existing <typeparamref name="TModel"/> download request if it exists.

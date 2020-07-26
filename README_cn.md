@@ -24,13 +24,13 @@
 
 ## 运行osu！
 
-如果您正在寻找一个可以不用搭建开发环境即可安装/测试osu!，您可以下载我们的[二进制发行版](https://github.com/ppy/osu/releases)。
+如果您正在寻找一个可以不用搭建开发环境即可安装/测试的osu!，您可以下载我们的[二进制发行版](https://github.com/ppy/osu/releases)。
 下面的链接可以帮助您在您的操作系统上获取osu!的最新版本：
 
-**最新构建：**
+**最新构建：(官方版)**
 
 | [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [iOS(iOS 10+)](https://osu.ppy.sh/home/testflight) | [Android (5+)](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage)
-| ------------- | ------------- | ------------- | ------------- |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
 
 - 如果您在 Windows 7 或 8.1　上运行, 您也许需要下载 **[额外依赖](https://docs.microsoft.com/en-us/dotnet/core/install/dependencies?tabs=netcore31&pivots=os-windows)** 来运行 .NET Core 应用程序。
 
@@ -43,7 +43,7 @@
 - 装有[.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)或更高版本的桌面平台。
 - 若要开发移动平台的osu！，您需要安装[Xamarin](https://docs.microsoft.com/en-us/xamarin/)，Xamarin通常会作为 Visual Studio 或 [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)的一个安装选项来附带。
 - 当编写代码时，我们推荐您使用带有自动补全和语法高亮的IDE来进行，如：[Visual Studio 2019+](https://visualstudio.microsoft.com/vs/), [JetBrains Rider](https://www.jetbrains.com/rider/) 或 [Visual Studio Code](https://code.visualstudio.com/).
-- 当在Linux上运行时，osu！需要一个系统范围的FFmpeg安装，否则视频播放将无法使用。
+- 当在Linux上运行时，osu!需要一个系统范围的FFmpeg安装，否则视频播放将无法使用。
 * 译者注：您可以尝试将原本AppImage中的`AppRun`脚本替换为[这个pr](https://github.com/ppy/osu-deploy/pull/44/files)中提供的`AppRun`，如果在替换后视频播放正常，则代表您的发行版没有正确创建相关软链。
 
 ### 下载源码（需要git）
@@ -63,22 +63,24 @@ git pull
 
 ### 构建
 
-Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this is provided [below](#contributing).
+我们已经为上方列出的IDE准备好了构建配置。您应当使用我们所提供的构建、运行功能来确保所有事情正常运作。
+当测试或构建新功能时，我们极力推荐您使用`VisualTests`进行。
+详细信息已被列在[下方](#contributing)。
 
-- Visual Studio / Rider users should load the project via one of the platform-specific `.slnf` files, rather than the main `.sln.` This will allow access to template run configurations.
-- Visual Studio Code users must run the `Restore` task before any build attempt.
+- Visual Studio / Rider 用户应当通过`.slnf`而不是`.sln`来加载项目，这将允许访问模板进行配置。
+- Visual Studio Code 用户需要在构建前运行`Restore`任务以避免出现问题。
 
-You can also build and run *osu!* from the command-line with a single command:
+您同样也可以通过一条指令来运行*osu!*
 
 ```shell
 dotnet run --project osu.Desktop
 ```
 
-If you are not interested in debugging *osu!*, you can add `-c Release` to gain performance. In this case, you must replace `Debug` with `Release` in any commands mentioned in this document.
+如果您对调试*osu!*不感兴趣，您可以在指令后面添加`-c Release`选项来提升性能。既然如此，那您必须将此文档中所有的`Debug`替换成`Release`
 
-If the build fails, try to restore NuGet packages with `dotnet restore`.
+如果构建失败了，则尝试通过`dotnet restore`来还原项目所需的NuGet包
 
-_Due to a historical feature gap between .NET Core and Xamarin, running `dotnet` CLI from the root directory will not work for most commands. This can be resolved by specifying a target `.csproj` or the helper project at `build/Desktop.proj`. Configurations have been provided to work around this issue for all supported IDEs mentioned above._
+_因为一些 .NET Core 和 Xamarin 的历史遗留问题，在项目根目录运行`dotnet`CLI的绝大多数指令均为出现问题。这可以通过在`.csproj`中指定目标或在`build/Desktop.csproj`中指定助手项目来解决。对于上述所有受支持的IDE，我们已经提供了解决该问题的配置。_
 
 ### Testing with resource/framework modifications
 
