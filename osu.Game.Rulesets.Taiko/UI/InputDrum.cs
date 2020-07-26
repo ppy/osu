@@ -37,39 +37,41 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                Scale = new Vector2(0.9f),
-                Children = new Drawable[]
+                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
                 {
-                    new TaikoHalfDrum(false)
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fit,
+                    Scale = new Vector2(0.9f),
+                    Children = new Drawable[]
                     {
-                        Name = "Left Half",
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.CentreRight,
-                        RelativeSizeAxes = Axes.Both,
-                        RelativePositionAxes = Axes.X,
-                        X = -middle_split / 2,
-                        RimAction = TaikoAction.LeftRim,
-                        CentreAction = TaikoAction.LeftCentre
-                    },
-                    new TaikoHalfDrum(true)
-                    {
-                        Name = "Right Half",
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.Both,
-                        RelativePositionAxes = Axes.X,
-                        X = middle_split / 2,
-                        RimAction = TaikoAction.RightRim,
-                        CentreAction = TaikoAction.RightCentre
+                        new TaikoHalfDrum(false)
+                        {
+                            Name = "Left Half",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreRight,
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.X,
+                            X = -middle_split / 2,
+                            RimAction = TaikoAction.LeftRim,
+                            CentreAction = TaikoAction.LeftCentre
+                        },
+                        new TaikoHalfDrum(true)
+                        {
+                            Name = "Right Half",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.X,
+                            X = middle_split / 2,
+                            RimAction = TaikoAction.RightRim,
+                            CentreAction = TaikoAction.RightCentre
+                        }
                     }
-                }
-            });
-
-            AddRangeInternal(sampleContainer.Sounds);
+                }),
+                sampleContainer
+            };
         }
 
         /// <summary>
