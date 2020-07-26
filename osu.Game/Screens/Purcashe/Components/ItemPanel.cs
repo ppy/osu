@@ -13,7 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.PurePlayer.Components;
+using osu.Game.Screens.Mvis.Components;
 using osuTK;
 using osuTK.Graphics;
 

@@ -40,7 +40,6 @@ namespace osu.Game.Screens.Menu
         private Screen songSelect;
 
         private Screen mvisScreen;
-        private Screen purePlayerScreen;
 
         private MenuSideFlashes sideFlashes;
 
@@ -108,7 +107,6 @@ namespace osu.Game.Screens.Menu
                             OnSolo = onSolo,
                             OnMvisButton = onMvis,
                             OnPurcashe = onPurcashe,
-                            OnPurePlayerButton = onPurePlayer,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = confirmAndExit,
                         }
@@ -147,7 +145,6 @@ namespace osu.Game.Screens.Menu
             LoadComponentAsync(background = new BackgroundScreenDefault());
             LoadComponentAsync(mvisScreen = new MvisScreen());
             LoadComponentAsync(purcasheScreen = new PurcasheScreen());
-            LoadComponentAsync(purePlayerScreen = new PurePlayerScreen());
             preloadScreens();
         }
 
@@ -172,9 +169,6 @@ namespace osu.Game.Screens.Menu
 
             if (mvisScreen == null)
                 LoadComponentAsync(mvisScreen = new MvisScreen());
-
-            if (purePlayerScreen == null)
-                LoadComponentAsync(purePlayerScreen = new PurePlayerScreen());
         }
 
         public void LoadToSolo() => Schedule(onSolo);
@@ -182,8 +176,6 @@ namespace osu.Game.Screens.Menu
         private void onSolo() => this.Push(consumeSongSelect());
 
         private void onMvis() => this.Push(consumeMvis());
-
-        private void onPurePlayer() => this.Push(consumePurePlayer());
 
         private void onPurcashe() => this.Push(consumePurcashe());
 
@@ -198,13 +190,6 @@ namespace osu.Game.Screens.Menu
         {
             var s = mvisScreen;
             mvisScreen = null;
-            return s;
-        }
-
-        private Screen consumePurePlayer()
-        {
-            var s = purePlayerScreen;
-            purePlayerScreen = null;
             return s;
         }
 

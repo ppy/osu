@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Extensions.Color4Extensions;
 
-namespace osu.Game.Screens.PurePlayer.Components
+namespace osu.Game.Screens.Mvis.Components
 {
     public class BeatmapCover : Container
     {
