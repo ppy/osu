@@ -130,11 +130,16 @@ namespace osu.Game.Rulesets.Judgements
             if (type == currentDrawableType)
                 return;
 
-            InternalChild = JudgementBody = new Container
+            // sub-classes might have added their own children that would be removed here if .InternalChild was used.
+            if (JudgementBody != null)
+                RemoveInternal(JudgementBody);
+
+            AddInternal(JudgementBody = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
+                Depth = -float.MaxValue,
                 Child = bodyDrawable = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ => JudgementText = new OsuSpriteText
                 {
                     Text = type.GetDescription().ToUpperInvariant(),
@@ -142,7 +147,7 @@ namespace osu.Game.Rulesets.Judgements
                     Colour = colours.ForHitResult(type),
                     Scale = new Vector2(0.85f, 1),
                 }, confineMode: ConfineMode.NoScaling)
-            };
+            });
 
             currentDrawableType = type;
         }
