@@ -44,59 +44,50 @@ namespace osu.Game.Overlays.Rankings
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChildren = new Drawable[]
+            InternalChild = new FillFlowContainer
             {
-                new Container
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = RankingsOverlay.CONTENT_X_MARGIN },
-                    Child = new FillFlowContainer
+                    new Container
+                    {
+                        Margin = new MarginPadding { Vertical = 20 },
+                        RelativeSizeAxes = Axes.X,
+                        Height = 40,
+                        Depth = -float.MaxValue,
+                        Child = dropdown = new SpotlightsDropdown
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Current = Current
+                        }
+                    },
+                    new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new Container
+                            new FillFlowContainer
                             {
-                                Margin = new MarginPadding { Vertical = 20 },
-                                RelativeSizeAxes = Axes.X,
-                                Height = 40,
-                                Depth = -float.MaxValue,
-                                Child = dropdown = new SpotlightsDropdown
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Current = Current
-                                }
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(10, 0),
+                                Margin = new MarginPadding { Bottom = 5 },
                                 Children = new Drawable[]
                                 {
-                                    new FillFlowContainer
-                                    {
-                                        AutoSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(10, 0),
-                                        Margin = new MarginPadding { Bottom = 5 },
-                                        Children = new Drawable[]
-                                        {
-                                            startDateColumn = new InfoColumn(@"Start Date"),
-                                            endDateColumn = new InfoColumn(@"End Date"),
-                                            mapCountColumn = new InfoColumn(@"Map Count"),
-                                            participantsColumn = new InfoColumn(@"Participants")
-                                        }
-                                    },
-                                    new RankingsSortTabControl
-                                    {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        Current = Sort
-                                    }
+                                    startDateColumn = new InfoColumn(@"Start Date"),
+                                    endDateColumn = new InfoColumn(@"End Date"),
+                                    mapCountColumn = new InfoColumn(@"Map Count"),
+                                    participantsColumn = new InfoColumn(@"Participants")
                                 }
+                            },
+                            new RankingsSortTabControl
+                            {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Current = Sort
                             }
                         }
                     }

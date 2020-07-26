@@ -52,14 +52,20 @@ namespace osu.Game.Overlays.Rankings.Displays
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Depth = -float.MaxValue,
-                        Children = new[]
+                        Children = new Drawable[]
                         {
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = colourProvider.Dark3
                             },
-                            CreateHeader()
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Padding = new MarginPadding { Horizontal = RankingsOverlay.CONTENT_X_MARGIN },
+                                Child = CreateHeader()
+                            }
                         }
                     },
                     content = new Container

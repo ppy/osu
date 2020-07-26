@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -27,7 +25,6 @@ namespace osu.Game.Overlays.Rankings
             set => current.Current = value;
         }
 
-        private readonly Box background;
         private readonly CountryPill countryPill;
         private readonly Container content;
 
@@ -42,17 +39,12 @@ namespace osu.Game.Overlays.Rankings
                 Alpha = 0,
                 Children = new Drawable[]
                 {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    },
                     new FillFlowContainer
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(10, 0),
-                        Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
                         Children = new Drawable[]
                         {
                             new OsuSpriteText
@@ -73,12 +65,6 @@ namespace osu.Game.Overlays.Rankings
                     }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            background.Colour = colourProvider.Dark3;
         }
 
         protected override void LoadComplete()

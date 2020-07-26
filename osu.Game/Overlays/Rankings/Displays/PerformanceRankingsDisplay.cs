@@ -26,35 +26,27 @@ namespace osu.Game.Overlays.Rankings.Displays
 
         protected override APIRequest<GetUsersResponse> CreateRequest() => new GetUserRankingsRequest(Current.Value, UserRankingsType.Performance, sort.Value, 1, Country.Value?.FlagName);
 
-        protected override Drawable CreateHeader() => new Container
+        protected override Drawable CreateHeader() => new FillFlowContainer
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
+            Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                new CountryFilter
+                {
+                    Current = Country
+                },
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    Child = new RankingsSortTabControl
                     {
-                        new CountryFilter
-                        {
-                            Current = Country
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Child = new RankingsSortTabControl
-                            {
-                                Margin = new MarginPadding { Vertical = 20, Right = RankingsOverlay.CONTENT_X_MARGIN },
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                Current = sort
-                            }
-                        }
+                        Margin = new MarginPadding { Vertical = 20 },
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Current = sort
                     }
                 }
             }
