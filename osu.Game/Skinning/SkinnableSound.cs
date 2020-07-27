@@ -22,6 +22,9 @@ namespace osu.Game.Skinning
         [Resolved]
         private ISampleStore samples { get; set; }
 
+        public override bool RemoveWhenNotAlive => false;
+        public override bool RemoveCompletedTransforms => false;
+
         public SkinnableSound(ISampleInfo hitSamples)
             : this(new[] { hitSamples })
         {

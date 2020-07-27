@@ -6,7 +6,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 
-namespace osu.Game.Online.API
+namespace osu.Game.Online.Multiplayer
 {
     public class APIPlaylistBeatmap : APIBeatmap
     {

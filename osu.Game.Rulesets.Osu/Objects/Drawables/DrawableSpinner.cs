@@ -14,6 +14,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Rulesets.Objects;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
@@ -24,9 +25,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         protected readonly Spinner Spinner;
 
+        private readonly Container<DrawableSpinnerTick> ticks;
+
         public readonly SpinnerDisc Disc;
         public readonly SpinnerTicks Ticks;
         public readonly SpinnerSpmCounter SpmCounter;
+        private readonly SpinnerBonusDisplay bonusDisplay;
 
         private readonly Container mainContainer;
 
@@ -60,6 +64,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
+                ticks = new Container<DrawableSpinnerTick>(),
                 circleContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
@@ -120,8 +125,46 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     Y = 120,
                     Alpha = 0
+                },
+                bonusDisplay = new SpinnerBonusDisplay
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Y = -120,
                 }
             };
+        }
+
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
+
+            switch (hitObject)
+            {
+                case DrawableSpinnerTick tick:
+                    ticks.Add(tick);
+                    break;
+            }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            ticks.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case SpinnerBonusTick bonusTick:
+                    return new DrawableSpinnerBonusTick(bonusTick);
+
+                case SpinnerTick tick:
+                    return new DrawableSpinnerTick(tick);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
         }
 
         [BackgroundDependencyLoader]
@@ -156,6 +199,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < Spinner.EndTime)
                 return;
 
+            // Trigger a miss result for remaining ticks to avoid infinite gameplay.
+            foreach (var tick in ticks.Where(t => !t.IsHit))
+                tick.TriggerResult(false);
+
             ApplyResult(r =>
             {
                 if (Progress >= 1)
@@ -185,13 +232,48 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
+
             SpmCounter.SetRotation(Disc.CumulativeRotation);
+
+            updateBonusScore();
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             float targetScale = relativeCircleScale + (1 - relativeCircleScale) * Progress;
             Disc.Scale = new Vector2((float)Interpolation.Lerp(Disc.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
 
             symbol.Rotation = (float)Interpolation.Lerp(symbol.Rotation, Disc.Rotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
+        }
+
+        private int wholeSpins;
+
+        private void updateBonusScore()
+        {
+            if (ticks.Count == 0)
+                return;
+
+            int spins = (int)(Disc.CumulativeRotation / 360);
+
+            if (spins < wholeSpins)
+            {
+                // rewinding, silently handle
+                wholeSpins = spins;
+                return;
+            }
+
+            while (wholeSpins != spins)
+            {
+                var tick = ticks.FirstOrDefault(t => !t.IsHit);
+
+                // tick may be null if we've hit the spin limit.
+                if (tick != null)
+                {
+                    tick.TriggerResult(true);
+                    if (tick is DrawableSpinnerBonusTick)
+                        bonusDisplay.SetBonusCount(spins - Spinner.SpinsRequired);
+                }
+
+                wholeSpins++;
+            }
         }
 
         protected override void UpdateInitialTransforms()
