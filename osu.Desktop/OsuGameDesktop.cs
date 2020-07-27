@@ -16,6 +16,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
+using osu.Desktop.Windows;
 
 namespace osu.Desktop
 {
@@ -98,6 +99,9 @@ namespace osu.Desktop
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
