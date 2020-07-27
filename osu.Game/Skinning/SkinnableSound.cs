@@ -40,42 +40,6 @@ namespace osu.Game.Skinning
 
         private readonly AudioContainer<DrawableSample> samplesContainer;
 
-        public BindableNumber<double> Volume => samplesContainer.Volume;
-
-        public BindableNumber<double> Balance => samplesContainer.Balance;
-
-        public BindableNumber<double> Frequency => samplesContainer.Frequency;
-
-        public BindableNumber<double> Tempo => samplesContainer.Tempo;
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Volume"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<DrawableAudioWrapper> VolumeTo(double newVolume, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.VolumeTo(newVolume, duration, easing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Balance"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<DrawableAudioWrapper> BalanceTo(double newBalance, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.BalanceTo(newBalance, duration, easing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Frequency"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<DrawableAudioWrapper> FrequencyTo(double newFrequency, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.FrequencyTo(newFrequency, duration, easing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Tempo"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<DrawableAudioWrapper> TempoTo(double newTempo, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.TempoTo(newTempo, duration, easing);
-
         public bool Looping
         {
             get => looping;
@@ -130,5 +94,45 @@ namespace osu.Game.Skinning
             if (wasPlaying)
                 Play();
         }
+
+        #region Re-expose AudioContainer
+
+        public BindableNumber<double> Volume => samplesContainer.Volume;
+
+        public BindableNumber<double> Balance => samplesContainer.Balance;
+
+        public BindableNumber<double> Frequency => samplesContainer.Frequency;
+
+        public BindableNumber<double> Tempo => samplesContainer.Tempo;
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="Volume"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public TransformSequence<DrawableAudioWrapper> VolumeTo(double newVolume, double duration = 0, Easing easing = Easing.None) =>
+            samplesContainer.VolumeTo(newVolume, duration, easing);
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="Balance"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public TransformSequence<DrawableAudioWrapper> BalanceTo(double newBalance, double duration = 0, Easing easing = Easing.None) =>
+            samplesContainer.BalanceTo(newBalance, duration, easing);
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="Frequency"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public TransformSequence<DrawableAudioWrapper> FrequencyTo(double newFrequency, double duration = 0, Easing easing = Easing.None) =>
+            samplesContainer.FrequencyTo(newFrequency, duration, easing);
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="Tempo"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public TransformSequence<DrawableAudioWrapper> TempoTo(double newTempo, double duration = 0, Easing easing = Easing.None) =>
+            samplesContainer.TempoTo(newTempo, duration, easing);
+
+        #endregion
     }
 }
