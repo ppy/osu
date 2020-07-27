@@ -47,15 +47,16 @@ namespace osu.Game.Tests.Visual.Gameplay
                 sample = skinnableSound.ChildrenOfType<DrawableSample>().First();
             });
 
-            AddAssert("sample playing", () => sample.Playing);
+            AddUntilStep("wait for sample to start playing", () => sample.Playing);
 
             AddStep("stop sample", () => skinnableSound.Stop());
 
-            AddAssert("sample not playing", () => !sample.Playing);
+            AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
 
             AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
             AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
 
+            AddWaitStep("wait a bit", 5);
             AddAssert("sample not playing", () => !sample.Playing);
         }
 
@@ -70,13 +71,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 sample = skinnableSound.ChildrenOfType<DrawableSample>().First();
             });
 
-            AddAssert("sample playing", () => sample.Playing);
+            AddUntilStep("wait for sample to start playing", () => sample.Playing);
 
             AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
-            AddAssert("sample not playing", () => !sample.Playing);
-
-            AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
-            AddUntilStep("wait for sample to start playing", () => sample.Playing);
+            AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
         }
 
         [Test]
@@ -92,9 +90,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("sample playing", () => sample.Playing);
 
             AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
-            AddAssert("sample not playing", () => !sample.Playing);
+            AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
 
             AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
+
+            AddAssert("sample not playing", () => !sample.Playing);
+            AddAssert("sample not playing", () => !sample.Playing);
             AddAssert("sample not playing", () => !sample.Playing);
         }
     }
