@@ -1,26 +1,28 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Utils;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osuTK;
-using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Storyboards;
+using osu.Game.Tests.Visual;
+using osuTK;
 using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -33,6 +35,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         private TrackVirtualManual track;
 
         protected override bool Autoplay => true;
+
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new ScoreExposedPlayer();
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
@@ -130,17 +134,43 @@ namespace osu.Game.Rulesets.Osu.Tests
         };
 
         [Test]
+        public void TestSpinnerNormalBonusRewinding()
+        {
+            addSeekStep(1000);
+
+            AddAssert("player score matching expected bonus score", () =>
+            {
+                // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
+                var totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
+                return totalScore == (int)(drawableSpinner.Disc.CumulativeRotation / 360) * 100;
+            });
+
+            addSeekStep(0);
+
+            AddAssert("player score is 0", () => ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value == 0);
+        }
+
+        [Test]
+        public void TestSpinnerCompleteBonusRewinding()
+        {
+            addSeekStep(2500);
+            addSeekStep(0);
+
+            AddAssert("player score is 0", () => ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value == 0);
+        }
+
+        [Test]
         public void TestSpinPerMinuteOnRewind()
         {
             double estimatedSpm = 0;
 
-            addSeekStep(2500);
+            addSeekStep(1000);
             AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpmCounter.SpinsPerMinute);
 
-            addSeekStep(5000);
+            addSeekStep(2000);
             AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
 
-            addSeekStep(2500);
+            addSeekStep(1000);
             AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
         }
 
@@ -160,12 +190,17 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Position = new Vector2(256, 192),
                     EndTime = 6000,
                 },
-                // placeholder object to avoid hitting the results screen
-                new HitCircle
-                {
-                    StartTime = 99999,
-                }
             }
         };
+
+        private class ScoreExposedPlayer : TestPlayer
+        {
+            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+
+            public ScoreExposedPlayer()
+                : base(false, false)
+            {
+            }
+        }
     }
 }
