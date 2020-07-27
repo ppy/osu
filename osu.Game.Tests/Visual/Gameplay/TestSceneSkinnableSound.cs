@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private SkinnableSound skinnableSound;
 
         [SetUp]
-        public void SetUp()
+        public void SetUp() => Schedule(() =>
         {
             Children = new Drawable[]
             {
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Child = skinnableSound = new SkinnableSound(new SampleInfo("normal-sliderslide"))
                 },
             };
-        }
+        });
 
         [Test]
         public void TestStoppedSoundDoesntResumeAfterPause()
