@@ -31,13 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     Clock = gameplayClock,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        skinnableSound = new SkinnableSound(new SampleInfo("normal-sliderslide"))
-                        {
-                            Looping = true
-                        }
-                    }
+                    Child = skinnableSound = new SkinnableSound(new SampleInfo("normal-sliderslide"))
                 },
             };
         }
@@ -46,27 +40,47 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestStoppedSoundDoesntResumeAfterPause()
         {
             DrawableSample sample = null;
-            AddStep("start sample", () =>
+            AddStep("start sample with looping", () =>
             {
+                skinnableSound.Looping = true;
                 skinnableSound.Play();
                 sample = skinnableSound.ChildrenOfType<DrawableSample>().First();
             });
 
-            AddUntilStep("wait for sample to start playing", () => sample.Playing);
+            AddAssert("sample playing", () => sample.Playing);
 
             AddStep("stop sample", () => skinnableSound.Stop());
 
-            AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
+            AddAssert("sample not playing", () => !sample.Playing);
 
             AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
             AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
 
-            AddWaitStep("wait a bit", 5);
             AddAssert("sample not playing", () => !sample.Playing);
         }
 
         [Test]
         public void TestLoopingSoundResumesAfterPause()
+        {
+            DrawableSample sample = null;
+            AddStep("start sample with looping", () =>
+            {
+                skinnableSound.Looping = true;
+                skinnableSound.Play();
+                sample = skinnableSound.ChildrenOfType<DrawableSample>().First();
+            });
+
+            AddAssert("sample playing", () => sample.Playing);
+
+            AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
+            AddAssert("sample not playing", () => !sample.Playing);
+
+            AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
+            AddUntilStep("wait for sample to start playing", () => sample.Playing);
+        }
+
+        [Test]
+        public void TestNonLoopingStopsWithPause()
         {
             DrawableSample sample = null;
             AddStep("start sample", () =>
@@ -75,13 +89,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 sample = skinnableSound.ChildrenOfType<DrawableSample>().First();
             });
 
-            AddUntilStep("wait for sample to start playing", () => sample.Playing);
+            AddAssert("sample playing", () => sample.Playing);
 
             AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
-            AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
+            AddAssert("sample not playing", () => !sample.Playing);
 
             AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
-            AddUntilStep("wait for sample to start playing", () => sample.Playing);
+            AddAssert("sample not playing", () => !sample.Playing);
         }
     }
 }
