@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private GameplayClock gameplayClock = new GameplayClock(new FramedClock());
 
-        private SkinnableSound skinnableSounds;
+        private SkinnableSound skinnableSound;
 
         [SetUp]
         public void SetUp()
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        skinnableSounds = new SkinnableSound(new SampleInfo("normal-sliderslide"))
+                        skinnableSound = new SkinnableSound(new SampleInfo("normal-sliderslide"))
                         {
                             Looping = true
                         }
@@ -48,13 +48,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             DrawableSample sample = null;
             AddStep("start sample", () =>
             {
-                skinnableSounds.Play();
-                sample = skinnableSounds.ChildrenOfType<DrawableSample>().First();
+                skinnableSound.Play();
+                sample = skinnableSound.ChildrenOfType<DrawableSample>().First();
             });
 
             AddUntilStep("wait for sample to start playing", () => sample.Playing);
 
-            AddStep("stop sample", () => skinnableSounds.Stop());
+            AddStep("stop sample", () => skinnableSound.Stop());
 
             AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
 
@@ -71,8 +71,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             DrawableSample sample = null;
             AddStep("start sample", () =>
             {
-                skinnableSounds.Play();
-                sample = skinnableSounds.ChildrenOfType<DrawableSample>().First();
+                skinnableSound.Play();
+                sample = skinnableSound.ChildrenOfType<DrawableSample>().First();
             });
 
             AddUntilStep("wait for sample to start playing", () => sample.Playing);
