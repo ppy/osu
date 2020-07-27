@@ -21,7 +21,6 @@ namespace osu.Game.Overlays.Comments.Buttons
         public ShowMoreButton()
         {
             AutoSizeAxes = Axes.Both;
-            Margin = new MarginPadding { Vertical = 10, Left = 80 };
             LoadingAnimationSize = new Vector2(8);
         }
 
