@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             LinkFlowContainer username;
             FillFlowContainer info;
@@ -176,14 +176,12 @@ namespace osu.Game.Overlays.Comments
                                                             Spacing = new Vector2(10, 0),
                                                             Children = new Drawable[]
                                                             {
-                                                                new OsuSpriteText
+                                                                new DrawableDate(Comment.CreatedAt, 12, false)
                                                                 {
                                                                     Anchor = Anchor.CentreLeft,
                                                                     Origin = Anchor.CentreLeft,
-                                                                    Font = OsuFont.GetFont(size: 12),
-                                                                    Colour = OsuColour.Gray(0.7f),
-                                                                    Text = HumanizerUtils.Humanize(Comment.CreatedAt)
-                                                                },
+                                                                    Colour = colourProvider.Foreground1
+                                                                }
                                                             }
                                                         },
                                                         showRepliesButton = new ShowRepliesButton(Comment.RepliesCount)
