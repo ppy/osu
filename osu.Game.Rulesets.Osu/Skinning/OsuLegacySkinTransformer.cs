@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 case OsuSkinComponents.HitCircleText:
                     var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCirclePrefix)?.Value ?? "default";
-                    var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? 0;
+                    var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? -2;
 
                     return !hasFont(font)
                         ? null
