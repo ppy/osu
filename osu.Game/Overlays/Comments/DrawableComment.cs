@@ -363,19 +363,6 @@ namespace osu.Game.Overlays.Comments
             showMoreButton.IsLoading = loadRepliesButton.IsLoading = false;
         }
 
-        private class ShowMoreButton : GetCommentRepliesButton
-        {
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                Margin = new MarginPadding { Vertical = 10, Left = 80 };
-                IdleColour = colourProvider.Light2;
-                HoverColour = colourProvider.Light1;
-            }
-
-            protected override string GetText() => @"Show More";
-        }
-
         private class ParentUsername : FillFlowContainer, IHasTooltip
         {
             public string TooltipText => getParentMessage();
