@@ -228,13 +228,19 @@ namespace osu.Game.Overlays.Comments
                         },
                     }
                 },
-                chevronButton = new ChevronButton
+                new Container
                 {
+                    Size = new Vector2(70, 40),
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Margin = new MarginPadding { Right = 30, Top = margin },
-                    Expanded = { BindTarget = childrenExpanded },
-                    Alpha = 0
+                    Margin = new MarginPadding { Horizontal = 5 },
+                    Child = chevronButton = new ChevronButton
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Expanded = { BindTarget = childrenExpanded },
+                        Alpha = 0
+                    }
                 }
             };
 
@@ -355,24 +361,6 @@ namespace osu.Game.Overlays.Comments
                 chevronButton.FadeTo(loadedReplesCount != 0 ? 1 : 0);
 
             showMoreButton.IsLoading = loadRepliesButton.IsLoading = false;
-        }
-
-        private class ChevronButton : ShowChildrenButton
-        {
-            private readonly SpriteIcon icon;
-
-            public ChevronButton()
-            {
-                Child = icon = new SpriteIcon
-                {
-                    Size = new Vector2(12),
-                };
-            }
-
-            protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
-            {
-                icon.Icon = expanded.NewValue ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;
-            }
         }
 
         private class ShowMoreButton : GetCommentRepliesButton
