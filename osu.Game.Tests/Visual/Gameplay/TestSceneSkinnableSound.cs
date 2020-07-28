@@ -25,6 +25,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            gameplayClock.IsPaused.Value = false;
+
             Children = new Drawable[]
             {
                 new Container
@@ -42,9 +44,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             DrawableSample sample = null;
             AddStep("start sample with looping", () =>
             {
+                sample = skinnableSound.ChildrenOfType<DrawableSample>().First();
+
                 skinnableSound.Looping = true;
                 skinnableSound.Play();
-                sample = skinnableSound.ChildrenOfType<DrawableSample>().First();
             });
 
             AddUntilStep("wait for sample to start playing", () => sample.Playing);
