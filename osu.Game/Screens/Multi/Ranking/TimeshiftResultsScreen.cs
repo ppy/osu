@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
@@ -23,8 +22,8 @@ namespace osu.Game.Screens.Multi.Ranking
         private readonly PlaylistItem playlistItem;
 
         private LoadingSpinner loadingLayer;
-        private Cursor higherScoresCursor;
-        private Cursor lowerScoresCursor;
+        private MultiplayerScores higherScores;
+        private MultiplayerScores lowerScores;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -52,8 +51,8 @@ namespace osu.Game.Screens.Multi.Ranking
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
             // This performs two requests:
-            // 1. A request to show the user's score.
-            // 2. If (1) fails, a request to index the room.
+            // 1. A request to show the user's score (and scores around).
+            // 2. If that fails, a request to index the room starting from the highest score.
 
             var userScoreReq = new ShowPlaylistUserScoreRequest(roomId, playlistItem.ID, api.LocalUser.Value.Id);
 
@@ -64,13 +63,13 @@ namespace osu.Game.Screens.Multi.Ranking
                 if (userScore.ScoresAround?.Higher != null)
                 {
                     allScores.AddRange(userScore.ScoresAround.Higher.Scores);
-                    higherScoresCursor = userScore.ScoresAround.Higher.Cursor;
+                    higherScores = userScore.ScoresAround.Higher;
                 }
 
                 if (userScore.ScoresAround?.Lower != null)
                 {
                     allScores.AddRange(userScore.ScoresAround.Lower.Scores);
-                    lowerScoresCursor = userScore.ScoresAround.Lower.Cursor;
+                    lowerScores = userScore.ScoresAround.Lower;
                 }
 
                 performSuccessCallback(scoresCallback, allScores);
@@ -84,7 +83,7 @@ namespace osu.Game.Screens.Multi.Ranking
                 indexReq.Success += r =>
                 {
                     performSuccessCallback(scoresCallback, r.Scores);
-                    lowerScoresCursor = r.Cursor;
+                    lowerScores = r;
                 };
 
                 indexReq.Failure += __ => loadingLayer.Hide();
@@ -99,39 +98,19 @@ namespace osu.Game.Screens.Multi.Ranking
         {
             Debug.Assert(direction == 1 || direction == -1);
 
-            Cursor cursor;
-            MultiplayerScoresSort sort;
+            MultiplayerScores pivot = direction == -1 ? higherScores : lowerScores;
 
-            switch (direction)
-            {
-                case -1:
-                    cursor = higherScoresCursor;
-                    sort = MultiplayerScoresSort.Ascending;
-                    break;
-
-                default:
-                    cursor = lowerScoresCursor;
-                    sort = MultiplayerScoresSort.Descending;
-                    break;
-            }
-
-            if (cursor == null)
+            if (pivot?.Cursor == null)
                 return null;
 
-            var indexReq = new IndexPlaylistScoresRequest(roomId, playlistItem.ID, cursor, sort);
+            var indexReq = new IndexPlaylistScoresRequest(roomId, playlistItem.ID, pivot.Cursor, pivot.Params);
 
             indexReq.Success += r =>
             {
-                switch (direction)
-                {
-                    case -1:
-                        higherScoresCursor = r.Cursor;
-                        break;
-
-                    default:
-                        lowerScoresCursor = r.Cursor;
-                        break;
-                }
+                if (direction == -1)
+                    higherScores = r;
+                else
+                    lowerScores = r;
 
                 performSuccessCallback(scoresCallback, r.Scores);
             };
