@@ -146,15 +146,12 @@ namespace osu.Game.Screens.Ranking
                                 Children = new[]
                                 {
                                     middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both },
-                                    new DelayedLoadUnloadWrapper(() => new UserCoverBackground
+                                    new UserCoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         User = Score.User,
                                         Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
-                                    }, 300, 5000)
-                                    {
-                                        RelativeSizeAxes = Axes.Both
-                                    },
+                                    }
                                 }
                             },
                             middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
