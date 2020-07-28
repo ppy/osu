@@ -22,6 +22,9 @@ namespace osu.Game.Skinning
         [Resolved]
         private ISampleStore samples { get; set; }
 
+        public override bool RemoveWhenNotAlive => false;
+        public override bool RemoveCompletedTransforms => false;
+
         public SkinnableSound(ISampleInfo hitSamples)
             : this(new[] { hitSamples })
         {
@@ -98,6 +101,8 @@ namespace osu.Game.Skinning
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
+            bool wasPlaying = samplesContainer.Any(s => s.Playing);
+
             var channels = hitSamples.Select(s =>
             {
                 var ch = skin.GetSample(s);
@@ -121,6 +126,9 @@ namespace osu.Game.Skinning
             }).Where(c => c != null);
 
             samplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
+
+            if (wasPlaying)
+                Play();
         }
     }
 }
