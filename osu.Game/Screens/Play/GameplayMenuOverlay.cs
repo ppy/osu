@@ -24,7 +24,8 @@ namespace osu.Game.Screens.Play
 {
     public abstract class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
-        private const int transition_duration = 200;
+        protected const int TRANSITION_DURATION = 200;
+
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
 
@@ -156,8 +157,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
-        protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
+        protected override void PopIn() => this.FadeIn(TRANSITION_DURATION, Easing.In);
+        protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(MouseDownEvent e) => true;
