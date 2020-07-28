@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 return;
 
             displayedCount = count;
-            bonusCounter.Text = $"{1000 * count}";
+            bonusCounter.Text = $"{SpinnerBonusTick.SCORE_PER_TICK * count}";
             bonusCounter.FadeOutFromOne(1500);
             bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
         }

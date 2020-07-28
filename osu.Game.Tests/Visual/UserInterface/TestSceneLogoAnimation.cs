@@ -11,14 +11,14 @@ using osu.Game.Graphics.Sprites;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneHueAnimation : OsuTestScene
+    public class TestSceneLogoAnimation : OsuTestScene
     {
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
-            HueAnimation anim2;
+            LogoAnimation anim2;
 
-            Add(anim2 = new HueAnimation
+            Add(anim2 = new LogoAnimation
             {
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit,
@@ -26,9 +26,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Colour = Colour4.White,
             });
 
-            HueAnimation anim;
+            LogoAnimation anim;
 
-            Add(anim = new HueAnimation
+            Add(anim = new LogoAnimation
             {
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit,

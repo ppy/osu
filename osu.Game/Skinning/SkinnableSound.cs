@@ -22,6 +22,9 @@ namespace osu.Game.Skinning
         [Resolved]
         private ISampleStore samples { get; set; }
 
+        public override bool RemoveWhenNotAlive => false;
+        public override bool RemoveCompletedTransforms => false;
+
         public SkinnableSound(ISampleInfo hitSamples)
             : this(new[] { hitSamples })
         {
@@ -44,6 +47,10 @@ namespace osu.Game.Skinning
         public BindableNumber<double> Frequency => samplesContainer.Frequency;
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
+
+        public override bool IsPresent => Scheduler.HasPendingTasks || IsPlaying;
+
+        public bool IsPlaying => samplesContainer.Any(s => s.Playing);
 
         /// <summary>
         /// Smoothly adjusts <see cref="Volume"/> over time.
@@ -93,8 +100,6 @@ namespace osu.Game.Skinning
         });
 
         public void Stop() => samplesContainer.ForEach(c => c.Stop());
-
-        public override bool IsPresent => Scheduler.HasPendingTasks;
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
