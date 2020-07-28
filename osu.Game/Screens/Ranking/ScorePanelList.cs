@@ -26,9 +26,20 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         private const float expanded_panel_spacing = 15;
 
-        public bool IsScrolledToStart => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.Current <= 100;
+        /// <summary>
+        /// Minimum distance from either end point of the list that the list can be considered scrolled to the end point.
+        /// </summary>
+        private const float scroll_endpoint_distance = 100;
 
-        public bool IsScrolledToEnd => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.IsScrolledToEnd(100);
+        /// <summary>
+        /// Whether this <see cref="ScorePanelList"/> can be scrolled and is currently scrolled to the start.
+        /// </summary>
+        public bool IsScrolledToStart => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.Current <= scroll_endpoint_distance;
+
+        /// <summary>
+        /// Whether this <see cref="ScorePanelList"/> can be scrolled and is currently scrolled to the end.
+        /// </summary>
+        public bool IsScrolledToEnd => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.IsScrolledToEnd(scroll_endpoint_distance);
 
         /// <summary>
         /// An action to be invoked if a <see cref="ScorePanel"/> is clicked while in an expanded state.

@@ -50,6 +50,9 @@ namespace osu.Game.Screens.Ranking
         private ScorePanelList scorePanelList;
         private Container<ScorePanel> detachedPanelContainer;
 
+        private bool fetchedInitialScores;
+        private APIRequest nextPageRequest;
+
         protected ResultsScreen(ScoreInfo score, bool allowRetry = true)
         {
             Score = score;
@@ -172,13 +175,11 @@ namespace osu.Game.Screens.Ranking
             statisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
         }
 
-        private APIRequest nextPageRequest;
-
         protected override void Update()
         {
             base.Update();
 
-            if (hasAnyScores && nextPageRequest == null)
+            if (fetchedInitialScores && nextPageRequest == null)
             {
                 if (scorePanelList.IsScrolledToStart)
                     nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
@@ -202,16 +203,20 @@ namespace osu.Game.Screens.Ranking
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected virtual APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
 
+        /// <summary>
+        /// Performs a fetch of the next page of scores. This is invoked every frame until a non-null <see cref="APIRequest"/> is returned.
+        /// </summary>
+        /// <param name="direction">The fetch direction. -1 to fetch scores greater than the current start of the list, and 1 to fetch scores lower than the current end of the list.</param>
+        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
+        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected virtual APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
-
-        private bool hasAnyScores;
 
         private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
         {
             foreach (var s in scores)
                 addScore(s);
 
-            hasAnyScores = true;
+            fetchedInitialScores = true;
         });
 
         public override void OnEntering(IScreen last)
