@@ -3,29 +3,26 @@
 
 using System.Net.Http;
 using osu.Framework.IO.Network;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Users;
+using osu.Game.Online.API;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.Multiplayer
 {
-    public class JoinRoomRequest : APIRequest
+    public class PartRoomRequest : APIRequest
     {
         private readonly Room room;
-        private readonly User user;
 
-        public JoinRoomRequest(Room room, User user)
+        public PartRoomRequest(Room room)
         {
             this.room = room;
-            this.user = user;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
-            req.Method = HttpMethod.Put;
+            req.Method = HttpMethod.Delete;
             return req;
         }
 
-        protected override string Target => $"rooms/{room.RoomID.Value}/users/{user.Id}";
+        protected override string Target => $"rooms/{room.RoomID.Value}/users/{User.Id}";
     }
 }
