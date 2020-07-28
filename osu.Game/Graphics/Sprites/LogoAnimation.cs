@@ -11,13 +11,13 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class HueAnimation : Sprite
+    public class LogoAnimation : Sprite
     {
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
         {
-            TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"HueAnimation");
-            RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"HueAnimation"); // Masking isn't supported for now
+            TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"LogoAnimation");
+            RoundedTextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, @"LogoAnimation"); // Masking isn't supported for now
         }
 
         private float animationProgress;
@@ -36,15 +36,15 @@ namespace osu.Game.Graphics.Sprites
 
         public override bool IsPresent => true;
 
-        protected override DrawNode CreateDrawNode() => new HueAnimationDrawNode(this);
+        protected override DrawNode CreateDrawNode() => new LogoAnimationDrawNode(this);
 
-        private class HueAnimationDrawNode : SpriteDrawNode
+        private class LogoAnimationDrawNode : SpriteDrawNode
         {
-            private HueAnimation source => (HueAnimation)Source;
+            private LogoAnimation source => (LogoAnimation)Source;
 
             private float progress;
 
-            public HueAnimationDrawNode(HueAnimation source)
+            public LogoAnimationDrawNode(LogoAnimation source)
                 : base(source)
             {
             }

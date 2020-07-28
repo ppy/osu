@@ -32,10 +32,6 @@ namespace osu.Game.Overlays.Comments.Buttons
         protected CommentRepliesButton()
         {
             AutoSizeAxes = Axes.Both;
-            Margin = new MarginPadding
-            {
-                Vertical = 2
-            };
             InternalChildren = new Drawable[]
             {
                 new CircularContainer
