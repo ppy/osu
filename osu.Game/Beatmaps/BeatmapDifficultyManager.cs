@@ -240,7 +240,9 @@ namespace osu.Game.Beatmaps
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             cancelTrackedBindableUpdate();
+            updateScheduler.Dispose();
         }
 
         private readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
