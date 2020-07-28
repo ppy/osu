@@ -109,23 +109,40 @@ namespace osu.Game.Beatmaps
         }
 
         private CancellationTokenSource trackedUpdateCancellationSource;
+        private readonly List<CancellationTokenSource> linkedCancellationSources = new List<CancellationTokenSource>();
 
         /// <summary>
         /// Updates all tracked <see cref="BindableStarDifficulty"/> using the current ruleset and mods.
         /// </summary>
         private void updateTrackedBindables()
         {
-            trackedUpdateCancellationSource?.Cancel();
+            cancelTrackedBindableUpdate();
             trackedUpdateCancellationSource = new CancellationTokenSource();
 
             foreach (var b in trackedBindables)
             {
-                if (trackedUpdateCancellationSource.IsCancellationRequested)
-                    break;
+                var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken);
+                linkedCancellationSources.Add(linkedSource);
 
-                using (var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken))
-                    updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
+                updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
             }
+        }
+
+        /// <summary>
+        /// Cancels the existing update of all tracked <see cref="BindableStarDifficulty"/> via <see cref="updateTrackedBindables"/>.
+        /// </summary>
+        private void cancelTrackedBindableUpdate()
+        {
+            trackedUpdateCancellationSource?.Cancel();
+            trackedUpdateCancellationSource = null;
+
+            foreach (var c in linkedCancellationSources)
+            {
+                c.Cancel();
+                c.Dispose();
+            }
+
+            linkedCancellationSources.Clear();
         }
 
         /// <summary>
@@ -218,6 +235,12 @@ namespace osu.Game.Beatmaps
 
             key = new DifficultyCacheLookup(beatmapInfo.ID, rulesetInfo.ID.Value, mods);
             return difficultyCache.TryGetValue(key, out existingDifficulty);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            cancelTrackedBindableUpdate();
         }
 
         private readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
