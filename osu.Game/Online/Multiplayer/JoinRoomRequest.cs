@@ -2,18 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Net.Http;
-using Newtonsoft.Json;
 using osu.Framework.IO.Network;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.API;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.Multiplayer
 {
-    public class CreateRoomRequest : APIRequest<APICreatedRoom>
+    public class JoinRoomRequest : APIRequest
     {
         private readonly Room room;
 
-        public CreateRoomRequest(Room room)
+        public JoinRoomRequest(Room room)
         {
             this.room = room;
         }
@@ -21,15 +19,10 @@ namespace osu.Game.Online.API.Requests
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
-
-            req.ContentType = "application/json";
-            req.Method = HttpMethod.Post;
-
-            req.AddRaw(JsonConvert.SerializeObject(room));
-
+            req.Method = HttpMethod.Put;
             return req;
         }
 
-        protected override string Target => "rooms";
+        protected override string Target => $"rooms/{room.RoomID.Value}/users/{User.Id}";
     }
 }

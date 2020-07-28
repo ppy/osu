@@ -14,7 +14,6 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Multi.Lounge.Components;
