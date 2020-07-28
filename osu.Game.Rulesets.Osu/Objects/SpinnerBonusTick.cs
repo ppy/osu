@@ -9,6 +9,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class SpinnerBonusTick : SpinnerTick
     {
+        public new const int SCORE_PER_TICK = 50;
+
         public SpinnerBonusTick()
         {
             Samples.Add(new HitSampleInfo { Name = "spinnerbonus" });
@@ -18,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public class OsuSpinnerBonusTickJudgement : OsuSpinnerTickJudgement
         {
-            protected override int NumericResultFor(HitResult result) => 50;
+            protected override int NumericResultFor(HitResult result) => SCORE_PER_TICK;
 
             protected override double HealthIncreaseFor(HitResult result) => base.HealthIncreaseFor(result) * 2;
         }
