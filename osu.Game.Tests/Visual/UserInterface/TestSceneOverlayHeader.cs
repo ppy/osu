@@ -36,11 +36,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             });
 
-            addHeader("Orange OverlayHeader (no background)", new TestNoBackgroundHeader(), OverlayColourScheme.Orange);
-            addHeader("Blue OverlayHeader", new TestNoControlHeader(), OverlayColourScheme.Blue);
+            addHeader("Orange OverlayHeader (no background, 100 padding)", new TestNoBackgroundHeader(), OverlayColourScheme.Orange);
+            addHeader("Blue OverlayHeader (default 50 padding)", new TestNoControlHeader(), OverlayColourScheme.Blue);
             addHeader("Green TabControlOverlayHeader (string) with ruleset selector", new TestStringTabControlHeader(), OverlayColourScheme.Green);
-            addHeader("Pink TabControlOverlayHeader (enum)", new TestEnumTabControlHeader(), OverlayColourScheme.Pink);
-            addHeader("Red BreadcrumbControlOverlayHeader (no background)", new TestBreadcrumbControlHeader(), OverlayColourScheme.Red);
+            addHeader("Pink TabControlOverlayHeader (enum, 30 padding)", new TestEnumTabControlHeader(), OverlayColourScheme.Pink);
+            addHeader("Red BreadcrumbControlOverlayHeader (no background, 10 padding)", new TestBreadcrumbControlHeader(), OverlayColourScheme.Red);
         }
 
         private void addHeader(string name, OverlayHeader header, OverlayColourScheme colourScheme)
@@ -86,6 +86,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestNoBackgroundHeader : OverlayHeader
         {
             protected override OverlayTitle CreateTitle() => new TestTitle();
+
+            public TestNoBackgroundHeader()
+            {
+                ContentSidePadding = 100;
+            }
         }
 
         private class TestNoControlHeader : OverlayHeader
@@ -112,6 +117,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestEnumTabControlHeader : TabControlOverlayHeader<TestEnum>
         {
+            public TestEnumTabControlHeader()
+            {
+                ContentSidePadding = 30;
+            }
+
             protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/rankings");
 
             protected override OverlayTitle CreateTitle() => new TestTitle();
@@ -130,6 +140,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public TestBreadcrumbControlHeader()
             {
+                ContentSidePadding = 10;
+
                 TabControl.AddItem("tab1");
                 TabControl.AddItem("tab2");
                 TabControl.Current.Value = "tab2";
