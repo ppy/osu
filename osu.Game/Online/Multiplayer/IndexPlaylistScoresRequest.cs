@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -16,31 +17,31 @@ namespace osu.Game.Online.Multiplayer
         private readonly int roomId;
         private readonly int playlistItemId;
         private readonly Cursor cursor;
-        private readonly MultiplayerScoresSort? sort;
+        private readonly IndexScoresParams indexParams;
 
-        public IndexPlaylistScoresRequest(int roomId, int playlistItemId, Cursor cursor = null, MultiplayerScoresSort? sort = null)
+        public IndexPlaylistScoresRequest(int roomId, int playlistItemId)
         {
             this.roomId = roomId;
             this.playlistItemId = playlistItemId;
+        }
+
+        public IndexPlaylistScoresRequest(int roomId, int playlistItemId, [NotNull] Cursor cursor, [NotNull] IndexScoresParams indexParams)
+            : this(roomId, playlistItemId)
+        {
             this.cursor = cursor;
-            this.sort = sort;
+            this.indexParams = indexParams;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
 
-            req.AddCursor(cursor);
-
-            switch (sort)
+            if (cursor != null)
             {
-                case MultiplayerScoresSort.Ascending:
-                    req.AddParameter("sort", "score_asc");
-                    break;
+                req.AddCursor(cursor);
 
-                case MultiplayerScoresSort.Descending:
-                    req.AddParameter("sort", "score_desc");
-                    break;
+                foreach (var (key, value) in indexParams.Properties)
+                    req.AddParameter(key, value.ToString());
             }
 
             return req;

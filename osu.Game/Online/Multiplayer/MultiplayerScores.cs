@@ -29,5 +29,11 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         [JsonProperty("user_score")]
         public MultiplayerScore UserScore { get; set; }
+
+        /// <summary>
+        /// The parameters to be used to fetch the next page.
+        /// </summary>
+        [JsonProperty("params")]
+        public IndexScoresParams Params { get; set; }
     }
 }
