@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;

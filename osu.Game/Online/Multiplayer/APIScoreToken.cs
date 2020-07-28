@@ -3,7 +3,7 @@
 
 using Newtonsoft.Json;
 
-namespace osu.Game.Online.API.Requests.Responses
+namespace osu.Game.Online.Multiplayer
 {
     public class APIScoreToken
     {
