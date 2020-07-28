@@ -139,7 +139,6 @@ namespace osu.Game.Rulesets.Judgements
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Depth = -float.MaxValue,
                 Child = bodyDrawable = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ => JudgementText = new OsuSpriteText
                 {
                     Text = type.GetDescription().ToUpperInvariant(),
