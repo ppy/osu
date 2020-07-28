@@ -48,6 +48,10 @@ namespace osu.Game.Skinning
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
 
+        public override bool IsPresent => Scheduler.HasPendingTasks || IsPlaying;
+
+        public bool IsPlaying => samplesContainer.Any(s => s.Playing);
+
         /// <summary>
         /// Smoothly adjusts <see cref="Volume"/> over time.
         /// </summary>
@@ -96,8 +100,6 @@ namespace osu.Game.Skinning
         });
 
         public void Stop() => samplesContainer.ForEach(c => c.Stop());
-
-        public override bool IsPresent => Scheduler.HasPendingTasks;
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
