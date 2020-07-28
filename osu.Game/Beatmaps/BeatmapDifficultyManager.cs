@@ -146,6 +146,22 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
+        /// Creates a new <see cref="BindableStarDifficulty"/> and triggers an initial value update.
+        /// </summary>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> that star difficulty should correspond to.</param>
+        /// <param name="initialRulesetInfo">The initial <see cref="RulesetInfo"/> to get the difficulty with.</param>
+        /// <param name="initialMods">The initial <see cref="Mod"/>s to get the difficulty with.</param>
+        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
+        /// <returns>The <see cref="BindableStarDifficulty"/>.</returns>
+        private BindableStarDifficulty createBindable([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo initialRulesetInfo, [CanBeNull] IEnumerable<Mod> initialMods,
+                                                      CancellationToken cancellationToken)
+        {
+            var bindable = new BindableStarDifficulty(beatmapInfo, cancellationToken);
+            updateBindable(bindable, initialRulesetInfo, initialMods, cancellationToken);
+            return bindable;
+        }
+
+        /// <summary>
         /// Updates the value of a <see cref="BindableStarDifficulty"/> with a given ruleset + mods.
         /// </summary>
         /// <param name="bindable">The <see cref="BindableStarDifficulty"/> to update.</param>
@@ -163,22 +179,6 @@ namespace osu.Game.Beatmaps
                         bindable.Value = t.Result;
                 });
             }, cancellationToken);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="BindableStarDifficulty"/> and triggers an initial value update.
-        /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> that star difficulty should correspond to.</param>
-        /// <param name="initialRulesetInfo">The initial <see cref="RulesetInfo"/> to get the difficulty with.</param>
-        /// <param name="initialMods">The initial <see cref="Mod"/>s to get the difficulty with.</param>
-        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
-        /// <returns>The <see cref="BindableStarDifficulty"/>.</returns>
-        private BindableStarDifficulty createBindable([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo initialRulesetInfo, [CanBeNull] IEnumerable<Mod> initialMods,
-                                                      CancellationToken cancellationToken)
-        {
-            var bindable = new BindableStarDifficulty(beatmapInfo, cancellationToken);
-            updateBindable(bindable, initialRulesetInfo, initialMods, cancellationToken);
-            return bindable;
         }
 
         /// <summary>
