@@ -103,8 +103,6 @@ namespace osu.Game.Skinning
             samplesContainer.ForEach(c => c.Stop());
         }
 
-        public override bool IsPresent => Scheduler.HasPendingTasks;
-
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             var channels = hitSamples.Select(s =>
@@ -144,6 +142,8 @@ namespace osu.Game.Skinning
         public BindableNumber<double> Frequency => samplesContainer.Frequency;
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
+
+        public bool IsPlaying => samplesContainer.Any(s => s.Playing);
 
         /// <summary>
         /// Smoothly adjusts <see cref="Volume"/> over time.
