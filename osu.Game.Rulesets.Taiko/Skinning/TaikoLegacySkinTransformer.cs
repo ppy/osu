@@ -91,10 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                     return null;
 
                 case TaikoSkinComponents.Mascot:
-                    if (GetTexture("pippidonclear0") != null)
-                        return new DrawableTaikoMascot();
-
-                    return null;
+                    return new DrawableTaikoMascot();
             }
 
             return Source.GetDrawableComponent(component);
