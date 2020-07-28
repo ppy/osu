@@ -70,14 +70,11 @@ namespace osu.Game.Screens.Ranking.Contracted
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4Extensions.FromHex("444")
                                 },
-                                new DelayedLoadUnloadWrapper(() => new UserCoverBackground
+                                new UserCoverBackground
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     User = score.User,
                                     Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
-                                }, 300, 5000)
-                                {
-                                    RelativeSizeAxes = Axes.Both
                                 },
                                 new FillFlowContainer
                                 {
