@@ -74,15 +74,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Y,
                     Children = new[]
                     {
-                        Background = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBackground), _ => new SpinnerFill
-                        {
-                            Disc =
-                            {
-                                Alpha = 0f,
-                            },
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }),
+                        Background = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBackground), _ => new DefaultSpinnerBackground()),
                         Disc = new SpinnerDisc(Spinner)
                         {
                             Scale = Vector2.Zero,
@@ -150,8 +142,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             normalColour = baseColour;
             completeColour = colours.YellowLight;
-
-            if (Background.Drawable is IHasAccentColour accent) accent.AccentColour = normalColour;
 
             Ticks.AccentColour = normalColour;
             Disc.AccentColour = fillColour;
@@ -302,8 +292,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void transformFillColour(Colour4 colour, double duration)
         {
             Disc.FadeAccent(colour, duration);
-
-            (Background.Drawable as IHasAccentColour)?.FadeAccent(colour.Darken(1), duration);
             Ticks.FadeAccent(colour, duration);
         }
     }
