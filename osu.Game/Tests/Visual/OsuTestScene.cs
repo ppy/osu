@@ -305,8 +305,10 @@ namespace osu.Game.Tests.Visual
                     {
                         double refTime = referenceClock.CurrentTime;
 
-                        if (lastReferenceTime.HasValue)
-                            accumulated += (refTime - lastReferenceTime.Value) * Rate;
+                        double? lastRefTime = lastReferenceTime;
+
+                        if (lastRefTime != null)
+                            accumulated += (refTime - lastRefTime.Value) * Rate;
 
                         lastReferenceTime = refTime;
                     }

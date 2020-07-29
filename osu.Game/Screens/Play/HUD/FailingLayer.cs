@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float max_alpha = 0.4f;
         private const int fade_time = 400;
-        private const float gradient_size = 0.3f;
+        private const float gradient_size = 0.2f;
 
         /// <summary>
         /// The threshold under which the current player life should be considered low and the layer should start fading in.
@@ -56,16 +56,16 @@ namespace osu.Game.Screens.Play.HUD
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0)),
-                            Height = gradient_size,
+                            Colour = ColourInfo.GradientHorizontal(Color4.White, Color4.White.Opacity(0)),
+                            Width = gradient_size,
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Height = gradient_size,
-                            Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0), Color4.White),
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Width = gradient_size,
+                            Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White),
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
                         },
                     }
                 },
