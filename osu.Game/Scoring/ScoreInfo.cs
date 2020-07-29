@@ -51,9 +51,6 @@ namespace osu.Game.Scoring
         [NotMapped]
         public bool Passed { get; set; } = true;
 
-        [JsonProperty("version_hash")]
-        public string VersionHash { get; set; }
-
         [JsonIgnore]
         public virtual RulesetInfo Ruleset { get; set; }
 
