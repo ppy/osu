@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -104,25 +103,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             Spacing = new Vector2(-overlap, 0)
                         };
 
-                case OsuSkinComponents.SpinnerDisc:
-                    if (Source.GetTexture("spinner-background") != null)
-                        return new Sprite { Texture = Source.GetTexture("spinner-circle") };
-                    else if (Source.GetTexture("spinner-top") != null)
-                        return new Sprite { Texture = Source.GetTexture("spinner-top") };
-
-                    return null;
-
-                case OsuSkinComponents.SpinnerBackground:
-                    if (Source.GetTexture("spinner-background") != null)
-                        return new Sprite { Texture = Source.GetTexture("spinner-background") };
-
-                    return null;
-
-                case OsuSkinComponents.SpinnerCentre:
-                    if (Source.GetTexture("spinner-background") != null)
-                        return Drawable.Empty();
-                    else if (Source.GetTexture("spinner-top") != null)
-                        return new Sprite { Texture = Source.GetTexture("spinner-middle2") };
+                case OsuSkinComponents.SpinnerBody:
+                    if (Source.GetTexture("spinner-top") != null)
+                        return new LegacyNewStyleSpinner();
+                    else if (Source.GetTexture("spinner-background") != null)
+                        return new LegacyOldStyleSpinner();
 
                     return null;
             }

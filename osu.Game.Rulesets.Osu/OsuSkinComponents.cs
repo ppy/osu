@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Osu
         SliderFollowCircle,
         SliderBall,
         SliderBody,
-        SpinnerDisc,
-        SpinnerBackground,
-        SpinnerCentre
+        SpinnerBody
     }
 }
