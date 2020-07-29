@@ -50,10 +50,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
             int numTotalHits = totalComboHits();
 
-            // Longer maps are worth more
-            double lengthBonus =
-                0.95 + 0.3 * Math.Min(1.0, numTotalHits / 2500.0) +
-                (numTotalHits > 2500 ? Math.Log10(numTotalHits / 2500.0) * 0.475 : 0.0);
+            // Longer maps with more movements are worth more
+            double lengthBonusFactor = numTotalHits * 0.75 + (float)Attributes.DirectionChangeCount / 1.8;
+
+            double lengthBonus = Math.Log10(lengthBonusFactor + 100) * 0.75 - 1.3;
 
             // Longer maps are worth more
             value *= lengthBonus;
@@ -72,25 +72,36 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (approachRate > 10.0)
                 approachRateFactor += 0.1 * (approachRate - 10.0); // Additional 10% at AR 11, 30% total
             else if (approachRate < 8.0)
-                approachRateFactor += 0.025 * (8.0 - approachRate); // 2.5% for each AR below 8
+                approachRateFactor += 0.04 * (8.0 - approachRate); // 4% for each AR below 8
 
             value *= approachRateFactor;
 
             if (mods.Any(m => m is ModHidden))
             {
-                // Hiddens gives almost nothing on max approach rate, and more the lower it is
-                if (approachRate <= 10.0)
-                    value *= 1.05 + 0.075 * (10.0 - approachRate); // 7.5% for each AR below 10
-                else if (approachRate > 10.0)
-                    value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
+                value *= 1 + 0.175 * (9.8 - Math.Min(9.8, Attributes.ApproachRate)); // 20% for each AR below 9.8
             }
 
             if (mods.Any(m => m is ModFlashlight))
+            {
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
                 value *= 1.35 * lengthBonus;
 
+                if (approachRate > 8.0)
+                    approachRateFactor += 0.1 * (approachRate - 8.0); // 10% for each AR above 8
+                if (approachRate < 8.0)
+                    approachRateFactor -= 0.07 * (approachRate - 8.0); // -7% for each AR below 8
+            }
+
             // Scale the aim value with accuracy _slightly_
-            value *= Math.Pow(accuracy(), 5.5);
+            value *= Math.Pow(accuracy(), 7.5);
+
+            // Custom multiplier for HalfTime -> slower catcher = easier to control
+            if (mods.Any(m => m is ModHalfTime))
+                value *= 0.85;
+
+            // Custom multiplier for DoubleTime -> faster catcher = harder to control
+            if (mods.Any(m => m is ModDoubleTime))
+                value *= 1.10;
 
             // Custom multipliers for NoFail. SpunOut is not applicable.
             if (mods.Any(m => m is ModNoFail))

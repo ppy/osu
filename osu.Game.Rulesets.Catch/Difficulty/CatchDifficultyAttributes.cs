@@ -9,5 +9,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public double ApproachRate;
         public int MaxCombo;
+        public double DirectionChangeCount;
     }
 }
