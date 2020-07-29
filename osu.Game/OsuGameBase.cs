@@ -152,6 +152,7 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto-Thai");
 
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Bold");
@@ -197,6 +198,10 @@ namespace osu.Game
                 if (i.NewValue.TryGetTarget(out var item))
                     ScoreManager.Undelete(getBeatmapScores(item), true);
             });
+
+            var difficultyManager = new BeatmapDifficultyManager();
+            dependencies.Cache(difficultyManager);
+            AddInternal(difficultyManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
