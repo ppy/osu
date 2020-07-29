@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -63,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 explosion.Anchor = direction.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
-        public void Animate()
+        public void Animate(JudgementResult result)
         {
             (explosion as IFramedAnimation)?.GotoFrame(0);
 

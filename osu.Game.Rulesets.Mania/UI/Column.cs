@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            HitObjectArea.Explosions.Add(hitExplosionPool.Get());
+            HitObjectArea.Explosions.Add(hitExplosionPool.Get(e => e.Apply(result)));
         }
 
         public bool OnPressed(ManiaAction action)
