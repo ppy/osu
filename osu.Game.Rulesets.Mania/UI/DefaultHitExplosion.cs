@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class DefaultHitExplosion : CompositeDrawable
+    public class DefaultHitExplosion : CompositeDrawable, IHitExplosion
     {
         public override bool RemoveWhenNotAlive => true;
 
@@ -123,21 +123,6 @@ namespace osu.Game.Rulesets.Mania.UI
             direction.BindValueChanged(onDirectionChanged, true);
         }
 
-        protected override void LoadComplete()
-        {
-            const double duration = 200;
-
-            base.LoadComplete();
-
-            largeFaint
-                .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
-                .FadeOut(duration * 2);
-
-            mainGlow1.ScaleTo(1.4f, duration, Easing.OutQuint);
-
-            this.FadeOut(duration, Easing.Out);
-        }
-
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
             if (direction.NewValue == ScrollingDirection.Up)
@@ -150,6 +135,17 @@ namespace osu.Game.Rulesets.Mania.UI
                 Anchor = Anchor.BottomCentre;
                 Y = -DefaultNotePiece.NOTE_HEIGHT / 2;
             }
+        }
+
+        public void Animate()
+        {
+            largeFaint
+                .ResizeTo(largeFaint.Size * new Vector2(5, 1), PoolableHitExplosion.DURATION, Easing.OutQuint)
+                .FadeOut(PoolableHitExplosion.DURATION * 2);
+
+            mainGlow1.ScaleTo(1.4f, PoolableHitExplosion.DURATION, Easing.OutQuint);
+
+            this.FadeOut(PoolableHitExplosion.DURATION, Easing.Out);
         }
     }
 }
