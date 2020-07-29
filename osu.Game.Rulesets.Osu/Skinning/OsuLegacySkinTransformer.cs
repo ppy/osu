@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -102,6 +103,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             Scale = new Vector2(0.8f),
                             Spacing = new Vector2(-overlap, 0)
                         };
+
+                case OsuSkinComponents.SpinnerDisc:
+                    if (Source.GetTexture("spinner-background") != null)
+                        return new Sprite { Texture = Source.GetTexture("spinner-circle") };
+                    else if (Source.GetTexture("spinner-top") != null)
+                        return new Sprite { Texture = Source.GetTexture("spinner-top") };
+
+                    return null;
             }
 
             return null;

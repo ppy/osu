@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -16,13 +17,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         private readonly Spinner spinner;
 
+        private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get => background.AccentColour;
-            set => background.AccentColour = value;
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+                if (background.Drawable is IHasAccentColour accent)
+                    accent.AccentColour = value;
+            }
         }
 
-        private readonly SpinnerBackground background;
+        private readonly SkinnableDrawable background;
 
         private const float idle_alpha = 0.2f;
         private const float tracking_alpha = 0.4f;
@@ -37,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                background = new SpinnerBackground { Alpha = idle_alpha },
+                background = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerDisc), _ => new SpinnerBackground { Alpha = idle_alpha }),
             };
         }
 
@@ -54,7 +62,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 tracking = value;
 
-                background.FadeTo(tracking ? tracking_alpha : idle_alpha, 100);
+                // todo: new default only
+                background.Drawable.FadeTo(tracking ? tracking_alpha : idle_alpha, 100);
             }
         }
 
@@ -121,11 +130,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             if (Complete && updateCompleteTick())
             {
-                background.FinishTransforms(false, nameof(Alpha));
-                background
-                    .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
-                    .Then()
-                    .FadeTo(tracking_alpha, 250, Easing.OutQuint);
+                // todo: new default only
+                background.Drawable.FinishTransforms(false, nameof(Alpha));
+                background.Drawable
+                          .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
+                          .Then()
+                          .FadeTo(tracking_alpha, 250, Easing.OutQuint);
             }
 
             Rotation = (float)Interpolation.Lerp(Rotation, currentRotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
