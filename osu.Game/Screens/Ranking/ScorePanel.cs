@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -142,7 +143,16 @@ namespace osu.Game.Screens.Ranking
                                 CornerRadius = 20,
                                 CornerExponent = 2.5f,
                                 Masking = true,
-                                Child = middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
+                                Children = new[]
+                                {
+                                    middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both },
+                                    new UserCoverBackground
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        User = Score.User,
+                                        Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
+                                    },
+                                }
                             },
                             middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
                         }
@@ -155,18 +165,10 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            if (state == PanelState.Expanded)
-            {
-                topLayerBackground.FadeColour(expanded_top_layer_colour);
-                middleLayerBackground.FadeColour(expanded_middle_layer_colour);
-            }
-            else
-            {
-                topLayerBackground.FadeColour(contracted_top_layer_colour);
-                middleLayerBackground.FadeColour(contracted_middle_layer_colour);
-            }
-
             updateState();
+
+            topLayerBackground.FinishTransforms(false, nameof(Colour));
+            middleLayerBackground.FinishTransforms(false, nameof(Colour));
         }
 
         private PanelState state = PanelState.Contracted;

@@ -5,12 +5,14 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
@@ -103,6 +105,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private double hyperDashModifier = 1;
         private int hyperDashDirection;
         private float hyperDashTargetPosition;
+        private Bindable<bool> hitLighting;
 
         public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
         {
@@ -118,8 +121,10 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            hitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
+
             InternalChildren = new Drawable[]
             {
                 caughtFruitContainer,
@@ -194,11 +199,14 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtFruitContainer.Add(fruit);
 
-            AddInternal(new HitExplosion(fruit)
+            if (hitLighting.Value)
             {
-                X = fruit.X,
-                Scale = new Vector2(fruit.HitObject.Scale)
-            });
+                AddInternal(new HitExplosion(fruit)
+                {
+                    X = fruit.X,
+                    Scale = new Vector2(fruit.HitObject.Scale)
+                });
+            }
         }
 
         /// <summary>
