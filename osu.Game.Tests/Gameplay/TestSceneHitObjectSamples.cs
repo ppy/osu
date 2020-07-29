@@ -6,9 +6,9 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Tests.Gameplay
 {
@@ -190,7 +190,7 @@ namespace osu.Game.Tests.Gameplay
         }
 
         /// <summary>
-        /// Tests that when a custom sample bank is used, but <see cref="GlobalSkinConfiguration.LayeredHitSounds"/> is disabled,
+        /// Tests that when a custom sample bank is used, but <see cref="LegacySetting.LayeredHitSounds"/> is disabled,
         /// only the additional sound will be looked up.
         /// </summary>
         [Test]
@@ -209,7 +209,7 @@ namespace osu.Game.Tests.Gameplay
         }
 
         /// <summary>
-        /// Tests that when a normal sample bank is used and <see cref="GlobalSkinConfiguration.LayeredHitSounds"/> is disabled,
+        /// Tests that when a normal sample bank is used and <see cref="LegacySetting.LayeredHitSounds"/> is disabled,
         /// the normal sound will be looked up anyway.
         /// </summary>
         [Test]
@@ -226,6 +226,6 @@ namespace osu.Game.Tests.Gameplay
         }
 
         private void disableLayeredHitSounds()
-            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[GlobalSkinConfiguration.LayeredHitSounds.ToString()] = "0");
+            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[LegacySetting.LayeredHitSounds.ToString()] = "0");
     }
 }
