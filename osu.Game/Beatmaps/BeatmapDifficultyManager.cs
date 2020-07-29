@@ -137,10 +137,7 @@ namespace osu.Game.Beatmaps
             trackedUpdateCancellationSource = null;
 
             foreach (var c in linkedCancellationSources)
-            {
-                c.Cancel();
                 c.Dispose();
-            }
 
             linkedCancellationSources.Clear();
         }
