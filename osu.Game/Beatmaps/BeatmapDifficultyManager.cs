@@ -136,10 +136,13 @@ namespace osu.Game.Beatmaps
             trackedUpdateCancellationSource?.Cancel();
             trackedUpdateCancellationSource = null;
 
-            foreach (var c in linkedCancellationSources)
-                c.Dispose();
+            if (linkedCancellationSources != null)
+            {
+                foreach (var c in linkedCancellationSources)
+                    c.Dispose();
 
-            linkedCancellationSources.Clear();
+                linkedCancellationSources.Clear();
+            }
         }
 
         /// <summary>
@@ -239,7 +242,7 @@ namespace osu.Game.Beatmaps
             base.Dispose(isDisposing);
 
             cancelTrackedBindableUpdate();
-            updateScheduler.Dispose();
+            updateScheduler?.Dispose();
         }
 
         private readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
