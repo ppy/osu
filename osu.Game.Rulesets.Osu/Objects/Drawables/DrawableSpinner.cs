@@ -14,7 +14,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Scoring;
@@ -38,10 +37,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public readonly SkinnableDrawable Background;
         private readonly SkinnableDrawable circleContainer;
-        private CirclePiece circle;
-        private GlowPiece glow;
-
-        private SpriteIcon symbol;
 
         private readonly Color4 baseColour = Color4Extensions.FromHex(@"002c3c");
         private readonly Color4 fillColour = Color4Extensions.FromHex(@"005b7c");
@@ -67,30 +62,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             InternalChildren = new Drawable[]
             {
                 ticks = new Container<DrawableSpinnerTick>(),
-                circleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerCentre), _ => new Container
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Children = new Drawable[]
-                    {
-                        glow = new GlowPiece(),
-                        circle = new CirclePiece
-                        {
-                            Position = Vector2.Zero,
-                            Anchor = Anchor.Centre,
-                        },
-                        new RingPiece(),
-                        symbol = new SpriteIcon
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(48),
-                            Icon = FontAwesome.Solid.Asterisk,
-                            Shadow = false,
-                        },
-                    }
-                })
+                circleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerCentre), _ => new DefaultSpinnerCentre())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -184,9 +156,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Ticks.AccentColour = normalColour;
             Disc.AccentColour = fillColour;
 
-            if (circle != null) circle.Colour = colours.BlueDark;
-            if (glow != null) glow.Colour = colours.BlueDark;
-
             positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
         }
@@ -239,7 +208,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!SpmCounter.IsPresent && Disc.Tracking)
                 SpmCounter.FadeIn(HitObject.TimeFadeIn);
 
-            if (circle != null) circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
 
             SpmCounter.SetRotation(Disc.CumulativeRotation);
@@ -249,9 +217,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             float relativeCircleScale = Spinner.Scale * relativeHeight;
             float targetScale = relativeCircleScale + (1 - relativeCircleScale) * Progress;
             Disc.Scale = new Vector2((float)Interpolation.Lerp(Disc.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
-
-            if (symbol != null)
-                symbol.Rotation = (float)Interpolation.Lerp(symbol.Rotation, Disc.Rotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
         }
 
         private int wholeSpins;
@@ -340,9 +305,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             (Background.Drawable as IHasAccentColour)?.FadeAccent(colour.Darken(1), duration);
             Ticks.FadeAccent(colour, duration);
-
-            circle?.FadeColour(colour, duration);
-            glow?.FadeColour(colour, duration);
         }
     }
 }
