@@ -175,8 +175,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Background.AccentColour = normalColour;
             Ticks.AccentColour = normalColour;
-
             Disc.AccentColour = fillColour;
+
             circle.Colour = colours.BlueDark;
             glow.Colour = colours.BlueDark;
 
