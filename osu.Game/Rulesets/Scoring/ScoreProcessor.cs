@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -16,8 +17,6 @@ namespace osu.Game.Rulesets.Scoring
 {
     public class ScoreProcessor : JudgementProcessor
     {
-        private const double base_portion = 0.3;
-        private const double combo_portion = 0.7;
         private const double max_score = 1000000;
 
         /// <summary>
@@ -55,8 +54,20 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
 
-        private double maxHighestCombo;
+        /// <summary>
+        /// The default portion of <see cref="max_score"/> awarded for hitting <see cref="HitObject"/>s accurately. Defaults to 30%.
+        /// </summary>
+        protected virtual double DefaultAccuracyPortion => 0.3;
 
+        /// <summary>
+        /// The default portion of <see cref="max_score"/> awarded for achieving a high combo. Default to 70%.
+        /// </summary>
+        protected virtual double DefaultComboPortion => 0.7;
+
+        private readonly double accuracyPortion;
+        private readonly double comboPortion;
+
+        private double maxHighestCombo;
         private double maxBaseScore;
         private double rollingMaxBaseScore;
         private double baseScore;
@@ -69,7 +80,11 @@ namespace osu.Game.Rulesets.Scoring
 
         public ScoreProcessor()
         {
-            Debug.Assert(base_portion + combo_portion == 1.0);
+            accuracyPortion = DefaultAccuracyPortion;
+            comboPortion = DefaultComboPortion;
+
+            if (!Precision.AlmostEquals(1.0, accuracyPortion + comboPortion))
+                throw new InvalidOperationException($"{nameof(DefaultAccuracyPortion)} + {nameof(DefaultComboPortion)} must equal 1.");
 
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += accuracy =>
@@ -189,7 +204,10 @@ namespace osu.Game.Rulesets.Scoring
             {
                 default:
                 case ScoringMode.Standardised:
-                    return (max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore) * scoreMultiplier;
+                    double accuracyScore = accuracyPortion * baseScore / maxBaseScore;
+                    double comboScore = comboPortion * HighestCombo.Value / maxHighestCombo;
+
+                    return (max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier;
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)

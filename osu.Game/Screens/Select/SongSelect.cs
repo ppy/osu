@@ -599,12 +599,6 @@ namespace osu.Game.Screens.Select
 
         public override bool OnExiting(IScreen next)
         {
-            if (ModSelect.State.Value == Visibility.Visible)
-            {
-                ModSelect.Hide();
-                return true;
-            }
-
             if (base.OnExiting(next))
                 return true;
 
@@ -616,6 +610,17 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
+
+            return false;
+        }
+
+        public override bool OnBackButton()
+        {
+            if (ModSelect.State.Value == Visibility.Visible)
+            {
+                ModSelect.Hide();
+                return true;
+            }
 
             return false;
         }

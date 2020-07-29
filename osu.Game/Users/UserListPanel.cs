@@ -12,7 +12,7 @@ using osu.Game.Overlays.Profile.Header.Components;
 
 namespace osu.Game.Users
 {
-    public class UserListPanel : UserPanel
+    public class UserListPanel : ExtendedUserPanel
     {
         public UserListPanel(User user)
             : base(user)
