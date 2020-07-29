@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DefaultSpinnerCentre : CompositeDrawable
+    public class SpinnerCentreLayer : CompositeDrawable, IHasAccentColour
     {
         private DrawableSpinner spinner;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private SpriteIcon symbol;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, DrawableHitObject drawableHitObject)
+        private void load(DrawableHitObject drawableHitObject)
         {
             spinner = (DrawableSpinner)drawableHitObject;
 
@@ -49,35 +49,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Shadow = false,
                 },
             };
-
-            drawableHitObject.State.BindValueChanged(val =>
-            {
-                Color4 colour;
-
-                switch (val.NewValue)
-                {
-                    default:
-                        colour = colours.BlueDark;
-                        break;
-
-                    case ArmedState.Hit:
-                        colour = colours.YellowLight;
-                        break;
-                }
-
-                circle.FadeColour(colour, 200);
-                glow.FadeColour(colour, 200);
-            }, true);
-
-            FinishTransforms(true);
         }
 
         protected override void Update()
         {
             base.Update();
+            symbol.Rotation = (float)Interpolation.Lerp(symbol.Rotation, spinner.RotationTracker.Rotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
+        }
 
-            circle.Rotation = spinner.Disc.Rotation;
-            symbol.Rotation = (float)Interpolation.Lerp(symbol.Rotation, spinner.Disc.Rotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
+        private Color4 accentColour;
+
+        public Color4 AccentColour
+        {
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+
+                circle.Colour = accentColour;
+                glow.Colour = accentColour;
+            }
         }
     }
 }

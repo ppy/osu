@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             RelativeSizeAxes = Axes.Both;
             Masking = true;
 
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
             Children = new Drawable[]
             {
                 Disc = new Box

@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 base.Update();
                 if (auto)
-                    Disc.Rotate((float)(Clock.ElapsedFrameTime * 3));
+                    RotationTracker.AddRotation((float)(Clock.ElapsedFrameTime * 3));
             }
         }
     }
