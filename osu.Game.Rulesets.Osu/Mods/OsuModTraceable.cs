@@ -58,8 +58,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 case DrawableSpinner spinner:
-                    spinner.Disc.Hide();
-                    spinner.Background.Hide();
+                    //todo: hide background
                     break;
             }
         }
