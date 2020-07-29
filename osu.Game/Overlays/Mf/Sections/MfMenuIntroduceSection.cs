@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.MfMenu
             t.AddText("任何与翻译文本、字体大小等有关的问题, 请前往");
             t.AddLink("Mf-osu的issue页面","https://github.com/MATRIX-feather/osu/issues");
             t.AddText("提交新的issue来讨论。");
-            t.AddParagraph("如果你在使用时发现了一个bug, 请先");
+            t.AddParagraph("如果您在使用时发现了一个bug, 请先");
             t.AddLink("下载最新官方版本","https://github.com/ppy/osu/releases/latest");
             t.AddText(", 如果该问题仍然存在, 请前往");
             t.AddLink("osu!lazer的issue页面","https://github.com/ppy/osu/issues");
@@ -183,7 +183,7 @@ namespace osu.Game.Overlays.MfMenu
             t.AddText("Mf-osu项目在跟进和维护的同时也会尝试");
             t.AddText("添加一些新奇的功能。");
             t.AddParagraph("大部分功能会保持其原有的实现方式。");
-            t.AddParagraph("如果你觉得下面的某个功能很赞, 您可以前往");
+            t.AddParagraph("如果您觉得下面的某个功能很赞, 您可以前往");
             t.AddParagraph("该项目的主页点个Star以支持原作者, 或者帮助其完善和发展。");
             t.NewParagraph();
             t.AddLink("osu!下物件的高潮闪光(Kiai Flash) → pr7316[Open]","https://github.com/ppy/osu/pull/7316");
