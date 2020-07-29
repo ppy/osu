@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Scale = new Vector2(Spinner.Scale),
                     Children = new Drawable[]
                     {
-                        new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerDisc), _ => new DefaultSpinnerDisc()),
+                        new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinnerDisc()),
                         RotationTracker = new SpinnerRotationTracker(Spinner)
                         {
                             Anchor = Anchor.Centre,
