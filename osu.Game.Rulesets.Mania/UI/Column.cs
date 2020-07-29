@@ -9,9 +9,9 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         public readonly ColumnHitObjectArea HitObjectArea;
-
         internal readonly Container TopLevelContainer;
+        private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
 
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
@@ -53,6 +53,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             InternalChildren = new[]
             {
+                hitExplosionPool = new DrawablePool<PoolableHitExplosion>(5),
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
                 HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
@@ -108,15 +109,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            var explosion = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion, Index), _ =>
-                new DefaultHitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick))
-            {
-                RelativeSizeAxes = Axes.Both
-            };
-
-            HitObjectArea.Explosions.Add(explosion);
-
-            explosion.Delay(200).Expire(true);
+            HitObjectArea.Explosions.Add(hitExplosionPool.Get());
         }
 
         public bool OnPressed(ManiaAction action)
