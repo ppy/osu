@@ -3,8 +3,10 @@ using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osuTK.Graphics;
 using System;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Utils;
+using osu.Framework.Allocation;
+using osu.Game.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Mvis.UI.Objects
 {
@@ -20,10 +22,18 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         /// </summary>
         private const float particle_max_scale = 3;
 
-        protected override Drawable CreateParticle(bool firstLoad) => new Particle();
+        protected override Drawable CreateParticle() => new Particle();
 
         private class Particle : Circle
         {
+            [Resolved(canBeNull: true)]
+            private MfConfigManager config { get; set; }
+
+            private readonly Bindable<bool> useCustomColour = new Bindable<bool>();
+            private readonly Bindable<int> red = new Bindable<int>(0);
+            private readonly Bindable<int> green = new Bindable<int>(0);
+            private readonly Bindable<int> blue = new Bindable<int>(0);
+
             private Vector2 finalPosition;
             private double lifeTime;
             private float finalScale;
@@ -33,22 +43,49 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
                 RelativePositionAxes = Axes.Both;
-                Colour = Color4.White.Opacity(200);
-                Position = new Vector2(RNG.NextSingle(-0.5f, 0.5f), RNG.NextSingle(-0.5f, 0.5f));
                 Size = new Vector2(2);
-                Alpha = 0;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                config?.BindWith(MfSetting.MvisRed, red);
+                config?.BindWith(MfSetting.MvisGreen, green);
+                config?.BindWith(MfSetting.MvisBlue, blue);
+                config?.BindWith(MfSetting.MvisUseCustomColour, useCustomColour);
+
+                red.BindValueChanged(_ => updateColour());
+                green.BindValueChanged(_ => updateColour());
+                blue.BindValueChanged(_ => updateColour());
+                useCustomColour.BindValueChanged(_ => updateColour(), true);
+            }
+
+            private void updateColour()
+            {
+                if (!useCustomColour.Value)
+                {
+                    Colour = Color4.White;
+                    return;
+                }
+
+                this.FadeColour(new Colour4(red.Value / 255f, green.Value / 255f, blue.Value / 255f, 1));
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+                Reuse();
+            }
 
+            public void Reuse()
+            {
+                Alpha = 0;
+                Position = new Vector2(RNG.NextSingle(-0.5f, 0.5f), RNG.NextSingle(-0.5f, 0.5f));
                 calculateValues();
 
-                this.FadeIn(500);
+                this.FadeIn(lifeTime > 500 ? 500 : lifeTime);
                 this.MoveTo(finalPosition, lifeTime);
-                this.ScaleTo(finalScale, lifeTime);
-                Expire();
+                this.ScaleTo(finalScale, lifeTime).Finally(_ => Reuse());
             }
 
             private void calculateValues()
