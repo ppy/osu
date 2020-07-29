@@ -54,7 +54,9 @@ namespace osu.Game.Screens.Play
         {
             base.PopOut();
 
-            pauseLoop.VolumeTo(minimum_volume, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
+            pauseLoop.Stop();
+
+            //pauseLoop.VolumeTo(minimum_volume, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
         }
     }
 }
