@@ -4,37 +4,32 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSpinner : OsuTestScene
+    public class TestSceneSpinner : OsuSkinnableTestScene
     {
-        private readonly Container content;
-        protected override Container<Drawable> Content => content;
-
         private int depthIndex;
 
         public TestSceneSpinner()
         {
-            base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
+            //            base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
 
-            AddStep("Miss Big", () => testSingle(2));
-            AddStep("Miss Medium", () => testSingle(5));
-            AddStep("Miss Small", () => testSingle(7));
-            AddStep("Hit Big", () => testSingle(2, true));
-            AddStep("Hit Medium", () => testSingle(5, true));
-            AddStep("Hit Small", () => testSingle(7, true));
+            AddStep("Miss Big", () => SetContents(() => testSingle(2)));
+            AddStep("Miss Medium", () => SetContents(() => testSingle(5)));
+            AddStep("Miss Small", () => SetContents(() => testSingle(7)));
+            AddStep("Hit Big", () => SetContents(() => testSingle(2, true)));
+            AddStep("Hit Medium", () => SetContents(() => testSingle(5, true)));
+            AddStep("Hit Small", () => SetContents(() => testSingle(7, true)));
         }
 
-        private void testSingle(float circleSize, bool auto = false)
+        private Drawable testSingle(float circleSize, bool auto = false)
         {
             var spinner = new Spinner { StartTime = Time.Current + 2000, EndTime = Time.Current + 5000 };
 
@@ -49,12 +44,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
-            Add(drawable);
+            return drawable;
         }
 
         private class TestDrawableSpinner : DrawableSpinner
         {
-            private bool auto;
+            private readonly bool auto;
 
             public TestDrawableSpinner(Spinner s, bool auto)
                 : base(s)
@@ -62,16 +57,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 this.auto = auto;
             }
 
-            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            protected override void Update()
             {
-                if (auto && !userTriggered && Time.Current > Spinner.StartTime + Spinner.Duration / 2 && Progress < 1)
-                {
-                    // force completion only once to not break human interaction
-                    Disc.CumulativeRotation = Spinner.SpinsRequired * 360;
-                    auto = false;
-                }
-
-                base.CheckForResult(userTriggered, timeOffset);
+                base.Update();
+                if (auto)
+                    Disc.Rotate((float)(Clock.ElapsedFrameTime * 3));
             }
         }
     }
