@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                background = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerDisc), _ => new SpinnerBackground { Alpha = idle_alpha }),
+                background = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerDisc), _ => new SpinnerFill { Alpha = idle_alpha }),
             };
         }
 

@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerBackground : CircularContainer, IHasAccentColour
+    public class SpinnerFill : CircularContainer, IHasAccentColour
     {
         public readonly Box Disc;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        public SpinnerBackground()
+        public SpinnerFill()
         {
             RelativeSizeAxes = Axes.Both;
             Masking = true;
