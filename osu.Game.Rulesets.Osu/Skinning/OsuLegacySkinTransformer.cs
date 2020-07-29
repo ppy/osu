@@ -111,6 +111,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         return new Sprite { Texture = Source.GetTexture("spinner-top") };
 
                     return null;
+
+                case OsuSkinComponents.SpinnerBackground:
+                    if (Source.GetTexture("spinner-background") != null)
+                        return new Sprite { Texture = Source.GetTexture("spinner-background") };
+
+                    return null;
             }
 
             return null;

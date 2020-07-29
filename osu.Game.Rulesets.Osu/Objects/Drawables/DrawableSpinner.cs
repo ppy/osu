@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Container mainContainer;
 
-        public readonly SpinnerBackground Background;
+        public readonly SkinnableDrawable Background;
         private readonly Container circleContainer;
         private readonly CirclePiece circle;
         private readonly GlowPiece glow;
@@ -96,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Y,
                     Children = new[]
                     {
-                        Background = new SpinnerBackground
+                        Background = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBackground), _ => new SpinnerFill
                         {
                             Disc =
                             {
@@ -104,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                        },
+                        }),
                         Disc = new SpinnerDisc(Spinner)
                         {
                             Scale = Vector2.Zero,
@@ -173,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             normalColour = baseColour;
             completeColour = colours.YellowLight;
 
-            Background.AccentColour = normalColour;
+            if (Background.Drawable is IHasAccentColour accent) accent.AccentColour = normalColour;
             Ticks.AccentColour = normalColour;
             Disc.AccentColour = fillColour;
 
@@ -328,7 +329,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Disc.FadeAccent(colour, duration);
 
-            Background.FadeAccent(colour.Darken(1), duration);
+            (Background.Drawable as IHasAccentColour)?.FadeAccent(colour.Darken(1), duration);
             Ticks.FadeAccent(colour, duration);
 
             circle.FadeColour(colour, duration);
