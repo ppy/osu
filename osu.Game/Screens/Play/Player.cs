@@ -465,6 +465,7 @@ namespace osu.Game.Screens.Play
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = rulesetInfo,
+                VersionHash = Game.VersionHash,
                 Mods = Mods.Value.ToArray(),
             };
 
