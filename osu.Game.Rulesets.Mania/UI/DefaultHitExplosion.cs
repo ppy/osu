@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class DefaultHitExplosion : CompositeDrawable, IHitExplosion
     {
+        private const float default_large_faint_size = 0.8f;
+
         public override bool RemoveWhenNotAlive => true;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
@@ -54,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     // we want our size to be very small so the glow dominates it.
-                    Size = new Vector2(0.8f),
+                    Size = new Vector2(default_large_faint_size),
                     Blending = BlendingParameters.Additive,
                     EdgeEffect = new EdgeEffectParameters
                     {
@@ -140,12 +142,17 @@ namespace osu.Game.Rulesets.Mania.UI
         public void Animate()
         {
             largeFaint
-                .ResizeTo(largeFaint.Size * new Vector2(5, 1), PoolableHitExplosion.DURATION, Easing.OutQuint)
+                .ResizeTo(default_large_faint_size)
+                .Then()
+                .ResizeTo(default_large_faint_size * new Vector2(5, 1), PoolableHitExplosion.DURATION, Easing.OutQuint)
                 .FadeOut(PoolableHitExplosion.DURATION * 2);
 
-            mainGlow1.ScaleTo(1.4f, PoolableHitExplosion.DURATION, Easing.OutQuint);
+            mainGlow1
+                .ScaleTo(1)
+                .Then()
+                .ScaleTo(1.4f, PoolableHitExplosion.DURATION, Easing.OutQuint);
 
-            this.FadeOut(PoolableHitExplosion.DURATION, Easing.Out);
+            this.FadeOutFromOne(PoolableHitExplosion.DURATION, Easing.Out);
         }
     }
 }

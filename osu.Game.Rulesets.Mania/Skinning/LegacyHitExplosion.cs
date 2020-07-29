@@ -65,6 +65,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         public void Animate()
         {
+            (explosion as IFramedAnimation)?.GotoFrame(0);
+
             explosion?.FadeInFromZero(80)
                      .Then().FadeOut(120);
         }
