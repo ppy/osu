@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double strainValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more
-            double lengthBonus = 1 + 0.1f * Math.Min(1.0, totalHits / 1500.0);
+            double lengthBonus = 1 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
             strainValue *= lengthBonus;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
