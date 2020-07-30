@@ -98,16 +98,16 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            leftIcon.FadeHoverColour();
-            rightIcon.FadeHoverColour();
+            leftIcon.SetHoveredState(true);
+            rightIcon.SetHoveredState(true);
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            leftIcon.FadeIdleColour();
-            rightIcon.FadeIdleColour();
+            leftIcon.SetHoveredState(false);
+            rightIcon.SetHoveredState(false);
         }
 
         public class ChevronIcon : SpriteIcon
@@ -127,9 +127,8 @@ namespace osu.Game.Graphics.UserInterface
                 Colour = colourProvider.Foreground1;
             }
 
-            public void FadeHoverColour() => this.FadeColour(colourProvider.Light1, 200, Easing.OutQuint);
-
-            public void FadeIdleColour() => this.FadeColour(colourProvider.Foreground1, 200, Easing.OutQuint);
+            public void SetHoveredState(bool hovered) =>
+                this.FadeColour(hovered ? colourProvider.Light1 : colourProvider.Foreground1, 200, Easing.OutQuint);
         }
     }
 }
