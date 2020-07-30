@@ -57,9 +57,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     applySliderState(slider);
                     break;
 
-                case DrawableSpinner spinner:
-                    //todo: hide background
-                    break;
+                //todo: hide spinner background somehow
             }
         }
 
