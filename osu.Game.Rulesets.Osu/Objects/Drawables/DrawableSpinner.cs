@@ -117,6 +117,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
+        /// <summary>
+        /// The completion progress of this spinner from 0..1 (clamped).
+        /// </summary>
         public float Progress => Math.Clamp(RotationTracker.CumulativeRotation / 360 / Spinner.SpinsRequired, 0, 1);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
