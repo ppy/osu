@@ -133,8 +133,14 @@ namespace osu.Game.Skinning
 
                     break;
 
-                case LegacySkinConfiguration.LegacySetting s when s == LegacySkinConfiguration.LegacySetting.Version:
-                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
+                case LegacySkinConfiguration.LegacySetting legacy:
+                    switch (legacy)
+                    {
+                        case LegacySkinConfiguration.LegacySetting.Version:
+                            return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
+                    }
+
+                    goto default;
 
                 default:
                     // handles lookups like some in LegacySkinConfiguration.LegacySetting
