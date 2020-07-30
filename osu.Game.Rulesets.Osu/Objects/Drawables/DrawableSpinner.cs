@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -39,29 +38,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             RelativeSizeAxes = Axes.Both;
 
-            // we are slightly bigger than our parent, to clip the top and bottom of the circle
-            Height = 1.3f;
-
             Spinner = s;
 
             InternalChildren = new Drawable[]
             {
                 ticks = new Container<DrawableSpinnerTick>(),
-                RotationTracker = new SpinnerRotationTracker(Spinner),
                 new AspectContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Y,
-                    Scale = new Vector2(Spinner.Scale),
                     Children = new Drawable[]
                     {
                         new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinnerDisc()),
                         RotationTracker = new SpinnerRotationTracker(Spinner)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
                     }
                 },
                 SpmCounter = new SpinnerSpmCounter
@@ -161,8 +151,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (HandleUserInput)
                 RotationTracker.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
         }
-
-        public float RelativeHeight => ToScreenSpace(new RectangleF(0, 0, 0, OsuHitObject.OBJECT_RADIUS * 2)).Height / DrawHeight;
 
         protected override void UpdateAfterChildren()
         {

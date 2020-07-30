@@ -28,9 +28,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             spinner = (DrawableSpinner)drawableHitObject;
 
-            AutoSizeAxes = Axes.Both;
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
             InternalChildren = new Drawable[]
             {
                 glow = new GlowPiece(),
