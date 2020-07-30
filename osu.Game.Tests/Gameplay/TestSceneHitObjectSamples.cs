@@ -67,9 +67,11 @@ namespace osu.Game.Tests.Gameplay
         /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the beatmap skin:
         /// normal-hitnormal2
         /// normal-hitnormal
+        /// hitnormal
         /// </summary>
         [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
         {
             SetupSkins(expectedSample, expectedSample);
@@ -83,9 +85,11 @@ namespace osu.Game.Tests.Gameplay
         /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the user skin when the beatmap does not contain the sample:
         /// normal-hitnormal2
         /// normal-hitnormal
+        /// hitnormal
         /// </summary>
         [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
         {
             SetupSkins(string.Empty, expectedSample);
@@ -145,6 +149,7 @@ namespace osu.Game.Tests.Gameplay
         /// </summary>
         [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestControlPointCustomSampleFromBeatmap(string sampleName)
         {
             SetupSkins(sampleName, sampleName);
