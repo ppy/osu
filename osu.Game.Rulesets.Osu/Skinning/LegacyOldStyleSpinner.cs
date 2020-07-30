@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -24,6 +25,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private void load(ISkinSource source, DrawableHitObject drawableObject)
         {
             drawableSpinner = (DrawableSpinner)drawableObject;
+
+            Scale = new Vector2(0.625f);
 
             InternalChildren = new Drawable[]
             {
