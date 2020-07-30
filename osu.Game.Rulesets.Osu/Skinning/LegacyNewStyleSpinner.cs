@@ -12,6 +12,10 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
+    /// <summary>
+    /// Legacy skinned spinner with two main spinning layers, one fixed overlay and one final spinning overlay.
+    /// No background layer.
+    /// </summary>
     public class LegacyNewStyleSpinner : CompositeDrawable
     {
         private Sprite discBottom;

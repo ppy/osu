@@ -12,6 +12,9 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
+    /// <summary>
+    /// Legacy skinned spinner with one main spinning layer and a background layer.
+    /// </summary>
     public class LegacyOldStyleSpinner : CompositeDrawable
     {
         private DrawableSpinner drawableSpinner;
