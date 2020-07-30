@@ -39,6 +39,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             RelativeSizeAxes = Axes.Both;
 
+            // we are slightly bigger than our parent, to clip the top and bottom of the circle
+            // this should probably be revisited when scaled spinners are a thing.
+            Scale = new Vector2(1.3f);
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
         }
@@ -95,22 +99,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             centre.ScaleTo(0);
             mainContainer.ScaleTo(0);
-            this.ScaleTo(1);
 
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt / 2, true))
             {
-                float phaseOneScale = spinner.Scale * 0.7f;
-
-                centre.ScaleTo(phaseOneScale, spinner.TimePreempt / 4, Easing.OutQuint);
-
-                mainContainer
-                    .ScaleTo(phaseOneScale * drawableSpinner.RelativeHeight * 1.6f, spinner.TimePreempt / 4, Easing.OutQuint);
-
+                // constant ambient rotation to give the spinner "spinning" character.
                 this.RotateTo((float)(25 * spinner.Duration / 2000), spinner.TimePreempt + spinner.Duration);
+
+                centre.ScaleTo(0.3f, spinner.TimePreempt / 4, Easing.OutQuint);
+                mainContainer.ScaleTo(0.2f, spinner.TimePreempt / 4, Easing.OutQuint);
 
                 using (BeginDelayedSequence(spinner.TimePreempt / 2, true))
                 {
-                    centre.ScaleTo(spinner.Scale, spinner.TimePreempt / 2, Easing.OutQuint);
+                    centre.ScaleTo(0.5f, spinner.TimePreempt / 2, Easing.OutQuint);
                     mainContainer.ScaleTo(1, spinner.TimePreempt / 2, Easing.OutQuint);
                 }
             }
@@ -160,8 +160,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     .FadeTo(tracking_alpha, 250, Easing.OutQuint);
             }
 
-            float relativeCircleScale = spinner.Scale * drawableSpinner.RelativeHeight;
-            float targetScale = relativeCircleScale + (1 - relativeCircleScale) * drawableSpinner.Progress;
+            const float initial_scale = 0.2f;
+            float targetScale = initial_scale + (1 - initial_scale) * drawableSpinner.Progress;
 
             fill.Scale = new Vector2((float)Interpolation.Lerp(fill.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
             mainContainer.Rotation = drawableSpinner.RotationTracker.Rotation;
