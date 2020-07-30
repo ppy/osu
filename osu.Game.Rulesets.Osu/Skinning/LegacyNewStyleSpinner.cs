@@ -6,9 +6,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -21,13 +25,18 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private Sprite discBottom;
         private Sprite discTop;
         private Sprite spinningMiddle;
+        private Sprite fixedMiddle;
 
         private DrawableSpinner drawableSpinner;
+
+        private const float final_scale = 0.625f;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource source, DrawableHitObject drawableObject)
         {
             drawableSpinner = (DrawableSpinner)drawableObject;
+
+            Scale = new Vector2(final_scale);
 
             InternalChildren = new Drawable[]
             {
@@ -43,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Origin = Anchor.Centre,
                     Texture = source.GetTexture("spinner-top")
                 },
-                new Sprite
+                fixedMiddle = new Sprite
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -68,10 +77,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void updateStateTransforms(ValueChangedEvent<ArmedState> state)
         {
-            var spinner = drawableSpinner.HitObject;
+            var spinner = (Spinner)drawableSpinner.HitObject;
 
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt / 2, true))
                 this.FadeInFromZero(spinner.TimePreempt / 2);
+
+            fixedMiddle.FadeColour(Color4.White);
+            using (BeginAbsoluteSequence(spinner.StartTime, true))
+                fixedMiddle.FadeColour(Color4.Red, spinner.Duration);
         }
 
         protected override void Update()
@@ -79,6 +92,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
             base.Update();
             spinningMiddle.Rotation = discTop.Rotation = drawableSpinner.RotationTracker.Rotation;
             discBottom.Rotation = discTop.Rotation / 3;
+
+            Scale = new Vector2(final_scale * 0.8f
+                                + (float)Interpolation.ApplyEasing(Easing.Out, drawableSpinner.Progress) * (final_scale * 0.2f));
         }
     }
 }
