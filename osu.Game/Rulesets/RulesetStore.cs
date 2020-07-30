@@ -65,11 +65,15 @@ namespace osu.Game.Rulesets
             // the requesting assembly may be located out of the executable's base directory, thus requiring manual resolving of its dependencies.
             // this attempts resolving the ruleset dependencies on game core and framework assemblies by returning assemblies with the same assembly name
             // already loaded in the AppDomain.
-            foreach (var curAsm in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (asm.Name.Equals(curAsm.GetName().Name, StringComparison.Ordinal))
-                    return curAsm;
-            }
+            var domainAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                                          // Given name is always going to be equally-or-more qualified than the assembly name.
+                                          .Where(a => args.Name.Contains(a.GetName().Name, StringComparison.Ordinal))
+                                          // Pick the greatest assembly version.
+                                          .OrderBy(a => a.GetName().Version)
+                                          .LastOrDefault();
+
+            if (domainAssembly != null)
+                return domainAssembly;
 
             return loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == asm.FullName);
         }
