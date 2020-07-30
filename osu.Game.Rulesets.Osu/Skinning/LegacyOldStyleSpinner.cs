@@ -24,6 +24,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private Sprite disc;
         private Container metre;
 
+        private const float background_y_offset = 20;
+
+        private const float sprite_scale = 1 / 1.6f;
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource source, DrawableHitObject drawableObject)
         {
@@ -38,21 +42,21 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Texture = source.GetTexture("spinner-background"),
-                    Y = 20,
-                    Scale = new Vector2(0.625f)
+                    Y = background_y_offset,
+                    Scale = new Vector2(sprite_scale)
                 },
                 disc = new Sprite
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Texture = source.GetTexture("spinner-circle"),
-                    Scale = new Vector2(0.625f)
+                    Scale = new Vector2(sprite_scale)
                 },
                 metre = new Container
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Y = 20,
+                    Y = background_y_offset,
                     Masking = true,
                     Child = new Sprite
                     {
