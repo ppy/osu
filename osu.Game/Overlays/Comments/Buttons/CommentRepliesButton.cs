@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         {
             base.OnHover(e);
             background.FadeColour(colourProvider.Background1, 200, Easing.OutQuint);
-            icon.FadeHoverColour();
+            icon.SetHoveredState(true);
             return true;
         }
 
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         {
             base.OnHoverLost(e);
             background.FadeColour(colourProvider.Background2, 200, Easing.OutQuint);
-            icon.FadeIdleColour();
+            icon.SetHoveredState(false);
         }
     }
 }
