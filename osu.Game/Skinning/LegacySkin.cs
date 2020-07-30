@@ -356,10 +356,6 @@ namespace osu.Game.Skinning
                     return sample;
             }
 
-            if (sampleInfo is HitSampleInfo hsi)
-                // Try fallback to non-bank samples.
-                return Samples?.Get(hsi.Name);
-
             return null;
         }
 
@@ -382,6 +378,11 @@ namespace osu.Game.Skinning
                 // using .EndsWith() is intentional as it ensures parity in all edge cases
                 // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
                 lookupNames = hitSample.LookupNames.Where(name => !name.EndsWith(hitSample.Suffix));
+
+            // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
+            // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
+            // which is why this is done locally here.
+            lookupNames = lookupNames.Append(hitSample.Name);
 
             return lookupNames;
         }
