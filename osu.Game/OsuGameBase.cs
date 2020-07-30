@@ -134,13 +134,8 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            var assembly = Assembly.GetEntryAssembly();
-
-            if (assembly != null)
-            {
-                using (var str = File.OpenRead(assembly.Location))
-                    VersionHash = str.ComputeMD5Hash();
-            }
+            using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
+                VersionHash = str.ComputeMD5Hash();
 
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
