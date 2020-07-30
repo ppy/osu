@@ -87,16 +87,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.LoadComplete();
 
-            centre.ScaleTo(0);
-            mainContainer.ScaleTo(0);
-            this.ScaleTo(1);
-
             drawableSpinner.RotationTracker.Complete.BindValueChanged(complete => updateComplete(complete.NewValue, 200));
             drawableSpinner.State.BindValueChanged(updateStateTransforms, true);
         }
 
         private void updateStateTransforms(ValueChangedEvent<ArmedState> state)
         {
+            centre.ScaleTo(0);
+            mainContainer.ScaleTo(0);
+            this.ScaleTo(1);
+
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt / 2, true))
             {
                 float phaseOneScale = spinner.Scale * 0.7f;
