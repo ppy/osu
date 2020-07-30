@@ -70,6 +70,58 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
+        private Bindable<bool> isSpinning;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            isSpinning = RotationTracker.IsSpinning.GetBoundCopy();
+            isSpinning.BindValueChanged(updateSpinningSample);
+        }
+
+        private SkinnableSound spinningSample;
+
+        private const float minimum_volume = 0.0001f;
+
+        protected override void LoadSamples()
+        {
+            base.LoadSamples();
+
+            spinningSample?.Expire();
+            spinningSample = null;
+
+            var firstSample = HitObject.Samples.FirstOrDefault();
+
+            if (firstSample != null)
+            {
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
+                clone.Name = "spinnerspin";
+
+                AddInternal(spinningSample = new SkinnableSound(clone)
+                {
+                    Volume = { Value = minimum_volume },
+                    Looping = true,
+                });
+            }
+        }
+
+        private void updateSpinningSample(ValueChangedEvent<bool> tracking)
+        {
+            // note that samples will not start playing if exiting a seek operation in the middle of a spinner.
+            // may be something we want to address at a later point, but not so easy to make happen right now
+            // (SkinnableSound would need to expose whether the sample is already playing and this logic would need to run in Update).
+            if (tracking.NewValue && ShouldPlaySamples)
+            {
+                spinningSample?.Play();
+                spinningSample?.VolumeTo(1, 200);
+            }
+            else
+            {
+                spinningSample?.VolumeTo(minimum_volume, 200).Finally(_ => spinningSample.Stop());
+            }
+        }
+
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
         {
             base.AddNestedHitObject(hitObject);
@@ -88,6 +140,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             using (BeginDelayedSequence(Spinner.Duration, true))
                 this.FadeOut(160);
+
+            // skin change does a rewind of transforms, which will stop the spinning sound from playing if it's currently in playback.
+            isSpinning?.TriggerChange();
         }
 
         protected override void ClearNestedHitObjects()
@@ -151,8 +206,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             base.Update();
+
             if (HandleUserInput)
-                RotationTracker.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
+                RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+
+            if (spinningSample != null)
+                // todo: implement SpinnerFrequencyModulate
+                spinningSample.Frequency.Value = 0.5f + Progress;
         }
 
         protected override void UpdateAfterChildren()
