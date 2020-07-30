@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var h = drawableOsu.HitObject;
 
+            //todo: expose and hide spinner background somehow
+
             switch (drawable)
             {
                 case DrawableHitCircle circle:
@@ -56,8 +58,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     slider.Body.OnSkinChanged += () => applySliderState(slider);
                     applySliderState(slider);
                     break;
-
-                //todo: hide spinner background somehow
             }
         }
 
