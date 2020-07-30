@@ -5,12 +5,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
+using static osu.Game.Graphics.UserInterface.ShowMoreButton;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
@@ -25,17 +25,13 @@ namespace osu.Game.Overlays.Comments.Buttons
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        private readonly SpriteIcon icon;
+        private readonly ChevronIcon icon;
         private readonly Box background;
         private readonly OsuSpriteText text;
 
         protected CommentRepliesButton()
         {
             AutoSizeAxes = Axes.Both;
-            Margin = new MarginPadding
-            {
-                Vertical = 2
-            };
             InternalChildren = new Drawable[]
             {
                 new CircularContainer
@@ -72,12 +68,10 @@ namespace osu.Game.Overlays.Comments.Buttons
                                         AlwaysPresent = true,
                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
                                     },
-                                    icon = new SpriteIcon
+                                    icon = new ChevronIcon
                                     {
                                         Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Size = new Vector2(7.5f),
-                                        Icon = FontAwesome.Solid.ChevronDown
+                                        Origin = Anchor.CentreLeft
                                     }
                                 }
                             }
@@ -92,7 +86,6 @@ namespace osu.Game.Overlays.Comments.Buttons
         private void load()
         {
             background.Colour = colourProvider.Background2;
-            icon.Colour = colourProvider.Foreground1;
         }
 
         protected void SetIconDirection(bool upwards) => icon.ScaleTo(new Vector2(1, upwards ? -1 : 1));
@@ -103,7 +96,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         {
             base.OnHover(e);
             background.FadeColour(colourProvider.Background1, 200, Easing.OutQuint);
-            icon.FadeColour(colourProvider.Light1, 200, Easing.OutQuint);
+            icon.SetHoveredState(true);
             return true;
         }
 
@@ -111,7 +104,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         {
             base.OnHoverLost(e);
             background.FadeColour(colourProvider.Background2, 200, Easing.OutQuint);
-            icon.FadeColour(colourProvider.Foreground1, 200, Easing.OutQuint);
+            icon.SetHoveredState(false);
         }
     }
 }

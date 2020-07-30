@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
@@ -25,6 +26,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
+        private ChevronIcon leftIcon;
+        private ChevronIcon rightIcon;
         private SpriteText text;
         private Box background;
         private FillFlowContainer textContainer;
@@ -58,15 +61,19 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(7),
+                    Spacing = new Vector2(10),
                     Margin = new MarginPadding
                     {
                         Horizontal = 20,
-                        Vertical = 5,
+                        Vertical = 5
                     },
                     Children = new Drawable[]
                     {
-                        new ChevronIcon(),
+                        leftIcon = new ChevronIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
                         text = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
@@ -74,7 +81,11 @@ namespace osu.Game.Graphics.UserInterface
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                             Text = "show more".ToUpper(),
                         },
-                        new ChevronIcon()
+                        rightIcon = new ChevronIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
                     }
                 }
             }
@@ -84,21 +95,40 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnLoadFinished() => textContainer.FadeIn(duration, Easing.OutQuint);
 
-        private class ChevronIcon : SpriteIcon
+        protected override bool OnHover(HoverEvent e)
         {
+            base.OnHover(e);
+            leftIcon.SetHoveredState(true);
+            rightIcon.SetHoveredState(true);
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            leftIcon.SetHoveredState(false);
+            rightIcon.SetHoveredState(false);
+        }
+
+        public class ChevronIcon : SpriteIcon
+        {
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; }
+
             public ChevronIcon()
             {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-                Size = new Vector2(8);
+                Size = new Vector2(7.5f);
                 Icon = FontAwesome.Solid.ChevronDown;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load()
             {
                 Colour = colourProvider.Foreground1;
             }
+
+            public void SetHoveredState(bool hovered) =>
+                this.FadeColour(hovered ? colourProvider.Light1 : colourProvider.Foreground1, 200, Easing.OutQuint);
         }
     }
 }

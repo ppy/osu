@@ -8,21 +8,27 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using osuTK;
+using osu.Framework.Allocation;
 
-namespace osu.Game.Overlays.Comments
+namespace osu.Game.Overlays.Comments.Buttons
 {
-    public abstract class GetCommentRepliesButton : LoadingButton
+    public class ShowMoreRepliesButton : LoadingButton
     {
-        private const int duration = 200;
-
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
         private OsuSpriteText text;
 
-        protected GetCommentRepliesButton()
+        public ShowMoreRepliesButton()
         {
             AutoSizeAxes = Axes.Both;
             LoadingAnimationSize = new Vector2(8);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            IdleColour = colourProvider.Light2;
+            HoverColour = colourProvider.Light1;
         }
 
         protected override Drawable CreateContent() => new Container
@@ -31,15 +37,13 @@ namespace osu.Game.Overlays.Comments
             Child = text = new OsuSpriteText
             {
                 AlwaysPresent = true,
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                Text = GetText()
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                Text = "show more"
             }
         };
 
-        protected abstract string GetText();
+        protected override void OnLoadStarted() => text.FadeOut(200, Easing.OutQuint);
 
-        protected override void OnLoadStarted() => text.FadeOut(duration, Easing.OutQuint);
-
-        protected override void OnLoadFinished() => text.FadeIn(duration, Easing.OutQuint);
+        protected override void OnLoadFinished() => text.FadeIn(200, Easing.OutQuint);
     }
 }
