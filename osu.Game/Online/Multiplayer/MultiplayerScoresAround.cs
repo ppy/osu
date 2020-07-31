@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace osu.Game.Online.Multiplayer
@@ -14,12 +15,14 @@ namespace osu.Game.Online.Multiplayer
         /// Scores sorted "higher" than the user's score, depending on the sorting order.
         /// </summary>
         [JsonProperty("higher")]
+        [CanBeNull]
         public MultiplayerScores Higher { get; set; }
 
         /// <summary>
         /// Scores sorted "lower" than the user's score, depending on the sorting order.
         /// </summary>
         [JsonProperty("lower")]
+        [CanBeNull]
         public MultiplayerScores Lower { get; set; }
     }
 }
