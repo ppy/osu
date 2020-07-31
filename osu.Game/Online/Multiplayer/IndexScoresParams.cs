@@ -6,12 +6,12 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.Multiplayer
 {
     /// <summary>
-    /// A collection of parameters which should be passed to the search endpoint to fetch the next page.
+    /// A collection of parameters which should be passed to the index endpoint to fetch the next page.
     /// </summary>
-    public class Cursor
+    public class IndexScoresParams
     {
         [UsedImplicitly]
         [JsonExtensionData]
