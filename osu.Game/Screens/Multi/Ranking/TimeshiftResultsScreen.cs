@@ -22,7 +22,9 @@ namespace osu.Game.Screens.Multi.Ranking
         private readonly int roomId;
         private readonly PlaylistItem playlistItem;
 
-        private LoadingSpinner loadingLayer;
+        private LoadingSpinner leftLoadingLayer;
+        private LoadingSpinner centreLoadingLayer;
+        private LoadingSpinner rightLoadingLayer;
         private MultiplayerScores higherScores;
         private MultiplayerScores lowerScores;
 
@@ -39,13 +41,29 @@ namespace osu.Game.Screens.Multi.Ranking
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(loadingLayer = new LoadingLayer
+            AddInternal(new Container
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                X = -10,
-                State = { Value = Score == null ? Visibility.Visible : Visibility.Hidden },
-                Padding = new MarginPadding { Bottom = TwoLayerButton.SIZE_EXTENDED.Y }
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Bottom = TwoLayerButton.SIZE_EXTENDED.Y },
+                Children = new Drawable[]
+                {
+                    leftLoadingLayer = new PanelListLoadingSpinner(ScorePanelList)
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.Centre,
+                    },
+                    centreLoadingLayer = new PanelListLoadingSpinner(ScorePanelList)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        State = { Value = Score == null ? Visibility.Visible : Visibility.Hidden },
+                    },
+                    rightLoadingLayer = new PanelListLoadingSpinner(ScorePanelList)
+                    {
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.Centre,
+                    },
+                }
             });
         }
 
@@ -91,6 +109,11 @@ namespace osu.Game.Screens.Multi.Ranking
             if (pivot?.Cursor == null)
                 return null;
 
+            if (pivot == higherScores)
+                leftLoadingLayer.Show();
+            else
+                rightLoadingLayer.Show();
+
             return createIndexRequest(scoresCallback, pivot);
         }
 
@@ -114,10 +137,10 @@ namespace osu.Game.Screens.Multi.Ranking
                 else
                     higherScores = r;
 
-                performSuccessCallback(scoresCallback, r.Scores, pivot);
+                performSuccessCallback(scoresCallback, r.Scores, r);
             };
 
-            indexReq.Failure += _ => loadingLayer.Hide();
+            indexReq.Failure += _ => hideLoadingSpinners(pivot);
 
             return indexReq;
         }
@@ -146,7 +169,45 @@ namespace osu.Game.Screens.Multi.Ranking
             // Invoke callback to add the scores. Exclude the user's current score which was added previously.
             callback.Invoke(scoreInfos.Where(s => s.ID != Score?.OnlineScoreID));
 
-            loadingLayer.Hide();
+            hideLoadingSpinners(pivot);
+        }
+
+        private void hideLoadingSpinners([CanBeNull] MultiplayerScores pivot = null)
+        {
+            centreLoadingLayer.Hide();
+
+            if (pivot == lowerScores)
+                rightLoadingLayer.Hide();
+            else if (pivot == higherScores)
+                leftLoadingLayer.Hide();
+        }
+
+        private class PanelListLoadingSpinner : LoadingSpinner
+        {
+            private readonly ScorePanelList list;
+
+            /// <summary>
+            /// Creates a new <see cref="PanelListLoadingSpinner"/>.
+            /// </summary>
+            /// <param name="list">The list to track.</param>
+            /// <param name="withBox">Whether the spinner should have a surrounding black box for visibility.</param>
+            public PanelListLoadingSpinner(ScorePanelList list, bool withBox = true)
+                : base(withBox)
+            {
+                this.list = list;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                float panelOffset = list.DrawWidth / 2 - ScorePanel.EXPANDED_WIDTH;
+
+                if ((Anchor & Anchor.x0) > 0)
+                    X = (float)(panelOffset - list.Current);
+                else if ((Anchor & Anchor.x2) > 0)
+                    X = (float)(list.ScrollableExtent - list.Current - panelOffset);
+            }
         }
     }
 }
