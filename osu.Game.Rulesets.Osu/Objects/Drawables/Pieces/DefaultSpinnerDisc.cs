@@ -29,7 +29,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private SpinnerTicks ticks;
 
-        private int completeTick;
+        private int wholeRotationCount;
+
         private SpinnerFill fill;
         private Container mainContainer;
         private SpinnerCentreLayer centre;
@@ -95,6 +96,33 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             drawableSpinner.State.BindValueChanged(updateStateTransforms, true);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (drawableSpinner.RotationTracker.Complete.Value)
+            {
+                if (checkNewRotationCount)
+                {
+                    fill.FinishTransforms(false, nameof(Alpha));
+                    fill
+                        .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
+                        .Then()
+                        .FadeTo(tracking_alpha, 250, Easing.OutQuint);
+                }
+            }
+            else
+            {
+                fill.Alpha = (float)Interpolation.Damp(fill.Alpha, drawableSpinner.RotationTracker.Tracking ? tracking_alpha : idle_alpha, 0.98f, (float)Math.Abs(Clock.ElapsedFrameTime));
+            }
+
+            const float initial_scale = 0.2f;
+            float targetScale = initial_scale + (1 - initial_scale) * drawableSpinner.Progress;
+
+            fill.Scale = new Vector2((float)Interpolation.Lerp(fill.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
+            mainContainer.Rotation = drawableSpinner.RotationTracker.Rotation;
+        }
+
         private void updateStateTransforms(ValueChangedEvent<ArmedState> state)
         {
             centre.ScaleTo(0);
@@ -145,26 +173,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             centre.FadeAccent(colour, duration);
         }
 
-        private bool updateCompleteTick() => completeTick != (completeTick = (int)(drawableSpinner.RotationTracker.CumulativeRotation / 360));
-
-        protected override void Update()
+        private bool checkNewRotationCount
         {
-            base.Update();
-
-            if (drawableSpinner.RotationTracker.Complete.Value && updateCompleteTick())
+            get
             {
-                fill.FinishTransforms(false, nameof(Alpha));
-                fill
-                    .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
-                    .Then()
-                    .FadeTo(tracking_alpha, 250, Easing.OutQuint);
+                int rotations = (int)(drawableSpinner.RotationTracker.CumulativeRotation / 360);
+
+                if (wholeRotationCount == rotations) return false;
+
+                wholeRotationCount = rotations;
+                return true;
             }
-
-            const float initial_scale = 0.2f;
-            float targetScale = initial_scale + (1 - initial_scale) * drawableSpinner.Progress;
-
-            fill.Scale = new Vector2((float)Interpolation.Lerp(fill.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
-            mainContainer.Rotation = drawableSpinner.RotationTracker.Rotation;
         }
     }
 }
