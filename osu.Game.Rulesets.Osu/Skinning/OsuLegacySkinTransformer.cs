@@ -104,9 +104,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         };
 
                 case OsuSkinComponents.SpinnerBody:
-                    if (Source.GetTexture("spinner-top") != null)
+                    bool hasBackground = Source.GetTexture("spinner-background") != null;
+
+                    if (Source.GetTexture("spinner-top") != null && !hasBackground)
                         return new LegacyNewStyleSpinner();
-                    else if (Source.GetTexture("spinner-background") != null)
+                    else if (hasBackground)
                         return new LegacyOldStyleSpinner();
 
                     return null;
