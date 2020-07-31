@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -75,21 +76,8 @@ namespace osu.Game.Screens.Multi.Ranking
                 performSuccessCallback(scoresCallback, allScores);
             };
 
-            userScoreReq.Failure += _ =>
-            {
-                // Fallback to a normal index.
-                var indexReq = new IndexPlaylistScoresRequest(roomId, playlistItem.ID);
-
-                indexReq.Success += r =>
-                {
-                    performSuccessCallback(scoresCallback, r.Scores);
-                    lowerScores = r;
-                };
-
-                indexReq.Failure += __ => loadingLayer.Hide();
-
-                api.Queue(indexReq);
-            };
+            // On failure, fallback to a normal index.
+            userScoreReq.Failure += _ => api.Queue(createIndexRequest(scoresCallback));
 
             return userScoreReq;
         }
@@ -103,16 +91,30 @@ namespace osu.Game.Screens.Multi.Ranking
             if (pivot?.Cursor == null)
                 return null;
 
-            var indexReq = new IndexPlaylistScoresRequest(roomId, playlistItem.ID, pivot.Cursor, pivot.Params);
+            return createIndexRequest(scoresCallback, pivot);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="IndexPlaylistScoresRequest"/> with an optional score pivot.
+        /// </summary>
+        /// <remarks>Does not queue the request.</remarks>
+        /// <param name="scoresCallback">The callback to perform with the resulting scores.</param>
+        /// <param name="pivot">An optional score pivot to retrieve scores around. Can be null to retrieve scores from the highest score.</param>
+        /// <returns>The indexing <see cref="APIRequest"/>.</returns>
+        private APIRequest createIndexRequest(Action<IEnumerable<ScoreInfo>> scoresCallback, [CanBeNull] MultiplayerScores pivot = null)
+        {
+            var indexReq = pivot != null
+                ? new IndexPlaylistScoresRequest(roomId, playlistItem.ID, pivot.Cursor, pivot.Params)
+                : new IndexPlaylistScoresRequest(roomId, playlistItem.ID);
 
             indexReq.Success += r =>
             {
-                if (direction == -1)
-                    higherScores = r;
-                else
+                if (pivot == lowerScores)
                     lowerScores = r;
+                else
+                    higherScores = r;
 
-                performSuccessCallback(scoresCallback, r.Scores);
+                performSuccessCallback(scoresCallback, r.Scores, pivot);
             };
 
             indexReq.Failure += _ => loadingLayer.Hide();
@@ -120,7 +122,13 @@ namespace osu.Game.Screens.Multi.Ranking
             return indexReq;
         }
 
-        private void performSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores)
+        /// <summary>
+        /// Transforms returned <see cref="MultiplayerScores"/> into <see cref="ScoreInfo"/>s, ensure the <see cref="ScorePanelList"/> is put into a sane state, and invokes a given success callback.
+        /// </summary>
+        /// <param name="callback">The callback to invoke with the final <see cref="ScoreInfo"/>s.</param>
+        /// <param name="scores">The <see cref="MultiplayerScore"/>s that were retrieved from <see cref="APIRequest"/>s.</param>
+        /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
+        private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null)
         {
             var scoreInfos = new List<ScoreInfo>(scores.Select(s => s.CreateScoreInfo(playlistItem)));
 
@@ -136,7 +144,7 @@ namespace osu.Game.Screens.Multi.Ranking
             }
 
             // Invoke callback to add the scores. Exclude the user's current score which was added previously.
-            callback?.Invoke(scoreInfos.Where(s => s.ID != Score?.OnlineScoreID));
+            callback.Invoke(scoreInfos.Where(s => s.ID != Score?.OnlineScoreID));
 
             loadingLayer.Hide();
         }
