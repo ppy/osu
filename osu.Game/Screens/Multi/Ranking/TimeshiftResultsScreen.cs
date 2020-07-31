@@ -84,12 +84,18 @@ namespace osu.Game.Screens.Multi.Ranking
                 {
                     allScores.AddRange(userScore.ScoresAround.Higher.Scores);
                     higherScores = userScore.ScoresAround.Higher;
+
+                    Debug.Assert(userScore.Position != null);
+                    setPositions(higherScores, userScore.Position.Value, -1);
                 }
 
                 if (userScore.ScoresAround?.Lower != null)
                 {
                     allScores.AddRange(userScore.ScoresAround.Lower.Scores);
                     lowerScores = userScore.ScoresAround.Lower;
+
+                    Debug.Assert(userScore.Position != null);
+                    setPositions(lowerScores, userScore.Position.Value, 1);
                 }
 
                 performSuccessCallback(scoresCallback, allScores);
@@ -134,9 +140,15 @@ namespace osu.Game.Screens.Multi.Ranking
             indexReq.Success += r =>
             {
                 if (pivot == lowerScores)
+                {
                     lowerScores = r;
+                    setPositions(r, pivot, 1);
+                }
                 else
+                {
                     higherScores = r;
+                    setPositions(r, pivot, -1);
+                }
 
                 performSuccessCallback(scoresCallback, r.Scores, r);
             };
@@ -181,6 +193,30 @@ namespace osu.Game.Screens.Multi.Ranking
                 RightSpinner.Hide();
             else if (pivot == higherScores)
                 LeftSpinner.Hide();
+        }
+
+        /// <summary>
+        /// Applies positions to all <see cref="MultiplayerScore"/>s referenced to a given pivot.
+        /// </summary>
+        /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
+        /// <param name="pivot">The pivot.</param>
+        /// <param name="increment">The amount to increment the pivot position by for each <see cref="MultiplayerScore"/> in <paramref name="scores"/>.</param>
+        private void setPositions([NotNull] MultiplayerScores scores, [CanBeNull] MultiplayerScores pivot, int increment)
+            => setPositions(scores, pivot?.Scores[^1].Position ?? 0, increment);
+
+        /// <summary>
+        /// Applies positions to all <see cref="MultiplayerScore"/>s referenced to a given pivot.
+        /// </summary>
+        /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
+        /// <param name="pivotPosition">The pivot position.</param>
+        /// <param name="increment">The amount to increment the pivot position by for each <see cref="MultiplayerScore"/> in <paramref name="scores"/>.</param>
+        private void setPositions([NotNull] MultiplayerScores scores, int pivotPosition, int increment)
+        {
+            foreach (var s in scores.Scores)
+            {
+                pivotPosition += increment;
+                s.Position = pivotPosition;
+            }
         }
 
         private class PanelListLoadingSpinner : LoadingSpinner

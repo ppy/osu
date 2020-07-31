@@ -19,8 +19,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public TestSceneSpinner()
         {
-            //            base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
-
             AddStep("Miss Big", () => SetContents(() => testSingle(2)));
             AddStep("Miss Medium", () => SetContents(() => testSingle(5)));
             AddStep("Miss Small", () => SetContents(() => testSingle(7)));
