@@ -93,8 +93,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             spinningMiddle.Rotation = discTop.Rotation = drawableSpinner.RotationTracker.Rotation;
             discBottom.Rotation = discTop.Rotation / 3;
 
-            Scale = new Vector2(final_scale * 0.8f
-                                + (float)Interpolation.ApplyEasing(Easing.Out, drawableSpinner.Progress) * (final_scale * 0.2f));
+            Scale = new Vector2(final_scale * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, drawableSpinner.Progress) * 0.2f));
         }
     }
 }
