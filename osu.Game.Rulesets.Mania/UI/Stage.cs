@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
@@ -33,8 +34,8 @@ namespace osu.Game.Rulesets.Mania.UI
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
 
-        public Container<DrawableManiaJudgement> Judgements => judgements;
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
+        private readonly DrawablePool<DrawableManiaJudgement> judgementPool;
 
         private readonly Drawable barLineContainer;
         private readonly Container topLevelContainer;
@@ -63,6 +64,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             InternalChildren = new Drawable[]
             {
+                judgementPool = new DrawablePool<DrawableManiaJudgement>(2),
                 new Container
                 {
                     Anchor = Anchor.TopCentre,
@@ -208,12 +210,14 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            judgements.Clear();
-            judgements.Add(new DrawableManiaJudgement(result, judgedObject)
+            judgements.Clear(false);
+            judgements.Add(judgementPool.Get(j =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            });
+                j.Apply(result, judgedObject);
+
+                j.Anchor = Anchor.Centre;
+                j.Origin = Anchor.Centre;
+            }));
         }
 
         protected override void Update()
