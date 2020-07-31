@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile
                 Masking = true,
                 Children = new Drawable[]
                 {
-                    coverContainer = new UserCoverBackground
+                    coverContainer = new ProfileCoverBackground
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -99,6 +99,11 @@ namespace osu.Game.Overlays.Profile
                 Title = "player info";
                 IconTexture = "Icons/profile";
             }
+        }
+
+        private class ProfileCoverBackground : UserCoverBackground
+        {
+            protected override double LoadDelay => 0;
         }
     }
 }

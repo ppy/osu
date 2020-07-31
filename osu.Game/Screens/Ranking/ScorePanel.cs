@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Ranking
                                         RelativeSizeAxes = Axes.Both,
                                         User = Score.User,
                                         Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
-                                    },
+                                    }
                                 }
                             },
                             middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
