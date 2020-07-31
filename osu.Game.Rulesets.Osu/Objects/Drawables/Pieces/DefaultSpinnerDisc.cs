@@ -29,7 +29,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private SpinnerTicks ticks;
 
-        private int completeTick;
+        private int wholeRotationCount;
+
         private SpinnerFill fill;
         private Container mainContainer;
         private SpinnerCentreLayer centre;
@@ -145,13 +146,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             centre.FadeAccent(colour, duration);
         }
 
-        private bool updateCompleteTick() => completeTick != (completeTick = (int)(drawableSpinner.RotationTracker.CumulativeRotation / 360));
+        private bool checkNewRotationCount
+        {
+            get
+            {
+                int rotations = (int)(drawableSpinner.RotationTracker.CumulativeRotation / 360);
+
+                if (wholeRotationCount == rotations) return false;
+
+                wholeRotationCount = rotations;
+                return true;
+            }
+        }
 
         protected override void Update()
         {
             base.Update();
 
-            if (drawableSpinner.RotationTracker.Complete.Value && updateCompleteTick())
+            if (drawableSpinner.RotationTracker.Complete.Value && checkNewRotationCount)
             {
                 fill.FinishTransforms(false, nameof(Alpha));
                 fill
