@@ -96,6 +96,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             drawableSpinner.State.BindValueChanged(updateStateTransforms, true);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (drawableSpinner.RotationTracker.Complete.Value && checkNewRotationCount)
+            {
+                fill.FinishTransforms(false, nameof(Alpha));
+                fill
+                    .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
+                    .Then()
+                    .FadeTo(tracking_alpha, 250, Easing.OutQuint);
+            }
+
+            const float initial_scale = 0.2f;
+            float targetScale = initial_scale + (1 - initial_scale) * drawableSpinner.Progress;
+
+            fill.Scale = new Vector2((float)Interpolation.Lerp(fill.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
+            mainContainer.Rotation = drawableSpinner.RotationTracker.Rotation;
+        }
+
         private void updateStateTransforms(ValueChangedEvent<ArmedState> state)
         {
             centre.ScaleTo(0);
@@ -159,24 +179,5 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (drawableSpinner.RotationTracker.Complete.Value && checkNewRotationCount)
-            {
-                fill.FinishTransforms(false, nameof(Alpha));
-                fill
-                    .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
-                    .Then()
-                    .FadeTo(tracking_alpha, 250, Easing.OutQuint);
-            }
-
-            const float initial_scale = 0.2f;
-            float targetScale = initial_scale + (1 - initial_scale) * drawableSpinner.Progress;
-
-            fill.Scale = new Vector2((float)Interpolation.Lerp(fill.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
-            mainContainer.Rotation = drawableSpinner.RotationTracker.Rotation;
-        }
     }
 }
