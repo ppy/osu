@@ -100,13 +100,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
-            if (drawableSpinner.RotationTracker.Complete.Value && checkNewRotationCount)
+            if (drawableSpinner.RotationTracker.Complete.Value)
             {
-                fill.FinishTransforms(false, nameof(Alpha));
-                fill
-                    .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
-                    .Then()
-                    .FadeTo(tracking_alpha, 250, Easing.OutQuint);
+                if (checkNewRotationCount)
+                {
+                    fill.FinishTransforms(false, nameof(Alpha));
+                    fill
+                        .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
+                        .Then()
+                        .FadeTo(tracking_alpha, 250, Easing.OutQuint);
+                }
+            }
+            else
+            {
+                fill.Alpha = (float)Interpolation.Damp(fill.Alpha, drawableSpinner.RotationTracker.Tracking ? tracking_alpha : idle_alpha, 0.98f, (float)Clock.ElapsedFrameTime);
             }
 
             const float initial_scale = 0.2f;
