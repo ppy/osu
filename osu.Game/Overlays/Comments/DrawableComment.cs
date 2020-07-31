@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Comments
         private FillFlowContainer childCommentsVisibilityContainer;
         private FillFlowContainer childCommentsContainer;
         private LoadRepliesButton loadRepliesButton;
-        private ShowMoreButton showMoreButton;
+        private ShowMoreRepliesButton showMoreButton;
         private ShowRepliesButton showRepliesButton;
         private ChevronButton chevronButton;
         private DeletedCommentsCounter deletedCommentsCounter;
@@ -213,7 +213,7 @@ namespace osu.Game.Overlays.Comments
                                             Top = 10
                                         }
                                     },
-                                    showMoreButton = new ShowMoreButton
+                                    showMoreButton = new ShowMoreRepliesButton
                                     {
                                         Action = () => RepliesRequested(this, ++currentPage)
                                     }

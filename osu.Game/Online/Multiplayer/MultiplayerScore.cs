@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Online.API;
@@ -46,6 +47,19 @@ namespace osu.Game.Online.Multiplayer
 
         [JsonProperty("ended_at")]
         public DateTimeOffset EndedAt { get; set; }
+
+        /// <summary>
+        /// The position of this score, starting at 1.
+        /// </summary>
+        [JsonProperty("position")]
+        public int? Position { get; set; }
+
+        /// <summary>
+        /// Any scores in the room around this score.
+        /// </summary>
+        [JsonProperty("scores_around")]
+        [CanBeNull]
+        public MultiplayerScoresAround ScoresAround { get; set; }
 
         public ScoreInfo CreateScoreInfo(PlaylistItem playlistItem)
         {
