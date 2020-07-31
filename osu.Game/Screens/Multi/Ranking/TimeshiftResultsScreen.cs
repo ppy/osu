@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Multi.Ranking
             }
 
             // Invoke callback to add the scores. Exclude the user's current score which was added previously.
-            callback.Invoke(scoreInfos.Where(s => s.ID != Score?.OnlineScoreID));
+            callback.Invoke(scoreInfos.Where(s => s.OnlineScoreID != Score?.OnlineScoreID));
 
             hideLoadingSpinners(pivot);
         }
