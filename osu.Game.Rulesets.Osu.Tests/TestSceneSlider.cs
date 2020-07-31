@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -26,19 +25,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class TestSceneSlider : OsuSkinnableTestScene
     {
-        private Container content;
-
-        protected override Container<Drawable> Content
-        {
-            get
-            {
-                if (content == null)
-                    base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
-
-                return content;
-            }
-        }
-
         private int depthIndex;
 
         public TestSceneSlider()
