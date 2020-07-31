@@ -16,12 +16,12 @@ namespace osu.Game.Online.Multiplayer
         /// The scores.
         /// </summary>
         [JsonProperty("scores")]
-        public List<MultiplayerScore> Scores { get; set; }
+        public List<MultiplayerScore> Scores { get; set; } = new List<MultiplayerScore>();
 
         /// <summary>
         /// The parameters to be used to fetch the next page.
         /// </summary>
         [JsonProperty("params")]
-        public IndexScoresParams Params { get; set; }
+        public IndexScoresParams Params { get; set; } = new IndexScoresParams();
     }
 }
