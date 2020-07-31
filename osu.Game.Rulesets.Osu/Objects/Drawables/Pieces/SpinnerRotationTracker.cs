@@ -2,76 +2,33 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerDisc : CircularContainer, IHasAccentColour
+    public class SpinnerRotationTracker : CircularContainer
     {
         private readonly Spinner spinner;
 
-        public Color4 AccentColour
-        {
-            get => background.AccentColour;
-            set => background.AccentColour = value;
-        }
-
-        private readonly SpinnerBackground background;
-
-        private const float idle_alpha = 0.2f;
-        private const float tracking_alpha = 0.4f;
-
         public override bool IsPresent => true; // handle input when hidden
 
-        public SpinnerDisc(Spinner s)
+        public SpinnerRotationTracker(Spinner s)
         {
             spinner = s;
 
             RelativeSizeAxes = Axes.Both;
-
-            Children = new Drawable[]
-            {
-                background = new SpinnerBackground { Alpha = idle_alpha },
-            };
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        private bool tracking;
+        public bool Tracking { get; set; }
 
-        public bool Tracking
-        {
-            get => tracking;
-            set
-            {
-                if (value == tracking) return;
-
-                tracking = value;
-
-                background.FadeTo(tracking ? tracking_alpha : idle_alpha, 100);
-            }
-        }
-
-        private bool complete;
-
-        public bool Complete
-        {
-            get => complete;
-            set
-            {
-                if (value == complete) return;
-
-                complete = value;
-
-                updateCompleteTick();
-            }
-        }
+        public readonly BindableBool Complete = new BindableBool();
 
         /// <summary>
         /// The total rotation performed on the spinner disc, disregarding the spin direction.
@@ -84,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// If the spinner is spun 360 degrees clockwise and then 360 degrees counter-clockwise,
         /// this property will return the value of 720 (as opposed to 0 for <see cref="Drawable.Rotation"/>).
         /// </example>
-        public float CumulativeRotation;
+        public float CumulativeRotation { get; private set; }
 
         /// <summary>
         /// Whether currently in the correct time range to allow spinning.
@@ -101,9 +58,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private float lastAngle;
         private float currentRotation;
-        private int completeTick;
-
-        private bool updateCompleteTick() => completeTick != (completeTick = (int)(CumulativeRotation / 360));
 
         private bool rotationTransferred;
 
@@ -114,19 +68,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             var delta = thisAngle - lastAngle;
 
-            if (tracking)
-                Rotate(delta);
+            if (Tracking)
+                AddRotation(delta);
 
             lastAngle = thisAngle;
-
-            if (Complete && updateCompleteTick())
-            {
-                background.FinishTransforms(false, nameof(Alpha));
-                background
-                    .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
-                    .Then()
-                    .FadeTo(tracking_alpha, 250, Easing.OutQuint);
-            }
 
             Rotation = (float)Interpolation.Lerp(Rotation, currentRotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
         }
@@ -138,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// Will be a no-op if not a valid time to spin.
         /// </remarks>
         /// <param name="angle">The delta angle.</param>
-        public void Rotate(float angle)
+        public void AddRotation(float angle)
         {
             if (!isSpinnableTime)
                 return;

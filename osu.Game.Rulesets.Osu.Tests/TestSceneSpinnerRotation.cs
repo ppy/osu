@@ -61,12 +61,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestSpinnerRewindingRotation()
         {
             addSeekStep(5000);
-            AddAssert("is disc rotation not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Disc.Rotation, 0, 100));
-            AddAssert("is disc rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Disc.CumulativeRotation, 0, 100));
+            AddAssert("is disc rotation not almost 0", () => !Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, 0, 100));
+            AddAssert("is disc rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, 0, 100));
 
             addSeekStep(0);
-            AddAssert("is disc rotation almost 0", () => Precision.AlmostEquals(drawableSpinner.Disc.Rotation, 0, 100));
-            AddAssert("is disc rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.Disc.CumulativeRotation, 0, 100));
+            AddAssert("is disc rotation almost 0", () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, 0, 100));
+            AddAssert("is disc rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, 0, 100));
         }
 
         [Test]
@@ -75,24 +75,24 @@ namespace osu.Game.Rulesets.Osu.Tests
             double finalAbsoluteDiscRotation = 0, finalRelativeDiscRotation = 0, finalSpinnerSymbolRotation = 0;
 
             addSeekStep(5000);
-            AddStep("retrieve disc relative rotation", () => finalRelativeDiscRotation = drawableSpinner.Disc.Rotation);
-            AddStep("retrieve disc absolute rotation", () => finalAbsoluteDiscRotation = drawableSpinner.Disc.CumulativeRotation);
+            AddStep("retrieve disc relative rotation", () => finalRelativeDiscRotation = drawableSpinner.RotationTracker.Rotation);
+            AddStep("retrieve disc absolute rotation", () => finalAbsoluteDiscRotation = drawableSpinner.RotationTracker.CumulativeRotation);
             AddStep("retrieve spinner symbol rotation", () => finalSpinnerSymbolRotation = spinnerSymbol.Rotation);
 
             addSeekStep(2500);
             AddUntilStep("disc rotation rewound",
                 // we want to make sure that the rotation at time 2500 is in the same direction as at time 5000, but about half-way in.
-                () => Precision.AlmostEquals(drawableSpinner.Disc.Rotation, finalRelativeDiscRotation / 2, 100));
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalRelativeDiscRotation / 2, 100));
             AddUntilStep("symbol rotation rewound",
                 () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation / 2, 100));
 
             addSeekStep(5000);
             AddAssert("is disc rotation almost same",
-                () => Precision.AlmostEquals(drawableSpinner.Disc.Rotation, finalRelativeDiscRotation, 100));
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalRelativeDiscRotation, 100));
             AddAssert("is symbol rotation almost same",
                 () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation, 100));
             AddAssert("is disc rotation absolute almost same",
-                () => Precision.AlmostEquals(drawableSpinner.Disc.CumulativeRotation, finalAbsoluteDiscRotation, 100));
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, finalAbsoluteDiscRotation, 100));
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addSeekStep(5000);
 
-            AddAssert("disc spin direction correct", () => clockwise ? drawableSpinner.Disc.Rotation > 0 : drawableSpinner.Disc.Rotation < 0);
+            AddAssert("disc spin direction correct", () => clockwise ? drawableSpinner.RotationTracker.Rotation > 0 : drawableSpinner.RotationTracker.Rotation < 0);
             AddAssert("spinner symbol direction correct", () => clockwise ? spinnerSymbol.Rotation > 0 : spinnerSymbol.Rotation < 0);
         }
 
@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
                 var totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
-                return totalScore == (int)(drawableSpinner.Disc.CumulativeRotation / 360) * SpinnerTick.SCORE_PER_TICK;
+                return totalScore == (int)(drawableSpinner.RotationTracker.CumulativeRotation / 360) * SpinnerTick.SCORE_PER_TICK;
             });
 
             addSeekStep(0);
