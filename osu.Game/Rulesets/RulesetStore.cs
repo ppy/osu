@@ -69,8 +69,8 @@ namespace osu.Game.Rulesets
                                           // Given name is always going to be equally-or-more qualified than the assembly name.
                                           .Where(a => args.Name.Contains(a.GetName().Name, StringComparison.Ordinal))
                                           // Pick the greatest assembly version.
-                                          .OrderBy(a => a.GetName().Version)
-                                          .LastOrDefault();
+                                          .OrderByDescending(a => a.GetName().Version)
+                                          .FirstOrDefault();
 
             if (domainAssembly != null)
                 return domainAssembly;
