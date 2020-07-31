@@ -190,8 +190,9 @@ namespace osu.Game.Screens.Ranking
 
                 if (nextPageRequest != null)
                 {
-                    nextPageRequest.Success += () => nextPageRequest = null;
-                    nextPageRequest.Failure += _ => nextPageRequest = null;
+                    // Scheduled after children to give the list a chance to update its scroll position and not potentially trigger a second request too early.
+                    nextPageRequest.Success += () => ScheduleAfterChildren(() => nextPageRequest = null);
+                    nextPageRequest.Failure += _ => ScheduleAfterChildren(() => nextPageRequest = null);
 
                     api.Queue(nextPageRequest);
                 }
