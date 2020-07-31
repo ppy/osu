@@ -178,6 +178,5 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 return true;
             }
         }
-
     }
 }
