@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
             else
             {
-                fill.Alpha = (float)Interpolation.Damp(fill.Alpha, drawableSpinner.RotationTracker.Tracking ? tracking_alpha : idle_alpha, 0.98f, (float)Clock.ElapsedFrameTime);
+                fill.Alpha = (float)Interpolation.Damp(fill.Alpha, drawableSpinner.RotationTracker.Tracking ? tracking_alpha : idle_alpha, 0.98f, (float)Math.Abs(Clock.ElapsedFrameTime));
             }
 
             const float initial_scale = 0.2f;
