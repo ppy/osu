@@ -236,8 +236,8 @@ namespace osu.Game.Overlays
             {
                 if (beatmap is Bindable<WorkingBeatmap> working)
                     working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
-                beatmap.Value.Track.Restart();
 
+                restartTrack();
                 return PreviousTrackResult.Previous;
             }
 
@@ -263,14 +263,18 @@ namespace osu.Game.Overlays
                 if (beatmap is Bindable<WorkingBeatmap> working)
                     working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
 
-                // if not scheduled, the previously track will be stopped one frame later (see ScheduleAfterChildren logic in GameBase).
-                // we probably want to move this to a central method for switching to a new working beatmap in the future.
-                Schedule(() => beatmap.Value.Track.Restart());
-
+                restartTrack();
                 return true;
             }
 
             return false;
+        }
+
+        private void restartTrack()
+        {
+            // if not scheduled, the previously track will be stopped one frame later (see ScheduleAfterChildren logic in GameBase).
+            // we probably want to move this to a central method for switching to a new working beatmap in the future.
+            Schedule(() => beatmap.Value.Track.Restart());
         }
 
         private WorkingBeatmap current;
