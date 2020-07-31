@@ -42,6 +42,16 @@ namespace osu.Game.Screens.Ranking
         public bool IsScrolledToEnd => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.IsScrolledToEnd(scroll_endpoint_distance);
 
         /// <summary>
+        /// The current scroll position.
+        /// </summary>
+        public double Current => scroll.Current;
+
+        /// <summary>
+        /// The scrollable extent.
+        /// </summary>
+        public double ScrollableExtent => scroll.ScrollableExtent;
+
+        /// <summary>
         /// An action to be invoked if a <see cref="ScorePanel"/> is clicked while in an expanded state.
         /// </summary>
         public Action PostExpandAction;
