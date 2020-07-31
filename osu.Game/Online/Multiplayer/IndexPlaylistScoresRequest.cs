@@ -12,7 +12,7 @@ namespace osu.Game.Online.Multiplayer
     /// <summary>
     /// Returns a list of scores for the specified playlist item.
     /// </summary>
-    public class IndexPlaylistScoresRequest : APIRequest<MultiplayerScores>
+    public class IndexPlaylistScoresRequest : APIRequest<IndexedMultiplayerScores>
     {
         private readonly int roomId;
         private readonly int playlistItemId;

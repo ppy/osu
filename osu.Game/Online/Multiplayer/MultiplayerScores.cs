@@ -19,18 +19,6 @@ namespace osu.Game.Online.Multiplayer
         public List<MultiplayerScore> Scores { get; set; }
 
         /// <summary>
-        /// The total scores in the playlist item. Only provided via <see cref="IndexPlaylistScoresRequest"/>.
-        /// </summary>
-        [JsonProperty("total")]
-        public int? TotalScores { get; set; }
-
-        /// <summary>
-        /// The user's score, if any. Only provided via <see cref="IndexPlaylistScoresRequest"/>.
-        /// </summary>
-        [JsonProperty("user_score")]
-        public MultiplayerScore UserScore { get; set; }
-
-        /// <summary>
         /// The parameters to be used to fetch the next page.
         /// </summary>
         [JsonProperty("params")]

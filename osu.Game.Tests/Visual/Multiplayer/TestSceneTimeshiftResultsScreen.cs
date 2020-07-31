@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         void success()
                         {
-                            r.TriggerSuccess(new MultiplayerScores { Scores = roomScores });
+                            r.TriggerSuccess(new IndexedMultiplayerScores { Scores = roomScores });
                             roomsReceived = true;
                         }
 
