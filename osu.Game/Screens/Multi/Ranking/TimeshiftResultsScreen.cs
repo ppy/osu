@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Multi.Ranking
         }
 
         /// <summary>
-        /// Applies positions to all <see cref="MultiplayerScore"/>s from a given pivot.
+        /// Applies positions to all <see cref="MultiplayerScore"/>s referenced to a given pivot.
         /// </summary>
         /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
         /// <param name="pivot">The pivot.</param>
@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Multi.Ranking
             => setPositions(scores, pivot?.Scores[^1].Position ?? 0, increment);
 
         /// <summary>
-        /// Applies positions to all <see cref="MultiplayerScore"/>s from a given pivot.
+        /// Applies positions to all <see cref="MultiplayerScore"/>s referenced to a given pivot.
         /// </summary>
         /// <param name="scores">The <see cref="MultiplayerScores"/> to set positions on.</param>
         /// <param name="pivotPosition">The pivot position.</param>
