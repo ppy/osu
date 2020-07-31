@@ -244,6 +244,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 EndedAt = userScore.Date,
                 Passed = userScore.Passed,
                 Rank = userScore.Rank,
+                Position = 200,
                 MaxCombo = userScore.MaxCombo,
                 TotalScore = userScore.TotalScore,
                 User = userScore.User,

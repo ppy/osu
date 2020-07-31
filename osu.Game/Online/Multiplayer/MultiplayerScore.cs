@@ -80,7 +80,8 @@ namespace osu.Game.Online.Multiplayer
                 Date = EndedAt,
                 Hash = string.Empty, // todo: temporary?
                 Rank = Rank,
-                Mods = Mods?.Select(m => m.ToMod(rulesetInstance)).ToArray() ?? Array.Empty<Mod>()
+                Mods = Mods?.Select(m => m.ToMod(rulesetInstance)).ToArray() ?? Array.Empty<Mod>(),
+                Position = Position,
             };
 
             return scoreInfo;
