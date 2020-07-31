@@ -44,6 +44,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public float CumulativeRotation { get; private set; }
 
         /// <summary>
+        /// Whether the spinning is spinning at a reasonable speed to be considered visually spinning.
+        /// </summary>
+        public readonly BindableBool IsSpinning = new BindableBool();
+
+        /// <summary>
         /// Whether currently in the correct time range to allow spinning.
         /// </summary>
         private bool isSpinnableTime => spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
@@ -73,7 +78,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             lastAngle = thisAngle;
 
-            Rotation = (float)Interpolation.Lerp(Rotation, currentRotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
+            IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation / 2 - Rotation) > 5f;
+
+            Rotation = (float)Interpolation.Damp(Rotation, currentRotation / 2, 0.99, Math.Abs(Time.Elapsed));
         }
 
         /// <summary>
