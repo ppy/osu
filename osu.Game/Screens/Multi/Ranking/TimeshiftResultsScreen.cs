@@ -22,9 +22,10 @@ namespace osu.Game.Screens.Multi.Ranking
         private readonly int roomId;
         private readonly PlaylistItem playlistItem;
 
-        private LoadingSpinner leftLoadingLayer;
-        private LoadingSpinner centreLoadingLayer;
-        private LoadingSpinner rightLoadingLayer;
+        protected LoadingSpinner LeftSpinner { get; private set; }
+        protected LoadingSpinner CentreSpinner { get; private set; }
+        protected LoadingSpinner RightSpinner { get; private set; }
+
         private MultiplayerScores higherScores;
         private MultiplayerScores lowerScores;
 
@@ -47,18 +48,18 @@ namespace osu.Game.Screens.Multi.Ranking
                 Padding = new MarginPadding { Bottom = TwoLayerButton.SIZE_EXTENDED.Y },
                 Children = new Drawable[]
                 {
-                    leftLoadingLayer = new PanelListLoadingSpinner(ScorePanelList)
+                    LeftSpinner = new PanelListLoadingSpinner(ScorePanelList)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.Centre,
                     },
-                    centreLoadingLayer = new PanelListLoadingSpinner(ScorePanelList)
+                    CentreSpinner = new PanelListLoadingSpinner(ScorePanelList)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         State = { Value = Score == null ? Visibility.Visible : Visibility.Hidden },
                     },
-                    rightLoadingLayer = new PanelListLoadingSpinner(ScorePanelList)
+                    RightSpinner = new PanelListLoadingSpinner(ScorePanelList)
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.Centre,
@@ -110,9 +111,9 @@ namespace osu.Game.Screens.Multi.Ranking
                 return null;
 
             if (pivot == higherScores)
-                leftLoadingLayer.Show();
+                LeftSpinner.Show();
             else
-                rightLoadingLayer.Show();
+                RightSpinner.Show();
 
             return createIndexRequest(scoresCallback, pivot);
         }
@@ -174,12 +175,12 @@ namespace osu.Game.Screens.Multi.Ranking
 
         private void hideLoadingSpinners([CanBeNull] MultiplayerScores pivot = null)
         {
-            centreLoadingLayer.Hide();
+            CentreSpinner.Hide();
 
             if (pivot == lowerScores)
-                rightLoadingLayer.Hide();
+                RightSpinner.Hide();
             else if (pivot == higherScores)
-                leftLoadingLayer.Hide();
+                LeftSpinner.Hide();
         }
 
         private class PanelListLoadingSpinner : LoadingSpinner

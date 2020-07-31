@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
@@ -14,39 +15,45 @@ namespace osu.Game.Online.Multiplayer
     /// </summary>
     public class IndexPlaylistScoresRequest : APIRequest<IndexedMultiplayerScores>
     {
-        private readonly int roomId;
-        private readonly int playlistItemId;
-        private readonly Cursor cursor;
-        private readonly IndexScoresParams indexParams;
+        public readonly int RoomId;
+        public readonly int PlaylistItemId;
+
+        [CanBeNull]
+        public readonly Cursor Cursor;
+
+        [CanBeNull]
+        public readonly IndexScoresParams IndexParams;
 
         public IndexPlaylistScoresRequest(int roomId, int playlistItemId)
         {
-            this.roomId = roomId;
-            this.playlistItemId = playlistItemId;
+            RoomId = roomId;
+            PlaylistItemId = playlistItemId;
         }
 
         public IndexPlaylistScoresRequest(int roomId, int playlistItemId, [NotNull] Cursor cursor, [NotNull] IndexScoresParams indexParams)
             : this(roomId, playlistItemId)
         {
-            this.cursor = cursor;
-            this.indexParams = indexParams;
+            Cursor = cursor;
+            IndexParams = indexParams;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
 
-            if (cursor != null)
+            if (Cursor != null)
             {
-                req.AddCursor(cursor);
+                Debug.Assert(IndexParams != null);
 
-                foreach (var (key, value) in indexParams.Properties)
+                req.AddCursor(Cursor);
+
+                foreach (var (key, value) in IndexParams.Properties)
                     req.AddParameter(key, value.ToString());
             }
 
             return req;
         }
 
-        protected override string Target => $@"rooms/{roomId}/playlist/{playlistItemId}/scores";
+        protected override string Target => $@"rooms/{RoomId}/playlist/{PlaylistItemId}/scores";
     }
 }
