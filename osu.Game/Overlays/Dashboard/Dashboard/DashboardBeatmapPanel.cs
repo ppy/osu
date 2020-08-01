@@ -108,25 +108,18 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
                                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                                                 Text = SetInfo.Metadata.Artist
                                             },
-                                            new FillFlowContainer
+                                            new LinkFlowContainer(f => f.Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold))
                                             {
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(3, 0),
-                                                Margin = new MarginPadding { Top = 2 },
-                                                Children = new[]
-                                                {
-                                                    new LinkFlowContainer(f => f.Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold))
-                                                    {
-                                                        AutoSizeAxes = Axes.Both
-                                                    }.With(c =>
-                                                    {
-                                                        c.AddText("by ");
-                                                        c.AddUserLink(SetInfo.Metadata.Author);
-                                                    }),
-                                                    CreateInfo()
-                                                }
-                                            }
+                                                AutoSizeAxes = Axes.Y,
+                                                RelativeSizeAxes = Axes.X,
+                                                Spacing = new Vector2(3),
+                                                Margin = new MarginPadding { Top = 2 }
+                                            }.With(c =>
+                                            {
+                                                c.AddText("by");
+                                                c.AddUserLink(SetInfo.Metadata.Author);
+                                                c.AddArbitraryDrawable(CreateInfo());
+                                            })
                                         }
                                     }
                                 },
