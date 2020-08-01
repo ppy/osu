@@ -160,9 +160,14 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         {
             base.Update();
 
-            var track = Beatmap.Value?.Track;
+            var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
+            float progress = (track == null || track.IsDummyDevice) ? 0 : (float)(track.CurrentTime / track.Length);
+            if(float.IsNaN(progress))
+            {
+                progress = 0;
+            }
 
-            progressGlow.Current.Value = track == null ? 0 : (float)(track.CurrentTime / track.Length);
+            progressGlow.Current.Value = progress;
         }
 
         protected override void Dispose(bool isDisposing)

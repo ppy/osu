@@ -517,6 +517,7 @@ namespace osu.Game.Screens
             {
                 TrackRunning.Value = Track.IsRunning;
                 progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
+                progressBarContainer.progressBar.EndTime = Track.Length;
             }
             else
             {
@@ -717,10 +718,6 @@ namespace osu.Game.Screens
         {
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
-            this.Schedule(() =>
-            {
-                progressBarContainer.progressBar.EndTime = beatmap.Track.Length;
-            });
             sbLoader.UpdateStoryBoardAsync(displayDelay, () =>
             {
                 SBOverlayProxy?.Hide();
