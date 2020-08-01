@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
                                                 Direction = FillDirection.Horizontal,
                                                 Spacing = new Vector2(3, 0),
                                                 Margin = new MarginPadding { Top = 2 },
-                                                Children = new Drawable[]
+                                                Children = new[]
                                                 {
                                                     new LinkFlowContainer(f => f.Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold))
                                                     {
