@@ -100,6 +100,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
             Set(OsuSetting.GameplayDisableWinKey, true);
+            Set(OsuSetting.GameplayDisableOverlayActivation, true);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -231,6 +232,7 @@ namespace osu.Game.Configuration
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource,
-        GameplayDisableWinKey
+        GameplayDisableWinKey,
+        GameplayDisableOverlayActivation
     }
 }

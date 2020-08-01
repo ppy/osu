@@ -77,6 +77,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Score display mode",
                     Bindable = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Disable overlays during gameplay",
+                    Bindable = config.GetBindable<bool>(OsuSetting.GameplayDisableOverlayActivation)
                 }
             };
 
