@@ -485,7 +485,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                      SpecialFunctions.Logistic((d12 - 1.9) / 0.15) * 0.23;
 
             // Correction #7 - Small circle bonus
-            double smallCircleBonus = SpecialFunctions.Logistic((55 - 2 * obj2.Radius) / 3.0) * 0.3;
+            double smallCircleBonus = ((SpecialFunctions.Logistic((55 - 2 * obj2.Radius) / 3.0) * 0.3) +
+                                      (Math.Pow(24.5 - Math.Min(obj2.Radius, 24.5), 1.4) * 0.01315)) *
+                                      Math.Max(SpecialFunctions.Logistic((d12 - 0.5) / 0.1), 0.25);
 
             // Correction #8 - Stacked notes nerf
             double d12StackedNerf = Math.Max(0, Math.Min(d12, Math.Min(1.2 * d12 - 0.185, 1.4 * d12 - 0.32)));
