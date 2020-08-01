@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -98,6 +99,11 @@ namespace osu.Game
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
+        /// <summary>
+        /// MD5 representation of the game executable.
+        /// </summary>
+        public string VersionHash { get; private set; }
+
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
         public virtual string Version
@@ -129,6 +135,9 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
+            using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
+                VersionHash = str.ComputeMD5Hash();
+
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
@@ -199,6 +208,10 @@ namespace osu.Game
                 if (i.NewValue.TryGetTarget(out var item))
                     ScoreManager.Undelete(getBeatmapScores(item), true);
             });
+
+            var difficultyManager = new BeatmapDifficultyManager();
+            dependencies.Cache(difficultyManager);
+            AddInternal(difficultyManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));

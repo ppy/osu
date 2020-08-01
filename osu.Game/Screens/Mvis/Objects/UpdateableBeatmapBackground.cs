@@ -10,8 +10,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Screens.Mvis.UI.Objects.Helpers;
-using osu.Framework.Localisation;
-using System.Threading;
 
 namespace osu.Game.Screens.Mvis.UI.Objects
 {
@@ -22,9 +20,6 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         private readonly Container backgroundContainer;
         private readonly Container nameContainer;
         private readonly MusicIntensityController intensityController;
-
-        private CancellationTokenSource ChangeBeatmapBackground;
-        private CancellationTokenSource ChangeBeatmapName;
 
         private BeatmapBackground background;
         private BeatmapName name;
@@ -84,9 +79,6 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
         protected override void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
-            ChangeBeatmapBackground?.Cancel();
-            ChangeBeatmapName?.Cancel();
-
             LoadComponentAsync(new BeatmapBackground(beatmap.NewValue)
             {
                 Anchor = Anchor.Centre,
@@ -102,7 +94,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                 backgroundContainer.Add(newBackground);
                 newBackground.RotateTo(360, animation_duration, Easing.OutQuint);
                 newBackground.FadeIn(animation_duration, Easing.OutQuint);
-            }, (ChangeBeatmapBackground = new CancellationTokenSource()).Token);
+            });
 
             LoadComponentAsync(new BeatmapName(beatmap.NewValue)
             {
@@ -118,7 +110,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                 name = newName;
                 nameContainer.Add(newName);
                 newName.MoveToY(0, animation_duration, Easing.OutQuint);
-            }, (ChangeBeatmapName = new CancellationTokenSource()).Token);
+            });
         }
 
         private class BeatmapName : CompositeDrawable
@@ -145,7 +137,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 26, weight: FontWeight.SemiBold),
-                            Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                            Text = beatmap.Metadata.Artist,
                             Shadow = false,
                         },
                         new OsuSpriteText
@@ -153,7 +145,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold),
-                            Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)),
+                            Text = getShortTitle(beatmap.Metadata.Title),
                             Shadow = false,
                         }
                     }
@@ -164,6 +156,39 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                     Sigma = new Vector2(5)
                 }));
             }
+
+            /// <summary>
+            /// Trims additional info in brackets in beatmap title (if exists).
+            /// </summary>
+            /// <param name="longTitle">The title to trim.</param>
+            /// <returns></returns>
+            private string getShortTitle(string longTitle)
+            {
+                var newTitle = longTitle;
+
+                for (int i = 0; i < title_chars.Length; i++)
+                {
+                    if (newTitle.Contains(title_chars[i]))
+                    {
+                        var charIndex = newTitle.IndexOf(title_chars[i]);
+
+                        if (charIndex != 0)
+                            newTitle = newTitle.Substring(0, charIndex);
+                    }
+                }
+
+                if (newTitle.EndsWith(" "))
+                    newTitle = newTitle.Substring(0, newTitle.Length - 1);
+
+                return newTitle;
+            }
+
+            private static readonly char[] title_chars = new[]
+            {
+                '(',
+                '-',
+                '~'
+            };
         }
     }
 }

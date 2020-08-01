@@ -30,6 +30,7 @@ using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Storyboard;
 using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Input;
+using osu.Framework.Timing;
 
 namespace osu.Game.Screens
 {
@@ -80,6 +81,7 @@ namespace osu.Game.Screens
         private LoadingSpinner loadingSpinner;
         private BindableBool TrackRunning = new BindableBool();
         private readonly BindableBool SBEnableProxy = new BindableBool();
+        private readonly BindableBool ShowParticles = new BindableBool();
         private readonly BindableFloat BgBlur = new BindableFloat();
         private readonly BindableFloat IdleBgDim = new BindableFloat();
         private readonly BindableFloat ContentAlpha = new BindableFloat();
@@ -90,6 +92,7 @@ namespace osu.Game.Screens
         private readonly IBindable<bool> IsIdle = new BindableBool();
         private BufferedBeatmapCover beatmapCover;
         private Container gameplayBackground;
+        private Container particles;
 
         public float BottombarHeight => bottomBar.DrawHeight - bottomFillFlow.Y;
 
@@ -308,7 +311,10 @@ namespace osu.Game.Screens
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new SpaceParticlesContainer(),
+                                particles = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both
+                                },
                                 new ParallaxContainer
                                 {
                                     ParallaxAmount = -0.0025f,
@@ -382,6 +388,7 @@ namespace osu.Game.Screens
             config.BindWith(MfSetting.MvisIdleBgDim, IdleBgDim);
             config.BindWith(MfSetting.MvisContentAlpha, ContentAlpha);
             config.BindWith(MfSetting.MvisEnableSBOverlayProxy, SBEnableProxy);
+            config.BindWith(MfSetting.MvisShowParticles, ShowParticles);
         }
 
         protected override void LoadComplete()
@@ -394,6 +401,19 @@ namespace osu.Game.Screens
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
             SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue), true);
+            ShowParticles.BindValueChanged(v => 
+            {
+                switch ( v.NewValue )
+                {
+                    case true:
+                        particles.Child = new SpaceParticlesContainer();
+                        break;
+                    
+                    case false:
+                        particles.Clear();
+                        break;
+                }
+            });
 
             sbLoader.NeedToHideTriangles.BindValueChanged(UpdateBgTriangles, true);
             sbLoader.IsReady.BindValueChanged(v =>
@@ -458,7 +478,7 @@ namespace osu.Game.Screens
         private void UpdateStoryboardProxy(bool AllowDisplayAboveGameplay)
         {
             //需要进一步优化，现在的逻辑仍然有些混乱
-            if ( !sbLoader.IsReady.Value ) return;
+            if (!sbLoader.IsReady.Value) return;
 
             //重置proxy
             if (SBOverlayProxy != null) //如果SBOverlayProxy不是空，则从背景和面板容器中移除
@@ -467,7 +487,7 @@ namespace osu.Game.Screens
                 gameplayContent.Remove(SBOverlayProxy);
             }
 
-            switch(AllowDisplayAboveGameplay)
+            switch (AllowDisplayAboveGameplay)
             {
                 case true:
                     sbLoader.Remove(SBOverlayProxy);
@@ -497,6 +517,7 @@ namespace osu.Game.Screens
             {
                 TrackRunning.Value = Track.IsRunning;
                 progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
+                progressBarContainer.progressBar.EndTime = Track.Length;
             }
             else
             {
@@ -530,7 +551,8 @@ namespace osu.Game.Screens
         {
             Beatmap.Value.Track.Looping = false;
             Track = new TrackVirtual(Beatmap.Value.Track.Length);
-            beatmapLogo.Exit();
+            beatmapLogo.Clock = new DecoupleableInterpolatingFramedClock();
+            ((beatmapLogo.Clock as DecoupleableInterpolatingFramedClock)).Stop();
             sbLoader.CancelAllTasks();
             lockChanges.Value = true;
 
@@ -696,10 +718,6 @@ namespace osu.Game.Screens
         {
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
-            this.Schedule(() =>
-            {
-                progressBarContainer.progressBar.EndTime = beatmap.Track.Length;
-            });
             sbLoader.UpdateStoryBoardAsync(displayDelay, () =>
             {
                 SBOverlayProxy?.Hide();

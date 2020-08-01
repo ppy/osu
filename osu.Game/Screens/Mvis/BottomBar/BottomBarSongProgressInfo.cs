@@ -49,15 +49,6 @@ namespace osu.Game.Screens.Mvis.UI
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            b.BindValueChanged( _ => UpdateEndTime() );
-
-            UpdateEndTime();
-        }
-
         protected override void Update()
         {
             var Track = b.Value?.TrackLoaded ?? false ? b.Value.Track : null;
@@ -65,20 +56,13 @@ namespace osu.Game.Screens.Mvis.UI
             {
                 int currentSecond = (int)Math.Floor(Track.CurrentTime / 1000.0);
                 timeCurrent.Text = formatTime(TimeSpan.FromSeconds(currentSecond));
+                timeTotal.Text = formatTime(TimeSpan.FromMilliseconds(b.Value.Track.Length));
             }
             else
             {
                 timeCurrent.Text = "???";
                 timeTotal.Text = "???";
             }
-        }
-
-        private void UpdateEndTime()
-        {
-            this.Schedule(() =>
-            {
-                timeTotal.Text = formatTime(TimeSpan.FromMilliseconds(b.Value.Track.Length));
-            });
         }
     }
 }

@@ -18,6 +18,7 @@ using osu.Game.Screens.Menu;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -769,7 +770,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
-                        Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
+                        Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\n该错误信息已被自动报告给开发人员" : string.Empty),
                     }));
                 }
                 else if (recentLogCount == short_term_display_limit)
@@ -777,7 +778,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
-                        Text = "Subsequent messages have been logged. Click to view log files.",
+                        Text = "详细信息已被记录，点击此处查看日志",
                         Activated = () =>
                         {
                             Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();

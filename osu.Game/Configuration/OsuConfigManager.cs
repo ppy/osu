@@ -99,6 +99,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
+            Set(OsuSetting.GameplayDisableWinKey, true);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -247,6 +248,7 @@ namespace osu.Game.Configuration
         MvisUseOsuLogoVisualisation,
         MvisEnableStoryboard,
         MvisIdleBgDim,
-        MvisContentAlpha
+        MvisContentAlpha,
+        GameplayDisableWinKey
     }
 }

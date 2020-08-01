@@ -128,17 +128,17 @@ namespace osu.Game.Screens.Edit.Timing
                 switch (controlPoint)
                 {
                     case TimingControlPoint timing:
-                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}");
+                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature.GetDescription() ?? timing.TimeSignature.ToString()}");
 
                     case DifficultyControlPoint difficulty:
 
-                        return new RowAttribute("难度", () => $"{difficulty.SpeedMultiplier:n2}x");
+                        return new RowAttribute("难度 / 绿线", () => $"{difficulty.SpeedMultiplier:n2}x");
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("效果", () => $"{(effect.KiaiMode ? "+高潮 " : "")}{(effect.OmitFirstBarLine ? "+越过第一条线 " : "")}");
+                        return new RowAttribute("效果", () => $"{(effect.KiaiMode ? "+高潮" : "")} {(effect.OmitFirstBarLine ? "+越过第一条线" : "")}");
 
                     case SampleControlPoint sample:
-                        return new RowAttribute("音频 / 采样", () => $"{sample.SampleBank} {sample.SampleVolume}%");
+                        return new RowAttribute("音效", () => $"{sample.SampleBank} {sample.SampleVolume}%");
                 }
 
                 return null;

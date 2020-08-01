@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.ComponentModel;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 
@@ -37,12 +38,21 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisEnableStoryboard, false);
             Set(MfSetting.MvisUseOsuLogoVisualisation, false);
             Set(MfSetting.MvisIdleBgDim, 0.3f, 0f, 1f);
-            Set(MfSetting.MvisBarCount, 120, 20, 120);
-            Set(MfSetting.MvisBarRGBLighting, false);
-            Set(MfSetting.MvisEnableBrick, false);
             Set(MfSetting.MvisEnableBgTriangles, true);
             Set(MfSetting.MvisEnableSBOverlayProxy, true);
             Set(MfSetting.UseSayobot, true);
+
+            //Mvis Settings(Upstream)
+            Set(MfSetting.MvisShowParticles, true);
+            Set(MfSetting.MvisBarType, MvisBarType.Rounded);
+            Set(MfSetting.MvisVisualizerAmount, 3, 1, 5);
+            Set(MfSetting.MvisBarWidth, 3.0, 1, 20);
+            Set(MfSetting.MvisBarsPerVisual, 120, 1, 200);
+            Set(MfSetting.MvisRotation, 0, 0, 359);
+            Set(MfSetting.MvisUseCustomColour, false);
+            Set(MfSetting.MvisRed, 0, 0, 255);
+            Set(MfSetting.MvisGreen, 0, 0, 255);
+            Set(MfSetting.MvisBlue, 0, 0, 255);
 
             //Easter Eggs
             Set(MfSetting.EasterEggBGBeatmap, false);
@@ -62,16 +72,34 @@ namespace osu.Game.Configuration
         MvisEnableStoryboard,
         MvisIdleBgDim,
         MvisContentAlpha,
-        MvisBarCount,
-        MvisBarRGBLighting,
-        MvisEnableBrick,
         MvisEnableBgTriangles,
         MvisEnableSBOverlayProxy,
+        MvisShowParticles,
+        MvisVisualizerAmount,
+        MvisBarWidth,
+        MvisBarsPerVisual,
+        MvisBarType,
+        MvisRotation,
+        MvisUseCustomColour,
+        MvisRed,
+        MvisGreen,
+        MvisBlue,
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect,
         EasterEggBGTriangle,
         EasterEggBGBeatmap,
         EasterEggCoinCount
+    }
+
+
+    public enum MvisBarType
+    {
+        [Description("基本")]
+        Basic,
+        [Description("圆角")]
+        Rounded,
+        [Description("打砖块")]
+        Fall
     }
 }
