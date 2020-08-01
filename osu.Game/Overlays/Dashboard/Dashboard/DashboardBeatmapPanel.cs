@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
                                             {
                                                 AutoSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(5, 0),
+                                                Spacing = new Vector2(3, 0),
                                                 Margin = new MarginPadding { Top = 2 },
                                                 Children = new Drawable[]
                                                 {

@@ -9,6 +9,7 @@ using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using osu.Game.Users;
 using System;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -19,17 +20,23 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public TestSceneDashboardBeatmapPanel()
         {
-            Add(new Container
+            Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Y,
                 Width = 300,
-                Child = new DashboardNewBeatmapPanel(beatmap_set)
+                Spacing = new Vector2(0, 10),
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
+                {
+                    new DashboardNewBeatmapPanel(new_beatmap_set),
+                    new DashboardPopularBeatmapPanel(popular_beatmap_set)
+                }
             });
         }
 
-        private static readonly BeatmapSetInfo beatmap_set = new BeatmapSetInfo
+        private static readonly BeatmapSetInfo new_beatmap_set = new BeatmapSetInfo
         {
             Metadata = new BeatmapMetadata
             {
@@ -48,6 +55,28 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
                 },
                 Ranked = DateTimeOffset.Now
+            }
+        };
+
+        private static readonly BeatmapSetInfo popular_beatmap_set = new BeatmapSetInfo
+        {
+            Metadata = new BeatmapMetadata
+            {
+                Title = "Title",
+                Artist = "Artist",
+                Author = new User
+                {
+                    Username = "author",
+                    Id = 100
+                }
+            },
+            OnlineInfo = new BeatmapSetOnlineInfo
+            {
+                Covers = new BeatmapSetOnlineCovers
+                {
+                    Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
+                },
+                FavouriteCount = 100
             }
         };
     }
