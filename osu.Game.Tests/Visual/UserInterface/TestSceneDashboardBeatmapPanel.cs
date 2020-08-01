@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using osu.Game.Users;
+using System;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Y,
                 Width = 300,
-                Child = new DashboardBeatmapPanel(beatmap_set)
+                Child = new DashboardNewBeatmapPanel(beatmap_set)
             });
         }
 
@@ -33,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             Metadata = new BeatmapMetadata
             {
                 Title = "Very Long Title (TV size) [TATOE]",
-                Artist = "This artist has a really long name how is it possible",
+                Artist = "This artist has a really long name how is this possible",
                 Author = new User
                 {
                     Username = "author",
@@ -45,7 +46,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Covers = new BeatmapSetOnlineCovers
                 {
                     Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
-                }
+                },
+                Ranked = DateTimeOffset.Now
             }
         };
     }
