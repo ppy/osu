@@ -136,7 +136,7 @@ namespace osu.Game
         private void load()
         {
             using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
-                VersionHash = str.ComputeMD5Hash();
+                VersionHash = "253aa3a3a356a71295bf5b018cd4fda1"; //str.ComputeMD5Hash();
 
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
