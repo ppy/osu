@@ -16,22 +16,22 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Dashboard
 {
-    public class DashboardBeatmapPanel : OsuClickableContainer
+    public abstract class DashboardBeatmapPanel : OsuClickableContainer
     {
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        protected OverlayColourProvider ColourProvider { get; private set; }
 
         [Resolved(canBeNull: true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
 
-        private readonly BeatmapSetInfo setInfo;
+        protected readonly BeatmapSetInfo SetInfo;
 
         private Box background;
         private SpriteIcon chevron;
 
-        public DashboardBeatmapPanel(BeatmapSetInfo setInfo)
+        protected DashboardBeatmapPanel(BeatmapSetInfo setInfo)
         {
-            this.setInfo = setInfo;
+            SetInfo = setInfo;
         }
 
         [BackgroundDependencyLoader]
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3,
+                    Colour = ColourProvider.Background3,
                     Alpha = 0
                 },
                 new Container
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
                                         RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        BeatmapSet = setInfo
+                                        BeatmapSet = SetInfo
                                     }
                                 },
                                 new Container
@@ -99,24 +99,34 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
                                                 RelativeSizeAxes = Axes.X,
                                                 Truncate = true,
                                                 Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                                                Text = setInfo.Metadata.Title
+                                                Text = SetInfo.Metadata.Title
                                             },
                                             new OsuSpriteText
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 Truncate = true,
                                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                                                Text = setInfo.Metadata.Artist
+                                                Text = SetInfo.Metadata.Artist
                                             },
-                                            new LinkFlowContainer(f => f.Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold))
+                                            new FillFlowContainer
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y
-                                            }.With(c =>
-                                            {
-                                                c.AddText("by ");
-                                                c.AddUserLink(setInfo.Metadata.Author);
-                                            })
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(5, 0),
+                                                Margin = new MarginPadding { Top = 2 },
+                                                Children = new Drawable[]
+                                                {
+                                                    new LinkFlowContainer(f => f.Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold))
+                                                    {
+                                                        AutoSizeAxes = Axes.Both
+                                                    }.With(c =>
+                                                    {
+                                                        c.AddText("by ");
+                                                        c.AddUserLink(SetInfo.Metadata.Author);
+                                                    }),
+                                                    CreateInfo()
+                                                }
+                                            }
                                         }
                                     }
                                 },
@@ -126,7 +136,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
                                     Origin = Anchor.CentreRight,
                                     Size = new Vector2(16),
                                     Icon = FontAwesome.Solid.ChevronRight,
-                                    Colour = colourProvider.Foreground1
+                                    Colour = ColourProvider.Foreground1
                                 }
                             }
                         }
@@ -136,16 +146,18 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
 
             Action = () =>
             {
-                if (setInfo.OnlineBeatmapSetID.HasValue)
-                    beatmapOverlay?.FetchAndShowBeatmapSet(setInfo.OnlineBeatmapSetID.Value);
+                if (SetInfo.OnlineBeatmapSetID.HasValue)
+                    beatmapOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineBeatmapSetID.Value);
             };
         }
+
+        protected abstract Drawable CreateInfo();
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
             background.FadeIn(200, Easing.OutQuint);
-            chevron.FadeColour(colourProvider.Light1, 200, Easing.OutQuint);
+            chevron.FadeColour(ColourProvider.Light1, 200, Easing.OutQuint);
             return true;
         }
 
@@ -153,7 +165,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
         {
             base.OnHoverLost(e);
             background.FadeOut(200, Easing.OutQuint);
-            chevron.FadeColour(colourProvider.Foreground1, 200, Easing.OutQuint);
+            chevron.FadeColour(ColourProvider.Foreground1, 200, Easing.OutQuint);
         }
     }
 }
