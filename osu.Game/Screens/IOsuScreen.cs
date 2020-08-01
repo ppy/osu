@@ -39,6 +39,11 @@ namespace osu.Game.Screens
         bool HideOverlaysOnEnter { get; }
 
         /// <summary>
+        /// Whether global actions should be ignored while this screen is active corresponding to the option
+        /// </summary>
+        bool AllowBlockedGlobalActions { get; }
+
+        /// <summary>
         /// Whether overlays should be able to be opened once this screen is entered or resumed.
         /// </summary>
         OverlayActivation InitialOverlayActivationMode { get; }

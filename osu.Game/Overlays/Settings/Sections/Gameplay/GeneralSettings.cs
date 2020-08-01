@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Score display mode",
                     Bindable = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
-                }
+                },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
@@ -88,6 +88,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Bindable = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
                 });
             }
+
+            Add(new SettingsCheckbox
+            {
+                LabelText = "Disable Global Actions during gameplay",
+                Bindable = config.GetBindable<bool>(OsuSetting.GameplayDisableGlobalActions)
+            });
         }
     }
 }

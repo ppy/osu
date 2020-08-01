@@ -114,6 +114,9 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
+        private bool bindingDeactivateGlobalActions;
+        private bool screenDeactivateGlobalActions;
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -214,6 +217,11 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+
+            Bindable<bool> deactivateGlobalActions = LocalConfig.GetBindable<bool>(OsuSetting.GameplayDisableGlobalActions);
+            bindingDeactivateGlobalActions = deactivateGlobalActions.Value;
+            deactivateGlobalActions.ValueChanged += value => bindingDeactivateGlobalActions = value.NewValue;
+            screenDeactivateGlobalActions = false;
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -857,6 +865,8 @@ namespace osu.Game
         {
             if (introScreen == null) return false;
 
+            if (screenDeactivateGlobalActions && bindingDeactivateGlobalActions) return false;
+
             switch (action)
             {
                 case GlobalAction.ToggleNowPlaying:
@@ -1003,6 +1013,12 @@ namespace osu.Game
                     BackButton.Show();
                 else
                     BackButton.Hide();
+
+                screenDeactivateGlobalActions = newOsuScreen.AllowBlockedGlobalActions;
+            }
+            else
+            {
+                screenDeactivateGlobalActions = false;
             }
         }
 

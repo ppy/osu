@@ -50,6 +50,8 @@ namespace osu.Game.Screens.Play
 
         public override bool HideOverlaysOnEnter => true;
 
+        public override bool AllowBlockedGlobalActions => true;
+
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         /// <summary>
