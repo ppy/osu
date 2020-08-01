@@ -865,6 +865,24 @@ namespace osu.Game
         {
             if (introScreen == null) return false;
 
+            switch (action)
+            {
+                case GlobalAction.ResetInputSettings:
+                    var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
+
+                    sensitivity.Disabled = false;
+                    sensitivity.Value = 1;
+                    sensitivity.Disabled = true;
+
+                    frameworkConfig.Set(FrameworkSetting.IgnoredInputHandlers, string.Empty);
+                    frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
+                    return true;
+
+                case GlobalAction.ToggleGameplayMouseButtons:
+                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
+                    return true;
+            }
+
             if (screenDeactivateGlobalActions && bindingDeactivateGlobalActions) return false;
 
             switch (action)
@@ -881,17 +899,6 @@ namespace osu.Game
                     dashboard.ToggleVisibility();
                     return true;
 
-                case GlobalAction.ResetInputSettings:
-                    var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
-
-                    sensitivity.Disabled = false;
-                    sensitivity.Value = 1;
-                    sensitivity.Disabled = true;
-
-                    frameworkConfig.Set(FrameworkSetting.IgnoredInputHandlers, string.Empty);
-                    frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
-                    return true;
-
                 case GlobalAction.ToggleToolbar:
                     Toolbar.ToggleVisibility();
                     return true;
@@ -906,10 +913,6 @@ namespace osu.Game
 
                 case GlobalAction.ToggleNotifications:
                     notifications.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleGameplayMouseButtons:
-                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
             }
 
