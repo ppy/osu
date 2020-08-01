@@ -81,9 +81,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
-                    spinner.Disc.Hide();
-                    spinner.Ticks.Hide();
-                    spinner.Background.Hide();
+                    // todo: hide background
 
                     using (spinner.BeginAbsoluteSequence(fadeOutStartTime + longFadeDuration, true))
                         spinner.FadeOut(fadeOutDuration);

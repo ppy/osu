@@ -12,13 +12,13 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
-    public class ShowMoreButton : LoadingButton
+    public class ShowMoreRepliesButton : LoadingButton
     {
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
         private OsuSpriteText text;
 
-        public ShowMoreButton()
+        public ShowMoreRepliesButton()
         {
             AutoSizeAxes = Axes.Both;
             LoadingAnimationSize = new Vector2(8);
