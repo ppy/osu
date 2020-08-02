@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.Dashboard.Dashboard
+namespace osu.Game.Overlays.Dashboard.Home
 {
     public class DashboardNewBeatmapPanel : DashboardBeatmapPanel
     {

@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osuTK;
 
-namespace osu.Game.Overlays.Dashboard.Dashboard
+namespace osu.Game.Overlays.Dashboard.Home
 {
     public class DashboardBeatmapListing : CompositeDrawable
     {

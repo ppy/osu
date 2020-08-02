@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using osu.Game.Overlays.Dashboard.Dashboard;
+using osu.Game.Overlays.Dashboard.Home;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
