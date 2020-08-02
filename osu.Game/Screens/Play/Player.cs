@@ -205,10 +205,13 @@ namespace osu.Game.Screens.Play
 
             gameplayOverlaysDisabled.ValueChanged += disabled =>
             {
-                game.OverlayActivationMode.Value = disabled.NewValue && !DrawableRuleset.IsPaused.Value ? OverlayActivation.Disabled : OverlayActivation.All;
+                if (DrawableRuleset.HasReplayLoaded.Value)
+                    game.OverlayActivationMode.Value = OverlayActivation.UserTriggered;
+                else
+                    game.OverlayActivationMode.Value = disabled.NewValue && !DrawableRuleset.IsPaused.Value ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
             };
             DrawableRuleset.IsPaused.BindValueChanged(_ => gameplayOverlaysDisabled.TriggerChange());
-            
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => gameplayOverlaysDisabled.TriggerChange());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
