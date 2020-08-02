@@ -41,8 +41,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
                     {
                         Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
                         Colour = colourProvider.Light1,
-                        Text = Title,
-                        Padding = new MarginPadding { Left = 10 }
+                        Text = Title
                     }
                 }
             };

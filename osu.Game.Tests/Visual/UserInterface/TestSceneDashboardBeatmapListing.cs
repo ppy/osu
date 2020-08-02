@@ -36,7 +36,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         RelativeSizeAxes = Axes.Both,
                         Colour = colourProvider.Background4
                     },
-                    new DashboardBeatmapListing(new_beatmaps, popular_beatmaps)
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = 10 },
+                        Child = new DashboardBeatmapListing(new_beatmaps, popular_beatmaps)
+                    }
                 }
             });
         }
