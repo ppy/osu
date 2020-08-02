@@ -14,7 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
-namespace osu.Game.Overlays.Dashboard.Dashboard
+namespace osu.Game.Overlays.Dashboard.Home
 {
     public abstract class DashboardBeatmapPanel : OsuClickableContainer
     {

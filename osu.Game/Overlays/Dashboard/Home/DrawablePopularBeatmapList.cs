@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 
-namespace osu.Game.Overlays.Dashboard.Dashboard
+namespace osu.Game.Overlays.Dashboard.Home
 {
     public class DrawablePopularBeatmapList : DrawableBeatmapList
     {
