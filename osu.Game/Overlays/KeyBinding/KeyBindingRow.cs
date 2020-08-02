@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.KeyBinding
         public bool FilteringActive { get; set; }
 
         private OsuSpriteText text;
-        private Drawable pressAKey;
+        private FillFlowContainer cancelAndClearButtons;
 
         public FillFlowContainer<KeyButton> Buttons;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.KeyBinding
                 Hollow = true,
             };
 
-            Children = new[]
+            Children = new Drawable[]
             {
                 new Box
                 {
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.KeyBinding
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight
                 },
-                pressAKey = new FillFlowContainer
+                cancelAndClearButtons = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Padding = new MarginPadding(padding) { Top = height + padding * 2 },
@@ -187,7 +187,8 @@ namespace osu.Game.Overlays.KeyBinding
 
             if (bindTarget.IsHovered)
                 finalise();
-            else if (Buttons.Any(b => b.IsHovered))
+            // prevent updating bind target before clear button's action
+            else if (!cancelAndClearButtons.Any(b => b.IsHovered))
                 updateBindTarget();
         }
 
@@ -298,8 +299,8 @@ namespace osu.Game.Overlays.KeyBinding
             if (HasFocus)
                 GetContainingInputManager().ChangeFocus(null);
 
-            pressAKey.FadeOut(300, Easing.OutQuint);
-            pressAKey.BypassAutoSizeAxes |= Axes.Y;
+            cancelAndClearButtons.FadeOut(300, Easing.OutQuint);
+            cancelAndClearButtons.BypassAutoSizeAxes |= Axes.Y;
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -307,8 +308,8 @@ namespace osu.Game.Overlays.KeyBinding
             AutoSizeDuration = 500;
             AutoSizeEasing = Easing.OutQuint;
 
-            pressAKey.FadeIn(300, Easing.OutQuint);
-            pressAKey.BypassAutoSizeAxes &= ~Axes.Y;
+            cancelAndClearButtons.FadeIn(300, Easing.OutQuint);
+            cancelAndClearButtons.BypassAutoSizeAxes &= ~Axes.Y;
 
             updateBindTarget();
             base.OnFocus(e);
