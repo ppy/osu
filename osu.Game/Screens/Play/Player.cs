@@ -11,6 +11,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -18,6 +19,7 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -35,7 +37,7 @@ using osu.Game.Users;
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class Player : ScreenWithBeatmapBackground
+    public class Player : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The delay upon completion of the beatmap before displaying the results screen.
@@ -50,8 +52,6 @@ namespace osu.Game.Screens.Play
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override bool AllowBlockedGlobalActions => true;
-
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         /// <summary>
@@ -64,6 +64,8 @@ namespace osu.Game.Screens.Play
         public bool HasFailed { get; private set; }
 
         private Bindable<bool> mouseWheelDisabled;
+
+        private Bindable<bool> globalActionsDisabled;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
@@ -167,6 +169,8 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+
+            globalActionsDisabled = config.GetBindable<bool>(OsuSetting.GameplayDisableGlobalActions);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
@@ -347,6 +351,27 @@ namespace osu.Game.Screens.Play
             HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
                                                      && !DrawableRuleset.HasReplayLoaded.Value
                                                      && !breakTracker.IsBreakTime.Value;
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (!globalActionsDisabled.Value)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.ToggleChat:
+                case GlobalAction.ToggleDirect:
+                case GlobalAction.ToggleNotifications:
+                case GlobalAction.ToggleSettings:
+                case GlobalAction.ToggleSocial:
+                case GlobalAction.ToggleToolbar:
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action) { }
 
         private IBeatmap loadPlayableBeatmap()
         {

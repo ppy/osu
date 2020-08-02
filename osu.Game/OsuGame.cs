@@ -114,9 +114,6 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
-        private bool bindingDeactivateGlobalActions;
-        private bool screenDeactivateGlobalActions;
-
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -217,11 +214,6 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
-
-            Bindable<bool> deactivateGlobalActions = LocalConfig.GetBindable<bool>(OsuSetting.GameplayDisableGlobalActions);
-            bindingDeactivateGlobalActions = deactivateGlobalActions.Value;
-            deactivateGlobalActions.ValueChanged += value => bindingDeactivateGlobalActions = value.NewValue;
-            screenDeactivateGlobalActions = false;
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -867,26 +859,6 @@ namespace osu.Game
 
             switch (action)
             {
-                case GlobalAction.ResetInputSettings:
-                    var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
-
-                    sensitivity.Disabled = false;
-                    sensitivity.Value = 1;
-                    sensitivity.Disabled = true;
-
-                    frameworkConfig.Set(FrameworkSetting.IgnoredInputHandlers, string.Empty);
-                    frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
-                    return true;
-
-                case GlobalAction.ToggleGameplayMouseButtons:
-                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
-                    return true;
-            }
-
-            if (screenDeactivateGlobalActions && bindingDeactivateGlobalActions) return false;
-
-            switch (action)
-            {
                 case GlobalAction.ToggleNowPlaying:
                     nowPlaying.ToggleVisibility();
                     return true;
@@ -897,6 +869,17 @@ namespace osu.Game
 
                 case GlobalAction.ToggleSocial:
                     dashboard.ToggleVisibility();
+                    return true;
+
+                case GlobalAction.ResetInputSettings:
+                    var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
+
+                    sensitivity.Disabled = false;
+                    sensitivity.Value = 1;
+                    sensitivity.Disabled = true;
+
+                    frameworkConfig.Set(FrameworkSetting.IgnoredInputHandlers, string.Empty);
+                    frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
 
                 case GlobalAction.ToggleToolbar:
@@ -913,6 +896,10 @@ namespace osu.Game
 
                 case GlobalAction.ToggleNotifications:
                     notifications.ToggleVisibility();
+                    return true;
+
+                case GlobalAction.ToggleGameplayMouseButtons:
+                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
             }
 
@@ -1016,12 +1003,6 @@ namespace osu.Game
                     BackButton.Show();
                 else
                     BackButton.Hide();
-
-                screenDeactivateGlobalActions = newOsuScreen.AllowBlockedGlobalActions;
-            }
-            else
-            {
-                screenDeactivateGlobalActions = false;
             }
         }
 
