@@ -97,12 +97,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("retrieve cumulative disc rotation", () => finalCumulativeTrackerRotation = drawableSpinner.RotationTracker.CumulativeRotation);
 
             addSeekStep(2500);
-            AddUntilStep("disc rotation rewound",
+            AddAssert("disc rotation rewound",
                 // we want to make sure that the rotation at time 2500 is in the same direction as at time 5000, but about half-way in.
                 // due to the exponential damping applied we're allowing a larger margin of error of about 10%
                 // (5% relative to the final rotation value, but we're half-way through the spin).
                 () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalTrackerRotation / 2, trackerRotationTolerance));
-            AddUntilStep("symbol rotation rewound",
+            AddAssert("symbol rotation rewound",
                 () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation / 2, spinnerSymbolRotationTolerance));
             AddAssert("is cumulative rotation rewound",
                 // cumulative rotation is not damped, so we're treating it as the "ground truth" and allowing a comparatively smaller margin of error.
