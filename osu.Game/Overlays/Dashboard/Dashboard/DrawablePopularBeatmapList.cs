@@ -15,6 +15,6 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
 
         protected override DashboardBeatmapPanel CreateBeatmapPanel(BeatmapSetInfo setInfo) => new DashboardPopularBeatmapPanel(setInfo);
 
-        protected override string CreateTitle() => "Popular Beatmaps";
+        protected override string Title => "Popular Beatmaps";
     }
 }

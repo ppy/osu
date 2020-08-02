@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
                     {
                         Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
                         Colour = colourProvider.Light1,
-                        Text = CreateTitle(),
+                        Text = Title,
                         Padding = new MarginPadding { Left = 10 }
                     }
                 }
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
             flow.AddRange(beatmaps.Select(CreateBeatmapPanel));
         }
 
-        protected abstract string CreateTitle();
+        protected abstract string Title { get; }
 
         protected abstract DashboardBeatmapPanel CreateBeatmapPanel(BeatmapSetInfo setInfo);
     }
