@@ -13,11 +13,11 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Dashboard
 {
-    public abstract class DrawableBeatmapsList : CompositeDrawable
+    public abstract class DrawableBeatmapList : CompositeDrawable
     {
         private readonly List<BeatmapSetInfo> beatmaps;
 
-        protected DrawableBeatmapsList(List<BeatmapSetInfo> beatmaps)
+        protected DrawableBeatmapList(List<BeatmapSetInfo> beatmaps)
         {
             this.beatmaps = beatmaps;
         }

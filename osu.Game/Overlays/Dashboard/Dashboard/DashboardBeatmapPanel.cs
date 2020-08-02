@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
 
         protected readonly BeatmapSetInfo SetInfo;
 
-        private Box background;
+        private Box hoverBackground;
         private SpriteIcon chevron;
 
         protected DashboardBeatmapPanel(BeatmapSetInfo setInfo)
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
             Height = 60;
             Children = new Drawable[]
             {
-                background = new Box
+                hoverBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourProvider.Background3,
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            background.FadeIn(200, Easing.OutQuint);
+            hoverBackground.FadeIn(200, Easing.OutQuint);
             chevron.FadeColour(ColourProvider.Light1, 200, Easing.OutQuint);
             return true;
         }
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            background.FadeOut(200, Easing.OutQuint);
+            hoverBackground.FadeOut(200, Easing.OutQuint);
             chevron.FadeColour(ColourProvider.Foreground1, 200, Easing.OutQuint);
         }
     }
