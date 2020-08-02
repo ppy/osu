@@ -41,16 +41,20 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
             Height = 60;
             Children = new Drawable[]
             {
-                hoverBackground = new Box
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourProvider.Background3,
-                    Alpha = 0
+                    Padding = new MarginPadding { Horizontal = -10 },
+                    Child = hoverBackground = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourProvider.Background3,
+                        Alpha = 0
+                    }
                 },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 10 },
                     Child = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
