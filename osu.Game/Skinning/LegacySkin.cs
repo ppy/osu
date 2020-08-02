@@ -143,27 +143,7 @@ namespace osu.Game.Skinning
                     goto default;
 
                 default:
-                    // handles lookups like some in LegacySkinConfiguration.LegacySetting
-
-                    try
-                    {
-                        if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
-                        {
-                            // special case for handling skins which use 1 or 0 to signify a boolean state.
-                            if (typeof(TValue) == typeof(bool))
-                                val = val == "1" ? "true" : "false";
-
-                            var bindable = new Bindable<TValue>();
-                            if (val != null)
-                                bindable.Parse(val);
-                            return bindable;
-                        }
-                    }
-                    catch
-                    {
-                    }
-
-                    break;
+                    return genericLookup<TLookup, TValue>(lookup);
             }
 
             return null;
@@ -285,6 +265,30 @@ namespace osu.Game.Skinning
 
         private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
             => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
+
+        [CanBeNull]
+        private IBindable<TValue> genericLookup<TLookup, TValue>(TLookup lookup)
+        {
+            try
+            {
+                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
+                {
+                    // special case for handling skins which use 1 or 0 to signify a boolean state.
+                    if (typeof(TValue) == typeof(bool))
+                        val = val == "1" ? "true" : "false";
+
+                    var bindable = new Bindable<TValue>();
+                    if (val != null)
+                        bindable.Parse(val);
+                    return bindable;
+                }
+            }
+            catch
+            {
+            }
+
+            return null;
+        }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
