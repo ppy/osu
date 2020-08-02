@@ -104,5 +104,37 @@ namespace osu.Game.Tests.Visual.Settings
                 });
             }
         }
+
+        [Test]
+        public void TestClickRowSelectsFirstBinding()
+        {
+            KeyBindingRow backBindingRow = null;
+
+            AddStep("click back binding row", () =>
+            {
+                backBindingRow = panel.ChildrenOfType<KeyBindingRow>().ElementAt(10);
+                InputManager.MoveMouseTo(backBindingRow);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("first binding selected", () => backBindingRow.Buttons.First().IsBinding);
+
+            AddStep("click second binding", () =>
+            {
+                var target = backBindingRow.Buttons.ElementAt(1);
+
+                InputManager.MoveMouseTo(target);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("click back binding row", () =>
+            {
+                backBindingRow = panel.ChildrenOfType<KeyBindingRow>().ElementAt(10);
+                InputManager.MoveMouseTo(backBindingRow);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("first binding selected", () => backBindingRow.Buttons.First().IsBinding);
+        }
     }
 }
