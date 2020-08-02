@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -60,39 +61,60 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestSpinnerRewindingRotation()
         {
+            double trackerRotationTolerance = 0;
+
             addSeekStep(5000);
+            AddStep("calculate rotation tolerance", () =>
+            {
+                trackerRotationTolerance = Math.Abs(drawableSpinner.RotationTracker.Rotation * 0.1f);
+            });
             AddAssert("is disc rotation not almost 0", () => !Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, 0, 100));
             AddAssert("is disc rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, 0, 100));
 
             addSeekStep(0);
-            AddAssert("is disc rotation almost 0", () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, 0, 100));
+            AddAssert("is disc rotation almost 0", () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, 0, trackerRotationTolerance));
             AddAssert("is disc rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, 0, 100));
         }
 
         [Test]
         public void TestSpinnerMiddleRewindingRotation()
         {
-            double finalAbsoluteDiscRotation = 0, finalRelativeDiscRotation = 0, finalSpinnerSymbolRotation = 0;
+            double finalCumulativeTrackerRotation = 0;
+            double finalTrackerRotation = 0, trackerRotationTolerance = 0;
+            double finalSpinnerSymbolRotation = 0, spinnerSymbolRotationTolerance = 0;
 
             addSeekStep(5000);
-            AddStep("retrieve disc relative rotation", () => finalRelativeDiscRotation = drawableSpinner.RotationTracker.Rotation);
-            AddStep("retrieve disc absolute rotation", () => finalAbsoluteDiscRotation = drawableSpinner.RotationTracker.CumulativeRotation);
-            AddStep("retrieve spinner symbol rotation", () => finalSpinnerSymbolRotation = spinnerSymbol.Rotation);
+            AddStep("retrieve disc rotation", () =>
+            {
+                finalTrackerRotation = drawableSpinner.RotationTracker.Rotation;
+                trackerRotationTolerance = Math.Abs(finalTrackerRotation * 0.05f);
+            });
+            AddStep("retrieve spinner symbol rotation", () =>
+            {
+                finalSpinnerSymbolRotation = spinnerSymbol.Rotation;
+                spinnerSymbolRotationTolerance = Math.Abs(finalSpinnerSymbolRotation * 0.05f);
+            });
+            AddStep("retrieve cumulative disc rotation", () => finalCumulativeTrackerRotation = drawableSpinner.RotationTracker.CumulativeRotation);
 
             addSeekStep(2500);
             AddUntilStep("disc rotation rewound",
                 // we want to make sure that the rotation at time 2500 is in the same direction as at time 5000, but about half-way in.
-                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalRelativeDiscRotation / 2, 100));
+                // due to the exponential damping applied we're allowing a larger margin of error of about 10%
+                // (5% relative to the final rotation value, but we're half-way through the spin).
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalTrackerRotation / 2, trackerRotationTolerance));
             AddUntilStep("symbol rotation rewound",
-                () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation / 2, 100));
+                () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation / 2, spinnerSymbolRotationTolerance));
+            AddAssert("is cumulative rotation rewound",
+                // cumulative rotation is not damped, so we're treating it as the "ground truth" and allowing a comparatively smaller margin of error.
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, finalCumulativeTrackerRotation / 2, 100));
 
             addSeekStep(5000);
             AddAssert("is disc rotation almost same",
-                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalRelativeDiscRotation, 100));
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalTrackerRotation, trackerRotationTolerance));
             AddAssert("is symbol rotation almost same",
-                () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation, 100));
-            AddAssert("is disc rotation absolute almost same",
-                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, finalAbsoluteDiscRotation, 100));
+                () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation, spinnerSymbolRotationTolerance));
+            AddAssert("is cumulative rotation almost same",
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, finalCumulativeTrackerRotation, 100));
         }
 
         [Test]
