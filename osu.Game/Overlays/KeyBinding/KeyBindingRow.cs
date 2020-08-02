@@ -320,6 +320,9 @@ namespace osu.Game.Overlays.KeyBinding
             base.OnFocusLost(e);
         }
 
+        /// <summary>
+        /// Updates the bind target to the currently hovered key button or the first if clicked anywhere else.
+        /// </summary>
         private void updateBindTarget()
         {
             if (bindTarget != null) bindTarget.IsBinding = false;
