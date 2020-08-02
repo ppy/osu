@@ -6,9 +6,9 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Dashboard.Dashboard
 {
-    public class DrawablePopularBeatmapsList : DrawableBeatmapsList
+    public class DrawablePopularBeatmapList : DrawableBeatmapList
     {
-        public DrawablePopularBeatmapsList(List<BeatmapSetInfo> beatmaps)
+        public DrawablePopularBeatmapList(List<BeatmapSetInfo> beatmaps)
             : base(beatmaps)
         {
         }

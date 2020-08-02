@@ -26,16 +26,16 @@ namespace osu.Game.Overlays.Dashboard.Dashboard
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChild = new FillFlowContainer<DrawableBeatmapsList>
+            InternalChild = new FillFlowContainer<DrawableBeatmapList>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 10),
-                Children = new DrawableBeatmapsList[]
+                Children = new DrawableBeatmapList[]
                 {
-                    new DrawableNewBeatmapsList(newBeatmaps),
-                    new DrawablePopularBeatmapsList(popularBeatmaps)
+                    new DrawableNewBeatmapList(newBeatmaps),
+                    new DrawablePopularBeatmapList(popularBeatmaps)
                 }
             };
         }
