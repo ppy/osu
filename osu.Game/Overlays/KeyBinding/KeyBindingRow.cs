@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.KeyBinding
         private OsuSpriteText text;
         private Drawable pressAKey;
 
-        private FillFlowContainer<KeyButton> buttons;
+        public FillFlowContainer<KeyButton> Buttons;
 
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend((string)text.Text);
 
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.KeyBinding
                     Text = action.GetDescription(),
                     Margin = new MarginPadding(padding),
                 },
-                buttons = new FillFlowContainer<KeyButton>
+                Buttons = new FillFlowContainer<KeyButton>
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.TopRight,
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.KeyBinding
             };
 
             foreach (var b in bindings)
-                buttons.Add(new KeyButton(b));
+                Buttons.Add(new KeyButton(b));
         }
 
         public void RestoreDefaults()
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.KeyBinding
 
             foreach (var d in Defaults)
             {
-                var button = buttons[i++];
+                var button = Buttons[i++];
                 button.UpdateKeyCombination(d);
                 store.Update(button.KeyBinding);
             }
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.KeyBinding
 
             if (bindTarget.IsHovered)
                 finalise();
-            else if (buttons.Any(b => b.IsHovered))
+            else if (Buttons.Any(b => b.IsHovered))
                 updateBindTarget();
         }
 
@@ -326,7 +326,7 @@ namespace osu.Game.Overlays.KeyBinding
         private void updateBindTarget()
         {
             if (bindTarget != null) bindTarget.IsBinding = false;
-            bindTarget = buttons.FirstOrDefault(b => b.IsHovered) ?? buttons.FirstOrDefault();
+            bindTarget = Buttons.FirstOrDefault(b => b.IsHovered) ?? Buttons.FirstOrDefault();
             if (bindTarget != null) bindTarget.IsBinding = true;
         }
 
@@ -357,7 +357,7 @@ namespace osu.Game.Overlays.KeyBinding
             }
         }
 
-        private class KeyButton : Container
+        public class KeyButton : Container
         {
             public readonly Framework.Input.Bindings.KeyBinding KeyBinding;
 
