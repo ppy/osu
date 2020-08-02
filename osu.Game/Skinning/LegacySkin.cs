@@ -134,13 +134,7 @@ namespace osu.Game.Skinning
                     break;
 
                 case LegacySkinConfiguration.LegacySetting legacy:
-                    switch (legacy)
-                    {
-                        case LegacySkinConfiguration.LegacySetting.Version:
-                            return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
-                    }
-
-                    goto default;
+                    return legacySettingLookup<TValue>(legacy);
 
                 default:
                     return genericLookup<TLookup, TValue>(lookup);
@@ -265,6 +259,19 @@ namespace osu.Game.Skinning
 
         private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
             => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
+
+        [CanBeNull]
+        private IBindable<TValue> legacySettingLookup<TValue>(LegacySkinConfiguration.LegacySetting legacySetting)
+        {
+            switch (legacySetting)
+            {
+                case LegacySkinConfiguration.LegacySetting.Version:
+                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
+
+                default:
+                    return genericLookup<LegacySkinConfiguration.LegacySetting, TValue>(legacySetting);
+            }
+        }
 
         [CanBeNull]
         private IBindable<TValue> genericLookup<TLookup, TValue>(TLookup lookup)
