@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -152,24 +153,37 @@ namespace osu.Game.Tests.Visual
         {
             private readonly bool extrapolateAnimations;
 
+            private readonly HashSet<string> legacyFontPrefixes = new HashSet<string>();
+
             public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, bool extrapolateAnimations)
                 : base(skin, storage, audioManager, "skin.ini")
             {
                 this.extrapolateAnimations = extrapolateAnimations;
+
+                legacyFontPrefixes.Add(GetConfig<string, string>("HitCirclePrefix")?.Value ?? "default");
+                legacyFontPrefixes.Add(GetConfig<string, string>("ScorePrefix")?.Value ?? "score");
+                legacyFontPrefixes.Add(GetConfig<string, string>("ComboPrefix")?.Value ?? "score");
             }
 
             public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
                 // extrapolate frames to test longer animations
-                if (extrapolateAnimations)
-                {
-                    var match = Regex.Match(componentName, "-([0-9]*)");
-
-                    if (match.Length > 0 && int.TryParse(match.Groups[1].Value, out var number) && number < 60)
-                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"), wrapModeS, wrapModeT);
-                }
+                if (extrapolateAnimations && isAnimationComponent(componentName, out var number) && number < 60)
+                    return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"), wrapModeS, wrapModeT);
 
                 return base.GetTexture(componentName, wrapModeS, wrapModeT);
+            }
+
+            private bool isAnimationComponent(string componentName, out int number)
+            {
+                number = 0;
+
+                // legacy font glyph textures have the pattern "{fontPrefix}-{character}", which could be mistaken for an animation frame.
+                if (legacyFontPrefixes.Any(p => componentName.StartsWith($"{p}-")))
+                    return false;
+
+                var match = Regex.Match(componentName, "-([0-9]*)");
+                return match.Length > 0 && int.TryParse(match.Groups[1].Value, out number);
             }
         }
     }
