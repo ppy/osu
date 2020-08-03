@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Ranking
                                         RelativeSizeAxes = Axes.Both,
                                         User = Score.User,
                                         Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
-                                    },
+                                    }
                                 }
                             },
                             middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
@@ -203,8 +203,8 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
 
-                    topLayerContentContainer.Add(middleLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(topLayerContent = new ExpandedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
 
                 case PanelState.Contracted:
@@ -213,7 +213,8 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(contracted_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, resize_duration, Easing.OutQuint);
 
-                    middleLayerContentContainer.Add(topLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ContractedPanelTopContent(Score).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
             }
 

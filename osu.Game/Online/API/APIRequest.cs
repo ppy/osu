@@ -136,6 +136,11 @@ namespace osu.Game.Online.API
             Success?.Invoke();
         }
 
+        internal void TriggerFailure(Exception e)
+        {
+            Failure?.Invoke(e);
+        }
+
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
 
         public void Fail(Exception e)
@@ -166,7 +171,7 @@ namespace osu.Game.Online.API
             }
 
             Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
-            pendingFailure = () => Failure?.Invoke(e);
+            pendingFailure = () => TriggerFailure(e);
             checkAndScheduleFailure();
         }
 
