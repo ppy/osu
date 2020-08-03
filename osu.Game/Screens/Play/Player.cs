@@ -612,6 +612,7 @@ namespace osu.Game.Screens.Play
 
             // bind component bindables.
             Background.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+            gameplayBeatmap.IsBreakTime.BindTo(breakTracker.IsBreakTime);
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
