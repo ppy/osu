@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osuTK;
@@ -23,14 +24,20 @@ namespace osu.Game.Screens.Ranking.Expanded
             // Todo: AutoSize X removed here due to https://github.com/ppy/osu-framework/issues/3369
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            DisplayedCountSpriteText.Anchor = Anchor.TopCentre;
-            DisplayedCountSpriteText.Origin = Anchor.TopCentre;
-
-            DisplayedCountSpriteText.Font = OsuFont.Torus.With(size: 60, weight: FontWeight.Light, fixedWidth: true);
-            DisplayedCountSpriteText.Spacing = new Vector2(-5, 0);
         }
 
         protected override string FormatCount(long count) => count.ToString("N0");
+
+        protected override OsuSpriteText CreateSpriteText()
+        {
+            var spriteText = base.CreateSpriteText();
+            spriteText.Anchor = Anchor.TopCentre;
+            spriteText.Origin = Anchor.TopCentre;
+
+            spriteText.Font = OsuFont.Torus.With(size: 60, weight: FontWeight.Light, fixedWidth: true);
+            spriteText.Spacing = new Vector2(-5, 0);
+            return spriteText;
+        }
 
         public override void Increment(long amount)
             => Current.Value += amount;
