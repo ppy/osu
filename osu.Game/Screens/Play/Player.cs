@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
 
         private SampleChannel sampleRestart;
@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Play
         private BreakTracker breakTracker;
 
         private SkipOverlay skipOverlay;
+
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.Disabled);
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
@@ -203,12 +205,15 @@ namespace osu.Game.Screens.Play
                 skipOverlay.Hide();
             }
 
+            if (game != null)
+                OverlayActivationMode.BindTo(game.OverlayActivationMode);
+
             gameplayOverlaysDisabled.ValueChanged += disabled =>
             {
                 if (DrawableRuleset.HasReplayLoaded.Value)
-                    game.OverlayActivationMode.Value = OverlayActivation.UserTriggered;
+                    OverlayActivationMode.Value = OverlayActivation.UserTriggered;
                 else
-                    game.OverlayActivationMode.Value = disabled.NewValue && !DrawableRuleset.IsPaused.Value ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
+                    OverlayActivationMode.Value = disabled.NewValue && !DrawableRuleset.IsPaused.Value ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
             };
             DrawableRuleset.IsPaused.BindValueChanged(_ => gameplayOverlaysDisabled.TriggerChange());
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => gameplayOverlaysDisabled.TriggerChange());
