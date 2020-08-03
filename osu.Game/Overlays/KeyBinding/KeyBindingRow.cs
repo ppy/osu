@@ -49,8 +49,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private OsuSpriteText text;
         private FillFlowContainer cancelAndClearButtons;
-
-        public FillFlowContainer<KeyButton> Buttons;
+        private FillFlowContainer<KeyButton> buttons;
 
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend((string)text.Text);
 
@@ -93,7 +92,7 @@ namespace osu.Game.Overlays.KeyBinding
                     Text = action.GetDescription(),
                     Margin = new MarginPadding(padding),
                 },
-                Buttons = new FillFlowContainer<KeyButton>
+                buttons = new FillFlowContainer<KeyButton>
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.TopRight,
@@ -116,7 +115,7 @@ namespace osu.Game.Overlays.KeyBinding
             };
 
             foreach (var b in bindings)
-                Buttons.Add(new KeyButton(b));
+                buttons.Add(new KeyButton(b));
         }
 
         public void RestoreDefaults()
@@ -125,7 +124,7 @@ namespace osu.Game.Overlays.KeyBinding
 
             foreach (var d in Defaults)
             {
-                var button = Buttons[i++];
+                var button = buttons[i++];
                 button.UpdateKeyCombination(d);
                 store.Update(button.KeyBinding);
             }
@@ -327,7 +326,7 @@ namespace osu.Game.Overlays.KeyBinding
         private void updateBindTarget()
         {
             if (bindTarget != null) bindTarget.IsBinding = false;
-            bindTarget = Buttons.FirstOrDefault(b => b.IsHovered) ?? Buttons.FirstOrDefault();
+            bindTarget = buttons.FirstOrDefault(b => b.IsHovered) ?? buttons.FirstOrDefault();
             if (bindTarget != null) bindTarget.IsBinding = true;
         }
 
