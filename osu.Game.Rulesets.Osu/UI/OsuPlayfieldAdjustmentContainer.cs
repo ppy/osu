@@ -15,6 +15,14 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private const float playfield_size_adjust = 0.8f;
 
+        /// <summary>
+        /// Whether an osu-stable playfield offset should be applied (8 osu!pixels)
+        /// </summary>
+        public bool PlayfieldShift
+        {
+            set => ((ScalingContainer)content).PlayfieldShift = value;
+        }
+
         public OsuPlayfieldAdjustmentContainer()
         {
             Anchor = Anchor.Centre;
@@ -39,6 +47,8 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private class ScalingContainer : Container
         {
+            internal bool PlayfieldShift { get; set; }
+
             protected override void Update()
             {
                 base.Update();
@@ -55,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 // Scale = 819.2 / 512
                 // Scale = 1.6
                 Scale = new Vector2(Parent.ChildSize.X / OsuPlayfield.BASE_SIZE.X);
-                Position = new Vector2(0, 8 * Parent.ChildSize.Y / OsuPlayfield.BASE_SIZE.Y);
+                Position = new Vector2(0, (PlayfieldShift ? 8f : 0f) * Parent.ChildSize.Y / OsuPlayfield.BASE_SIZE.Y);
                 // Size = 0.625
                 Size = Vector2.Divide(Vector2.One, Scale);
             }
