@@ -81,7 +81,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
         }
 
-        private class SettingsRoundDropdown : SettingsDropdown<TournamentRound>
+        private class SettingsRoundDropdown : LadderSettingsDropdown<TournamentRound>
         {
             public SettingsRoundDropdown(BindableList<TournamentRound> rounds)
             {

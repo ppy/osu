@@ -116,6 +116,8 @@ namespace osu.Game.Overlays.Settings.Sections
             private class SkinDropdownControl : DropdownControl
             {
                 protected override string GenerateItemText(SkinInfo item) => item.ToString();
+
+                protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
             }
         }
 
