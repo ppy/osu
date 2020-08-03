@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -24,7 +25,6 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="leading">How many leading zeroes the counter will have.</param>
         public ScoreCounter(uint leading = 0)
         {
-            DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
             LeadingZeroes = leading;
         }
 
@@ -47,6 +47,13 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             return ((long)count).ToString(format);
+        }
+
+        protected override OsuSpriteText CreateSpriteText()
+        {
+            var spriteText = base.CreateSpriteText();
+            spriteText.Font = spriteText.Font.With(fixedWidth: true);
+            return spriteText;
         }
 
         public override void Increment(double amount)
