@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Catch
         Droplet,
         CatcherIdle,
         CatcherFail,
-        CatcherKiai
+        CatcherKiai,
+        CatchComboCounter
     }
 }
