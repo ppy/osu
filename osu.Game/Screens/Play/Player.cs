@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Play
             if (game != null)
                 OverlayActivationMode.BindTo(game.OverlayActivationMode);
 
-            gameplayOverlaysDisabled.ValueChanged += disabled => updateOverlayActivationMode();
+            gameplayOverlaysDisabled.BindValueChanged(_ => updateOverlayActivationMode());
             DrawableRuleset.IsPaused.BindValueChanged(_ => updateOverlayActivationMode());
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateOverlayActivationMode());
 
@@ -654,7 +654,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
 
-            gameplayOverlaysDisabled.TriggerChange();
+            updateOverlayActivationMode();
         }
 
         public override void OnSuspending(IScreen next)
