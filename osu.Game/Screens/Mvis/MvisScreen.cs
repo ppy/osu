@@ -720,8 +720,12 @@ namespace osu.Game.Screens
 
             sbLoader.UpdateStoryBoardAsync(displayDelay, () =>
             {
-                SBOverlayProxy?.Hide();
-                SBOverlayProxy?.Expire();
+                if (SBOverlayProxy != null)
+                {
+                    SBOverlayProxy.Hide();
+                    SBOverlayProxy.Expire();
+                }
+
                 SBOverlayProxy = sbLoader.GetOverlayProxy();
 
                 UpdateStoryboardProxy(SBEnableProxy.Value);
