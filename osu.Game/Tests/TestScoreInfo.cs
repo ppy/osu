@@ -37,6 +37,8 @@ namespace osu.Game.Tests
             Statistics[HitResult.Meh] = 50;
             Statistics[HitResult.Good] = 100;
             Statistics[HitResult.Great] = 300;
+
+            Position = 1;
         }
 
         private class TestModHardRock : ModHardRock

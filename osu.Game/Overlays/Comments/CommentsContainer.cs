@@ -78,21 +78,22 @@ namespace osu.Game.Overlays.Comments
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background4
-                                },
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
+                                    Margin = new MarginPadding { Bottom = 20 },
                                     Children = new Drawable[]
                                     {
                                         deletedCommentsCounter = new DeletedCommentsCounter
                                         {
-                                            ShowDeleted = { BindTarget = ShowDeleted }
+                                            ShowDeleted = { BindTarget = ShowDeleted },
+                                            Margin = new MarginPadding
+                                            {
+                                                Horizontal = 70,
+                                                Vertical = 10
+                                            }
                                         },
                                         new Container
                                         {
@@ -102,7 +103,10 @@ namespace osu.Game.Overlays.Comments
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                                Margin = new MarginPadding(5),
+                                                Margin = new MarginPadding
+                                                {
+                                                    Vertical = 10
+                                                },
                                                 Action = getComments,
                                                 IsLoading = true,
                                             }
