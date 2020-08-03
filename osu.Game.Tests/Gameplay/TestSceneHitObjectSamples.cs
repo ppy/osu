@@ -67,9 +67,11 @@ namespace osu.Game.Tests.Gameplay
         /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the beatmap skin:
         /// normal-hitnormal2
         /// normal-hitnormal
+        /// hitnormal
         /// </summary>
         [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
         {
             SetupSkins(expectedSample, expectedSample);
@@ -80,12 +82,13 @@ namespace osu.Game.Tests.Gameplay
         }
 
         /// <summary>
-        /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the user skin when the beatmap does not contain the sample:
-        /// normal-hitnormal2
+        /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the user skin
+        /// (ignoring the custom sample set index) when the beatmap skin does not contain the sample:
         /// normal-hitnormal
+        /// hitnormal
         /// </summary>
-        [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
         {
             SetupSkins(string.Empty, expectedSample);
@@ -93,6 +96,23 @@ namespace osu.Game.Tests.Gameplay
             CreateTestWithBeatmap("hitobject-beatmap-custom-sample.osu");
 
             AssertUserLookup(expectedSample);
+        }
+
+        /// <summary>
+        /// Tests that a hitobject which provides a custom sample set of 2 does not retrieve a normal-hitnormal2 sample from the user skin
+        /// if the beatmap skin does not contain the sample.
+        /// User skins in stable ignore the custom sample set index when performing lookups.
+        /// </summary>
+        [Test]
+        public void TestUserSkinLookupIgnoresSampleBank()
+        {
+            const string unwanted_sample = "normal-hitnormal2";
+
+            SetupSkins(string.Empty, unwanted_sample);
+
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample.osu");
+
+            AssertNoLookup(unwanted_sample);
         }
 
         /// <summary>
@@ -145,6 +165,7 @@ namespace osu.Game.Tests.Gameplay
         /// </summary>
         [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestControlPointCustomSampleFromBeatmap(string sampleName)
         {
             SetupSkins(sampleName, sampleName);
@@ -178,7 +199,7 @@ namespace osu.Game.Tests.Gameplay
             string[] expectedSamples =
             {
                 "normal-hitnormal2",
-                "normal-hitwhistle2"
+                "normal-hitwhistle" // user skin lookups ignore custom sample set index
             };
 
             SetupSkins(expectedSamples[0], expectedSamples[1]);
