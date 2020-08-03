@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public const float CENTER_X = WIDTH / 2;
 
         internal readonly CatcherArea CatcherArea;
+        private readonly CatchComboDisplay comboDisplay;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             // only check the X position; handle all vertical space.
@@ -48,12 +49,22 @@ namespace osu.Game.Rulesets.Catch.UI
                 Origin = Anchor.TopLeft,
             };
 
+            comboDisplay = new CatchComboDisplay
+            {
+                AutoSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.None,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.Centre,
+                Y = 30f,
+            };
+
             InternalChildren = new[]
             {
                 explodingFruitContainer,
                 CatcherArea.MovableCatcher.CreateProxiedContent(),
                 HitObjectContainer,
-                CatcherArea
+                CatcherArea,
+                comboDisplay,
             };
         }
 
@@ -62,6 +73,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public override void Add(DrawableHitObject h)
         {
             h.OnNewResult += onNewResult;
+            h.OnRevertResult += onRevertResult;
 
             base.Add(h);
 
@@ -69,7 +81,23 @@ namespace osu.Game.Rulesets.Catch.UI
             fruit.CheckPosition = CheckIfWeCanCatch;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            comboDisplay.X = CatcherArea.MovableCatcher.X;
+        }
+
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
-            => CatcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
+        {
+            var catchObject = (DrawableCatchHitObject)judgedObject;
+            CatcherArea.OnResult(catchObject, result);
+
+            comboDisplay.OnNewResult(catchObject, result);
+        }
+
+        private void onRevertResult(DrawableHitObject judgedObject, JudgementResult result)
+        {
+            comboDisplay.OnRevertResult((DrawableCatchHitObject)judgedObject, result);
+        }
     }
 }
