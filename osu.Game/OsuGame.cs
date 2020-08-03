@@ -73,6 +73,8 @@ namespace osu.Game
 
         private DashboardOverlay dashboard;
 
+        private NewsOverlay news;
+
         private UserProfileOverlay userProfile;
 
         private BeatmapSetOverlay beatmapSetOverlay;
@@ -632,6 +634,7 @@ namespace osu.Game
             // overlay elements
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
@@ -689,7 +692,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
 
             foreach (var overlay in singleDisplayOverlays)
             {
