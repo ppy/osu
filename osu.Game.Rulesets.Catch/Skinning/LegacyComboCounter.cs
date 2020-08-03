@@ -47,6 +47,23 @@ namespace osu.Game.Rulesets.Catch.Skinning
             };
         }
 
+        private IBindable<bool> isBreakTime;
+
+        [Resolved(canBeNull: true)]
+        private GameplayBeatmap beatmap { get; set; }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            isBreakTime = beatmap?.IsBreakTime.GetBoundCopy();
+            isBreakTime?.BindValueChanged(b =>
+            {
+                if (b.NewValue)
+                    this.FadeOut(400.0, Easing.OutQuint);
+            });
+        }
+
         public void DisplayInitialCombo(int combo) => updateCombo(combo, null, true);
         public void UpdateCombo(int combo, Color4? hitObjectColour) => updateCombo(combo, hitObjectColour, false);
 
