@@ -102,17 +102,17 @@ namespace osu.Game.Overlays.Dashboard.Home
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 Truncate = true,
-                                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                                                Font = OsuFont.GetFont(weight: FontWeight.Regular),
                                                 Text = SetInfo.Metadata.Title
                                             },
                                             new OsuSpriteText
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 Truncate = true,
-                                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                 Text = SetInfo.Metadata.Artist
                                             },
-                                            new LinkFlowContainer(f => f.Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold))
+                                            new LinkFlowContainer(f => f.Font = OsuFont.GetFont(size: 10, weight: FontWeight.Regular))
                                             {
                                                 AutoSizeAxes = Axes.Y,
                                                 RelativeSizeAxes = Axes.X,

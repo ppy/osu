@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Dashboard.Home
                 },
                 new OsuSpriteText
                 {
-                    Font = OsuFont.GetFont(size: 10),
+                    Font = OsuFont.GetFont(size: 10, weight: FontWeight.Regular),
                     Text = SetInfo.OnlineInfo.FavouriteCount.ToString()
                 }
             }
