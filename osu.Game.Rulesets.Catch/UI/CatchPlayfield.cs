@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
             comboDisplay = new CatchComboDisplay
             {
-                AutoSizeAxes = Axes.Both,
                 RelativeSizeAxes = Axes.None,
+                AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.Centre,
                 Y = 30f,
