@@ -55,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 // Scale = 819.2 / 512
                 // Scale = 1.6
                 Scale = new Vector2(Parent.ChildSize.X / OsuPlayfield.BASE_SIZE.X);
+                Position = new Vector2(0, 8 * Parent.ChildSize.Y / OsuPlayfield.BASE_SIZE.Y);
                 // Size = 0.625
                 Size = Vector2.Divide(Vector2.One, Scale);
             }
