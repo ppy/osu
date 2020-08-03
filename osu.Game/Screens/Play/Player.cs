@@ -90,7 +90,10 @@ namespace osu.Game.Screens.Play
 
         private SkipOverlay skipOverlay;
 
-        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.Disabled);
+        /// <summary>
+        /// The current activation mode for overlays.
+        /// </summary>
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.UserTriggered);
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
@@ -208,15 +211,9 @@ namespace osu.Game.Screens.Play
             if (game != null)
                 OverlayActivationMode.BindTo(game.OverlayActivationMode);
 
-            gameplayOverlaysDisabled.ValueChanged += disabled =>
-            {
-                if (DrawableRuleset.HasReplayLoaded.Value)
-                    OverlayActivationMode.Value = OverlayActivation.UserTriggered;
-                else
-                    OverlayActivationMode.Value = disabled.NewValue && !DrawableRuleset.IsPaused.Value ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
-            };
-            DrawableRuleset.IsPaused.BindValueChanged(_ => gameplayOverlaysDisabled.TriggerChange());
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => gameplayOverlaysDisabled.TriggerChange());
+            gameplayOverlaysDisabled.ValueChanged += disabled => updateOverlayActivationMode();
+            DrawableRuleset.IsPaused.BindValueChanged(_ => updateOverlayActivationMode());
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateOverlayActivationMode());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
@@ -360,6 +357,14 @@ namespace osu.Game.Screens.Play
         {
             updatePauseOnFocusLostState();
             HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
+        }
+
+        private void updateOverlayActivationMode()
+        {
+            if (DrawableRuleset.HasReplayLoaded.Value)
+                OverlayActivationMode.Value = OverlayActivation.UserTriggered;
+            else
+                OverlayActivationMode.Value = gameplayOverlaysDisabled.Value && !DrawableRuleset.IsPaused.Value ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
         }
 
         private void updatePauseOnFocusLostState() =>

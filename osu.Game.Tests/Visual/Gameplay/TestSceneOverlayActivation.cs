@@ -14,11 +14,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         private OverlayTestPlayer testPlayer;
 
         [Resolved]
-        private OsuConfigManager mng { get; set; }
+        private OsuConfigManager config { get; set; }
 
         public override void SetUpSteps()
         {
-            AddStep("disable overlay activation during gameplay", () => mng.Set(OsuSetting.GameplayDisableOverlayActivation, true));
+            AddStep("disable overlay activation during gameplay", () => config.Set(OsuSetting.GameplayDisableOverlayActivation, true));
             base.SetUpSteps();
         }
 
