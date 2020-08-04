@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             isSpinning.BindValueChanged(updateSpinningSample);
         }
 
-        private SkinnableSound spinningSample;
+        private GameplaySkinnableSound spinningSample;
 
         private const float minimum_volume = 0.0001f;
 
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
                 clone.Name = "spinnerspin";
 
-                AddInternal(spinningSample = new SkinnableSound(clone)
+                AddInternal(spinningSample = new GameplaySkinnableSound(clone)
                 {
                     Volume = { Value = minimum_volume },
                     Looping = true,
