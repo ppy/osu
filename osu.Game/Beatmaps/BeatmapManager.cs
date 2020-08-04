@@ -255,7 +255,7 @@ namespace osu.Game.Beatmaps
                         new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager));
                 }
 
-                previous?.TransferTo(working);
+                // previous?.TransferTo(working);
                 return working;
             }
         }

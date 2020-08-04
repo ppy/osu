@@ -40,7 +40,6 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack(1000));
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
@@ -250,10 +249,9 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
-        public virtual bool TrackLoaded => track.IsResultAvailable;
-        public Track Track => track.Value;
+        public Track GetRealTrack() => GetTrack() ?? GetVirtualTrack(1000);
+
         protected abstract Track GetTrack();
-        private RecyclableLazy<Track> track;
 
         public bool WaveformLoaded => waveform.IsResultAvailable;
         public Waveform Waveform => waveform.Value;
@@ -270,22 +268,6 @@ namespace osu.Game.Beatmaps
 
         protected virtual ISkin GetSkin() => new DefaultSkin();
         private readonly RecyclableLazy<ISkin> skin;
-
-        /// <summary>
-        /// Transfer pieces of a beatmap to a new one, where possible, to save on loading.
-        /// </summary>
-        /// <param name="other">The new beatmap which is being switched to.</param>
-        public virtual void TransferTo(WorkingBeatmap other)
-        {
-            if (track.IsResultAvailable && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
-                other.track = track;
-        }
-
-        /// <summary>
-        /// Eagerly dispose of the audio track associated with this <see cref="WorkingBeatmap"/> (if any).
-        /// Accessing track again will load a fresh instance.
-        /// </summary>
-        public virtual void RecycleTrack() => track.Recycle();
 
         ~WorkingBeatmap()
         {

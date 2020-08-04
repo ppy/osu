@@ -175,11 +175,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
         private void createDrawableRuleset()
         {
-            AddUntilStep("wait for beatmap to be loaded", () => Beatmap.Value.Track.IsLoaded);
+            AddUntilStep("wait for beatmap to be loaded", () => MusicController.TrackLoaded);
 
             AddStep("create drawable ruleset", () =>
             {
-                Beatmap.Value.Track.Start();
+                MusicController.Play(true);
 
                 SetContents(() =>
                 {

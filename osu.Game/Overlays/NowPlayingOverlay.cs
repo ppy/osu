@@ -234,14 +234,12 @@ namespace osu.Game.Overlays
                 pendingBeatmapSwitch = null;
             }
 
-            var track = beatmap.Value?.TrackLoaded ?? false ? beatmap.Value.Track : null;
-
-            if (track?.IsDummyDevice == false)
+            if (musicController.IsDummyDevice == false)
             {
-                progressBar.EndTime = track.Length;
-                progressBar.CurrentTime = track.CurrentTime;
+                progressBar.EndTime = musicController.TrackLength;
+                progressBar.CurrentTime = musicController.CurrentTrackTime;
 
-                playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+                playButton.Icon = musicController.IsPlaying ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
             }
             else
             {

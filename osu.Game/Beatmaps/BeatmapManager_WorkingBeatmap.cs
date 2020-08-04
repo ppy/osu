@@ -79,22 +79,6 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            public override void RecycleTrack()
-            {
-                base.RecycleTrack();
-
-                trackStore?.Dispose();
-                trackStore = null;
-            }
-
-            public override void TransferTo(WorkingBeatmap other)
-            {
-                base.TransferTo(other);
-
-                if (other is BeatmapManagerWorkingBeatmap owb && textureStore != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
-                    owb.textureStore = textureStore;
-            }
-
             protected override Waveform GetWaveform()
             {
                 try

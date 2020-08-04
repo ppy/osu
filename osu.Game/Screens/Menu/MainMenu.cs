@@ -5,7 +5,6 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
@@ -61,8 +60,6 @@ namespace osu.Game.Screens.Menu
         private BackgroundScreenDefault background;
 
         protected override BackgroundScreen CreateBackground() => background;
-
-        internal Track Track { get; private set; }
 
         private Bindable<float> holdDelay;
         private Bindable<bool> loginDisplayed;
@@ -172,20 +169,23 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private Storage storage { get; set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
 
-            Track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is IntroScreen && Track != null)
+            if (last is IntroScreen && musicController.TrackLoaded)
             {
-                if (!Track.IsRunning)
+                // Todo: Wrong.
+                if (!musicController.IsPlaying)
                 {
-                    Track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * Track.Length);
-                    Track.Start();
+                    musicController.SeekTo(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * musicController.TrackLength);
+                    musicController.Play();
                 }
             }
 

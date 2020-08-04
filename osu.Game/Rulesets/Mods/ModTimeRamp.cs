@@ -51,9 +51,9 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
-        public void ApplyToTrack(Track track)
+        public void ApplyToTrack(ITrack track)
         {
-            this.track = track;
+            this.track = track as Track;
 
             FinalRate.TriggerChange();
             AdjustPitch.TriggerChange();

@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Components
@@ -26,6 +27,9 @@ namespace osu.Game.Screens.Edit.Components
 
         [Resolved]
         private EditorClock editorClock { get; set; }
+
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         private readonly BindableNumber<double> tempo = new BindableDouble(1);
 
@@ -62,12 +66,12 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            Track?.AddAdjustment(AdjustableProperty.Tempo, tempo);
+            musicController.AddAdjustment(AdjustableProperty.Tempo, tempo);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            Track?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
+            musicController?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
 
             base.Dispose(isDisposing);
         }

@@ -431,19 +431,19 @@ namespace osu.Game
 
             if (newBeatmap != null)
             {
-                newBeatmap.Track.Completed += () => Scheduler.AddOnce(() => trackCompleted(newBeatmap));
+                // MusicController.Completed += () => Scheduler.AddOnce(() => trackCompleted(newBeatmap));
                 newBeatmap.BeginAsyncLoad();
             }
 
-            void trackCompleted(WorkingBeatmap b)
-            {
-                // the source of track completion is the audio thread, so the beatmap may have changed before firing.
-                if (Beatmap.Value != b)
-                    return;
-
-                if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
-                    MusicController.NextTrack();
-            }
+            // void trackCompleted(WorkingBeatmap b)
+            // {
+            //     // the source of track completion is the audio thread, so the beatmap may have changed before firing.
+            //     if (Beatmap.Value != b)
+            //         return;
+            //
+            //     if (!MusicController.Looping && !Beatmap.Disabled)
+            //         MusicController.NextTrack();
+            // }
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -555,6 +555,7 @@ namespace osu.Game
             BackButton.Receptor receptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
+            dependencies.CacheAs(MusicController = new MusicController());
 
             AddRange(new Drawable[]
             {
@@ -617,7 +618,7 @@ namespace osu.Game
 
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
-            loadComponentSingleFile(MusicController = new MusicController(), Add, true);
+            loadComponentSingleFile(MusicController, Add);
 
             loadComponentSingleFile(notifications.With(d =>
             {

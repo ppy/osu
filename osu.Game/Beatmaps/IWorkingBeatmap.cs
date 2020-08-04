@@ -27,11 +27,6 @@ namespace osu.Game.Beatmaps
         Texture Background { get; }
 
         /// <summary>
-        /// Retrieves the audio track for this <see cref="WorkingBeatmap"/>.
-        /// </summary>
-        Track Track { get; }
-
-        /// <summary>
         /// Retrieves the <see cref="Waveform"/> for the <see cref="Track"/> of this <see cref="WorkingBeatmap"/>.
         /// </summary>
         Waveform Waveform { get; }

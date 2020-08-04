@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -32,6 +31,6 @@ namespace osu.Game.Tests.Skins
         public void TestRetrieveOggSample() => AddAssert("sample is non-null", () => beatmap.Skin.GetSample(new SampleInfo("sample")) != null);
 
         [Test]
-        public void TestRetrieveOggTrack() => AddAssert("track is non-null", () => !(beatmap.Track is TrackVirtual));
+        public void TestRetrieveOggTrack() => AddAssert("track is non-null", () => !MusicController.IsDummyDevice);
     }
 }

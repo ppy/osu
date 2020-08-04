@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Audio.Track;
 using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 
@@ -15,11 +14,9 @@ namespace osu.Game.Tests.Visual.Menus
 
         public TestSceneIntroWelcome()
         {
-            AddUntilStep("wait for load", () => getTrack() != null);
+            AddUntilStep("wait for load", () => MusicController.TrackLoaded);
 
-            AddAssert("check if menu music loops", () => getTrack().Looping);
+            AddAssert("check if menu music loops", () => MusicController.Looping);
         }
-
-        private Track getTrack() => (IntroStack?.CurrentScreen as MainMenu)?.Track;
     }
 }

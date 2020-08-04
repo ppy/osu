@@ -7,12 +7,16 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
     public class BeatSyncedContainer : Container
     {
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         private int lastBeat;
         private TimingControlPoint lastTimingPoint;
@@ -47,22 +51,18 @@ namespace osu.Game.Graphics.Containers
 
         protected override void Update()
         {
-            Track track = null;
             IBeatmap beatmap = null;
 
             double currentTrackTime = 0;
             TimingControlPoint timingPoint = null;
             EffectControlPoint effectPoint = null;
 
-            if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
-            {
-                track = Beatmap.Value.Track;
+            if (musicController.TrackLoaded && Beatmap.Value.BeatmapLoaded)
                 beatmap = Beatmap.Value.Beatmap;
-            }
 
-            if (track != null && beatmap != null && track.IsRunning && track.Length > 0)
+            if (beatmap != null && musicController.IsPlaying && musicController.TrackLength > 0)
             {
-                currentTrackTime = track.CurrentTime + EarlyActivationMilliseconds;
+                currentTrackTime = musicController.CurrentTrackTime + EarlyActivationMilliseconds;
 
                 timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
                 effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
@@ -98,7 +98,7 @@ namespace osu.Game.Graphics.Containers
                 return;
 
             using (BeginDelayedSequence(-TimeSinceLastBeat, true))
-                OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? ChannelAmplitudes.Empty);
+                OnNewBeat(beatIndex, timingPoint, effectPoint, musicController.CurrentAmplitudes);
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;

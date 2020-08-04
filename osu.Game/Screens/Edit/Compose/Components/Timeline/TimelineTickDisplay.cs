@@ -3,10 +3,9 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
@@ -18,7 +17,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private EditorBeatmap beatmap { get; set; }
 
         [Resolved]
-        private Bindable<WorkingBeatmap> working { get; set; }
+        private MusicController musicController { get; set; }
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
@@ -44,7 +43,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             for (var i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
             {
                 var point = beatmap.ControlPointInfo.TimingPoints[i];
-                var until = i + 1 < beatmap.ControlPointInfo.TimingPoints.Count ? beatmap.ControlPointInfo.TimingPoints[i + 1].Time : working.Value.Track.Length;
+                var until = i + 1 < beatmap.ControlPointInfo.TimingPoints.Count ? beatmap.ControlPointInfo.TimingPoints[i + 1].Time : musicController.TrackLength;
 
                 int beat = 0;
 
