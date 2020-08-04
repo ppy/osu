@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Audio;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Skinning
 {
@@ -22,8 +21,6 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private ISampleStore samples { get; set; }
-
-        private bool requestedPlaying;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -41,27 +38,6 @@ namespace osu.Game.Skinning
             InternalChild = samplesContainer = new AudioContainer<DrawableSample>();
         }
 
-        private Bindable<bool> gameplayClockPaused;
-
-        [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock gameplayClock)
-        {
-            // if in a gameplay context, pause sample playback when gameplay is paused.
-            gameplayClockPaused = gameplayClock?.IsPaused.GetBoundCopy();
-            gameplayClockPaused?.BindValueChanged(paused =>
-            {
-                if (requestedPlaying)
-                {
-                    if (paused.NewValue)
-                        stop();
-                    // it's not easy to know if a sample has finished playing (to end).
-                    // to keep things simple only resume playing looping samples.
-                    else if (Looping)
-                        play();
-                }
-            });
-        }
-
         private bool looping;
 
         public bool Looping
@@ -77,13 +53,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public void Play()
-        {
-            requestedPlaying = true;
-            play();
-        }
-
-        private void play()
+        public virtual void Play()
         {
             samplesContainer.ForEach(c =>
             {
@@ -92,19 +62,15 @@ namespace osu.Game.Skinning
             });
         }
 
-        public void Stop()
-        {
-            requestedPlaying = false;
-            stop();
-        }
-
-        private void stop()
+        public virtual void Stop()
         {
             samplesContainer.ForEach(c => c.Stop());
         }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
+            var wasPlaying = IsPlaying;
+
             var channels = hitSamples.Select(s =>
             {
                 var ch = skin.GetSample(s);
@@ -129,7 +95,7 @@ namespace osu.Game.Skinning
 
             samplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
 
-            if (requestedPlaying)
+            if (wasPlaying)
                 Play();
         }
 
