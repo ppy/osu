@@ -46,9 +46,9 @@ namespace osu.Game.Scoring
             {
                 try
                 {
-                    return new DatabasedLegacyScoreParser(rulesets, beatmaps()).Parse(stream).ScoreInfo;
+                    return new DatabasedLegacyScoreDecoder(rulesets, beatmaps()).Parse(stream).ScoreInfo;
                 }
-                catch (LegacyScoreParser.BeatmapNotFoundException e)
+                catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
                     Logger.Log(e.Message, LoggingTarget.Information, LogLevel.Error);
                     return null;

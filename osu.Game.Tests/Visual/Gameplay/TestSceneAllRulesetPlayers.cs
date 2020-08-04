@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -73,9 +72,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Beatmap.Value = working;
             SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
-
-            Player?.Exit();
-            Player = null;
 
             Player = CreatePlayer(ruleset);
 

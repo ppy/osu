@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
                 },
-                new Container //artificial shadow
+                new Container // artificial shadow
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 3,

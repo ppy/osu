@@ -25,8 +25,10 @@ namespace osu.Game.Rulesets.Mania.Judgements
                     return 200;
 
                 case HitResult.Great:
-                case HitResult.Perfect:
                     return 300;
+
+                case HitResult.Perfect:
+                    return 350;
             }
         }
     }

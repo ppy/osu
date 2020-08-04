@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Online.API.Requests.Responses;
@@ -14,18 +13,6 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneChangelogOverlay : OsuTestScene
     {
         private TestChangelogOverlay changelog;
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(UpdateStreamBadgeArea),
-            typeof(UpdateStreamBadge),
-            typeof(ChangelogHeader),
-            typeof(ChangelogContent),
-            typeof(ChangelogListing),
-            typeof(ChangelogSingleBuild),
-            typeof(ChangelogBuild),
-            typeof(Comments),
-        };
 
         protected override bool UseOnlineAPI => true;
 

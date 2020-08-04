@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Overlays.SearchableList
@@ -72,7 +71,7 @@ namespace osu.Game.Overlays.SearchableList
                     {
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
-                        Child = new OsuScrollContainer
+                        Child = new OverlayScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             ScrollbarVisible = false,
@@ -80,7 +79,7 @@ namespace osu.Game.Overlays.SearchableList
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding { Horizontal = WIDTH_PADDING, Bottom = 50 },
+                                Padding = new MarginPadding { Horizontal = 10, Bottom = 50 },
                                 Direction = FillDirection.Vertical,
                             },
                         },

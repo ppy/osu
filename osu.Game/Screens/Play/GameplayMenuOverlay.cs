@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Input;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.Bindings;
@@ -25,7 +24,8 @@ namespace osu.Game.Screens.Play
 {
     public abstract class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
-        private const int transition_duration = 200;
+        protected const int TRANSITION_DURATION = 200;
+
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
 
@@ -157,8 +157,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
-        protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
+        protected override void PopIn() => this.FadeIn(TRANSITION_DURATION, Easing.In);
+        protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(MouseDownEvent e) => true;
@@ -204,35 +204,24 @@ namespace osu.Game.Screens.Play
                 InternalButtons[selectionIndex].Selected.Value = true;
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat)
-            {
-                switch (e.Key)
-                {
-                    case Key.Up:
-                        if (selectionIndex == -1 || selectionIndex == 0)
-                            setSelected(InternalButtons.Count - 1);
-                        else
-                            setSelected(selectionIndex - 1);
-                        return true;
-
-                    case Key.Down:
-                        if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                            setSelected(0);
-                        else
-                            setSelected(selectionIndex + 1);
-                        return true;
-                }
-            }
-
-            return base.OnKeyDown(e);
-        }
-
         public bool OnPressed(GlobalAction action)
         {
             switch (action)
             {
+                case GlobalAction.SelectPrevious:
+                    if (selectionIndex == -1 || selectionIndex == 0)
+                        setSelected(InternalButtons.Count - 1);
+                    else
+                        setSelected(selectionIndex - 1);
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
+                        setSelected(0);
+                    else
+                        setSelected(selectionIndex + 1);
+                    return true;
+
                 case GlobalAction.Back:
                     BackAction.Invoke();
                     return true;

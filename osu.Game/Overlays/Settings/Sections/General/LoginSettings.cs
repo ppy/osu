@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private UserPanel panel;
+        private UserGridPanel panel;
         private UserDropdown dropdown;
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         {
                             Text = "ACCOUNT",
                             Margin = new MarginPadding { Bottom = 5 },
-                            Font = OsuFont.GetFont(weight: FontWeight.Black),
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         },
                         form = new LoginForm
                         {
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                         },
                                     },
                                 },
-                                panel = new UserPanel(api.LocalUser.Value)
+                                panel = new UserGridPanel(api.LocalUser.Value)
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Action = RequestHide

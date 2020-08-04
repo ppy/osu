@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -20,6 +21,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
+        public IBindable<bool> IsHitting => isHitting;
+
+        private readonly Bindable<bool> isHitting = new Bindable<bool>();
+
         public DrawableHoldNoteHead Head => headContainer.Child;
         public DrawableHoldNoteTail Tail => tailContainer.Child;
 
@@ -27,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Container<DrawableHoldNoteTail> tailContainer;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
-        private readonly BodyPiece bodyPiece;
+        private readonly Drawable bodyPiece;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -44,18 +49,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             RelativeSizeAxes = Axes.X;
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
-                bodyPiece = new BodyPiece { RelativeSizeAxes = Axes.X },
+                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                {
+                    RelativeSizeAxes = Axes.Both
+                })
+                {
+                    RelativeSizeAxes = Axes.X
+                },
                 tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
                 headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both },
                 tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },
             });
-
-            AccentColour.BindValueChanged(colour =>
-            {
-                bodyPiece.AccentColour = colour.NewValue;
-            }, true);
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -124,6 +130,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Anchor = bodyPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
 
+        public override void PlaySamples()
+        {
+            // Samples are played by the head/tail notes.
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -156,6 +167,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
+            // The tail has a lenience applied to it which is factored into the miss window (i.e. the miss judgement will be delayed).
+            // But the hold cannot ever be started within the late-lenience window, so we should skip trying to begin the hold during that time.
+            // Note: Unlike below, we use the tail's start time to determine the time offset.
+            if (Time.Current > Tail.HitObject.StartTime && !Tail.HitObject.HitWindows.CanBeHit(Time.Current - Tail.HitObject.StartTime))
+                return false;
+
             beginHoldAt(Time.Current - Head.HitObject.StartTime);
             Head.UpdateResult();
 
@@ -168,7 +185,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
 
             HoldStartTime = Time.Current;
-            bodyPiece.Hitting = true;
+            isHitting.Value = true;
         }
 
         public void OnReleased(ManiaAction action)
@@ -194,7 +211,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private void endHold()
         {
             HoldStartTime = null;
-            bodyPiece.Hitting = false;
+            isHitting.Value = false;
         }
     }
 }

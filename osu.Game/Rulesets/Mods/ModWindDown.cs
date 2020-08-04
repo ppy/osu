@@ -37,6 +37,13 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
+        public override BindableBool AdjustPitch { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
+
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindUp)).ToArray();
     }
 }

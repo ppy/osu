@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             float startRotation = RNG.NextSingle() * 20;
             double duration = HitObject.TimePreempt + 2000;
 
-            this.RotateTo(startRotation).RotateTo(startRotation + 720, duration);
+            ScaleContainer.RotateTo(startRotation).RotateTo(startRotation + 720, duration);
         }
     }
 }

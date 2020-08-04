@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -21,7 +22,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
@@ -48,7 +49,8 @@ namespace osu.Game.Screens.Multi
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
 
-        private readonly PlaylistItem item;
+        public readonly PlaylistItem Item;
+
         private readonly bool allowEdit;
         private readonly bool allowSelection;
 
@@ -57,8 +59,11 @@ namespace osu.Game.Screens.Multi
         public DrawableRoomPlaylistItem(PlaylistItem item, bool allowEdit, bool allowSelection)
             : base(item)
         {
-            this.item = item;
+            Item = item;
+
+            // TODO: edit support should be moved out into a derived class
             this.allowEdit = allowEdit;
+
             this.allowSelection = allowSelection;
 
             beatmap.BindTo(item.Beatmap);
@@ -102,14 +107,14 @@ namespace osu.Game.Screens.Multi
             difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value) { Size = new Vector2(32) };
 
             beatmapText.Clear();
-            beatmapText.AddLink(item.Beatmap.ToString(), LinkAction.OpenBeatmap, item.Beatmap.Value.OnlineBeatmapID.ToString());
+            beatmapText.AddLink(Item.Beatmap.ToString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
 
             authorText.Clear();
 
-            if (item.Beatmap?.Value?.Metadata?.Author != null)
+            if (Item.Beatmap?.Value?.Metadata?.Author != null)
             {
                 authorText.AddText("mapped by ");
-                authorText.AddUserLink(item.Beatmap.Value?.Metadata.Author);
+                authorText.AddUserLink(Item.Beatmap.Value?.Metadata.Author);
             }
 
             modDisplay.Current.Value = requiredMods.ToArray();
@@ -161,7 +166,7 @@ namespace osu.Game.Screens.Multi
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10, 0),
+                                    Spacing = new Vector2(15, 0),
                                     Children = new Drawable[]
                                     {
                                         authorText = new LinkFlowContainer { AutoSizeAxes = Axes.Both },
@@ -180,28 +185,32 @@ namespace osu.Game.Screens.Multi
                         }
                     }
                 },
-                new Container
+                new FillFlowContainer
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
+                    Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     X = -18,
-                    Children = new Drawable[]
-                    {
-                        new PlaylistDownloadButton(item.Beatmap.Value.BeatmapSet)
-                        {
-                            Size = new Vector2(50, 30)
-                        },
-                        new IconButton
-                        {
-                            Icon = FontAwesome.Solid.MinusSquare,
-                            Alpha = allowEdit ? 1 : 0,
-                            Action = () => RequestDeletion?.Invoke(Model),
-                        },
-                    }
+                    ChildrenEnumerable = CreateButtons()
                 }
             }
         };
+
+        protected virtual IEnumerable<Drawable> CreateButtons() =>
+            new Drawable[]
+            {
+                new PlaylistDownloadButton(Item)
+                {
+                    Size = new Vector2(50, 30)
+                },
+                new IconButton
+                {
+                    Icon = FontAwesome.Solid.MinusSquare,
+                    Alpha = allowEdit ? 1 : 0,
+                    Action = () => RequestDeletion?.Invoke(Model),
+                },
+            };
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -210,11 +219,17 @@ namespace osu.Game.Screens.Multi
             return true;
         }
 
-        private class PlaylistDownloadButton : PanelDownloadButton
+        private class PlaylistDownloadButton : BeatmapPanelDownloadButton
         {
-            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-                : base(beatmapSet, noVideo)
+            private readonly PlaylistItem playlistItem;
+
+            [Resolved]
+            private BeatmapManager beatmapManager { get; set; }
+
+            public PlaylistDownloadButton(PlaylistItem playlistItem)
+                : base(playlistItem.Beatmap.Value.BeatmapSet)
             {
+                this.playlistItem = playlistItem;
                 Alpha = 0;
             }
 
@@ -223,11 +238,26 @@ namespace osu.Game.Screens.Multi
                 base.LoadComplete();
 
                 State.BindValueChanged(stateChanged, true);
+                FinishTransforms(true);
             }
 
             private void stateChanged(ValueChangedEvent<DownloadState> state)
             {
-                this.FadeTo(state.NewValue == DownloadState.LocallyAvailable ? 0 : 1, 500);
+                switch (state.NewValue)
+                {
+                    case DownloadState.LocallyAvailable:
+                        // Perform a local query of the beatmap by beatmap checksum, and reset the state if not matching.
+                        if (beatmapManager.QueryBeatmap(b => b.MD5Hash == playlistItem.Beatmap.Value.MD5Hash) == null)
+                            State.Value = DownloadState.NotDownloaded;
+                        else
+                            this.FadeTo(0, 500);
+
+                        break;
+
+                    default:
+                        this.FadeTo(1, 500);
+                        break;
+                }
             }
         }
 
@@ -246,10 +276,11 @@ namespace osu.Game.Screens.Multi
                         FillMode = FillMode.Fill,
                         Beatmap = { BindTarget = Beatmap }
                     },
-                    new Container
+                    new FillFlowContainer
                     {
                         Depth = -1,
                         RelativeSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
                         Alpha = 0.5f,
@@ -259,7 +290,6 @@ namespace osu.Game.Screens.Multi
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
                                 Colour = Color4.Black,
                                 Width = 0.4f,
                             },
@@ -267,26 +297,20 @@ namespace osu.Game.Screens.Multi
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
                                 Width = 0.05f,
-                                X = 0.4f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
                                 Width = 0.2f,
-                                X = 0.45f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
                                 Width = 0.05f,
-                                X = 0.65f,
                             },
                         }
                     }

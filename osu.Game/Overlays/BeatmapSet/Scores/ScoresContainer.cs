@@ -52,17 +52,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 if (value?.Scores.Any() != true)
                 {
-                    scoreTable.Scores = null;
+                    scoreTable.ClearScores();
                     scoreTable.Hide();
                     return;
                 }
 
                 var scoreInfos = value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToList();
+                var topScore = scoreInfos.First();
 
-                scoreTable.Scores = scoreInfos;
+                scoreTable.DisplayScores(scoreInfos, topScore.Beatmap?.Status == BeatmapSetOnlineStatus.Ranked);
                 scoreTable.Show();
 
-                var topScore = scoreInfos.First();
                 var userScore = value.UserScore;
                 var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets);
 
