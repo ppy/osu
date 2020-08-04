@@ -385,7 +385,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 judgementResults = new List<JudgementResult>();
             });
 
-            AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
+            AddUntilStep("Beatmap at 0", () => MusicController.CurrentTrackTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }

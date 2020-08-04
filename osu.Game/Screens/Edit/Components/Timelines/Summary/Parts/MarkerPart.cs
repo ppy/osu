@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -58,7 +59,9 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     return;
 
                 float markerPos = Math.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
-                editorClock.SeekTo(markerPos / DrawWidth * editorClock.TrackLength);
+
+                Debug.Assert(editorClock.TrackLength != null);
+                editorClock.SeekTo(markerPos / DrawWidth * editorClock.TrackLength.Value);
             });
         }
 

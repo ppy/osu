@@ -5,10 +5,10 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Storyboards;
@@ -21,19 +21,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private AudioManager audioManager { get; set; }
 
-        private Track track;
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
-        {
-            var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
-            track = working.Track;
-            return working;
-        }
+            => new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
 
         [Test]
         public void TestNoJudgementsOnRewind()
         {
-            AddUntilStep("wait for track to start running", () => track.IsRunning);
+            AddUntilStep("wait for track to start running", () => MusicController.IsPlaying);
             addSeekStep(3000);
             AddAssert("all judged", () => Player.DrawableRuleset.Playfield.AllHitObjects.All(h => h.Judged));
             AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses >= 7));
@@ -46,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void addSeekStep(double time)
         {
-            AddStep($"seek to {time}", () => track.Seek(time));
+            AddStep($"seek to {time}", () => MusicController.SeekTo(time));
 
             // Allow a few frames of lenience
             AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));

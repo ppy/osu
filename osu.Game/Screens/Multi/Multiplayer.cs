@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Multi
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
         [Resolved]
-        private MusicController music { get; set; }
+        private MusicController musicController { get; set; }
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
@@ -343,15 +343,9 @@ namespace osu.Game.Screens.Multi
         {
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
-                var track = Beatmap.Value?.Track;
-
-                if (track != null)
-                {
-                    track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
-                    track.Looping = true;
-
-                    music.EnsurePlayingSomething();
-                }
+                musicController.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+                musicController.Looping = true;
+                musicController.EnsurePlayingSomething();
             }
             else
             {
@@ -361,13 +355,8 @@ namespace osu.Game.Screens.Multi
 
         private void cancelLooping()
         {
-            var track = Beatmap?.Value?.Track;
-
-            if (track != null)
-            {
-                track.Looping = false;
-                track.RestartPoint = 0;
-            }
+            musicController.Looping = false;
+            musicController.RestartPoint = 0;
         }
 
         protected override void Dispose(bool isDisposing)

@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -46,7 +45,6 @@ namespace osu.Game.Tests.Visual.Navigation
             Player player = null;
 
             WorkingBeatmap beatmap() => Game.Beatmap.Value;
-            Track track() => beatmap().Track;
 
             PushAndConfirm(() => new TestSongSelect());
 
@@ -62,30 +60,27 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
             AddUntilStep("wait for fail", () => player.HasFailed);
 
-            AddUntilStep("wait for track stop", () => !track().IsRunning);
-            AddAssert("Ensure time before preview point", () => track().CurrentTime < beatmap().Metadata.PreviewTime);
+            AddUntilStep("wait for track stop", () => !MusicController.IsPlaying);
+            AddAssert("Ensure time before preview point", () => MusicController.CurrentTrackTime < beatmap().Metadata.PreviewTime);
 
             pushEscape();
 
-            AddUntilStep("wait for track playing", () => track().IsRunning);
-            AddAssert("Ensure time wasn't reset to preview point", () => track().CurrentTime < beatmap().Metadata.PreviewTime);
+            AddUntilStep("wait for track playing", () => MusicController.IsPlaying);
+            AddAssert("Ensure time wasn't reset to preview point", () => MusicController.CurrentTrackTime < beatmap().Metadata.PreviewTime);
         }
 
         [Test]
         public void TestMenuMakesMusic()
         {
-            WorkingBeatmap beatmap() => Game.Beatmap.Value;
-            Track track() => beatmap().Track;
-
             TestSongSelect songSelect = null;
 
             PushAndConfirm(() => songSelect = new TestSongSelect());
 
-            AddUntilStep("wait for no track", () => track() is TrackVirtual);
+            AddUntilStep("wait for no track", () => MusicController.IsDummyDevice);
 
             AddStep("return to menu", () => songSelect.Exit());
 
-            AddUntilStep("wait for track", () => !(track() is TrackVirtual) && track().IsRunning);
+            AddUntilStep("wait for track", () => !MusicController.IsDummyDevice && MusicController.IsPlaying);
         }
 
         [Test]
@@ -140,12 +135,12 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("Wait for music controller", () => Game.MusicController.IsLoaded);
             AddStep("Seek close to end", () =>
             {
-                Game.MusicController.SeekTo(Game.Beatmap.Value.Track.Length - 1000);
-                Game.Beatmap.Value.Track.Completed += () => trackCompleted = true;
+                Game.MusicController.SeekTo(MusicController.TrackLength - 1000);
+                // MusicController.Completed += () => trackCompleted = true;
             });
 
             AddUntilStep("Track was completed", () => trackCompleted);
-            AddUntilStep("Track was restarted", () => Game.Beatmap.Value.Track.IsRunning);
+            AddUntilStep("Track was restarted", () => MusicController.IsPlaying);
         }
 
         private void pushEscape() =>

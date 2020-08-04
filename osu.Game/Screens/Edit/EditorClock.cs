@@ -2,13 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit
 {
@@ -17,7 +20,7 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
-        public readonly double TrackLength;
+        public double? TrackLength { get; private set; }
 
         public ControlPointInfo ControlPointInfo;
 
@@ -25,12 +28,15 @@ namespace osu.Game.Screens.Edit
 
         private readonly DecoupleableInterpolatingFramedClock underlyingClock;
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
-            : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
+            : this(beatmap.Beatmap.ControlPointInfo, null, beatDivisor)
         {
         }
 
-        public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)
+        public EditorClock(ControlPointInfo controlPointInfo, double? trackLength, BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor = beatDivisor;
 
@@ -43,6 +49,13 @@ namespace osu.Game.Screens.Edit
         public EditorClock()
             : this(new ControlPointInfo(), 1000, new BindableBeatDivisor())
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            // Todo: What.
+            TrackLength ??= musicController.TrackLength;
         }
 
         /// <summary>
@@ -135,7 +148,8 @@ namespace osu.Game.Screens.Edit
                 seekTime = timingPoint.Time;
 
             // Ensure the sought point is within the boundaries
-            seekTime = Math.Clamp(seekTime, 0, TrackLength);
+            Debug.Assert(TrackLength != null);
+            seekTime = Math.Clamp(seekTime, 0, TrackLength.Value);
             SeekTo(seekTime);
         }
 

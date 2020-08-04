@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
 using osuTK;
@@ -43,7 +44,8 @@ namespace osu.Game.Screens.Menu
 
         private WorkingBeatmap initialBeatmap;
 
-        protected Track Track => initialBeatmap?.Track;
+        [Resolved]
+        protected MusicController MusicController { get; private set; }
 
         private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
 
@@ -111,7 +113,7 @@ namespace osu.Game.Screens.Menu
                 if (setInfo != null)
                 {
                     initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-                    UsingThemedIntro = !(Track is TrackVirtual);
+                    UsingThemedIntro = !MusicController.IsDummyDevice;
                 }
 
                 return UsingThemedIntro;
@@ -150,7 +152,7 @@ namespace osu.Game.Screens.Menu
         {
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
             if (UsingThemedIntro)
-                Track.Restart();
+                MusicController.Play(true);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

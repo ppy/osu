@@ -30,6 +30,9 @@ namespace osu.Game.Overlays.Music
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         private FilterControl filter;
         private Playlist list;
 
@@ -80,10 +83,7 @@ namespace osu.Game.Overlays.Music
                 BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
 
                 if (toSelect != null)
-                {
                     beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);
-                    beatmap.Value.Track.Restart();
-                }
             };
         }
 
@@ -116,12 +116,12 @@ namespace osu.Game.Overlays.Music
         {
             if (set.ID == (beatmap.Value?.BeatmapSetInfo?.ID ?? -1))
             {
-                beatmap.Value?.Track?.Seek(0);
+                musicController.SeekTo(0);
                 return;
             }
 
             beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
-            beatmap.Value.Track.Restart();
+            musicController.Play(true);
         }
     }
 

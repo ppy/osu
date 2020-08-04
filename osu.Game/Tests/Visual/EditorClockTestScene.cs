@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
             Clock.ControlPointInfo = e.NewValue.Beatmap.ControlPointInfo;
-            Clock.ChangeSource((IAdjustableClock)e.NewValue.Track ?? new StopwatchClock());
+            Clock.ChangeSource(MusicController.GetTrackClock() ?? new StopwatchClock());
             Clock.ProcessFrame();
         }
 
