@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { PlayfieldShift = true };
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { AlignWithStoryboard = true };
 
         protected override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
 
