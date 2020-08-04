@@ -45,7 +45,5 @@ namespace osu.Game.IO.Archives
         }
 
         public override IEnumerable<string> Filenames => archive.Entries.Select(e => e.Key).ExcludeSystemFileNames();
-
-        public override Stream GetUnderlyingStream() => archiveStream;
     }
 }

@@ -16,8 +16,8 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
@@ -27,8 +27,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneScrollingHitObjects : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };
-
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
@@ -80,19 +78,18 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             };
 
-            setUpHitObjects();
+            hitObjectSpawnDelegate?.Cancel();
         });
 
-        private void setUpHitObjects()
+        private void setUpHitObjects() => AddStep("set up hit objects", () =>
         {
             scrollContainers.ForEach(c => c.ControlPoints.Add(new MultiplierControlPoint(0)));
 
             for (int i = spawn_rate / 2; i <= time_range; i += spawn_rate)
                 addHitObject(Time.Current + i);
 
-            hitObjectSpawnDelegate?.Cancel();
             hitObjectSpawnDelegate = Scheduler.AddDelayed(() => addHitObject(Time.Current + time_range), spawn_rate, true);
-        }
+        });
 
         private IList<MultiplierControlPoint> testControlPoints => new List<MultiplierControlPoint>
         {
@@ -104,6 +101,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestScrollAlgorithms()
         {
+            setUpHitObjects();
+
             AddStep("constant scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Constant));
             AddStep("overlapping scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Overlapping));
             AddStep("sequential scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Sequential));
@@ -116,6 +115,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestConstantScrollLifetime()
         {
+            setUpHitObjects();
+
             AddStep("set constant scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Constant));
             // scroll container time range must be less than the rate of spawning hitobjects
             // otherwise the hitobjects will spawn already partly visible on screen and look wrong
@@ -125,14 +126,40 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSequentialScrollLifetime()
         {
+            setUpHitObjects();
+
             AddStep("set sequential scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Sequential));
             AddStep("set time range", () => scrollContainers.ForEach(c => c.TimeRange = time_range / 2.0));
             AddStep("add control points", () => addControlPoints(testControlPoints, Time.Current));
         }
 
         [Test]
+        public void TestSlowSequentialScroll()
+        {
+            AddStep("set sequential scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Sequential));
+            AddStep("set time range", () => scrollContainers.ForEach(c => c.TimeRange = time_range));
+            AddStep("add control points", () => addControlPoints(
+                new List<MultiplierControlPoint>
+                {
+                    new MultiplierControlPoint { Velocity = 0.1 }
+                },
+                Time.Current + time_range));
+
+            // All of the hit objects added below should be immediately visible on screen
+            AddStep("add hit objects", () =>
+            {
+                for (int i = 0; i < 20; ++i)
+                {
+                    addHitObject(Time.Current + time_range * (2 + 0.1 * i));
+                }
+            });
+        }
+
+        [Test]
         public void TestOverlappingScrollLifetime()
         {
+            setUpHitObjects();
+
             AddStep("set overlapping scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Overlapping));
             AddStep("set time range", () => scrollContainers.ForEach(c => c.TimeRange = time_range / 2.0));
             AddStep("add control points", () => addControlPoints(testControlPoints, Time.Current));
@@ -224,7 +251,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestDrawableControlPoint : DrawableHitObject<HitObject>
         {
             public TestDrawableControlPoint(ScrollingDirection direction, double time)
-                : base(new HitObject { StartTime = time })
+                : base(new HitObject { StartTime = time, HitWindows = HitWindows.Empty })
             {
                 Origin = Anchor.Centre;
 
@@ -255,7 +282,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestDrawableHitObject : DrawableHitObject<HitObject>
         {
             public TestDrawableHitObject(double time)
-                : base(new HitObject { StartTime = time })
+                : base(new HitObject { StartTime = time, HitWindows = HitWindows.Empty })
             {
                 Origin = Anchor.Custom;
                 OriginPosition = new Vector2(75 / 4.0f);

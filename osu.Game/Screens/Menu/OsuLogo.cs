@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,7 +15,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public class OsuLogo : BeatSyncedContainer
     {
-        public readonly Color4 OsuPink = OsuColour.FromHex(@"e967a1");
+        public readonly Color4 OsuPink = Color4Extensions.FromHex(@"e967a1");
 
         private const double transition_length = 300;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Menu
         private readonly Container logoBeatContainer;
         private readonly Container logoAmplitudeContainer;
         private readonly Container logoHoverContainer;
-        private readonly LogoVisualisation visualizer;
+        private readonly MenuLogoVisualisation visualizer;
 
         private readonly IntroSequence intro;
 
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Menu
                                             AutoSizeAxes = Axes.Both,
                                             Children = new Drawable[]
                                             {
-                                                visualizer = new LogoVisualisation
+                                                visualizer = new MenuLogoVisualisation
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                     Origin = Anchor.Centre,
@@ -176,8 +176,8 @@ namespace osu.Game.Screens.Menu
                                                                         triangles = new Triangles
                                                                         {
                                                                             TriangleScale = 4,
-                                                                            ColourLight = OsuColour.FromHex(@"ff7db7"),
-                                                                            ColourDark = OsuColour.FromHex(@"de5b95"),
+                                                                            ColourLight = Color4Extensions.FromHex(@"ff7db7"),
+                                                                            ColourDark = Color4Extensions.FromHex(@"de5b95"),
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         },
                                                                     }
@@ -264,7 +264,7 @@ namespace osu.Game.Screens.Menu
 
         private int lastBeatIndex;
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
@@ -330,7 +330,7 @@ namespace osu.Game.Screens.Menu
             if (Beatmap.Value.Track.IsRunning)
             {
                 var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track.CurrentAmplitudes.Maximum : 0;
-                logoAmplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 75, Easing.OutQuint);
+                logoAmplitudeContainer.Scale = new Vector2((float)Interpolation.Damp(logoAmplitudeContainer.Scale.X, 1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 0.9f, Time.Elapsed));
 
                 if (maxAmplitude > velocity_adjust_cutoff)
                     triangles.Velocity = 1 + Math.Max(0, maxAmplitude - velocity_adjust_cutoff) * 50;

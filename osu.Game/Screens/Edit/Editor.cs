@@ -22,7 +22,9 @@ using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
@@ -36,7 +38,7 @@ using osu.Game.Users;
 namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IBeatSnapProvider
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -61,6 +63,7 @@ namespace osu.Game.Screens.Edit
 
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
+        private EditorChangeHandler changeHandler;
 
         private DependencyContainer dependencies;
 
@@ -80,18 +83,33 @@ namespace osu.Game.Screens.Edit
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
-            dependencies.CacheAs<IFrameBasedClock>(clock);
-            dependencies.CacheAs<IAdjustableClock>(clock);
+            dependencies.CacheAs(clock);
+            AddInternal(clock);
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
+            try
+            {
+                playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Could not load beatmap successfully!");
+                // couldn't load, hard abort!
+                this.Exit();
+                return;
+            }
 
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
             dependencies.CacheAs(editorBeatmap);
 
+            changeHandler = new EditorChangeHandler(editorBeatmap);
+            dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
+
             EditorMenuBar menuBar;
+            OsuMenuItem undoMenuItem;
+            OsuMenuItem redoMenuItem;
 
             var fileMenuItems = new List<MenuItem>
             {
@@ -135,6 +153,14 @@ namespace osu.Game.Screens.Edit
                                 new MenuItem("File")
                                 {
                                     Items = fileMenuItems
+                                },
+                                new MenuItem("Edit")
+                                {
+                                    Items = new[]
+                                    {
+                                        undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, Undo),
+                                        redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, Redo)
+                                    }
                                 }
                             }
                         }
@@ -191,6 +217,9 @@ namespace osu.Game.Screens.Edit
                 }
             });
 
+            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+
             menuBar.Mode.ValueChanged += onModeChanged;
 
             bottomBackground.Colour = colours.Gray2;
@@ -200,6 +229,30 @@ namespace osu.Game.Screens.Edit
         {
             base.Update();
             clock.ProcessFrame();
+        }
+
+        public bool OnPressed(PlatformAction action)
+        {
+            switch (action.ActionType)
+            {
+                case PlatformActionType.Undo:
+                    Undo();
+                    return true;
+
+                case PlatformActionType.Redo:
+                    Redo();
+                    return true;
+
+                case PlatformActionType.Save:
+                    saveBeatmap();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(PlatformAction action)
+        {
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -213,15 +266,6 @@ namespace osu.Game.Screens.Edit
                 case Key.Right:
                     seek(e, 1);
                     return true;
-
-                case Key.S:
-                    if (e.ControlPressed)
-                    {
-                        saveBeatmap();
-                        return true;
-                    }
-
-                    break;
             }
 
             return base.OnKeyDown(e);
@@ -231,11 +275,22 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            scrollAccumulation += (e.ScrollDelta.X + e.ScrollDelta.Y) * (e.IsPrecise ? 0.1 : 1);
+            const double precision = 1;
 
-            const int precision = 1;
+            double scrollComponent = e.ScrollDelta.X + e.ScrollDelta.Y;
 
-            while (Math.Abs(scrollAccumulation) > precision)
+            double scrollDirection = Math.Sign(scrollComponent);
+
+            // this is a special case to handle the "pivot" scenario.
+            // if we are precise scrolling in one direction then change our mind and scroll backwards,
+            // the existing accumulation should be applied in the inverse direction to maintain responsiveness.
+            if (Math.Sign(scrollAccumulation) != scrollDirection)
+                scrollAccumulation = scrollDirection * (precision - Math.Abs(scrollAccumulation));
+
+            scrollAccumulation += scrollComponent * (e.IsPrecise ? 0.1 : 1);
+
+            // because we are doing snapped seeking, we need to add up precise scrolls until they accumulate to an arbitrary cut-off.
+            while (Math.Abs(scrollAccumulation) >= precision)
             {
                 if (scrollAccumulation > 0)
                     seek(e, -1);
@@ -284,6 +339,10 @@ namespace osu.Game.Screens.Edit
 
             return base.OnExiting(next);
         }
+
+        protected void Undo() => changeHandler.RestoreState(-1);
+
+        protected void Redo() => changeHandler.RestoreState(1);
 
         private void resetTrack(bool seekToStart = false)
         {

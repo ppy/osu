@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Edit.Timing
             public HeaderText(string text)
             {
                 Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black);
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold);
             }
         }
 

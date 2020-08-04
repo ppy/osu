@@ -7,12 +7,12 @@ using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
 {
-    public class EditBodyPiece : BodyPiece
+    public class EditBodyPiece : DefaultBodyPiece
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AccentColour = colours.Yellow;
+            AccentColour.Value = colours.Yellow;
 
             Background.Alpha = 0.5f;
             Foreground.Alpha = 0;

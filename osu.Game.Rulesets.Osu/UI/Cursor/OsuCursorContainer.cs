@@ -30,7 +30,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Drawable cursorTrail;
 
-        public Bindable<float> CursorScale = new BindableFloat(1);
+        public IBindable<float> CursorScale => cursorScale;
+
+        private readonly Bindable<float> cursorScale = new BindableFloat(1);
 
         private Bindable<float> userCursorScale;
         private Bindable<bool> autoCursorScale;
@@ -68,13 +70,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
             autoCursorScale.ValueChanged += _ => calculateScale();
 
-            CursorScale.ValueChanged += e =>
+            CursorScale.BindValueChanged(e =>
             {
                 var newScale = new Vector2(e.NewValue);
 
                 ActiveCursor.Scale = newScale;
                 cursorTrail.Scale = newScale;
-            };
+            }, true);
 
             calculateScale();
         }
@@ -95,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 scale *= GetScaleForCircleSize(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
             }
 
-            CursorScale.Value = scale;
+            cursorScale.Value = scale;
 
             var newScale = new Vector2(scale);
 

@@ -43,5 +43,25 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description(@"Perfect")]
         Perfect,
+
+        /// <summary>
+        /// Indicates small tick miss.
+        /// </summary>
+        SmallTickMiss,
+
+        /// <summary>
+        /// Indicates a small tick hit.
+        /// </summary>
+        SmallTickHit,
+
+        /// <summary>
+        /// Indicates a large tick miss.
+        /// </summary>
+        LargeTickMiss,
+
+        /// <summary>
+        /// Indicates a large tick hit.
+        /// </summary>
+        LargeTickHit
     }
 }

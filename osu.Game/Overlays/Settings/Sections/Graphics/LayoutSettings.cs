@@ -209,15 +209,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private IReadOnlyList<Size> getResolutions()
         {
             var resolutions = new List<Size> { new Size(9999, 9999) };
+            var currentDisplay = game.Window?.CurrentDisplay.Value;
 
-            if (game.Window != null)
+            if (currentDisplay != null)
             {
-                resolutions.AddRange(game.Window.AvailableResolutions
-                                         .Where(r => r.Width >= 800 && r.Height >= 600)
-                                         .OrderByDescending(r => r.Width)
-                                         .ThenByDescending(r => r.Height)
-                                         .Select(res => new Size(res.Width, res.Height))
-                                         .Distinct());
+                resolutions.AddRange(currentDisplay.DisplayModes
+                                                   .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
+                                                   .OrderByDescending(m => m.Size.Width)
+                                                   .ThenByDescending(m => m.Size.Height)
+                                                   .Select(m => m.Size)
+                                                   .Distinct());
             }
 
             return resolutions;

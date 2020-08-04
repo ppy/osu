@@ -78,10 +78,10 @@ namespace osu.Game.Screens.Play
 
             // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
             // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new FramedOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+            platformOffsetClock = new HardwareCorrectionOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
             // the final usable gameplay clock with user-set offsets applied.
-            userOffsetClock = new FramedOffsetClock(platformOffsetClock);
+            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock);
 
             // the clock to be exposed via DI to children.
             GameplayClock = new GameplayClock(userOffsetClock);
@@ -123,6 +123,10 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
+            // The Reset() call below causes speed adjustments to be reset in an async context, leading to deadlocks.
+            // The deadlock can be prevented by resetting the track synchronously before entering the async context.
+            track.ResetSpeedAdjustments();
+
             Task.Run(() =>
             {
                 track.Reset();
@@ -242,6 +246,18 @@ namespace osu.Game.Screens.Play
             {
                 track.ResetSpeedAdjustments();
                 speedAdjustmentsApplied = false;
+            }
+        }
+
+        private class HardwareCorrectionOffsetClock : FramedOffsetClock
+        {
+            // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
+            // base implementation already adds offset at 1.0 rate, so we only add the difference from that here.
+            public override double CurrentTime => base.CurrentTime + Offset * (Rate - 1);
+
+            public HardwareCorrectionOffsetClock(IClock source, bool processSource = true)
+                : base(source, processSource)
+            {
             }
         }
     }

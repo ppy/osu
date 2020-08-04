@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -59,7 +58,7 @@ namespace osu.Game.Screens.Multi.Play
             if (!playlistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
 
-            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
+            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID, Game.VersionHash);
             req.Success += r => token = r.ID;
             req.Failure += e =>
             {
@@ -90,23 +89,25 @@ namespace osu.Game.Screens.Multi.Play
             return false;
         }
 
-        protected override ScoreInfo CreateScore()
+        protected override ResultsScreen CreateResults(ScoreInfo score)
         {
-            submitScore();
-            return base.CreateScore();
+            Debug.Assert(roomId.Value != null);
+            return new TimeshiftResultsScreen(score, roomId.Value.Value, playlistItem);
         }
 
-        private void submitScore()
+        protected override ScoreInfo CreateScore()
         {
             var score = base.CreateScore();
-
             score.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
 
             Debug.Assert(token != null);
 
             var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score);
+            request.Success += s => score.OnlineScoreID = s.ID;
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
+
+            return score;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -115,7 +116,5 @@ namespace osu.Game.Screens.Multi.Play
 
             Exited = null;
         }
-
-        protected override Results CreateResults(ScoreInfo score) => new MatchResults(score);
     }
 }

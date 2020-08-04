@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var beatmap = decodeAsJson(normal);
 
-            var curveData = beatmap.HitObjects[0] as IHasCurve;
+            var curveData = beatmap.HitObjects[0] as IHasPathWithRepeats;
             var positionData = beatmap.HitObjects[0] as IHasPosition;
 
             Assert.IsNotNull(positionData);
@@ -125,6 +125,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
                                      // Todo: CustomSampleBank shouldn't exist going forward, we need a conversion mechanism
                                      || r.Name == nameof(LegacyDecoder<Beatmap>.LegacySampleControlPoint.CustomSampleBank))
                 .Assert();
+        }
+
+        [Test]
+        public void TestGetJsonDecoder()
+        {
+            Decoder<Beatmap> decoder;
+
+            using (var stream = TestResources.OpenResource(normal))
+            using (var sr = new LineBufferedReader(stream))
+            {
+                var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
+
+                using (var memStream = new MemoryStream())
+                using (var memWriter = new StreamWriter(memStream))
+                using (var memReader = new LineBufferedReader(memStream))
+                {
+                    memWriter.Write(legacyDecoded.Serialize());
+                    memWriter.Flush();
+
+                    memStream.Position = 0;
+                    decoder = Decoder.GetDecoder<Beatmap>(memReader);
+                }
+            }
+
+            Assert.IsInstanceOf(typeof(JsonBeatmapDecoder), decoder);
         }
 
         /// <summary>

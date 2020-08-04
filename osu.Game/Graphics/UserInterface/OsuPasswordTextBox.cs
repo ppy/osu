@@ -18,7 +18,13 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuPasswordTextBox : OsuTextBox, ISuppressKeyEventLogging
     {
-        protected override Drawable GetDrawableCharacter(char c) => new PasswordMaskChar(CalculatedTextSize);
+        protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
+        {
+            AutoSizeAxes = Axes.Both,
+            Child = new PasswordMaskChar(CalculatedTextSize),
+        };
+
+        protected override bool AllowUniqueCharacterSamples => false;
 
         protected override bool AllowClipboardExport => false;
 

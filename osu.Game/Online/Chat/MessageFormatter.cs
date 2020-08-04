@@ -78,13 +78,13 @@ namespace osu.Game.Online.Chat
                 {
                     result.Text = result.Text.Remove(index, m.Length).Insert(index, displayText);
 
-                    //since we just changed the line display text, offset any already processed links.
+                    // since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
                     var details = GetLinkDetails(linkText);
                     result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.Action, details.Argument));
 
-                    //adjust the offset for processing the current matches group.
+                    // adjust the offset for processing the current matches group.
                     captureOffset += m.Length - displayText.Length;
                 }
             }

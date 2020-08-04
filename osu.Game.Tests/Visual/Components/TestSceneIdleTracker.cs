@@ -12,7 +12,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Components
 {
     [TestFixture]
-    public class TestSceneIdleTracker : ManualInputManagerTestScene
+    public class TestSceneIdleTracker : OsuManualInputManagerTestScene
     {
         private IdleTrackingBox box1;
         private IdleTrackingBox box2;

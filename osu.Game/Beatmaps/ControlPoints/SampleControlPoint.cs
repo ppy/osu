@@ -10,6 +10,12 @@ namespace osu.Game.Beatmaps.ControlPoints
     {
         public const string DEFAULT_BANK = "normal";
 
+        public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
+        {
+            SampleBankBindable = { Disabled = true },
+            SampleVolumeBindable = { Disabled = true }
+        };
+
         /// <summary>
         /// The default sample bank at this control point.
         /// </summary>
@@ -68,8 +74,9 @@ namespace osu.Game.Beatmaps.ControlPoints
             return newSampleInfo;
         }
 
-        public override bool EquivalentTo(ControlPoint other) =>
-            other is SampleControlPoint otherTyped &&
-            SampleBank == otherTyped.SampleBank && SampleVolume == otherTyped.SampleVolume;
+        public override bool IsRedundant(ControlPoint existing)
+            => existing is SampleControlPoint existingSample
+               && SampleBank == existingSample.SampleBank
+               && SampleVolume == existingSample.SampleVolume;
     }
 }

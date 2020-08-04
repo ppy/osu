@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.Multi;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 
@@ -16,6 +16,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public TestSceneOverlinedPlaylist()
         {
+            Room = new Room { RoomID = { Value = 7 } };
+
             for (int i = 0; i < 10; i++)
             {
                 Room.Playlist.Add(new PlaylistItem
@@ -26,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             }
 
-            Add(new OverlinedPlaylist(false)
+            Add(new DrawableRoomPlaylist(false, false)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

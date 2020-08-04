@@ -15,6 +15,9 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModPerfect;
         public override string Description => "SS or quit.";
 
-        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => result.Type != result.Judgement.MaxResult;
+        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+            => !(result.Judgement is IgnoreJudgement)
+               && result.Judgement.AffectsCombo
+               && result.Type != result.Judgement.MaxResult;
     }
 }

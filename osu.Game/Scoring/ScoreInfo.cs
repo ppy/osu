@@ -115,9 +115,7 @@ namespace osu.Game.Scoring
             get => User?.Username;
             set
             {
-                if (User == null)
-                    User = new User();
-
+                User ??= new User();
                 User.Username = value;
             }
         }
@@ -129,9 +127,7 @@ namespace osu.Game.Scoring
             get => User?.Id ?? 1;
             set
             {
-                if (User == null)
-                    User = new User();
-
+                User ??= new User();
                 User.Id = value ?? 1;
             }
         }
@@ -170,6 +166,10 @@ namespace osu.Game.Scoring
             }
         }
 
+        [NotMapped]
+        [JsonIgnore]
+        public List<HitEvent> HitEvents { get; set; }
+
         [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }
 
@@ -178,6 +178,13 @@ namespace osu.Game.Scoring
 
         [JsonIgnore]
         public bool DeletePending { get; set; }
+
+        /// <summary>
+        /// The position of this score, starting at 1.
+        /// </summary>
+        [NotMapped]
+        [JsonProperty("position")]
+        public int? Position { get; set; }
 
         [Serializable]
         protected class DeserializedMod : IMod

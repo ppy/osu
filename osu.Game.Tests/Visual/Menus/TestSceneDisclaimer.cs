@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Menus
                 API.LocalUser.Value = new User
                 {
                     Username = API.LocalUser.Value.Username,
-                    Id = API.LocalUser.Value.Id,
+                    Id = API.LocalUser.Value.Id + 1,
                     IsSupporter = !API.LocalUser.Value.IsSupporter,
                 };
             });

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -10,7 +11,7 @@ namespace osu.Game.Screens.Play
         private readonly Score score;
 
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
-        protected override bool AllowFail => false;
+        protected override bool CheckModsAllowFailure() => false;
 
         public ReplayPlayer(Score score, bool allowPause = true, bool showResults = true)
             : base(allowPause, showResults)
@@ -18,12 +19,21 @@ namespace osu.Game.Screens.Play
             this.score = score;
         }
 
-        protected override void LoadComplete()
+        protected override void PrepareReplay()
         {
-            base.LoadComplete();
             DrawableRuleset?.SetReplayScore(score);
         }
 
-        protected override ScoreInfo CreateScore() => score.ScoreInfo;
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
+
+        protected override ScoreInfo CreateScore()
+        {
+            var baseScore = base.CreateScore();
+
+            // Since the replay score doesn't contain statistics, we'll pass them through here.
+            score.ScoreInfo.HitEvents = baseScore.HitEvents;
+
+            return score.ScoreInfo;
+        }
     }
 }

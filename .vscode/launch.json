@@ -11,11 +11,6 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Debug)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
         },
         {
@@ -28,11 +23,6 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Release)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
         },
         {
@@ -45,11 +35,6 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tests (Debug)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
         },
         {
@@ -62,11 +47,6 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tests (Release)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
         },
         {
@@ -80,11 +60,6 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Debug)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
         },
         {
@@ -98,11 +73,6 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Release)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
         },
         {
@@ -116,11 +86,6 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tournament tests (Debug)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
         },
         {
@@ -134,11 +99,6 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tournament tests (Release)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
         },
         {

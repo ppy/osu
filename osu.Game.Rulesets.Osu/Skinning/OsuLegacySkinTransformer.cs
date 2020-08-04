@@ -2,21 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
-using osu.Game.Audio;
 using osu.Game.Skinning;
 using osuTK;
 using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
-    public class OsuLegacySkinTransformer : ISkin
+    public class OsuLegacySkinTransformer : LegacySkinTransformer
     {
-        private readonly ISkin source;
-
         private Lazy<bool> hasHitCircle;
 
         /// <summary>
@@ -27,19 +22,18 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public const float LEGACY_CIRCLE_RADIUS = 64 - 5;
 
         public OsuLegacySkinTransformer(ISkinSource source)
+            : base(source)
         {
-            this.source = source;
-
-            source.SourceChanged += sourceChanged;
+            Source.SourceChanged += sourceChanged;
             sourceChanged();
         }
 
         private void sourceChanged()
         {
-            hasHitCircle = new Lazy<bool>(() => source.GetTexture("hitcircle") != null);
+            hasHitCircle = new Lazy<bool>(() => Source.GetTexture("hitcircle") != null);
         }
 
-        public Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             if (!(component is OsuSkinComponent osuComponent))
                 return null;
@@ -47,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             switch (osuComponent.Component)
             {
                 case OsuSkinComponents.FollowPoint:
-                    return this.GetAnimation(component.LookupName, true, false, true);
+                    return this.GetAnimation(component.LookupName, true, false, true, startAtCurrentTime: false);
 
                 case OsuSkinComponents.SliderFollowCircle:
                     var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
@@ -63,23 +57,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
 
                     if (sliderBallContent != null)
-                    {
-                        var size = sliderBallContent.Size;
-
-                        sliderBallContent.RelativeSizeAxes = Axes.Both;
-                        sliderBallContent.Size = Vector2.One;
-
-                        return new LegacySliderBall(sliderBallContent)
-                        {
-                            Size = size
-                        };
-                    }
+                        return new LegacySliderBall(sliderBallContent);
 
                     return null;
 
                 case OsuSkinComponents.SliderBody:
                     if (hasHitCircle.Value)
                         return new LegacySliderBody();
+
+                    return null;
+
+                case OsuSkinComponents.SliderHeadHitCircle:
+                    if (hasHitCircle.Value)
+                        return new LegacyMainCirclePiece("sliderstartcircle");
 
                     return null;
 
@@ -90,44 +80,50 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     return null;
 
                 case OsuSkinComponents.Cursor:
-                    if (source.GetTexture("cursor") != null)
+                    if (Source.GetTexture("cursor") != null)
                         return new LegacyCursor();
 
                     return null;
 
                 case OsuSkinComponents.CursorTrail:
-                    if (source.GetTexture("cursortrail") != null)
+                    if (Source.GetTexture("cursortrail") != null)
                         return new LegacyCursorTrail();
 
                     return null;
 
                 case OsuSkinComponents.HitCircleText:
                     var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCirclePrefix)?.Value ?? "default";
-                    var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? 0;
+                    var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? -2;
 
                     return !hasFont(font)
                         ? null
-                        : new LegacySpriteText(source, font)
+                        : new LegacySpriteText(Source, font)
                         {
                             // stable applies a blanket 0.8x scale to hitcircle fonts
                             Scale = new Vector2(0.8f),
                             Spacing = new Vector2(-overlap, 0)
                         };
+
+                case OsuSkinComponents.SpinnerBody:
+                    bool hasBackground = Source.GetTexture("spinner-background") != null;
+
+                    if (Source.GetTexture("spinner-top") != null && !hasBackground)
+                        return new LegacyNewStyleSpinner();
+                    else if (hasBackground)
+                        return new LegacyOldStyleSpinner();
+
+                    return null;
             }
 
             return null;
         }
 
-        public Texture GetTexture(string componentName) => source.GetTexture(componentName);
-
-        public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
-
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
             {
                 case OsuSkinColour colour:
-                    return source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    return Source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
 
                 case OsuSkinConfiguration osuLookup:
                     switch (osuLookup)
@@ -138,7 +134,13 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                             break;
 
-                        case OsuSkinConfiguration.ExpandNumberPiece:
+                        case OsuSkinConfiguration.HitCircleOverlayAboveNumber:
+                            // See https://osu.ppy.sh/help/wiki/Skinning/skin.ini#%5Bgeneral%5D
+                            // HitCircleOverlayAboveNumer (with typo) should still be supported for now.
+                            return Source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber) ??
+                                   Source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);
+                        
+						case OsuSkinConfiguration.ExpandNumberPiece:
                             bool expand = !(source.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value >= 2.0m);
                             return SkinUtils.As<TValue>(new BindableBool(expand));
                     }
@@ -146,9 +148,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     break;
             }
 
-            return source.GetConfig<TLookup, TValue>(lookup);
+            return Source.GetConfig<TLookup, TValue>(lookup);
         }
 
-        private bool hasFont(string fontName) => source.GetTexture($"{fontName}-0") != null;
+        private bool hasFont(string fontName) => Source.GetTexture($"{fontName}-0") != null;
     }
 }

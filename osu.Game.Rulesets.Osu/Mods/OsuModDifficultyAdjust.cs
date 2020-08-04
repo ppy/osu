@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableNumber<float> CircleSize { get; } = new BindableFloat
         {
             Precision = 0.1f,
-            MinValue = 1,
+            MinValue = 0,
             MaxValue = 10,
             Default = 5,
             Value = 5,
@@ -24,11 +25,27 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableNumber<float> ApproachRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
-            MinValue = 1,
+            MinValue = 0,
             MaxValue = 10,
             Default = 5,
             Value = 5,
         };
+
+        public override string SettingDescription
+        {
+            get
+            {
+                string circleSize = CircleSize.IsDefault ? string.Empty : $"CS {CircleSize.Value:N1}";
+                string approachRate = ApproachRate.IsDefault ? string.Empty : $"AR {ApproachRate.Value:N1}";
+
+                return string.Join(", ", new[]
+                {
+                    circleSize,
+                    base.SettingDescription,
+                    approachRate
+                }.Where(s => !string.IsNullOrEmpty(s)));
+            }
+        }
 
         protected override void TransferSettings(BeatmapDifficulty difficulty)
         {

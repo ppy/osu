@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
+        protected override bool IsFirstHideableObject(DrawableHitObject hitObject) => !(hitObject is DrawableSpinner);
+
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             static void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
@@ -80,9 +82,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
-                    spinner.Disc.Hide();
-                    spinner.Ticks.Hide();
-                    spinner.Background.Hide();
+                    // todo: hide background
 
                     using (spinner.BeginAbsoluteSequence(fadeOutStartTime + longFadeDuration, true))
                         spinner.FadeOut(fadeOutDuration);

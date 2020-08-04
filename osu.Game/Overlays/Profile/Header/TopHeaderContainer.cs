@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -170,7 +171,7 @@ namespace osu.Game.Overlays.Profile.Header
             userCountryText.Text = user?.Country?.FullName ?? "Alien";
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
-            titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
+            titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
 
             userStats.Clear();
 
