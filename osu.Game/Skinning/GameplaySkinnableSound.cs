@@ -29,11 +29,11 @@ namespace osu.Game.Skinning
 
         private IBindable<bool> gameplayPaused;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(GameplayClock gameplayClock)
         {
-            gameplayPaused = gameplayClock.IsPaused.GetBoundCopy();
-            gameplayPaused.BindValueChanged(paused =>
+            gameplayPaused = gameplayClock?.IsPaused.GetBoundCopy();
+            gameplayPaused?.BindValueChanged(paused =>
             {
                 if (requestedPlaying)
                 {
