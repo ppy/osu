@@ -11,16 +11,17 @@ namespace osu.Game.Rulesets.Osu.UI
     public class OsuPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
         protected override Container<Drawable> Content => content;
-        private readonly Container content;
+        private readonly ScalingContainer content;
 
         private const float playfield_size_adjust = 0.8f;
 
         /// <summary>
-        /// Whether an osu-stable playfield offset should be applied (8 osu!pixels)
+        /// When true, an offset is applied to allow alignment with historical storyboards displayed in the same parent space.
+        /// This will shift the playfield downwards slightly.
         /// </summary>
-        public bool PlayfieldShift
+        public bool AlignWithStoryboard
         {
-            set => ((ScalingContainer)content).PlayfieldShift = value;
+            set => content.PlayfieldShift = value;
         }
 
         public OsuPlayfieldAdjustmentContainer()
@@ -65,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 // Scale = 819.2 / 512
                 // Scale = 1.6
                 Scale = new Vector2(Parent.ChildSize.X / OsuPlayfield.BASE_SIZE.X);
-                Position = new Vector2(0, (PlayfieldShift ? 8f : 0f) * Parent.ChildSize.Y / OsuPlayfield.BASE_SIZE.Y);
+                Position = new Vector2(0, (PlayfieldShift ? 8f : 0f) * Scale.X);
                 // Size = 0.625
                 Size = Vector2.Divide(Vector2.One, Scale);
             }
