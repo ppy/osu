@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
@@ -49,6 +50,9 @@ namespace osu.Game.Screens.Multi
 
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
+
+        [Resolved]
+        private MusicController music { get; set; }
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
@@ -346,8 +350,7 @@ namespace osu.Game.Screens.Multi
                     track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                     track.Looping = true;
 
-                    if (!track.IsRunning)
-                        track.Restart();
+                    music.EnsurePlayingSomething();
                 }
             }
             else
