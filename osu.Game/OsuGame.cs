@@ -554,8 +554,8 @@ namespace osu.Game
             Container logoContainer;
             BackButton.Receptor receptor;
 
-            dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
             dependencies.CacheAs(MusicController = new MusicController());
+            dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
             AddRange(new Drawable[]
             {
