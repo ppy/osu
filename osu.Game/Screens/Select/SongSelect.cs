@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics.UserInterface;
@@ -560,9 +561,9 @@ namespace osu.Game.Screens.Select
 
             BeatmapDetails.Refresh();
 
-            if (music != null)
+            if (music?.CurrentTrack != null)
             {
-                music.Looping = true;
+                music.CurrentTrack.Looping = true;
                 music.ResetTrackAdjustments();
             }
 
@@ -588,8 +589,8 @@ namespace osu.Game.Screens.Select
 
             BeatmapOptions.Hide();
 
-            if (music != null)
-                music.Looping = false;
+            if (music?.CurrentTrack != null)
+                music.CurrentTrack.Looping = false;
 
             this.ScaleTo(1.1f, 250, Easing.InSine);
 
@@ -610,8 +611,8 @@ namespace osu.Game.Screens.Select
 
             FilterControl.Deactivate();
 
-            if (music != null)
-                music.Looping = false;
+            if (music?.CurrentTrack != null)
+                music.CurrentTrack.Looping = false;
 
             return false;
         }
@@ -652,9 +653,11 @@ namespace osu.Game.Screens.Select
 
             BeatmapDetails.Beatmap = beatmap;
 
-            if (music != null)
-                music.Looping = false;
+            if (music?.CurrentTrack != null)
+                music.CurrentTrack.Looping = false;
         }
+
+        private readonly WeakReference<ITrack> lastTrack = new WeakReference<ITrack>(null);
 
         /// <summary>
         /// Ensures some music is playing for the current track.
@@ -662,8 +665,18 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private void ensurePlayingSelected()
         {
-            music.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
-            music.EnsurePlayingSomething();
+            ITrack track = music?.CurrentTrack;
+            if (track == null)
+                return;
+
+            bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
+
+            track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+
+            if (!track.IsRunning && (music?.IsUserPaused != true || isNewTrack))
+                music?.Play(true);
+
+            lastTrack.SetTarget(track);
         }
 
         private void carouselBeatmapsLoaded()

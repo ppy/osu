@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -30,12 +31,11 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableDouble trackFreq = new BindableDouble(1);
 
+        private DrawableTrack track;
+
         private const float duration = 2500;
 
         private SampleChannel failSample;
-
-        [Resolved]
-        private MusicController musicController { get; set; }
 
         public FailAnimation(DrawableRuleset drawableRuleset)
         {
@@ -43,8 +43,9 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, IBindable<WorkingBeatmap> beatmap)
+        private void load(AudioManager audio, IBindable<WorkingBeatmap> beatmap, MusicController musicController)
         {
+            track = musicController.CurrentTrack;
             failSample = audio.Samples.Get(@"Gameplay/failsound");
         }
 
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.Play
                 Expire();
             });
 
-            musicController.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
+            track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
 
             applyToPlayfield(drawableRuleset.Playfield);
             drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
@@ -107,7 +108,7 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            musicController?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
         }
     }
 }

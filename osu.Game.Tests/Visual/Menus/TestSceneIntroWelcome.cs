@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             AddUntilStep("wait for load", () => MusicController.TrackLoaded);
 
-            AddAssert("check if menu music loops", () => MusicController.Looping);
+            AddAssert("check if menu music loops", () => MusicController.CurrentTrack?.Looping == true);
         }
     }
 }

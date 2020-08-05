@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -61,12 +62,12 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for fail", () => player.HasFailed);
 
             AddUntilStep("wait for track stop", () => !MusicController.IsPlaying);
-            AddAssert("Ensure time before preview point", () => MusicController.CurrentTrackTime < beatmap().Metadata.PreviewTime);
+            AddAssert("Ensure time before preview point", () => MusicController.CurrentTrack?.CurrentTime < beatmap().Metadata.PreviewTime);
 
             pushEscape();
 
             AddUntilStep("wait for track playing", () => MusicController.IsPlaying);
-            AddAssert("Ensure time wasn't reset to preview point", () => MusicController.CurrentTrackTime < beatmap().Metadata.PreviewTime);
+            AddAssert("Ensure time wasn't reset to preview point", () => MusicController.CurrentTrack?.CurrentTime < beatmap().Metadata.PreviewTime);
         }
 
         [Test]
@@ -76,11 +77,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
             PushAndConfirm(() => songSelect = new TestSongSelect());
 
-            AddUntilStep("wait for no track", () => MusicController.IsDummyDevice);
+            AddUntilStep("wait for no track", () => MusicController.CurrentTrack?.IsDummyDevice == true);
 
             AddStep("return to menu", () => songSelect.Exit());
 
-            AddUntilStep("wait for track", () => !MusicController.IsDummyDevice && MusicController.IsPlaying);
+            AddUntilStep("wait for track", () => MusicController.CurrentTrack?.IsDummyDevice == false && MusicController.IsPlaying);
         }
 
         [Test]
@@ -135,8 +136,8 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("Wait for music controller", () => Game.MusicController.IsLoaded);
             AddStep("Seek close to end", () =>
             {
-                Game.MusicController.SeekTo(MusicController.TrackLength - 1000);
-                // MusicController.Completed += () => trackCompleted = true;
+                Game.MusicController.SeekTo(MusicController.CurrentTrack.AsNonNull().Length - 1000);
+                MusicController.CurrentTrack.AsNonNull().Completed += () => trackCompleted = true;
             });
 
             AddUntilStep("Track was completed", () => trackCompleted);

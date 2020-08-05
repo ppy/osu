@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osuTK;
@@ -57,7 +58,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 return;
             }
 
-            content.RelativeChildSize = new Vector2((float)Math.Max(1, musicController.TrackLength), 1);
+            Debug.Assert(musicController.CurrentTrack != null);
+            content.RelativeChildSize = new Vector2((float)Math.Max(1, musicController.CurrentTrack.Length), 1);
         }
 
         protected virtual void LoadBeatmap(WorkingBeatmap beatmap)

@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -27,8 +29,7 @@ namespace osu.Game.Screens.Play
         private readonly WorkingBeatmap beatmap;
         private readonly IReadOnlyList<Mod> mods;
 
-        [Resolved]
-        private MusicController musicController { get; set; }
+        private DrawableTrack track;
 
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -95,8 +96,10 @@ namespace osu.Game.Screens.Play
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, MusicController musicController)
         {
+            track = musicController.CurrentTrack;
+
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
 
@@ -121,15 +124,15 @@ namespace osu.Game.Screens.Play
         {
             // The Reset() call below causes speed adjustments to be reset in an async context, leading to deadlocks.
             // The deadlock can be prevented by resetting the track synchronously before entering the async context.
-            musicController.Reset();
+            track.ResetSpeedAdjustments();
 
             Task.Run(() =>
             {
-                musicController.Reset();
+                track.Reset();
 
                 Schedule(() =>
                 {
-                    adjustableClock.ChangeSource(musicController.GetTrackClock());
+                    adjustableClock.ChangeSource(track);
                     updateRate();
 
                     if (!IsPaused.Value)
@@ -190,6 +193,20 @@ namespace osu.Game.Screens.Play
             IsPaused.Value = true;
         }
 
+        /// <summary>
+        /// Changes the backing clock to avoid using the originally provided track.
+        /// </summary>
+        public void StopUsingBeatmapClock()
+        {
+            if (track == null)
+                return;
+
+            removeSourceClockAdjustments();
+
+            track = new DrawableTrack(new TrackVirtual(track.Length));
+            adjustableClock.ChangeSource(track);
+        }
+
         protected override void Update()
         {
             if (!IsPaused.Value)
@@ -202,23 +219,30 @@ namespace osu.Game.Screens.Play
 
         private void updateRate()
         {
+            if (track == null) return;
+
             speedAdjustmentsApplied = true;
-            musicController.ResetTrackAdjustments();
-            musicController.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            musicController.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.ResetSpeedAdjustments();
+
+            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+
+            foreach (var mod in mods.OfType<IApplicableToTrack>())
+                mod.ApplyToTrack(track);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
             removeSourceClockAdjustments();
+            track = null;
         }
 
         private void removeSourceClockAdjustments()
         {
             if (speedAdjustmentsApplied)
             {
-                musicController.ResetTrackAdjustments();
+                track.ResetSpeedAdjustments();
                 speedAdjustmentsApplied = false;
             }
         }

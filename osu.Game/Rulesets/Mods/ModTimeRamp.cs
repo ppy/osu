@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private Track track;
+        private ITrack track;
 
         protected ModTimeRamp()
         {
@@ -51,9 +51,9 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
-        public void ApplyToTrack(ITrack track)
+        public void ApplyToTrack<T>(T track) where T : ITrack, IAdjustableAudioComponent
         {
-            this.track = track as Track;
+            this.track = track;
 
             FinalRate.TriggerChange();
             AdjustPitch.TriggerChange();
@@ -89,9 +89,9 @@ namespace osu.Game.Rulesets.Mods
         private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
         {
             // remove existing old adjustment
-            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+            (track as IAdjustableAudioComponent)?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
 
-            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+            (track as IAdjustableAudioComponent)?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
         }
 
         private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)

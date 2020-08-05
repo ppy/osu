@@ -87,9 +87,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void restart()
         {
-            MusicController.Reset();
+            MusicController.CurrentTrack?.Reset();
             loadStoryboard(Beatmap.Value);
-            MusicController.Play(true);
+            MusicController.CurrentTrack?.Start();
         }
 
         private void loadStoryboard(WorkingBeatmap working)
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
-            decoupledClock.ChangeSource(musicController.GetTrackClock());
+            decoupledClock.ChangeSource(musicController.CurrentTrack);
         }
 
         private void loadStoryboardNoVideo()
@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             storyboard = sb.CreateDrawable(Beatmap.Value);
 
             storyboardContainer.Add(storyboard);
-            decoupledClock.ChangeSource(musicController.GetTrackClock());
+            decoupledClock.ChangeSource(musicController.CurrentTrack);
         }
     }
 }
