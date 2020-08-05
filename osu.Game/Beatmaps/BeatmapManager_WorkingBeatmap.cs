@@ -19,13 +19,18 @@ namespace osu.Game.Beatmaps
     {
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
+            public readonly TextureStore TextureStore;
+            public readonly ITrackStore TrackStore;
+
             private readonly IResourceStore<byte[]> store;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
+            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, ITrackStore trackStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
                 : base(beatmapInfo, audioManager)
             {
                 this.store = store;
-                this.textureStore = textureStore;
+
+                TextureStore = textureStore;
+                TrackStore = trackStore;
             }
 
             protected override IBeatmap GetBeatmap()
@@ -44,10 +49,6 @@ namespace osu.Game.Beatmaps
 
             private string getPathForFile(string filename) => BeatmapSetInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
-            private TextureStore textureStore;
-
-            private ITrackStore trackStore;
-
             protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
 
             protected override Texture GetBackground()
@@ -57,7 +58,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return textureStore.Get(getPathForFile(Metadata.BackgroundFile));
+                    return TextureStore.Get(getPathForFile(Metadata.BackgroundFile));
                 }
                 catch (Exception e)
                 {
@@ -70,7 +71,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return (trackStore ??= AudioManager.GetTrackStore(store)).Get(getPathForFile(Metadata.AudioFile));
+                    return TrackStore.Get(getPathForFile(Metadata.AudioFile));
                 }
                 catch (Exception e)
                 {

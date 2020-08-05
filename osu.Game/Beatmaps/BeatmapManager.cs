@@ -218,7 +218,7 @@ namespace osu.Game.Beatmaps
             removeWorkingCache(info);
         }
 
-        private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
+        private readonly WeakList<BeatmapManagerWorkingBeatmap> workingCache = new WeakList<BeatmapManagerWorkingBeatmap>();
 
         /// <summary>
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
@@ -246,16 +246,19 @@ namespace osu.Game.Beatmaps
             lock (workingCache)
             {
                 var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+                if (working != null)
+                    return working;
 
-                if (working == null)
-                {
-                    beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
+                beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
-                    workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store,
-                        new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager));
-                }
+                ITrackStore trackStore = workingCache.FirstOrDefault(b => b.BeatmapInfo.AudioEquals(beatmapInfo))?.TrackStore;
+                TextureStore textureStore = workingCache.FirstOrDefault(b => b.BeatmapInfo.BackgroundEquals(beatmapInfo))?.TextureStore;
 
-                // previous?.TransferTo(working);
+                textureStore ??= new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
+                trackStore ??= audioManager.GetTrackStore(Files.Store);
+
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, textureStore, trackStore, beatmapInfo, audioManager));
+
                 return working;
             }
         }
