@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
 using osuTK;
-using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -139,10 +138,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             // HitCircleOverlayAboveNumer (with typo) should still be supported for now.
                             return Source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber) ??
                                    Source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);
-                        
-						case OsuSkinConfiguration.ExpandNumberPiece:
-                            bool expand = !(source.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value >= 2.0m);
-                            return SkinUtils.As<TValue>(new BindableBool(expand));
                     }
 
                     break;
