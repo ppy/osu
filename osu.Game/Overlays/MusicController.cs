@@ -320,6 +320,18 @@ namespace osu.Game.Overlays
 
             current = beatmap.NewValue;
 
+            if (!beatmap.OldValue.BeatmapInfo.AudioEquals(current?.BeatmapInfo))
+                changeTrack();
+
+            TrackChanged?.Invoke(current, direction);
+
+            ResetTrackAdjustments();
+
+            queuedDirection = null;
+        }
+
+        private void changeTrack()
+        {
             CurrentTrack?.Expire();
             CurrentTrack = null;
 
@@ -328,12 +340,6 @@ namespace osu.Game.Overlays
                 trackContainer.Add(CurrentTrack = new DrawableTrack(current.GetRealTrack()));
                 CurrentTrack.Completed += () => onTrackCompleted(current);
             }
-
-            TrackChanged?.Invoke(current, direction);
-
-            ResetTrackAdjustments();
-
-            queuedDirection = null;
         }
 
         private void onTrackCompleted(WorkingBeatmap workingBeatmap)
