@@ -126,15 +126,6 @@ namespace osu.Game.Skinning
 
                     break;
 
-                case LegacySkinConfiguration.LegacySetting legacy:
-                    switch (legacy)
-                    {
-                        case LegacySkinConfiguration.LegacySetting.Version:
-                            return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
-                    }
-
-                    break;
-
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
 
@@ -148,28 +139,11 @@ namespace osu.Game.Skinning
 
                     break;
 
+                case LegacySkinConfiguration.LegacySetting legacy:
+                    return legacySettingLookup<TValue>(legacy);
+
                 default:
-                    // handles lookups like GlobalSkinConfiguration
-
-                    try
-                    {
-                        if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
-                        {
-                            // special case for handling skins which use 1 or 0 to signify a boolean state.
-                            if (typeof(TValue) == typeof(bool))
-                                val = val == "1" ? "true" : "false";
-
-                            var bindable = new Bindable<TValue>();
-                            if (val != null)
-                                bindable.Parse(val);
-                            return bindable;
-                        }
-                    }
-                    catch
-                    {
-                    }
-
-                    break;
+                    return genericLookup<TLookup, TValue>(lookup);
             }
 
             return null;
@@ -291,6 +265,43 @@ namespace osu.Game.Skinning
 
         private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
             => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
+
+        [CanBeNull]
+        private IBindable<TValue> legacySettingLookup<TValue>(LegacySkinConfiguration.LegacySetting legacySetting)
+        {
+            switch (legacySetting)
+            {
+                case LegacySkinConfiguration.LegacySetting.Version:
+                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
+
+                default:
+                    return genericLookup<LegacySkinConfiguration.LegacySetting, TValue>(legacySetting);
+            }
+        }
+
+        [CanBeNull]
+        private IBindable<TValue> genericLookup<TLookup, TValue>(TLookup lookup)
+        {
+            try
+            {
+                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
+                {
+                    // special case for handling skins which use 1 or 0 to signify a boolean state.
+                    if (typeof(TValue) == typeof(bool))
+                        val = val == "1" ? "true" : "false";
+
+                    var bindable = new Bindable<TValue>();
+                    if (val != null)
+                        bindable.Parse(val);
+                    return bindable;
+                }
+            }
+            catch
+            {
+            }
+
+            return null;
+        }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
