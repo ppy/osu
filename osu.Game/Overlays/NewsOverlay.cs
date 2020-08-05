@@ -67,6 +67,8 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            // should not be run until first pop-in to avoid requesting data before user views.
             article.BindValueChanged(onArticleChanged);
         }
 
