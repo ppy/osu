@@ -361,10 +361,12 @@ namespace osu.Game.Screens.Play
 
         private void updateOverlayActivationMode()
         {
-            if (DrawableRuleset.HasReplayLoaded.Value)
+            bool canTriggerOverlays = DrawableRuleset.IsPaused.Value || !gameplayOverlaysDisabled.Value;
+
+            if (DrawableRuleset.HasReplayLoaded.Value || canTriggerOverlays)
                 OverlayActivationMode.Value = OverlayActivation.UserTriggered;
             else
-                OverlayActivationMode.Value = gameplayOverlaysDisabled.Value && !DrawableRuleset.IsPaused.Value ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
+                OverlayActivationMode.Value = OverlayActivation.Disabled;
         }
 
         private void updatePauseOnFocusLostState() =>
