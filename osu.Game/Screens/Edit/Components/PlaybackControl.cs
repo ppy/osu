@@ -66,12 +66,12 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            musicController.AddAdjustment(AdjustableProperty.Tempo, tempo);
+            musicController.CurrentTrack?.AddAdjustment(AdjustableProperty.Tempo, tempo);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            musicController?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
+            musicController?.CurrentTrack?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
 
             base.Dispose(isDisposing);
         }

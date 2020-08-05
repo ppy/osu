@@ -51,6 +51,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void Update()
         {
+            ITrack track = null;
             IBeatmap beatmap = null;
 
             double currentTrackTime = 0;
@@ -58,11 +59,14 @@ namespace osu.Game.Graphics.Containers
             EffectControlPoint effectPoint = null;
 
             if (musicController.TrackLoaded && Beatmap.Value.BeatmapLoaded)
-                beatmap = Beatmap.Value.Beatmap;
-
-            if (beatmap != null && musicController.IsPlaying && musicController.TrackLength > 0)
             {
-                currentTrackTime = musicController.CurrentTrackTime + EarlyActivationMilliseconds;
+                track = musicController.CurrentTrack;
+                beatmap = Beatmap.Value.Beatmap;
+            }
+
+            if (track != null && beatmap != null && musicController.IsPlaying && track.Length > 0)
+            {
+                currentTrackTime = track.CurrentTime + EarlyActivationMilliseconds;
 
                 timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
                 effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
@@ -98,7 +102,7 @@ namespace osu.Game.Graphics.Containers
                 return;
 
             using (BeginDelayedSequence(-TimeSinceLastBeat, true))
-                OnNewBeat(beatIndex, timingPoint, effectPoint, musicController.CurrentAmplitudes);
+                OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? ChannelAmplitudes.Empty);
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;

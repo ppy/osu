@@ -19,6 +19,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Utils;
 using osu.Game.Overlays;
 
@@ -108,14 +109,14 @@ namespace osu.Game.Screens.Menu
         private void updateAmplitudes()
         {
             var effect = beatmap.Value.BeatmapLoaded && musicController.TrackLoaded
-                ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(musicController.CurrentTrackTime)
+                ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(musicController.CurrentTrack.AsNonNull().CurrentTime)
                 : null;
 
             for (int i = 0; i < temporalAmplitudes.Length; i++)
                 temporalAmplitudes[i] = 0;
 
             if (musicController.TrackLoaded)
-                addAmplitudesFromSource(musicController);
+                addAmplitudesFromSource(musicController.CurrentTrack.AsNonNull());
 
             foreach (var source in amplitudeSources)
                 addAmplitudesFromSource(source);

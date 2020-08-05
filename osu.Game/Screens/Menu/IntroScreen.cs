@@ -113,7 +113,9 @@ namespace osu.Game.Screens.Menu
                 if (setInfo != null)
                 {
                     initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-                    UsingThemedIntro = !MusicController.IsDummyDevice;
+
+                    // Todo: Wrong.
+                    UsingThemedIntro = MusicController.CurrentTrack?.IsDummyDevice == false;
                 }
 
                 return UsingThemedIntro;

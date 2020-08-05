@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
@@ -94,7 +95,10 @@ namespace osu.Game.Tests.Visual.Editing
                 base.Update();
 
                 if (musicController.TrackLoaded)
-                    marker.X = (float)(editorClock.CurrentTime / musicController.TrackLength);
+                {
+                    Debug.Assert(musicController.CurrentTrack != null);
+                    marker.X = (float)(editorClock.CurrentTime / musicController.CurrentTrack.Length);
+                }
             }
         }
 

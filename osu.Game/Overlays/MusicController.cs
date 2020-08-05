@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +14,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Framework.Threading;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.OSD;
@@ -26,7 +24,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// Handles playback of the global music track.
     /// </summary>
-    public class MusicController : CompositeDrawable, IKeyBindingHandler<GlobalAction>, ITrack
+    public class MusicController : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -70,10 +68,7 @@ namespace osu.Game.Overlays
         private readonly TrackContainer trackContainer;
 
         [CanBeNull]
-        private DrawableTrack drawableTrack;
-
-        [CanBeNull]
-        private Track track;
+        public DrawableTrack CurrentTrack { get; private set; }
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
@@ -116,33 +111,12 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Returns whether the beatmap track is playing.
         /// </summary>
-        public bool IsPlaying => drawableTrack?.IsRunning ?? false;
+        public bool IsPlaying => CurrentTrack?.IsRunning ?? false;
 
         /// <summary>
         /// Returns whether the beatmap track is loaded.
         /// </summary>
-        public bool TrackLoaded => drawableTrack?.IsLoaded == true;
-
-        /// <summary>
-        /// Returns the current time of the beatmap track.
-        /// </summary>
-        public double CurrentTrackTime => drawableTrack?.CurrentTime ?? 0;
-
-        /// <summary>
-        /// Returns the length of the beatmap track.
-        /// </summary>
-        public double TrackLength => drawableTrack?.Length ?? 0;
-
-        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => trackContainer.AddAdjustment(type, adjustBindable);
-
-        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => trackContainer.RemoveAdjustment(type, adjustBindable);
-
-        public void Reset() => drawableTrack?.Reset();
-
-        [CanBeNull]
-        public IAdjustableClock GetTrackClock() => track;
+        public bool TrackLoaded => CurrentTrack?.IsLoaded == true;
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
@@ -175,7 +149,7 @@ namespace osu.Game.Overlays
             seekDelegate = Schedule(() =>
             {
                 if (!beatmap.Disabled)
-                    drawableTrack?.Seek(position);
+                    CurrentTrack?.Seek(position);
             });
         }
 
@@ -187,7 +161,7 @@ namespace osu.Game.Overlays
         {
             if (IsUserPaused) return;
 
-            if (drawableTrack == null || drawableTrack.IsDummyDevice)
+            if (CurrentTrack == null || CurrentTrack.IsDummyDevice)
             {
                 if (beatmap.Disabled)
                     return;
@@ -208,13 +182,13 @@ namespace osu.Game.Overlays
         {
             IsUserPaused = false;
 
-            if (drawableTrack == null)
+            if (CurrentTrack == null)
                 return false;
 
             if (restart)
-                drawableTrack.Restart();
+                CurrentTrack.Restart();
             else if (!IsPlaying)
-                drawableTrack.Start();
+                CurrentTrack.Start();
 
             return true;
         }
@@ -225,8 +199,8 @@ namespace osu.Game.Overlays
         public void Stop()
         {
             IsUserPaused = true;
-            if (drawableTrack?.IsRunning == true)
-                drawableTrack.Stop();
+            if (CurrentTrack?.IsRunning == true)
+                CurrentTrack.Stop();
         }
 
         /// <summary>
@@ -235,7 +209,7 @@ namespace osu.Game.Overlays
         /// <returns>Whether the operation was successful.</returns>
         public bool TogglePause()
         {
-            if (drawableTrack?.IsRunning == true)
+            if (CurrentTrack?.IsRunning == true)
                 Stop();
             else
                 Play();
@@ -257,7 +231,7 @@ namespace osu.Game.Overlays
             if (beatmap.Disabled)
                 return PreviousTrackResult.None;
 
-            var currentTrackPosition = drawableTrack?.CurrentTime;
+            var currentTrackPosition = CurrentTrack?.CurrentTime;
 
             if (currentTrackPosition >= restart_cutoff_point)
             {
@@ -311,7 +285,7 @@ namespace osu.Game.Overlays
         {
             // if not scheduled, the previously track will be stopped one frame later (see ScheduleAfterChildren logic in GameBase).
             // we probably want to move this to a central method for switching to a new working beatmap in the future.
-            Schedule(() => drawableTrack?.Restart());
+            Schedule(() => CurrentTrack?.Restart());
         }
 
         private WorkingBeatmap current;
@@ -345,12 +319,11 @@ namespace osu.Game.Overlays
 
             current = beatmap.NewValue;
 
-            drawableTrack?.Expire();
-            drawableTrack = null;
-            track = null;
+            CurrentTrack?.Expire();
+            CurrentTrack = null;
 
             if (current != null)
-                trackContainer.Add(drawableTrack = new DrawableTrack(track = current.GetRealTrack()));
+                trackContainer.Add(CurrentTrack = new DrawableTrack(current.GetRealTrack()));
 
             TrackChanged?.Invoke(current, direction);
 
@@ -379,15 +352,15 @@ namespace osu.Game.Overlays
 
         public void ResetTrackAdjustments()
         {
-            if (drawableTrack == null)
+            if (CurrentTrack == null)
                 return;
 
-            drawableTrack.ResetSpeedAdjustments();
+            CurrentTrack.ResetSpeedAdjustments();
 
             if (allowRateAdjustments)
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
-                    mod.ApplyToTrack(drawableTrack);
+                    mod.ApplyToTrack(CurrentTrack);
             }
         }
 
@@ -442,129 +415,6 @@ namespace osu.Game.Overlays
         private class TrackContainer : AudioContainer<DrawableTrack>
         {
         }
-
-        #region ITrack
-
-        /// <summary>
-        /// The volume of this component.
-        /// </summary>
-        public BindableNumber<double> Volume => drawableTrack?.Volume; // Todo: Bad
-
-        /// <summary>
-        /// The playback balance of this sample (-1 .. 1 where 0 is centered)
-        /// </summary>
-        public BindableNumber<double> Balance => drawableTrack?.Balance; // Todo: Bad
-
-        /// <summary>
-        /// Rate at which the component is played back (affects pitch). 1 is 100% playback speed, or default frequency.
-        /// </summary>
-        public BindableNumber<double> Frequency => drawableTrack?.Frequency; // Todo: Bad
-
-        /// <summary>
-        /// Rate at which the component is played back (does not affect pitch). 1 is 100% playback speed.
-        /// </summary>
-        public BindableNumber<double> Tempo => drawableTrack?.Tempo; // Todo: Bad
-
-        public IBindable<double> AggregateVolume => drawableTrack?.AggregateVolume; // Todo: Bad
-
-        public IBindable<double> AggregateBalance => drawableTrack?.AggregateBalance; // Todo: Bad
-
-        public IBindable<double> AggregateFrequency => drawableTrack?.AggregateFrequency; // Todo: Bad
-
-        public IBindable<double> AggregateTempo => drawableTrack?.AggregateTempo; // Todo: Bad
-
-        /// <summary>
-        /// Overall playback rate (1 is 100%, -1 is reversed at 100%).
-        /// </summary>
-        public double Rate => AggregateFrequency.Value * AggregateTempo.Value;
-
-        event Action ITrack.Completed
-        {
-            add
-            {
-                if (drawableTrack != null)
-                    drawableTrack.Completed += value;
-            }
-            remove
-            {
-                if (drawableTrack != null)
-                    drawableTrack.Completed -= value;
-            }
-        }
-
-        event Action ITrack.Failed
-        {
-            add
-            {
-                if (drawableTrack != null)
-                    drawableTrack.Failed += value;
-            }
-            remove
-            {
-                if (drawableTrack != null)
-                    drawableTrack.Failed -= value;
-            }
-        }
-
-        public bool Looping
-        {
-            get => drawableTrack?.Looping ?? false;
-            set
-            {
-                if (drawableTrack != null)
-                    drawableTrack.Looping = value;
-            }
-        }
-
-        public bool IsDummyDevice => drawableTrack?.IsDummyDevice ?? true;
-
-        public double RestartPoint
-        {
-            get => drawableTrack?.RestartPoint ?? 0;
-            set
-            {
-                if (drawableTrack != null)
-                    drawableTrack.RestartPoint = value;
-            }
-        }
-
-        double ITrack.CurrentTime => CurrentTrackTime;
-
-        double ITrack.Length
-        {
-            get => TrackLength;
-            set
-            {
-                if (drawableTrack != null)
-                    drawableTrack.Length = value;
-            }
-        }
-
-        public int? Bitrate => drawableTrack?.Bitrate;
-
-        bool ITrack.IsRunning => IsPlaying;
-
-        public bool IsReversed => drawableTrack?.IsReversed ?? false;
-
-        public bool HasCompleted => drawableTrack?.HasCompleted ?? false;
-
-        void ITrack.Reset() => drawableTrack?.Reset();
-
-        void ITrack.Restart() => Play(true);
-
-        void ITrack.ResetSpeedAdjustments() => ResetTrackAdjustments();
-
-        bool ITrack.Seek(double seek)
-        {
-            SeekTo(seek);
-            return true;
-        }
-
-        void ITrack.Start() => Play();
-
-        public ChannelAmplitudes CurrentAmplitudes => drawableTrack?.CurrentAmplitudes ?? ChannelAmplitudes.Empty;
-
-        #endregion
     }
 
     public enum TrackChangeDirection

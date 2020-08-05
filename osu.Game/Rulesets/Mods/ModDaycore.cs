@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 
@@ -27,11 +26,11 @@ namespace osu.Game.Rulesets.Mods
             }, true);
         }
 
-        public override void ApplyToTrack(ITrack track)
+        public override void ApplyToTrack<T>(T track)
         {
             // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
-            (track as Track)?.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
-            (track as Track)?.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
+            track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
     }
 }

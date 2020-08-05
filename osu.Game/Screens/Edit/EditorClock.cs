@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit
         private void load()
         {
             // Todo: What.
-            TrackLength ??= musicController.TrackLength;
+            TrackLength ??= musicController.CurrentTrack?.Length ?? 0;
         }
 
         /// <summary>

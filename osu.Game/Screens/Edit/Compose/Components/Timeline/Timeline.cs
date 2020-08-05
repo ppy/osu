@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -60,21 +62,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Beatmap.BindValueChanged(b =>
             {
                 waveform.Waveform = b.NewValue.Waveform;
+                track = musicController.CurrentTrack;
 
-                // Todo: Wrong.
-                Schedule(() =>
+                Debug.Assert(track != null);
+
+                if (track.Length > 0)
                 {
-                    if (musicController.TrackLength > 0)
-                    {
-                        MaxZoom = getZoomLevelForVisibleMilliseconds(500);
-                        MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                        Zoom = getZoomLevelForVisibleMilliseconds(2000);
-                    }
-                });
+                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
+                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                }
             }, true);
         }
 
-        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(musicController.TrackLength / milliseconds);
+        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(track.Length / milliseconds);
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -95,6 +96,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// Whether the track was playing before a user drag event.
         /// </summary>
         private bool trackWasPlaying;
+
+        private ITrack track;
 
         protected override void Update()
         {
@@ -136,15 +139,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (!musicController.TrackLoaded)
                 return;
 
-            editorClock.Seek(Current / Content.DrawWidth * musicController.TrackLength);
+            editorClock.Seek(Current / Content.DrawWidth * track.Length);
         }
 
         private void scrollToTrackTime()
         {
-            if (!musicController.TrackLoaded || musicController.TrackLength == 0)
+            if (!musicController.TrackLoaded || track.Length == 0)
                 return;
 
-            ScrollTo((float)(editorClock.CurrentTime / musicController.TrackLength) * Content.DrawWidth, false);
+            ScrollTo((float)(editorClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -188,7 +191,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(screenSpacePosition))));
 
         private double getTimeFromPosition(Vector2 localPosition) =>
-            (localPosition.X / Content.DrawWidth) * musicController.TrackLength;
+            (localPosition.X / Content.DrawWidth) * track.Length;
 
         public float GetBeatSnapDistanceAt(double referenceTime) => throw new NotImplementedException();
 

@@ -288,7 +288,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void confirmNoTrackAdjustments()
         {
-            AddAssert("track has no adjustments", () => MusicController.AggregateFrequency.Value == 1);
+            AddAssert("track has no adjustments", () => MusicController.CurrentTrack?.AggregateFrequency.Value == 1);
         }
 
         private void restart() => AddStep("restart", () => Player.Restart());

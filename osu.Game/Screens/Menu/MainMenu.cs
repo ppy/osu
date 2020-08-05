@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -181,11 +182,12 @@ namespace osu.Game.Screens.Menu
 
             if (last is IntroScreen && musicController.TrackLoaded)
             {
-                // Todo: Wrong.
-                if (!musicController.IsPlaying)
+                Debug.Assert(musicController.CurrentTrack != null);
+
+                if (!musicController.CurrentTrack.IsRunning)
                 {
-                    musicController.SeekTo(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * musicController.TrackLength);
-                    musicController.Play();
+                    musicController.CurrentTrack.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * musicController.CurrentTrack.Length);
+                    musicController.CurrentTrack.Start();
                 }
             }
 
