@@ -654,7 +654,7 @@ namespace osu.Game.Screens.Select
             BeatmapDetails.Beatmap = beatmap;
 
             if (music?.CurrentTrack != null)
-                music.CurrentTrack.Looping = false;
+                music.CurrentTrack.Looping = true;
         }
 
         private readonly WeakReference<ITrack> lastTrack = new WeakReference<ITrack>(null);
