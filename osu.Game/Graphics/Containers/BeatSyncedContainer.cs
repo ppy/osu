@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.Containers
                 beatmap = Beatmap.Value.Beatmap;
             }
 
-            if (track != null && beatmap != null && musicController.IsPlaying && track.Length > 0)
+            if (track != null && beatmap != null && track.IsRunning && track.Length > 0)
             {
                 currentTrackTime = track.CurrentTime + EarlyActivationMilliseconds;
 
