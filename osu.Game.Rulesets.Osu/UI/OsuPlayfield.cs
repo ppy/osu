@@ -23,7 +23,8 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
-        private readonly ApproachCircleProxyContainer approachCircles;
+        private readonly ProxyContainer approachCircles;
+        private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly FollowPointRenderer followPoints;
         private readonly OrderedHitPolicy hitPolicy;
@@ -38,6 +39,10 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             InternalChildren = new Drawable[]
             {
+                spinnerProxies = new ProxyContainer
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
                 followPoints = new FollowPointRenderer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -54,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     Child = HitObjectContainer,
                 },
-                approachCircles = new ApproachCircleProxyContainer
+                approachCircles = new ProxyContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = -1,
@@ -76,6 +81,9 @@ namespace osu.Game.Rulesets.Osu.UI
             h.OnNewResult += onNewResult;
             h.OnLoadComplete += d =>
             {
+                if (d is DrawableSpinner)
+                    spinnerProxies.Add(d.CreateProxy());
+
                 if (d is IDrawableHitObjectWithProxiedApproach c)
                     approachCircles.Add(c.ProxiedLayer.CreateProxy());
             };
@@ -113,9 +121,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
 
-        private class ApproachCircleProxyContainer : LifetimeManagementContainer
+        private class ProxyContainer : LifetimeManagementContainer
         {
-            public void Add(Drawable approachCircleProxy) => AddInternal(approachCircleProxy);
+            public void Add(Drawable proxy) => AddInternal(proxy);
         }
 
         private class DrawableJudgementPool : DrawablePool<DrawableOsuJudgement>
