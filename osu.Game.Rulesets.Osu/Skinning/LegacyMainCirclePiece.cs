@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -28,7 +29,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
+        private Container<Sprite> circlePieces;
         private Sprite hitCircleSprite, hitCircleOverlay;
+
         private SkinnableSpriteText hitCircleText;
 
         private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
@@ -45,12 +48,27 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             InternalChildren = new Drawable[]
             {
-                hitCircleSprite = new Sprite
+                circlePieces = new Container<Sprite>
                 {
-                    Texture = getTextureWithFallback(string.Empty),
-                    Colour = drawableObject.AccentColour.Value,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new[]
+                    {
+                        hitCircleSprite = new Sprite
+                        {
+                            Texture = getTextureWithFallback(string.Empty),
+                            Colour = drawableObject.AccentColour.Value,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                        hitCircleOverlay = new Sprite
+                        {
+                            Texture = getTextureWithFallback("overlay"),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
+                    }
                 },
                 hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
@@ -61,31 +79,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                hitCircleOverlay = new Sprite
-                {
-                    Texture = getTextureWithFallback("overlay"),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
             };
 
             bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
-            if (!overlayAboveNumber)
-                ChangeInternalChildDepth(hitCircleText, -float.MaxValue);
+            if (overlayAboveNumber)
+                AddInternal(hitCircleOverlay.CreateProxy());
 
             state.BindTo(drawableObject.State);
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(osuObject.IndexInCurrentComboBindable);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            state.BindValueChanged(updateState, true);
-            accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue, true);
-            indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
 
             Texture getTextureWithFallback(string name)
             {
@@ -98,6 +101,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            state.BindValueChanged(updateState, true);
+            accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue, true);
+            indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
+        }
+
         private void updateState(ValueChangedEvent<ArmedState> state)
         {
             const double legacy_fade_duration = 240;
@@ -105,13 +117,20 @@ namespace osu.Game.Rulesets.Osu.Skinning
             switch (state.NewValue)
             {
                 case ArmedState.Hit:
-                    this.FadeOut(legacy_fade_duration, Easing.Out);
+                    circlePieces.FadeOut(legacy_fade_duration, Easing.Out);
+                    circlePieces.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                    hitCircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
-                    hitCircleOverlay.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                    var legacyVersion = skin.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value;
 
-                    if (skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.ExpandNumberPiece)?.Value ?? true)
+                    if (legacyVersion >= 2.0m)
+                        // legacy skins of version 2.0 and newer apply immediate fade out to the number piece and only that.
+                        hitCircleText.FadeOut(legacy_fade_duration / 4, Easing.Out);
+                    else
+                    {
+                        // old skins scale and fade it normally along other pieces.
+                        hitCircleText.FadeOut(legacy_fade_duration, Easing.Out);
                         hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                    }
 
                     break;
             }
