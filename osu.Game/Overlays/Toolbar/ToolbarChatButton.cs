@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarChatButton()
         {
             SetIcon(FontAwesome.Solid.Comments);
+            TooltipMain = "Chat";
+            TooltipSub = "Join the real-time discussion";
         }
 
         [BackgroundDependencyLoader(true)]
