@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
-        private Container<Sprite> circlePieces;
+        private Container<Sprite> circleSprites;
         private Sprite hitCircleSprite, hitCircleOverlay;
 
         private SkinnableSpriteText hitCircleText;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             InternalChildren = new Drawable[]
             {
-                circlePieces = new Container<Sprite>
+                circleSprites = new Container<Sprite>
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -117,8 +117,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             switch (state.NewValue)
             {
                 case ArmedState.Hit:
-                    circlePieces.FadeOut(legacy_fade_duration, Easing.Out);
-                    circlePieces.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                    circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
+                    circleSprites.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
                     var legacyVersion = skin.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value;
 
