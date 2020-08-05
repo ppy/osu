@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -323,13 +324,28 @@ namespace osu.Game.Overlays
             CurrentTrack = null;
 
             if (current != null)
+            {
                 trackContainer.Add(CurrentTrack = new DrawableTrack(current.GetRealTrack()));
+                CurrentTrack.Completed += () => onTrackCompleted(current);
+            }
 
             TrackChanged?.Invoke(current, direction);
 
             ResetTrackAdjustments();
 
             queuedDirection = null;
+        }
+
+        private void onTrackCompleted(WorkingBeatmap workingBeatmap)
+        {
+            // the source of track completion is the audio thread, so the beatmap may have changed before firing.
+            if (current != workingBeatmap)
+                return;
+
+            Debug.Assert(CurrentTrack != null);
+
+            if (!CurrentTrack.Looping && !beatmap.Disabled)
+                NextTrack();
         }
 
         private bool allowRateAdjustments;
