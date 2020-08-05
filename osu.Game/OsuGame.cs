@@ -427,23 +427,7 @@ namespace osu.Game
 
             updateModDefaults();
 
-            var newBeatmap = beatmap.NewValue;
-
-            if (newBeatmap != null)
-            {
-                // MusicController.Completed += () => Scheduler.AddOnce(() => trackCompleted(newBeatmap));
-                newBeatmap.BeginAsyncLoad();
-            }
-
-            // void trackCompleted(WorkingBeatmap b)
-            // {
-            //     // the source of track completion is the audio thread, so the beatmap may have changed before firing.
-            //     if (Beatmap.Value != b)
-            //         return;
-            //
-            //     if (!MusicController.Looping && !Beatmap.Disabled)
-            //         MusicController.NextTrack();
-            // }
+            beatmap.NewValue?.BeginAsyncLoad();
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
