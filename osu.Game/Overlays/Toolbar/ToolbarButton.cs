@@ -18,7 +18,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarButton : OsuClickableContainer
+    public abstract class ToolbarButton : OsuClickableContainer
     {
         public const float WIDTH = Toolbar.HEIGHT * 1.4f;
 
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly SpriteText tooltip2;
         protected FillFlowContainer Flow;
 
-        public ToolbarButton()
+        protected ToolbarButton()
             : base(HoverSampleSet.Loud)
         {
             Width = WIDTH;
