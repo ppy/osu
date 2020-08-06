@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Mods
     /// </summary>
     public interface IApplicableToTrack : IApplicableMod
     {
-        void ApplyToTrack<T>(T track) where T : ITrack, IAdjustableAudioComponent;
+        void ApplyToTrack<T>(T track) where T : class, ITrack, IAdjustableAudioComponent;
     }
 }
