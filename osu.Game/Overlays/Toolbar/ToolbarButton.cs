@@ -5,22 +5,26 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public abstract class ToolbarButton : OsuClickableContainer
+    public abstract class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float WIDTH = Toolbar.HEIGHT * 1.4f;
+
+        protected GlobalAction? Hotkey { get; set; }
 
         public void SetIcon(Drawable icon)
         {
@@ -163,6 +167,21 @@ namespace osu.Game.Overlays.Toolbar
         {
             HoverBackground.FadeOut(200);
             tooltipContainer.FadeOut(100);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == Hotkey)
+            {
+                Click();
+                return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 
