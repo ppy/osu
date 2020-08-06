@@ -30,6 +30,7 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Overlays;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -72,6 +73,8 @@ namespace osu.Game
         protected IAPIProvider API;
 
         protected MenuCursorContainer MenuCursorContainer;
+
+        protected MusicController MusicController;
 
         private Container content;
 
@@ -264,6 +267,9 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
+
+            AddInternal(MusicController = new MusicController());
+            dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }
