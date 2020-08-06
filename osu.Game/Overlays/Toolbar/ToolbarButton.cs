@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -76,7 +77,7 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         [Resolved]
-        private KeyBindingStore store { get; set; }
+        private KeyBindingStore keyBindings { get; set; }
 
         protected ToolbarButton()
             : base(HoverSampleSet.Loud)
@@ -159,21 +160,25 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
+        private readonly Cached tooltipKeyBinding = new Cached();
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            updateTooltip();
-
-            store.KeyBindingChanged += updateTooltip;
+            keyBindings.KeyBindingChanged += () => tooltipKeyBinding.Invalidate();
+            updateKeyBindingTooltip();
         }
 
-        private void updateTooltip()
+        private void updateKeyBindingTooltip()
         {
-            var binding = store.Query().Find(b => (GlobalAction)b.Action == Hotkey);
+            if (tooltipKeyBinding.IsValid)
+                return;
 
+            var binding = keyBindings.Query().Find(b => (GlobalAction)b.Action == Hotkey);
             var keyBindingString = binding?.KeyCombination.ReadableString();
-
             keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString) ? $" ({keyBindingString})" : string.Empty;
+
+            tooltipKeyBinding.Validate();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
@@ -187,6 +192,8 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnHover(HoverEvent e)
         {
+            updateKeyBindingTooltip();
+
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
             return base.OnHover(e);
