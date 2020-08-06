@@ -14,11 +14,11 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
+    public class DrawableStoryboardSprite : SkinReloadableDrawable, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 
-        private ISkinSource currentSkin;
+        private Sprite drawableSprite;
 
         private TextureStore storyboardTextureStore;
 
@@ -123,34 +123,28 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            if (skin != null)
+            InternalChild = drawableSprite = new Sprite
             {
-                currentSkin = skin;
-                skin.SourceChanged += onChange;
-            }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            };
 
             storyboardTextureStore = textureStore;
 
             texturePath = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
-            skinChanged();
-
             Sprite.ApplyTransforms(this);
         }
 
-        private void onChange() =>
-            // schedule required to avoid calls after disposed.
-            // note that this has the side-effect of components only performing a possible texture change when they are alive.
-            Scheduler.AddOnce(skinChanged);
-
-        private void skinChanged()
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            var newTexture = currentSkin?.GetTexture(Sprite.Path) ?? storyboardTextureStore?.Get(texturePath);
+            base.SkinChanged(skin, allowFallback);
+            var newTexture = skin?.GetTexture(Sprite.Path) ?? storyboardTextureStore?.Get(texturePath);
 
-            if (Texture == newTexture) return;
+            if (drawableSprite.Texture == newTexture) return;
 
-            Size = Vector2.Zero; // Sprite size needs to be recalculated (e.g. aspect ratio of combo number textures may differ between skins)
-            Texture = newTexture;
+            drawableSprite.Size = Vector2.Zero; // Sprite size needs to be recalculated (e.g. aspect ratio of combo number textures may differ between skins)
+            drawableSprite.Texture = newTexture;
         }
     }
 }
