@@ -32,7 +32,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             requestCount = 0;
             increment = skip_time;
 
-            Child = gameplayClockContainer = new GameplayClockContainer(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), Array.Empty<Mod>(), 0)
+            var working = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
+
+            Child = gameplayClockContainer = new GameplayClockContainer(working.GetRealTrack(), working, Array.Empty<Mod>(), 0)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]

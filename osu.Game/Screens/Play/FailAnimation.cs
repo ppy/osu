@@ -8,11 +8,10 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -28,24 +27,23 @@ namespace osu.Game.Screens.Play
         public Action OnComplete;
 
         private readonly DrawableRuleset drawableRuleset;
+        private readonly ITrack track;
 
         private readonly BindableDouble trackFreq = new BindableDouble(1);
-
-        private DrawableTrack track;
 
         private const float duration = 2500;
 
         private SampleChannel failSample;
 
-        public FailAnimation(DrawableRuleset drawableRuleset)
+        public FailAnimation(DrawableRuleset drawableRuleset, ITrack track)
         {
             this.drawableRuleset = drawableRuleset;
+            this.track = track;
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, IBindable<WorkingBeatmap> beatmap, MusicController musicController)
+        private void load(AudioManager audio, IBindable<WorkingBeatmap> beatmap)
         {
-            track = musicController.CurrentTrack;
             failSample = audio.Samples.Get(@"Gameplay/failsound");
         }
 
@@ -69,7 +67,7 @@ namespace osu.Game.Screens.Play
                 Expire();
             });
 
-            track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
+            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
 
             applyToPlayfield(drawableRuleset.Playfield);
             drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
@@ -108,7 +106,7 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            (track as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
         }
     }
 }

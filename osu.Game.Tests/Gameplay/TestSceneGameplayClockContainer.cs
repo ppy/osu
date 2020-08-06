@@ -19,7 +19,12 @@ namespace osu.Game.Tests.Gameplay
         {
             GameplayClockContainer gcc = null;
 
-            AddStep("create container", () => Add(gcc = new GameplayClockContainer(CreateWorkingBeatmap(new OsuRuleset().RulesetInfo), Array.Empty<Mod>(), 0)));
+            AddStep("create container", () =>
+            {
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                Add(gcc = new GameplayClockContainer(working.GetRealTrack(), working, Array.Empty<Mod>(), 0));
+            });
+
             AddStep("start track", () => gcc.Start());
             AddUntilStep("elapsed greater than zero", () => gcc.GameplayClock.ElapsedFrameTime > 0);
         }
