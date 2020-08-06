@@ -23,11 +23,14 @@ namespace osu.Game.Beatmaps
             public readonly ITrackStore TrackStore;
 
             private readonly IResourceStore<byte[]> store;
+            private readonly Action<ITrackStore> dereferenceAction;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, ITrackStore trackStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
+            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, ITrackStore trackStore, BeatmapInfo beatmapInfo, AudioManager audioManager,
+                                                Action<ITrackStore> dereferenceAction)
                 : base(beatmapInfo, audioManager)
             {
                 this.store = store;
+                this.dereferenceAction = dereferenceAction;
 
                 TextureStore = textureStore;
                 TrackStore = trackStore;
@@ -136,6 +139,11 @@ namespace osu.Game.Beatmaps
                     Logger.Error(e, "Skin failed to load");
                     return null;
                 }
+            }
+
+            ~BeatmapManagerWorkingBeatmap()
+            {
+                dereferenceAction?.Invoke(TrackStore);
             }
         }
     }
