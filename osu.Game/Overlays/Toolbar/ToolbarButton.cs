@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +15,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
@@ -70,7 +72,11 @@ namespace osu.Game.Overlays.Toolbar
         private readonly FillFlowContainer tooltipContainer;
         private readonly SpriteText tooltip1;
         private readonly SpriteText tooltip2;
+        private readonly SpriteText keyBindingTooltip;
         protected FillFlowContainer Flow;
+
+        [Resolved]
+        private KeyBindingStore store { get; set; }
 
         protected ToolbarButton()
             : base(HoverSampleSet.Loud)
@@ -127,7 +133,7 @@ namespace osu.Game.Overlays.Toolbar
                     Origin = TooltipAnchor,
                     Position = new Vector2(TooltipAnchor.HasFlag(Anchor.x0) ? 5 : -5, 5),
                     Alpha = 0,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         tooltip1 = new OsuSpriteText
                         {
@@ -136,15 +142,38 @@ namespace osu.Game.Overlays.Toolbar
                             Shadow = true,
                             Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                         },
-                        tooltip2 = new OsuSpriteText
+                        new FillFlowContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Anchor = TooltipAnchor,
                             Origin = TooltipAnchor,
-                            Shadow = true,
+                            Direction = FillDirection.Horizontal,
+                            Children = new[]
+                            {
+                                tooltip2 = new OsuSpriteText { Shadow = true },
+                                keyBindingTooltip = new OsuSpriteText { Shadow = true }
+                            }
                         }
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            updateTooltip();
+
+            store.KeyBindingChanged += updateTooltip;
+        }
+
+        private void updateTooltip()
+        {
+            var binding = store.Query().Find(b => (GlobalAction)b.Action == Hotkey);
+
+            var keyBindingString = binding?.KeyCombination.ReadableString();
+
+            keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString) ? $" ({keyBindingString})" : string.Empty;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
