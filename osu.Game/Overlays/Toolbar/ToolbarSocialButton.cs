@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarSocialButton()
         {
             Icon = FontAwesome.Solid.Users;
+            TooltipMain = "Friends";
+            TooltipSub = "Interact with those close to you";
         }
 
         [BackgroundDependencyLoader(true)]
