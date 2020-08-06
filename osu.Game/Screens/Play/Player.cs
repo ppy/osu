@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -150,7 +151,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config)
+        private void load(AudioManager audio, OsuConfigManager config, MusicController musicController)
         {
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
@@ -178,7 +179,7 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, Mods.Value, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(musicController.CurrentTrack, Beatmap.Value, Mods.Value, DrawableRuleset.GameplayStartTime);
 
             AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
@@ -187,7 +188,7 @@ namespace osu.Game.Screens.Play
 
             addUnderlayComponents(GameplayClockContainer);
             addGameplayComponents(GameplayClockContainer, Beatmap.Value, playableBeatmap);
-            addOverlayComponents(GameplayClockContainer, Beatmap.Value);
+            addOverlayComponents(GameplayClockContainer, Beatmap.Value, musicController.CurrentTrack);
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -264,7 +265,7 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void addOverlayComponents(Container target, WorkingBeatmap working)
+        private void addOverlayComponents(Container target, WorkingBeatmap working, ITrack track)
         {
             target.AddRange(new[]
             {
@@ -331,7 +332,7 @@ namespace osu.Game.Screens.Play
                         performImmediateExit();
                     },
                 },
-                failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
+                failAnimation = new FailAnimation(DrawableRuleset, track) { OnComplete = onFailComplete, },
             });
         }
 

@@ -11,12 +11,10 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Play
@@ -29,7 +27,7 @@ namespace osu.Game.Screens.Play
         private readonly WorkingBeatmap beatmap;
         private readonly IReadOnlyList<Mod> mods;
 
-        private DrawableTrack track;
+        private ITrack track;
 
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -62,11 +60,13 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock platformOffsetClock;
 
-        public GameplayClockContainer(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
+        public GameplayClockContainer(ITrack track, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
         {
             this.beatmap = beatmap;
             this.mods = mods;
             this.gameplayStartTime = gameplayStartTime;
+            this.track = track;
+
             firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
 
             RelativeSizeAxes = Axes.Both;
@@ -96,10 +96,8 @@ namespace osu.Game.Screens.Play
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, MusicController musicController)
+        private void load(OsuConfigManager config)
         {
-            track = musicController.CurrentTrack;
-
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
 
@@ -132,7 +130,7 @@ namespace osu.Game.Screens.Play
 
                 Schedule(() =>
                 {
-                    adjustableClock.ChangeSource(track);
+                    adjustableClock.ChangeSource((IAdjustableClock)track);
                     updateRate();
 
                     if (!IsPaused.Value)
@@ -203,8 +201,8 @@ namespace osu.Game.Screens.Play
 
             removeSourceClockAdjustments();
 
-            track = new DrawableTrack(new TrackVirtual(track.Length));
-            adjustableClock.ChangeSource(track);
+            track = new TrackVirtual(track.Length);
+            adjustableClock.ChangeSource((IAdjustableClock)track);
         }
 
         protected override void Update()
@@ -224,8 +222,8 @@ namespace osu.Game.Screens.Play
             speedAdjustmentsApplied = true;
             track.ResetSpeedAdjustments();
 
-            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             foreach (var mod in mods.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(track);
