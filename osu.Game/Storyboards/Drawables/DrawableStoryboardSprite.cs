@@ -10,12 +10,19 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Skinning;
 
 namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
+
+        private ISkinSource currentSkin;
+
+        private TextureStore storyboardTextureStore;
+
+        private string texturePath;
 
         private bool flipH;
 
@@ -114,14 +121,36 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(ISkinSource skin, IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            var path = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
-            if (path == null)
-                return;
+            if (skin != null)
+            {
+                currentSkin = skin;
+                skin.SourceChanged += onChange;
+            }
 
-            Texture = textureStore.Get(path);
+            storyboardTextureStore = textureStore;
+
+            texturePath = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+
+            skinChanged();
+
             Sprite.ApplyTransforms(this);
+        }
+
+        private void onChange() =>
+            // schedule required to avoid calls after disposed.
+            // note that this has the side-effect of components only performing a possible texture change when they are alive.
+            Scheduler.AddOnce(skinChanged);
+
+        private void skinChanged()
+        {
+            var newTexture = currentSkin?.GetTexture(Sprite.Path) ?? storyboardTextureStore?.Get(texturePath);
+
+            if (Texture == newTexture) return;
+
+            Size = Vector2.Zero; // Sprite size needs to be recalculated (e.g. aspect ratio of combo number textures may differ between skins)
+            Texture = newTexture;
         }
     }
 }
