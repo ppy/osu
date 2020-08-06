@@ -38,11 +38,11 @@ namespace osu.Game.Rulesets.Mods
             }, true);
         }
 
-        public override void ApplyToTrack<T>(T track)
+        public override void ApplyToTrack(ITrack track)
         {
             // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
-            track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
-            track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
+            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
+            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
