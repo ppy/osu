@@ -49,7 +49,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable testSingle(float circleSize, bool auto = false, double length = 3000)
         {
-            var spinner = new Spinner { StartTime = Time.Current + 2000, EndTime = Time.Current + +2000 + length };
+            const double delay = 2000;
+
+            var spinner = new Spinner
+            {
+                StartTime = Time.Current + delay,
+                EndTime = Time.Current + delay + length
+            };
 
             spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
 
