@@ -170,9 +170,6 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private Storage storage { get; set; }
 
-        [Resolved]
-        private MusicController musicController { get; set; }
-
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -180,14 +177,14 @@ namespace osu.Game.Screens.Menu
 
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is IntroScreen && musicController.TrackLoaded)
+            if (last is IntroScreen && music.TrackLoaded)
             {
-                Debug.Assert(musicController.CurrentTrack != null);
+                Debug.Assert(music.CurrentTrack != null);
 
-                if (!musicController.CurrentTrack.IsRunning)
+                if (!music.CurrentTrack.IsRunning)
                 {
-                    musicController.CurrentTrack.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * musicController.CurrentTrack.Length);
-                    musicController.CurrentTrack.Start();
+                    music.CurrentTrack.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * music.CurrentTrack.Length);
+                    music.CurrentTrack.Start();
                 }
             }
 
