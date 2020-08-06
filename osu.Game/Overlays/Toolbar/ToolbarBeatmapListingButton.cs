@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -13,6 +14,8 @@ namespace osu.Game.Overlays.Toolbar
             SetIcon(OsuIcon.ChevronDownCircle);
             TooltipMain = "Beatmap listing";
             TooltipSub = "Browse for new beatmaps";
+
+            Hotkey = GlobalAction.ToggleDirect;
         }
 
         [BackgroundDependencyLoader(true)]
