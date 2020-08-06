@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarNewsButton()
         {
             Icon = FontAwesome.Solid.Newspaper;
+            TooltipMain = "News";
+            TooltipSub = "Get up-to-date on community happenings";
         }
 
         [BackgroundDependencyLoader(true)]
