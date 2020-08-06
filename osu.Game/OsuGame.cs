@@ -538,7 +538,6 @@ namespace osu.Game
             Container logoContainer;
             BackButton.Receptor receptor;
 
-            dependencies.CacheAs(MusicController = new MusicController());
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
             AddRange(new Drawable[]
@@ -580,8 +579,6 @@ namespace osu.Game
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
-
-            loadComponentSingleFile(MusicController, Add);
 
             loadComponentSingleFile(osuLogo, logo =>
             {
@@ -924,8 +921,6 @@ namespace osu.Game
         private FrameworkConfigManager frameworkConfig { get; set; }
 
         private ScalingContainer screenContainer;
-
-        protected MusicController MusicController { get; private set; }
 
         protected override bool OnExiting()
         {
