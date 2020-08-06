@@ -117,6 +117,8 @@ namespace osu.Game.Rulesets.UI
 
         public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
 
+        public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotImplementedException();
+
         public BindableNumber<double> Volume => throw new NotSupportedException();
 
         public BindableNumber<double> Balance => throw new NotSupportedException();
