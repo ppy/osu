@@ -175,7 +175,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// The completion progress of this spinner from 0..1 (clamped).
         /// </summary>
-        public float Progress => Math.Clamp(RotationTracker.CumulativeRotation / 360 / Spinner.SpinsRequired, 0, 1);
+        public float Progress
+        {
+            get
+            {
+                if (Spinner.SpinsRequired == 0)
+                    // some spinners are so short they can't require an integer spin count.
+                    // these become implicitly hit.
+                    return 1;
+
+                return Math.Clamp(RotationTracker.CumulativeRotation / 360 / Spinner.SpinsRequired, 0, 1);
+            }
+        }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
