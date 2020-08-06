@@ -219,6 +219,7 @@ namespace osu.Game.Beatmaps
         }
 
         private readonly WeakList<BeatmapManagerWorkingBeatmap> workingCache = new WeakList<BeatmapManagerWorkingBeatmap>();
+        private readonly Dictionary<ITrackStore, int> referencedTrackStores = new Dictionary<ITrackStore, int>();
 
         /// <summary>
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
@@ -257,9 +258,22 @@ namespace osu.Game.Beatmaps
                 textureStore ??= new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
                 trackStore ??= audioManager.GetTrackStore(Files.Store);
 
-                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, textureStore, trackStore, beatmapInfo, audioManager));
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, textureStore, trackStore, beatmapInfo, audioManager, dereferenceTrackStore));
+                referencedTrackStores[trackStore] = referencedTrackStores.GetOrDefault(trackStore) + 1;
 
                 return working;
+            }
+        }
+
+        private void dereferenceTrackStore(ITrackStore trackStore)
+        {
+            lock (workingCache)
+            {
+                if (--referencedTrackStores[trackStore] == 0)
+                {
+                    referencedTrackStores.Remove(trackStore);
+                    trackStore.Dispose();
+                }
             }
         }
 
