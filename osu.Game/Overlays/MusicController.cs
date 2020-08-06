@@ -65,19 +65,11 @@ namespace osu.Game.Overlays
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
-        [NotNull]
-        private readonly TrackContainer trackContainer;
-
         [CanBeNull]
         public DrawableTrack CurrentTrack { get; private set; }
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
-
-        public MusicController()
-        {
-            InternalChild = trackContainer = new TrackContainer { RelativeSizeAxes = Axes.Both };
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -337,8 +329,10 @@ namespace osu.Game.Overlays
 
             if (current != null)
             {
-                trackContainer.Add(CurrentTrack = new DrawableTrack(current.GetRealTrack()));
+                CurrentTrack = new DrawableTrack(current.GetRealTrack());
                 CurrentTrack.Completed += () => onTrackCompleted(current);
+
+                AddInternal(CurrentTrack);
             }
         }
 
@@ -432,10 +426,6 @@ namespace osu.Game.Overlays
                 : base("Music Playback", action, string.Empty)
             {
             }
-        }
-
-        private class TrackContainer : AudioContainer<DrawableTrack>
-        {
         }
     }
 
