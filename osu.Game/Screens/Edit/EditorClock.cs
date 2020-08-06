@@ -2,16 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit
 {
@@ -20,7 +17,7 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
-        public double? TrackLength { get; private set; }
+        public readonly double TrackLength;
 
         public ControlPointInfo ControlPointInfo;
 
@@ -28,22 +25,9 @@ namespace osu.Game.Screens.Edit
 
         private readonly DecoupleableInterpolatingFramedClock underlyingClock;
 
-        [Resolved]
-        private MusicController musicController { get; set; }
-
-        public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
-            : this(beatmap.Beatmap.ControlPointInfo, null, beatDivisor)
+        public EditorClock(WorkingBeatmap beatmap, double trackLength, BindableBeatDivisor beatDivisor)
+            : this(beatmap.Beatmap.ControlPointInfo, trackLength, beatDivisor)
         {
-        }
-
-        public EditorClock(ControlPointInfo controlPointInfo, double? trackLength, BindableBeatDivisor beatDivisor)
-        {
-            this.beatDivisor = beatDivisor;
-
-            ControlPointInfo = controlPointInfo;
-            TrackLength = trackLength;
-
-            underlyingClock = new DecoupleableInterpolatingFramedClock();
         }
 
         public EditorClock()
@@ -51,11 +35,14 @@ namespace osu.Game.Screens.Edit
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)
         {
-            // Todo: What.
-            TrackLength ??= musicController.CurrentTrack?.Length ?? 0;
+            this.beatDivisor = beatDivisor;
+
+            ControlPointInfo = controlPointInfo;
+            TrackLength = trackLength;
+
+            underlyingClock = new DecoupleableInterpolatingFramedClock();
         }
 
         /// <summary>
@@ -148,8 +135,7 @@ namespace osu.Game.Screens.Edit
                 seekTime = timingPoint.Time;
 
             // Ensure the sought point is within the boundaries
-            Debug.Assert(TrackLength != null);
-            seekTime = Math.Clamp(seekTime, 0, TrackLength.Value);
+            seekTime = Math.Clamp(seekTime, 0, TrackLength);
             SeekTo(seekTime);
         }
 
