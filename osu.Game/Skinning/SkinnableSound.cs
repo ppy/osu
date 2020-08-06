@@ -28,6 +28,16 @@ namespace osu.Game.Skinning
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
 
+        /// <summary>
+        /// Whether to play the underlying sample when aggregate volume is zero.
+        /// Note that this is checked at the point of calling <see cref="Play"/>; changing the volume post-play will not begin playback.
+        /// Defaults to false unless <see cref="Looping"/>.
+        /// </summary>
+        /// <remarks>
+        /// Can serve as an optimisation if it is known ahead-of-time that this behaviour will not negatively affect behaviour.
+        /// </remarks>
+        protected bool SkipPlayWhenZeroVolume => !Looping;
+
         private readonly AudioContainer<DrawableSample> samplesContainer;
 
         public SkinnableSound(ISampleInfo hitSamples)
@@ -87,7 +97,7 @@ namespace osu.Game.Skinning
         {
             samplesContainer.ForEach(c =>
             {
-                if (c.AggregateVolume.Value > 0)
+                if (!SkipPlayWhenZeroVolume || c.AggregateVolume.Value > 0)
                     c.Play();
             });
         }
