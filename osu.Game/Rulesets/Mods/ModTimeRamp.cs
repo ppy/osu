@@ -51,7 +51,8 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
-        public void ApplyToTrack<T>(T track) where T : ITrack, IAdjustableAudioComponent
+        public void ApplyToTrack<T>(T track)
+            where T : class, ITrack, IAdjustableAudioComponent
         {
             this.track = track;
 
