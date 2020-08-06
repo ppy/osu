@@ -23,12 +23,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(true)]
         public void TestVariousSpinners(bool autoplay)
         {
-            AddStep("Miss Big", () => SetContents(() => testSingle(2)));
-            AddStep("Miss Medium", () => SetContents(() => testSingle(5)));
-            AddStep("Miss Small", () => SetContents(() => testSingle(7)));
-            AddStep("Hit Big", () => SetContents(() => testSingle(2, autoplay)));
-            AddStep("Hit Medium", () => SetContents(() => testSingle(5, autoplay)));
-            AddStep("Hit Small", () => SetContents(() => testSingle(7, autoplay)));
+            string term = autoplay ? "Hit" : "Miss";
+            AddStep($"{term} Big", () => SetContents(() => testSingle(2, autoplay)));
+            AddStep($"{term} Medium", () => SetContents(() => testSingle(5, autoplay)));
+            AddStep($"{term} Small", () => SetContents(() => testSingle(7, autoplay)));
         }
 
         [TestCase(false)]
