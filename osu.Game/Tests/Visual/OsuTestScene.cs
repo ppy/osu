@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -169,7 +170,10 @@ namespace osu.Game.Tests.Visual
             rulesetDependencies?.Dispose();
 
             if (MusicController?.TrackLoaded == true)
-                MusicController.Stop();
+            {
+                Debug.Assert(MusicController.CurrentTrack != null);
+                MusicController.CurrentTrack.Stop();
+            }
 
             if (contextFactory.IsValueCreated)
                 contextFactory.Value.ResetDatabase();
