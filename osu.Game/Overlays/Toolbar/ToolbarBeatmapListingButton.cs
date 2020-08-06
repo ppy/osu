@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarBeatmapListingButton()
         {
             SetIcon(OsuIcon.ChevronDownCircle);
-            TooltipMain = "Beatmap Listing";
+            TooltipMain = "Beatmap listing";
             TooltipSub = "Browse for new beatmaps";
         }
 
