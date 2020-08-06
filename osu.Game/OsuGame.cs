@@ -581,6 +581,8 @@ namespace osu.Game
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
 
+            loadComponentSingleFile(MusicController, Add);
+
             loadComponentSingleFile(osuLogo, logo =>
             {
                 logoContainer.Add(logo);
@@ -601,8 +603,6 @@ namespace osu.Game
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
-
-            loadComponentSingleFile(MusicController, Add);
 
             loadComponentSingleFile(notifications.With(d =>
             {

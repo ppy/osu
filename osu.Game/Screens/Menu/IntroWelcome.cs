@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osuTK.Graphics;
 
@@ -31,9 +30,6 @@ namespace osu.Game.Screens.Menu
             Alpha = 0,
         };
 
-        [Resolved]
-        private MusicController musicController { get; set; }
-
         private BackgroundScreenDefault background;
 
         [BackgroundDependencyLoader]
@@ -43,9 +39,6 @@ namespace osu.Game.Screens.Menu
                 welcome = audio.Samples.Get(@"Intro/Welcome/welcome");
 
             pianoReverb = audio.Samples.Get(@"Intro/Welcome/welcome_piano");
-
-            if (musicController.CurrentTrack != null)
-                musicController.CurrentTrack.Looping = true;
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -54,6 +47,8 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
+                Track.Looping = true;
+
                 LoadComponentAsync(new WelcomeIntroSequence
                 {
                     RelativeSizeAxes = Axes.Both
