@@ -12,10 +12,9 @@ namespace osu.Game.Rulesets.Mods
     {
         public abstract BindableNumber<double> SpeedChange { get; }
 
-        public virtual void ApplyToTrack<T>(T track)
-            where T : class, ITrack, IAdjustableAudioComponent
+        public virtual void ApplyToTrack(ITrack track)
         {
-            track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
+            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
         }
 
         public virtual void ApplyToSample(SampleChannel sample)
