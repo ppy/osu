@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
-using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.Tests.Visual
 {
