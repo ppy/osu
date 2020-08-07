@@ -95,10 +95,7 @@ namespace osu.Game.Tests.Visual.Editing
                 base.Update();
 
                 if (musicController.TrackLoaded)
-                {
-                    Debug.Assert(musicController.CurrentTrack != null);
                     marker.X = (float)(editorClock.CurrentTime / musicController.CurrentTrack.Length);
-                }
             }
         }
 

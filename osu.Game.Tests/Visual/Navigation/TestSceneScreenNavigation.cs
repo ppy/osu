@@ -136,8 +136,8 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("Wait for music controller", () => Game.MusicController.IsLoaded);
             AddStep("Seek close to end", () =>
             {
-                Game.MusicController.SeekTo(MusicController.CurrentTrack.AsNonNull().Length - 1000);
-                MusicController.CurrentTrack.AsNonNull().Completed += () => trackCompleted = true;
+                Game.MusicController.SeekTo(MusicController.CurrentTrack.Length - 1000);
+                MusicController.CurrentTrack.Completed += () => trackCompleted = true;
             });
 
             AddUntilStep("Track was completed", () => trackCompleted);

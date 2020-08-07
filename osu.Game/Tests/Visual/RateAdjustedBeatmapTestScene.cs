@@ -16,10 +16,7 @@ namespace osu.Game.Tests.Visual
 
             // note that this will override any mod rate application
             if (MusicController.TrackLoaded)
-            {
-                Debug.Assert(MusicController.CurrentTrack != null);
                 MusicController.CurrentTrack.Tempo.Value = Clock.Rate;
-            }
         }
     }
 }
