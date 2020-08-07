@@ -5,8 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -40,81 +38,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     Children = new Drawable[]
                     {
                         new ClickableNewsBackground(post),
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            ColumnDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension()
-                            },
-                            RowDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize)
-                            },
-                            Content = new[]
-                            {
-                                new Drawable[]
-                                {
-                                    new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Y,
-                                        Width = 80,
-                                        Padding = new MarginPadding(10),
-                                        Children = new Drawable[]
-                                        {
-                                            new Box
-                                            {
-                                                Anchor = Anchor.TopRight,
-                                                Origin = Anchor.TopRight,
-                                                RelativeSizeAxes = Axes.Y,
-                                                Width = 1,
-                                                Colour = ColourProvider.Light1
-                                            },
-                                            new Container
-                                            {
-                                                Anchor = Anchor.TopRight,
-                                                Origin = Anchor.TopRight,
-                                                AutoSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Right = 11 },
-                                                Child = new DateContainer(post.PublishedAt)
-                                            }
-                                        }
-                                    },
-                                    new Container
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Padding = new MarginPadding { Right = 10 },
-                                        Children = new Drawable[]
-                                        {
-                                            new FillFlowContainer
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Margin = new MarginPadding { Top = 5, Bottom = 10 },
-                                                Spacing = new Vector2(0, 10),
-                                                Direction = FillDirection.Vertical,
-                                                Children = new Drawable[]
-                                                {
-                                                    new TitleLink(post),
-                                                    new TextFlowContainer(f =>
-                                                    {
-                                                        f.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
-                                                    })
-                                                    {
-                                                        RelativeSizeAxes = Axes.X,
-                                                        AutoSizeAxes = Axes.Y,
-                                                        Text = post.Preview
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        new Footer(post)
                     }
                 }
             };
@@ -158,54 +82,48 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             }
         }
 
-        private class TitleLink : OsuHoverContainer
+        private class Footer : HomeNewsPanelFooter
         {
-            private readonly APINewsPost post;
+            protected override float BarPading => 10;
 
-            public TitleLink(APINewsPost post)
+            public Footer(APINewsPost post)
+                : base(post)
             {
-                this.post = post;
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(GameHost host)
+            protected override NewsPostDrawableDate CreateDate(DateTimeOffset date) => new Date(date);
+
+            protected override Drawable CreateContent(APINewsPost post) => new FillFlowContainer
             {
-                Child = new TextFlowContainer(t =>
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Margin = new MarginPadding { Top = 5, Bottom = 10 },
+                Spacing = new Vector2(0, 10),
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
                 {
-                    t.Font = OsuFont.GetFont(weight: FontWeight.Bold);
-                })
+                    new NewsTitleLink(post),
+                    new TextFlowContainer(f =>
+                    {
+                        f.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
+                    })
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Text = post.Preview
+                    }
+                }
+            };
+
+            private class Date : NewsPostDrawableDate
+            {
+                public Date(DateTimeOffset date)
+                    : base(date)
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Text = post.Title
-                };
+                    Margin = new MarginPadding { Top = 10 };
+                }
 
-                TooltipText = "view in browser";
-                Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
-            }
-        }
-
-        private class DateContainer : CompositeDrawable, IHasCustomTooltip
-        {
-            public ITooltip GetCustomTooltip() => new DateTooltip();
-
-            public object TooltipContent => date;
-
-            private readonly DateTimeOffset date;
-
-            public DateContainer(DateTimeOffset date)
-            {
-                this.date = date;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                AutoSizeAxes = Axes.Both;
-                InternalChild = new FillFlowContainer
+                protected override Drawable CreateDate(DateTimeOffset date, OverlayColourProvider colourProvider) => new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -219,7 +137,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Origin = Anchor.TopRight,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold), // using Bold since there is no 800 weight alternative
                             Colour = colourProvider.Light1,
-                            Text = date.Day.ToString()
+                            Text = $"{date: dd}"
                         },
                         new TextFlowContainer(f =>
                         {

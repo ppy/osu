@@ -16,9 +16,6 @@ namespace osu.Game.Overlays.Dashboard.Home
     {
         protected override Container<Drawable> Content => content;
 
-        [Resolved]
-        protected OverlayColourProvider ColourProvider { get; private set; }
-
         private readonly Container content;
         private readonly Box background;
 
@@ -50,9 +47,9 @@ namespace osu.Game.Overlays.Dashboard.Home
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = ColourProvider.Background4;
+            background.Colour = colourProvider.Background4;
         }
     }
 }
