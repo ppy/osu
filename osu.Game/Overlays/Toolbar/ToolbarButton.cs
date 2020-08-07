@@ -1,26 +1,33 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarButton : OsuClickableContainer
+    public abstract class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float WIDTH = Toolbar.HEIGHT * 1.4f;
+
+        protected GlobalAction? Hotkey { get; set; }
 
         public void SetIcon(Drawable icon)
         {
@@ -66,9 +73,13 @@ namespace osu.Game.Overlays.Toolbar
         private readonly FillFlowContainer tooltipContainer;
         private readonly SpriteText tooltip1;
         private readonly SpriteText tooltip2;
+        private readonly SpriteText keyBindingTooltip;
         protected FillFlowContainer Flow;
 
-        public ToolbarButton()
+        [Resolved]
+        private KeyBindingStore keyBindings { get; set; }
+
+        protected ToolbarButton()
             : base(HoverSampleSet.Loud)
         {
             Width = WIDTH;
@@ -123,7 +134,7 @@ namespace osu.Game.Overlays.Toolbar
                     Origin = TooltipAnchor,
                     Position = new Vector2(TooltipAnchor.HasFlag(Anchor.x0) ? 5 : -5, 5),
                     Alpha = 0,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         tooltip1 = new OsuSpriteText
                         {
@@ -132,15 +143,42 @@ namespace osu.Game.Overlays.Toolbar
                             Shadow = true,
                             Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                         },
-                        tooltip2 = new OsuSpriteText
+                        new FillFlowContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Anchor = TooltipAnchor,
                             Origin = TooltipAnchor,
-                            Shadow = true,
+                            Direction = FillDirection.Horizontal,
+                            Children = new[]
+                            {
+                                tooltip2 = new OsuSpriteText { Shadow = true },
+                                keyBindingTooltip = new OsuSpriteText { Shadow = true }
+                            }
                         }
                     }
                 }
             };
+        }
+
+        private readonly Cached tooltipKeyBinding = new Cached();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            keyBindings.KeyBindingChanged += () => tooltipKeyBinding.Invalidate();
+            updateKeyBindingTooltip();
+        }
+
+        private void updateKeyBindingTooltip()
+        {
+            if (tooltipKeyBinding.IsValid)
+                return;
+
+            var binding = keyBindings.Query().Find(b => (GlobalAction)b.Action == Hotkey);
+            var keyBindingString = binding?.KeyCombination.ReadableString();
+            keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString) ? $" ({keyBindingString})" : string.Empty;
+
+            tooltipKeyBinding.Validate();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
@@ -154,6 +192,8 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnHover(HoverEvent e)
         {
+            updateKeyBindingTooltip();
+
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
             return base.OnHover(e);
@@ -163,6 +203,21 @@ namespace osu.Game.Overlays.Toolbar
         {
             HoverBackground.FadeOut(200);
             tooltipContainer.FadeOut(100);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == Hotkey)
+            {
+                Click();
+                return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 

@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -11,6 +12,10 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarChatButton()
         {
             SetIcon(FontAwesome.Solid.Comments);
+            TooltipMain = "Chat";
+            TooltipSub = "Join the real-time discussion";
+
+            Hotkey = GlobalAction.ToggleChat;
         }
 
         [BackgroundDependencyLoader(true)]
