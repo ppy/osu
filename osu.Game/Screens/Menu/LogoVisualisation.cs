@@ -109,14 +109,14 @@ namespace osu.Game.Screens.Menu
         private void updateAmplitudes()
         {
             var effect = beatmap.Value.BeatmapLoaded && musicController.TrackLoaded
-                ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(musicController.CurrentTrack.AsNonNull().CurrentTime)
+                ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(musicController.CurrentTrack.CurrentTime)
                 : null;
 
             for (int i = 0; i < temporalAmplitudes.Length; i++)
                 temporalAmplitudes[i] = 0;
 
             if (musicController.TrackLoaded)
-                addAmplitudesFromSource(musicController.CurrentTrack.AsNonNull());
+                addAmplitudesFromSource(musicController.CurrentTrack);
 
             foreach (var source in amplitudeSources)
                 addAmplitudesFromSource(source);

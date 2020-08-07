@@ -170,10 +170,7 @@ namespace osu.Game.Tests.Visual
             rulesetDependencies?.Dispose();
 
             if (MusicController?.TrackLoaded == true)
-            {
-                Debug.Assert(MusicController.CurrentTrack != null);
                 MusicController.CurrentTrack.Stop();
-            }
 
             if (contextFactory.IsValueCreated)
                 contextFactory.Value.ResetDatabase();

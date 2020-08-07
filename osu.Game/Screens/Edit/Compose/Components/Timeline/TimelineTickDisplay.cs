@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             for (var i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
             {
                 var point = beatmap.ControlPointInfo.TimingPoints[i];
-                var until = i + 1 < beatmap.ControlPointInfo.TimingPoints.Count ? beatmap.ControlPointInfo.TimingPoints[i + 1].Time : musicController.CurrentTrack.AsNonNull().Length;
+                var until = i + 1 < beatmap.ControlPointInfo.TimingPoints.Count ? beatmap.ControlPointInfo.TimingPoints[i + 1].Time : musicController.CurrentTrack.Length;
 
                 int beat = 0;
 

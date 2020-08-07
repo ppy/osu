@@ -58,7 +58,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 return;
             }
 
-            Debug.Assert(musicController.CurrentTrack != null);
             content.RelativeChildSize = new Vector2((float)Math.Max(1, musicController.CurrentTrack.Length), 1);
         }
 

@@ -179,8 +179,6 @@ namespace osu.Game.Screens.Menu
 
             if (last is IntroScreen && music.TrackLoaded)
             {
-                Debug.Assert(music.CurrentTrack != null);
-
                 if (!music.CurrentTrack.IsRunning)
                 {
                     music.CurrentTrack.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * music.CurrentTrack.Length);

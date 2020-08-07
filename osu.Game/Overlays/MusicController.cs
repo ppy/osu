@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -65,8 +64,7 @@ namespace osu.Game.Overlays
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
-        [CanBeNull]
-        public DrawableTrack CurrentTrack { get; private set; }
+        public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
@@ -312,7 +310,7 @@ namespace osu.Game.Overlays
 
             current = beatmap.NewValue;
 
-            if (!beatmap.OldValue.BeatmapInfo.AudioEquals(current?.BeatmapInfo))
+            if (CurrentTrack == null || !beatmap.OldValue.BeatmapInfo.AudioEquals(current?.BeatmapInfo))
                 changeTrack();
 
             TrackChanged?.Invoke(current, direction);
