@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Visual
                 store?.Dispose();
             }
 
-            protected override Track GetTrack() => track;
+            protected override Track GetBeatmapTrack() => track;
 
             public class TrackVirtualStore : AudioCollectionManager<Track>, ITrackStore
             {

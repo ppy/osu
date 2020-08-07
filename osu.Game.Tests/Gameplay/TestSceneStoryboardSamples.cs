@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Gameplay
             {
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
-                Add(gameplayContainer = new GameplayClockContainer(working.GetRealTrack(), working, Array.Empty<Mod>(), 0));
+                Add(gameplayContainer = new GameplayClockContainer(working.GetTrack(), working, Array.Empty<Mod>(), 0));
 
                 gameplayContainer.Add(sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
                 {

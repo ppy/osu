@@ -249,9 +249,9 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
-        public Track GetRealTrack() => GetTrack() ?? GetVirtualTrack(1000);
+        public Track GetTrack() => GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
-        protected abstract Track GetTrack();
+        protected abstract Track GetBeatmapTrack();
 
         public bool WaveformLoaded => waveform.IsResultAvailable;
         public Waveform Waveform => waveform.Value;

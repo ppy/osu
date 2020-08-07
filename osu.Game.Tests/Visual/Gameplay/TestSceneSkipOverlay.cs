@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             var working = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
 
-            Child = gameplayClockContainer = new GameplayClockContainer(working.GetRealTrack(), working, Array.Empty<Mod>(), 0)
+            Child = gameplayClockContainer = new GameplayClockContainer(working.GetTrack(), working, Array.Empty<Mod>(), 0)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
