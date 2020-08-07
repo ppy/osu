@@ -30,7 +30,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         private Container<Sprite> circleSprites;
-        private Sprite hitCircleSprite, hitCircleOverlay;
+        private Sprite hitCircleSprite;
+        private Sprite hitCircleOverlay;
 
         private SkinnableSpriteText hitCircleText;
 
