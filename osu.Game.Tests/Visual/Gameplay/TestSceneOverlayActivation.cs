@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -13,19 +12,23 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private OverlayTestPlayer testPlayer;
 
-        [Resolved]
-        private OsuConfigManager config { get; set; }
-
         public override void SetUpSteps()
         {
-            AddStep("disable overlay activation during gameplay", () => config.Set(OsuSetting.GameplayDisableOverlayActivation, true));
+            AddStep("disable overlay activation during gameplay", () => LocalConfig.Set(OsuSetting.GameplayDisableOverlayActivation, true));
             base.SetUpSteps();
         }
 
         [Test]
-        public void TestGameplayOverlayActivationSetting()
+        public void TestGameplayOverlayActivation()
         {
             AddAssert("activation mode is disabled", () => testPlayer.OverlayActivationMode == OverlayActivation.Disabled);
+        }
+
+        [Test]
+        public void TestGameplayOverlayActivationDisabled()
+        {
+            AddStep("enable overlay activation during gameplay", () => LocalConfig.Set(OsuSetting.GameplayDisableOverlayActivation, false));
+            AddAssert("activation mode is user triggered", () => testPlayer.OverlayActivationMode == OverlayActivation.UserTriggered);
         }
 
         [Test]
