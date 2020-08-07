@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,6 +28,8 @@ namespace osu.Game.Overlays.Toolbar
             Icon = FontAwesome.Solid.Bars;
             TooltipMain = "通知";
             TooltipSub = "等待着你~";
+
+            Hotkey = GlobalAction.ToggleNotifications;
 
             Add(countDisplay = new CountCircle
             {

@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -13,6 +14,8 @@ namespace osu.Game.Overlays.Toolbar
             SetIcon(FontAwesome.Solid.Comments);
             TooltipMain = "聊天";
             TooltipSub = "在这里和全球各地的人们聊天";
+
+            Hotkey = GlobalAction.ToggleChat;
         }
 
         [BackgroundDependencyLoader(true)]

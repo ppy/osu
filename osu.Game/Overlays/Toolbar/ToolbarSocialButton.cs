@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -13,6 +14,8 @@ namespace osu.Game.Overlays.Toolbar
             Icon = FontAwesome.Solid.Users;
             TooltipMain = "看板";
             TooltipSub = "在这里查看各种各样的东西";
+
+            Hotkey = GlobalAction.ToggleSocial;
         }
 
         [BackgroundDependencyLoader(true)]

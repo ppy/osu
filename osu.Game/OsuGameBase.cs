@@ -36,6 +36,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK.Input;
+using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
 {
@@ -135,8 +136,17 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
-                VersionHash = "253aa3a3a356a71295bf5b018cd4fda1"; //str.ComputeMD5Hash();
+            try
+            {
+                using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
+                    VersionHash = "b9aa39d209ae8828671366ea08d9c4a9";
+            }
+            catch
+            {
+                // special case for android builds, which can't read DLLs from a packed apk.
+                // should eventually be handled in a better way.
+                VersionHash = $"{Version}-{RuntimeInfo.OS}".ComputeMD5Hash();
+            }
 
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 

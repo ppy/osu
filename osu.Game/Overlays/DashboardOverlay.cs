@@ -19,7 +19,6 @@ namespace osu.Game.Overlays
     {
         private CancellationTokenSource cancellationToken;
 
-        private Box background;
         private Container content;
         private DashboardOverlayHeader header;
         private LoadingLayer loading;
@@ -35,9 +34,10 @@ namespace osu.Game.Overlays
         {
             Children = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourProvider.Background5
                 },
                 scrollFlow = new OverlayScrollContainer
                 {
@@ -66,8 +66,6 @@ namespace osu.Game.Overlays
                 },
                 loading = new LoadingLayer(content),
             };
-
-            background.Colour = ColourProvider.Background5;
         }
 
         protected override void LoadComplete()
