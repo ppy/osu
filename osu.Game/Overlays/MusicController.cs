@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -64,6 +64,7 @@ namespace osu.Game.Overlays
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
+        [NotNull]
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
@@ -102,12 +103,12 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Returns whether the beatmap track is playing.
         /// </summary>
-        public bool IsPlaying => CurrentTrack?.IsRunning ?? false;
+        public bool IsPlaying => CurrentTrack.IsRunning;
 
         /// <summary>
         /// Returns whether the beatmap track is loaded.
         /// </summary>
-        public bool TrackLoaded => CurrentTrack?.IsLoaded == true;
+        public bool TrackLoaded => CurrentTrack.IsLoaded;
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
@@ -140,7 +141,7 @@ namespace osu.Game.Overlays
             seekDelegate = Schedule(() =>
             {
                 if (!beatmap.Disabled)
-                    CurrentTrack?.Seek(position);
+                    CurrentTrack.Seek(position);
             });
         }
 
@@ -152,7 +153,7 @@ namespace osu.Game.Overlays
         {
             if (IsUserPaused) return;
 
-            if (CurrentTrack == null || CurrentTrack.IsDummyDevice)
+            if (CurrentTrack.IsDummyDevice)
             {
                 if (beatmap.Disabled)
                     return;
@@ -173,9 +174,6 @@ namespace osu.Game.Overlays
         {
             IsUserPaused = false;
 
-            if (CurrentTrack == null)
-                return false;
-
             if (restart)
                 CurrentTrack.Restart();
             else if (!IsPlaying)
@@ -190,7 +188,7 @@ namespace osu.Game.Overlays
         public void Stop()
         {
             IsUserPaused = true;
-            if (CurrentTrack?.IsRunning == true)
+            if (CurrentTrack.IsRunning)
                 CurrentTrack.Stop();
         }
 
@@ -200,7 +198,7 @@ namespace osu.Game.Overlays
         /// <returns>Whether the operation was successful.</returns>
         public bool TogglePause()
         {
-            if (CurrentTrack?.IsRunning == true)
+            if (CurrentTrack.IsRunning)
                 Stop();
             else
                 Play();
@@ -222,7 +220,7 @@ namespace osu.Game.Overlays
             if (beatmap.Disabled)
                 return PreviousTrackResult.None;
 
-            var currentTrackPosition = CurrentTrack?.CurrentTime;
+            var currentTrackPosition = CurrentTrack.CurrentTime;
 
             if (currentTrackPosition >= restart_cutoff_point)
             {
@@ -276,7 +274,7 @@ namespace osu.Game.Overlays
         {
             // if not scheduled, the previously track will be stopped one frame later (see ScheduleAfterChildren logic in GameBase).
             // we probably want to move this to a central method for switching to a new working beatmap in the future.
-            Schedule(() => CurrentTrack?.Restart());
+            Schedule(() => CurrentTrack.Restart());
         }
 
         private WorkingBeatmap current;
@@ -310,7 +308,7 @@ namespace osu.Game.Overlays
 
             current = beatmap.NewValue;
 
-            if (CurrentTrack == null || !beatmap.OldValue.BeatmapInfo.AudioEquals(current?.BeatmapInfo))
+            if (CurrentTrack.IsDummyDevice || !beatmap.OldValue.BeatmapInfo.AudioEquals(current?.BeatmapInfo))
                 changeTrack();
 
             TrackChanged?.Invoke(current, direction);
@@ -322,7 +320,7 @@ namespace osu.Game.Overlays
 
         private void changeTrack()
         {
-            CurrentTrack?.Expire();
+            CurrentTrack.Expire();
             CurrentTrack = null;
 
             if (current != null)
@@ -339,8 +337,6 @@ namespace osu.Game.Overlays
             // the source of track completion is the audio thread, so the beatmap may have changed before firing.
             if (current != workingBeatmap)
                 return;
-
-            Debug.Assert(CurrentTrack != null);
 
             if (!CurrentTrack.Looping && !beatmap.Disabled)
                 NextTrack();
@@ -366,9 +362,6 @@ namespace osu.Game.Overlays
 
         public void ResetTrackAdjustments()
         {
-            if (CurrentTrack == null)
-                return;
-
             CurrentTrack.ResetSpeedAdjustments();
 
             if (allowRateAdjustments)

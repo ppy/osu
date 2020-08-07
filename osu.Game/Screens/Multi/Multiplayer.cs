@@ -343,13 +343,10 @@ namespace osu.Game.Screens.Multi
         {
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
-                if (musicController.CurrentTrack != null)
-                {
-                    musicController.CurrentTrack.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
-                    musicController.CurrentTrack.Looping = true;
+                musicController.CurrentTrack.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+                musicController.CurrentTrack.Looping = true;
 
-                    musicController.EnsurePlayingSomething();
-                }
+                musicController.EnsurePlayingSomething();
             }
             else
             {
@@ -359,11 +356,8 @@ namespace osu.Game.Screens.Multi
 
         private void cancelLooping()
         {
-            if (musicController.CurrentTrack != null)
-            {
-                musicController.CurrentTrack.Looping = false;
-                musicController.CurrentTrack.RestartPoint = 0;
-            }
+            musicController.CurrentTrack.Looping = false;
+            musicController.CurrentTrack.RestartPoint = 0;
         }
 
         protected override void Dispose(bool isDisposing)

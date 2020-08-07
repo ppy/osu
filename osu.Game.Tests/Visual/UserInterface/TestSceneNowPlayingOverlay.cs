@@ -80,12 +80,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Store track", () => currentBeatmap = Beatmap.Value);
 
             AddStep(@"Seek track to 6 second", () => musicController.SeekTo(6000));
-            AddUntilStep(@"Wait for current time to update", () => musicController.CurrentTrack?.CurrentTime > 5000);
+            AddUntilStep(@"Wait for current time to update", () => musicController.CurrentTrack.CurrentTime > 5000);
 
             AddStep(@"Set previous", () => musicController.PreviousTrack());
 
             AddAssert(@"Check beatmap didn't change", () => currentBeatmap == Beatmap.Value);
-            AddUntilStep("Wait for current time to update", () => musicController.CurrentTrack?.CurrentTime < 5000);
+            AddUntilStep("Wait for current time to update", () => musicController.CurrentTrack.CurrentTime < 5000);
 
             AddStep(@"Set previous", () => musicController.PreviousTrack());
             AddAssert(@"Check beatmap did change", () => currentBeatmap != Beatmap.Value);

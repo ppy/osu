@@ -48,7 +48,7 @@ namespace osu.Game.Audio
 
             track.Started += () => Schedule(() =>
             {
-                CurrentTrack?.Stop();
+                CurrentTrack.Stop();
                 CurrentTrack = track;
                 audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
             });
