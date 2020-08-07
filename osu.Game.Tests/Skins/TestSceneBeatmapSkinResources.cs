@@ -18,17 +18,15 @@ namespace osu.Game.Tests.Skins
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        private WorkingBeatmap beatmap;
-
         [BackgroundDependencyLoader]
         private void load()
         {
             var imported = beatmaps.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-beatmap.osz"))).Result;
-            beatmap = beatmaps.GetWorkingBeatmap(imported.Beatmaps[0]);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(imported.Beatmaps[0]);
         }
 
         [Test]
-        public void TestRetrieveOggSample() => AddAssert("sample is non-null", () => beatmap.Skin.GetSample(new SampleInfo("sample")) != null);
+        public void TestRetrieveOggSample() => AddAssert("sample is non-null", () => Beatmap.Value.Skin.GetSample(new SampleInfo("sample")) != null);
 
         [Test]
         public void TestRetrieveOggTrack() => AddAssert("track is non-null", () => MusicController.CurrentTrack.IsDummyDevice == false);
