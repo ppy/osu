@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -13,6 +14,8 @@ namespace osu.Game.Overlays.Toolbar
             Icon = FontAwesome.Solid.Cog;
             TooltipMain = "Settings";
             TooltipSub = "Change your settings";
+
+            Hotkey = GlobalAction.ToggleSettings;
         }
 
         [BackgroundDependencyLoader(true)]

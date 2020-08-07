@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarChangelogButton()
         {
             SetIcon(FontAwesome.Solid.Bullhorn);
+            TooltipMain = "Changelog";
+            TooltipSub = "Track recent dev updates in the osu! ecosystem";
         }
 
         [BackgroundDependencyLoader(true)]
