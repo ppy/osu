@@ -79,12 +79,9 @@ namespace osu.Game.Overlays
             managerRemoved.BindValueChanged(beatmapRemoved);
 
             beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal, true).OrderBy(_ => RNG.Next()));
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
+            // Todo: These binds really shouldn't be here, but are unlikely to cause any issues for now.
+            // They are placed here for now since some tests rely on setting the beatmap _and_ their hierarchies inside their load(), which runs before the MusicController's load().
             beatmap.BindValueChanged(beatmapChanged, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
