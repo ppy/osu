@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 return;
             }
 
-            bool hasEnoughTime = musicController.CurrentTrack != null && DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(musicController.CurrentTrack.Length) < endDate.Value;
+            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(musicController.CurrentTrack.Length) < endDate.Value;
 
             Enabled.Value = hasBeatmap && hasEnoughTime;
         }

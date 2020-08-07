@@ -87,9 +87,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void restart()
         {
-            MusicController.CurrentTrack?.Reset();
+            MusicController.CurrentTrack.Reset();
             loadStoryboard(Beatmap.Value);
-            MusicController.CurrentTrack?.Start();
+            MusicController.CurrentTrack.Start();
         }
 
         private void loadStoryboard(WorkingBeatmap working)

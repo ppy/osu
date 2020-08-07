@@ -330,7 +330,7 @@ namespace osu.Game.Screens.Menu
             const float velocity_adjust_cutoff = 0.98f;
             const float paused_velocity = 0.5f;
 
-            if (musicController.CurrentTrack?.IsRunning == true)
+            if (musicController.CurrentTrack.IsRunning)
             {
                 var maxAmplitude = lastBeatIndex >= 0 ? musicController.CurrentTrack.CurrentAmplitudes.Maximum : 0;
                 logoAmplitudeContainer.Scale = new Vector2((float)Interpolation.Damp(logoAmplitudeContainer.Scale.X, 1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 0.9f, Time.Elapsed));

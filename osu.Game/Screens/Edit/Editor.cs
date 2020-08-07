@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit
 
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
             var sourceClock = (IAdjustableClock)musicController.CurrentTrack ?? new StopwatchClock();
-            clock = new EditorClock(Beatmap.Value, musicController.CurrentTrack?.Length ?? 0, beatDivisor) { IsCoupled = false };
+            clock = new EditorClock(Beatmap.Value, musicController.CurrentTrack.Length, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
             dependencies.CacheAs(clock);

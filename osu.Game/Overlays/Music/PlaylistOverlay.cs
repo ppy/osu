@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Music
                 if (toSelect != null)
                 {
                     beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);
-                    musicController.CurrentTrack?.Restart();
+                    musicController.CurrentTrack.Restart();
                 }
             };
         }
@@ -119,12 +119,12 @@ namespace osu.Game.Overlays.Music
         {
             if (set.ID == (beatmap.Value?.BeatmapSetInfo?.ID ?? -1))
             {
-                musicController.CurrentTrack?.Seek(0);
+                musicController.CurrentTrack.Seek(0);
                 return;
             }
 
             beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
-            musicController.CurrentTrack?.Restart();
+            musicController.CurrentTrack.Restart();
         }
     }
 

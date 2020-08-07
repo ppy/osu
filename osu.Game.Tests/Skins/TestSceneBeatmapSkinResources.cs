@@ -31,6 +31,6 @@ namespace osu.Game.Tests.Skins
         public void TestRetrieveOggSample() => AddAssert("sample is non-null", () => beatmap.Skin.GetSample(new SampleInfo("sample")) != null);
 
         [Test]
-        public void TestRetrieveOggTrack() => AddAssert("track is non-null", () => MusicController.CurrentTrack?.IsDummyDevice == false);
+        public void TestRetrieveOggTrack() => AddAssert("track is non-null", () => MusicController.CurrentTrack.IsDummyDevice == false);
     }
 }
