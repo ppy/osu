@@ -321,15 +321,13 @@ namespace osu.Game.Overlays
         private void changeTrack()
         {
             CurrentTrack.Expire();
-            CurrentTrack = null;
+            CurrentTrack = new DrawableTrack(new TrackVirtual(1000));
 
             if (current != null)
-            {
                 CurrentTrack = new DrawableTrack(current.GetRealTrack());
-                CurrentTrack.Completed += () => onTrackCompleted(current);
 
-                AddInternal(CurrentTrack);
-            }
+            CurrentTrack.Completed += () => onTrackCompleted(current);
+            AddInternal(CurrentTrack);
         }
 
         private void onTrackCompleted(WorkingBeatmap workingBeatmap)
