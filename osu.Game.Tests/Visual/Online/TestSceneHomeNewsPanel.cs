@@ -8,6 +8,8 @@ using osu.Framework.Allocation;
 using osu.Game.Overlays;
 using System;
 using osu.Game.Overlays.Dashboard.Home.News;
+using osuTK;
+using System.Collections.Generic;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -18,20 +20,40 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneHomeNewsPanel()
         {
-            Add(new Container
+            Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Y,
                 Width = 500,
-                Child = new HomeNewsPanel(new APINewsPost
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 5),
+                Children = new Drawable[]
                 {
-                    Title = "This post has an image which starts with \"/\" and has many authors!",
-                    Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                    FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
-                    PublishedAt = DateTimeOffset.Now,
-                    Slug = "2020-07-16-summer-theme-park-2020-voting-open"
-                })
+                    new HomeNewsPanel(new APINewsPost
+                    {
+                        Title = "This post has an image which starts with \"/\" and has many authors!",
+                        Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                        FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
+                        PublishedAt = DateTimeOffset.Now,
+                        Slug = "2020-07-16-summer-theme-park-2020-voting-open"
+                    }),
+                    new HomeNewsGroupPanel(new List<APINewsPost>
+                    {
+                        new APINewsPost
+                        {
+                            Title = "Title 1",
+                            Slug = "2020-07-16-summer-theme-park-2020-voting-open",
+                            PublishedAt = DateTimeOffset.Now,
+                        },
+                        new APINewsPost
+                        {
+                            Title = "Title of this post is Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                            Slug = "2020-07-16-summer-theme-park-2020-voting-open",
+                            PublishedAt = DateTimeOffset.Now,
+                        }
+                    })
+                }
             });
         }
     }
