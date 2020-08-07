@@ -67,8 +67,6 @@ namespace osu.Game
         [NotNull]
         private readonly NotificationOverlay notifications = new NotificationOverlay();
 
-        private NowPlayingOverlay nowPlaying;
-
         private BeatmapListingOverlay beatmapListing;
 
         private DashboardOverlay dashboard;
@@ -76,6 +74,7 @@ namespace osu.Game
         private MfMenuOverlay mfmenu;
         
         public OnlinePictureOverlay picture;
+        private NewsOverlay news;
 
         private UserProfileOverlay userProfile;
 
@@ -641,6 +640,7 @@ namespace osu.Game
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(mfmenu = new MfMenuOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
@@ -657,7 +657,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(nowPlaying = new NowPlayingOverlay
+            loadComponentSingleFile(new NowPlayingOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -699,7 +699,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { mfmenu, chatOverlay, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
 
             foreach (var overlay in singleDisplayOverlays)
             {
@@ -869,18 +869,6 @@ namespace osu.Game
 
             switch (action)
             {
-                case GlobalAction.ToggleNowPlaying:
-                    nowPlaying.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleChat:
-                    chatOverlay.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleSocial:
-                    dashboard.ToggleVisibility();
-                    return true;
-
                 case GlobalAction.ResetInputSettings:
                     var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
@@ -894,18 +882,6 @@ namespace osu.Game
 
                 case GlobalAction.ToggleToolbar:
                     Toolbar.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleSettings:
-                    Settings.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleDirect:
-                    beatmapListing.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleNotifications:
-                    notifications.ToggleVisibility();
                     return true;
 
                 case GlobalAction.ToggleGameplayMouseButtons:

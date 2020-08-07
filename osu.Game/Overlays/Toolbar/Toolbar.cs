@@ -81,6 +81,7 @@ namespace osu.Game.Overlays.Toolbar
                     Children = new Drawable[]
                     {
                         ToolbarTimeButton = new ToolbarTimeButton(),
+                        new ToolbarNewsButton(),
                         new ToolbarChangelogButton(),
                         new ToolbarRankingsButton(),
                         new ToolbarBeatmapListingButton(),

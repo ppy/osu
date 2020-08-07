@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -11,17 +12,17 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.News
 {
-    public class NewsCard : CompositeDrawable
+    public class NewsCard : OsuHoverContainer
     {
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
         private readonly APINewsPost post;
 
@@ -31,24 +32,28 @@ namespace osu.Game.Overlays.News
         public NewsCard(APINewsPost post)
         {
             this.post = post;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 6;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider, GameHost host)
+        {
+            if (post.Slug != null)
+            {
+                TooltipText = "在浏览器中查看";
+                Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
+            }
 
             NewsBackground bg;
-
-            InternalChildren = new Drawable[]
+            AddRange(new Drawable[]
             {
                 background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4
+                    RelativeSizeAxes = Axes.Both
                 },
                 new FillFlowContainer
                 {
@@ -104,9 +109,11 @@ namespace osu.Game.Overlays.News
                             }
                         }
                     }
-                },
-                new HoverClickSounds()
-            };
+                }
+            });
+
+            IdleColour = colourProvider.Background4;
+            HoverColour = colourProvider.Background3;
 
             bg.OnLoadComplete += d => d.FadeIn(250, Easing.In);
 
@@ -114,18 +121,6 @@ namespace osu.Game.Overlays.News
             main.AddParagraph(post.Preview, t => t.Font = OsuFont.GetFont(size: 12)); // Should use sans-serif font
             main.AddParagraph("by ", t => t.Font = OsuFont.GetFont(size: 12));
             main.AddText(post.Author, t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold));
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            background.FadeColour(colourProvider.Background3, 200, Easing.OutQuint);
-            return true;
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            background.FadeColour(colourProvider.Background4, 200, Easing.OutQuint);
-            base.OnHoverLost(e);
         }
 
         [LongRunningLoad]
@@ -184,7 +179,7 @@ namespace osu.Game.Overlays.News
                     new OsuSpriteText
                     {
                         Text = date.ToString("yyyy MMM d").ToUpper(),
-                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                         Margin = new MarginPadding
                         {
                             Horizontal = 20,
@@ -193,6 +188,8 @@ namespace osu.Game.Overlays.News
                     }
                 };
             }
+
+            protected override bool OnClick(ClickEvent e) => true; // Protects the NewsCard from clicks while hovering DateContainer
         }
     }
 }

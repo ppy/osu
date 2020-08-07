@@ -9,13 +9,13 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Screens.Play;
+using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Mvis.Storyboard
 {
     public class BackgroundStoryBoardLoader : Container
     {
         private const float DURATION = 750;
-        private Container sbClock;
         private CancellationTokenSource ChangeSB;
         private BindableBool EnableSB = new BindableBool();
         ///<summary>
@@ -50,12 +50,13 @@ namespace osu.Game.Screens.Mvis.Storyboard
         /// </summary>
         private Action OnComplete;
 
-        private DimmableStoryboard dimmableSB;
-        private StoryboardClock StoryboardClock;
+        private DrawableStoryboard storyboard;
+        private StoryboardClock StoryboardClock = new StoryboardClock();
+        private Container ClockContainer;
 
         public Drawable GetOverlayProxy()
         {
-            var proxy = dimmableSB.OverlayLayerContainer.CreateProxy();
+            var proxy = storyboard.OverlayLayer.CreateProxy();
             return proxy;
         }
 
@@ -90,11 +91,11 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
                 }
 
-                sbClock?.FadeIn(DURATION, Easing.OutQuint);
+                ClockContainer?.FadeIn(DURATION, Easing.OutQuint);
             }
             else
             {
-                sbClock?.FadeOut(DURATION / 2, Easing.OutQuint);
+                ClockContainer?.FadeOut(DURATION / 2, Easing.OutQuint);
                 storyboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
                 IsReady.Value = true;
@@ -106,34 +107,22 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             try
             {
-                if ( sbClock != null )
-                {
-                    StoryboardClock?.Stop();
-                    sbClock.FadeOut(DURATION, Easing.OutQuint);
-                    sbClock.Expire();
-                }
-
+                StoryboardClock.Stop();
                 LoadSBTask = LoadComponentAsync(new Container
                 {
                     Name = "Storyboard Container",
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Child = dimmableSB = new DimmableStoryboard(b.Value.Storyboard)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Clock = StoryboardClock = new StoryboardClock(),
-                        Name = "Storyboard"
-                    }
-                }, newsbClock =>
+                    Child = storyboard = beatmap.Storyboard.CreateDrawable(),
+                }, newClockContainer =>
                 {
-                    sbClock = newsbClock;
-
-                    dimmableSB.IgnoreUserSettings.Value = true;
-                    dimmableSB.EnableUserDim.Value = false;
+                    //将故事版的Clock设为StoryboardClock以避免一些问题
+                    storyboard.Clock = StoryboardClock = new StoryboardClock();
 
                     StoryboardClock.ChangeSource(beatmap.Track);
 
-                    this.Add(sbClock);
+                    this.Add(newClockContainer);
+                    ClockContainer = newClockContainer;
 
                     SBLoaded.Value = true;
                     IsReady.Value = true;
@@ -173,7 +162,11 @@ namespace osu.Game.Screens.Mvis.Storyboard
             SBLoaded.Value = false;
             NeedToHideTriangles.Value = false;
 
-            dimmableSB = null;
+            ClockContainer?.FadeOut(DURATION, Easing.OutQuint);
+            ClockContainer?.Expire();
+            ClockContainer = null;
+
+            storyboard = null;
 
             if ( !EnableSB.Value )
             {
