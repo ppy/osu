@@ -54,5 +54,10 @@ namespace osu.Game.Beatmaps
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
         IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null);
+
+        /// <summary>
+        /// Retrieves the <see cref="Track"/> which this <see cref="WorkingBeatmap"/> provides.
+        /// </summary>
+        Track GetTrack();
     }
 }

@@ -45,7 +45,7 @@ namespace osu.Game.Beatmaps
 
         protected override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
 
-        protected override Track GetTrack() => GetVirtualTrack();
+        protected override Track GetBeatmapTrack() => GetVirtualTrack();
 
         private class DummyRulesetInfo : RulesetInfo
         {

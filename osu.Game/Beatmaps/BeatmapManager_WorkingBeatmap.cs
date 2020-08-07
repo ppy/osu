@@ -70,7 +70,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            protected override Track GetTrack()
+            protected override Track GetBeatmapTrack()
             {
                 try
                 {
