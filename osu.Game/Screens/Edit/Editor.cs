@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Edit
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
-            var sourceClock = (IAdjustableClock)musicController.CurrentTrack ?? new StopwatchClock();
+            var sourceClock = (IAdjustableClock)musicController.CurrentTrack;
             clock = new EditorClock(Beatmap.Value, musicController.CurrentTrack.Length, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
