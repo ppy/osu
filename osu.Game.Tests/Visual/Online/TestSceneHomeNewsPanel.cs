@@ -52,7 +52,8 @@ namespace osu.Game.Tests.Visual.Online
                             Slug = "2020-07-16-summer-theme-park-2020-voting-open",
                             PublishedAt = DateTimeOffset.Now,
                         }
-                    })
+                    }),
+                    new HomeShowMoreNewsPanel()
                 }
             });
         }
