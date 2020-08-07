@@ -318,12 +318,9 @@ namespace osu.Game.Overlays
         private void changeTrack()
         {
             CurrentTrack.Expire();
-            CurrentTrack = new DrawableTrack(new TrackVirtual(1000));
-
-            if (current != null)
-                CurrentTrack = new DrawableTrack(current.GetTrack());
-
+            CurrentTrack = new DrawableTrack(current.GetTrack());
             CurrentTrack.Completed += () => onTrackCompleted(current);
+
             AddInternal(CurrentTrack);
         }
 
