@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
         /// <remarks>
         /// Can serve as an optimisation if it is known ahead-of-time that this behaviour is allowed in a given use case.
         /// </remarks>
-        protected bool SkipPlayWhenZeroVolume => !Looping;
+        protected bool PlayWhenZeroVolume => Looping;
 
         private readonly AudioContainer<DrawableSample> samplesContainer;
 
@@ -98,7 +98,7 @@ namespace osu.Game.Skinning
         {
             samplesContainer.ForEach(c =>
             {
-                if (!SkipPlayWhenZeroVolume || c.AggregateVolume.Value > 0)
+                if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
                     c.Play();
             });
         }
