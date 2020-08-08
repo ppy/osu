@@ -7,18 +7,20 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.News;
+using osu.Game.Overlays.News.Displays;
 
 namespace osu.Game.Overlays
 {
     public class NewsOverlay : FullscreenOverlay
     {
+        private readonly Bindable<string> article = new Bindable<string>(null);
+
+        private Container content;
+        private LoadingLayer loading;
         private NewsHeader header;
-
-        private Container<NewsContent> content;
-
-        public readonly Bindable<string> Current = new Bindable<string>(null);
+        private OverlayScrollContainer scrollFlow;
 
         public NewsOverlay()
             : base(OverlayColourScheme.Purple)
@@ -26,18 +28,19 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.PurpleDarkAlternative
+                    Colour = ColourProvider.Background5,
                 },
-                new OverlayScrollContainer
+                scrollFlow = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    ScrollbarVisible = false,
                     Child = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
@@ -49,7 +52,7 @@ namespace osu.Game.Overlays
                             {
                                 ShowFrontPage = ShowFrontPage
                             },
-                            content = new Container<NewsContent>
+                            content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
@@ -57,31 +60,81 @@ namespace osu.Game.Overlays
                         },
                     },
                 },
+                loading = new LoadingLayer(content),
             };
-
-            header.Post.BindTo(Current);
-            Current.TriggerChange();
         }
 
-        private CancellationTokenSource loadContentCancellation;
-
-        protected void LoadAndShowContent(NewsContent newContent)
+        protected override void LoadComplete()
         {
-            content.FadeTo(0.2f, 300, Easing.OutQuint);
+            base.LoadComplete();
 
-            loadContentCancellation?.Cancel();
+            // should not be run until first pop-in to avoid requesting data before user views.
+            article.BindValueChanged(onArticleChanged);
+        }
 
-            LoadComponentAsync(newContent, c =>
+        private bool displayUpdateRequired = true;
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            if (displayUpdateRequired)
             {
-                content.Child = c;
-                content.FadeIn(300, Easing.OutQuint);
-            }, (loadContentCancellation = new CancellationTokenSource()).Token);
+                article.TriggerChange();
+                displayUpdateRequired = false;
+            }
+        }
+
+        protected override void PopOutComplete()
+        {
+            base.PopOutComplete();
+            displayUpdateRequired = true;
         }
 
         public void ShowFrontPage()
         {
-            Current.Value = null;
+            article.Value = null;
             Show();
+        }
+
+        public void ShowArticle(string slug)
+        {
+            article.Value = slug;
+            Show();
+        }
+
+        private CancellationTokenSource cancellationToken;
+
+        private void onArticleChanged(ValueChangedEvent<string> e)
+        {
+            cancellationToken?.Cancel();
+            loading.Show();
+
+            if (e.NewValue == null)
+            {
+                header.SetFrontPage();
+                LoadDisplay(new FrontPageDisplay());
+                return;
+            }
+
+            header.SetArticle(e.NewValue);
+            LoadDisplay(Empty());
+        }
+
+        protected void LoadDisplay(Drawable display)
+        {
+            scrollFlow.ScrollToStart();
+            LoadComponentAsync(display, loaded =>
+            {
+                content.Child = loaded;
+                loading.Hide();
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            cancellationToken?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }

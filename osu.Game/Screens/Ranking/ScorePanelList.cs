@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -25,12 +26,45 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         private const float expanded_panel_spacing = 15;
 
+        /// <summary>
+        /// Minimum distance from either end point of the list that the list can be considered scrolled to the end point.
+        /// </summary>
+        private const float scroll_endpoint_distance = 100;
+
+        /// <summary>
+        /// Whether this <see cref="ScorePanelList"/> can be scrolled and is currently scrolled to the start.
+        /// </summary>
+        public bool IsScrolledToStart => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.Current <= scroll_endpoint_distance;
+
+        /// <summary>
+        /// Whether this <see cref="ScorePanelList"/> can be scrolled and is currently scrolled to the end.
+        /// </summary>
+        public bool IsScrolledToEnd => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.IsScrolledToEnd(scroll_endpoint_distance);
+
+        /// <summary>
+        /// The current scroll position.
+        /// </summary>
+        public double Current => scroll.Current;
+
+        /// <summary>
+        /// The scrollable extent.
+        /// </summary>
+        public double ScrollableExtent => scroll.ScrollableExtent;
+
+        /// <summary>
+        /// An action to be invoked if a <see cref="ScorePanel"/> is clicked while in an expanded state.
+        /// </summary>
+        public Action PostExpandAction;
+
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
 
         private readonly Flow flow;
         private readonly Scroll scroll;
         private ScorePanel expandedPanel;
 
+        /// <summary>
+        /// Creates a new <see cref="ScorePanelList"/>.
+        /// </summary>
         public ScorePanelList()
         {
             RelativeSizeAxes = Axes.Both;
@@ -38,6 +72,7 @@ namespace osu.Game.Screens.Ranking
             InternalChild = scroll = new Scroll
             {
                 RelativeSizeAxes = Axes.Both,
+                HandleScroll = () => expandedPanel?.IsHovered != true, // handle horizontal scroll only when not hovering the expanded panel.
                 Child = flow = new Flow
                 {
                     Anchor = Anchor.Centre,
@@ -60,12 +95,11 @@ namespace osu.Game.Screens.Ranking
         /// Adds a <see cref="ScoreInfo"/> to this list.
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to add.</param>
-        public void AddScore(ScoreInfo score)
+        public ScorePanel AddScore(ScoreInfo score)
         {
-            flow.Add(new ScorePanel(score)
+            var panel = new ScorePanel(score)
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                PostExpandAction = () => PostExpandAction?.Invoke()
             }.With(p =>
             {
                 p.StateChanged += s =>
@@ -73,6 +107,12 @@ namespace osu.Game.Screens.Ranking
                     if (s == PanelState.Expanded)
                         SelectedScore.Value = p.Score;
                 };
+            });
+
+            flow.Add(panel.CreateTrackingContainer().With(d =>
+            {
+                d.Anchor = Anchor.Centre;
+                d.Origin = Anchor.Centre;
             }));
 
             if (SelectedScore.Value == score)
@@ -90,6 +130,8 @@ namespace osu.Game.Screens.Ranking
                     scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
                 }
             }
+
+            return panel;
         }
 
         /// <summary>
@@ -99,24 +141,24 @@ namespace osu.Game.Screens.Ranking
         private void selectedScoreChanged(ValueChangedEvent<ScoreInfo> score)
         {
             // Contract the old panel.
-            foreach (var p in flow.Where(p => p.Score == score.OldValue))
+            foreach (var t in flow.Where(t => t.Panel.Score == score.OldValue))
             {
-                p.State = PanelState.Contracted;
-                p.Margin = new MarginPadding();
+                t.Panel.State = PanelState.Contracted;
+                t.Margin = new MarginPadding();
             }
 
             // Find the panel corresponding to the new score.
-            expandedPanel = flow.SingleOrDefault(p => p.Score == score.NewValue);
-
-            // handle horizontal scroll only when not hovering the expanded panel.
-            scroll.HandleScroll = () => expandedPanel?.IsHovered != true;
+            var expandedTrackingComponent = flow.SingleOrDefault(t => t.Panel.Score == score.NewValue);
+            expandedPanel = expandedTrackingComponent?.Panel;
 
             if (expandedPanel == null)
                 return;
 
+            Debug.Assert(expandedTrackingComponent != null);
+
             // Expand the new panel.
+            expandedTrackingComponent.Margin = new MarginPadding { Horizontal = expanded_panel_spacing };
             expandedPanel.State = PanelState.Expanded;
-            expandedPanel.Margin = new MarginPadding { Horizontal = expanded_panel_spacing };
 
             // Scroll to the new panel. This is done manually since we need:
             // 1) To scroll after the scroll container's visible range is updated.
@@ -145,15 +187,92 @@ namespace osu.Game.Screens.Ranking
             flow.Padding = new MarginPadding { Horizontal = offset };
         }
 
-        private class Flow : FillFlowContainer<ScorePanel>
+        private bool handleInput = true;
+
+        /// <summary>
+        /// Whether this <see cref="ScorePanelList"/> or any of the <see cref="ScorePanel"/>s contained should handle scroll or click input.
+        /// Setting to <c>false</c> will also hide the scrollbar.
+        /// </summary>
+        public bool HandleInput
+        {
+            get => handleInput;
+            set
+            {
+                handleInput = value;
+                scroll.ScrollbarVisible = value;
+            }
+        }
+
+        public override bool PropagatePositionalInputSubTree => HandleInput && base.PropagatePositionalInputSubTree;
+
+        public override bool PropagateNonPositionalInputSubTree => HandleInput && base.PropagateNonPositionalInputSubTree;
+
+        /// <summary>
+        /// Enumerates all <see cref="ScorePanel"/>s contained in this <see cref="ScorePanelList"/>.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ScorePanel> GetScorePanels() => flow.Select(t => t.Panel);
+
+        /// <summary>
+        /// Finds the <see cref="ScorePanel"/> corresponding to a <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to find the corresponding <see cref="ScorePanel"/> for.</param>
+        /// <returns>The <see cref="ScorePanel"/>.</returns>
+        public ScorePanel GetPanelForScore(ScoreInfo score) => flow.Single(t => t.Panel.Score == score).Panel;
+
+        /// <summary>
+        /// Detaches a <see cref="ScorePanel"/> from its <see cref="ScorePanelTrackingContainer"/>, allowing the panel to be moved elsewhere in the hierarchy.
+        /// </summary>
+        /// <param name="panel">The <see cref="ScorePanel"/> to detach.</param>
+        /// <exception cref="InvalidOperationException">If <paramref name="panel"/> is not a part of this <see cref="ScorePanelList"/>.</exception>
+        public void Detach(ScorePanel panel)
+        {
+            var container = flow.SingleOrDefault(t => t.Panel == panel);
+            if (container == null)
+                throw new InvalidOperationException("Panel is not contained by the score panel list.");
+
+            container.Detach();
+        }
+
+        /// <summary>
+        /// Attaches a <see cref="ScorePanel"/> to its <see cref="ScorePanelTrackingContainer"/> in this <see cref="ScorePanelList"/>.
+        /// </summary>
+        /// <param name="panel">The <see cref="ScorePanel"/> to attach.</param>
+        /// <exception cref="InvalidOperationException">If <paramref name="panel"/> is not a part of this <see cref="ScorePanelList"/>.</exception>
+        public void Attach(ScorePanel panel)
+        {
+            var container = flow.SingleOrDefault(t => t.Panel == panel);
+            if (container == null)
+                throw new InvalidOperationException("Panel is not contained by the score panel list.");
+
+            container.Attach();
+        }
+
+        private class Flow : FillFlowContainer<ScorePanelTrackingContainer>
         {
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
-            public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Score != score).Count();
+            public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Panel.Score != score).Count();
 
-            private IEnumerable<ScorePanel> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanel>()
-                                                                                                      .OrderByDescending(s => s.Score.TotalScore)
-                                                                                                      .ThenBy(s => s.Score.OnlineScoreID);
+            private IEnumerable<ScorePanelTrackingContainer> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanelTrackingContainer>()
+                                                                                                                       .OrderByDescending(s => s.Panel.Score.TotalScore)
+                                                                                                                       .ThenBy(s => s.Panel.Score.OnlineScoreID);
+
+            protected override int Compare(Drawable x, Drawable y)
+            {
+                var tX = (ScorePanelTrackingContainer)x;
+                var tY = (ScorePanelTrackingContainer)y;
+
+                int result = tY.Panel.Score.TotalScore.CompareTo(tX.Panel.Score.TotalScore);
+
+                if (result != 0)
+                    return result;
+
+                if (tX.Panel.Score.OnlineScoreID == null || tY.Panel.Score.OnlineScoreID == null)
+                    return base.Compare(x, y);
+
+                return tX.Panel.Score.OnlineScoreID.Value.CompareTo(tY.Panel.Score.OnlineScoreID.Value);
+            }
         }
 
         private class Scroll : OsuScrollContainer

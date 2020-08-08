@@ -13,6 +13,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -99,6 +101,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestManiaMods()
         {
             changeRuleset(3);
+
+            var mania = new ManiaRuleset();
+
+            testModsWithSameBaseType(
+                mania.GetAllMods().Single(m => m.GetType() == typeof(ManiaModFadeIn)),
+                mania.GetAllMods().Single(m => m.GetType() == typeof(ManiaModHidden)));
         }
 
         [Test]
@@ -195,6 +203,18 @@ namespace osu.Game.Tests.Visual.UserInterface
             selectPrevious(mod);
             AddWaitStep("wait for changing colour", 1);
             checkLabelColor(() => Color4.White);
+        }
+
+        private void testModsWithSameBaseType(Mod modA, Mod modB)
+        {
+            selectNext(modA);
+            checkSelected(modA);
+            selectNext(modB);
+            checkSelected(modB);
+
+            // Backwards
+            selectPrevious(modA);
+            checkSelected(modA);
         }
 
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));

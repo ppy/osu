@@ -64,6 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox = CreateDragBox(select),
                 selectionHandler,
                 SelectionBlueprints = CreateSelectionBlueprintContainer(),
+                selectionHandler.CreateProxy(),
                 DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
 
@@ -121,14 +122,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return e.Button == MouseButton.Left;
         }
 
+        private SelectionBlueprint clickedBlueprint;
+
         protected override bool OnClick(ClickEvent e)
         {
             if (e.Button == MouseButton.Right)
                 return false;
 
+            // store for double-click handling
+            clickedBlueprint = selectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered);
+
             // Deselection should only occur if no selected blueprints are hovered
             // A special case for when a blueprint was selected via this click is added since OnClick() may occur outside the hitobject and should not trigger deselection
-            if (endClickSelection() || selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+            if (endClickSelection() || clickedBlueprint != null)
                 return true;
 
             deselectAll();
@@ -140,9 +146,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Button == MouseButton.Right)
                 return false;
 
-            SelectionBlueprint clickedBlueprint = selectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered);
-
-            if (clickedBlueprint == null)
+            // ensure the blueprint which was hovered for the first click is still the hovered blueprint.
+            if (clickedBlueprint == null || selectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered) != clickedBlueprint)
                 return false;
 
             editorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);

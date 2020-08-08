@@ -1,20 +1,29 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Utils;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osuTK;
-using System.Collections.Generic;
-using System.Linq;
+using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Storyboards;
+using osu.Game.Tests.Visual;
+using osuTK;
 using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -28,6 +37,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override bool Autoplay => true;
 
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new ScoreExposedPlayer();
+
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
             var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
@@ -36,6 +47,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private DrawableSpinner drawableSpinner;
+        private SpriteIcon spinnerSymbol => drawableSpinner.ChildrenOfType<SpriteIcon>().Single();
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -49,24 +61,124 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestSpinnerRewindingRotation()
         {
+            double trackerRotationTolerance = 0;
+
             addSeekStep(5000);
-            AddAssert("is rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, 0, 100));
+            AddStep("calculate rotation tolerance", () =>
+            {
+                trackerRotationTolerance = Math.Abs(drawableSpinner.RotationTracker.Rotation * 0.1f);
+            });
+            AddAssert("is disc rotation not almost 0", () => !Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, 0, 100));
+            AddAssert("is disc rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, 0, 100));
 
             addSeekStep(0);
-            AddAssert("is rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, 0, 100));
+            AddAssert("is disc rotation almost 0", () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, 0, trackerRotationTolerance));
+            AddAssert("is disc rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, 0, 100));
         }
 
         [Test]
         public void TestSpinnerMiddleRewindingRotation()
         {
-            double estimatedRotation = 0;
+            double finalCumulativeTrackerRotation = 0;
+            double finalTrackerRotation = 0, trackerRotationTolerance = 0;
+            double finalSpinnerSymbolRotation = 0, spinnerSymbolRotationTolerance = 0;
 
             addSeekStep(5000);
-            AddStep("retrieve rotation", () => estimatedRotation = drawableSpinner.Disc.RotationAbsolute);
+            AddStep("retrieve disc rotation", () =>
+            {
+                finalTrackerRotation = drawableSpinner.RotationTracker.Rotation;
+                trackerRotationTolerance = Math.Abs(finalTrackerRotation * 0.05f);
+            });
+            AddStep("retrieve spinner symbol rotation", () =>
+            {
+                finalSpinnerSymbolRotation = spinnerSymbol.Rotation;
+                spinnerSymbolRotationTolerance = Math.Abs(finalSpinnerSymbolRotation * 0.05f);
+            });
+            AddStep("retrieve cumulative disc rotation", () => finalCumulativeTrackerRotation = drawableSpinner.RotationTracker.CumulativeRotation);
 
             addSeekStep(2500);
+            AddAssert("disc rotation rewound",
+                // we want to make sure that the rotation at time 2500 is in the same direction as at time 5000, but about half-way in.
+                // due to the exponential damping applied we're allowing a larger margin of error of about 10%
+                // (5% relative to the final rotation value, but we're half-way through the spin).
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalTrackerRotation / 2, trackerRotationTolerance));
+            AddAssert("symbol rotation rewound",
+                () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation / 2, spinnerSymbolRotationTolerance));
+            AddAssert("is cumulative rotation rewound",
+                // cumulative rotation is not damped, so we're treating it as the "ground truth" and allowing a comparatively smaller margin of error.
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, finalCumulativeTrackerRotation / 2, 100));
+
             addSeekStep(5000);
-            AddAssert("is rotation absolute almost same", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, estimatedRotation, 100));
+            AddAssert("is disc rotation almost same",
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, finalTrackerRotation, trackerRotationTolerance));
+            AddAssert("is symbol rotation almost same",
+                () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation, spinnerSymbolRotationTolerance));
+            AddAssert("is cumulative rotation almost same",
+                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.CumulativeRotation, finalCumulativeTrackerRotation, 100));
+        }
+
+        [Test]
+        public void TestRotationDirection([Values(true, false)] bool clockwise)
+        {
+            if (clockwise)
+            {
+                AddStep("flip replay", () =>
+                {
+                    var drawableRuleset = this.ChildrenOfType<DrawableOsuRuleset>().Single();
+                    var score = drawableRuleset.ReplayScore;
+                    var scoreWithFlippedReplay = new Score
+                    {
+                        ScoreInfo = score.ScoreInfo,
+                        Replay = flipReplay(score.Replay)
+                    };
+                    drawableRuleset.SetReplayScore(scoreWithFlippedReplay);
+                });
+            }
+
+            addSeekStep(5000);
+
+            AddAssert("disc spin direction correct", () => clockwise ? drawableSpinner.RotationTracker.Rotation > 0 : drawableSpinner.RotationTracker.Rotation < 0);
+            AddAssert("spinner symbol direction correct", () => clockwise ? spinnerSymbol.Rotation > 0 : spinnerSymbol.Rotation < 0);
+        }
+
+        private Replay flipReplay(Replay scoreReplay) => new Replay
+        {
+            Frames = scoreReplay
+                     .Frames
+                     .Cast<OsuReplayFrame>()
+                     .Select(replayFrame =>
+                     {
+                         var flippedPosition = new Vector2(OsuPlayfield.BASE_SIZE.X - replayFrame.Position.X, replayFrame.Position.Y);
+                         return new OsuReplayFrame(replayFrame.Time, flippedPosition, replayFrame.Actions.ToArray());
+                     })
+                     .Cast<ReplayFrame>()
+                     .ToList()
+        };
+
+        [Test]
+        public void TestSpinnerNormalBonusRewinding()
+        {
+            addSeekStep(1000);
+
+            AddAssert("player score matching expected bonus score", () =>
+            {
+                // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
+                var totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
+                return totalScore == (int)(drawableSpinner.RotationTracker.CumulativeRotation / 360) * SpinnerTick.SCORE_PER_TICK;
+            });
+
+            addSeekStep(0);
+
+            AddAssert("player score is 0", () => ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value == 0);
+        }
+
+        [Test]
+        public void TestSpinnerCompleteBonusRewinding()
+        {
+            addSeekStep(2500);
+            addSeekStep(0);
+
+            AddAssert("player score is 0", () => ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value == 0);
         }
 
         [Test]
@@ -74,13 +186,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             double estimatedSpm = 0;
 
-            addSeekStep(2500);
+            addSeekStep(1000);
             AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpmCounter.SpinsPerMinute);
 
-            addSeekStep(5000);
+            addSeekStep(2000);
             AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
 
-            addSeekStep(2500);
+            addSeekStep(1000);
             AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
         }
 
@@ -100,12 +212,17 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Position = new Vector2(256, 192),
                     EndTime = 6000,
                 },
-                // placeholder object to avoid hitting the results screen
-                new HitCircle
-                {
-                    StartTime = 99999,
-                }
             }
         };
+
+        private class ScoreExposedPlayer : TestPlayer
+        {
+            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+
+            public ScoreExposedPlayer()
+                : base(false, false)
+            {
+            }
+        }
     }
 }
