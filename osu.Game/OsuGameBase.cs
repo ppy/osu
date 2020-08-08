@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -35,6 +36,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK.Input;
+using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
 {
@@ -97,6 +99,11 @@ namespace osu.Game
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
+        /// <summary>
+        /// MD5 representation of the game executable.
+        /// </summary>
+        public string VersionHash { get; private set; }
+
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
         public virtual string Version
@@ -128,6 +135,18 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
+            try
+            {
+                using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
+                    VersionHash = str.ComputeMD5Hash();
+            }
+            catch
+            {
+                // special case for android builds, which can't read DLLs from a packed apk.
+                // should eventually be handled in a better way.
+                VersionHash = $"{Version}-{RuntimeInfo.OS}".ComputeMD5Hash();
+            }
+
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
@@ -152,6 +171,7 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto-Thai");
 
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Bold");
@@ -197,6 +217,10 @@ namespace osu.Game
                 if (i.NewValue.TryGetTarget(out var item))
                     ScoreManager.Undelete(getBeatmapScores(item), true);
             });
+
+            var difficultyManager = new BeatmapDifficultyManager();
+            dependencies.Cache(difficultyManager);
+            AddInternal(difficultyManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
@@ -312,10 +336,12 @@ namespace osu.Game
             base.SetHost(host);
 
             // may be non-null for certain tests
-            Storage ??= new OsuStorage(host);
+            Storage ??= host.Storage;
 
             LocalConfig ??= new OsuConfigManager(Storage);
         }
+
+        protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 

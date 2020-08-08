@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var spinner = (DrawableSpinner)drawable;
 
-            spinner.Disc.Tracking = true;
-            spinner.Disc.Rotate(MathUtils.RadiansToDegrees((float)spinner.Clock.ElapsedFrameTime * 0.03f));
+            spinner.RotationTracker.Tracking = true;
+            spinner.RotationTracker.AddRotation(MathUtils.RadiansToDegrees((float)spinner.Clock.ElapsedFrameTime * 0.03f));
         }
     }
 }

@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -76,6 +77,12 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
         public event Action<PanelState> StateChanged;
+
+        /// <summary>
+        /// An action to be invoked if this <see cref="ScorePanel"/> is clicked while in an expanded state.
+        /// </summary>
+        public Action PostExpandAction;
+
         public readonly ScoreInfo Score;
 
         private Container content;
@@ -136,7 +143,16 @@ namespace osu.Game.Screens.Ranking
                                 CornerRadius = 20,
                                 CornerExponent = 2.5f,
                                 Masking = true,
-                                Child = middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
+                                Children = new[]
+                                {
+                                    middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both },
+                                    new UserCoverBackground
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        User = Score.User,
+                                        Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
+                                    }
+                                }
                             },
                             middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
                         }
@@ -149,18 +165,10 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            if (state == PanelState.Expanded)
-            {
-                topLayerBackground.FadeColour(expanded_top_layer_colour);
-                middleLayerBackground.FadeColour(expanded_middle_layer_colour);
-            }
-            else
-            {
-                topLayerBackground.FadeColour(contracted_top_layer_colour);
-                middleLayerBackground.FadeColour(contracted_middle_layer_colour);
-            }
-
             updateState();
+
+            topLayerBackground.FinishTransforms(false, nameof(Colour));
+            middleLayerBackground.FinishTransforms(false, nameof(Colour));
         }
 
         private PanelState state = PanelState.Contracted;
@@ -195,8 +203,8 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
 
-                    topLayerContentContainer.Add(middleLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(topLayerContent = new ExpandedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
 
                 case PanelState.Contracted:
@@ -205,7 +213,8 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(contracted_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, resize_duration, Easing.OutQuint);
 
-                    middleLayerContentContainer.Add(topLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ContractedPanelTopContent(Score).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
             }
 
@@ -236,10 +245,28 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        public override Vector2 Size
+        {
+            get => base.Size;
+            set
+            {
+                base.Size = value;
+
+                // Auto-size isn't used to avoid 1-frame issues and because the score panel is removed/re-added to the container.
+                if (trackingContainer != null)
+                    trackingContainer.Size = value;
+            }
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             if (State == PanelState.Contracted)
+            {
                 State = PanelState.Expanded;
+                return true;
+            }
+
+            PostExpandAction?.Invoke();
 
             return true;
         }
@@ -248,5 +275,24 @@ namespace osu.Game.Screens.Ranking
             => base.ReceivePositionalInputAt(screenSpacePos)
                || topLayerContainer.ReceivePositionalInputAt(screenSpacePos)
                || middleLayerContainer.ReceivePositionalInputAt(screenSpacePos);
+
+        private ScorePanelTrackingContainer trackingContainer;
+
+        /// <summary>
+        /// Creates a <see cref="ScorePanelTrackingContainer"/> which this <see cref="ScorePanel"/> can reside inside.
+        /// The <see cref="ScorePanelTrackingContainer"/> will track the size of this <see cref="ScorePanel"/>.
+        /// </summary>
+        /// <remarks>
+        /// This <see cref="ScorePanel"/> is immediately added as a child of the <see cref="ScorePanelTrackingContainer"/>.
+        /// </remarks>
+        /// <returns>The <see cref="ScorePanelTrackingContainer"/>.</returns>
+        /// <exception cref="InvalidOperationException">If a <see cref="ScorePanelTrackingContainer"/> already exists.</exception>
+        public ScorePanelTrackingContainer CreateTrackingContainer()
+        {
+            if (trackingContainer != null)
+                throw new InvalidOperationException("A score panel container has already been created.");
+
+            return trackingContainer = new ScorePanelTrackingContainer(this);
+        }
     }
 }
