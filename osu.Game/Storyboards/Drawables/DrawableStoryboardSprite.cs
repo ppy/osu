@@ -20,7 +20,8 @@ namespace osu.Game.Storyboards.Drawables
 
         private Sprite drawableSprite;
 
-        private TextureStore storyboardTextureStore;
+        [Resolved]
+        private TextureStore storyboardTextureStore { get; set; }
 
         private string texturePath;
 
@@ -121,15 +122,13 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             InternalChild = drawableSprite = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             };
-
-            storyboardTextureStore = textureStore;
 
             texturePath = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
