@@ -50,7 +50,13 @@ namespace osu.Game.Screens.Play
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
+        private const OverlayActivation initial_overlay_activation_mode = OverlayActivation.UserTriggered;
+        public override OverlayActivation InitialOverlayActivationMode => initial_overlay_activation_mode;
+
+        /// <summary>
+        /// The current activation mode for overlays.
+        /// </summary>
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(initial_overlay_activation_mode);
 
         /// <summary>
         /// Whether gameplay should pause when the game window focus is lost.
@@ -89,11 +95,6 @@ namespace osu.Game.Screens.Play
         private BreakTracker breakTracker;
 
         private SkipOverlay skipOverlay;
-
-        /// <summary>
-        /// The current activation mode for overlays.
-        /// </summary>
-        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.UserTriggered);
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
