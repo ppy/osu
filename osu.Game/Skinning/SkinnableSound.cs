@@ -34,7 +34,7 @@ namespace osu.Game.Skinning
         /// Defaults to false unless <see cref="Looping"/>.
         /// </summary>
         /// <remarks>
-        /// Can serve as an optimisation if it is known ahead-of-time that this behaviour will not negatively affect behaviour.
+        /// Can serve as an optimisation if it is known ahead-of-time that this behaviour is allowed in a given use case.
         /// </remarks>
         protected bool SkipPlayWhenZeroVolume => !Looping;
 
