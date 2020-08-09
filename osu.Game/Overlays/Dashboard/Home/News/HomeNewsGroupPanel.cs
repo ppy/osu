@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -44,41 +45,51 @@ namespace osu.Game.Overlays.Dashboard.Home.News
 
             protected override Drawable CreateContent(APINewsPost post) => new NewsTitleLink(post);
 
-            protected override NewsPostDrawableDate CreateDate(DateTimeOffset date) => new Date(date);
+            protected override Drawable CreateDate(DateTimeOffset date) => new Date(date);
+        }
 
-            private class Date : NewsPostDrawableDate
+        private class Date : CompositeDrawable, IHasCustomTooltip
+        {
+            public ITooltip GetCustomTooltip() => new DateTooltip();
+
+            public object TooltipContent => date;
+
+            private readonly DateTimeOffset date;
+
+            public Date(DateTimeOffset date)
             {
-                public Date(DateTimeOffset date)
-                    : base(date)
+                this.date = date;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                TextFlowContainer textFlow;
+
+                AutoSizeAxes = Axes.Both;
+                Anchor = Anchor.TopRight;
+                Origin = Anchor.TopRight;
+                InternalChild = textFlow = new TextFlowContainer(t =>
                 {
-                }
-
-                protected override Drawable CreateDate(DateTimeOffset date, OverlayColourProvider colourProvider)
+                    t.Colour = colourProvider.Light1;
+                })
                 {
-                    var drawableDate = new TextFlowContainer(t =>
-                    {
-                        t.Colour = colourProvider.Light1;
-                    })
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        Margin = new MarginPadding { Vertical = 5 }
-                    };
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding { Vertical = 5 }
+                };
 
-                    drawableDate.AddText($"{date:dd} ", t =>
-                    {
-                        t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
-                    });
+                textFlow.AddText($"{date:dd}", t =>
+                {
+                    t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
+                });
 
-                    drawableDate.AddText($"{date:MMM}", t =>
-                    {
-                        t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular);
-                    });
-
-                    return drawableDate;
-                }
+                textFlow.AddText($"{date: MMM}", t =>
+                {
+                    t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular);
+                });
             }
         }
     }

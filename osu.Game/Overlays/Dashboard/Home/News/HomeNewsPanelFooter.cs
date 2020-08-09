@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
 {
     public abstract class HomeNewsPanelFooter : CompositeDrawable
     {
-        protected virtual float BarPading { get; } = 0;
+        protected virtual float BarPadding { get; } = 0;
 
         private readonly APINewsPost post;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Vertical = BarPading },
+                            Padding = new MarginPadding { Vertical = BarPadding },
                             Child = new Box
                             {
                                 Anchor = Anchor.TopCentre,
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             };
         }
 
-        protected abstract NewsPostDrawableDate CreateDate(DateTimeOffset date);
+        protected abstract Drawable CreateDate(DateTimeOffset date);
 
         protected abstract Drawable CreateContent(APINewsPost post);
     }

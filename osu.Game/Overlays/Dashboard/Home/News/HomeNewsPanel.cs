@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -84,14 +85,14 @@ namespace osu.Game.Overlays.Dashboard.Home.News
 
         private class Footer : HomeNewsPanelFooter
         {
-            protected override float BarPading => 10;
+            protected override float BarPadding => 10;
 
             public Footer(APINewsPost post)
                 : base(post)
             {
             }
 
-            protected override NewsPostDrawableDate CreateDate(DateTimeOffset date) => new Date(date);
+            protected override Drawable CreateDate(DateTimeOffset date) => new Date(date);
 
             protected override Drawable CreateContent(APINewsPost post) => new FillFlowContainer
             {
@@ -114,16 +115,29 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     }
                 }
             };
+        }
 
-            private class Date : NewsPostDrawableDate
+        private class Date : CompositeDrawable, IHasCustomTooltip
+        {
+            public ITooltip GetCustomTooltip() => new DateTooltip();
+
+            public object TooltipContent => date;
+
+            private readonly DateTimeOffset date;
+
+            public Date(DateTimeOffset date)
             {
-                public Date(DateTimeOffset date)
-                    : base(date)
-                {
-                    Margin = new MarginPadding { Top = 10 };
-                }
+                this.date = date;
+            }
 
-                protected override Drawable CreateDate(DateTimeOffset date, OverlayColourProvider colourProvider) => new FillFlowContainer
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                AutoSizeAxes = Axes.Both;
+                Anchor = Anchor.TopRight;
+                Origin = Anchor.TopRight;
+                Margin = new MarginPadding { Top = 10 };
+                InternalChild = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -137,7 +151,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Origin = Anchor.TopRight,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold), // using Bold since there is no 800 weight alternative
                             Colour = colourProvider.Light1,
-                            Text = $"{date: dd}"
+                            Text = $"{date:dd}"
                         },
                         new TextFlowContainer(f =>
                         {
