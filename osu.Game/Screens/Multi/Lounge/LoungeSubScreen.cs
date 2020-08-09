@@ -62,7 +62,18 @@ namespace osu.Game.Screens.Multi.Lounge
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
                                     Padding = new MarginPadding(10),
-                                    Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
+                                    Child = roomsContainer = new RoomsContainer
+                                    {
+                                        JoinRequested = joinRequested,
+                                        DuplicateRoom = room =>
+                                        {
+                                            Room newRoom = new Room();
+                                            newRoom.CopyFrom(room, true);
+                                            newRoom.Name.Value = $"Copy of {room.Name.Value}";
+
+                                            Open(newRoom);
+                                        }
+                                    }
                                 },
                                 loadingLayer = new LoadingLayer(roomsContainer),
                             }
@@ -126,7 +137,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (selectedRoom.Value?.RoomID.Value == null)
                 selectedRoom.Value = new Room();
 
-            music.EnsurePlayingSomething();
+            music?.EnsurePlayingSomething();
 
             onReturning();
         }
