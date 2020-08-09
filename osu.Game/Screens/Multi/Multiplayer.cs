@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Multi
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private MusicController music { get; set; }
 
         [Cached(Type = typeof(IRoomManager))]
@@ -350,7 +350,7 @@ namespace osu.Game.Screens.Multi
                     track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                     track.Looping = true;
 
-                    music.EnsurePlayingSomething();
+                    music?.EnsurePlayingSomething();
                 }
             }
             else

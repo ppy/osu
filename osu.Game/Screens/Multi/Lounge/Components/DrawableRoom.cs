@@ -21,10 +21,12 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable
+    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu
     {
         public const float SELECTION_BORDER_WIDTH = 4;
         private const float corner_radius = 5;
@@ -35,6 +37,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private const float cover_width = 145;
 
         public event Action<SelectionState> StateChanged;
+
+        public Action<Room> DuplicateRoom;
 
         private readonly Box selectionBox;
         private CachedModelDependencyContainer<Room> dependencies;
@@ -232,5 +236,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 Current = name;
             }
         }
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem("Duplicate", MenuItemType.Standard, () => DuplicateRoom?.Invoke(Room))
+        };
     }
 }
