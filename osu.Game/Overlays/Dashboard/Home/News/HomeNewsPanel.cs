@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -27,7 +28,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Children = new Drawable[]
             {
@@ -39,7 +40,63 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     Children = new Drawable[]
                     {
                         new ClickableNewsBackground(post),
-                        new Footer(post)
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            RowDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize)
+                            },
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.Absolute, size: 60),
+                                new Dimension(GridSizeMode.Absolute, size: 20),
+                                new Dimension()
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new Date(post.PublishedAt),
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Vertical = 10 },
+                                        Child = new Box
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopRight,
+                                            Width = 1,
+                                            RelativeSizeAxes = Axes.Y,
+                                            Colour = colourProvider.Light1
+                                        }
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Margin = new MarginPadding { Top = 5, Bottom = 10 },
+                                        Padding = new MarginPadding { Right = 10 },
+                                        Spacing = new Vector2(0, 10),
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
+                                        {
+                                            new NewsTitleLink(post),
+                                            new TextFlowContainer(f =>
+                                            {
+                                                f.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
+                                            })
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Text = post.Preview
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             };
@@ -81,40 +138,6 @@ namespace osu.Game.Overlays.Dashboard.Home.News
 
                 HoverColour = Color4.White;
             }
-        }
-
-        private class Footer : HomeNewsPanelFooter
-        {
-            protected override float BarPadding => 10;
-
-            public Footer(APINewsPost post)
-                : base(post)
-            {
-            }
-
-            protected override Drawable CreateDate(DateTimeOffset date) => new Date(date);
-
-            protected override Drawable CreateContent(APINewsPost post) => new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Margin = new MarginPadding { Top = 5, Bottom = 10 },
-                Spacing = new Vector2(0, 10),
-                Direction = FillDirection.Vertical,
-                Children = new Drawable[]
-                {
-                    new NewsTitleLink(post),
-                    new TextFlowContainer(f =>
-                    {
-                        f.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
-                    })
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Text = post.Preview
-                    }
-                }
-            };
         }
 
         private class Date : CompositeDrawable, IHasCustomTooltip
