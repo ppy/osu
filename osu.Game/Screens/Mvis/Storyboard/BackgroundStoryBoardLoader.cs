@@ -2,13 +2,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Timing;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Screens.Play;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Mvis.Storyboard
@@ -108,17 +108,30 @@ namespace osu.Game.Screens.Mvis.Storyboard
             try
             {
                 StoryboardClock.Stop();
+
+                if ( ClockContainer != null )
+                {
+                    ClockContainer.Clock = new ThrottledFrameClock();
+
+                    if ( storyboard != null )
+                        storyboard.Clock = StoryboardClock;
+
+                    ClockContainer.FadeOut(DURATION, Easing.OutQuint);
+                    ClockContainer.Expire();
+                    ClockContainer = null;
+                }
+    
+                storyboard = null;
+
                 LoadSBTask = LoadComponentAsync(new Container
                 {
                     Name = "Storyboard Container",
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Child = storyboard = beatmap.Storyboard.CreateDrawable(),
+                    Clock = StoryboardClock = new StoryboardClock(),
+                    Child = storyboard = beatmap.Storyboard.CreateDrawable()
                 }, newClockContainer =>
                 {
-                    //将故事版的Clock设为StoryboardClock以避免一些问题
-                    storyboard.Clock = StoryboardClock = new StoryboardClock();
-
                     StoryboardClock.ChangeSource(beatmap.Track);
 
                     this.Add(newClockContainer);
@@ -152,7 +165,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             LogTask = null;
         }
 
-        public void UpdateStoryBoardAsync( float displayDelay = 0, Action OnComplete = null )
+        public void UpdateStoryBoardAsync( Action OnComplete = null )
         {
             if ( b == null )
                 return;
@@ -161,12 +174,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
             IsReady.Value = false;
             SBLoaded.Value = false;
             NeedToHideTriangles.Value = false;
-
-            ClockContainer?.FadeOut(DURATION, Easing.OutQuint);
-            ClockContainer?.Expire();
-            ClockContainer = null;
-
-            storyboard = null;
 
             if ( !EnableSB.Value )
             {

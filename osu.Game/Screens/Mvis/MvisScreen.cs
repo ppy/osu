@@ -397,7 +397,7 @@ namespace osu.Game.Screens
             ContentAlpha.BindValueChanged(_ => UpdateIdleVisuals());
             IdleBgDim.BindValueChanged(_ => UpdateIdleVisuals());
 
-            Beatmap.BindValueChanged(v => updateComponentFromBeatmap(v.NewValue));
+            Beatmap.BindValueChanged(v => updateComponentFromBeatmap(v.NewValue), true);
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
             SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue), true);
@@ -532,7 +532,6 @@ namespace osu.Game.Screens
             base.OnEntering(last);
 
             var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
-            track.RestartPoint = 0;
 
             //各种背景层的动画
             Background?.Delay(250).Then().FadeOut(250);
@@ -544,7 +543,6 @@ namespace osu.Game.Screens
             bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, DURATION, Easing.OutQuint);
 
             loadingSpinner.Show();
-            updateComponentFromBeatmap(Beatmap.Value, 500);
         }
 
         public override bool OnExiting(IScreen next)
@@ -714,11 +712,12 @@ namespace osu.Game.Screens
             gameplayContent.FadeTo(ContentAlpha.Value, DURATION, Easing.OutQuint);
         }
 
-        private void updateComponentFromBeatmap(WorkingBeatmap beatmap, float displayDelay = 0)
+        private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
+            Beatmap.Value.Track.RestartPoint = 0;
 
-            sbLoader.UpdateStoryBoardAsync(displayDelay, () =>
+            sbLoader.UpdateStoryBoardAsync(() =>
             {
                 if (SBOverlayProxy != null)
                 {
