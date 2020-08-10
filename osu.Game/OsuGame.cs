@@ -702,6 +702,9 @@ namespace osu.Game
                     if (state.NewValue == Visibility.Hidden) return;
 
                     singleDisplayOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+
+                    if (!overlay.IsPresent)
+                        overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
                 };
             }
 
