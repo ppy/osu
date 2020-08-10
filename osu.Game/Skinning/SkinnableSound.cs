@@ -8,16 +8,14 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Audio;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableSound : SkinReloadableDrawable
+    public class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         private readonly ISampleInfo[] hitSamples;
 
@@ -154,35 +152,16 @@ namespace osu.Game.Skinning
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
 
+        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+            => samplesContainer.AddAdjustment(type, adjustBindable);
+
+        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+            => samplesContainer.RemoveAdjustment(type, adjustBindable);
+
+        public void RemoveAllAdjustments(AdjustableProperty type)
+            => samplesContainer.RemoveAllAdjustments(type);
+
         public bool IsPlaying => samplesContainer.Any(s => s.Playing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Volume"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<AudioContainer<DrawableSample>> VolumeTo(double newVolume, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.VolumeTo(newVolume, duration, easing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Balance"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<AudioContainer<DrawableSample>> BalanceTo(double newBalance, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.BalanceTo(newBalance, duration, easing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Frequency"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<AudioContainer<DrawableSample>> FrequencyTo(double newFrequency, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.FrequencyTo(newFrequency, duration, easing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Tempo"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<AudioContainer<DrawableSample>> TempoTo(double newTempo, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.TempoTo(newTempo, duration, easing);
 
         #endregion
     }
