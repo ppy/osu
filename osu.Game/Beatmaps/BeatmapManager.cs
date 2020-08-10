@@ -26,6 +26,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Skinning;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Beatmaps
@@ -201,7 +202,10 @@ namespace osu.Game.Beatmaps
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(beatmapContent).Encode(sw);
+                {
+                    var skin = new LegacyBeatmapSkin(info, Files.Store, audioManager);
+                    new LegacyBeatmapEncoder(beatmapContent, skin).Encode(sw);
+                }
 
                 stream.Seek(0, SeekOrigin.Begin);
 
