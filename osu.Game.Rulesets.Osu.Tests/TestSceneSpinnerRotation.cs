@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -183,6 +184,49 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSeekStep(1000);
             AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
         }
+
+        [TestCase(0.5)]
+        [TestCase(2.0)]
+        public void TestSpinUnaffectedByClockRate(double rate)
+        {
+            double expectedProgress = 0;
+            double expectedSpm = 0;
+
+            addSeekStep(1000);
+            AddStep("retrieve spinner state", () =>
+            {
+                expectedProgress = drawableSpinner.Progress;
+                expectedSpm = drawableSpinner.SpmCounter.SpinsPerMinute;
+            });
+
+            addSeekStep(0);
+
+            AddStep("adjust track rate", () => track.AddAdjustment(AdjustableProperty.Tempo, new BindableDouble(rate)));
+            // autoplay replay frames use track time;
+            // if a spin takes 1000ms in track time and we're playing with a 2x rate adjustment, the spin will take 500ms of *real* time.
+            // therefore we need to apply the rate adjustment to the replay itself to change from track time to real time,
+            // as real time is what we care about for spinners
+            // (so we're making the spin take 1000ms in real time *always*, regardless of the track clock's rate).
+            transformReplay(replay => applyRateAdjustment(replay, rate));
+
+            addSeekStep(1000);
+            AddAssert("progress almost same", () => Precision.AlmostEquals(expectedProgress, drawableSpinner.Progress, 0.05));
+            AddAssert("spm almost same", () => Precision.AlmostEquals(expectedSpm, drawableSpinner.SpmCounter.SpinsPerMinute, 2.0));
+        }
+
+        private Replay applyRateAdjustment(Replay scoreReplay, double rate) => new Replay
+        {
+            Frames = scoreReplay
+                     .Frames
+                     .Cast<OsuReplayFrame>()
+                     .Select(replayFrame =>
+                     {
+                         var adjustedTime = replayFrame.Time * rate;
+                         return new OsuReplayFrame(adjustedTime, replayFrame.Position, replayFrame.Actions.ToArray());
+                     })
+                     .Cast<ReplayFrame>()
+                     .ToList()
+        };
 
         private void addSeekStep(double time)
         {
