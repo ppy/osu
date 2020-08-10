@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Formats
@@ -22,10 +23,12 @@ namespace osu.Game.Beatmaps.Formats
         public const int LATEST_VERSION = 128;
 
         private readonly IBeatmap beatmap;
+        private readonly LegacyBeatmapSkin beatmapSkin;
 
-        public LegacyBeatmapEncoder(IBeatmap beatmap)
+        public LegacyBeatmapEncoder(IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin = null)
         {
             this.beatmap = beatmap;
+            this.beatmapSkin = beatmapSkin;
 
             if (beatmap.BeatmapInfo.RulesetID < 0 || beatmap.BeatmapInfo.RulesetID > 3)
                 throw new ArgumentException("Only beatmaps in the osu, taiko, catch, or mania rulesets can be encoded to the legacy beatmap format.", nameof(beatmap));
@@ -52,6 +55,9 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine();
             handleControlPoints(writer);
+
+            writer.WriteLine();
+            handleComboColours(writer);
 
             writer.WriteLine();
             handleHitObjects(writer);
@@ -193,6 +199,31 @@ namespace osu.Game.Beatmaps.Formats
                 writer.Write(FormattableString.Invariant($"{(isTimingPoint ? '1' : '0')},"));
                 writer.Write(FormattableString.Invariant($"{(int)effectFlags}"));
                 writer.WriteLine();
+            }
+        }
+
+        private void handleComboColours(TextWriter writer)
+        {
+            if (beatmapSkin == null)
+                return;
+
+            var colours = beatmapSkin.Configuration.ComboColours;
+
+            if (colours.Count == 0)
+                return;
+
+            writer.WriteLine("[Colours]");
+
+            for (var i = 0; i < colours.Count; i++)
+            {
+                var comboColour = colours[i];
+
+                var r = (byte)(comboColour.R * byte.MaxValue);
+                var g = (byte)(comboColour.G * byte.MaxValue);
+                var b = (byte)(comboColour.B * byte.MaxValue);
+                var a = (byte)(comboColour.A * byte.MaxValue);
+
+                writer.WriteLine($"Combo{i}: {r},{g},{b},{a}");
             }
         }
 
