@@ -363,6 +363,9 @@ namespace osu.Game.Screens.Play
 
         private void updateOverlayActivationMode()
         {
+            if (!this.IsCurrentScreen())
+                return;
+
             bool canTriggerOverlays = DrawableRuleset.IsPaused.Value || breakTracker.IsBreakTime.Value || !gameplayOverlaysDisabled.Value;
 
             if (DrawableRuleset.HasReplayLoaded.Value || canTriggerOverlays)
