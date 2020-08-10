@@ -121,19 +121,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestRotationDirection([Values(true, false)] bool clockwise)
         {
             if (clockwise)
-            {
-                AddStep("flip replay", () =>
-                {
-                    var drawableRuleset = this.ChildrenOfType<DrawableOsuRuleset>().Single();
-                    var score = drawableRuleset.ReplayScore;
-                    var scoreWithFlippedReplay = new Score
-                    {
-                        ScoreInfo = score.ScoreInfo,
-                        Replay = flipReplay(score.Replay)
-                    };
-                    drawableRuleset.SetReplayScore(scoreWithFlippedReplay);
-                });
-            }
+                transformReplay(flip);
 
             addSeekStep(5000);
 
@@ -141,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("spinner symbol direction correct", () => clockwise ? spinnerSymbol.Rotation > 0 : spinnerSymbol.Rotation < 0);
         }
 
-        private Replay flipReplay(Replay scoreReplay) => new Replay
+        private Replay flip(Replay scoreReplay) => new Replay
         {
             Frames = scoreReplay
                      .Frames
@@ -202,6 +190,18 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
         }
+
+        private void transformReplay(Func<Replay, Replay> replayTransformation) => AddStep("set replay", () =>
+        {
+            var drawableRuleset = this.ChildrenOfType<DrawableOsuRuleset>().Single();
+            var score = drawableRuleset.ReplayScore;
+            var transformedScore = new Score
+            {
+                ScoreInfo = score.ScoreInfo,
+                Replay = replayTransformation.Invoke(score.Replay)
+            };
+            drawableRuleset.SetReplayScore(transformedScore);
+        });
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap
         {
