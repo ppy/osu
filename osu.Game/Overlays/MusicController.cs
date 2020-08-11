@@ -105,7 +105,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Returns whether the beatmap track is loaded.
         /// </summary>
-        public bool TrackLoaded => CurrentTrack.IsLoaded;
+        public bool TrackLoaded => CurrentTrack.TrackLoaded;
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
