@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Multi.Play
             {
                 failed = true;
 
-                Logger.Error(e, "Failed to retrieve a score submission token.\n\nThis may happen if you are not running an official release of osu! (ie. you are self-compiling).");
+                Logger.Error(e, "Failed to retrieve a score submission token.\n\nThis may happen if you are running an old or non-official release of osu! (ie. you are self-compiling).");
 
                 Schedule(() =>
                 {
