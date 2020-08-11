@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Play
 
                 Schedule(() =>
                 {
-                    adjustableClock.ChangeSource((IAdjustableClock)track);
+                    adjustableClock.ChangeSource(track);
                     updateRate();
 
                     if (!IsPaused.Value)
@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Play
             removeSourceClockAdjustments();
 
             track = new TrackVirtual(track.Length);
-            adjustableClock.ChangeSource((IAdjustableClock)track);
+            adjustableClock.ChangeSource(track);
         }
 
         protected override void Update()

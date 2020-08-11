@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Menu
                 LoadComponentAsync(new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(UsingThemedIntro ? (IAdjustableClock)Track : null),
+                    Clock = new FramedClock(UsingThemedIntro ? Track : null),
                     LoadMenu = LoadMenu
                 }, t =>
                 {
