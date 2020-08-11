@@ -317,11 +317,28 @@ namespace osu.Game.Overlays
 
         private void changeTrack()
         {
-            CurrentTrack.Expire();
-            CurrentTrack = new DrawableTrack(current.GetTrack());
-            CurrentTrack.Completed += () => onTrackCompleted(current);
+            var lastTrack = CurrentTrack;
 
-            AddInternal(CurrentTrack);
+            var newTrack = new DrawableTrack(current.GetTrack());
+            newTrack.Completed += () => onTrackCompleted(current);
+
+            CurrentTrack = newTrack;
+
+            // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.
+            // CurrentTrack is immediately updated above for situations where a immediate knowledge about the new track is required,
+            // but the mutation of the hierarchy is scheduled to avoid exceptions.
+            Schedule(() =>
+            {
+                lastTrack.Expire();
+
+                if (newTrack == CurrentTrack)
+                    AddInternal(newTrack);
+                else
+                {
+                    // If the track has changed via changeTrack() being called multiple times in a single update, force disposal on the old track.
+                    newTrack.Dispose();
+                }
+            });
         }
 
         private void onTrackCompleted(WorkingBeatmap workingBeatmap)
