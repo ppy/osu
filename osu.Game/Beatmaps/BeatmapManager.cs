@@ -63,8 +63,9 @@ namespace osu.Game.Beatmaps
         private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;
         private readonly AudioManager audioManager;
-        private readonly GameHost host;
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
+        private readonly TextureStore textureStore;
+        private readonly ITrackStore trackStore;
 
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
@@ -72,7 +73,6 @@ namespace osu.Game.Beatmaps
         {
             this.rulesets = rulesets;
             this.audioManager = audioManager;
-            this.host = host;
 
             DefaultBeatmap = defaultBeatmap;
 
@@ -83,6 +83,9 @@ namespace osu.Game.Beatmaps
             beatmaps.ItemUpdated += removeWorkingCache;
 
             onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+
+            textureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
+            trackStore = audioManager.GetTrackStore(Files.Store);
         }
 
         protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
@@ -219,7 +222,6 @@ namespace osu.Game.Beatmaps
         }
 
         private readonly WeakList<BeatmapManagerWorkingBeatmap> workingCache = new WeakList<BeatmapManagerWorkingBeatmap>();
-        private readonly Dictionary<ITrackStore, int> referencedTrackStores = new Dictionary<ITrackStore, int>();
 
         /// <summary>
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
@@ -252,28 +254,9 @@ namespace osu.Game.Beatmaps
 
                 beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
-                ITrackStore trackStore = workingCache.FirstOrDefault(b => b.BeatmapInfo.AudioEquals(beatmapInfo))?.TrackStore;
-                TextureStore textureStore = workingCache.FirstOrDefault(b => b.BeatmapInfo.BackgroundEquals(beatmapInfo))?.TextureStore;
-
-                textureStore ??= new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
-                trackStore ??= audioManager.GetTrackStore(Files.Store);
-
-                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, textureStore, trackStore, beatmapInfo, audioManager, dereferenceTrackStore));
-                referencedTrackStores[trackStore] = referencedTrackStores.GetOrDefault(trackStore) + 1;
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, textureStore, trackStore, beatmapInfo, audioManager));
 
                 return working;
-            }
-        }
-
-        private void dereferenceTrackStore(ITrackStore trackStore)
-        {
-            lock (workingCache)
-            {
-                if (--referencedTrackStores[trackStore] == 0)
-                {
-                    referencedTrackStores.Remove(trackStore);
-                    trackStore.Dispose();
-                }
             }
         }
 

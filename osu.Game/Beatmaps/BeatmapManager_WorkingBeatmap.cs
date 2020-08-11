@@ -19,21 +19,16 @@ namespace osu.Game.Beatmaps
     {
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
-            public readonly TextureStore TextureStore;
-            public readonly ITrackStore TrackStore;
-
             private readonly IResourceStore<byte[]> store;
-            private readonly Action<ITrackStore> dereferenceAction;
+            private readonly TextureStore textureStore;
+            private readonly ITrackStore trackStore;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, ITrackStore trackStore, BeatmapInfo beatmapInfo, AudioManager audioManager,
-                                                Action<ITrackStore> dereferenceAction)
+            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, ITrackStore trackStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
                 : base(beatmapInfo, audioManager)
             {
                 this.store = store;
-                this.dereferenceAction = dereferenceAction;
-
-                TextureStore = textureStore;
-                TrackStore = trackStore;
+                this.textureStore = textureStore;
+                this.trackStore = trackStore;
             }
 
             protected override IBeatmap GetBeatmap()
@@ -61,7 +56,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return TextureStore.Get(getPathForFile(Metadata.BackgroundFile));
+                    return textureStore.Get(getPathForFile(Metadata.BackgroundFile));
                 }
                 catch (Exception e)
                 {
@@ -74,7 +69,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return TrackStore.Get(getPathForFile(Metadata.AudioFile));
+                    return trackStore.Get(getPathForFile(Metadata.AudioFile));
                 }
                 catch (Exception e)
                 {
@@ -139,11 +134,6 @@ namespace osu.Game.Beatmaps
                     Logger.Error(e, "Skin failed to load");
                     return null;
                 }
-            }
-
-            ~BeatmapManagerWorkingBeatmap()
-            {
-                dereferenceAction?.Invoke(TrackStore);
             }
         }
     }
