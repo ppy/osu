@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private MusicController music { get; set; }
 
         [Resolved(canBeNull: true)]
