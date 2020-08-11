@@ -19,8 +19,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
-            MusicController.Play(true);
-            MusicController.SeekTo(Beatmap.Value.Beatmap.HitObjects.First().StartTime - 1000);
+            MusicController.CurrentTrack.Start();
+            MusicController.CurrentTrack.Seek(Beatmap.Value.Beatmap.HitObjects.First().StartTime - 1000);
 
             Add(new ModNightcore<HitObject>.NightcoreBeatContainer());
 

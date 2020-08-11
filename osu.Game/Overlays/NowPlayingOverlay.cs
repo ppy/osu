@@ -236,7 +236,7 @@ namespace osu.Game.Overlays
 
             var track = musicController.CurrentTrack;
 
-            if (track.IsDummyDevice == false)
+            if (!track.IsDummyDevice)
             {
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
