@@ -26,9 +26,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private readonly NowPlayingOverlay np;
 
-        [Cached]
-        private MusicController musicController = new MusicController();
-
         public TestSceneBeatSyncedContainer()
         {
             Clock = new FramedClock();
@@ -36,7 +33,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddRange(new Drawable[]
             {
-                musicController,
                 new BeatContainer
                 {
                     Anchor = Anchor.BottomCentre,
