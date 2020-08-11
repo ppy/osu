@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Mods
         public override void ApplyToTrack(ITrack track)
         {
             // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
-            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
-            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
+            track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
     }
 }
