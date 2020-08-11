@@ -1,25 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ManagedBass;
-using Microsoft.Extensions.Logging;
-using NUnit.Framework.Internal;
-using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
-using osu.Game.Audio;
-using osu.Game.Screens.Play.HUD.HitErrorMeters;
-using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Framework.Bindables;
-using System.Linq;
+using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -27,28 +17,21 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Metronome";
         public override string Acronym => "MT";
-        public override IconUsage? Icon => OsuIcon.ModAuto;
+        public override IconUsage? Icon => OsuIcon.ModAuto; // temporary icon
         public override ModType Type => ModType.DifficultyReduction;
         public override string Description => "Add a metronome";
         public override bool Ranked => false;
         public override double ScoreMultiplier => 0.0;
-        public override bool HasImplementation => true;
 
-        private const float min_frequency = 0.25f;
-
-        [SettingSource("Frequency", "Number of beats between each tick of the metronome")]
-        public BindableNumber<float> TickFrequency { get; } = new BindableFloat
+        public enum tickFrequency
         {
-            MinValue = min_frequency,
-            MaxValue = 1/min_frequency,
-            Default = 1f,
-            Value = 1f,
-            Precision = 0.25f,
-        };
-
-        protected ModMetronome()
-        {
+            One = 1,
+            Two = 2,
+            Four = 4
         }
+
+        [SettingSource("Tick frequency", "Number of metronome ticks per beat")]
+        public Bindable<tickFrequency> TickFrequency { get; } = new Bindable<tickFrequency>(tickFrequency.One);
 
     }
 
@@ -57,26 +40,23 @@ namespace osu.Game.Rulesets.Mods
     {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new MetronomeBeatContainer(TickFrequency.GetBoundCopy(), 0.25f));
+            drawableRuleset.Overlays.Add(new MetronomeBeatContainer(TickFrequency.GetBoundCopy()));
         }
 
         public class MetronomeBeatContainer : BeatSyncedContainer
-        {
-            
-            private float freq;
-
+        {  
             private SkinnableSound metronomeSample;
 
-            private BindableNumber<float> tickFrequency;
+            private Bindable<tickFrequency> tickFrequency;
 
-            public MetronomeBeatContainer(BindableNumber<float> tickFrequency, float minFrequency)
+            public MetronomeBeatContainer(Bindable<tickFrequency> tickFrequency)
             {
                 this.tickFrequency = tickFrequency;
-                this.tickFrequency.BindValueChanged(val =>
-                {
-                    Divisor = (int)(1 / minFrequency);
-                    freq = tickFrequency.Value * Divisor;
-                }, true);
+
+                 this.tickFrequency.BindValueChanged(val =>
+                 {
+                     Divisor = (int)tickFrequency.Value;
+                 }, true);
                 
             }
 
@@ -84,7 +64,7 @@ namespace osu.Game.Rulesets.Mods
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = metronomeSample =  new SkinnableSound(new Audio.SampleInfo("nightcore-hat"));
+                InternalChild = metronomeSample =  new SkinnableSound(new SampleInfo("nightcore-hat")); // temporary sample
             }
 
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
@@ -103,19 +83,8 @@ namespace osu.Game.Rulesets.Mods
                     firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
 
                 if (beatIndex >= firstBeat)
-                    playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
-
-            }
-
-            private void playBeatFor(int beatIndex, TimeSignatures signature)
-            {
-                if (beatIndex % freq == 0)
                     metronomeSample.Play();
-        
             }
-
-
         }
     }
-
 }
