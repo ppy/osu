@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load(GameHost host, OverlayColourProvider colourProvider)
         {
             Child = new TextFlowContainer(t =>
             {
@@ -35,6 +35,8 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                 AutoSizeAxes = Axes.Y,
                 Text = post.Title
             };
+
+            HoverColour = colourProvider.Light1;
 
             TooltipText = "view in browser";
             Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
