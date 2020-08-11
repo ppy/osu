@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("return to menu", () => songSelect.Exit());
 
-            AddUntilStep("wait for track", () => Game.MusicController.CurrentTrack.IsDummyDevice == false && Game.MusicController.IsPlaying);
+            AddUntilStep("wait for track", () => !Game.MusicController.CurrentTrack.IsDummyDevice && Game.MusicController.IsPlaying);
         }
 
         [Test]
