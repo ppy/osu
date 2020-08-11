@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework;
@@ -27,6 +28,7 @@ namespace osu.Game.Screens.Play
         private readonly WorkingBeatmap beatmap;
         private readonly IReadOnlyList<Mod> mods;
 
+        [NotNull]
         private ITrack track;
 
         public readonly BindableBool IsPaused = new BindableBool();
@@ -60,7 +62,7 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock platformOffsetClock;
 
-        public GameplayClockContainer(ITrack track, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
+        public GameplayClockContainer([NotNull] ITrack track, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
         {
             this.beatmap = beatmap;
             this.mods = mods;
@@ -196,9 +198,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void StopUsingBeatmapClock()
         {
-            if (track == null)
-                return;
-
             removeSourceClockAdjustments();
 
             track = new TrackVirtual(track.Length);
@@ -217,8 +216,6 @@ namespace osu.Game.Screens.Play
 
         private void updateRate()
         {
-            if (track == null) return;
-
             speedAdjustmentsApplied = true;
             track.ResetSpeedAdjustments();
 
@@ -233,7 +230,6 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
             removeSourceClockAdjustments();
-            track = null;
         }
 
         private void removeSourceClockAdjustments()
