@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Game.Rulesets.UI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
@@ -26,6 +27,8 @@ namespace osu.Game.Screens.Play
         public Action OnComplete;
 
         private readonly DrawableRuleset drawableRuleset;
+
+        [NotNull]
         private readonly ITrack track;
 
         private readonly BindableDouble trackFreq = new BindableDouble(1);
@@ -34,7 +37,7 @@ namespace osu.Game.Screens.Play
 
         private SampleChannel failSample;
 
-        public FailAnimation(DrawableRuleset drawableRuleset, ITrack track)
+        public FailAnimation(DrawableRuleset drawableRuleset, [NotNull] ITrack track)
         {
             this.drawableRuleset = drawableRuleset;
             this.track = track;
