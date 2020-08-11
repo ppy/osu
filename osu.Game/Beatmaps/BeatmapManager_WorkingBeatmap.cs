@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
-        protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
+        private class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
             private readonly IResourceStore<byte[]> store;
             private readonly TextureStore textureStore;
