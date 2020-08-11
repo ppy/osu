@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -184,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     // these become implicitly hit.
                     return 1;
 
-                return Math.Clamp(RotationTracker.CumulativeRotation / 360 / Spinner.SpinsRequired, 0, 1);
+                return Math.Clamp(RotationTracker.RateAdjustedRotation / 360 / Spinner.SpinsRequired, 0, 1);
             }
         }
 
@@ -232,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (!SpmCounter.IsPresent && RotationTracker.Tracking)
                 SpmCounter.FadeIn(HitObject.TimeFadeIn);
-            SpmCounter.SetRotation(RotationTracker.CumulativeRotation);
+            SpmCounter.SetRotation(RotationTracker.RateAdjustedRotation);
 
             updateBonusScore();
         }
@@ -244,7 +245,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (ticks.Count == 0)
                 return;
 
-            int spins = (int)(RotationTracker.CumulativeRotation / 360);
+            int spins = (int)(RotationTracker.RateAdjustedRotation / 360);
 
             if (spins < wholeSpins)
             {
