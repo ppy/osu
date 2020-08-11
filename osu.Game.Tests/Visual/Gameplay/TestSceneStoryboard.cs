@@ -25,16 +25,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly Container<DrawableStoryboard> storyboardContainer;
         private DrawableStoryboard storyboard;
 
-        [Cached]
-        private MusicController musicController = new MusicController();
-
         public TestSceneStoryboard()
         {
             Clock = new FramedClock();
 
             AddRange(new Drawable[]
             {
-                musicController,
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -104,7 +100,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
-            decoupledClock.ChangeSource(musicController.CurrentTrack);
+            decoupledClock.ChangeSource(MusicController.CurrentTrack);
         }
 
         private void loadStoryboardNoVideo()
@@ -127,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             storyboard = sb.CreateDrawable(Beatmap.Value);
 
             storyboardContainer.Add(storyboard);
-            decoupledClock.ChangeSource(musicController.CurrentTrack);
+            decoupledClock.ChangeSource(MusicController.CurrentTrack);
         }
     }
 }
