@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
@@ -249,6 +250,7 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
+        [NotNull]
         public Track GetTrack() => GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
         protected abstract Track GetBeatmapTrack();
