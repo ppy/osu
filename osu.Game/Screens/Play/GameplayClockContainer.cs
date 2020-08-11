@@ -219,8 +219,8 @@ namespace osu.Game.Screens.Play
             speedAdjustmentsApplied = true;
             track.ResetSpeedAdjustments();
 
-            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             foreach (var mod in mods.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(track);

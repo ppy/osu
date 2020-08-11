@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
                 Expire();
             });
 
-            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
+            track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
 
             applyToPlayfield(drawableRuleset.Playfield);
             drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            (track as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
         }
     }
 }

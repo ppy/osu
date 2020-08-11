@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void ApplyToTrack(ITrack track)
         {
-            (track as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
+            track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
         }
 
         public virtual void ApplyToSample(SampleChannel sample)

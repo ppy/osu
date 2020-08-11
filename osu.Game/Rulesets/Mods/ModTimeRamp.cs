@@ -89,9 +89,9 @@ namespace osu.Game.Rulesets.Mods
         private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
         {
             // remove existing old adjustment
-            (track as IAdjustableAudioComponent)?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
 
-            (track as IAdjustableAudioComponent)?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
         }
 
         private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
