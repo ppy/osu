@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -63,8 +62,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 waveform.Waveform = b.NewValue.Waveform;
                 track = musicController.CurrentTrack;
-
-                Debug.Assert(track != null);
 
                 if (track.Length > 0)
                 {
