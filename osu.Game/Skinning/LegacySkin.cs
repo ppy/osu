@@ -38,6 +38,12 @@ namespace osu.Game.Skinning
 
         protected virtual bool AllowManiaSkin => hasKeyTexture.Value;
 
+        /// <summary>
+        /// Whether this skin can use samples with a custom bank (custom sample set in stable terminology).
+        /// Added in order to match sample lookup logic from stable (in stable, only the beatmap skin could use samples with a custom sample bank).
+        /// </summary>
+        protected virtual bool UseCustomSampleBanks => false;
+
         public new LegacySkinConfiguration Configuration
         {
             get => base.Configuration as LegacySkinConfiguration;
@@ -120,15 +126,6 @@ namespace osu.Game.Skinning
 
                     break;
 
-                case LegacySkinConfiguration.LegacySetting legacy:
-                    switch (legacy)
-                    {
-                        case LegacySkinConfiguration.LegacySetting.Version:
-                            return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
-                    }
-
-                    break;
-
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
 
@@ -142,28 +139,11 @@ namespace osu.Game.Skinning
 
                     break;
 
+                case LegacySkinConfiguration.LegacySetting legacy:
+                    return legacySettingLookup<TValue>(legacy);
+
                 default:
-                    // handles lookups like GlobalSkinConfiguration
-
-                    try
-                    {
-                        if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
-                        {
-                            // special case for handling skins which use 1 or 0 to signify a boolean state.
-                            if (typeof(TValue) == typeof(bool))
-                                val = val == "1" ? "true" : "false";
-
-                            var bindable = new Bindable<TValue>();
-                            if (val != null)
-                                bindable.Parse(val);
-                            return bindable;
-                        }
-                    }
-                    catch
-                    {
-                    }
-
-                    break;
+                    return genericLookup<TLookup, TValue>(lookup);
             }
 
             return null;
@@ -286,6 +266,43 @@ namespace osu.Game.Skinning
         private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
             => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
 
+        [CanBeNull]
+        private IBindable<TValue> legacySettingLookup<TValue>(LegacySkinConfiguration.LegacySetting legacySetting)
+        {
+            switch (legacySetting)
+            {
+                case LegacySkinConfiguration.LegacySetting.Version:
+                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
+
+                default:
+                    return genericLookup<LegacySkinConfiguration.LegacySetting, TValue>(legacySetting);
+            }
+        }
+
+        [CanBeNull]
+        private IBindable<TValue> genericLookup<TLookup, TValue>(TLookup lookup)
+        {
+            try
+            {
+                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
+                {
+                    // special case for handling skins which use 1 or 0 to signify a boolean state.
+                    if (typeof(TValue) == typeof(bool))
+                        val = val == "1" ? "true" : "false";
+
+                    var bindable = new Bindable<TValue>();
+                    if (val != null)
+                        bindable.Parse(val);
+                    return bindable;
+                }
+            }
+            catch
+            {
+            }
+
+            return null;
+        }
+
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
@@ -337,17 +354,18 @@ namespace osu.Game.Skinning
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo)
         {
-            foreach (var lookup in sampleInfo.LookupNames)
+            var lookupNames = sampleInfo.LookupNames;
+
+            if (sampleInfo is HitSampleInfo hitSample)
+                lookupNames = getLegacyLookupNames(hitSample);
+
+            foreach (var lookup in lookupNames)
             {
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
                     return sample;
             }
-
-            if (sampleInfo is HitSampleInfo hsi)
-                // Try fallback to non-bank samples.
-                return Samples?.Get(hsi.Name);
 
             return null;
         }
@@ -360,6 +378,24 @@ namespace osu.Game.Skinning
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
             yield return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
+        }
+
+        private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
+        {
+            var lookupNames = hitSample.LookupNames;
+
+            if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
+                // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
+                // using .EndsWith() is intentional as it ensures parity in all edge cases
+                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
+                lookupNames = hitSample.LookupNames.Where(name => !name.EndsWith(hitSample.Suffix));
+
+            // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
+            // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
+            // which is why this is done locally here.
+            lookupNames = lookupNames.Append(hitSample.Name);
+
+            return lookupNames;
         }
     }
 }
