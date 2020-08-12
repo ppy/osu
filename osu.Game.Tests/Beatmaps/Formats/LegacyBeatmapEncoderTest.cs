@@ -10,6 +10,7 @@ using System.Text;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -19,6 +20,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Beatmaps.Formats
@@ -61,7 +63,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var stream = new MemoryStream();
 
             using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                new LegacyBeatmapEncoder(beatmap).Encode(writer);
+            using (var rs = new ResourceStore<byte[]>())
+            {
+                var skin = new LegacyBeatmapSkin(beatmap.BeatmapInfo, rs, null);
+                new LegacyBeatmapEncoder(beatmap, skin).Encode(writer);
+            }
 
             stream.Position = 0;
 
