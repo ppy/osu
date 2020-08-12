@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using osu.Framework.Bindables;
+using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
@@ -85,7 +87,11 @@ namespace osu.Game.Screens.Edit
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(editorBeatmap).Encode(sw);
+                using (var rs = new ResourceStore<byte[]>())
+                {
+                    var skin = new LegacyBeatmapSkin(editorBeatmap.BeatmapInfo, rs, null);
+                    new LegacyBeatmapEncoder(editorBeatmap, skin).Encode(sw);
+                }
 
                 savedStates.Add(stream.ToArray());
             }
