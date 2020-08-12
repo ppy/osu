@@ -207,12 +207,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleComboColours(TextWriter writer)
         {
-            if (beatmapSkin == null)
-                return;
+            var colours = beatmapSkin?.Configuration.ComboColours;
 
-            var colours = beatmapSkin.Configuration.ComboColours;
-
-            if (colours.Count == 0)
+            if (colours == null || colours.Count == 0)
                 return;
 
             writer.WriteLine("[Colours]");
