@@ -12,24 +12,52 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Colour : Skill
     {
+        private const int mono_history_max_length = 5;
+
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
 
-        private NoteColour prevNoteColour = NoteColour.None;
+        private HitType? previousHitType;
 
         private int currentMonoLength = 1;
         private readonly List<int> monoHistory = new List<int>();
-        private const int mono_history_max_length = 5;
+
+        protected override double StrainValueOf(DifficultyHitObject current)
+        {
+            if (!(current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000))
+            {
+                previousHitType = null;
+                return 0.0;
+            }
+
+            var taikoCurrent = (TaikoDifficultyHitObject)current;
+
+            double objectStrain = 0.0;
+
+            if (taikoCurrent.HitType != null && previousHitType != null && taikoCurrent.HitType != previousHitType)
+            {
+                objectStrain = 1.0;
+
+                if (monoHistory.Count < 2)
+                    objectStrain = 0.0;
+                else if ((monoHistory[^1] + currentMonoLength) % 2 == 0)
+                    objectStrain *= sameParityPenalty();
+
+                objectStrain *= repetitionPenalties();
+                currentMonoLength = 1;
+            }
+            else
+            {
+                currentMonoLength += 1;
+            }
+
+            previousHitType = taikoCurrent.HitType;
+            return objectStrain;
+        }
 
         private double sameParityPenalty()
         {
             return 0.0;
-        }
-
-        private double repetitionPenalty(int notesSince)
-        {
-            double n = notesSince;
-            return Math.Min(1.0, 0.032 * n);
         }
 
         private double repetitionPenalties()
@@ -68,47 +96,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return penalty;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        private double repetitionPenalty(int notesSince)
         {
-            if (!(current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000))
-            {
-                prevNoteColour = NoteColour.None;
-                return 0.0;
-            }
-
-            TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
-
-            double objectStrain = 0.0;
-
-            NoteColour noteColour = hitObject.IsKat ? NoteColour.Ka : NoteColour.Don;
-
-            if (noteColour == NoteColour.Don && prevNoteColour == NoteColour.Ka ||
-                noteColour == NoteColour.Ka && prevNoteColour == NoteColour.Don)
-            {
-                objectStrain = 1.0;
-
-                if (monoHistory.Count < 2)
-                    objectStrain = 0.0;
-                else if ((monoHistory[^1] + currentMonoLength) % 2 == 0)
-                    objectStrain *= sameParityPenalty();
-
-                objectStrain *= repetitionPenalties();
-                currentMonoLength = 1;
-            }
-            else
-            {
-                currentMonoLength += 1;
-            }
-
-            prevNoteColour = noteColour;
-            return objectStrain;
-        }
-
-        private enum NoteColour
-        {
-            Don,
-            Ka,
-            None
+            double n = notesSince;
+            return Math.Min(1.0, 0.032 * n);
         }
     }
 }

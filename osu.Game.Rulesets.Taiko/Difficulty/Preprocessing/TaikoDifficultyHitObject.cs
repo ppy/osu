@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     public class TaikoDifficultyHitObject : DifficultyHitObject
     {
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
-        public readonly bool IsKat;
+        public readonly HitType? HitType;
 
         public bool StaminaCheese = false;
 
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             double prevLength = (lastObject.StartTime - lastLastObject.StartTime) / clockRate;
 
             Rhythm = getClosestRhythm(DeltaTime / prevLength, commonRhythms);
-            IsKat = currentHit?.Type == HitType.Rim;
+            HitType = currentHit?.Type;
 
             ObjectIndex = objectIndex;
         }
