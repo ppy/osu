@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addSeekStep(0);
 
-            AddStep("adjust track rate", () => track.AddAdjustment(AdjustableProperty.Tempo, new BindableDouble(rate)));
+            AddStep("adjust track rate", () => MusicController.CurrentTrack.AddAdjustment(AdjustableProperty.Tempo, new BindableDouble(rate)));
             // autoplay replay frames use track time;
             // if a spin takes 1000ms in track time and we're playing with a 2x rate adjustment, the spin will take 500ms of *real* time.
             // therefore we need to apply the rate adjustment to the replay itself to change from track time to real time,
