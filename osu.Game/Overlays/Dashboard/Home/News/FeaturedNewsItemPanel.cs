@@ -18,11 +18,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class HomeNewsPanel : HomePanel
+    public class FeaturedNewsItemPanel : HomePanel
     {
         private readonly APINewsPost post;
 
-        public HomeNewsPanel(APINewsPost post)
+        public FeaturedNewsItemPanel(APINewsPost post)
         {
             this.post = post;
         }

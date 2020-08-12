@@ -12,11 +12,11 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class CollapsedNewsPanel : CompositeDrawable
+    public class NewsGroupItem : CompositeDrawable
     {
         private readonly APINewsPost post;
 
-        public CollapsedNewsPanel(APINewsPost post)
+        public NewsGroupItem(APINewsPost post)
         {
             this.post = post;
         }

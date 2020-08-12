@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(0, 5),
                 Children = new Drawable[]
                 {
-                    new HomeNewsPanel(new APINewsPost
+                    new FeaturedNewsItemPanel(new APINewsPost
                     {
                         Title = "This post has an image which starts with \"/\" and has many authors!",
                         Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Online
                         PublishedAt = DateTimeOffset.Now,
                         Slug = "2020-07-16-summer-theme-park-2020-voting-open"
                     }),
-                    new HomeNewsGroupPanel(new List<APINewsPost>
+                    new NewsItemGroupPanel(new List<APINewsPost>
                     {
                         new APINewsPost
                         {
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Online
                             PublishedAt = DateTimeOffset.Now,
                         }
                     }),
-                    new HomeShowMoreNewsPanel()
+                    new ShowMoreNewsPanel()
                 }
             });
         }
