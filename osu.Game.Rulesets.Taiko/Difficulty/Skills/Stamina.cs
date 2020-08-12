@@ -49,14 +49,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
 
-            if (hitObject.N % 2 == hand)
+            if (hitObject.ObjectIndex % 2 == hand)
             {
                 double objectStrain = 1;
 
-                if (hitObject.N == 1)
+                if (hitObject.ObjectIndex == 1)
                     return 1;
 
-                notePairDurationHistory.Add(hitObject.NoteLength + offhandObjectDuration);
+                notePairDurationHistory.Add(hitObject.DeltaTime + offhandObjectDuration);
 
                 if (notePairDurationHistory.Count > max_history_length)
                     notePairDurationHistory.RemoveAt(0);
@@ -65,12 +65,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 objectStrain += speedBonus(shortestRecentNote);
 
                 if (hitObject.StaminaCheese)
-                    objectStrain *= cheesePenalty(hitObject.NoteLength + offhandObjectDuration);
+                    objectStrain *= cheesePenalty(hitObject.DeltaTime + offhandObjectDuration);
 
                 return objectStrain;
             }
 
-            offhandObjectDuration = hitObject.NoteLength;
+            offhandObjectDuration = hitObject.DeltaTime;
             return 0;
         }
 

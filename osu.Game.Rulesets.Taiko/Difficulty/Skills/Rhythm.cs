@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
                     if (samePattern) // Repetition found!
                     {
-                        int notesSince = hitobject.N - rhythmHistory[start].N;
+                        int notesSince = hitobject.ObjectIndex - rhythmHistory[start].ObjectIndex;
                         penalty *= repetitionPenalty(notesSince);
                         break;
                     }
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             objectStrain *= repetitionPenalties(hitobject);
             objectStrain *= patternLengthPenalty(notesSinceRhythmChange);
-            objectStrain *= speedPenalty(hitobject.NoteLength);
+            objectStrain *= speedPenalty(hitobject.DeltaTime);
 
             notesSinceRhythmChange = 0;
 
