@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
@@ -17,10 +18,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             hitObjects = difficultyHitObjects;
             findRolls(3);
             findRolls(4);
-            findTlTap(0, true);
-            findTlTap(1, true);
-            findTlTap(0, false);
-            findTlTap(1, false);
+            findTlTap(0, HitType.Rim);
+            findTlTap(1, HitType.Rim);
+            findTlTap(0, HitType.Centre);
+            findTlTap(1, HitType.Centre);
         }
 
         private void findRolls(int patternLength)
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
                 for (int j = 0; j < patternLength; j++)
                 {
-                    if (history[j].IsKat != history[j + patternLength].IsKat)
+                    if (history[j].HitType != history[j + patternLength].HitType)
                     {
                         isRepeat = false;
                     }
@@ -63,13 +64,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             }
         }
 
-        private void findTlTap(int parity, bool kat)
+        private void findTlTap(int parity, HitType type)
         {
             int tlLength = -2;
 
             for (int i = parity; i < hitObjects.Count; i += 2)
             {
-                if (kat == hitObjects[i].IsKat)
+                if (hitObjects[i].HitType == type)
                 {
                     tlLength += 2;
                 }
