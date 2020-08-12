@@ -17,21 +17,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
         public bool StaminaCheese = false;
 
-        public readonly double NoteLength;
+        public readonly int ObjectIndex;
 
-        public readonly int N;
-
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, int n, IEnumerable<TaikoDifficultyHitObjectRhythm> commonRhythms)
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, int objectIndex,
+                                        IEnumerable<TaikoDifficultyHitObjectRhythm> commonRhythms)
             : base(hitObject, lastObject, clockRate)
         {
             var currentHit = hitObject as Hit;
 
-            NoteLength = DeltaTime;
             double prevLength = (lastObject.StartTime - lastLastObject.StartTime) / clockRate;
-            Rhythm = getClosestRhythm(NoteLength / prevLength, commonRhythms);
+
+            Rhythm = getClosestRhythm(DeltaTime / prevLength, commonRhythms);
             IsKat = currentHit?.Type == HitType.Rim;
 
-            N = n;
+            ObjectIndex = objectIndex;
         }
 
         private TaikoDifficultyHitObjectRhythm getClosestRhythm(double ratio, IEnumerable<TaikoDifficultyHitObjectRhythm> commonRhythms)
