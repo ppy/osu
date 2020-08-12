@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -25,7 +26,9 @@ namespace osu.Game.Beatmaps.Formats
         private readonly IBeatmap beatmap;
         private readonly LegacyBeatmapSkin beatmapSkin;
 
-        public LegacyBeatmapEncoder(IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin = null)
+        /// <param name="beatmap">The beatmap to encode</param>
+        /// <param name="beatmapSkin">An optional beatmap skin, for encoding the beatmap's combo colours.</param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] LegacyBeatmapSkin beatmapSkin)
         {
             this.beatmap = beatmap;
             this.beatmapSkin = beatmapSkin;
