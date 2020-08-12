@@ -665,9 +665,8 @@ namespace osu.Game
             {
                 overlay.State.ValueChanged += state =>
                 {
-                    if (state.NewValue == Visibility.Hidden) return;
-
-                    informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+                    if (state.NewValue != Visibility.Hidden)
+                        showOverlayAboveOthers(overlay, informationalOverlays);
                 };
             }
 
@@ -681,9 +680,8 @@ namespace osu.Game
                     // informational overlays should be dismissed on a show or hide of a full overlay.
                     informationalOverlays.ForEach(o => o.Hide());
 
-                    if (state.NewValue == Visibility.Hidden) return;
-
-                    singleDisplayOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+                    if (state.NewValue != Visibility.Hidden)
+                        showOverlayAboveOthers(overlay, singleDisplayOverlays);
                 };
             }
 
@@ -706,6 +704,15 @@ namespace osu.Game
 
             Settings.State.ValueChanged += _ => updateScreenOffset();
             notifications.State.ValueChanged += _ => updateScreenOffset();
+        }
+
+        private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
+        {
+            otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+
+            // show above others if not visible at all, else leave at current depth.
+            if (!overlay.IsPresent)
+                overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
         }
 
         public class GameIdleTracker : IdleTracker
