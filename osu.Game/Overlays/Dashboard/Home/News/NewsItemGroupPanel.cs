@@ -10,11 +10,11 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class HomeNewsGroupPanel : HomePanel
+    public class NewsItemGroupPanel : HomePanel
     {
         private readonly List<APINewsPost> posts;
 
-        public HomeNewsGroupPanel(List<APINewsPost> posts)
+        public NewsItemGroupPanel(List<APINewsPost> posts)
         {
             this.posts = posts;
         }
@@ -24,12 +24,12 @@ namespace osu.Game.Overlays.Dashboard.Home.News
         {
             Content.Padding = new MarginPadding { Vertical = 5 };
 
-            Child = new FillFlowContainer<CollapsedNewsPanel>
+            Child = new FillFlowContainer<NewsGroupItem>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Children = posts.Select(p => new CollapsedNewsPanel(p)).ToArray()
+                Children = posts.Select(p => new NewsGroupItem(p)).ToArray()
             };
         }
     }

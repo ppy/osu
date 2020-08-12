@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
 {
-    public class HomeShowMoreNewsPanel : OsuHoverContainer
+    public class ShowMoreNewsPanel : OsuHoverContainer
     {
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
 
         private OsuSpriteText text;
 
-        public HomeShowMoreNewsPanel()
+        public ShowMoreNewsPanel()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
