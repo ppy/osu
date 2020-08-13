@@ -212,11 +212,6 @@ namespace osu.Game.Screens.Play
             if (game != null)
                 OverlayActivationMode.BindTo(game.OverlayActivationMode);
 
-            gameplayOverlaysDisabled.BindValueChanged(_ => updateOverlayActivationMode());
-            DrawableRuleset.IsPaused.BindValueChanged(_ => updateOverlayActivationMode());
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateOverlayActivationMode());
-            breakTracker.IsBreakTime.BindValueChanged(_ => updateOverlayActivationMode());
-
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
             // bind clock into components that require it
@@ -363,9 +358,6 @@ namespace osu.Game.Screens.Play
 
         private void updateOverlayActivationMode()
         {
-            if (!this.IsCurrentScreen())
-                return;
-
             bool canTriggerOverlays = DrawableRuleset.IsPaused.Value || breakTracker.IsBreakTime.Value || !gameplayOverlaysDisabled.Value;
 
             if (DrawableRuleset.HasReplayLoaded.Value || canTriggerOverlays)
@@ -661,7 +653,10 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
 
-            updateOverlayActivationMode();
+            DrawableRuleset.IsPaused.BindValueChanged(_ => updateOverlayActivationMode());
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateOverlayActivationMode());
+            breakTracker.IsBreakTime.BindValueChanged(_ => updateOverlayActivationMode());
+            gameplayOverlaysDisabled.BindValueChanged(_ => updateOverlayActivationMode(), true);
         }
 
         public override void OnSuspending(IScreen next)
