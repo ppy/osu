@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Select
     internal static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status|creator|artist)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
+            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status|creator|artist)((?<op>([=:><](?<=[><])[=:]?|[=:]))(?<value>([0-9]*\.?[0-9]*)|(\S)))?((?<op2>([=:><](?<=[><])[=:]?|[=:]))(?<value2>([0-9]*\.?[0-9]*)|(\S)))?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -21,8 +21,13 @@ namespace osu.Game.Screens.Select
                 var key = match.Groups["key"].Value.ToLower();
                 var op = match.Groups["op"].Value;
                 var value = match.Groups["value"].Value;
+                var op2 = match.Groups["op2"].Value;
+                var value2 = match.Groups["value2"].Value;
 
                 parseKeywordCriteria(criteria, key, value, op);
+
+                if (op2.Length != 0 || value2.Length != 0)
+                    parseKeywordCriteria(criteria, key, value2, op2);
 
                 query = query.Replace(match.ToString(), "");
             }
