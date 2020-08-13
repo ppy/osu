@@ -85,8 +85,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             var spinner = drawableSpinner.HitObject;
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt / 2, true))
-                this.FadeInFromZero(spinner.TimePreempt / 2);
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
+                this.FadeInFromZero(spinner.TimeFadeIn / 2);
         }
 
         protected override void Update()
