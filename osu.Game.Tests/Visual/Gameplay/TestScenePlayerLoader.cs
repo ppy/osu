@@ -66,20 +66,34 @@ namespace osu.Game.Tests.Visual.Gameplay
             InputManager.Child = container;
         }
 
-        /// <summary>
-        /// When <see cref="PlayerLoader"/> exits early, it has to wait for the player load task
-        /// to complete before running disposal on player. This previously caused an issue where mod
-        /// speed adjustments were undone too late, causing cross-screen pollution.
-        /// </summary>
         [Test]
-        public void TestEarlyExit()
+        public void TestEarlyExitBeforePlayerConstruction()
         {
             AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
             AddStep("exit loader", () => loader.Exit());
             AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
-            AddAssert("player did not load", () => player?.IsLoaded != true);
+            AddAssert("player did not load", () => player == null);
+            AddUntilStep("player disposed", () => loader.DisposalTask == null);
+            AddAssert("mod rate still applied", () => Beatmap.Value.Track.Rate != 1);
+        }
+
+        /// <summary>
+        /// When <see cref="PlayerLoader"/> exits early, it has to wait for the player load task
+        /// to complete before running disposal on player. This previously caused an issue where mod
+        /// speed adjustments were undone too late, causing cross-screen pollution.
+        /// </summary>
+        [Test]
+        public void TestEarlyExitAfterPlayerConstruction()
+        {
+            AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+            AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
+            AddUntilStep("wait for non-null player", () => player != null);
+            AddStep("exit loader", () => loader.Exit());
+            AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
+            AddAssert("player did not load", () => !player.IsLoaded);
             AddUntilStep("player disposed", () => loader.DisposalTask?.IsCompleted == true);
             AddAssert("mod rate still applied", () => Beatmap.Value.Track.Rate != 1);
         }
