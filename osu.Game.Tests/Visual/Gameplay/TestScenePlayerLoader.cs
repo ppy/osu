@@ -49,6 +49,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <param name="afterLoadAction">An action to run after container load.</param>
         public void ResetPlayer(bool interactive, Action beforeLoadAction = null, Action afterLoadAction = null)
         {
+            player = null;
+
             audioManager.Volume.SetDefault();
 
             InputManager.Clear();
@@ -80,7 +82,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
             AddStep("exit loader", () => loader.Exit());
             AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
-            AddAssert("player did not load", () => !player.IsLoaded);
+            AddAssert("player did not load", () => player?.IsLoaded != true);
             AddUntilStep("player disposed", () => loader.DisposalTask?.IsCompleted == true);
             AddAssert("mod rate still applied", () => Beatmap.Value.Track.Rate != 1);
         }
@@ -94,7 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for load ready", () =>
             {
                 moveMouse();
-                return player.LoadState == LoadState.Ready;
+                return player?.LoadState == LoadState.Ready;
             });
             AddRepeatStep("move mouse", moveMouse, 20);
 
@@ -222,7 +224,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
 
             AddStep("load player", () => ResetPlayer(false, beforeLoad, afterLoad));
-            AddUntilStep("wait for player", () => player.LoadState == LoadState.Ready);
+            AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
 
             AddAssert("check for notification", () => container.NotificationOverlay.UnreadCount.Value == 1);
             AddStep("click notification", () =>
