@@ -1,4 +1,7 @@
-﻿using osu.Framework.Allocation;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps.ControlPoints;
@@ -23,7 +26,7 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => false;
         public override double ScoreMultiplier => 0.0;
 
-        public enum tickFrequency
+        public enum TickFrequency
         {
             One = 1,
             Two = 2,
@@ -31,8 +34,7 @@ namespace osu.Game.Rulesets.Mods
         }
 
         [SettingSource("Tick frequency", "Number of metronome ticks per beat")]
-        public Bindable<tickFrequency> TickFrequency { get; } = new Bindable<tickFrequency>(tickFrequency.One);
-
+        public Bindable<TickFrequency> Frequency { get; } = new Bindable<TickFrequency>(TickFrequency.One);
     }
 
     public abstract class ModMetronome<TObject> : ModMetronome, IApplicableToDrawableRuleset<TObject>
@@ -40,31 +42,27 @@ namespace osu.Game.Rulesets.Mods
     {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new MetronomeBeatContainer(TickFrequency.GetBoundCopy()));
+            drawableRuleset.Overlays.Add(new MetronomeBeatContainer(Frequency.GetBoundCopy()));
         }
 
         public class MetronomeBeatContainer : BeatSyncedContainer
-        {  
+        {
             private SkinnableSound metronomeSample;
 
-            private Bindable<tickFrequency> tickFrequency;
-
-            public MetronomeBeatContainer(Bindable<tickFrequency> tickFrequency)
+            public MetronomeBeatContainer(Bindable<TickFrequency> tickFrequency)
             {
-                this.tickFrequency = tickFrequency;
-
-                 this.tickFrequency.BindValueChanged(val =>
-                 {
-                     Divisor = (int)tickFrequency.Value;
-                 }, true);
-                
+                tickFrequency.BindValueChanged(val =>
+                {
+                    Divisor = (int)tickFrequency.Value;
+                }, true);
             }
 
             private int? firstBeat;
+
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = metronomeSample =  new SkinnableSound(new SampleInfo("nightcore-hat")); // temporary sample
+                InternalChild = metronomeSample = new SkinnableSound(new SampleInfo("nightcore-hat")); // temporary sample
             }
 
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
@@ -78,6 +76,7 @@ namespace osu.Game.Rulesets.Mods
                     firstBeat = null;
                     return;
                 }
+
                 if (!firstBeat.HasValue || beatIndex < firstBeat)
                     // decide on a good starting beat index if once has not yet been decided.
                     firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
