@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
 
         private bool readyForPush =>
             // don't push unless the player is completely loaded
-            player.LoadState == LoadState.Ready
+            player?.LoadState == LoadState.Ready
             // don't push if the user is hovering one of the panes, unless they are idle.
             && (IsHovered || idleTracker.IsIdle.Value)
             // don't push if the user is dragging a slider or otherwise.
