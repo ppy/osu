@@ -10,24 +10,33 @@ namespace osu.Game.Screens.Select
 {
     internal static class FilterQueryParser
     {
+        //TODO Expression explanation
         private static readonly Regex query_syntax_regex = new Regex(
-            @"(?<key>(status|creator|artist|stars|ar|dr|cs|divisor|length|objects|bpm)\b)(?<op>(?(?<=status|creator|artist)\b([=:])|([=:><](?(?<=[><])([=:]?)))))(?<value>("".*"")|([^\s=:><]+))(?<op2>(?(?<=status|creator|artist)\b([=:])|([=:><](?(?<=[><])([=:]?)))))?(?<value2>("".*"")|([^\s]+))?",
+            @"((?<keyTextual>(status|creator|artist)\b)(?<opTextual>[=:])(?<valueTextual>("".*?"")|(\S*)))|((?<valuePreNumerical>([0-9]+\.?[0-9]*[mshdt]?))?(?<opPreNumerical>([=:><](?(?<=[><])([=:]?))))?(?<keyNumerical>(stars|ar|dr|cs|divisor|length|objects|bpm)\b)(?<opPostNumerical>([=:><](?(?<=[><])([=:]?))))?(?<valuePostNumerical>([0-9]+\.?[0-9]*[mshd]{0,2}))?)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
-                var key = match.Groups["key"].Value.ToLower();
-                var op = match.Groups["op"].Value;
-                var value = match.Groups["value"].Value;
-                var op2 = match.Groups["op2"].Value;
-                var value2 = match.Groups["value2"].Value;
+                var keyTextual = match.Groups["keyTextual"].Value.ToLower();
+                var opTextual = match.Groups["opTextual"].Value;
+                var valueTextual = match.Groups["valueTextual"].Value;
 
-                parseKeywordCriteria(criteria, key, value, op);
+                var keyNumerical = match.Groups["keyNumerical"].Value;
+                var opPreNumerical = match.Groups["opPreNumerical"].Value;
+                var valuePreNumerical = match.Groups["valuePreNumerical"].Value;
+                var opPostNumerical = match.Groups["opPostNumerical"].Value;
+                var valuePostNumerical = match.Groups["valuePostNumerical"].Value;
 
-                if (op2.Length != 0 || value2.Length != 0)
-                    parseKeywordCriteria(criteria, key, value2, op2);
+                if (opTextual.Length != 0 || valueTextual.Length != 0)
+                    parseKeywordCriteria(criteria, keyTextual, valueTextual, opTextual);
+
+                if (opPreNumerical.Length != 0 || valuePreNumerical.Length != 0)
+                    parseKeywordCriteria(criteria, keyNumerical, valuePreNumerical, opPreNumerical);
+
+                if (opPostNumerical.Length != 0 || valuePostNumerical.Length != 0)
+                    parseKeywordCriteria(criteria, keyNumerical, valuePostNumerical, opPostNumerical);
 
                 query = query.Replace(match.ToString(), "");
             }

@@ -169,7 +169,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("name with space", filterCriteria.Artist.SearchTerm);
         }
-    
+
         [Test]
         public void TestApplyArtistQueriesOneDoubleQuote()
         {
