@@ -24,7 +24,10 @@ namespace osu.Game.Screens.Select
                 var valueTextual = match.Groups["valueTextual"].Value;
 
                 var keyNumerical = match.Groups["keyNumerical"].Value;
-                var opPreNumerical = match.Groups["opPreNumerical"].Value;
+                //Operator used before the key needs to be inverted because when e.g. "4<stars<5"
+                //is decomposited it actually means "stars<4" and "stars<5", but in order for 
+                //the expression to be correct we need the first bit to be "stars>4".
+                var opPreNumerical = invertPreNumericalOperator(match.Groups["opPreNumerical"].Value);
                 var valuePreNumerical = match.Groups["valuePreNumerical"].Value;
                 var opPostNumerical = match.Groups["opPostNumerical"].Value;
                 var valuePostNumerical = match.Groups["valuePostNumerical"].Value;
@@ -42,6 +45,22 @@ namespace osu.Game.Screens.Select
             }
 
             criteria.SearchText = query;
+        }
+
+        private static string invertPreNumericalOperator(string op) {
+            switch (op)
+            {
+                case "<":
+                    return ">";
+                case ">":
+                    return "<";
+                case "<=":
+                    return ">=";
+                case ">=":
+                    return "<=";
+                default:
+                    return "";
+            }
         }
 
         private static void parseKeywordCriteria(FilterCriteria criteria, string key, string value, string op)
