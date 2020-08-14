@@ -83,8 +83,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private SkinnableSound spinningSample;
 
-        private const float minimum_volume = 0.0001f;
-
         protected override void LoadSamples()
         {
             base.LoadSamples();
@@ -101,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 AddInternal(spinningSample = new SkinnableSound(clone)
                 {
-                    Volume = { Value = minimum_volume },
+                    Volume = { Value = 0 },
                     Looping = true,
                 });
             }
@@ -119,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
             else
             {
-                spinningSample?.VolumeTo(minimum_volume, 200).Finally(_ => spinningSample.Stop());
+                spinningSample?.VolumeTo(0, 200).Finally(_ => spinningSample.Stop());
             }
         }
 
