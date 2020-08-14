@@ -11,17 +11,20 @@ namespace osu.Game.Online.Multiplayer
     {
         private readonly int roomId;
         private readonly int playlistItemId;
+        private readonly string versionHash;
 
-        public CreateRoomScoreRequest(int roomId, int playlistItemId)
+        public CreateRoomScoreRequest(int roomId, int playlistItemId, string versionHash)
         {
             this.roomId = roomId;
             this.playlistItemId = playlistItemId;
+            this.versionHash = versionHash;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
             req.Method = HttpMethod.Post;
+            req.AddParameter("version_hash", versionHash);
             return req;
         }
 
