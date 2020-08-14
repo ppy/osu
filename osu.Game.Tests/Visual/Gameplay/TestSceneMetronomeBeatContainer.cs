@@ -3,8 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
@@ -23,12 +21,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             Beatmap.Value.Track.Start();
             Beatmap.Value.Track.Seek(Beatmap.Value.Beatmap.HitObjects.First().StartTime - 1000);
 
-            var TickFrequency = new Bindable<ModMetronome.TickFrequency>(ModMetronome.TickFrequency.One);
-            Add(new ModMetronome<HitObject>.MetronomeBeatContainer(TickFrequency)); ;
+            var tickFrequency = new Bindable<ModMetronome.TickFrequency>(ModMetronome.TickFrequency.One);
+            Add(new ModMetronome<HitObject>.MetronomeBeatContainer(tickFrequency));
 
-            AddStep("change tick frequency to One", () => TickFrequency.Value = ModMetronome.TickFrequency.One);
-            AddStep("change tick frequency to Two", () => TickFrequency.Value = ModMetronome.TickFrequency.Two);
-            AddStep("change tick frequency to Four", () =>  TickFrequency.Value = ModMetronome.TickFrequency.Four);
+            AddStep("change tick frequency to One", () => tickFrequency.Value = ModMetronome.TickFrequency.One);
+            AddStep("change tick frequency to Two", () => tickFrequency.Value = ModMetronome.TickFrequency.Two);
+            AddStep("change tick frequency to Four", () => tickFrequency.Value = ModMetronome.TickFrequency.Four);
         }
     }
 }
