@@ -47,7 +47,8 @@ namespace osu.Game.Screens.Select
             criteria.SearchText = query;
         }
 
-        private static string invertPreNumericalOperator(string op) {
+        private static string invertPreNumericalOperator(string op)
+        {
             switch (op)
             {
                 case "<":
