@@ -184,10 +184,10 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestApplyDoubleConditionQueries()
         {
-            const string query = "give me the maps with stars>=6<8 please";
+            const string query = "give me the maps with 4<stars<6 please";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("give me the maps with  please", filterCriteria.SearchText.Trim());
+            Assert.AreEqual("give me the maps with   please", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.IsNotNull(filterCriteria.StarDifficulty.Max);
             Assert.Greater(filterCriteria.StarDifficulty.Max, 7.99d);
