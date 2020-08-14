@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(LargeTextureStore textures)
         {
             Sprite.Texture = Beatmap?.Background ?? textures.Get(fallbackTextureName);
         }
