@@ -24,9 +24,10 @@ namespace osu.Game.Screens.Select
                 var valueTextual = match.Groups["valueTextual"].Value;
 
                 var keyNumerical = match.Groups["keyNumerical"].Value;
-                //Operator used before the key needs to be inverted because when e.g. "4<stars<5"
-                //is decomposited it actually means "stars<4" and "stars<5", but in order for 
-                //the expression to be correct we need the first bit to be "stars>4".
+                /*Operator used before the key needs to be inverted because when e.g. "4<stars<5"
+                  is decomposited it actually means "stars<4" and "stars<5", but in order for
+                  the expression to be correct we need the first bit to be "stars>4".
+                  */
                 var opPreNumerical = invertPreNumericalOperator(match.Groups["opPreNumerical"].Value);
                 var valuePreNumerical = match.Groups["valuePreNumerical"].Value;
                 var opPostNumerical = match.Groups["opPostNumerical"].Value;
