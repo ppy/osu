@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         private SkinnableSound spinningSample;
-        private const float SPINNING_SAMPLE_INITAL_FREQUENCY = 1.0f;
+        private const float SPINNING_SAMPLE_INITIAL_FREQUENCY = 1.0f;
         private const float SPINNING_SAMPLE_MODULATED_BASE_FREQUENCY = 0.5f;
 
         protected override void LoadSamples()
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     Volume = { Value = 0 },
                     Looping = true,
-                    Frequency = { Value = SPINNING_SAMPLE_INITAL_FREQUENCY }
+                    Frequency = { Value = SPINNING_SAMPLE_INITIAL_FREQUENCY }
                 });
             }
         }
@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, ISkinSource skin)
+        private void load(OsuColour colours)
         {
             positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
@@ -179,6 +179,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void ApplySkin(ISkinSource skin, bool allowFallback)
         {
+            base.ApplySkin(skin, allowFallback);
             spinnerFrequencyModulate = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerFrequencyModulate)?.Value ?? true;
         }
 
