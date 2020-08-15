@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
@@ -30,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SpinnerBonusDisplay bonusDisplay;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+
+        private bool spinnerFrequencyModulate;
 
         public DrawableSpinner(Spinner s)
             : base(s)
@@ -165,10 +168,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, ISkinSource skin)
         {
             positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
+            spinnerFrequencyModulate = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerFrequencyModulate)?.Value ?? true;
         }
 
         /// <summary>
@@ -221,8 +225,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
 
             if (spinningSample != null)
-                // todo: implement SpinnerFrequencyModulate
-                spinningSample.Frequency.Value = 0.5f + Progress;
+                spinningSample.Frequency.Value = spinnerFrequencyModulate ? 0.5f + Progress : 0.5f;
         }
 
         protected override void UpdateAfterChildren()
