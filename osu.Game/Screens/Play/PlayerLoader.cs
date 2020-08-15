@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play
 
         private bool readyForPush =>
             // don't push unless the player is completely loaded
-            player.LoadState == LoadState.Ready
+            player?.LoadState == LoadState.Ready
             // don't push if the user is hovering one of the panes, unless they are idle.
             && (IsHovered || idleTracker.IsIdle.Value)
             // don't push if the user is dragging a slider or otherwise.
@@ -173,8 +173,6 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            prepareNewPlayer();
-
             content.ScaleTo(0.7f);
             Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
 
@@ -191,11 +189,6 @@ namespace osu.Game.Screens.Play
             base.OnResuming(last);
 
             contentIn();
-
-            MetadataInfo.Loading = true;
-
-            // we will only be resumed if the player has requested a re-run (see restartRequested).
-            prepareNewPlayer();
 
             this.Delay(400).Schedule(pushWhenLoaded);
         }
@@ -277,6 +270,9 @@ namespace osu.Game.Screens.Play
 
         private void prepareNewPlayer()
         {
+            if (!this.IsCurrentScreen())
+                return;
+
             var restartCount = player?.RestartCount + 1 ?? 0;
 
             player = createPlayer();
@@ -294,8 +290,10 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            content.ScaleTo(1, 650, Easing.OutQuint);
+            MetadataInfo.Loading = true;
+
             content.FadeInFromZero(400);
+            content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
         }
 
         private void contentOut()
