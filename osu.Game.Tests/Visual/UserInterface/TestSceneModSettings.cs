@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -15,6 +16,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -73,6 +75,24 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
             AddStep("deselect mod", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
             AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.Alpha == 0);
+        }
+
+        [Test]
+        public void TestModSettingsUnboundWhenCopied()
+        {
+            OsuModDoubleTime original = null;
+            OsuModDoubleTime copy = null;
+
+            AddStep("create mods", () =>
+            {
+                original = new OsuModDoubleTime();
+                copy = (OsuModDoubleTime)original.CreateCopy();
+            });
+
+            AddStep("change property", () => original.SpeedChange.Value = 2);
+
+            AddAssert("original has new value", () => Precision.AlmostEquals(2.0, original.SpeedChange.Value));
+            AddAssert("copy has original value", () => Precision.AlmostEquals(1.5, copy.SpeedChange.Value));
         }
 
         private void createModSelect()

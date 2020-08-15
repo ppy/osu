@@ -46,25 +46,37 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// </summary>
         /// <param name="interactive">If the test player should behave like the production one.</param>
         /// <param name="beforeLoadAction">An action to run before player load but after bindable leases are returned.</param>
-        /// <param name="afterLoadAction">An action to run after container load.</param>
-        public void ResetPlayer(bool interactive, Action beforeLoadAction = null, Action afterLoadAction = null)
+        public void ResetPlayer(bool interactive, Action beforeLoadAction = null)
         {
+            player = null;
+
             audioManager.Volume.SetDefault();
 
             InputManager.Clear();
 
+            container = new TestPlayerLoaderContainer(loader = new TestPlayerLoader(() => player = new TestPlayer(interactive, interactive)));
+
             beforeLoadAction?.Invoke();
+
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(Beatmap.Value.Track);
 
-            InputManager.Child = container = new TestPlayerLoaderContainer(
-                loader = new TestPlayerLoader(() =>
-                {
-                    afterLoadAction?.Invoke();
-                    return player = new TestPlayer(interactive, interactive);
-                }));
+            InputManager.Child = container;
+        }
+
+        [Test]
+        public void TestEarlyExitBeforePlayerConstruction()
+        {
+            AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+            AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
+            AddStep("exit loader", () => loader.Exit());
+            AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
+            AddAssert("player did not load", () => player == null);
+            AddUntilStep("player disposed", () => loader.DisposalTask == null);
+            AddAssert("mod rate still applied", () => Beatmap.Value.Track.Rate != 1);
         }
 
         /// <summary>
@@ -73,11 +85,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// speed adjustments were undone too late, causing cross-screen pollution.
         /// </summary>
         [Test]
-        public void TestEarlyExit()
+        public void TestEarlyExitAfterPlayerConstruction()
         {
             AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
+            AddUntilStep("wait for non-null player", () => player != null);
             AddStep("exit loader", () => loader.Exit());
             AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
             AddAssert("player did not load", () => !player.IsLoaded);
@@ -94,7 +107,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for load ready", () =>
             {
                 moveMouse();
-                return player.LoadState == LoadState.Ready;
+                return player?.LoadState == LoadState.Ready;
             });
             AddRepeatStep("move mouse", moveMouse, 20);
 
@@ -195,19 +208,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestMutedNotificationMasterVolume()
         {
-            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
+            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.IsDefault);
         }
 
         [Test]
         public void TestMutedNotificationTrackVolume()
         {
-            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, null, () => audioManager.VolumeTrack.IsDefault);
+            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, () => audioManager.VolumeTrack.IsDefault);
         }
 
         [Test]
         public void TestMutedNotificationMuteButton()
         {
-            addVolumeSteps("mute button", null, () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
+            addVolumeSteps("mute button", () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
         }
 
         /// <remarks>
@@ -215,14 +228,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// </remarks>
         /// <param name="volumeName">What part of the volume system is checked</param>
         /// <param name="beforeLoad">The action to be invoked to set the volume before loading</param>
-        /// <param name="afterLoad">The action to be invoked to set the volume after loading</param>
         /// <param name="assert">The function to be invoked and checked</param>
-        private void addVolumeSteps(string volumeName, Action beforeLoad, Action afterLoad, Func<bool> assert)
+        private void addVolumeSteps(string volumeName, Action beforeLoad, Func<bool> assert)
         {
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
 
-            AddStep("load player", () => ResetPlayer(false, beforeLoad, afterLoad));
-            AddUntilStep("wait for player", () => player.LoadState == LoadState.Ready);
+            AddStep("load player", () => ResetPlayer(false, beforeLoad));
+            AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
 
             AddAssert("check for notification", () => container.NotificationOverlay.UnreadCount.Value == 1);
             AddStep("click notification", () =>

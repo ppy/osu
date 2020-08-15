@@ -191,6 +191,11 @@ namespace osu.Game.Rulesets
             if (loadedAssemblies.ContainsKey(assembly))
                 return;
 
+            // the same assembly may be loaded twice in the same AppDomain (currently a thing in certain Rider versions https://youtrack.jetbrains.com/issue/RIDER-48799).
+            // as a failsafe, also compare by FullName.
+            if (loadedAssemblies.Any(a => a.Key.FullName == assembly.FullName))
+                return;
+
             try
             {
                 loadedAssemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
