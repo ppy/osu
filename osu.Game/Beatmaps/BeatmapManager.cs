@@ -195,7 +195,8 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
-        public void Save(BeatmapInfo info, IBeatmap beatmapContent)
+        /// <param name="skin">Optional beatmap skin for inline skin configuration in beatmap files.</param>
+        public void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin skin)
         {
             var setInfo = QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == info.ID));
 
@@ -203,7 +204,6 @@ namespace osu.Game.Beatmaps
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                 {
-                    var skin = new LegacyBeatmapSkin(info, Files.Store, audioManager);
                     new LegacyBeatmapEncoder(beatmapContent, skin).Encode(sw);
                 }
 
