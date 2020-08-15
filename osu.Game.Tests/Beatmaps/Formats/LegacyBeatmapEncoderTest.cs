@@ -42,18 +42,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             sort(decodedAfterEncode.beatmap);
 
             Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
-
-            areSkinsEqual(decoded.beatmapSkin, decodedAfterEncode.beatmapSkin);
-        }
-
-        private void areSkinsEqual(LegacySkin expected, LegacySkin actual)
-        {
-            var expectedColours = expected.Configuration.ComboColours;
-            var actualColours = actual.Configuration.ComboColours;
-
-            Assert.AreEqual(expectedColours.Count, actualColours.Count);
-            for (int i = 0; i < expectedColours.Count; i++)
-                Assert.AreEqual(expectedColours[i], actualColours[i]);
+            Assert.IsTrue(decoded.beatmapSkin.Configuration.Equals(decodedAfterEncode.beatmapSkin.Configuration));
         }
 
         private void sort(IBeatmap beatmap)
