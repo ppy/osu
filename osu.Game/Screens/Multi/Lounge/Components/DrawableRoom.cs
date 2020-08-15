@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public event Action<SelectionState> StateChanged;
 
-        public Action<Room> DuplicateRoom;
+        public Action DuplicateRoom;
 
         private readonly Box selectionBox;
         private CachedModelDependencyContainer<Room> dependencies;
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Duplicate", MenuItemType.Standard, () => DuplicateRoom?.Invoke(Room))
+            new OsuMenuItem("Create copy", MenuItemType.Standard, DuplicateRoom)
         };
     }
 }

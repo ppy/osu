@@ -18,6 +18,7 @@ using osu.Game.Screens.Multi.Match;
 
 namespace osu.Game.Screens.Multi.Lounge
 {
+    [Cached]
     public class LoungeSubScreen : MultiplayerSubScreen
     {
         public override string Title => "Lounge";
@@ -62,18 +63,7 @@ namespace osu.Game.Screens.Multi.Lounge
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
                                     Padding = new MarginPadding(10),
-                                    Child = roomsContainer = new RoomsContainer
-                                    {
-                                        JoinRequested = joinRequested,
-                                        DuplicateRoom = room =>
-                                        {
-                                            Room newRoom = new Room();
-                                            newRoom.CopyFrom(room, true);
-                                            newRoom.Name.Value = $"Copy of {room.Name.Value}";
-
-                                            Open(newRoom);
-                                        }
-                                    }
+                                    Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
                                 },
                                 loadingLayer = new LoadingLayer(roomsContainer),
                             }

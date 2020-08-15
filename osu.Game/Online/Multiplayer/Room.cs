@@ -104,47 +104,55 @@ namespace osu.Game.Online.Multiplayer
         public readonly Bindable<int> Position = new Bindable<int>(-1);
 
         /// <summary>
-        /// Copies the properties from another <see cref="Room"/> to this room.
+        /// Create a copy of this room, without information specific to it, such as Room ID or host
         /// </summary>
-        /// <param name="other">The room to copy</param>
-        /// <param name="duplicate">Whether the copy should exclude information unique to a specific room (i.e. when duplicating a room)</param>
-        public void CopyFrom(Room other, bool duplicate = false)
+        public Room CreateCopy()
         {
-            if (!duplicate)
+            Room newRoom = new Room
             {
-                RoomID.Value = other.RoomID.Value;
+                Name = { Value = Name.Value },
+                Availability = { Value = Availability.Value },
+                Type = { Value = Type.Value },
+                MaxParticipants = { Value = MaxParticipants.Value }
+            };
 
-                if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
-                    Host.Value = other.Host.Value;
+            newRoom.Playlist.AddRange(Playlist);
 
-                ChannelId.Value = other.ChannelId.Value;
-                Status.Value = other.Status.Value;
-                ParticipantCount.Value = other.ParticipantCount.Value;
-                EndDate.Value = other.EndDate.Value;
+            return newRoom;
+        }
 
-                if (DateTimeOffset.Now >= EndDate.Value)
-                    Status.Value = new RoomStatusEnded();
-
-                if (!RecentParticipants.SequenceEqual(other.RecentParticipants))
-                {
-                    RecentParticipants.Clear();
-                    RecentParticipants.AddRange(other.RecentParticipants);
-                }
-
-                Position.Value = other.Position.Value;
-            }
-
+        public void CopyFrom(Room other)
+        {
+            RoomID.Value = other.RoomID.Value;
             Name.Value = other.Name.Value;
 
+            if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
+                Host.Value = other.Host.Value;
+
+            ChannelId.Value = other.ChannelId.Value;
+            Status.Value = other.Status.Value;
             Availability.Value = other.Availability.Value;
             Type.Value = other.Type.Value;
             MaxParticipants.Value = other.MaxParticipants.Value;
+            ParticipantCount.Value = other.ParticipantCount.Value;
+            EndDate.Value = other.EndDate.Value;
+
+            if (DateTimeOffset.Now >= EndDate.Value)
+                Status.Value = new RoomStatusEnded();
 
             if (!Playlist.SequenceEqual(other.Playlist))
             {
                 Playlist.Clear();
                 Playlist.AddRange(other.Playlist);
             }
+
+            if (!RecentParticipants.SequenceEqual(other.RecentParticipants))
+            {
+                RecentParticipants.Clear();
+                RecentParticipants.AddRange(other.RecentParticipants);
+            }
+
+            Position.Value = other.Position.Value;
         }
 
         public bool ShouldSerializeRoomID() => false;
