@@ -33,6 +33,7 @@ using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Play;
+using osu.Game.Skinning;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
@@ -64,6 +65,7 @@ namespace osu.Game.Screens.Edit
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
         private EditorChangeHandler changeHandler;
+        private ISkin beatmapSkin;
 
         private DependencyContainer dependencies;
 
@@ -92,6 +94,7 @@ namespace osu.Game.Screens.Edit
             try
             {
                 playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+                beatmapSkin = Beatmap.Value.Skin;
             }
             catch (Exception e)
             {
@@ -104,7 +107,7 @@ namespace osu.Game.Screens.Edit
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
             dependencies.CacheAs(editorBeatmap);
 
-            changeHandler = new EditorChangeHandler(editorBeatmap);
+            changeHandler = new EditorChangeHandler(editorBeatmap, beatmapSkin);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
             EditorMenuBar menuBar;
@@ -399,7 +402,7 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!clock.IsRunning, amount);
         }
 
-        private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
+        private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, Beatmap.Value.Skin);
 
         private void exportBeatmap()
         {

@@ -28,13 +28,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class LegacyBeatmapEncoderTest
     {
-        private static IEnumerable<string> allBeatmaps => TestResources.GetStore().GetAvailableResources().Where(res => res.EndsWith(".osu"));
+        private static readonly DllResourceStore resource_store = TestResources.GetStore();
+
+        private static IEnumerable<string> allBeatmaps = resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu"));
+
+        private static Stream beatmapSkinStream = resource_store.GetStream("skin.ini");
+
+        private ISkin skin;
+
+        [SetUp]
+        public void Init()
+        {
+            skin = decodeSkinFromLegacy(beatmapSkinStream);
+        }
 
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)
         {
-            var decoded = decodeFromLegacy(TestResources.GetStore().GetStream(name));
-            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded));
+            var decoded = decodeBeatmapFromLegacy(TestResources.GetStore().GetStream(name));
+            var decodedAfterEncode = decodeBeatmapFromLegacy(encodeToLegacy(decoded, skin));
 
             sort(decoded);
             sort(decodedAfterEncode);
@@ -52,20 +64,24 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private IBeatmap decodeFromLegacy(Stream stream)
+        private IBeatmap decodeBeatmapFromLegacy(Stream stream)
         {
             using (var reader = new LineBufferedReader(stream))
                 return convert(new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader));
         }
 
-        private Stream encodeToLegacy(IBeatmap beatmap)
+        private ISkin decodeSkinFromLegacy(Stream stream)
+        {
+            using (var reader = new LineBufferedReader(stream))
+                return new LegacySkin(SkinInfo.Default, resource_store, null);
+        }
+
+        private Stream encodeToLegacy(IBeatmap beatmap, ISkin skin)
         {
             var stream = new MemoryStream();
 
             using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-            using (var rs = new ResourceStore<byte[]>())
             {
-                var skin = new LegacyBeatmapSkin(beatmap.BeatmapInfo, rs, null);
                 new LegacyBeatmapEncoder(beatmap, skin).Encode(writer);
             }
 

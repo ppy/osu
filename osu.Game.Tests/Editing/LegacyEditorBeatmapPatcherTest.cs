@@ -4,7 +4,6 @@
 using System.IO;
 using System.Text;
 using NUnit.Framework;
-using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -15,7 +14,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
-using osu.Game.Skinning;
 using osuTK;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
@@ -353,11 +351,7 @@ namespace osu.Game.Tests.Editing
             using (var encoded = new MemoryStream())
             {
                 using (var sw = new StreamWriter(encoded))
-                using (var rs = new ResourceStore<byte[]>())
-                {
-                    var skin = new LegacyBeatmapSkin(beatmap.BeatmapInfo, rs, null);
-                    new LegacyBeatmapEncoder(beatmap, skin).Encode(sw);
-                }
+                    new LegacyBeatmapEncoder(beatmap, null).Encode(sw);
 
                 return encoded.ToArray();
             }

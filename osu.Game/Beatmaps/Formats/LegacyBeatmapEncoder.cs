@@ -24,14 +24,14 @@ namespace osu.Game.Beatmaps.Formats
         public const int LATEST_VERSION = 128;
 
         private readonly IBeatmap beatmap;
-        private readonly LegacyBeatmapSkin beatmapSkin;
+        private readonly ISkin skin;
 
         /// <param name="beatmap">The beatmap to encode</param>
-        /// <param name="beatmapSkin">An optional beatmap skin, for encoding the beatmap's combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] LegacyBeatmapSkin beatmapSkin)
+        /// <param name="skin">An optional skin, for encoding the beatmap's combo colours. This will only work if the parameter is a type of <see cref="LegacyBeatmapSkin"/>.</param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] ISkin skin)
         {
             this.beatmap = beatmap;
-            this.beatmapSkin = beatmapSkin;
+            this.skin = skin;
 
             if (beatmap.BeatmapInfo.RulesetID < 0 || beatmap.BeatmapInfo.RulesetID > 3)
                 throw new ArgumentException("Only beatmaps in the osu, taiko, catch, or mania rulesets can be encoded to the legacy beatmap format.", nameof(beatmap));
@@ -207,7 +207,10 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleComboColours(TextWriter writer)
         {
-            var colours = beatmapSkin?.Configuration.ComboColours;
+            if (!(skin is LegacyBeatmapSkin legacySkin))
+                return;
+
+            var colours = legacySkin?.Configuration.ComboColours;
 
             if (colours == null || colours.Count == 0)
                 return;
