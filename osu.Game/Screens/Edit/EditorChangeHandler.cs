@@ -90,9 +90,7 @@ namespace osu.Game.Screens.Edit
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                {
                     new LegacyBeatmapEncoder(editorBeatmap, beatmapSkin).Encode(sw);
-                }
 
                 savedStates.Add(stream.ToArray());
             }
