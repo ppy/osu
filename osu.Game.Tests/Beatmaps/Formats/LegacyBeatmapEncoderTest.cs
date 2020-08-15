@@ -32,25 +32,28 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         private static IEnumerable<string> allBeatmaps = resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu"));
 
-        private static readonly Stream beatmap_skin_stream = resource_store.GetStream("skin.ini");
-        private ISkin skin;
-
-        [SetUp]
-        public void Init()
-        {
-            skin = decodeSkinFromLegacy(beatmap_skin_stream);
-        }
-
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)
         {
-            var decoded = decodeBeatmapFromLegacy(TestResources.GetStore().GetStream(name));
-            var decodedAfterEncode = decodeBeatmapFromLegacy(encodeToLegacy(decoded, skin));
+            var decoded = decodeFromLegacy(TestResources.GetStore().GetStream(name));
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded));
 
-            sort(decoded);
-            sort(decodedAfterEncode);
+            sort(decoded.beatmap);
+            sort(decodedAfterEncode.beatmap);
 
-            Assert.That(decodedAfterEncode.Serialize(), Is.EqualTo(decoded.Serialize()));
+            Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
+
+            areSkinsEqual(decoded.beatmapSkin, decodedAfterEncode.beatmapSkin);
+        }
+
+        private void areSkinsEqual(LegacySkin expected, LegacySkin actual)
+        {
+            var expectedColours = expected.Configuration.ComboColours;
+            var actualColours = actual.Configuration.ComboColours;
+
+            Assert.AreEqual(expectedColours.Count, actualColours.Count);
+            for (int i = 0; i < expectedColours.Count; i++)
+                Assert.AreEqual(expectedColours[i], actualColours[i]);
         }
 
         private void sort(IBeatmap beatmap)
@@ -63,20 +66,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private IBeatmap decodeBeatmapFromLegacy(Stream stream)
+        private (IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) decodeFromLegacy(Stream stream)
         {
             using (var reader = new LineBufferedReader(stream))
-                return convert(new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader));
+            {
+                var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
+                var beatmapSkin = new LegacyBeatmapSkin(beatmap.BeatmapInfo, resource_store, null);
+                return (convert(beatmap), beatmapSkin);
+            }
         }
 
-        private ISkin decodeSkinFromLegacy(Stream stream)
+        private Stream encodeToLegacy((IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) fullBeatmap)
         {
-            using (var reader = new LineBufferedReader(stream))
-                return new LegacySkin(SkinInfo.Default, resource_store, null);
-        }
-
-        private Stream encodeToLegacy(IBeatmap beatmap, ISkin beatmapSkin)
-        {
+            var (beatmap, beatmapSkin) = fullBeatmap;
             var stream = new MemoryStream();
 
             using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
