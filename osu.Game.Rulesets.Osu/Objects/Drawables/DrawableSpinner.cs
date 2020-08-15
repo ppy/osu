@@ -85,8 +85,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         private SkinnableSound spinningSample;
-        private const float SPINNING_SAMPLE_INITIAL_FREQUENCY = 1.0f;
-        private const float SPINNING_SAMPLE_MODULATED_BASE_FREQUENCY = 0.5f;
+        private const float spinning_sample_initial_frequency = 1.0f;
+        private const float spinning_sample_modulated_base_frequency = 0.5f;
 
         protected override void LoadSamples()
         {
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     Volume = { Value = 0 },
                     Looping = true,
-                    Frequency = { Value = SPINNING_SAMPLE_INITIAL_FREQUENCY }
+                    Frequency = { Value = spinning_sample_initial_frequency }
                 });
             }
         }
@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
 
             if (spinningSample != null && spinnerFrequencyModulate)
-                spinningSample.Frequency.Value = SPINNING_SAMPLE_MODULATED_BASE_FREQUENCY + Progress;
+                spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
         }
 
         protected override void UpdateAfterChildren()
