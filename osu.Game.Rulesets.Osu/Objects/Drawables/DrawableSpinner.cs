@@ -172,6 +172,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
+        }
+
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
             spinnerFrequencyModulate = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerFrequencyModulate)?.Value ?? true;
         }
 
