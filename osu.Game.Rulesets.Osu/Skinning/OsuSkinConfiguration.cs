@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         CursorExpand,
         CursorRotate,
         HitCircleOverlayAboveNumber,
-        HitCircleOverlayAboveNumer // Some old skins will have this typo
+        HitCircleOverlayAboveNumer, // Some old skins will have this typo
+		SpinnerFrequencyModulate
     }
 }
