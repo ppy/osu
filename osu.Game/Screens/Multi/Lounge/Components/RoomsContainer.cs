@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [Resolved]
         private IRoomManager roomManager { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private LoungeSubScreen loungeSubScreen { get; set; }
 
         public RoomsContainer()
@@ -100,9 +100,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     DuplicateRoom = () =>
                     {
                         Room newRoom = room.CreateCopy();
-                        newRoom.Name.Value = $"Copy of {room.Name.Value}";
+                        if (!newRoom.Name.Value.StartsWith("Copy of "))
+                            newRoom.Name.Value = $"Copy of {room.Name.Value}";
 
-                        loungeSubScreen.Open(newRoom);
+                        loungeSubScreen?.Open(newRoom);
                     },
                     Action = () =>
                     {
