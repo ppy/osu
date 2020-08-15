@@ -32,14 +32,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         private static IEnumerable<string> allBeatmaps = resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu"));
 
-        private static Stream beatmapSkinStream = resource_store.GetStream("skin.ini");
-
+        private static readonly Stream beatmap_skin_stream = resource_store.GetStream("skin.ini");
         private ISkin skin;
 
         [SetUp]
         public void Init()
         {
-            skin = decodeSkinFromLegacy(beatmapSkinStream);
+            skin = decodeSkinFromLegacy(beatmap_skin_stream);
         }
 
         [TestCaseSource(nameof(allBeatmaps))]
@@ -76,14 +75,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 return new LegacySkin(SkinInfo.Default, resource_store, null);
         }
 
-        private Stream encodeToLegacy(IBeatmap beatmap, ISkin skin)
+        private Stream encodeToLegacy(IBeatmap beatmap, ISkin beatmapSkin)
         {
             var stream = new MemoryStream();
 
             using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-            {
-                new LegacyBeatmapEncoder(beatmap, skin).Encode(writer);
-            }
+                new LegacyBeatmapEncoder(beatmap, beatmapSkin).Encode(writer);
 
             stream.Position = 0;
 
