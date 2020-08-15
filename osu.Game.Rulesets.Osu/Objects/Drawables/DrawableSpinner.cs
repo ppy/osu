@@ -104,6 +104,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     Volume = { Value = 0 },
                     Looping = true,
+                    Frequency = { Value = 1.0f }
                 });
             }
         }
@@ -228,8 +229,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (HandleUserInput)
                 RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
 
-            if (spinningSample != null)
-                spinningSample.Frequency.Value = spinnerFrequencyModulate ? 0.5f + Progress : 0.5f;
+            if (spinningSample != null && spinnerFrequencyModulate)
+                spinningSample.Frequency.Value = 0.5f + Progress;
         }
 
         protected override void UpdateAfterChildren()
