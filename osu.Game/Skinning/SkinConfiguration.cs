@@ -56,7 +56,7 @@ namespace osu.Game.Skinning
             return other != null &&
                    ConfigDictionary.SequenceEqual(other.ConfigDictionary) &&
                    ComboColours.SequenceEqual(other.ComboColours) &&
-                   CustomColours.SequenceEqual(other.CustomColours);
+                   CustomColours?.SequenceEqual(other.CustomColours) == true;
         }
     }
 }

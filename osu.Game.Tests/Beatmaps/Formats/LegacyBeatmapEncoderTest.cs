@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private (IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) decodeFromLegacy(Stream stream)
+        private (IBeatmap beatmap, LegacySkin beatmapSkin) decodeFromLegacy(Stream stream)
         {
             using (var reader = new LineBufferedReader(stream))
             {
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private Stream encodeToLegacy((IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) fullBeatmap)
+        private Stream encodeToLegacy((IBeatmap beatmap, LegacySkin beatmapSkin) fullBeatmap)
         {
             var (beatmap, beatmapSkin) = fullBeatmap;
             var stream = new MemoryStream();
