@@ -18,6 +18,7 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -62,6 +63,9 @@ namespace osu.Game.Screens.Play
         public bool HasFailed { get; private set; }
 
         private Bindable<bool> mouseWheelDisabled;
+
+        [Resolved(CanBeNull = true)]
+        private ConfineMouseTracker confineMouseTracker { get; set; }
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
@@ -197,10 +201,15 @@ namespace osu.Game.Screens.Play
                 skipOverlay.Hide();
             }
 
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ =>
+            {
+                updatePauseOnFocusLostState();
+                updateConfineMouse();
+            }, true);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
+            DrawableRuleset.IsPaused.ValueChanged += _ => updateConfineMouse();
 
             DrawableRuleset.OnNewResult += r =>
             {
@@ -346,6 +355,12 @@ namespace osu.Game.Screens.Play
                                                      && !DrawableRuleset.HasReplayLoaded.Value
                                                      && !breakTracker.IsBreakTime.Value;
 
+        private void updateConfineMouse()
+        {
+            if (confineMouseTracker != null)
+                confineMouseTracker.GameplayActive = !GameplayClockContainer.IsPaused.Value && !DrawableRuleset.HasReplayLoaded.Value && !HasFailed;
+        }
+
         private IBeatmap loadPlayableBeatmap()
         {
             IBeatmap playable;
@@ -379,7 +394,7 @@ namespace osu.Game.Screens.Play
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Could not load beatmap sucessfully!");
+                Logger.Error(e, "Could not load beatmap successfully!");
                 //couldn't load, hard abort!
                 return null;
             }
