@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
+using osu.Game.Input;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
@@ -66,6 +67,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MouseDisableButtons, false);
             Set(OsuSetting.MouseDisableWheel, false);
+            Set(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
 
             // Graphics
             Set(OsuSetting.ShowFpsDisplay, false);
@@ -191,6 +193,7 @@ namespace osu.Game.Configuration
         FadePlayfieldWhenHealthLow,
         MouseDisableButtons,
         MouseDisableWheel,
+        ConfineMouseMode,
         AudioOffset,
         VolumeInactive,
         MenuMusic,
