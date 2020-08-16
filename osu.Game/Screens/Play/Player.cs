@@ -69,8 +69,6 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> mouseWheelDisabled;
 
-        private Bindable<bool> gameplayOverlaysDisabled;
-
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
         public int RestartCount;
@@ -176,7 +174,6 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
-            gameplayOverlaysDisabled = config.GetBindable<bool>(OsuSetting.GameplayDisableOverlayActivation);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
@@ -211,6 +208,10 @@ namespace osu.Game.Screens.Play
 
             if (game != null)
                 OverlayActivationMode.BindTo(game.OverlayActivationMode);
+
+            DrawableRuleset.IsPaused.BindValueChanged(_ => updateOverlayActivationMode());
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateOverlayActivationMode());
+            breakTracker.IsBreakTime.BindValueChanged(_ => updateOverlayActivationMode());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
@@ -358,7 +359,7 @@ namespace osu.Game.Screens.Play
 
         private void updateOverlayActivationMode()
         {
-            bool canTriggerOverlays = DrawableRuleset.IsPaused.Value || breakTracker.IsBreakTime.Value || !gameplayOverlaysDisabled.Value;
+            bool canTriggerOverlays = DrawableRuleset.IsPaused.Value || breakTracker.IsBreakTime.Value;
 
             if (DrawableRuleset.HasReplayLoaded.Value || canTriggerOverlays)
                 OverlayActivationMode.Value = OverlayActivation.UserTriggered;
@@ -653,10 +654,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
 
-            DrawableRuleset.IsPaused.BindValueChanged(_ => updateOverlayActivationMode());
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateOverlayActivationMode());
-            breakTracker.IsBreakTime.BindValueChanged(_ => updateOverlayActivationMode());
-            gameplayOverlaysDisabled.BindValueChanged(_ => updateOverlayActivationMode(), true);
+            updateOverlayActivationMode();
         }
 
         public override void OnSuspending(IScreen next)
