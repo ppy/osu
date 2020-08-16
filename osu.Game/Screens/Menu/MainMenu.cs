@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Menu
         private GameHost host { get; set; }
 
         [Resolved]
-        private MusicController music { get; set; }
+        private MusicController musicController { get; set; }
 
         [Resolved(canBeNull: true)]
         private LoginOverlay login { get; set; }
@@ -176,12 +176,12 @@ namespace osu.Game.Screens.Menu
 
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is IntroScreen && music.TrackLoaded)
+            if (last is IntroScreen && musicController.TrackLoaded)
             {
-                if (!music.CurrentTrack.IsRunning)
+                if (!musicController.CurrentTrack.IsRunning)
                 {
-                    music.CurrentTrack.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * music.CurrentTrack.Length);
-                    music.CurrentTrack.Start();
+                    musicController.CurrentTrack.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * musicController.CurrentTrack.Length);
+                    musicController.CurrentTrack.Start();
                 }
             }
 
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Menu
             // we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 
-            music.EnsurePlayingSomething();
+            musicController.EnsurePlayingSomething();
         }
 
         public override bool OnExiting(IScreen next)
