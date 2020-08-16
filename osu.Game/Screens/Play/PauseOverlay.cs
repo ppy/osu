@@ -26,8 +26,6 @@ namespace osu.Game.Screens.Play
 
         protected override Action BackAction => () => InternalButtons.Children.First().Click();
 
-        private const float minimum_volume = 0.0001f;
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -38,10 +36,8 @@ namespace osu.Game.Screens.Play
             AddInternal(pauseLoop = new SkinnableSound(new SampleInfo("pause-loop"))
             {
                 Looping = true,
+                Volume = { Value = 0 }
             });
-
-            // SkinnableSound only plays a sound if its aggregate volume is > 0, so the volume must be turned up before playing it
-            pauseLoop.VolumeTo(minimum_volume);
         }
 
         protected override void PopIn()
@@ -56,7 +52,7 @@ namespace osu.Game.Screens.Play
         {
             base.PopOut();
 
-            pauseLoop.VolumeTo(minimum_volume, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
+            pauseLoop.VolumeTo(0, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
         }
     }
 }
