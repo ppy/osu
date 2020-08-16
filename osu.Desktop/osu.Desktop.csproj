@@ -3,7 +3,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputType>WinExe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>click the circles. to the beat.</Description>
+    <Description>A free-to-win rhythm game. Rhythm is just a *click* away!</Description>
     <AssemblyName>osu!</AssemblyName>
     <Title>osu!lazer</Title>
     <Product>osu!lazer</Product>
