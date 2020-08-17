@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -11,6 +12,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -32,6 +34,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Container<DrawableHoldNoteTail> tailContainer;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
+        private readonly Container bodyPieceContainer;
         private readonly Drawable bodyPiece;
 
         /// <summary>
@@ -44,19 +47,25 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         public bool HasBroken { get; private set; }
 
+        /// <summary>
+        /// Whether the hold note has been released potentially without having caused a break.
+        /// </summary>
+        private bool hasReleased;
+
         public DrawableHoldNote(HoldNote hitObject)
             : base(hitObject)
         {
             RelativeSizeAxes = Axes.X;
 
-            AddRangeInternal(new[]
+            AddRangeInternal(new Drawable[]
             {
-                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                bodyPieceContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
-                })
-                {
-                    RelativeSizeAxes = Axes.X
+                    RelativeSizeAxes = Axes.X,
+                    Child = bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    })
                 },
                 tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
                 headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both },
@@ -127,7 +136,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.OnDirectionChanged(e);
 
-            bodyPiece.Anchor = bodyPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+            bodyPieceContainer.Anchor = bodyPieceContainer.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+            bodyPieceContainer.Anchor = bodyPieceContainer.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.BottomLeft : Anchor.TopLeft;
         }
 
         public override void PlaySamples()
@@ -140,8 +150,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
-            bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
+            bodyPieceContainer.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
+            bodyPieceContainer.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
+
+            if (Head.IsHit && !hasReleased)
+            {
+                float heightDecrease = (float)(Math.Max(0, Time.Current - HitObject.StartTime) / HitObject.Duration);
+                bodyPiece.Height = MathHelper.Clamp(1 - heightDecrease, 0, 1);
+            }
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
@@ -206,6 +222,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // If the key has been released too early, the user should not receive full score for the release
             if (!Tail.IsHit)
                 HasBroken = true;
+
+            hasReleased = true;
         }
 
         private void endHold()
