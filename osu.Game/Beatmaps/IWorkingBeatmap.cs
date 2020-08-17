@@ -58,6 +58,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Retrieves the <see cref="Track"/> which this <see cref="WorkingBeatmap"/> provides.
         /// </summary>
-        Track GetTrack();
+        Track LoadTrack();
     }
 }

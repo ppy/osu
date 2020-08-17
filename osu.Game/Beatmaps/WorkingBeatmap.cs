@@ -250,8 +250,29 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
+        private Track loadedTrack;
+
+        /// <summary>
+        /// Load a new audio track instance for this beatmap.
+        /// </summary>
+        /// <returns>A fresh track instance, which will also be available via <see cref="Track"/>.</returns>
         [NotNull]
-        public Track GetTrack() => GetBeatmapTrack() ?? GetVirtualTrack(1000);
+        public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+
+        /// <summary>
+        /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
+        /// This generally happens via MusicController when changing the global beatmap.
+        /// </summary>
+        public Track Track
+        {
+            get
+            {
+                if (loadedTrack == null)
+                    throw new InvalidOperationException($"Cannot access {nameof(Track)} without first calling {nameof(LoadTrack)}.");
+
+                return loadedTrack;
+            }
+        }
 
         protected abstract Track GetBeatmapTrack();
 
