@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => false;
         public override double ScoreMultiplier => 0.0;
 
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModNightcore)).ToArray();
+
         public enum TickFrequency
         {
             One = 1,

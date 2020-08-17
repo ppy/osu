@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override string Description => "Uguuuuuuuu...";
 
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModMetronome)).ToArray();
+
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
 
