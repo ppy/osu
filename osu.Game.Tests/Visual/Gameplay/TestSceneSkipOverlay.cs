@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -35,7 +33,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var working = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
             working.LoadTrack();
 
-            Child = gameplayClockContainer = new GameplayClockContainer(working, Array.Empty<Mod>(), 0)
+            Child = gameplayClockContainer = new GameplayClockContainer(working, 0)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
