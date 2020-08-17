@@ -13,6 +13,8 @@ using osu.Framework.Input.Events;
 using osuTK.Input;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.UserInterface;
+using osu.Framework.Layout;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -20,19 +22,21 @@ namespace osu.Game.Overlays.Toolbar
     {
         protected Drawable ModeButtonLine { get; private set; }
 
-        public ToolbarRulesetSelector()
-        {
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
-        }
+        private RulesetTabDropdown dropdown => (RulesetTabDropdown)Dropdown;
+
+        protected override Dropdown<RulesetInfo> CreateDropdown() => new RulesetTabDropdown();
+
+        private OpaqueBackground background;
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            RelativeSizeAxes = Axes.Both;
             AddRangeInternal(new[]
             {
-                new OpaqueBackground
+                background = new OpaqueBackground
                 {
+                    RelativeSizeAxes = Axes.Y,
                     Depth = 1,
                 },
                 ModeButtonLine = new Container
@@ -61,17 +65,18 @@ namespace osu.Game.Overlays.Toolbar
             base.LoadComplete();
 
             Current.BindDisabledChanged(disabled => this.FadeColour(disabled ? Color4.Gray : Color4.White, 300), true);
-            Current.BindValueChanged(_ => moveLineToCurrent(), true);
+            Current.BindValueChanged(_ => moveLineToCurrent(false), true);
         }
 
         private bool hasInitialPosition;
 
         // Scheduled to allow the flow layout to be computed before the line position is updated
-        private void moveLineToCurrent() => ScheduleAfterChildren(() =>
+        private void moveLineToCurrent(bool instant) => ScheduleAfterChildren(() =>
         {
             if (SelectedTab != null)
             {
-                ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 200, Easing.OutQuint);
+                var xTarget = SelectedTab.IsPresent ? SelectedTab.DrawPosition.X : TabContainer.DrawSize.X - ToolbarButton.WIDTH;
+                ModeButtonLine.MoveToX(xTarget, !hasInitialPosition || instant ? 0 : 200, Easing.OutQuint);
                 hasInitialPosition = true;
             }
         });
@@ -84,12 +89,12 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ToolbarRulesetTabButton(value);
 
-        protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
+        protected override TabFillFlowContainer CreateTabFlow()
         {
-            RelativeSizeAxes = Axes.Y,
-            AutoSizeAxes = Axes.X,
-            Direction = FillDirection.Horizontal,
-        };
+            var flow = base.CreateTabFlow();
+            flow.Masking = false;
+            return flow;
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -106,6 +111,29 @@ namespace osu.Game.Overlays.Toolbar
             }
 
             return false;
+        }
+
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            if (source == InvalidationSource.Parent)
+            {
+                background.Width = dropdown.Header.IsPresent ? DrawWidth : TabContainer.TabItems.Count() * ToolbarButton.WIDTH;
+                moveLineToCurrent(true);
+            }
+
+            return base.OnInvalidate(invalidation, source);
+        }
+
+        private class RulesetTabDropdown : OsuTabDropdown<RulesetInfo>
+        {
+            public new DropdownHeader Header => base.Header;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Header.Margin = new MarginPadding { Right = 7 };
+                AccentColour = ToolbarRulesetTabButton.ICON_COLOUR;
+            }
         }
     }
 }

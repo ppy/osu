@@ -45,43 +45,61 @@ namespace osu.Game.Overlays.Toolbar
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
-                new FillFlowContainer
+                new GridContainer
                 {
-                    Direction = FillDirection.Horizontal,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Children = new Drawable[]
+                    RelativeSizeAxes = Axes.Both,
+                    RowDimensions = new[]
                     {
-                        new ToolbarSettingsButton(),
-                        new ToolbarHomeButton
+                        new Dimension()
+                    },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            Action = () => OnHome?.Invoke()
-                        },
-                        rulesetSelector = new ToolbarRulesetSelector()
-                    }
-                },
-                new FillFlowContainer
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Direction = FillDirection.Horizontal,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Children = new Drawable[]
-                    {
-                        new ToolbarNewsButton(),
-                        new ToolbarChangelogButton(),
-                        new ToolbarRankingsButton(),
-                        new ToolbarBeatmapListingButton(),
-                        new ToolbarChatButton(),
-                        new ToolbarSocialButton(),
-                        new ToolbarMusicButton(),
-                        //new ToolbarButton
-                        //{
-                        //    Icon = FontAwesome.Solid.search
-                        //},
-                        userButton = new ToolbarUserButton(),
-                        new ToolbarNotificationButton(),
+                            new FillFlowContainer
+                            {
+                                Direction = FillDirection.Horizontal,
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Children = new Drawable[]
+                                {
+                                    new ToolbarSettingsButton(),
+                                    new ToolbarHomeButton
+                                    {
+                                        Action = () => OnHome?.Invoke()
+                                    }
+                                }
+                            },
+                            rulesetSelector = new ToolbarRulesetSelector(),
+                            new FillFlowContainer
+                            {
+                                Direction = FillDirection.Horizontal,
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Children = new Drawable[]
+                                {
+                                    new ToolbarNewsButton(),
+                                    new ToolbarChangelogButton(),
+                                    new ToolbarRankingsButton(),
+                                    new ToolbarBeatmapListingButton(),
+                                    new ToolbarChatButton(),
+                                    new ToolbarSocialButton(),
+                                    new ToolbarMusicButton(),
+                                    //new ToolbarButton
+                                    //{
+                                    //    Icon = FontAwesome.Solid.search
+                                    //},
+                                    userButton = new ToolbarUserButton(),
+                                    new ToolbarNotificationButton(),
+                                }
+                            }
+                        }
                     }
                 }
             };

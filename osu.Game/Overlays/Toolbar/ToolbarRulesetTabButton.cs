@@ -12,6 +12,8 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarRulesetTabButton : TabItem<RulesetInfo>
     {
+        public static readonly Color4 ICON_COLOUR = new Color4(255, 194, 224, 255);
+
         private readonly RulesetButton ruleset;
 
         public ToolbarRulesetTabButton(RulesetInfo value)
@@ -54,7 +56,7 @@ namespace osu.Game.Overlays.Toolbar
                     }
                     else
                     {
-                        IconContainer.Colour = new Color4(255, 194, 224, 255);
+                        IconContainer.Colour = ICON_COLOUR;
                         IconContainer.EdgeEffect = new EdgeEffectParameters();
                     }
                 }
