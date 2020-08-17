@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit
         private readonly DecoupleableInterpolatingFramedClock underlyingClock;
 
         public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
-            : this(beatmap.Beatmap.ControlPointInfo, beatmap.GetTrack().Length, beatDivisor)
+            : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
         {
         }
 

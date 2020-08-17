@@ -319,7 +319,7 @@ namespace osu.Game.Overlays
         {
             var lastTrack = CurrentTrack;
 
-            var newTrack = new DrawableTrack(current.GetTrack());
+            var newTrack = new DrawableTrack(current.LoadTrack());
             newTrack.Completed += () => onTrackCompleted(current);
 
             CurrentTrack = newTrack;
