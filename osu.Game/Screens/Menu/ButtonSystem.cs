@@ -376,10 +376,9 @@ namespace osu.Game.Screens.Menu
 
                             bool impact = logo.Scale.X > 0.6f;
 
-                            if (lastState == ButtonSystemState.Initial)
-                                logo.ScaleTo(0.5f, 200, Easing.In);
+                            logo.ScaleTo(0.5f, 200, Easing.In);
 
-                            logoTrackingContainer.StartTracking(logo, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
+                            logoTrackingContainer.StartTracking(logo, 200, Easing.In);
 
                             logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>

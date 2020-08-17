@@ -148,9 +148,9 @@ namespace osu.Game.Overlays.Toolbar
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.BottomLeft,
                         Alpha = 0,
-                        Height = 90,
+                        Height = 100,
                         Colour = ColourInfo.GradientVertical(
-                            OsuColour.Gray(0.1f).Opacity(0.5f), OsuColour.Gray(0.1f).Opacity(0)),
+                            OsuColour.Gray(0).Opacity(0.9f), OsuColour.Gray(0).Opacity(0)),
                     },
                 };
             }
