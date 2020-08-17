@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -18,16 +20,15 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNightcore<TObject> : ModDoubleTime, IApplicableToDrawableRuleset<TObject>
-        where TObject : HitObject
+    public abstract class ModNightcore : ModDoubleTime
     {
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override string Description => "Uguuuuuuuu...";
 
-        private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
+        private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
 
         protected ModNightcore()
         {
@@ -44,7 +45,11 @@ namespace osu.Game.Rulesets.Mods
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
+    }
 
+    public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
+        where TObject : HitObject
+    {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
             drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
