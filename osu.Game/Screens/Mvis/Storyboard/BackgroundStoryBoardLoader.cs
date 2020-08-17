@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             if ( EnableSB.Value )
             {
                 if ( !SBLoaded.Value )
-                    UpdateStoryBoardAsync();
+                    UpdateStoryBoardAsync(this.OnComplete);
                 else
                 {
                     storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
@@ -108,6 +108,12 @@ namespace osu.Game.Screens.Mvis.Storyboard
             try
             {
                 StoryboardClock.Stop();
+
+                if ( !EnableSB.Value )
+                {
+                    IsReady.Value = true;
+                    return false;
+                }
 
                 if ( ClockContainer != null )
                 {
@@ -143,6 +149,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
                     UpdateVisuals();
                     OnComplete?.Invoke();
+                    OnComplete = null;
 
                     Logger.Log($"Load Storyboard for Beatmap \"{beatmap.BeatmapSetInfo}\" complete!");
                 }, (ChangeSB = new CancellationTokenSource()).Token);
@@ -174,12 +181,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
             IsReady.Value = false;
             SBLoaded.Value = false;
             NeedToHideTriangles.Value = false;
-
-            if ( !EnableSB.Value )
-            {
-                IsReady.Value = true;
-                return;
-            }
 
             Schedule(() =>
             {

@@ -31,6 +31,7 @@ using osu.Game.Screens.Mvis.Storyboard;
 using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Input;
 using osu.Framework.Timing;
+using System;
 
 namespace osu.Game.Screens
 {
@@ -331,52 +332,52 @@ namespace osu.Game.Screens
                             Origin = Anchor.BottomCentre,
                             Margin = new MarginPadding(60)
                         },
+                        sidebarContainer = new SideBarSettingsPanel
+                        {
+                            Name = "Sidebar Container",
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 400,
+                            Depth = -float.MaxValue,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Width = 400 + HORIZONTAL_OVERFLOW_PADDING,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Colour = Color4.Black,
+                                    Alpha = 0.5f,
+                                },
+                                new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = new FillFlowContainer
+                                    {
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        Spacing = new Vector2(20),
+                                        Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
+                                        {
+                                            new MfMvisSection
+                                            {
+                                                Margin = new MarginPadding { Top = 0 },
+                                            },
+                                            playlist = new PlaylistOverlay
+                                            {
+                                                Padding = new MarginPadding{ Left = 5, Right = 10 },
+                                                TakeFocusOnPopIn = false,
+                                                RelativeSizeAxes = Axes.X,
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        }
                     }
                 },
-                sidebarContainer = new SideBarSettingsPanel
-                {
-                    Name = "Sidebar Container",
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 400 + HORIZONTAL_OVERFLOW_PADDING,
-                    GetBottombarHeight = () => BottombarHeight,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0.5f,
-                        },
-                        new OsuScrollContainer
-                        {
-                            Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING },
-                            RelativeSizeAxes = Axes.Both,
-                            Child = new FillFlowContainer
-                            {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                                Spacing = new Vector2(20),
-                                Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
-                                Direction = FillDirection.Vertical,
-                                Children = new Drawable[]
-                                {
-                                    new MfMvisSection
-                                    {
-                                        Margin = new MarginPadding { Top = 0 },
-                                    },
-                                    playlist = new PlaylistOverlay
-                                    {
-                                        Padding = new MarginPadding{ Left = 5, Right = 10 },
-                                        TakeFocusOnPopIn = false,
-                                        RelativeSizeAxes = Axes.X,
-                                    },
-                                }
-                            },
-                        },
-                    }
-                }
             };
         }
 
@@ -400,7 +401,7 @@ namespace osu.Game.Screens
             Beatmap.BindValueChanged(v => updateComponentFromBeatmap(v.NewValue), true);
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
-            SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue), true);
+            SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue));
             ShowParticles.BindValueChanged(v => 
             {
                 switch ( v.NewValue )
@@ -478,7 +479,7 @@ namespace osu.Game.Screens
         private void UpdateStoryboardProxy(bool AllowDisplayAboveGameplay)
         {
             //需要进一步优化，现在的逻辑仍然有些混乱
-            if (!sbLoader.IsReady.Value) return;
+            if (!sbLoader.IsReady.Value || SBOverlayProxy == null) return;
 
             //重置proxy
             if (SBOverlayProxy != null) //如果SBOverlayProxy不是空，则从背景和面板容器中移除
