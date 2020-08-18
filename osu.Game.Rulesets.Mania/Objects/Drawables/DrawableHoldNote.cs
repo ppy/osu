@@ -45,6 +45,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Container bodyOffsetContainer;
 
         /// <summary>
+        /// Contains the masking area for the tail, which is resized along with <see cref="bodyContainer"/>.
+        /// </summary>
+        private readonly Container tailMaskingContainer;
+
+        /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
         /// </summary>
         public double? HoldStartTime { get; private set; }
@@ -84,8 +89,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     }
                 },
                 tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
-                headContainer.CreateProxy(),
-                tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },
+                tailMaskingContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Masking = true,
+                    Child = tailContainer = new Container<DrawableHoldNoteTail>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    }
+                },
+                headContainer.CreateProxy()
             });
         }
 
@@ -154,15 +167,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             // The body container is anchored from the position of the tail, since its height is changed when the hold note is being hit.
             // The body offset container is anchored from the position of the head (inverse of the above).
+            // The tail containers are both anchored from the position of the tail.
             if (e.NewValue == ScrollingDirection.Up)
             {
                 bodyContainer.Anchor = bodyContainer.Origin = Anchor.BottomLeft;
                 bodyOffsetContainer.Anchor = bodyOffsetContainer.Origin = Anchor.TopLeft;
+
+                tailMaskingContainer.Anchor = tailMaskingContainer.Origin = Anchor.BottomLeft;
+                tailContainer.Anchor = tailContainer.Origin = Anchor.BottomLeft;
             }
             else
             {
                 bodyContainer.Anchor = bodyContainer.Origin = Anchor.TopLeft;
                 bodyOffsetContainer.Anchor = bodyOffsetContainer.Origin = Anchor.BottomLeft;
+
+                tailMaskingContainer.Anchor = tailMaskingContainer.Origin = Anchor.TopLeft;
+                tailContainer.Anchor = tailContainer.Origin = Anchor.TopLeft;
             }
         }
 
@@ -185,9 +205,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 bodyContainer.Height = MathHelper.Clamp(1 - heightDecrease, 0, 1);
             }
 
-            // Offset the body to extend half-way under the head and tail.
+            // Re-position the body half-way up the head, and extend the height until it's half-way under the tail.
             bodyOffsetContainer.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
-            bodyOffsetContainer.Height = bodyContainer.DrawHeight - Head.Height / 2 + Tail.Height / 2;
+            bodyOffsetContainer.Height = bodyContainer.DrawHeight + Tail.Height / 2 - Head.Height / 2;
+
+            // The tail is positioned to be "outside" the hold note, so re-position its masking container to fully cover the tail and extend the height until it's half-way under the head.
+            // The masking height is determined by the size of the body so that the head and tail don't overlap as the body becomes shorter via hitting (above).
+            tailMaskingContainer.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Tail.Height;
+            tailMaskingContainer.Height = bodyContainer.DrawHeight + Tail.Height - Head.Height / 2;
+
+            // The tail container needs the reverse of the above offset applied to bring the tail to its original position.
+            // It also needs the full original height of the hold note to maintain positioning even as the height of the masking container changes.
+            tailContainer.Y = -tailMaskingContainer.Y;
+            tailContainer.Height = DrawHeight;
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
