@@ -73,12 +73,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         public Stamina(bool rightHand)
         {
-            hand = 0;
-
-            if (rightHand)
-            {
-                hand = 1;
-            }
+            hand = rightHand ? 1 : 0;
         }
     }
 }
