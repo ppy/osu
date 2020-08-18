@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private double patternLengthPenalty(int patternLength)
         {
             double shortPatternPenalty = Math.Min(0.15 * patternLength, 1.0);
-            double longPatternPenalty = Math.Max(Math.Min(2.5 - 0.15 * patternLength, 1.0), 0.0);
+            double longPatternPenalty = Math.Clamp(2.5 - 0.15 * patternLength, 0.0, 1.0);
             return Math.Min(shortPatternPenalty, longPatternPenalty);
         }
 
