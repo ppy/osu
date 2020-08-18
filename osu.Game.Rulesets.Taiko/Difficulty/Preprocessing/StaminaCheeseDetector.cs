@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
@@ -27,16 +28,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
         private void findRolls(int patternLength)
         {
-            List<TaikoDifficultyHitObject> history = new List<TaikoDifficultyHitObject>();
+            var history = new LimitedCapacityQueue<TaikoDifficultyHitObject>(2 * patternLength);
 
             int repetitionStart = 0;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
-                history.Add(hitObjects[i]);
-                if (history.Count < 2 * patternLength) continue;
-
-                if (history.Count > 2 * patternLength) history.RemoveAt(0);
+                history.Enqueue(hitObjects[i]);
+                if (!history.Full)
+                    continue;
 
                 bool isRepeat = true;
 

@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// <summary>
         /// List of the last <see cref="mono_history_max_length"/> most recent mono patterns, with the most recent at the end of the list.
         /// </summary>
-        private readonly List<int> monoHistory = new List<int>();
+        private readonly LimitedCapacityQueue<int> monoHistory = new LimitedCapacityQueue<int>(mono_history_max_length);
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -83,10 +83,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             const int l = 2;
             double penalty = 1.0;
 
-            monoHistory.Add(currentMonoLength);
-
-            if (monoHistory.Count > mono_history_max_length)
-                monoHistory.RemoveAt(0);
+            monoHistory.Enqueue(currentMonoLength);
 
             for (int start = monoHistory.Count - l - 1; start >= 0; start--)
             {
