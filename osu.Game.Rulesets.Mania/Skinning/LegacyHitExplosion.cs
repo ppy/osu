@@ -67,13 +67,13 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         public void Animate(JudgementResult result)
         {
-            if (!(result.Judgement is HoldNoteTickJudgement))
-            {
-                (explosion as IFramedAnimation)?.GotoFrame(0);
+            if (result.Judgement is HoldNoteTickJudgement)
+                return;
 
-                explosion?.FadeInFromZero(80)
-                         .Then().FadeOut(120);
-            }
+            (explosion as IFramedAnimation)?.GotoFrame(0);
+
+            explosion?.FadeInFromZero(80)
+                        .Then().FadeOut(120);
         }
     }
 }
