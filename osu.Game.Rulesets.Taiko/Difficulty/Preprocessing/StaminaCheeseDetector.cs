@@ -38,31 +38,32 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 if (!history.Full)
                     continue;
 
-                bool isRepeat = true;
-
-                for (int j = 0; j < patternLength; j++)
-                {
-                    if (history[j].HitType != history[j + patternLength].HitType)
-                    {
-                        isRepeat = false;
-                    }
-                }
-
-                if (!isRepeat)
+                if (!containsPatternRepeat(history, patternLength))
                 {
                     repetitionStart = i - 2 * patternLength;
+                    continue;
                 }
 
                 int repeatedLength = i - repetitionStart;
+                if (repeatedLength < roll_min_repetitions)
+                    continue;
 
-                if (repeatedLength >= roll_min_repetitions)
+                for (int j = repetitionStart; j < i; j++)
                 {
-                    for (int j = repetitionStart; j < i; j++)
-                    {
-                        hitObjects[j].StaminaCheese = true;
-                    }
+                    hitObjects[j].StaminaCheese = true;
                 }
             }
+        }
+
+        private static bool containsPatternRepeat(LimitedCapacityQueue<TaikoDifficultyHitObject> history, int patternLength)
+        {
+            for (int j = 0; j < patternLength; j++)
+            {
+                if (history[j].HitType != history[j + patternLength].HitType)
+                    return false;
+            }
+
+            return true;
         }
 
         private void findTlTap(int parity, HitType type)
@@ -72,20 +73,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             for (int i = parity; i < hitObjects.Count; i += 2)
             {
                 if (hitObjects[i].HitType == type)
-                {
                     tlLength += 2;
-                }
                 else
-                {
                     tlLength = -2;
-                }
 
-                if (tlLength >= tl_min_repetitions)
+                if (tlLength < tl_min_repetitions)
+                    continue;
+
+                for (int j = Math.Max(0, i - tlLength); j < i; j++)
                 {
-                    for (int j = Math.Max(0, i - tlLength); j < i; j++)
-                    {
-                        hitObjects[j].StaminaCheese = true;
-                    }
+                    hitObjects[j].StaminaCheese = true;
                 }
             }
         }
