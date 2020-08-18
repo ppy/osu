@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double StrainDecayBase => 0.4;
 
         private const int max_history_length = 2;
-        private readonly List<double> notePairDurationHistory = new List<double>();
+        private readonly LimitedCapacityQueue<double> notePairDurationHistory = new LimitedCapacityQueue<double>(max_history_length);
 
         private double offhandObjectDuration = double.MaxValue;
 
@@ -56,10 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 if (hitObject.ObjectIndex == 1)
                     return 1;
 
-                notePairDurationHistory.Add(hitObject.DeltaTime + offhandObjectDuration);
-
-                if (notePairDurationHistory.Count > max_history_length)
-                    notePairDurationHistory.RemoveAt(0);
+                notePairDurationHistory.Enqueue(hitObject.DeltaTime + offhandObjectDuration);
 
                 double shortestRecentNote = notePairDurationHistory.Min();
                 objectStrain += speedBonus(shortestRecentNote);

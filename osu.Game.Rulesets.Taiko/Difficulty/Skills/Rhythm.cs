@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private const double strain_decay = 0.96;
         private double currentStrain;
 
-        private readonly List<TaikoDifficultyHitObject> rhythmHistory = new List<TaikoDifficultyHitObject>();
+        private readonly LimitedCapacityQueue<TaikoDifficultyHitObject> rhythmHistory = new LimitedCapacityQueue<TaikoDifficultyHitObject>(rhythm_history_max_length);
         private const int rhythm_history_max_length = 8;
 
         private int notesSinceRhythmChange;
@@ -32,10 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             double penalty = 1;
 
-            rhythmHistory.Add(hitobject);
-
-            if (rhythmHistory.Count > rhythm_history_max_length)
-                rhythmHistory.RemoveAt(0);
+            rhythmHistory.Enqueue(hitobject);
 
             for (int l = 2; l <= rhythm_history_max_length / 2; l++)
             {
