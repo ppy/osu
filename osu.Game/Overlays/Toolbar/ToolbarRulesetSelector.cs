@@ -113,13 +113,16 @@ namespace osu.Game.Overlays.Toolbar
             return false;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            background.Width = dropdown.Header.IsPresent ? DrawWidth : TabContainer.TabItems.Count() * ToolbarButton.WIDTH;
+        }
+
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
             if (IsLoaded && source == InvalidationSource.Parent)
-            {
-                background.Width = dropdown.Header.IsPresent ? DrawWidth : TabContainer.TabItems.Count() * ToolbarButton.WIDTH;
                 moveLineToCurrent(true);
-            }
 
             return base.OnInvalidate(invalidation, source);
         }

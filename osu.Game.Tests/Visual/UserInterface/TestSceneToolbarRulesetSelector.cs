@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.X,
+                    Width = 400,
                     Height = Toolbar.HEIGHT,
                     Child = selector = new ToolbarRulesetSelector()
                 };
@@ -52,11 +52,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.X,
+                    Width = 400,
                     Height = Toolbar.HEIGHT,
                     Child = selector = new TestSelector()
                 };
-
+            });
+            AddStep("Select second", () =>
+            {
                 selector.Current.Value = rulesets.GetRuleset(2);
             });
 
