@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             int notes = HitObjects.Count(s => s is Note);
             int holdnotes = HitObjects.Count(s => s is HoldNote);
+            string keys = string.Join(", ", Stages.Select(g => g.Columns).Distinct().ToList().OrderByDescending(g => g).Select(g => g + "K"));
 
             return new[]
             {
@@ -50,6 +51,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     Content = holdnotes.ToString(),
                     Icon = FontAwesome.Regular.Circle
                 },
+                new BeatmapStatistic
+                {
+                    Name = @"Key Count",
+                    Content = keys,
+                    Icon = FontAwesome.Regular.Circle
+                }
             };
         }
     }
