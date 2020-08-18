@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
+        [SettingSource("调整音调", "Should pitch be adjusted with speed")]
         public override BindableBool AdjustPitch { get; } = new BindableBool
         {
             Default = true,
