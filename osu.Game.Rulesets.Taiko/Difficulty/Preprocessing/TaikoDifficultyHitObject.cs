@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
         public readonly HitType? HitType;
 
-        public bool StaminaCheese = false;
+        public bool StaminaCheese;
 
         public readonly int ObjectIndex;
 
