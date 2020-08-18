@@ -49,13 +49,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return 0.79 - Math.Atan(staminaDifficulty / colorDifficulty - 12) / Math.PI / 2;
         }
 
-        private double norm(double p, double v1, double v2, double v3)
+        private double norm(double p, params double[] values)
         {
-            return Math.Pow(
-                Math.Pow(v1, p) +
-                Math.Pow(v2, p) +
-                Math.Pow(v3, p)
-                , 1 / p);
+            return Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
         }
 
         private double rescale(double sr)
