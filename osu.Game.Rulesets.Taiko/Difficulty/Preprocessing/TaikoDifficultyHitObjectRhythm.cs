@@ -7,13 +7,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     {
         public readonly double Difficulty;
         public readonly double Ratio;
-        public readonly bool IsRepeat;
 
-        public TaikoDifficultyHitObjectRhythm(int numerator, int denominator, double difficulty, bool isRepeat)
+        public TaikoDifficultyHitObjectRhythm(int numerator, int denominator, double difficulty)
         {
             Ratio = numerator / (double)denominator;
             Difficulty = difficulty;
-            IsRepeat = isRepeat;
         }
     }
 }
