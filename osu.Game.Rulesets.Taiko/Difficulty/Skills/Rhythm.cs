@@ -38,26 +38,27 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             {
                 for (int start = rhythmHistory.Count - l - 1; start >= 0; start--)
                 {
-                    bool samePattern = true;
+                    if (!samePattern(start, l))
+                        continue;
 
-                    for (int i = 0; i < l; i++)
-                    {
-                        if (rhythmHistory[start + i].Rhythm != rhythmHistory[rhythmHistory.Count - l + i].Rhythm)
-                        {
-                            samePattern = false;
-                        }
-                    }
-
-                    if (samePattern) // Repetition found!
-                    {
-                        int notesSince = hitobject.ObjectIndex - rhythmHistory[start].ObjectIndex;
-                        penalty *= repetitionPenalty(notesSince);
-                        break;
-                    }
+                    int notesSince = hitobject.ObjectIndex - rhythmHistory[start].ObjectIndex;
+                    penalty *= repetitionPenalty(notesSince);
+                    break;
                 }
             }
 
             return penalty;
+        }
+
+        private bool samePattern(int start, int l)
+        {
+            for (int i = 0; i < l; i++)
+            {
+                if (rhythmHistory[start + i].Rhythm != rhythmHistory[rhythmHistory.Count - l + i].Rhythm)
+                    return false;
+            }
+
+            return true;
         }
 
         private double patternLengthPenalty(int patternLength)
