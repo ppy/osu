@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// <summary>
         /// Whether the hold note has been released potentially without having caused a break.
         /// </summary>
-        private bool hasReleased;
+        private double? releaseTime;
 
         public DrawableHoldNote(HoldNote hitObject)
             : base(hitObject)
@@ -175,8 +175,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.Update();
 
-            // Decrease the size of the body while the hold note is held and the head has been hit.
-            if (Head.IsHit && !hasReleased)
+            if (Time.Current < releaseTime)
+                releaseTime = null;
+
+            // Decrease the size of the body while the hold note is held and the head has been hit. This stops at the very first release point.
+            if (Head.IsHit && releaseTime == null)
             {
                 float heightDecrease = (float)(Math.Max(0, Time.Current - HitObject.StartTime) / HitObject.Duration);
                 bodyContainer.Height = MathHelper.Clamp(1 - heightDecrease, 0, 1);
@@ -250,7 +253,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!Tail.IsHit)
                 HasBroken = true;
 
-            hasReleased = true;
+            releaseTime = Time.Current;
         }
 
         private void endHold()
