@@ -34,8 +34,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Container<DrawableHoldNoteTail> tailContainer;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
-        private readonly Container bodyPieceContainer;
-        private readonly Drawable bodyPiece;
+        /// <summary>
+        /// Contains the maximum size/position of the body prior to any offset or size adjustments.
+        /// </summary>
+        private readonly Container bodyContainer;
+
+        /// <summary>
+        /// Contains the offset size/position of the body such that the body extends half-way between the head and tail pieces.
+        /// </summary>
+        private readonly Container bodyOffsetContainer;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -57,18 +64,27 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             RelativeSizeAxes = Axes.X;
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
-                bodyPieceContainer = new Container
+                bodyContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Child = bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both
-                    })
+                        bodyOffsetContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                            {
+                                RelativeSizeAxes = Axes.Both
+                            })
+                        },
+                        // The head needs to move along with changes in the size of the body.
+                        headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both }
+                    }
                 },
                 tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
-                headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both },
+                headContainer.CreateProxy(),
                 tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },
             });
         }
@@ -136,8 +152,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.OnDirectionChanged(e);
 
-            bodyPieceContainer.Anchor = bodyPieceContainer.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-            bodyPieceContainer.Anchor = bodyPieceContainer.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.BottomLeft : Anchor.TopLeft;
+            bodyOffsetContainer.Anchor = bodyOffsetContainer.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
 
         public override void PlaySamples()
@@ -149,15 +164,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.Update();
 
-            // Make the body piece not lie under the head note
-            bodyPieceContainer.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
-            bodyPieceContainer.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
-
+            // Decrease the size of the body while the hold note is held and the head has been hit.
             if (Head.IsHit && !hasReleased)
             {
                 float heightDecrease = (float)(Math.Max(0, Time.Current - HitObject.StartTime) / HitObject.Duration);
-                bodyPiece.Height = MathHelper.Clamp(1 - heightDecrease, 0, 1);
+                bodyContainer.Height = MathHelper.Clamp(1 - heightDecrease, 0, 1);
             }
+
+            // Offset the body to extend half-way under the head and tail.
+            bodyOffsetContainer.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
+            bodyOffsetContainer.Height = bodyContainer.DrawHeight - Head.Height / 2 + Tail.Height / 2;
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
