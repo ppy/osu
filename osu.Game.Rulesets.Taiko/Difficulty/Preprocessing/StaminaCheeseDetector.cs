@@ -48,10 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 if (repeatedLength < roll_min_repetitions)
                     continue;
 
-                for (int j = repetitionStart; j < i; j++)
-                {
-                    hitObjects[j].StaminaCheese = true;
-                }
+                markObjectsAsCheese(repetitionStart, i);
             }
         }
 
@@ -80,11 +77,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 if (tlLength < tl_min_repetitions)
                     continue;
 
-                for (int j = Math.Max(0, i - tlLength); j < i; j++)
-                {
-                    hitObjects[j].StaminaCheese = true;
-                }
+                markObjectsAsCheese(Math.Max(0, i - tlLength), i);
             }
+        }
+
+        private void markObjectsAsCheese(int start, int end)
+        {
+            for (int i = start; i < end; ++i)
+                hitObjects[i].StaminaCheese = true;
         }
     }
 }
