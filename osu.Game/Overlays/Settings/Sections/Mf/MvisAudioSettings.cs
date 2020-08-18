@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     LabelText = "播放速度",
                     Bindable = config.GetBindable<double>(MfSetting.MvisMusicSpeed),
-                    KeyboardStep = 0.1f,
+                    KeyboardStep = 0.01f,
                     DisplayAsPercentage = true,
                     TransferValueOnCommit = true
                 },

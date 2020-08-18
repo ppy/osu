@@ -98,7 +98,7 @@ namespace osu.Game.Screens
         private BufferedBeatmapCover beatmapCover;
         private Container gameplayBackground;
         private Container particles;
-        private NightcoreBeatContainer nightcoreBeatContainer = new NightcoreBeatContainer();
+        private NightcoreBeatContainer nightcoreBeatContainer;
 
         public float BottombarHeight => bottomBar.DrawHeight - bottomFillFlow.Y;
 
@@ -108,7 +108,7 @@ namespace osu.Game.Screens
 
             InternalChildren = new Drawable[]
             {
-                nightcoreBeatContainer,
+                nightcoreBeatContainer = new NightcoreBeatContainer(),
                 new ParallaxContainer
                 {
                     Depth = float.MaxValue,
@@ -411,19 +411,7 @@ namespace osu.Game.Screens
 
             MusicSpeed.BindValueChanged(_ => ApplyTrackAdjustments());
             AdjustFreq.BindValueChanged(_ => ApplyTrackAdjustments());
-            NightcoreBeat.BindValueChanged(v =>
-            {
-                switch(v.NewValue)
-                {
-                    case true:
-                        nightcoreBeatContainer.Show();
-                        break;
-
-                    case false:
-                        nightcoreBeatContainer.Hide();
-                        break;
-                }
-            }, true);
+            NightcoreBeat.BindValueChanged(_ => ApplyTrackAdjustments(), true);
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
             SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue));
@@ -573,8 +561,11 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
+            //重置Track
             Beatmap.Value.Track.Looping = false;
             Track = new TrackVirtual(Beatmap.Value.Track.Length);
+
+            //停止beatmapLogo，取消故事版家在任务以及锁定变更
             beatmapLogo.Clock = new DecoupleableInterpolatingFramedClock();
             ((beatmapLogo.Clock as DecoupleableInterpolatingFramedClock)).Stop();
             sbLoader.CancelAllTasks();
@@ -748,6 +739,11 @@ namespace osu.Game.Screens
                 track.AddAdjustment(AdjustableProperty.Frequency, MusicSpeed);
             else
                 track.AddAdjustment(AdjustableProperty.Tempo, MusicSpeed);
+
+            if ( NightcoreBeat.Value )
+                nightcoreBeatContainer.Show();
+            else
+                nightcoreBeatContainer.Hide();
         }
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
