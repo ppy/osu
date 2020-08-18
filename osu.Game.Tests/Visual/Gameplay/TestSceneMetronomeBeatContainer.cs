@@ -22,15 +22,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             Beatmap.Value.Track.Seek(Beatmap.Value.Beatmap.HitObjects.First().StartTime - 1000);
 
             var tickFrequency = new Bindable<ModMetronome.TickFrequency>(ModMetronome.TickFrequency.One);
-            var SpecialSampleForFirstBeatOfBar = new Bindable<bool>(true);
-            Add(new ModMetronome<HitObject>.MetronomeBeatContainer(tickFrequency, SpecialSampleForFirstBeatOfBar));
+            var specialSampleForFirstBeatOfBar = new Bindable<bool>(true);
+            Add(new ModMetronome<HitObject>.MetronomeBeatContainer(tickFrequency, specialSampleForFirstBeatOfBar));
 
             AddStep("change tick frequency to One", () => tickFrequency.Value = ModMetronome.TickFrequency.One);
             AddStep("change tick frequency to Two", () => tickFrequency.Value = ModMetronome.TickFrequency.Two);
             AddStep("change tick frequency to Four", () => tickFrequency.Value = ModMetronome.TickFrequency.Four);
 
-            AddStep("disable SpecialSampleForFirstBeatOfBar", () => SpecialSampleForFirstBeatOfBar.Value = false);
-            AddStep("enable SpecialSampleForFirstBeatOfBar", () => SpecialSampleForFirstBeatOfBar.Value = true);
+            AddStep("disable specialSampleForFirstBeatOfBar", () => specialSampleForFirstBeatOfBar.Value = false);
+            AddStep("enable specialSampleForFirstBeatOfBar", () => specialSampleForFirstBeatOfBar.Value = true);
         }
     }
 }

@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -57,14 +56,12 @@ namespace osu.Game.Rulesets.Mods
             drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
         }
 
-        public class NightcoreBeatContainer : BeatSyncedContainer
+        public class NightcoreBeatContainer : SoundOnBeatContainer
         {
             private SkinnableSound hatSample;
             private SkinnableSound clapSample;
             private SkinnableSound kickSample;
             private SkinnableSound finishSample;
-
-            private int? firstBeat;
 
             public NightcoreBeatContainer()
             {
@@ -83,30 +80,7 @@ namespace osu.Game.Rulesets.Mods
                 };
             }
 
-            private const int bars_per_segment = 4;
-
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-            {
-                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
-
-                int beatsPerBar = (int)timingPoint.TimeSignature;
-                int segmentLength = beatsPerBar * Divisor * bars_per_segment;
-
-                if (!IsBeatSyncedWithTrack)
-                {
-                    firstBeat = null;
-                    return;
-                }
-
-                if (!firstBeat.HasValue || beatIndex < firstBeat)
-                    // decide on a good starting beat index if once has not yet been decided.
-                    firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
-
-                if (beatIndex >= firstBeat)
-                    playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
-            }
-
-            private void playBeatFor(int beatIndex, TimeSignatures signature)
+            protected override void PlayOnBeat(int beatIndex, TimeSignatures signature)
             {
                 if (beatIndex == 0)
                     finishSample?.Play();
