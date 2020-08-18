@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
             new TrackedSetting<double>(ManiaRulesetSetting.ScrollTime,
-                v => new SettingDescription(v, "Scroll Speed", $"{(int)Math.Round(13720.0 / v)} ({v}ms)"))
+                v => new SettingDescription(v, "Scroll Speed", $"{(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / v)} ({v}ms)"))
         };
     }
 
