@@ -350,7 +350,8 @@ namespace osu.Game.Online.Leaderboards
         {
             public RankLabel(int? rank)
             {
-                TooltipText = rank == null || rank < 1000 ? null : $"#{rank:N0}";
+                if (rank >= 1000)
+                    TooltipText = $"#{rank:N0}";
 
                 Child = new OsuSpriteText
                 {
