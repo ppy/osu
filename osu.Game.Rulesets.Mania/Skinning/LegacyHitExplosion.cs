@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -66,10 +67,13 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         public void Animate(JudgementResult result)
         {
-            (explosion as IFramedAnimation)?.GotoFrame(0);
+            if (!(result.Judgement is HoldNoteTickJudgement))
+            {
+                (explosion as IFramedAnimation)?.GotoFrame(0);
 
-            explosion?.FadeInFromZero(80)
-                     .Then().FadeOut(120);
+                explosion?.FadeInFromZero(80)
+                         .Then().FadeOut(120);
+            }
         }
     }
 }
