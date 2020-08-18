@@ -61,7 +61,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return 10.43 * Math.Log(sr / 8 + 1);
         }
 
-        private double locallyCombinedDifficulty(double staminaPenalty, Skill colour, Skill rhythm, Skill stamina1, Skill stamina2)
+        private double locallyCombinedDifficulty(
+            double staminaPenalty, Colour colour, Rhythm rhythm, Stamina staminaRight, Stamina staminaLeft)
         {
             double difficulty = 0;
             double weight = 1;
@@ -71,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 double colourPeak = colour.StrainPeaks[i] * colour_skill_multiplier;
                 double rhythmPeak = rhythm.StrainPeaks[i] * rhythm_skill_multiplier;
-                double staminaPeak = (stamina1.StrainPeaks[i] + stamina2.StrainPeaks[i]) * stamina_skill_multiplier * staminaPenalty;
+                double staminaPeak = (staminaRight.StrainPeaks[i] + staminaLeft.StrainPeaks[i]) * stamina_skill_multiplier * staminaPenalty;
                 peaks.Add(norm(2, colourPeak, rhythmPeak, staminaPeak));
             }
 
@@ -89,14 +90,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
 
-            double colourRating = skills[0].DifficultyValue() * colour_skill_multiplier;
-            double rhythmRating = skills[1].DifficultyValue() * rhythm_skill_multiplier;
-            double staminaRating = (skills[2].DifficultyValue() + skills[3].DifficultyValue()) * stamina_skill_multiplier;
+            var colour = (Colour)skills[0];
+            var rhythm = (Rhythm)skills[1];
+            var staminaRight = (Stamina)skills[2];
+            var staminaLeft = (Stamina)skills[3];
+
+            double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
+            double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
+            double staminaRating = (staminaRight.DifficultyValue() + staminaLeft.DifficultyValue()) * stamina_skill_multiplier;
 
             double staminaPenalty = simpleColourPenalty(staminaRating, colourRating);
             staminaRating *= staminaPenalty;
 
-            double combinedRating = locallyCombinedDifficulty(staminaPenalty, skills[0], skills[1], skills[2], skills[3]);
+            double combinedRating = locallyCombinedDifficulty(staminaPenalty, colour, rhythm, staminaRight, staminaLeft);
             double separatedRating = norm(1.5, colourRating, rhythmRating, staminaRating);
             double starRating = 1.4 * separatedRating + 0.5 * combinedRating;
             starRating = rescale(starRating);
