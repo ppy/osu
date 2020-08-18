@@ -14,7 +14,6 @@ using osuTK.Input;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
-using osu.Framework.Layout;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -31,6 +30,7 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load()
         {
+            AutoSort = true;
             RelativeSizeAxes = Axes.Both;
             AddRangeInternal(new[]
             {
@@ -58,6 +58,8 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             });
+
+            TabContainer.TabVisibilityChanged += updateVisibility;
         }
 
         protected override void LoadComplete()
@@ -71,12 +73,11 @@ namespace osu.Game.Overlays.Toolbar
         private bool hasInitialPosition;
 
         // Scheduled to allow the flow layout to be computed before the line position is updated
-        private void moveLineToCurrent(bool instant) => Schedule(() =>
+        private void moveLineToCurrent(bool instant) => ScheduleAfterChildren(() =>
         {
             if (SelectedTab != null)
             {
-                var xTarget = SelectedTab.IsPresent ? SelectedTab.DrawPosition.X : TabContainer.DrawSize.X - ToolbarButton.WIDTH;
-                ModeButtonLine.MoveToX(xTarget, !hasInitialPosition || instant ? 0 : 200, Easing.OutQuint);
+                ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition || instant ? 0 : 200, Easing.OutQuint);
                 hasInitialPosition = true;
             }
         });
@@ -119,12 +120,13 @@ namespace osu.Game.Overlays.Toolbar
             background.Width = dropdown.Header.IsPresent ? DrawWidth : TabContainer.TabItems.Count() * ToolbarButton.WIDTH;
         }
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        private void updateVisibility(TabItem<RulesetInfo> tab, bool visible)
         {
-            if (IsLoaded && source == InvalidationSource.Parent)
+            if (Current.Value == tab.Value && visible == false)
+            {
+                PerformTabSort(tab);
                 moveLineToCurrent(true);
-
-            return base.OnInvalidate(invalidation, source);
+            }
         }
 
         private class RulesetTabDropdown : OsuTabDropdown<RulesetInfo>
