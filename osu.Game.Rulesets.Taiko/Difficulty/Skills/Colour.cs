@@ -80,6 +80,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// </summary>
         private double repetitionPenalties()
         {
+            const int l = 2;
             double penalty = 1.0;
 
             monoHistory.Add(currentMonoLength);
@@ -87,27 +88,24 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             if (monoHistory.Count > mono_history_max_length)
                 monoHistory.RemoveAt(0);
 
-            for (int l = 2; l <= mono_history_max_length / 2; l++)
+            for (int start = monoHistory.Count - l - 1; start >= 0; start--)
             {
-                for (int start = monoHistory.Count - l - 1; start >= 0; start--)
+                bool samePattern = true;
+
+                for (int i = 0; i < l; i++)
                 {
-                    bool samePattern = true;
-
-                    for (int i = 0; i < l; i++)
+                    if (monoHistory[start + i] != monoHistory[monoHistory.Count - l + i])
                     {
-                        if (monoHistory[start + i] != monoHistory[monoHistory.Count - l + i])
-                        {
-                            samePattern = false;
-                        }
+                        samePattern = false;
                     }
+                }
 
-                    if (samePattern) // Repetition found!
-                    {
-                        int notesSince = 0;
-                        for (int i = start; i < monoHistory.Count; i++) notesSince += monoHistory[i];
-                        penalty *= repetitionPenalty(notesSince);
-                        break;
-                    }
+                if (samePattern) // Repetition found!
+                {
+                    int notesSince = 0;
+                    for (int i = start; i < monoHistory.Count; i++) notesSince += monoHistory[i];
+                    penalty *= repetitionPenalty(notesSince);
+                    break;
                 }
             }
 
