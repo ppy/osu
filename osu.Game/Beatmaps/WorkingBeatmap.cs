@@ -260,6 +260,13 @@ namespace osu.Game.Beatmaps
         public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
         /// <summary>
+        /// Transfer a valid audio track into this working beatmap. Used as an optimisation to avoid reload / track swap
+        /// across difficulties in the same beatmap set.
+        /// </summary>
+        /// <param name="track">The track to transfer.</param>
+        public void TransferTrack([NotNull] Track track) => loadedTrack = track ?? throw new ArgumentNullException(nameof(track));
+
+        /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
         /// This generally happens via MusicController when changing the global beatmap.
         /// </summary>
