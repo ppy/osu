@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             TaikoDifficultyHitObject hitobject = (TaikoDifficultyHitObject)current;
             notesSinceRhythmChange += 1;
 
-            if (hitobject.Rhythm.IsRepeat)
+            if (hitobject.Rhythm.Difficulty == 0.0)
             {
                 return 0.0;
             }
