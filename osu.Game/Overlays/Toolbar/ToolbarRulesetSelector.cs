@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Toolbar
         private bool hasInitialPosition;
 
         // Scheduled to allow the flow layout to be computed before the line position is updated
-        private void moveLineToCurrent(bool instant) => ScheduleAfterChildren(() =>
+        private void moveLineToCurrent(bool instant) => Schedule(() =>
         {
             if (SelectedTab != null)
             {
@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            if (source == InvalidationSource.Parent)
+            if (IsLoaded && source == InvalidationSource.Parent)
             {
                 background.Width = dropdown.Header.IsPresent ? DrawWidth : TabContainer.TabItems.Count() * ToolbarButton.WIDTH;
                 moveLineToCurrent(true);
