@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             double objectStrain = 0.0;
 
-            if (taikoCurrent.HitType != null && previousHitType != null && taikoCurrent.HitType != previousHitType)
+            if (previousHitType != null && taikoCurrent.HitType != previousHitType)
             {
                 // The colour has changed.
                 objectStrain = 1.0;
