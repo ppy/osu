@@ -58,11 +58,6 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisRed, 0, 0, 255);
             Set(MfSetting.MvisGreen, 0, 0, 255);
             Set(MfSetting.MvisBlue, 0, 0, 255);
-
-            //Easter Eggs
-            Set(MfSetting.EasterEggBGBeatmap, false);
-            Set(MfSetting.EasterEggBGTriangle, false);
-            Set(MfSetting.EasterEggCoinCount, 1000, 0, int.MaxValue/2);
         }
     }
 
@@ -94,10 +89,7 @@ namespace osu.Game.Configuration
         MvisEnableNightcoreBeat,
         SamplePlaybackGain,
         SongSelectBgBlur,
-        IntroLoadDirectToSongSelect,
-        EasterEggBGTriangle,
-        EasterEggBGBeatmap,
-        EasterEggCoinCount
+        IntroLoadDirectToSongSelect
     }
 
     public enum MvisBarType
