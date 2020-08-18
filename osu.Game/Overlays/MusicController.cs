@@ -282,10 +282,10 @@ namespace osu.Game.Overlays
         {
             TrackChangeDirection direction = TrackChangeDirection.None;
 
+            bool audioEquals = beatmap.NewValue?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
+
             if (current != null)
             {
-                bool audioEquals = beatmap.NewValue?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
-
                 if (audioEquals)
                     direction = TrackChangeDirection.None;
                 else if (queuedDirection.HasValue)
@@ -305,8 +305,15 @@ namespace osu.Game.Overlays
 
             current = beatmap.NewValue;
 
-            if (CurrentTrack.IsDummyDevice || !beatmap.OldValue.BeatmapInfo.AudioEquals(current?.BeatmapInfo))
+            if (!audioEquals || CurrentTrack.IsDummyDevice)
+            {
                 changeTrack();
+            }
+            else
+            {
+                // transfer still valid track to new working beatmap
+                current.TransferTrack(beatmap.OldValue.Track);
+            }
 
             TrackChanged?.Invoke(current, direction);
 
