@@ -31,7 +31,8 @@ using osu.Game.Screens.Mvis.Storyboard;
 using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Input;
 using osu.Framework.Timing;
-using System;
+using osu.Framework.Audio;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
 {
@@ -43,7 +44,7 @@ namespace osu.Game.Screens
         private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
         public override bool CursorVisible => AllowCursor;
-        public override bool AllowRateAdjustments => false;
+        public override bool AllowRateAdjustments => true;
 
         private bool canReallyHide =>
             // don't hide if the user is hovering one of the panes, unless they are idle.
@@ -86,6 +87,9 @@ namespace osu.Game.Screens
         private readonly BindableFloat BgBlur = new BindableFloat();
         private readonly BindableFloat IdleBgDim = new BindableFloat();
         private readonly BindableFloat ContentAlpha = new BindableFloat();
+        private readonly BindableDouble MusicSpeed = new BindableDouble();
+        private readonly BindableBool AdjustFreq = new BindableBool();
+        private readonly BindableBool NightcoreBeat = new BindableBool();
         private bool OverlaysHidden = false;
         private Drawable SBOverlayProxy;
         private FillFlowContainer bottomFillFlow;
@@ -94,6 +98,7 @@ namespace osu.Game.Screens
         private BufferedBeatmapCover beatmapCover;
         private Container gameplayBackground;
         private Container particles;
+        private NightcoreBeatContainer nightcoreBeatContainer = new NightcoreBeatContainer();
 
         public float BottombarHeight => bottomBar.DrawHeight - bottomFillFlow.Y;
 
@@ -103,6 +108,7 @@ namespace osu.Game.Screens
 
             InternalChildren = new Drawable[]
             {
+                nightcoreBeatContainer,
                 new ParallaxContainer
                 {
                     Depth = float.MaxValue,
@@ -390,6 +396,9 @@ namespace osu.Game.Screens
             config.BindWith(MfSetting.MvisContentAlpha, ContentAlpha);
             config.BindWith(MfSetting.MvisEnableSBOverlayProxy, SBEnableProxy);
             config.BindWith(MfSetting.MvisShowParticles, ShowParticles);
+            config.BindWith(MfSetting.MvisMusicSpeed, MusicSpeed);
+            config.BindWith(MfSetting.MvisAdjustMusicWithFreq, AdjustFreq);
+            config.BindWith(MfSetting.MvisEnableNightcoreBeat, NightcoreBeat);
         }
 
         protected override void LoadComplete()
@@ -399,6 +408,22 @@ namespace osu.Game.Screens
             IdleBgDim.BindValueChanged(_ => UpdateIdleVisuals());
 
             Beatmap.BindValueChanged(v => updateComponentFromBeatmap(v.NewValue), true);
+
+            MusicSpeed.BindValueChanged(_ => ApplyTrackAdjustments());
+            AdjustFreq.BindValueChanged(_ => ApplyTrackAdjustments());
+            NightcoreBeat.BindValueChanged(v =>
+            {
+                switch(v.NewValue)
+                {
+                    case true:
+                        nightcoreBeatContainer.Show();
+                        break;
+
+                    case false:
+                        nightcoreBeatContainer.Hide();
+                        break;
+                }
+            }, true);
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
             SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue));
@@ -713,10 +738,21 @@ namespace osu.Game.Screens
             gameplayContent.FadeTo(ContentAlpha.Value, DURATION, Easing.OutQuint);
         }
 
+        private void ApplyTrackAdjustments()
+        {
+            var track = Beatmap.Value.Track;
+            track.ResetSpeedAdjustments();
+            track.Looping = loopToggleButton.ToggleableValue.Value;
+            track.RestartPoint = 0;
+            if ( AdjustFreq.Value )
+                track.AddAdjustment(AdjustableProperty.Frequency, MusicSpeed);
+            else
+                track.AddAdjustment(AdjustableProperty.Tempo, MusicSpeed);
+        }
+
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
-            Beatmap.Value.Track.RestartPoint = 0;
+            this.Schedule( () => ApplyTrackAdjustments() );
 
             sbLoader.UpdateStoryBoardAsync(() =>
             {

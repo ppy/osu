@@ -49,99 +49,99 @@ namespace osu.Game.Rulesets.Mods
         {
             drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
         }
+    }
 
-        public class NightcoreBeatContainer : BeatSyncedContainer
+    public class NightcoreBeatContainer : BeatSyncedContainer
+    {
+        private SkinnableSound hatSample;
+        private SkinnableSound clapSample;
+        private SkinnableSound kickSample;
+        private SkinnableSound finishSample;
+
+        private int? firstBeat;
+
+        public NightcoreBeatContainer()
         {
-            private SkinnableSound hatSample;
-            private SkinnableSound clapSample;
-            private SkinnableSound kickSample;
-            private SkinnableSound finishSample;
+            Divisor = 2;
+        }
 
-            private int? firstBeat;
-
-            public NightcoreBeatContainer()
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InternalChildren = new Drawable[]
             {
-                Divisor = 2;
+                hatSample = new SkinnableSound(new SampleInfo("nightcore-hat")),
+                clapSample = new SkinnableSound(new SampleInfo("nightcore-clap")),
+                kickSample = new SkinnableSound(new SampleInfo("nightcore-kick")),
+                finishSample = new SkinnableSound(new SampleInfo("nightcore-finish")),
+            };
+        }
+
+        private const int bars_per_segment = 4;
+
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        {
+            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            int beatsPerBar = (int)timingPoint.TimeSignature;
+            int segmentLength = beatsPerBar * Divisor * bars_per_segment;
+
+            if (!IsBeatSyncedWithTrack)
+            {
+                firstBeat = null;
+                return;
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
+            if (!firstBeat.HasValue || beatIndex < firstBeat)
+                // decide on a good starting beat index if once has not yet been decided.
+                firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
+
+            if (beatIndex >= firstBeat)
+                playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
+        }
+
+        private void playBeatFor(int beatIndex, TimeSignatures signature)
+        {
+            if (beatIndex == 0)
+                finishSample?.Play();
+
+            switch (signature)
             {
-                InternalChildren = new Drawable[]
+                case TimeSignatures.SimpleTriple:
+                switch (beatIndex % 6)
                 {
-                    hatSample = new SkinnableSound(new SampleInfo("nightcore-hat")),
-                    clapSample = new SkinnableSound(new SampleInfo("nightcore-clap")),
-                    kickSample = new SkinnableSound(new SampleInfo("nightcore-kick")),
-                    finishSample = new SkinnableSound(new SampleInfo("nightcore-finish")),
-                };
-            }
-
-            private const int bars_per_segment = 4;
-
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-            {
-                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
-
-                int beatsPerBar = (int)timingPoint.TimeSignature;
-                int segmentLength = beatsPerBar * Divisor * bars_per_segment;
-
-                if (!IsBeatSyncedWithTrack)
-                {
-                    firstBeat = null;
-                    return;
-                }
-
-                if (!firstBeat.HasValue || beatIndex < firstBeat)
-                    // decide on a good starting beat index if once has not yet been decided.
-                    firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
-
-                if (beatIndex >= firstBeat)
-                    playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
-            }
-
-            private void playBeatFor(int beatIndex, TimeSignatures signature)
-            {
-                if (beatIndex == 0)
-                    finishSample?.Play();
-
-                switch (signature)
-                {
-                    case TimeSignatures.SimpleTriple:
-                        switch (beatIndex % 6)
-                        {
-                            case 0:
-                                kickSample?.Play();
-                                break;
-
-                            case 3:
-                                clapSample?.Play();
-                                break;
-
-                            default:
-                                hatSample?.Play();
-                                break;
-                        }
-
+                    case 0:
+                        kickSample?.Play();
                         break;
 
-                    case TimeSignatures.SimpleQuadruple:
-                        switch (beatIndex % 4)
-                        {
-                            case 0:
-                                kickSample?.Play();
-                                break;
+                    case 3:
+                        clapSample?.Play();
+                        break;
 
-                            case 2:
-                                clapSample?.Play();
-                                break;
-
-                            default:
-                                hatSample?.Play();
-                                break;
-                        }
-
+                    default:
+                        hatSample?.Play();
                         break;
                 }
+
+                break;
+
+                case TimeSignatures.SimpleQuadruple:
+                switch (beatIndex % 4)
+                {
+                    case 0:
+                        kickSample?.Play();
+                        break;
+
+                    case 2:
+                        clapSample?.Play();
+                        break;
+
+                    default:
+                        hatSample?.Play();
+                        break;
+                }
+
+                break;
             }
         }
     }
