@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -58,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 {
                     for (int j = repetitionStart; j < i; j++)
                     {
-                        hitObjects[i].StaminaCheese = true;
+                        hitObjects[j].StaminaCheese = true;
                     }
                 }
             }
@@ -81,9 +82,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
                 if (tlLength >= tl_min_repetitions)
                 {
-                    for (int j = i - tlLength; j < i; j++)
+                    for (int j = Math.Max(0, i - tlLength); j < i; j++)
                     {
-                        hitObjects[i].StaminaCheese = true;
+                        hitObjects[j].StaminaCheese = true;
                     }
                 }
             }
