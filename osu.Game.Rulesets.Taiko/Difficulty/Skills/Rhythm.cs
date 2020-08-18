@@ -74,8 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             if (noteLengthMs < 80) return 1;
             if (noteLengthMs < 210) return Math.Max(0, 1.4 - 0.005 * noteLengthMs);
 
-            currentStrain = 0.0;
-            notesSinceRhythmChange = 0;
+            resetRhythmStrain();
             return 0.0;
         }
 
@@ -83,8 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             if (!(current.BaseObject is Hit))
             {
-                currentStrain = 0.0;
-                notesSinceRhythmChange = 0;
+                resetRhythmStrain();
                 return 0.0;
             }
 
@@ -108,6 +106,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             currentStrain += objectStrain;
             return currentStrain;
+        }
+
+        private void resetRhythmStrain()
+        {
+            currentStrain = 0.0;
+            notesSinceRhythmChange = 0;
         }
     }
 }
