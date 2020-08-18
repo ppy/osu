@@ -152,7 +152,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.OnDirectionChanged(e);
 
-            bodyOffsetContainer.Anchor = bodyOffsetContainer.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+            // The body container is anchored from the position of the tail, since its height is changed when the hold note is being hit.
+            // The body offset container is anchored from the position of the head (inverse of the above).
+            if (e.NewValue == ScrollingDirection.Up)
+            {
+                bodyContainer.Anchor = bodyContainer.Origin = Anchor.BottomLeft;
+                bodyOffsetContainer.Anchor = bodyOffsetContainer.Origin = Anchor.TopLeft;
+            }
+            else
+            {
+                bodyContainer.Anchor = bodyContainer.Origin = Anchor.TopLeft;
+                bodyOffsetContainer.Anchor = bodyOffsetContainer.Origin = Anchor.BottomLeft;
+            }
         }
 
         public override void PlaySamples()
