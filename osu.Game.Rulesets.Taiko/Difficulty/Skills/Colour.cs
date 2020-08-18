@@ -87,26 +87,27 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             for (int start = monoHistory.Count - l - 1; start >= 0; start--)
             {
-                bool samePattern = true;
+                if (!isSamePattern(start, l))
+                    continue;
 
-                for (int i = 0; i < l; i++)
-                {
-                    if (monoHistory[start + i] != monoHistory[monoHistory.Count - l + i])
-                    {
-                        samePattern = false;
-                    }
-                }
-
-                if (samePattern) // Repetition found!
-                {
-                    int notesSince = 0;
-                    for (int i = start; i < monoHistory.Count; i++) notesSince += monoHistory[i];
-                    penalty *= repetitionPenalty(notesSince);
-                    break;
-                }
+                int notesSince = 0;
+                for (int i = start; i < monoHistory.Count; i++) notesSince += monoHistory[i];
+                penalty *= repetitionPenalty(notesSince);
+                break;
             }
 
             return penalty;
+        }
+
+        private bool isSamePattern(int start, int l)
+        {
+            for (int i = 0; i < l; i++)
+            {
+                if (monoHistory[start + i] != monoHistory[monoHistory.Count - l + i])
+                    return false;
+            }
+
+            return true;
         }
 
         private double repetitionPenalty(int notesSince) => Math.Min(1.0, 0.032 * notesSince);
