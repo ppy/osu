@@ -9,8 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
@@ -48,7 +46,7 @@ namespace osu.Game.Overlays.News
                 Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
             }
 
-            NewsBackground bg;
+            NewsPostBackground bg;
             AddRange(new Drawable[]
             {
                 background = new Box
@@ -70,7 +68,7 @@ namespace osu.Game.Overlays.News
                             CornerRadius = 6,
                             Children = new Drawable[]
                             {
-                                new DelayedLoadWrapper(bg = new NewsBackground(post.FirstImage)
+                                new DelayedLoadWrapper(bg = new NewsPostBackground(post.FirstImage)
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fill,
@@ -121,34 +119,6 @@ namespace osu.Game.Overlays.News
             main.AddParagraph(post.Preview, t => t.Font = OsuFont.GetFont(size: 12)); // Should use sans-serif font
             main.AddParagraph("by ", t => t.Font = OsuFont.GetFont(size: 12));
             main.AddText(post.Author, t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold));
-        }
-
-        [LongRunningLoad]
-        private class NewsBackground : Sprite
-        {
-            private readonly string sourceUrl;
-
-            public NewsBackground(string sourceUrl)
-            {
-                this.sourceUrl = sourceUrl;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(LargeTextureStore store)
-            {
-                Texture = store.Get(createUrl(sourceUrl));
-            }
-
-            private string createUrl(string source)
-            {
-                if (string.IsNullOrEmpty(source))
-                    return "Headers/news";
-
-                if (source.StartsWith('/'))
-                    return "https://osu.ppy.sh" + source;
-
-                return source;
-            }
         }
 
         private class DateContainer : CircularContainer, IHasCustomTooltip

@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
@@ -29,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SpinnerBonusDisplay bonusDisplay;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+
+        private bool spinnerFrequencyModulate;
 
         public DrawableSpinner(Spinner s)
             : base(s)
@@ -81,8 +85,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         private SkinnableSound spinningSample;
-
-        private const float minimum_volume = 0.0001f;
+        private const float spinning_sample_initial_frequency = 1.0f;
+        private const float spinning_sample_modulated_base_frequency = 0.5f;
 
         protected override void LoadSamples()
         {
@@ -100,8 +104,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 AddInternal(spinningSample = new SkinnableSound(clone)
                 {
-                    Volume = { Value = minimum_volume },
+                    Volume = { Value = 0 },
                     Looping = true,
+                    Frequency = { Value = spinning_sample_initial_frequency }
                 });
             }
         }
@@ -118,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
             else
             {
-                spinningSample?.VolumeTo(minimum_volume, 200).Finally(_ => spinningSample.Stop());
+                spinningSample?.VolumeTo(0, 200).Finally(_ => spinningSample.Stop());
             }
         }
 
@@ -172,10 +177,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
+            base.ApplySkin(skin, allowFallback);
+            spinnerFrequencyModulate = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerFrequencyModulate)?.Value ?? true;
+        }
+
         /// <summary>
         /// The completion progress of this spinner from 0..1 (clamped).
         /// </summary>
-        public float Progress => Math.Clamp(RotationTracker.CumulativeRotation / 360 / Spinner.SpinsRequired, 0, 1);
+        public float Progress
+        {
+            get
+            {
+                if (Spinner.SpinsRequired == 0)
+                    // some spinners are so short they can't require an integer spin count.
+                    // these become implicitly hit.
+                    return 1;
+
+                return Math.Clamp(RotationTracker.RateAdjustedRotation / 360 / Spinner.SpinsRequired, 0, 1);
+            }
+        }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -210,9 +232,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (HandleUserInput)
                 RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
 
-            if (spinningSample != null)
-                // todo: implement SpinnerFrequencyModulate
-                spinningSample.Frequency.Value = 0.5f + Progress;
+            if (spinningSample != null && spinnerFrequencyModulate)
+                spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
         }
 
         protected override void UpdateAfterChildren()
@@ -221,7 +242,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (!SpmCounter.IsPresent && RotationTracker.Tracking)
                 SpmCounter.FadeIn(HitObject.TimeFadeIn);
-            SpmCounter.SetRotation(RotationTracker.CumulativeRotation);
+            SpmCounter.SetRotation(RotationTracker.RateAdjustedRotation);
 
             updateBonusScore();
         }
@@ -233,7 +254,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (ticks.Count == 0)
                 return;
 
-            int spins = (int)(RotationTracker.CumulativeRotation / 360);
+            int spins = (int)(RotationTracker.RateAdjustedRotation / 360);
 
             if (spins < wholeSpins)
             {
