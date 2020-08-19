@@ -137,19 +137,20 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             public bool Winning
             {
-                set => displayedSpriteText.Font = value
+                set => updateFont(value);
+            }
+
+            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
+            {
+                displayedSpriteText = s;
+                displayedSpriteText.Spacing = new Vector2(-6);
+                updateFont(false);
+            });
+
+            private void updateFont(bool winning)
+                => displayedSpriteText.Font = winning
                     ? OsuFont.Torus.With(weight: FontWeight.Bold, size: 50, fixedWidth: true)
                     : OsuFont.Torus.With(weight: FontWeight.Regular, size: 40, fixedWidth: true);
-            }
-
-            protected override OsuSpriteText CreateSpriteText()
-            {
-                displayedSpriteText = base.CreateSpriteText();
-                displayedSpriteText.Spacing = new Vector2(-6);
-                Winning = false;
-
-                return displayedSpriteText;
-            }
         }
     }
 }
