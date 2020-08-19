@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public class OsuSpinnerBonusTickJudgement : OsuSpinnerTickJudgement
         {
-            protected override int NumericResultFor(HitResult result) => SCORE_PER_TICK;
+            protected override int NumericResultFor(HitResult result) => result == MaxResult ? SCORE_PER_TICK : 0;
 
             protected override double HealthIncreaseFor(HitResult result) => base.HealthIncreaseFor(result) * 2;
         }
