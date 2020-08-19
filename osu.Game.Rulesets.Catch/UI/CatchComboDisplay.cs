@@ -10,6 +10,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
+    /// <summary>
+    /// Represents a component that displays a skinned <see cref="ICatchComboCounter"/> and handles combo judgement results for updating it accordingly.
+    /// </summary>
     public class CatchComboDisplay : SkinnableDrawable
     {
         private int currentCombo;

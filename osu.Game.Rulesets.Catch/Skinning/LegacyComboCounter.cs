@@ -16,6 +16,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
+    /// <summary>
+    /// A combo counter implementation that visually behaves almost similar to osu!stable's combo counter.
+    /// </summary>
     public class LegacyComboCounter : CompositeDrawable, ICatchComboCounter
     {
         private readonly ISkin skin;
