@@ -84,16 +84,14 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("try to show toolbar", () => toolbar.Show());
 
             if (mode == OverlayActivation.Disabled)
-                AddUntilStep("toolbar still hidden", () => toolbar.Visibility == Visibility.Hidden);
+                AddUntilStep("toolbar still hidden", () => toolbar.State.Value == Visibility.Hidden);
             else
-                AddAssert("toolbar is visible", () => toolbar.Visibility == Visibility.Visible);
+                AddAssert("toolbar is visible", () => toolbar.State.Value == Visibility.Visible);
         }
 
         public class TestToolbar : Toolbar
         {
             public new Bindable<OverlayActivation> OverlayActivationMode => base.OverlayActivationMode;
-
-            public Visibility Visibility => State.Value;
         }
     }
 }
