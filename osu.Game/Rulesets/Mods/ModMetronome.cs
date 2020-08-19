@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mods
         public Bindable<TickFrequency> Frequency { get; } = new Bindable<TickFrequency>(TickFrequency.One);
 
         [SettingSource("Highlight the first beat of each bar", "A different sample will be played on the first beat.")]
-        public Bindable<bool> HighlightFirstBeat  { get; } = new Bindable<bool>(true);
+        public Bindable<bool> HighlightFirstBeat { get; } = new Bindable<bool>(true);
     }
 
     public abstract class ModMetronome<TObject> : ModMetronome, IApplicableToDrawableRuleset<TObject>
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new MetronomeBeatContainer(Frequency, HighlightFirstBeat ));
+            drawableRuleset.Overlays.Add(new MetronomeBeatContainer(Frequency, HighlightFirstBeat));
         }
 
         public class MetronomeBeatContainer : SoundOnBeatContainer
@@ -56,18 +56,18 @@ namespace osu.Game.Rulesets.Mods
             private SkinnableSound firstBeatOfBarSample;
             private SkinnableSound otherBeatOfBarSample;
 
-            private bool highlightFirstBeat ;
+            private bool highlightFirstBeat;
 
-            public MetronomeBeatContainer(Bindable<TickFrequency> tickFrequency, Bindable<bool> highlightFirstBeat )
+            public MetronomeBeatContainer(Bindable<TickFrequency> tickFrequency, Bindable<bool> highlightFirstBeat)
             {
                 tickFrequency.BindValueChanged(val =>
                 {
                     Divisor = (int)tickFrequency.Value;
                 }, true);
 
-                highlightFirstBeat .BindValueChanged(val =>
+                highlightFirstBeat.BindValueChanged(val =>
                 {
-                    this.highlightFirstBeat  = highlightFirstBeat .Value;
+                    this.highlightFirstBeat = highlightFirstBeat.Value;
                 }, true);
             }
 

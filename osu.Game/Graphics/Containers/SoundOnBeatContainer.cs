@@ -40,6 +40,5 @@ namespace osu.Game.Graphics.Containers
         /// <param name="beatIndex"> The index of this beat in the current segment(<see cref="BARS_PER_SEGMENT"/> bars) </param>
         /// <param name="signature">The <see cref="TimeSignatures"/> of the current track</param>
         protected abstract void PlayOnBeat(int beatIndex, TimeSignatures signature);
-
     }
 }
