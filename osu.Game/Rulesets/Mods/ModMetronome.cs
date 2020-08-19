@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Tick frequency", "Number of metronome ticks per beat")]
         public Bindable<TickFrequency> Frequency { get; } = new Bindable<TickFrequency>(TickFrequency.One);
 
-        [SettingSource("Different Sound on the first beat of a bar")]
+        [SettingSource("Highlight the first beat of each bar", "A different sample will be played on the first beat.")]
         public Bindable<bool> SpecialSampleForFirstBeatOfBar { get; } = new Bindable<bool>(true);
     }
 
