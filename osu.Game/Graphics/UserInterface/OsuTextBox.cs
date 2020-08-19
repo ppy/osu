@@ -74,9 +74,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);
 
-        protected override void OnTextAdded(string added)
+        protected override void OnUserTextAdded(string added)
         {
-            base.OnTextAdded(added);
+            base.OnUserTextAdded(added);
 
             if (added.Any(char.IsUpper) && AllowUniqueCharacterSamples)
                 capsTextAddedSample?.Play();
@@ -84,9 +84,9 @@ namespace osu.Game.Graphics.UserInterface
                 textAddedSamples[RNG.Next(0, 3)]?.Play();
         }
 
-        protected override void OnTextRemoved(string removed)
+        protected override void OnUserTextRemoved(string removed)
         {
-            base.OnTextRemoved(removed);
+            base.OnUserTextRemoved(removed);
 
             textRemovedSample?.Play();
         }
