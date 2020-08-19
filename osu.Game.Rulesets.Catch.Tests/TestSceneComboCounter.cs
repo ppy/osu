@@ -55,25 +55,13 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void performJudgement(HitResult type, Judgement judgement = null)
         {
-            var judgedObject = new TestDrawableCatchHitObject(new TestCatchHitObject());
+            var judgedObject = new DrawableFruit(new Fruit()) { AccentColour = { Value = judgedObjectColour } };
+
             var result = new JudgementResult(judgedObject.HitObject, judgement ?? new Judgement()) { Type = type };
             scoreProcessor.ApplyResult(result);
 
             foreach (var counter in CreatedDrawables.Cast<CatchComboDisplay>())
                 counter.OnNewResult(judgedObject, result);
-        }
-
-        private class TestDrawableCatchHitObject : DrawableCatchHitObject
-        {
-            public TestDrawableCatchHitObject(CatchHitObject hitObject)
-                : base(hitObject)
-            {
-                AccentColour.Value = Color4.White;
-            }
-        }
-
-        private class TestCatchHitObject : CatchHitObject
-        {
         }
     }
 }
