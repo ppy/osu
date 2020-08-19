@@ -11,14 +11,14 @@ namespace osu.Game.Graphics.Containers
     {
         private int? firstBeat;
 
-        private const int bars_per_segment = 4;
+        protected const int BARS_PER_SEGMENT = 4;
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
             int beatsPerBar = (int)timingPoint.TimeSignature;
-            int segmentLength = beatsPerBar * Divisor * bars_per_segment;
+            int segmentLength = beatsPerBar * Divisor * BARS_PER_SEGMENT;
 
             if (!IsBeatSyncedWithTrack)
             {
@@ -34,9 +34,12 @@ namespace osu.Game.Graphics.Containers
                 PlayOnBeat(beatIndex % segmentLength, timingPoint.TimeSignature);
         }
 
-        //This function will be executed on every beat of the track
-        protected virtual void PlayOnBeat(int beatIndex, TimeSignatures signature)
-        {
-        }
+        /// <summary>
+        /// The function executed on every beat of the track
+        /// </summary>
+        /// <param name="beatIndex"> The index of this beat in the current segment(<see cref="BARS_PER_SEGMENT"/> bars) </param>
+        /// <param name="signature">The <see cref="TimeSignatures"/> of the current track</param>
+        protected abstract void PlayOnBeat(int beatIndex, TimeSignatures signature);
+
     }
 }
