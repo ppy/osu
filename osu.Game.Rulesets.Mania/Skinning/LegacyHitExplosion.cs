@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             (explosion as IFramedAnimation)?.GotoFrame(0);
 
             explosion?.FadeInFromZero(80)
-                        .Then().FadeOut(120);
+                     .Then().FadeOut(120);
         }
     }
 }
