@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
@@ -22,6 +23,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         private ScoreProcessor scoreProcessor;
         private GameplayBeatmap gameplayBeatmap;
         private readonly Bindable<bool> isBreakTime = new BindableBool();
+
+        private Color4 judgedObjectColour = Color4.White;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -50,7 +53,17 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddRepeatStep("perform hit", () => performJudgement(HitResult.Perfect), 20);
             AddStep("perform miss", () => performJudgement(HitResult.Miss));
+
             AddToggleStep("toggle gameplay break", v => isBreakTime.Value = v);
+            AddStep("randomize judged object colour", () =>
+            {
+                judgedObjectColour = new Color4(
+                    RNG.NextSingle(1f),
+                    RNG.NextSingle(1f),
+                    RNG.NextSingle(1f),
+                    1f
+                );
+            });
         }
 
         private void performJudgement(HitResult type, Judgement judgement = null)
