@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mods
         public Bindable<TickFrequency> Frequency { get; } = new Bindable<TickFrequency>(TickFrequency.One);
 
         [SettingSource("Highlight the first beat of each bar", "A different sample will be played on the first beat.")]
-        public Bindable<bool> SpecialSampleForFirstBeatOfBar { get; } = new Bindable<bool>(true);
+        public Bindable<bool> HighlightFirstBeat  { get; } = new Bindable<bool>(true);
     }
 
     public abstract class ModMetronome<TObject> : ModMetronome, IApplicableToDrawableRuleset<TObject>
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new MetronomeBeatContainer(Frequency, SpecialSampleForFirstBeatOfBar));
+            drawableRuleset.Overlays.Add(new MetronomeBeatContainer(Frequency, HighlightFirstBeat ));
         }
 
         public class MetronomeBeatContainer : SoundOnBeatContainer
@@ -56,18 +56,18 @@ namespace osu.Game.Rulesets.Mods
             private SkinnableSound firstBeatOfBarSample;
             private SkinnableSound otherBeatOfBarSample;
 
-            private bool specialSampleForFirstBeatOfBar;
+            private bool highlightFirstBeat ;
 
-            public MetronomeBeatContainer(Bindable<TickFrequency> tickFrequency, Bindable<bool> specialSampleForFirstBeatOfBar)
+            public MetronomeBeatContainer(Bindable<TickFrequency> tickFrequency, Bindable<bool> highlightFirstBeat )
             {
                 tickFrequency.BindValueChanged(val =>
                 {
                     Divisor = (int)tickFrequency.Value;
                 }, true);
 
-                specialSampleForFirstBeatOfBar.BindValueChanged(val =>
+                highlightFirstBeat .BindValueChanged(val =>
                 {
-                    this.specialSampleForFirstBeatOfBar = specialSampleForFirstBeatOfBar.Value;
+                    this.highlightFirstBeat  = highlightFirstBeat .Value;
                 }, true);
             }
 
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mods
 
             protected override void PlayOnBeat(int beatIndex, TimeSignatures signature)
             {
-                if ((beatIndex % ((int)signature * Divisor)) == 0 && specialSampleForFirstBeatOfBar)
+                if ((beatIndex % ((int)signature * Divisor)) == 0 && highlightFirstBeat )
                     firstBeatOfBarSample.Play();
                 else
                     otherBeatOfBarSample.Play();
