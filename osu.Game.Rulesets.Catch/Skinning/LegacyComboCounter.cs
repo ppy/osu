@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
-    internal class LegacyComboCounter : CompositeDrawable, ICatchComboCounter
+    public class LegacyComboCounter : CompositeDrawable, ICatchComboCounter
     {
         private readonly ISkin skin;
 
