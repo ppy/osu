@@ -28,16 +28,14 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         protected override string FormatCount(long count) => count.ToString("N0");
 
-        protected override OsuSpriteText CreateSpriteText()
+        protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
         {
-            var spriteText = base.CreateSpriteText();
-            spriteText.Anchor = Anchor.TopCentre;
-            spriteText.Origin = Anchor.TopCentre;
+            s.Anchor = Anchor.TopCentre;
+            s.Origin = Anchor.TopCentre;
 
-            spriteText.Font = OsuFont.Torus.With(size: 60, weight: FontWeight.Light, fixedWidth: true);
-            spriteText.Spacing = new Vector2(-5, 0);
-            return spriteText;
-        }
+            s.Font = OsuFont.Torus.With(size: 60, weight: FontWeight.Light, fixedWidth: true);
+            s.Spacing = new Vector2(-5, 0);
+        });
 
         public override void Increment(long amount)
             => Current.Value += amount;
