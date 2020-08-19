@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.UserInterface
         private void load()
         {
             displayedCountSpriteText = CreateSpriteText();
-            displayedCountSpriteText.Text = FormatCount(displayedCount);
+            displayedCountSpriteText.Text = FormatCount(DisplayedCount);
             Child = displayedCountSpriteText;
         }
 
