@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mods
 
             protected override void PlayOnBeat(int beatIndex, TimeSignatures signature)
             {
-                if ((beatIndex % ((int)signature * Divisor)) == 0 && highlightFirstBeat )
+                if (beatIndex % ((int)signature * Divisor) == 0 && highlightFirstBeat)
                     firstBeatOfBarSample.Play();
                 else
                     otherBeatOfBarSample.Play();
