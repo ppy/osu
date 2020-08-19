@@ -133,17 +133,19 @@ namespace osu.Game.Rulesets.Scoring
                 }
             }
 
+            double scoreIncrease = result.Type == HitResult.Miss ? 0 : result.Judgement.NumericResultFor(result);
+
             if (result.Judgement.IsBonus)
             {
                 if (result.IsHit)
-                    bonusScore += result.Judgement.NumericResultFor(result);
+                    bonusScore += scoreIncrease;
             }
             else
             {
                 if (result.HasResult)
                     scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
 
-                baseScore += result.Judgement.NumericResultFor(result);
+                baseScore += scoreIncrease;
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
 
@@ -169,17 +171,19 @@ namespace osu.Game.Rulesets.Scoring
             if (result.FailedAtJudgement)
                 return;
 
+            double scoreIncrease = result.Type == HitResult.Miss ? 0 : result.Judgement.NumericResultFor(result);
+
             if (result.Judgement.IsBonus)
             {
                 if (result.IsHit)
-                    bonusScore -= result.Judgement.NumericResultFor(result);
+                    bonusScore -= scoreIncrease;
             }
             else
             {
                 if (result.HasResult)
                     scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
 
-                baseScore -= result.Judgement.NumericResultFor(result);
+                baseScore -= scoreIncrease;
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
 
