@@ -108,7 +108,10 @@ namespace osu.Game.Screens
 
             InternalChildren = new Drawable[]
             {
-                nightcoreBeatContainer = new NightcoreBeatContainer(),
+                nightcoreBeatContainer = new NightcoreBeatContainer
+                {
+                    Alpha = 0
+                },
                 new ParallaxContainer
                 {
                     Depth = float.MaxValue,
@@ -411,7 +414,7 @@ namespace osu.Game.Screens
 
             MusicSpeed.BindValueChanged(_ => ApplyTrackAdjustments());
             AdjustFreq.BindValueChanged(_ => ApplyTrackAdjustments());
-            NightcoreBeat.BindValueChanged(_ => ApplyTrackAdjustments(), true);
+            NightcoreBeat.BindValueChanged(_ => ApplyTrackAdjustments());
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
             SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue));
