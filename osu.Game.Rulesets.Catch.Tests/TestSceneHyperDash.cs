@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
@@ -31,6 +32,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 AddUntilStep("wait for right hyperdash", () => getCatcher().Scale.X > 0 && getCatcher().HyperDashing);
                 AddUntilStep("wait for left hyperdash", () => getCatcher().Scale.X < 0 && getCatcher().HyperDashing);
             }
+
+            AddUntilStep("wait for right hyperdash", () => getCatcher().Scale.X > 0 && getCatcher().HyperDashing);
         }
 
         private Catcher getCatcher() => Player.ChildrenOfType<CatcherArea>().First().MovableCatcher;
@@ -45,6 +48,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                     BaseDifficulty = new BeatmapDifficulty { CircleSize = 3.6f }
                 }
             };
+
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint());
 
             // Should produce a hyper-dash (edge case test)
             beatmap.HitObjects.Add(new Fruit { StartTime = 1816, X = 56, NewCombo = true });
@@ -62,6 +67,20 @@ namespace osu.Game.Rulesets.Catch.Tests
             createObjects(() => new Fruit { X = left_x });
             createObjects(() => new Fruit { X = right_x });
             createObjects(() => new TestJuiceStream(left_x), 1);
+
+            beatmap.ControlPointInfo.Add(7900, new TimingControlPoint
+            {
+                BeatLength = 50
+            });
+
+            createObjects(() => new TestJuiceStream(left_x)
+            {
+                Path = new SliderPath(new[]
+                {
+                    new PathControlPoint(Vector2.Zero),
+                    new PathControlPoint(new Vector2(512, 0))
+                })
+            }, 1);
 
             return beatmap;
 
