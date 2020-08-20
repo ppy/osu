@@ -14,7 +14,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Screens.Multi.Multiplayer multi = new Screens.Multi.Multiplayer();
 
-            AddStep(@"show", () => LoadScreen(multi));
+            AddStep("show", () => LoadScreen(multi));
+            AddUntilStep("wait for loaded", () => multi.IsLoaded);
         }
     }
 }
