@@ -30,9 +30,8 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private Drawable createDrawableTinyDroplet()
         {
-            var droplet = new TinyDroplet
+            var droplet = new TestCatchTinyDroplet
             {
-                StartTime = Clock.CurrentTime,
                 Scale = 1.5f,
             };
 
@@ -49,9 +48,8 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private Drawable createDrawableDroplet()
         {
-            var droplet = new Droplet
+            var droplet = new TestCatchDroplet
             {
-                StartTime = Clock.CurrentTime,
                 Scale = 1.5f,
             };
 
@@ -94,6 +92,22 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
 
             public override FruitVisualRepresentation VisualRepresentation { get; }
+        }
+
+        public class TestCatchDroplet : Droplet
+        {
+            public TestCatchDroplet()
+            {
+                StartTime = 1000000000000;
+            }
+        }
+
+        public class TestCatchTinyDroplet : TinyDroplet
+        {
+            public TestCatchTinyDroplet()
+            {
+                StartTime = 1000000000000;
+            }
         }
     }
 }
