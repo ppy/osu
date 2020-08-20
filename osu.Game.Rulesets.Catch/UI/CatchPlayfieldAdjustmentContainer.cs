@@ -10,6 +10,8 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
+        private const float playfield_size_adjust = 0.8f;
+
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
@@ -18,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
-            Size = new Vector2(0.86f); // matches stable's vertical offset for catcher plate
+            Size = new Vector2(playfield_size_adjust);
 
             InternalChild = new Container
             {
