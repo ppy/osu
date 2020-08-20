@@ -139,7 +139,7 @@ namespace osu.Game
             try
             {
                 using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
-                    VersionHash = "41a91a94f54045f4ed20b0437618a108";
+                    VersionHash = str.ComputeMD5Hash();
             }
             catch
             {

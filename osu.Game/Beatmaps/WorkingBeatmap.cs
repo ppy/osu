@@ -109,6 +109,15 @@ namespace osu.Game.Beatmaps
                 // Convert
                 IBeatmap converted = converter.Convert();
 
+                // Apply conversion mods to the result
+                foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
+                {
+                    if (cancellationSource.IsCancellationRequested)
+                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
+
+                    mod.ApplyToBeatmap(converted);
+                }
+
                 // Apply difficulty mods
                 if (mods.Any(m => m is IApplicableToDifficulty))
                 {
