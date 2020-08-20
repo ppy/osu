@@ -212,6 +212,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             objectWithDroplets.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             double halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) / 2;
+
+            // Todo: This is wrong. osu!stable calculated hyperdashes using the full catcher size, excluding the margins.
+            // This should theoretically cause impossible scenarios, but practically, likely due to the size of the playfield, it doesn't seem possible.
+            // For now, to bring gameplay (and diffcalc!) completely in-line with stable, this code also uses the full catcher size.
+            halfCatcherWidth /= Catcher.ALLOWED_CATCH_RANGE;
+
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
 
