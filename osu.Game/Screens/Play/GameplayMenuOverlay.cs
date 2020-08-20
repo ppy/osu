@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play
 
         public abstract string Description { get; }
 
-        protected internal FillFlowContainer<DialogButton> InternalButtons;
+        protected ButtonContainer InternalButtons;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
         private VisualSettings VisualSettings;
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play
         {
             RelativeSizeAxes = Axes.Both;
 
-            State.ValueChanged += s => selectionIndex = -1;
+            State.ValueChanged += s => InternalButtons.Deselect();
         }
 
         [BackgroundDependencyLoader]
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        InternalButtons = new FillFlowContainer<DialogButton>
+                        InternalButtons = new ButtonContainer
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
@@ -225,40 +225,16 @@ namespace osu.Game.Screens.Play
             InternalButtons.Add(button);
         }
 
-        private int selectionIndex = -1;
-
-        private void setSelected(int value)
-        {
-            if (selectionIndex == value)
-                return;
-
-            // Deselect the previously-selected button
-            if (selectionIndex != -1)
-                InternalButtons[selectionIndex].Selected.Value = false;
-
-            selectionIndex = value;
-
-            // Select the newly-selected button
-            if (selectionIndex != -1)
-                InternalButtons[selectionIndex].Selected.Value = true;
-        }
-
         public bool OnPressed(GlobalAction action)
         {
             switch (action)
             {
                 case GlobalAction.SelectPrevious:
-                    if (selectionIndex == -1 || selectionIndex == 0)
-                        setSelected(InternalButtons.Count - 1);
-                    else
-                        setSelected(selectionIndex - 1);
+                    InternalButtons.SelectPrevious();
                     return true;
 
                 case GlobalAction.SelectNext:
-                    if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                        setSelected(0);
-                    else
-                        setSelected(selectionIndex + 1);
+                    InternalButtons.SelectNext();
                     return true;
 
                 case GlobalAction.Back:
@@ -280,9 +256,9 @@ namespace osu.Game.Screens.Play
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
         {
             if (!isSelected)
-                setSelected(-1);
+                InternalButtons.Deselect();
             else
-                setSelected(InternalButtons.IndexOf(button));
+                InternalButtons.Select(button);
         }
 
         private void updateRetryCount()
@@ -302,8 +278,44 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        private void BreakSettingsOverlayContainer()
+        protected class ButtonContainer : FillFlowContainer<DialogButton>
         {
+            private int selectedIndex = -1;
+
+            private void setSelected(int value)
+            {
+                if (selectedIndex == value)
+                    return;
+
+                // Deselect the previously-selected button
+                if (selectedIndex != -1)
+                    this[selectedIndex].Selected.Value = false;
+
+                selectedIndex = value;
+
+                // Select the newly-selected button
+                if (selectedIndex != -1)
+                    this[selectedIndex].Selected.Value = true;
+            }
+
+            public void SelectNext()
+            {
+                if (selectedIndex == -1 || selectedIndex == Count - 1)
+                    setSelected(0);
+                else
+                    setSelected(selectedIndex + 1);
+            }
+
+            public void SelectPrevious()
+            {
+                if (selectedIndex == -1 || selectedIndex == 0)
+                    setSelected(Count - 1);
+                else
+                    setSelected(selectedIndex - 1);
+            }
+
+            public void Deselect() => setSelected(-1);
+            public void Select(DialogButton button) => setSelected(IndexOf(button));
         }
 
         private class Button : DialogButton

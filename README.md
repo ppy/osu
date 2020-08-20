@@ -13,7 +13,9 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/matrix-feather/osu/badge/daily)](https://www.codefactor.io/repository/github/matrix-feather/osu/overview/daily)CodeFactor(matrix-feather/osu)
 
-Rhythm is just a *click* away. The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Commonly known by the codename *osu!lazer*. Pew pew.
+A free-to-win rhythm game. Rhythm is just a *click* away!
+
+The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Commonly known by the codename *osu!lazer*. Pew pew.
 
 ## Status
 

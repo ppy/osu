@@ -71,7 +71,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
-            AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
             AddStep("exit loader", () => loader.Exit());
             AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
             AddAssert("player did not load", () => player == null);

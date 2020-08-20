@@ -117,8 +117,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
                 if ( ClockContainer != null )
                 {
-                    ClockContainer.Clock = new ThrottledFrameClock();
-
                     if ( storyboard != null )
                         storyboard.Clock = StoryboardClock;
 
@@ -134,8 +132,12 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     Name = "Storyboard Container",
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Clock = StoryboardClock = new StoryboardClock(),
-                    Child = storyboard = beatmap.Storyboard.CreateDrawable()
+                    Child = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Clock = StoryboardClock = new StoryboardClock(),
+                        Child = storyboard = beatmap.Storyboard.CreateDrawable()
+                    }
                 }, newClockContainer =>
                 {
                     StoryboardClock.ChangeSource(beatmap.Track);

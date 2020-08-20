@@ -20,6 +20,9 @@ namespace osu.Game.Configuration
         {
             base.InitialiseDefaults();
 
+            //Other Settings
+            Set(MfSetting.UseSayobot, true);
+
             //UI Settings
             Set(MfSetting.OptUI, true);
             Set(MfSetting.TrianglesEnabled, true);
@@ -40,7 +43,9 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisIdleBgDim, 0.3f, 0f, 1f);
             Set(MfSetting.MvisEnableBgTriangles, true);
             Set(MfSetting.MvisEnableSBOverlayProxy, true);
-            Set(MfSetting.UseSayobot, true);
+            Set(MfSetting.MvisAdjustMusicWithFreq, true);
+            Set(MfSetting.MvisMusicSpeed, 1.0, 0.1, 2.0);
+            Set(MfSetting.MvisEnableNightcoreBeat, false);
 
             //Mvis Settings(Upstream)
             Set(MfSetting.MvisShowParticles, true);
@@ -53,11 +58,6 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisRed, 0, 0, 255);
             Set(MfSetting.MvisGreen, 0, 0, 255);
             Set(MfSetting.MvisBlue, 0, 0, 255);
-
-            //Easter Eggs
-            Set(MfSetting.EasterEggBGBeatmap, false);
-            Set(MfSetting.EasterEggBGTriangle, false);
-            Set(MfSetting.EasterEggCoinCount, 1000, 0, int.MaxValue/2);
         }
     }
 
@@ -84,14 +84,13 @@ namespace osu.Game.Configuration
         MvisRed,
         MvisGreen,
         MvisBlue,
+        MvisMusicSpeed,
+        MvisAdjustMusicWithFreq,
+        MvisEnableNightcoreBeat,
         SamplePlaybackGain,
         SongSelectBgBlur,
-        IntroLoadDirectToSongSelect,
-        EasterEggBGTriangle,
-        EasterEggBGBeatmap,
-        EasterEggCoinCount
+        IntroLoadDirectToSongSelect
     }
-
 
     public enum MvisBarType
     {

@@ -3,13 +3,13 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputType>WinExe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Description>click the circles. to the beat.</Description>
+    <Description>A free-to-win rhythm game. Rhythm is just a *click* away!</Description>
     <AssemblyName>osu!</AssemblyName>
     <Title>osu!lazer</Title>
     <Product>osu!lazer</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>2020.814.0</Version>
+    <Version>2020.820.0</Version>
     <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
