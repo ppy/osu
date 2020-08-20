@@ -31,6 +31,7 @@ namespace osu.Game.Tournament
         public static readonly Color4 TEXT_COLOUR = Color4Extensions.FromHex("#fff");
         private Drawable heightWarning;
         private Bindable<Size> windowSize;
+        private Bindable<WindowMode> windowMode;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
@@ -41,6 +42,12 @@ namespace osu.Game.Tournament
                 var minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
 
                 heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
+            }), true);
+
+            windowMode = frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            windowMode.BindValueChanged(mode => ScheduleAfterChildren(() =>
+            {
+                windowMode.Value = WindowMode.Windowed;
             }), true);
 
             AddRange(new[]
