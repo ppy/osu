@@ -15,14 +15,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public abstract class PalpableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
+    public abstract class PalpableDrawableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
         where TObject : CatchHitObject
     {
         public override bool CanBePlated => true;
 
         protected Container ScaleContainer { get; private set; }
 
-        protected PalpableCatchHitObject(TObject hitObject)
+        protected PalpableDrawableCatchHitObject(TObject hitObject)
             : base(hitObject)
         {
             Origin = Anchor.Centre;
