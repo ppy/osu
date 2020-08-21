@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.Menus
@@ -15,7 +16,7 @@ namespace osu.Game.Tests.Visual.Menus
         public TestSceneIntroWelcome()
         {
             AddUntilStep("wait for load", () => MusicController.TrackLoaded);
-
+            AddAssert("correct track", () => Precision.AlmostEquals(MusicController.CurrentTrack.Length, 48000, 1));
             AddAssert("check if menu music loops", () => MusicController.CurrentTrack.Looping);
         }
     }

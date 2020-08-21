@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (MenuVoice.Value && !UsingThemedIntro)
+            if (MenuVoice.Value)
                 welcome = audio.Samples.Get(@"Intro/welcome");
         }
 
