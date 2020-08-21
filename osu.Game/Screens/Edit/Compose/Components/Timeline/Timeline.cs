@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         private bool trackWasPlaying;
 
-        private ITrack track;
+        private Track track;
 
         public Timeline()
         {
@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void seekTrackToCurrent()
         {
-            if (!musicController.TrackLoaded)
+            if (!track.IsLoaded)
                 return;
 
             editorClock.Seek(Current / Content.DrawWidth * track.Length);
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void scrollToTrackTime()
         {
-            if (!musicController.TrackLoaded || track.Length == 0)
+            if (!track.IsLoaded || track.Length == 0)
                 return;
 
             ScrollTo((float)(editorClock.CurrentTime / track.Length) * Content.DrawWidth, false);

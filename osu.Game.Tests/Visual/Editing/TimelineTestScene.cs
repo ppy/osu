@@ -3,11 +3,12 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -64,10 +65,10 @@ namespace osu.Game.Tests.Visual.Editing
             private readonly Drawable marker;
 
             [Resolved]
-            private EditorClock editorClock { get; set; }
+            private IBindable<WorkingBeatmap> beatmap { get; set; }
 
             [Resolved]
-            private MusicController musicController { get; set; }
+            private EditorClock editorClock { get; set; }
 
             public AudioVisualiser()
             {
@@ -93,8 +94,8 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 base.Update();
 
-                if (musicController.TrackLoaded)
-                    marker.X = (float)(editorClock.CurrentTime / musicController.CurrentTrack.Length);
+                if (beatmap.Value.Track.IsLoaded)
+                    marker.X = (float)(editorClock.CurrentTime / beatmap.Value.Track.Length);
             }
         }
 

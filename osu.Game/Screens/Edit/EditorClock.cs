@@ -30,11 +30,6 @@ namespace osu.Game.Screens.Edit
         {
         }
 
-        public EditorClock()
-            : this(new ControlPointInfo(), 1000, new BindableBeatDivisor())
-        {
-        }
-
         public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor = beatDivisor;
@@ -43,6 +38,11 @@ namespace osu.Game.Screens.Edit
             TrackLength = trackLength;
 
             underlyingClock = new DecoupleableInterpolatingFramedClock();
+        }
+
+        public EditorClock()
+            : this(new ControlPointInfo(), 1000, new BindableBeatDivisor())
+        {
         }
 
         /// <summary>

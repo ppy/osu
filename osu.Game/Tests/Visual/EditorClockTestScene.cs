@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Edit;
@@ -43,7 +44,7 @@ namespace osu.Game.Tests.Visual
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
             Clock.ControlPointInfo = e.NewValue.Beatmap.ControlPointInfo;
-            Clock.ChangeSource(MusicController.CurrentTrack);
+            Clock.ChangeSource((IAdjustableClock)e.NewValue.Track ?? new StopwatchClock());
             Clock.ProcessFrame();
         }
 
