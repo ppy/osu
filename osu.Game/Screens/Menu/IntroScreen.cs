@@ -66,6 +66,7 @@ namespace osu.Game.Screens.Menu
 
         /// <summary>
         /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
+        /// Only valid during or after <see cref="LogoArriving"/>.
         /// </summary>
         protected bool UsingThemedIntro { get; private set; }
 
@@ -115,7 +116,6 @@ namespace osu.Game.Screens.Menu
                 if (setInfo != null)
                 {
                     initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-                    UsingThemedIntro = !initialBeatmap.LoadTrack().IsDummyDevice;
                 }
 
                 return UsingThemedIntro;
@@ -169,6 +169,7 @@ namespace osu.Game.Screens.Menu
             {
                 beatmap.Value = initialBeatmap;
                 Track = musicController.CurrentTrack;
+                UsingThemedIntro = !initialBeatmap.LoadTrack().IsDummyDevice;
 
                 logo.MoveTo(new Vector2(0.5f));
                 logo.ScaleTo(Vector2.One);
