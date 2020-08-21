@@ -13,8 +13,7 @@ namespace osu.Game.Tests.Visual
             base.Update();
 
             // note that this will override any mod rate application
-            if (MusicController.TrackLoaded)
-                MusicController.CurrentTrack.Tempo.Value = Clock.Rate;
+            Beatmap.Value.Track.Tempo.Value = Clock.Rate;
         }
     }
 }

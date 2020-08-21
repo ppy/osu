@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
                 beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
 
-                MusicController.CurrentTrack.Start();
+                Beatmap.Value.Track.Start();
             });
 
             AddStep("Load playfield", () => SetContents(() => new TaikoPlayfield(new ControlPointInfo())

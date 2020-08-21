@@ -278,7 +278,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Whether this beatmap's track has been loaded via <see cref="LoadTrack"/>.
         /// </summary>
-        public bool TrackLoaded => loadedTrack != null;
+        public virtual bool TrackLoaded => loadedTrack != null;
 
         /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
