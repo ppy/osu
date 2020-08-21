@@ -59,7 +59,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         hitCircleSprite = new Sprite
                         {
                             Texture = getTextureWithFallback(string.Empty),
-                            Colour = drawableObject.AccentColour.Value,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -107,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             base.LoadComplete();
 
             state.BindValueChanged(updateState, true);
-            accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue, true);
+            accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue.ToLegacyColour(), true);
             indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
         }
 
