@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, DrawableHitObject drawableObject)
         {
-            animationContent.Colour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
+            var ballColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
 
             InternalChildren = new[]
             {
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Texture = skin.GetTexture("sliderb-nd"),
                     Colour = new Color4(5, 5, 5, 255),
                 },
-                animationContent.With(d =>
+                animationContent.WithInitialColour(ballColour).With(d =>
                 {
                     d.Anchor = Anchor.Centre;
                     d.Origin = Anchor.Centre;
