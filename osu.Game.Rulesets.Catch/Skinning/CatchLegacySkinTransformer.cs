@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
@@ -61,7 +62,12 @@ namespace osu.Game.Rulesets.Catch.Skinning
             switch (lookup)
             {
                 case CatchSkinColour colour:
-                    return Source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    var result = (Bindable<Color4>)Source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    if (result == null)
+                        return null;
+
+                    result.Value = result.Value.ToLegacyColour();
+                    return (IBindable<TValue>)result;
             }
 
             return Source.GetConfig<TLookup, TValue>(lookup);

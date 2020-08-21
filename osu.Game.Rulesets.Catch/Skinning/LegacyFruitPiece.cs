@@ -40,7 +40,6 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 colouredSprite = new Sprite
                 {
                     Texture = skin.GetTexture(lookupName),
-                    Colour = drawableObject.AccentColour.Value,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
@@ -76,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
         {
             base.LoadComplete();
 
-            accentColour.BindValueChanged(colour => colouredSprite.Colour = colour.NewValue, true);
+            accentColour.BindValueChanged(colour => colouredSprite.Colour = colour.NewValue.ToLegacyColour(), true);
         }
     }
 }
