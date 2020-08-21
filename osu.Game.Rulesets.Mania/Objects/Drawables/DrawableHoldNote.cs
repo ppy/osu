@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private readonly Container tailMaskingContainer;
 
+        private readonly SkinnableDrawable bodyPiece;
+
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
         /// </summary>
@@ -79,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         bodyOffsetContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                            Child = bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
                             {
                                 RelativeSizeAxes = Axes.Both
                             })
@@ -189,6 +191,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public override void PlaySamples()
         {
             // Samples are played by the head/tail notes.
+        }
+
+        public override void OnKilled()
+        {
+            base.OnKilled();
+            (bodyPiece.Drawable as IHoldNoteBody)?.Recycle();
         }
 
         protected override void Update()

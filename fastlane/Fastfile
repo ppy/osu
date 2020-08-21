@@ -113,7 +113,7 @@ platform :ios do
 
     souyuz(
       platform: "ios",
-      plist_path: "../osu.iOS/Info.plist"
+      plist_path: "osu.iOS/Info.plist"
     )
   end
 
@@ -127,7 +127,7 @@ platform :ios do
   end
 
   lane :update_version do |options|
-    options[:plist_path] = '../osu.iOS/Info.plist'
+    options[:plist_path] = 'osu.iOS/Info.plist'
     app_version(options)
   end
 
