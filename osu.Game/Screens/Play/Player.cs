@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, MusicController musicController)
+        private void load(AudioManager audio, OsuConfigManager config)
         {
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Play
 
             addUnderlayComponents(GameplayClockContainer);
             addGameplayComponents(GameplayClockContainer, Beatmap.Value, playableBeatmap);
-            addOverlayComponents(GameplayClockContainer, Beatmap.Value, musicController.CurrentTrack);
+            addOverlayComponents(GameplayClockContainer, Beatmap.Value);
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void addOverlayComponents(Container target, WorkingBeatmap working, ITrack track)
+        private void addOverlayComponents(Container target, WorkingBeatmap working)
         {
             target.AddRange(new[]
             {
@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Play
                         performImmediateExit();
                     },
                 },
-                failAnimation = new FailAnimation(DrawableRuleset, track) { OnComplete = onFailComplete, },
+                failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
             });
         }
 
