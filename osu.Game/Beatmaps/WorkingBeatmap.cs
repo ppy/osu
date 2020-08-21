@@ -276,6 +276,11 @@ namespace osu.Game.Beatmaps
         public void TransferTrack([NotNull] Track track) => loadedTrack = track ?? throw new ArgumentNullException(nameof(track));
 
         /// <summary>
+        /// Whether this beatmap's track has been loaded via <see cref="LoadTrack"/>.
+        /// </summary>
+        public bool TrackLoaded => loadedTrack != null;
+
+        /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
         /// This generally happens via MusicController when changing the global beatmap.
         /// </summary>
@@ -283,7 +288,7 @@ namespace osu.Game.Beatmaps
         {
             get
             {
-                if (loadedTrack == null)
+                if (!TrackLoaded)
                     throw new InvalidOperationException($"Cannot access {nameof(Track)} without first calling {nameof(LoadTrack)}.");
 
                 return loadedTrack;
