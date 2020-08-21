@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             createObjects(() => new Fruit { X = right_x });
             createObjects(() => new TestJuiceStream(left_x), 1);
 
-            beatmap.ControlPointInfo.Add(7900, new TimingControlPoint
+            beatmap.ControlPointInfo.Add(startTime, new TimingControlPoint
             {
                 BeatLength = 50
             });
