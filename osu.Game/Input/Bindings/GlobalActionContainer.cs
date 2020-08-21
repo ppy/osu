@@ -112,9 +112,6 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle mute")]
         ToggleMute,
 
-        [Description("Show user profile")]
-        ShowProfile,
-
         // In-Game Keybindings
         [Description("Skip cutscene")]
         SkipCutscene,
@@ -170,5 +167,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Pause")]
         PauseGameplay,
+
+        [Description("Show user profile")]
+        ShowProfile,
     }
 }
