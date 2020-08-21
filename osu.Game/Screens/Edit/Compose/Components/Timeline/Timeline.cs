@@ -30,6 +30,28 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private MusicController musicController { get; set; }
 
+        /// <summary>
+        /// The timeline's scroll position in the last frame.
+        /// </summary>
+        private float lastScrollPosition;
+
+        /// <summary>
+        /// The track time in the last frame.
+        /// </summary>
+        private double lastTrackTime;
+
+        /// <summary>
+        /// Whether the user is currently dragging the timeline.
+        /// </summary>
+        private bool handlingDragInput;
+
+        /// <summary>
+        /// Whether the track was playing before a user drag event.
+        /// </summary>
+        private bool trackWasPlaying;
+
+        private ITrack track;
+
         public Timeline()
         {
             ZoomDuration = 200;
@@ -61,9 +83,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Beatmap.BindValueChanged(b =>
             {
                 waveform.Waveform = b.NewValue.Waveform;
-                track = musicController.CurrentTrack;
+                track = b.NewValue.Track;
 
-                if (track.Length > 0)
+                // todo: i don't think this is safe, the track may not be loaded yet.
+                if (b.NewValue.Track.Length > 0)
                 {
                     MaxZoom = getZoomLevelForVisibleMilliseconds(500);
                     MinZoom = getZoomLevelForVisibleMilliseconds(10000);
@@ -73,28 +96,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(track.Length / milliseconds);
-
-        /// <summary>
-        /// The timeline's scroll position in the last frame.
-        /// </summary>
-        private float lastScrollPosition;
-
-        /// <summary>
-        /// The track time in the last frame.
-        /// </summary>
-        private double lastTrackTime;
-
-        /// <summary>
-        /// Whether the user is currently dragging the timeline.
-        /// </summary>
-        private bool handlingDragInput;
-
-        /// <summary>
-        /// Whether the track was playing before a user drag event.
-        /// </summary>
-        private bool trackWasPlaying;
-
-        private ITrack track;
 
         protected override void Update()
         {
