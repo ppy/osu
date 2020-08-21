@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -25,6 +26,8 @@ namespace osu.Game.Overlays.Toolbar
             DrawableText.Font = OsuFont.GetFont(italics: true);
 
             Add(new OpaqueBackground { Depth = 1 });
+
+            Hotkey = GlobalAction.ShowProfile;
 
             Flow.Add(avatar = new UpdateableAvatar
             {
