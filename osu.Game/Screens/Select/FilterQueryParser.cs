@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Select
     internal static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status|creator|artist)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
+            @"\b(?<key>stars|ar|dr|hp|cs|divisor|length|objects|bpm|status|creator|artist)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -43,6 +43,10 @@ namespace osu.Game.Screens.Select
                     break;
 
                 case "dr" when parseFloatWithPoint(value, out var dr):
+                    updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
+                    break;
+
+                case "hp" when parseFloatWithPoint(value, out var dr):
                     updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
                     break;
 
