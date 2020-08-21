@@ -27,8 +27,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             InternalChild = new Pulp
             {
-                // RelativeSizeAxes is not used since the edge effect uses Size.
-                Size = Size,
+                RelativeSizeAxes = Axes.Both,
                 AccentColour = { BindTarget = drawableObject.AccentColour }
             };
 
