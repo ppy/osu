@@ -8,7 +8,6 @@ using osu.Framework.Audio;
 using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Storyboards;
@@ -21,16 +20,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private AudioManager audioManager { get; set; }
 
-        [Resolved]
-        private MusicController musicController { get; set; }
-
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
-            => new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
+            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
 
         [Test]
         public void TestNoJudgementsOnRewind()
         {
-            AddUntilStep("wait for track to start running", () => MusicController.IsPlaying);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
             addSeekStep(3000);
             AddAssert("all judged", () => Player.DrawableRuleset.Playfield.AllHitObjects.All(h => h.Judged));
             AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses >= 7));
@@ -43,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void addSeekStep(double time)
         {
-            AddStep($"seek to {time}", () => MusicController.SeekTo(time));
+            AddStep($"seek to {time}", () => Beatmap.Value.Track.Seek(time));
 
             // Allow a few frames of lenience
             AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));

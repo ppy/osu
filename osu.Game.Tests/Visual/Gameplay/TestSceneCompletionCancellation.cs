@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             base.SetUpSteps();
 
             // Ensure track has actually running before attempting to seek
-            AddUntilStep("wait for track to start running", () => MusicController.IsPlaying);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
         }
 
         [Test]
@@ -70,13 +70,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void complete()
         {
-            AddStep("seek to completion", () => MusicController.SeekTo(5000));
+            AddStep("seek to completion", () => Beatmap.Value.Track.Seek(5000));
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
         }
 
         private void cancel()
         {
-            AddStep("rewind to cancel", () => MusicController.SeekTo(4000));
+            AddStep("rewind to cancel", () => Beatmap.Value.Track.Seek(4000));
             AddUntilStep("completion cleared by processor", () => !Player.ScoreProcessor.HasCompleted.Value);
         }
 

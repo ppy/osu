@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
-                mod.ApplyToTrack(MusicController.CurrentTrack);
+                mod.ApplyToTrack(Beatmap.Value.Track);
 
             InputManager.Child = container;
         }
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
             AddAssert("player did not load", () => player == null);
             AddUntilStep("player disposed", () => loader.DisposalTask == null);
-            AddAssert("mod rate still applied", () => MusicController.CurrentTrack.Rate != 1);
+            AddAssert("mod rate still applied", () => Beatmap.Value.Track.Rate != 1);
         }
 
         /// <summary>
@@ -88,13 +88,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
-            AddAssert("mod rate applied", () => MusicController.CurrentTrack.Rate != 1);
+            AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
             AddUntilStep("wait for non-null player", () => player != null);
             AddStep("exit loader", () => loader.Exit());
             AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
             AddAssert("player did not load", () => !player.IsLoaded);
             AddUntilStep("player disposed", () => loader.DisposalTask?.IsCompleted == true);
-            AddAssert("mod rate still applied", () => MusicController.CurrentTrack.Rate != 1);
+            AddAssert("mod rate still applied", () => Beatmap.Value.Track.Rate != 1);
         }
 
         [Test]
