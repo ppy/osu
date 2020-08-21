@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osuTK.Graphics;
 using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Skinning
@@ -60,6 +61,21 @@ namespace osu.Game.Skinning
                     yield return texture;
                 }
             }
+        }
+
+        public static Color4 ToLegacyColour(this Color4 colour)
+        {
+            if (colour.A == 0)
+                colour.A = 1;
+            return colour;
+        }
+
+        public static T WithInitialColour<T>(this T drawable, Color4 colour)
+            where T : Drawable
+        {
+            drawable.Alpha = colour.A;
+            drawable.Colour = ToLegacyColour(colour);
+            return drawable;
         }
 
         public class SkinnableTextureAnimation : TextureAnimation
