@@ -216,6 +216,9 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <returns>Whether the catch is possible.</returns>
         public bool AttemptCatch(CatchHitObject fruit)
         {
+            if (!fruit.CanBePlated)
+                return false;
+
             var halfCatchWidth = catchWidth * 0.5f;
 
             // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
