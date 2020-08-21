@@ -8,7 +8,6 @@ using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
@@ -26,9 +25,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         private readonly Container<T> content;
 
         protected override Container<T> Content => content;
-
-        [Resolved]
-        private MusicController musicController { get; set; }
 
         public TimelinePart(Container<T> content = null)
         {
@@ -50,14 +46,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         private void updateRelativeChildSize()
         {
             // the track may not be loaded completely (only has a length once it is).
-            if (!musicController.TrackLoaded)
+            if (!Beatmap.Value.Track.IsLoaded)
             {
                 content.RelativeChildSize = Vector2.One;
                 Schedule(updateRelativeChildSize);
                 return;
             }
 
-            content.RelativeChildSize = new Vector2((float)Math.Max(1, musicController.CurrentTrack.Length), 1);
+            content.RelativeChildSize = new Vector2((float)Math.Max(1, Beatmap.Value.Track.Length), 1);
         }
 
         protected virtual void LoadBeatmap(WorkingBeatmap beatmap)

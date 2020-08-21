@@ -14,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
+using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
@@ -27,7 +28,6 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
-using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
@@ -52,9 +52,6 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
-
-        [Resolved]
-        private MusicController musicController { get; set; }
 
         private Box bottomBackground;
         private Container screenContainer;
@@ -82,8 +79,9 @@ namespace osu.Game.Screens.Edit
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
+            var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
-            clock.ChangeSource(musicController.CurrentTrack);
+            clock.ChangeSource(sourceClock);
 
             dependencies.CacheAs(clock);
             AddInternal(clock);
@@ -348,7 +346,7 @@ namespace osu.Game.Screens.Edit
 
         private void resetTrack(bool seekToStart = false)
         {
-            musicController.CurrentTrack.Stop();
+            Beatmap.Value.Track?.Stop();
 
             if (seekToStart)
             {
