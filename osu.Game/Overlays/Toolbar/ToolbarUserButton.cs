@@ -21,13 +21,15 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserButton()
         {
+            TooltipMain = "User";
+            TooltipSub = "Who are you?";
+            Hotkey = GlobalAction.ShowProfile;
+
             AutoSizeAxes = Axes.X;
 
             DrawableText.Font = OsuFont.GetFont(italics: true);
 
             Add(new OpaqueBackground { Depth = 1 });
-
-            Hotkey = GlobalAction.ShowProfile;
 
             Flow.Add(avatar = new UpdateableAvatar
             {
