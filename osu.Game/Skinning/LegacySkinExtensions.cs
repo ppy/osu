@@ -82,10 +82,10 @@ namespace osu.Game.Skinning
         /// <remarks>
         /// Beware: Any existing value in <see cref="Drawable.Alpha"/> is overwritten.
         /// </remarks>
-        /// <param name="drawable">The <see cref="Drawable"/> to set the "InitialColour" of.</param>
+        /// <param name="drawable">The <see cref="Drawable"/> to set the colour of.</param>
         /// <param name="colour">The <see cref="Color4"/> to set.</param>
         /// <returns>The given <see cref="Drawable"/>.</returns>
-        public static T WithInitialColour<T>(this T drawable, Color4 colour)
+        public static T WithLegacyColour<T>(this T drawable, Color4 colour)
             where T : Drawable
         {
             drawable.Alpha = colour.A;

@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Texture = skin.GetTexture("sliderb-nd"),
                     Colour = new Color4(5, 5, 5, 255),
                 },
-                animationContent.WithInitialColour(ballColour).With(d =>
+                animationContent.WithLegacyColour(ballColour).With(d =>
                 {
                     d.Anchor = Anchor.Centre;
                     d.Origin = Anchor.Centre;
