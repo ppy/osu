@@ -64,7 +64,8 @@ namespace osu.Game.Screens.Menu
                 }, t =>
                 {
                     AddInternal(t);
-                    welcome?.Play();
+                    if (!UsingThemedIntro)
+                        welcome?.Play();
 
                     StartTrack();
                 });
