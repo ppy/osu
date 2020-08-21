@@ -231,9 +231,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                if (beatmap is Bindable<WorkingBeatmap> working)
-                    working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
-
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
                 restartTrack();
                 return PreviousTrackResult.Previous;
             }
@@ -257,9 +255,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                if (beatmap is Bindable<WorkingBeatmap> working)
-                    working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
-
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
                 restartTrack();
                 return true;
             }
@@ -278,11 +274,15 @@ namespace osu.Game.Overlays
 
         private TrackChangeDirection? queuedDirection;
 
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap) => changeBeatmap(beatmap.NewValue);
+
+        private void changeBeatmap(WorkingBeatmap newWorking)
         {
+            var lastWorking = current;
+
             TrackChangeDirection direction = TrackChangeDirection.None;
 
-            bool audioEquals = beatmap.NewValue?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
+            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
 
             if (current != null)
             {
@@ -297,13 +297,13 @@ namespace osu.Game.Overlays
                 {
                     // figure out the best direction based on order in playlist.
                     var last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap.NewValue == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
+                    var next = newWorking == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != newWorking.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }
             }
 
-            current = beatmap.NewValue;
+            current = newWorking;
 
             if (!audioEquals || CurrentTrack.IsDummyDevice)
             {
@@ -312,7 +312,7 @@ namespace osu.Game.Overlays
             else
             {
                 // transfer still valid track to new working beatmap
-                current.TransferTrack(beatmap.OldValue.Track);
+                current.TransferTrack(lastWorking.Track);
             }
 
             TrackChanged?.Invoke(current, direction);
@@ -320,6 +320,11 @@ namespace osu.Game.Overlays
             ResetTrackAdjustments();
 
             queuedDirection = null;
+
+            // this will be a noop if coming from the beatmapChanged event.
+            // the exception is local operations like next/prev, where we want to complete loading the track before sending out a change.
+            if (beatmap.Value != current && beatmap is Bindable<WorkingBeatmap> working)
+                working.Value = current;
         }
 
         private void changeTrack()
