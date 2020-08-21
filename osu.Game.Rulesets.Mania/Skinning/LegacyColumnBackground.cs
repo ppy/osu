@@ -58,28 +58,24 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = backgroundColour
-                },
-                new Box
+                new Box { RelativeSizeAxes = Axes.Both }.WithInitialColour(backgroundColour),
+                new Container
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = leftLineWidth,
                     Scale = new Vector2(0.740f, 1),
-                    Colour = lineColour,
-                    Alpha = hasLeftLine ? 1 : 0
+                    Alpha = hasLeftLine ? 1 : 0,
+                    Child = new Box { RelativeSizeAxes = Axes.Both }.WithInitialColour(lineColour)
                 },
-                new Box
+                new Container
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
                     Width = rightLineWidth,
                     Scale = new Vector2(0.740f, 1),
-                    Colour = lineColour,
-                    Alpha = hasRightLine ? 1 : 0
+                    Alpha = hasRightLine ? 1 : 0,
+                    Child = new Box { RelativeSizeAxes = Axes.Both }.WithInitialColour(lineColour)
                 },
                 lightContainer = new Container
                 {
@@ -90,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Colour = lightColour,
+                        Colour = lightColour.ToLegacyColour(),
                         Texture = skin.GetTexture(lightImage),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,
