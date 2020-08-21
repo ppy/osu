@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -35,19 +34,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
         /// <summary>
-        /// Contains the maximum size/position of the body prior to any offset or size adjustments.
+        /// Contains the size of the hold note covering the whole head/tail bounds. The size of this container changes as the hold note is being pressed.
         /// </summary>
-        private readonly Container bodyContainer;
+        private readonly Container sizingContainer;
 
         /// <summary>
-        /// Contains the offset size/position of the body such that the body extends half-way between the head and tail pieces.
+        /// Contains the contents of the hold note that should be masked as the hold note is being pressed. Follows changes in the size of <see cref="sizingContainer"/>.
         /// </summary>
-        private readonly Container bodyOffsetContainer;
-
-        /// <summary>
-        /// Contains the masking area for the tail, which is resized along with <see cref="bodyContainer"/>.
-        /// </summary>
-        private readonly Container tailMaskingContainer;
+        private readonly Container maskingContainer;
 
         private readonly SkinnableDrawable bodyPiece;
 
@@ -71,36 +65,43 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             RelativeSizeAxes = Axes.X;
 
-            AddRangeInternal(new[]
+            Container maskedContents;
+
+            AddRangeInternal(new Drawable[]
             {
-                bodyContainer = new Container
+                sizingContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        bodyOffsetContainer = new Container
+                        maskingContainer = new Container
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Child = bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                            RelativeSizeAxes = Axes.Both,
+                            Child = maskedContents = new Container
                             {
-                                RelativeSizeAxes = Axes.Both
-                            })
+                                RelativeSizeAxes = Axes.Both,
+                                Masking = true,
+                            }
                         },
-                        // The head needs to move along with changes in the size of the body.
                         headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both }
                     }
                 },
-                tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
-                tailMaskingContainer = new Container
+                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Masking = true,
-                    Child = tailContainer = new Container<DrawableHoldNoteTail>
-                    {
-                        RelativeSizeAxes = Axes.X,
-                    }
+                    RelativeSizeAxes = Axes.Both,
+                })
+                {
+                    RelativeSizeAxes = Axes.X
                 },
-                headContainer.CreateProxy()
+                tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
+                tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },
+            });
+
+            maskedContents.AddRange(new[]
+            {
+                bodyPiece.CreateProxy(),
+                tickContainer.CreateProxy(),
+                tailContainer.CreateProxy(),
             });
         }
 
@@ -167,24 +168,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.OnDirectionChanged(e);
 
-            // The body container is anchored from the position of the tail, since its height is changed when the hold note is being hit.
-            // The body offset container is anchored from the position of the head (inverse of the above).
-            // The tail containers are both anchored from the position of the tail.
             if (e.NewValue == ScrollingDirection.Up)
             {
-                bodyContainer.Anchor = bodyContainer.Origin = Anchor.BottomLeft;
-                bodyOffsetContainer.Anchor = bodyOffsetContainer.Origin = Anchor.TopLeft;
-
-                tailMaskingContainer.Anchor = tailMaskingContainer.Origin = Anchor.BottomLeft;
-                tailContainer.Anchor = tailContainer.Origin = Anchor.BottomLeft;
+                bodyPiece.Anchor = bodyPiece.Origin = Anchor.TopLeft;
+                sizingContainer.Anchor = sizingContainer.Origin = Anchor.BottomLeft;
             }
             else
             {
-                bodyContainer.Anchor = bodyContainer.Origin = Anchor.TopLeft;
-                bodyOffsetContainer.Anchor = bodyOffsetContainer.Origin = Anchor.BottomLeft;
-
-                tailMaskingContainer.Anchor = tailMaskingContainer.Origin = Anchor.TopLeft;
-                tailContainer.Anchor = tailContainer.Origin = Anchor.TopLeft;
+                bodyPiece.Anchor = bodyPiece.Origin = Anchor.BottomLeft;
+                sizingContainer.Anchor = sizingContainer.Origin = Anchor.TopLeft;
             }
         }
 
@@ -206,26 +198,34 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Time.Current < releaseTime)
                 releaseTime = null;
 
-            // Decrease the size of the body while the hold note is held and the head has been hit. This stops at the very first release point.
+            // Pad the full size container so its contents (i.e. the masking container) reach under the tail.
+            // This is required for the tail to not be masked away, since it lies outside the bounds of the hold note.
+            sizingContainer.Padding = new MarginPadding
+            {
+                Top = Direction.Value == ScrollingDirection.Down ? -Tail.Height : 0,
+                Bottom = Direction.Value == ScrollingDirection.Up ? -Tail.Height : 0,
+            };
+
+            // Pad the masking container to the starting position of the body piece (half-way under the head).
+            // This is required ot make the body start getting masked immediately as soon as the note is held.
+            maskingContainer.Padding = new MarginPadding
+            {
+                Top = Direction.Value == ScrollingDirection.Up ? Head.Height / 2 : 0,
+                Bottom = Direction.Value == ScrollingDirection.Down ? Head.Height / 2 : 0,
+            };
+
+            // Position and resize the body to lie half-way under the head and the tail notes.
+            bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
+            bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
+
+            // As the note is being held, adjust the size of the fullSizeContainer. This has two effects:
+            // 1. The contained masking container will mask the body and ticks.
+            // 2. The head note will move along with the new "head position" in the container.
             if (Head.IsHit && releaseTime == null)
             {
                 float heightDecrease = (float)(Math.Max(0, Time.Current - HitObject.StartTime) / HitObject.Duration);
-                bodyContainer.Height = MathHelper.Clamp(1 - heightDecrease, 0, 1);
+                sizingContainer.Height = Math.Clamp(1 - heightDecrease, 0, 1);
             }
-
-            // Re-position the body half-way up the head, and extend the height until it's half-way under the tail.
-            bodyOffsetContainer.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
-            bodyOffsetContainer.Height = bodyContainer.DrawHeight + Tail.Height / 2 - Head.Height / 2;
-
-            // The tail is positioned to be "outside" the hold note, so re-position its masking container to fully cover the tail and extend the height until it's half-way under the head.
-            // The masking height is determined by the size of the body so that the head and tail don't overlap as the body becomes shorter via hitting (above).
-            tailMaskingContainer.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Tail.Height;
-            tailMaskingContainer.Height = bodyContainer.DrawHeight + Tail.Height - Head.Height / 2;
-
-            // The tail container needs the reverse of the above offset applied to bring the tail to its original position.
-            // It also needs the full original height of the hold note to maintain positioning even as the height of the masking container changes.
-            tailContainer.Y = -tailMaskingContainer.Y;
-            tailContainer.Height = DrawHeight;
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
