@@ -63,6 +63,11 @@ namespace osu.Game.Skinning
             }
         }
 
+        /// <summary>
+        /// The resultant colour after setting a post-constructor colour in osu!stable.
+        /// </summary>
+        /// <param name="colour">The <see cref="Color4"/> to convert.</param>
+        /// <returns>The converted <see cref="Color4"/>.</returns>
         public static Color4 ToLegacyColour(this Color4 colour)
         {
             if (colour.A == 0)
@@ -70,6 +75,16 @@ namespace osu.Game.Skinning
             return colour;
         }
 
+        /// <summary>
+        /// Equivalent of setting a colour in the constructor in osu!stable.
+        /// Doubles the alpha channel into <see cref="Drawable.Alpha"/> and uses <see cref="ToLegacyColour"/> to set <see cref="Drawable.Colour"/>.
+        /// </summary>
+        /// <remarks>
+        /// Beware: Any existing value in <see cref="Drawable.Alpha"/> is overwritten.
+        /// </remarks>
+        /// <param name="drawable">The <see cref="Drawable"/> to set the "InitialColour" of.</param>
+        /// <param name="colour">The <see cref="Color4"/> to set.</param>
+        /// <returns>The given <see cref="Drawable"/>.</returns>
         public static T WithInitialColour<T>(this T drawable, Color4 colour)
             where T : Drawable
         {
