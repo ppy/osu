@@ -229,7 +229,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 catchObjectPosition >= catcherPosition - halfCatchWidth &&
                 catchObjectPosition <= catcherPosition + halfCatchWidth;
 
-            // only update hyperdash state if we are catching not catching a tiny droplet.
+            // only update hyperdash state if we are not catching a tiny droplet.
             if (fruit is TinyDroplet) return validCatch;
 
             if (validCatch && fruit.HyperDash)
