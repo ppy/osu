@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                         Anchor = Anchor.CentreLeft,
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
-                        Colour = lineColour,
+                        Colour = lineColour.ToLegacyColour(),
                         Alpha = showJudgementLine ? 0.9f : 0
                     }
                 }
