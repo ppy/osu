@@ -20,19 +20,19 @@ namespace osu.Game.Rulesets.Catch.Tests
             foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
                 AddStep($"show {rep}", () => SetContents(() => createDrawable(rep)));
 
-            AddStep("show droplet", () => SetContents(createDrawableDroplet));
-
+            AddStep("show droplet", () => SetContents(() => createDrawableDroplet()));
             AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
 
             foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
                 AddStep($"show hyperdash {rep}", () => SetContents(() => createDrawable(rep, true)));
+
+            AddStep("show hyperdash droplet", () => SetContents(() => createDrawableDroplet(true)));
         }
 
         private Drawable createDrawableTinyDroplet()
         {
-            var droplet = new TinyDroplet
+            var droplet = new TestCatchTinyDroplet
             {
-                StartTime = Clock.CurrentTime,
                 Scale = 1.5f,
             };
 
@@ -47,12 +47,12 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
         }
 
-        private Drawable createDrawableDroplet()
+        private Drawable createDrawableDroplet(bool hyperdash = false)
         {
-            var droplet = new Droplet
+            var droplet = new TestCatchDroplet
             {
-                StartTime = Clock.CurrentTime,
                 Scale = 1.5f,
+                HyperDashTarget = hyperdash ? new Banana() : null
             };
 
             return new DrawableDroplet(droplet)
@@ -94,6 +94,22 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
 
             public override FruitVisualRepresentation VisualRepresentation { get; }
+        }
+
+        public class TestCatchDroplet : Droplet
+        {
+            public TestCatchDroplet()
+            {
+                StartTime = 1000000000000;
+            }
+        }
+
+        public class TestCatchTinyDroplet : TinyDroplet
+        {
+            public TestCatchTinyDroplet()
+            {
+                StartTime = 1000000000000;
+            }
         }
     }
 }
