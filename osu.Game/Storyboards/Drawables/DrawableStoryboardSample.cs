@@ -76,6 +76,8 @@ namespace osu.Game.Storyboards.Drawables
         protected override void Dispose(bool isDisposing)
         {
             Channel?.Stop();
+            Channel = null;
+
             base.Dispose(isDisposing);
         }
     }
