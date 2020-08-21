@@ -38,7 +38,6 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
             new KeyBinding(new[] { InputKey.Control, InputKey.P }, GlobalAction.ShowProfile),
 
-
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
 
@@ -50,7 +49,6 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
-
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
