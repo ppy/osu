@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             };
 
             // Pad the masking container to the starting position of the body piece (half-way under the head).
-            // This is required ot make the body start getting masked immediately as soon as the note is held.
+            // This is required to make the body start getting masked immediately as soon as the note is held.
             maskingContainer.Padding = new MarginPadding
             {
                 Top = Direction.Value == ScrollingDirection.Up ? Head.Height / 2 : 0,
@@ -218,13 +218,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
             bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
 
-            // As the note is being held, adjust the size of the fullSizeContainer. This has two effects:
+            // As the note is being held, adjust the size of the sizing container. This has two effects:
             // 1. The contained masking container will mask the body and ticks.
             // 2. The head note will move along with the new "head position" in the container.
             if (Head.IsHit && releaseTime == null)
             {
-                float heightDecrease = (float)(Math.Max(0, Time.Current - HitObject.StartTime) / HitObject.Duration);
-                sizingContainer.Height = Math.Clamp(1 - heightDecrease, 0, 1);
+                float remainingHeight = (float)(Math.Max(0, HitObject.GetEndTime() - Time.Current) / HitObject.Duration);
+                sizingContainer.Height = Math.Clamp(remainingHeight, 0, 1);
             }
         }
 
