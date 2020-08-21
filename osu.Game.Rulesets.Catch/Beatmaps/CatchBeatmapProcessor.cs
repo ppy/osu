@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             if (amount > 0)
             {
                 // Clamp to the right bound
-                if (position + amount < 1)
+                if (position + amount < CatchPlayfield.WIDTH)
                     position += amount;
             }
             else
