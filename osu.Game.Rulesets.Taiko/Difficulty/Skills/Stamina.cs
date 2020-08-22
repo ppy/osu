@@ -12,32 +12,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Stamina : Skill
     {
-        private readonly int hand;
-
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
 
         private const int max_history_length = 2;
+
+        private readonly int hand;
         private readonly LimitedCapacityQueue<double> notePairDurationHistory = new LimitedCapacityQueue<double>(max_history_length);
 
         private double offhandObjectDuration = double.MaxValue;
 
-        // Penalty for tl tap or roll
-        private double cheesePenalty(double notePairDuration)
+        public Stamina(bool rightHand)
         {
-            if (notePairDuration > 125) return 1;
-            if (notePairDuration < 100) return 0.6;
-
-            return 0.6 + (notePairDuration - 100) * 0.016;
-        }
-
-        private double speedBonus(double notePairDuration)
-        {
-            if (notePairDuration >= 200) return 0;
-
-            double bonus = 200 - notePairDuration;
-            bonus *= bonus;
-            return bonus / 100000;
+            hand = rightHand ? 1 : 0;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -71,9 +58,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return 0;
         }
 
-        public Stamina(bool rightHand)
+        // Penalty for tl tap or roll
+        private double cheesePenalty(double notePairDuration)
         {
-            hand = rightHand ? 1 : 0;
+            if (notePairDuration > 125) return 1;
+            if (notePairDuration < 100) return 0.6;
+
+            return 0.6 + (notePairDuration - 100) * 0.016;
+        }
+
+        private double speedBonus(double notePairDuration)
+        {
+            if (notePairDuration >= 200) return 0;
+
+            double bonus = 200 - notePairDuration;
+            bonus *= bonus;
+            return bonus / 100000;
         }
     }
 }

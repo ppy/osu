@@ -14,17 +14,43 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     {
         protected override double SkillMultiplier => 10;
         protected override double StrainDecayBase => 0;
-        private const double strain_decay = 0.96;
-        private double currentStrain;
 
-        private readonly LimitedCapacityQueue<TaikoDifficultyHitObject> rhythmHistory = new LimitedCapacityQueue<TaikoDifficultyHitObject>(rhythm_history_max_length);
+        private const double strain_decay = 0.96;
         private const int rhythm_history_max_length = 8;
 
+        private readonly LimitedCapacityQueue<TaikoDifficultyHitObject> rhythmHistory = new LimitedCapacityQueue<TaikoDifficultyHitObject>(rhythm_history_max_length);
+
+        private double currentStrain;
         private int notesSinceRhythmChange;
 
-        private double repetitionPenalty(int notesSince)
+        protected override double StrainValueOf(DifficultyHitObject current)
         {
-            return Math.Min(1.0, 0.032 * notesSince);
+            if (!(current.BaseObject is Hit))
+            {
+                resetRhythmStrain();
+                return 0.0;
+            }
+
+            currentStrain *= strain_decay;
+
+            TaikoDifficultyHitObject hitobject = (TaikoDifficultyHitObject)current;
+            notesSinceRhythmChange += 1;
+
+            if (hitobject.Rhythm.Difficulty == 0.0)
+            {
+                return 0.0;
+            }
+
+            double objectStrain = hitobject.Rhythm.Difficulty;
+
+            objectStrain *= repetitionPenalties(hitobject);
+            objectStrain *= patternLengthPenalty(notesSinceRhythmChange);
+            objectStrain *= speedPenalty(hitobject.DeltaTime);
+
+            notesSinceRhythmChange = 0;
+
+            currentStrain += objectStrain;
+            return currentStrain;
         }
 
         // Finds repetitions and applies penalties
@@ -61,6 +87,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return true;
         }
 
+        private double repetitionPenalty(int notesSince) => Math.Min(1.0, 0.032 * notesSince);
+
         private double patternLengthPenalty(int patternLength)
         {
             double shortPatternPenalty = Math.Min(0.15 * patternLength, 1.0);
@@ -76,36 +104,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             resetRhythmStrain();
             return 0.0;
-        }
-
-        protected override double StrainValueOf(DifficultyHitObject current)
-        {
-            if (!(current.BaseObject is Hit))
-            {
-                resetRhythmStrain();
-                return 0.0;
-            }
-
-            currentStrain *= strain_decay;
-
-            TaikoDifficultyHitObject hitobject = (TaikoDifficultyHitObject)current;
-            notesSinceRhythmChange += 1;
-
-            if (hitobject.Rhythm.Difficulty == 0.0)
-            {
-                return 0.0;
-            }
-
-            double objectStrain = hitobject.Rhythm.Difficulty;
-
-            objectStrain *= repetitionPenalties(hitobject);
-            objectStrain *= patternLengthPenalty(notesSinceRhythmChange);
-            objectStrain *= speedPenalty(hitobject.DeltaTime);
-
-            notesSinceRhythmChange = 0;
-
-            currentStrain += objectStrain;
-            return currentStrain;
         }
 
         private void resetRhythmStrain()

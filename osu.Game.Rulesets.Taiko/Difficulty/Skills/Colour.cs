@@ -12,10 +12,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Colour : Skill
     {
-        private const int mono_history_max_length = 5;
-
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
+
+        private const int mono_history_max_length = 5;
+
+        /// <summary>
+        /// List of the last <see cref="mono_history_max_length"/> most recent mono patterns, with the most recent at the end of the list.
+        /// </summary>
+        private readonly LimitedCapacityQueue<int> monoHistory = new LimitedCapacityQueue<int>(mono_history_max_length);
 
         private HitType? previousHitType;
 
@@ -23,11 +28,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// Length of the current mono pattern.
         /// </summary>
         private int currentMonoLength = 1;
-
-        /// <summary>
-        /// List of the last <see cref="mono_history_max_length"/> most recent mono patterns, with the most recent at the end of the list.
-        /// </summary>
-        private readonly LimitedCapacityQueue<int> monoHistory = new LimitedCapacityQueue<int>(mono_history_max_length);
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {

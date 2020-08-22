@@ -13,11 +13,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         private const int roll_min_repetitions = 12;
         private const int tl_min_repetitions = 16;
 
-        private List<TaikoDifficultyHitObject> hitObjects;
+        private readonly List<TaikoDifficultyHitObject> hitObjects;
 
-        public void FindCheese(List<TaikoDifficultyHitObject> difficultyHitObjects)
+        public StaminaCheeseDetector(List<TaikoDifficultyHitObject> hitObjects)
         {
-            hitObjects = difficultyHitObjects;
+            this.hitObjects = hitObjects;
+        }
+
+        public void FindCheese()
+        {
             findRolls(3);
             findRolls(4);
             findTlTap(0, HitType.Rim);
