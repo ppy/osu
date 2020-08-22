@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class Droplet : CatchHitObject
+    public class Droplet : PalpableCatchHitObject
     {
         public override Judgement CreateJudgement() => new CatchDropletJudgement();
     }

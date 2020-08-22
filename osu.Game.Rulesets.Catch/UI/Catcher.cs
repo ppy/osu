@@ -216,6 +216,9 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <returns>Whether the catch is possible.</returns>
         public bool AttemptCatch(CatchHitObject fruit)
         {
+            if (!fruit.CanBePlated)
+                return false;
+
             var halfCatchWidth = catchWidth * 0.5f;
 
             // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
@@ -226,9 +229,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 catchObjectPosition >= catcherPosition - halfCatchWidth &&
                 catchObjectPosition <= catcherPosition + halfCatchWidth;
 
-            // only update hyperdash state if we are catching a fruit.
-            // exceptions are Droplets and JuiceStreams.
-            if (!(fruit is Fruit)) return validCatch;
+            // only update hyperdash state if we are not catching a tiny droplet.
+            if (fruit is TinyDroplet) return validCatch;
 
             if (validCatch && fruit.HyperDash)
             {
