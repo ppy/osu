@@ -27,7 +27,6 @@ namespace osu.Game.Rulesets.Catch.Skinning
         private readonly float fontOverlap;
 
         private readonly LegacyRollingCounter counter;
-        private LegacyRollingCounter lastExplosion;
 
         public LegacyComboCounter(ISkin skin, string fontName, float fontOverlap)
         {
@@ -70,8 +69,14 @@ namespace osu.Game.Rulesets.Catch.Skinning
         public void DisplayInitialCombo(int combo) => updateCombo(combo, null, true);
         public void UpdateCombo(int combo, Color4? hitObjectColour) => updateCombo(combo, hitObjectColour, false);
 
+        private LegacyRollingCounter lastExplosion;
+
         private void updateCombo(int combo, Color4? hitObjectColour, bool immediate)
         {
+            // There may still be existing transforms to the counter (including value change after 250ms),
+            // finish them immediately before new transforms.
+            counter.FinishTransforms();
+
             // Combo fell to zero, roll down and fade out the counter.
             if (combo == 0)
             {
@@ -83,8 +88,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 return;
             }
 
-            // There may still be previous transforms being applied, finish them and remove explosion.
-            FinishTransforms(true);
+            // Remove last explosion to not conflict with the upcoming one.
             if (lastExplosion != null)
                 RemoveInternal(lastExplosion);
 
