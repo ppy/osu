@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual
             {
                 this.extrapolateAnimations = extrapolateAnimations;
 
-                // Use a direct string lookup for simplicity, as they're legacy settings and not worth creating enums for them.
+                // use a direct string lookup instead of enum to avoid having to reference ruleset assemblies.
                 legacyFontPrefixes.Add(GetConfig<string, string>("HitCirclePrefix")?.Value ?? "default");
                 legacyFontPrefixes.Add(GetConfig<string, string>("ScorePrefix")?.Value ?? "score");
                 legacyFontPrefixes.Add(GetConfig<string, string>("ComboPrefix")?.Value ?? "score");
