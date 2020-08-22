@@ -56,8 +56,16 @@ namespace osu.Game.Beatmaps
         IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null);
 
         /// <summary>
-        /// Retrieves the <see cref="Track"/> which this <see cref="WorkingBeatmap"/> provides.
+        /// Load a new audio track instance for this beatmap. This should be called once before accessing <see cref="Track"/>.
+        /// The caller of this method is responsible for the lifetime of the track.
         /// </summary>
+        /// <remarks>
+        /// In a standard game context, the loading of the track is managed solely by MusicController, which will
+        /// automatically load the track of the current global IBindable WorkingBeatmap.
+        /// As such, this method should only be called in very special scenarios, such as external tests or apps which are
+        /// outside of the game context.
+        /// </remarks>
+        /// <returns>A fresh track instance, which will also be available via <see cref="Track"/>.</returns>
         Track LoadTrack();
     }
 }

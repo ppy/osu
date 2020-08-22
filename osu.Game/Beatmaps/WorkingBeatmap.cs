@@ -261,10 +261,6 @@ namespace osu.Game.Beatmaps
 
         private Track loadedTrack;
 
-        /// <summary>
-        /// Load a new audio track instance for this beatmap.
-        /// </summary>
-        /// <returns>A fresh track instance, which will also be available via <see cref="Track"/>.</returns>
         [NotNull]
         public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
