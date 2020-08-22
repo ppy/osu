@@ -129,8 +129,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
 
             new StaminaCheeseDetector().FindCheese(taikoDifficultyHitObjects);
-            foreach (var hitobject in taikoDifficultyHitObjects)
-                yield return hitobject;
+            return taikoDifficultyHitObjects;
         }
 
         protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
