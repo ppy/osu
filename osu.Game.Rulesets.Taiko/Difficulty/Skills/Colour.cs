@@ -54,8 +54,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 else if ((monoHistory[^1] + currentMonoLength) % 2 == 0)
                 {
                     // The last streak in the history is guaranteed to be a different type to the current streak.
-                    // If the total number of notes in the two streaks is even, apply a penalty.
-                    objectStrain *= sameParityPenalty();
+                    // If the total number of notes in the two streaks is even, nullify this object's strain.
+                    objectStrain = 0.0;
                 }
 
                 objectStrain *= repetitionPenalties();
@@ -69,11 +69,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             previousHitType = taikoCurrent.HitType;
             return objectStrain;
         }
-
-        /// <summary>
-        /// The penalty to apply when the total number of notes in the two most recent colour streaks is even.
-        /// </summary>
-        private double sameParityPenalty() => 0.0;
 
         /// <summary>
         /// The penalty to apply due to the length of repetition in colour streaks.
