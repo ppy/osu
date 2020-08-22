@@ -24,19 +24,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private const double colour_skill_multiplier = 0.01;
         private const double stamina_skill_multiplier = 0.02;
 
-        private readonly TaikoDifficultyHitObjectRhythm[] commonRhythms =
-        {
-            new TaikoDifficultyHitObjectRhythm(1, 1, 0.0),
-            new TaikoDifficultyHitObjectRhythm(2, 1, 0.3),
-            new TaikoDifficultyHitObjectRhythm(1, 2, 0.5),
-            new TaikoDifficultyHitObjectRhythm(3, 1, 0.3),
-            new TaikoDifficultyHitObjectRhythm(1, 3, 0.35),
-            new TaikoDifficultyHitObjectRhythm(3, 2, 0.6),
-            new TaikoDifficultyHitObjectRhythm(2, 3, 0.4),
-            new TaikoDifficultyHitObjectRhythm(5, 4, 0.5),
-            new TaikoDifficultyHitObjectRhythm(4, 5, 0.7)
-        };
-
         public TaikoDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
@@ -135,7 +122,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 {
                     taikoDifficultyHitObjects.Add(
                         new TaikoDifficultyHitObject(
-                            beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, i, commonRhythms
+                            beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, i
                         )
                     );
                 }
