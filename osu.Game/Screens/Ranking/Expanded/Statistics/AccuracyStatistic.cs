@@ -49,13 +49,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             public override void Increment(double amount)
                 => Current.Value += amount;
 
-            protected override OsuSpriteText CreateSpriteText()
+            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
             {
-                var spriteText = base.CreateSpriteText();
-                spriteText.Font = OsuFont.Torus.With(size: 20, fixedWidth: true);
-                spriteText.Spacing = new Vector2(-2, 0);
-                return spriteText;
-            }
+                s.Font = OsuFont.Torus.With(size: 20, fixedWidth: true);
+                s.Spacing = new Vector2(-2, 0);
+            });
         }
     }
 }

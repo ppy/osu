@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
+        private void load(OsuColour colours) => Colour = colours.BlueLighter;
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {
@@ -50,11 +50,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         protected override OsuSpriteText CreateSpriteText()
-        {
-            var spriteText = base.CreateSpriteText();
-            spriteText.Font = spriteText.Font.With(fixedWidth: true);
-            return spriteText;
-        }
+            => base.CreateSpriteText().With(s => s.Font = s.Font.With(fixedWidth: true));
 
         public override void Increment(double amount)
         {

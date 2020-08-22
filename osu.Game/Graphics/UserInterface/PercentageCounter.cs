@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
 
@@ -28,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
+        private void load(OsuColour colours) => Colour = colours.BlueLighter;
 
         protected override string FormatCount(double count) => count.FormatAccuracy();
 
@@ -38,11 +39,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         protected override OsuSpriteText CreateSpriteText()
-        {
-            var spriteText = base.CreateSpriteText();
-            spriteText.Font = spriteText.Font.With(fixedWidth: true);
-            return spriteText;
-        }
+            => base.CreateSpriteText().With(s => s.Font = s.Font.With(size: 20f, fixedWidth: true));
 
         public override void Increment(double amount)
         {
