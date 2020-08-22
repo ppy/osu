@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
@@ -19,23 +18,35 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
         public readonly int ObjectIndex;
 
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, int objectIndex,
-                                        IEnumerable<TaikoDifficultyHitObjectRhythm> commonRhythms)
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, int objectIndex)
             : base(hitObject, lastObject, clockRate)
         {
             var currentHit = hitObject as Hit;
 
             double prevLength = (lastObject.StartTime - lastLastObject.StartTime) / clockRate;
 
-            Rhythm = getClosestRhythm(DeltaTime / prevLength, commonRhythms);
+            Rhythm = getClosestRhythm(DeltaTime / prevLength);
             HitType = currentHit?.Type;
 
             ObjectIndex = objectIndex;
         }
 
-        private TaikoDifficultyHitObjectRhythm getClosestRhythm(double ratio, IEnumerable<TaikoDifficultyHitObjectRhythm> commonRhythms)
+        private static readonly TaikoDifficultyHitObjectRhythm[] common_rhythms =
         {
-            return commonRhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
+            new TaikoDifficultyHitObjectRhythm(1, 1, 0.0),
+            new TaikoDifficultyHitObjectRhythm(2, 1, 0.3),
+            new TaikoDifficultyHitObjectRhythm(1, 2, 0.5),
+            new TaikoDifficultyHitObjectRhythm(3, 1, 0.3),
+            new TaikoDifficultyHitObjectRhythm(1, 3, 0.35),
+            new TaikoDifficultyHitObjectRhythm(3, 2, 0.6),
+            new TaikoDifficultyHitObjectRhythm(2, 3, 0.4),
+            new TaikoDifficultyHitObjectRhythm(5, 4, 0.5),
+            new TaikoDifficultyHitObjectRhythm(4, 5, 0.7)
+        };
+
+        private TaikoDifficultyHitObjectRhythm getClosestRhythm(double ratio)
+        {
+            return common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
         }
     }
 }
