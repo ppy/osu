@@ -43,10 +43,7 @@ namespace osu.Game.Screens.Select
                     break;
 
                 case "dr" when parseFloatWithPoint(value, out var dr):
-                    updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
-                    break;
-
-                case "hp" when parseFloatWithPoint(value, out var dr):
+                case "hp" when parseFloatWithPoint(value, out dr):
                     updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
                     break;
 
