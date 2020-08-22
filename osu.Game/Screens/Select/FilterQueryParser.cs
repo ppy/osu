@@ -10,24 +10,59 @@ namespace osu.Game.Screens.Select
 {
     internal static class FilterQueryParser
     {
+        //TODO Expression explanation
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status|creator|artist)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
+            @"((?<keyTextual>(status|creator|artist)\b)(?<opTextual>[=:])(?<valueTextual>("".*?"")|(\S*)))|((?<valuePreNumerical>([0-9]+\.?[0-9]*[mshdt]?))?(?<opPreNumerical>([=:><](?(?<=[><])([=:]?))))?(?<keyNumerical>(stars|ar|dr|cs|divisor|length|objects|bpm)\b)(?<opPostNumerical>([=:><](?(?<=[><])([=:]?))))?(?<valuePostNumerical>([0-9]+\.?[0-9]*[mshd]{0,2}))?)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
-                var key = match.Groups["key"].Value.ToLower();
-                var op = match.Groups["op"].Value;
-                var value = match.Groups["value"].Value;
+                var keyTextual = match.Groups["keyTextual"].Value.ToLower();
+                var opTextual = match.Groups["opTextual"].Value;
+                var valueTextual = match.Groups["valueTextual"].Value;
 
-                parseKeywordCriteria(criteria, key, value, op);
+                var keyNumerical = match.Groups["keyNumerical"].Value;
+                /*Operator used before the key needs to be inverted because when e.g. "4<stars<5"
+                  is decomposited it actually means "stars<4" and "stars<5", but in order for
+                  the expression to be correct we need the first bit to be "stars>4".
+                  */
+                var opPreNumerical = invertPreNumericalOperator(match.Groups["opPreNumerical"].Value);
+                var valuePreNumerical = match.Groups["valuePreNumerical"].Value;
+                var opPostNumerical = match.Groups["opPostNumerical"].Value;
+                var valuePostNumerical = match.Groups["valuePostNumerical"].Value;
+
+                if (opTextual.Length != 0 || valueTextual.Length != 0)
+                    parseKeywordCriteria(criteria, keyTextual, valueTextual, opTextual);
+
+                if (opPreNumerical.Length != 0 || valuePreNumerical.Length != 0)
+                    parseKeywordCriteria(criteria, keyNumerical, valuePreNumerical, opPreNumerical);
+
+                if (opPostNumerical.Length != 0 || valuePostNumerical.Length != 0)
+                    parseKeywordCriteria(criteria, keyNumerical, valuePostNumerical, opPostNumerical);
 
                 query = query.Replace(match.ToString(), "");
             }
 
             criteria.SearchText = query;
+        }
+
+        private static string invertPreNumericalOperator(string op)
+        {
+            switch (op)
+            {
+                case "<":
+                    return ">";
+                case ">":
+                    return "<";
+                case "<=":
+                    return ">=";
+                case ">=":
+                    return "<=";
+                default:
+                    return "";
+            }
         }
 
         private static void parseKeywordCriteria(FilterCriteria criteria, string key, string value, string op)

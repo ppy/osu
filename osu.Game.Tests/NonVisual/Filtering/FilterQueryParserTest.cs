@@ -180,5 +180,21 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("double\"quote", filterCriteria.Artist.SearchTerm);
         }
+
+        [Test]
+        public void TestApplyDoubleConditionQueries()
+        {
+            const string query = "give me maps with 6<stars<8 please";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("give me maps with  please", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            Assert.IsNotNull(filterCriteria.StarDifficulty.Max);
+            Assert.Greater(filterCriteria.StarDifficulty.Max, 7.99d);
+            Assert.Less(filterCriteria.StarDifficulty.Max, 8.00d);
+            Assert.IsNotNull(filterCriteria.StarDifficulty.Min);
+            Assert.Greater(filterCriteria.StarDifficulty.Min, 6.00d);
+            Assert.Less(filterCriteria.StarDifficulty.Min, 6.10d);
+        }
     }
 }
