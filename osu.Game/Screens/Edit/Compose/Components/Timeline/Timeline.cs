@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 track = b.NewValue.Track;
 
                 // todo: i don't think this is safe, the track may not be loaded yet.
-                if (b.NewValue.Track.Length > 0)
+                if (track.Length > 0)
                 {
                     MaxZoom = getZoomLevelForVisibleMilliseconds(500);
                     MinZoom = getZoomLevelForVisibleMilliseconds(10000);
