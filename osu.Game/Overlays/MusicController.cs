@@ -331,10 +331,10 @@ namespace osu.Game.Overlays
         {
             var lastTrack = CurrentTrack;
 
-            var newTrack = new DrawableTrack(current.LoadTrack());
-            newTrack.Completed += () => onTrackCompleted(current);
+            var queuedTrack = new DrawableTrack(current.LoadTrack());
+            queuedTrack.Completed += () => onTrackCompleted(current);
 
-            CurrentTrack = newTrack;
+            CurrentTrack = queuedTrack;
 
             // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.
             // CurrentTrack is immediately updated above for situations where a immediate knowledge about the new track is required,
@@ -343,12 +343,13 @@ namespace osu.Game.Overlays
             {
                 lastTrack.Expire();
 
-                if (newTrack == CurrentTrack)
-                    AddInternal(newTrack);
+                if (queuedTrack == CurrentTrack)
+                    AddInternal(queuedTrack);
                 else
                 {
-                    // If the track has changed via changeTrack() being called multiple times in a single update, force disposal on the old track.
-                    newTrack.Dispose();
+                    // If the track has changed since the call to changeTrack, it is safe to dispose the
+                    // queued track rather than consume it.
+                    queuedTrack.Dispose();
                 }
             });
         }
