@@ -108,6 +108,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
+        /// <summary>
+        /// Calculates the penalty for the stamina skill for maps with low colour difficulty.
+        /// </summary>
+        /// <remarks>
+        /// Some maps (especially converts) can be easy to read despite a high note density.
+        /// This penalty aims to reduce the star rating of such maps by factoring in colour difficulty to the stamina skill.
+        /// </remarks>
         private double simpleColourPenalty(double staminaDifficulty, double colorDifficulty)
         {
             if (colorDifficulty <= 0) return 0.79 - 0.25;
@@ -115,22 +122,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return 0.79 - Math.Atan(staminaDifficulty / colorDifficulty - 12) / Math.PI / 2;
         }
 
-        private double norm(double p, params double[] values)
-        {
-            return Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
-        }
+        /// <summary>
+        /// Returns the <i>p</i>-norm of an <i>n</i>-dimensional vector.
+        /// </summary>
+        /// <param name="p">The value of <i>p</i> to calculate the norm for.</param>
+        /// <param name="values">The coefficients of the vector.</param>
+        private double norm(double p, params double[] values) => Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
 
-        private double rescale(double sr)
-        {
-            if (sr < 0) return sr;
-
-            return 10.43 * Math.Log(sr / 8 + 1);
-        }
-
+        /// <summary>
+        /// Returns the partial star rating of the beatmap, calculated using peak strains from all sections of the map.
+        /// </summary>
+        /// <remarks>
+        /// For each section, the peak strains of all separate skills are combined into a single peak strain for the section.
+        /// The resulting partial rating of the beatmap is a weighted sum of the combined peaks (higher peaks are weighted more).
+        /// </remarks>
         private double locallyCombinedDifficulty(Colour colour, Rhythm rhythm, Stamina staminaRight, Stamina staminaLeft, double staminaPenalty)
         {
-            double difficulty = 0;
-            double weight = 1;
             List<double> peaks = new List<double>();
 
             for (int i = 0; i < colour.StrainPeaks.Count; i++)
@@ -141,6 +148,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 peaks.Add(norm(2, colourPeak, rhythmPeak, staminaPeak));
             }
 
+            double difficulty = 0;
+            double weight = 1;
+
             foreach (double strain in peaks.OrderByDescending(d => d))
             {
                 difficulty += strain * weight;
@@ -148,6 +158,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
 
             return difficulty;
+        }
+
+        /// <summary>
+        /// Applies a final re-scaling of the star rating to bring maps with recorded full combos below 9.5 stars.
+        /// </summary>
+        /// <param name="sr">The raw star rating value before re-scaling.</param>
+        private double rescale(double sr)
+        {
+            if (sr < 0) return sr;
+
+            return 10.43 * Math.Log(sr / 8 + 1);
         }
     }
 }

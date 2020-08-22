@@ -10,18 +10,45 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
+    /// <summary>
+    /// Calculates the stamina coefficient of taiko difficulty.
+    /// </summary>
+    /// <remarks>
+    /// The reference play style chosen uses two hands, with full alternating (the hand changes after every hit).
+    /// </remarks>
     public class Stamina : Skill
     {
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
 
+        /// <summary>
+        /// Maximum number of entries to keep in <see cref="notePairDurationHistory"/>.
+        /// </summary>
         private const int max_history_length = 2;
 
+        /// <summary>
+        /// The index of the hand this <see cref="Stamina"/> instance is associated with.
+        /// </summary>
+        /// <remarks>
+        /// The value of 0 indicates the left hand (full alternating gameplay starting with left hand is assumed).
+        /// This naturally translates onto index offsets of the objects in the map.
+        /// </remarks>
         private readonly int hand;
+
+        /// <summary>
+        /// Stores the last <see cref="max_history_length"/> durations between notes hit with the hand indicated by <see cref="hand"/>.
+        /// </summary>
         private readonly LimitedCapacityQueue<double> notePairDurationHistory = new LimitedCapacityQueue<double>(max_history_length);
 
+        /// <summary>
+        /// Stores the <see cref="DifficultyHitObject.DeltaTime"/> of the last object that was hit by the <i>other</i> hand.
+        /// </summary>
         private double offhandObjectDuration = double.MaxValue;
 
+        /// <summary>
+        /// Creates a <see cref="Stamina"/> skill.
+        /// </summary>
+        /// <param name="rightHand">Whether this instance is performing calculations for the right hand.</param>
         public Stamina(bool rightHand)
         {
             hand = rightHand ? 1 : 0;
@@ -58,7 +85,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return 0;
         }
 
-        // Penalty for tl tap or roll
+        /// <summary>
+        /// Applies a penalty for hit objects marked with <see cref="TaikoDifficultyHitObject.StaminaCheese"/>.
+        /// </summary>
+        /// <param name="notePairDuration">The duration between the current and previous note hit using the hand indicated by <see cref="hand"/>.</param>
         private double cheesePenalty(double notePairDuration)
         {
             if (notePairDuration > 125) return 1;
@@ -67,6 +97,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return 0.6 + (notePairDuration - 100) * 0.016;
         }
 
+        /// <summary>
+        /// Applies a speed bonus dependent on the time since the last hit performed using this hand.
+        /// </summary>
+        /// <param name="notePairDuration">The duration between the current and previous note hit using the hand indicated by <see cref="hand"/>.</param>
         private double speedBonus(double notePairDuration)
         {
             if (notePairDuration >= 200) return 0;
