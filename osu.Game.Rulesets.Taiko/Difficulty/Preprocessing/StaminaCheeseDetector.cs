@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -64,7 +63,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         {
             var history = new LimitedCapacityQueue<TaikoDifficultyHitObject>(2 * patternLength);
 
-            int repetitionStart = 0;
+            // for convenience, we're tracking the index of the item *before* our suspected repeat's start,
+            // as that index can be simply subtracted from the current index to get the number of elements in between
+            // without off-by-one errors
+            int indexBeforeLastRepeat = -1;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
@@ -74,15 +76,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
                 if (!containsPatternRepeat(history, patternLength))
                 {
-                    repetitionStart = i - 2 * patternLength;
+                    // we're setting this up for the next iteration, hence the +1.
+                    // right here this index will point at the queue's front (oldest item),
+                    // but that item is about to be popped next loop with an enqueue.
+                    indexBeforeLastRepeat = i - history.Count + 1;
                     continue;
                 }
 
-                int repeatedLength = i - repetitionStart;
+                int repeatedLength = i - indexBeforeLastRepeat;
                 if (repeatedLength < roll_min_repetitions)
                     continue;
 
-                markObjectsAsCheese(repetitionStart, i);
+                markObjectsAsCheese(i, repeatedLength);
             }
         }
 
@@ -119,17 +124,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 if (tlLength < tl_min_repetitions)
                     continue;
 
-                markObjectsAsCheese(Math.Max(0, i - tlLength), i);
+                markObjectsAsCheese(i, tlLength);
             }
         }
 
         /// <summary>
-        /// Marks all objects from index <paramref name="start"/> up until <paramref name="end"/> (exclusive) as <see cref="TaikoDifficultyHitObject.StaminaCheese"/>.
+        /// Marks <paramref name="count"/> elements counting backwards from <paramref name="end"/> as <see cref="TaikoDifficultyHitObject.StaminaCheese"/>.
         /// </summary>
-        private void markObjectsAsCheese(int start, int end)
+        private void markObjectsAsCheese(int end, int count)
         {
-            for (int i = start; i < end; ++i)
-                hitObjects[i].StaminaCheese = true;
+            for (int i = 0; i < count; ++i)
+                hitObjects[end - i].StaminaCheese = true;
         }
     }
 }
