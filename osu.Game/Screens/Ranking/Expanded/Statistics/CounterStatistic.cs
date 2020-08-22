@@ -44,13 +44,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
             protected override Easing RollingEasing => AccuracyCircle.ACCURACY_TRANSFORM_EASING;
 
-            protected override OsuSpriteText CreateSpriteText()
+            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
             {
-                var spriteText = base.CreateSpriteText();
-                spriteText.Font = OsuFont.Torus.With(size: 20, fixedWidth: true);
-                spriteText.Spacing = new Vector2(-2, 0);
-                return spriteText;
-            }
+                s.Font = OsuFont.Torus.With(size: 20, fixedWidth: true);
+                s.Spacing = new Vector2(-2, 0);
+            });
 
             public override void Increment(int amount)
                 => Current.Value += amount;

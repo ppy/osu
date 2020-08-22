@@ -9,11 +9,10 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class RollingCounter<T> : Container, IHasAccentColour
+    public abstract class RollingCounter<T> : Container
         where T : struct, IEquatable<T>
     {
         /// <summary>
@@ -60,38 +59,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public abstract void Increment(T amount);
 
-        private float textSize = 40f;
-
-        public float TextSize
-        {
-            get => displayedCountSpriteText?.Font.Size ?? textSize;
-            set
-            {
-                if (TextSize == value)
-                    return;
-
-                textSize = value;
-                if (displayedCountSpriteText != null)
-                    displayedCountSpriteText.Font = displayedCountSpriteText.Font.With(size: value);
-            }
-        }
-
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => displayedCountSpriteText?.Colour ?? accentColour;
-            set
-            {
-                if (AccentColour == value)
-                    return;
-
-                accentColour = value;
-                if (displayedCountSpriteText != null)
-                    displayedCountSpriteText.Colour = value;
-            }
-        }
-
         /// <summary>
         /// Skeleton of a numeric counter which value rolls over time.
         /// </summary>
@@ -110,7 +77,7 @@ namespace osu.Game.Graphics.UserInterface
         private void load()
         {
             displayedCountSpriteText = CreateSpriteText();
-            displayedCountSpriteText.Text = FormatCount(displayedCount);
+            displayedCountSpriteText.Text = FormatCount(DisplayedCount);
             Child = displayedCountSpriteText;
         }
 
@@ -185,8 +152,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected virtual OsuSpriteText CreateSpriteText() => new OsuSpriteText
         {
-            Font = OsuFont.Numeric.With(size: textSize),
-            Colour = accentColour,
+            Font = OsuFont.Numeric.With(size: 40f),
         };
     }
 }

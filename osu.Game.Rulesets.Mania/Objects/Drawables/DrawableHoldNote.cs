@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Container<DrawableHoldNoteTail> tailContainer;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
-        private readonly Drawable bodyPiece;
+        private readonly SkinnableDrawable bodyPiece;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             RelativeSizeAxes = Axes.X;
 
-            AddRangeInternal(new[]
+            AddRangeInternal(new Drawable[]
             {
                 bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
                 {
@@ -133,6 +133,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public override void PlaySamples()
         {
             // Samples are played by the head/tail notes.
+        }
+
+        public override void OnKilled()
+        {
+            base.OnKilled();
+            (bodyPiece.Drawable as IHoldNoteBody)?.Recycle();
         }
 
         protected override void Update()
