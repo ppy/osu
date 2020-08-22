@@ -13,10 +13,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
     {
         public readonly TaikoDifficultyHitObjectRhythm Rhythm;
         public readonly HitType? HitType;
+        public readonly int ObjectIndex;
 
         public bool StaminaCheese;
-
-        public readonly int ObjectIndex;
 
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, int objectIndex)
             : base(hitObject, lastObject, clockRate)
@@ -45,8 +44,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         };
 
         private TaikoDifficultyHitObjectRhythm getClosestRhythm(double ratio)
-        {
-            return common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
-        }
+            => common_rhythms.OrderBy(x => Math.Abs(x.Ratio - ratio)).First();
     }
 }
