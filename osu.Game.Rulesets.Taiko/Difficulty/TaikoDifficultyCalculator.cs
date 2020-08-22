@@ -118,7 +118,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
                 // Check for negative durations
-                if (beatmap.HitObjects[i].StartTime > beatmap.HitObjects[i - 1].StartTime && beatmap.HitObjects[i - 1].StartTime > beatmap.HitObjects[i - 2].StartTime)
+                var currentAfterLast = beatmap.HitObjects[i].StartTime > beatmap.HitObjects[i - 1].StartTime;
+                var lastAfterSecondLast = beatmap.HitObjects[i - 1].StartTime > beatmap.HitObjects[i - 2].StartTime;
+
+                if (currentAfterLast && lastAfterSecondLast)
                 {
                     taikoDifficultyHitObjects.Add(
                         new TaikoDifficultyHitObject(
