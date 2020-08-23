@@ -23,7 +23,7 @@ namespace osu.Game.Skinning
 
         public readonly int Keys;
 
-        public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
+        public IDictionary<string, Color4> CustomColours { get; set; } = new SortedDictionary<string, Color4>();
 
         public Dictionary<string, string> ImageLookups = new Dictionary<string, string>();
 

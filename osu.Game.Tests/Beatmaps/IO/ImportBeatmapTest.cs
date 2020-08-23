@@ -730,8 +730,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
 
                     var beatmapInfo = setToUpdate.Beatmaps.First(b => b.RulesetID == 0);
-                    var workingBeatmap = manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0));
-                    Beatmap beatmapToUpdate = (Beatmap)workingBeatmap.Beatmap;
+                    Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
                     BeatmapSetFileInfo fileToUpdate = setToUpdate.Files.First(f => beatmapToUpdate.BeatmapInfo.Path.Contains(f.Filename));
 
                     string oldMd5Hash = beatmapToUpdate.BeatmapInfo.MD5Hash;
@@ -739,7 +738,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     beatmapToUpdate.HitObjects.Clear();
                     beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
 
-                    manager.Save(beatmapInfo, beatmapToUpdate, workingBeatmap.Skin);
+                    manager.Save(beatmapInfo, beatmapToUpdate);
 
                     // Check that the old file reference has been removed
                     Assert.That(manager.QueryBeatmapSet(s => s.ID == setToUpdate.ID).Files.All(f => f.ID != fileToUpdate.ID));
