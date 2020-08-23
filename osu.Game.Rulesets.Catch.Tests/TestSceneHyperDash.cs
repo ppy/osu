@@ -22,21 +22,38 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestHyperDash()
         {
-            AddAssert("First note is hyperdash", () => Beatmap.Value.Beatmap.HitObjects[0] is Fruit f && f.HyperDash);
-            AddUntilStep("wait for right movement", () => getCatcher().Scale.X > 0); // don't check hyperdashing as it happens too fast.
-
-            AddUntilStep("wait for left movement", () => getCatcher().Scale.X < 0);
-
-            for (int i = 0; i < 3; i++)
+            AddStep("reset count", () =>
             {
-                AddUntilStep("wait for right hyperdash", () => getCatcher().Scale.X > 0 && getCatcher().HyperDashing);
-                AddUntilStep("wait for left hyperdash", () => getCatcher().Scale.X < 0 && getCatcher().HyperDashing);
-            }
+                inHyperDash = false;
+                hyperDashCount = 0;
+            });
 
-            AddUntilStep("wait for right hyperdash", () => getCatcher().Scale.X > 0 && getCatcher().HyperDashing);
+            AddAssert("First note is hyperdash", () => Beatmap.Value.Beatmap.HitObjects[0] is Fruit f && f.HyperDash);
+
+            for (int i = 0; i < 9; i++)
+            {
+                int count = i + 1;
+                AddUntilStep("wait for next hyperdash", () => hyperDashCount == count);
+            }
         }
 
-        private Catcher getCatcher() => Player.ChildrenOfType<CatcherArea>().First().MovableCatcher;
+        private int hyperDashCount;
+        private bool inHyperDash;
+
+        protected override void Update()
+        {
+            var catcher = Player.ChildrenOfType<CatcherArea>().FirstOrDefault()?.MovableCatcher;
+
+            if (catcher == null)
+                return;
+
+            if (catcher.HyperDashing != inHyperDash)
+            {
+                inHyperDash = catcher.HyperDashing;
+                if (catcher.HyperDashing)
+                    hyperDashCount++;
+            }
+        }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
