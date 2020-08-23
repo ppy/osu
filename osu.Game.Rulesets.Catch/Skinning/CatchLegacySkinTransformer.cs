@@ -55,11 +55,10 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
                 case CatchSkinComponents.CatchComboCounter:
                     var comboFont = GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score";
-                    var fontOverlap = GetConfig<LegacySetting, float>(LegacySetting.ComboOverlap)?.Value ?? -2f;
 
                     // For simplicity, let's use legacy combo font texture existence as a way to identify legacy skins from default.
                     if (this.HasFont(comboFont))
-                        return new LegacyComboCounter(Source, comboFont, fontOverlap);
+                        return new LegacyComboCounter(Source);
 
                     break;
             }
