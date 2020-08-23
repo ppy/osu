@@ -47,14 +47,13 @@ namespace osu.Game.Skinning
 
         public void AddComboColours(params Color4[] colours) => comboColours.AddRange(colours);
 
-        public IDictionary<string, Color4> CustomColours { get; set; } = new SortedDictionary<string, Color4>();
+        public IDictionary<string, Color4> CustomColours { get; } = new SortedDictionary<string, Color4>();
 
         public readonly SortedDictionary<string, string> ConfigDictionary = new SortedDictionary<string, string>();
 
-        public bool Equals(SkinConfiguration other)
-            => other != null
-            && ConfigDictionary.SequenceEqual(other.ConfigDictionary)
-            && ComboColours.SequenceEqual(other.ComboColours)
-            && CustomColours?.SequenceEqual(other.CustomColours) == true;
+        public bool Equals(SkinConfiguration other) => other != null
+                                                    && ConfigDictionary.SequenceEqual(other.ConfigDictionary)
+                                                    && ComboColours.SequenceEqual(other.ComboColours)
+                                                    && CustomColours?.SequenceEqual(other.CustomColours) == true;
     }
 }
