@@ -51,9 +51,6 @@ namespace osu.Game.Skinning
 
         public readonly SortedDictionary<string, string> ConfigDictionary = new SortedDictionary<string, string>();
 
-        public bool Equals(SkinConfiguration other) => other != null
-                                                    && ConfigDictionary.SequenceEqual(other.ConfigDictionary)
-                                                    && ComboColours.SequenceEqual(other.ComboColours)
-                                                    && CustomColours?.SequenceEqual(other.CustomColours) == true;
+        public bool Equals(SkinConfiguration other) => other != null && ConfigDictionary.SequenceEqual(other.ConfigDictionary) && ComboColours.SequenceEqual(other.ComboColours) && CustomColours?.SequenceEqual(other.CustomColours) == true;
     }
 }
