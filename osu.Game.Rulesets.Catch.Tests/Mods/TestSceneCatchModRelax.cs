@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                     {
                         X = CatchPlayfield.CENTER_X,
                         StartTime = 750,
-                        Path = new SliderPath(PathType.Linear, new Vector2[] { Vector2.Zero, Vector2.UnitY * 200 })
+                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, Vector2.UnitY * 200 })
                     }
                 }
             }
@@ -64,12 +64,15 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 case 0:
                     InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre);
                     break;
+
                 case 1:
                     InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.BottomLeft);
                     break;
+
                 case 2:
                     InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.BottomRight);
                     break;
+
                 case 3:
                     InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre);
                     break;
