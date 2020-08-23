@@ -10,7 +10,9 @@ using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
@@ -23,23 +25,57 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
         {
             Mod = new CatchModRelax(),
             Autoplay = false,
-            PassCondition = () =>
-            {
-                var playfield = this.ChildrenOfType<CatchPlayfield>().Single();
-                InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre);
-
-                return Player.ScoreProcessor.Combo.Value > 0;
-            },
+            PassCondition = passCondition,
             Beatmap = new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
                     new Fruit
                     {
-                        X = CatchPlayfield.CENTER_X
+                        X = CatchPlayfield.CENTER_X,
+                        StartTime = 0
+                    },
+                    new Fruit
+                    {
+                        X = 0,
+                        StartTime = 250
+                    },
+                    new Fruit
+                    {
+                        X = CatchPlayfield.WIDTH,
+                        StartTime = 500
+                    },
+                    new JuiceStream
+                    {
+                        X = CatchPlayfield.CENTER_X,
+                        StartTime = 750,
+                        Path = new SliderPath(PathType.Linear, new Vector2[] { Vector2.Zero, Vector2.UnitY * 200 })
                     }
                 }
             }
         });
+
+        private bool passCondition()
+        {
+            var playfield = this.ChildrenOfType<CatchPlayfield>().Single();
+
+            switch (Player.ScoreProcessor.Combo.Value)
+            {
+                case 0:
+                    InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre);
+                    break;
+                case 1:
+                    InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.BottomLeft);
+                    break;
+                case 2:
+                    InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.BottomRight);
+                    break;
+                case 3:
+                    InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre);
+                    break;
+            }
+
+            return Player.ScoreProcessor.Combo.Value >= 6;
+        }
     }
 }
