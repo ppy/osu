@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit
         private int currentState = -1;
 
         private readonly EditorBeatmap editorBeatmap;
-        private readonly ISkin beatmapSkin;
+        private readonly LegacyBeatmapSkin beatmapSkin;
         private int bulkChangesStarted;
         private bool isRestoring;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="editorBeatmap">The <see cref="EditorBeatmap"/> to track the <see cref="HitObject"/>s of.</param>
         /// <param name="beatmapSkin">The skin to track the inline skin configuration of.</param>
-        public EditorChangeHandler(EditorBeatmap editorBeatmap, ISkin beatmapSkin)
+        public EditorChangeHandler(EditorBeatmap editorBeatmap, LegacyBeatmapSkin beatmapSkin)
         {
             this.editorBeatmap = editorBeatmap;
 

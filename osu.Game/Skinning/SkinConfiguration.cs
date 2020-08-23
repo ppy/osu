@@ -12,7 +12,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// An empty skin configuration.
     /// </summary>
-    public class SkinConfiguration : IHasComboColours, IHasCustomColours, IEquatable<SkinConfiguration>
+    public class SkinConfiguration : IEquatable<SkinConfiguration>, IHasComboColours, IHasCustomColours
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
@@ -47,16 +47,14 @@ namespace osu.Game.Skinning
 
         public void AddComboColours(params Color4[] colours) => comboColours.AddRange(colours);
 
-        public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
+        public IDictionary<string, Color4> CustomColours { get; set; } = new SortedDictionary<string, Color4>();
 
-        public readonly Dictionary<string, string> ConfigDictionary = new Dictionary<string, string>();
+        public readonly SortedDictionary<string, string> ConfigDictionary = new SortedDictionary<string, string>();
 
         public bool Equals(SkinConfiguration other)
-        {
-            return other != null &&
-                   ConfigDictionary.SequenceEqual(other.ConfigDictionary) &&
-                   ComboColours.SequenceEqual(other.ComboColours) &&
-                   CustomColours?.SequenceEqual(other.CustomColours) == true;
-        }
+            => other != null
+            && ConfigDictionary.SequenceEqual(other.ConfigDictionary)
+            && ComboColours.SequenceEqual(other.ComboColours)
+            && CustomColours?.SequenceEqual(other.CustomColours) == true;
     }
 }

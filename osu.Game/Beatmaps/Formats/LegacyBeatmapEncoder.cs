@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -24,11 +25,14 @@ namespace osu.Game.Beatmaps.Formats
         public const int LATEST_VERSION = 128;
 
         private readonly IBeatmap beatmap;
-        private readonly ISkin skin;
+        private readonly LegacyBeatmapSkin skin;
 
-        /// <param name="beatmap">The beatmap to encode</param>
-        /// <param name="skin">An optional skin, for encoding the beatmap's combo colours. This will only work if the parameter is a type of <see cref="LegacyBeatmapSkin"/>.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] ISkin skin)
+        /// <summary>
+        /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to encode.</param>
+        /// <param name="skin">An optional skin, for encoding the beatmap's combo colours.</param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] LegacyBeatmapSkin skin)
         {
             this.beatmap = beatmap;
             this.skin = skin;
@@ -210,7 +214,7 @@ namespace osu.Game.Beatmaps.Formats
             if (!(skin is LegacyBeatmapSkin legacySkin))
                 return;
 
-            var colours = legacySkin?.Configuration.ComboColours;
+            var colours = legacySkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
 
             if (colours == null || colours.Count == 0)
                 return;
@@ -221,12 +225,11 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var comboColour = colours[i];
 
-                var r = (byte)(comboColour.R * byte.MaxValue);
-                var g = (byte)(comboColour.G * byte.MaxValue);
-                var b = (byte)(comboColour.B * byte.MaxValue);
-                var a = (byte)(comboColour.A * byte.MaxValue);
-
-                writer.WriteLine($"Combo{i}: {r},{g},{b},{a}");
+                writer.Write(FormattableString.Invariant($"Combo{i}: "));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.R * byte.MaxValue)},"));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.G * byte.MaxValue)},"));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.B * byte.MaxValue)},"));
+                writer.WriteLine(FormattableString.Invariant($"{(byte)(comboColour.A * byte.MaxValue)}"));
             }
         }
 

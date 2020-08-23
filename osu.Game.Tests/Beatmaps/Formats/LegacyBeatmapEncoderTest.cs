@@ -28,25 +28,27 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class LegacyBeatmapEncoderTest
     {
-        private static readonly DllResourceStore resource_store = TestResources.GetStore();
+        private static readonly DllResourceStore beatmaps_resource_store = TestResources.GetStore();
 
-        private static IEnumerable<string> allBeatmaps = resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu"));
+        private static IEnumerable<string> allBeatmaps = beatmaps_resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu"));
 
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)
         {
-            var decoded = decodeFromLegacy(TestResources.GetStore().GetStream(name));
-            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded));
+            var decoded = decodeFromLegacy(TestResources.GetStore().GetStream(name), name);
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
 
-            sort(decoded.beatmap);
-            sort(decodedAfterEncode.beatmap);
+            sort(decoded);
+            sort(decodedAfterEncode);
 
             Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
             Assert.IsTrue(decoded.beatmapSkin.Configuration.Equals(decodedAfterEncode.beatmapSkin.Configuration));
         }
 
-        private void sort(IBeatmap beatmap)
+        private void sort((IBeatmap, LegacyBeatmapSkin) bs)
         {
+            var (beatmap, beatmapSkin) = bs;
+
             // Sort control points to ensure a sane ordering, as they may be parsed in different orders. This works because each group contains only uniquely-typed control points.
             foreach (var g in beatmap.ControlPointInfo.Groups)
             {
@@ -55,17 +57,26 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private (IBeatmap beatmap, LegacySkin beatmapSkin) decodeFromLegacy(Stream stream)
+        private (IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) decodeFromLegacy(Stream stream, string name)
         {
             using (var reader = new LineBufferedReader(stream))
             {
                 var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
-                var beatmapSkin = new LegacyBeatmapSkin(beatmap.BeatmapInfo, resource_store, null);
+                beatmap.BeatmapInfo.BeatmapSet.Files = new List<BeatmapSetFileInfo>
+                {
+                    new BeatmapSetFileInfo
+                    {
+                        Filename = name,
+                        FileInfo = new osu.Game.IO.FileInfo() { Hash = name }
+                    }
+                };
+
+                var beatmapSkin = new LegacyBeatmapSkin(beatmap.BeatmapInfo, beatmaps_resource_store, null);
                 return (convert(beatmap), beatmapSkin);
             }
         }
 
-        private Stream encodeToLegacy((IBeatmap beatmap, LegacySkin beatmapSkin) fullBeatmap)
+        private Stream encodeToLegacy((IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) fullBeatmap)
         {
             var (beatmap, beatmapSkin) = fullBeatmap;
             var stream = new MemoryStream();
