@@ -45,12 +45,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.IsTrue(decoded.beatmapSkin.Configuration.Equals(decodedAfterEncode.beatmapSkin.Configuration));
         }
 
-        private void sort((IBeatmap, LegacyBeatmapSkin) bs)
+        private void sort((IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) tuple)
         {
-            var (beatmap, beatmapSkin) = bs;
-
             // Sort control points to ensure a sane ordering, as they may be parsed in different orders. This works because each group contains only uniquely-typed control points.
-            foreach (var g in beatmap.ControlPointInfo.Groups)
+            foreach (var g in tuple.beatmap.ControlPointInfo.Groups)
             {
                 ArrayList.Adapter((IList)g.ControlPoints).Sort(
                     Comparer<ControlPoint>.Create((c1, c2) => string.Compare(c1.GetType().ToString(), c2.GetType().ToString(), StringComparison.Ordinal)));
@@ -67,7 +65,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new BeatmapSetFileInfo
                     {
                         Filename = name,
-                        FileInfo = new osu.Game.IO.FileInfo() { Hash = name }
+                        FileInfo = new osu.Game.IO.FileInfo { Hash = name }
                     }
                 };
 
