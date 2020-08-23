@@ -13,6 +13,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
@@ -28,12 +29,12 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
         private readonly LegacyRollingCounter counter;
 
-        public LegacyComboCounter(ISkin skin, string fontName, float fontOverlap)
+        public LegacyComboCounter(ISkin skin)
         {
             this.skin = skin;
 
-            this.fontName = fontName;
-            this.fontOverlap = fontOverlap;
+            fontName = skin.GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score";
+            fontOverlap = skin.GetConfig<LegacySetting, float>(LegacySetting.ComboOverlap)?.Value ?? -2f;
 
             AutoSizeAxes = Axes.Both;
 
