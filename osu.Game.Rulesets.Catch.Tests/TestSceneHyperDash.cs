@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             for (int i = 0; i < 9; i++)
             {
                 int count = i + 1;
-                AddUntilStep("wait for next hyperdash", () => hyperDashCount == count);
+                AddUntilStep("wait for next hyperdash", () => hyperDashCount >= count);
             }
         }
 
