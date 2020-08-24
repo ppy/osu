@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }, true);
         }
 
-        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(track.Length / milliseconds);
+        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => Math.Max(1, (float)(track.Length / milliseconds));
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
