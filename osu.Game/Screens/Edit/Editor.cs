@@ -89,6 +89,14 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
+            bool isNewBeatmap = false;
+
+            if (Beatmap.Value is DummyWorkingBeatmap)
+            {
+                isNewBeatmap = true;
+                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value);
+            }
+
             try
             {
                 playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
@@ -148,6 +156,7 @@ namespace osu.Game.Screens.Edit
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.Both,
+                            Mode = { Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose },
                             Items = new[]
                             {
                                 new MenuItem("File")
