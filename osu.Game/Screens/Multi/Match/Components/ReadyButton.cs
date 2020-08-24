@@ -10,7 +10,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
@@ -26,9 +25,6 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
-
-        [Resolved]
-        private MusicController musicController { get; set; }
 
         private bool hasBeatmap;
 
@@ -104,7 +100,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 return;
             }
 
-            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(musicController.CurrentTrack.Length) < endDate.Value;
+            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < endDate.Value;
 
             Enabled.Value = hasBeatmap && hasEnoughTime;
         }
