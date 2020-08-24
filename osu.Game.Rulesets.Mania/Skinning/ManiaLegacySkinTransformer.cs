@@ -57,6 +57,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
         /// </summary>
         private Lazy<bool> hasKeyTexture;
 
+        private LegacyStageBackground stageBackground;
+
         public ManiaLegacySkinTransformer(ISkinSource source, IBeatmap beatmap)
             : base(source)
         {
@@ -88,10 +90,11 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     switch (maniaComponent.Component)
                     {
                         case ManiaSkinComponents.ColumnBackground:
-                            return new LegacyColumnBackground(maniaComponent.TargetColumn == beatmap.TotalColumns - 1);
+                            return new LegacyColumnBackground(maniaComponent.TargetColumn == beatmap.TotalColumns - 1, stageBackground);
 
                         case ManiaSkinComponents.HitTarget:
-                            return new LegacyHitTarget();
+                            // Created within the column background, but should not fall back. See comments in LegacyColumnBackground.
+                            return Drawable.Empty();
 
                         case ManiaSkinComponents.KeyArea:
                             return new LegacyKeyArea();
@@ -112,7 +115,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                             return new LegacyHitExplosion();
 
                         case ManiaSkinComponents.StageBackground:
-                            return new LegacyStageBackground();
+                            return stageBackground = new LegacyStageBackground();
 
                         case ManiaSkinComponents.StageForeground:
                             return new LegacyStageForeground();

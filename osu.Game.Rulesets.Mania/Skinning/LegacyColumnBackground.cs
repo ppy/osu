@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,15 +22,20 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly bool isLastColumn;
 
-        private Container borderLineContainer;
+        [CanBeNull]
+        private readonly LegacyStageBackground stageBackground;
+
+        private Container hitTargetContainer;
         private Container lightContainer;
         private Sprite light;
+        private Drawable hitTarget;
 
         private float hitPosition;
 
-        public LegacyColumnBackground(bool isLastColumn)
+        public LegacyColumnBackground(bool isLastColumn, [CanBeNull] LegacyStageBackground stageBackground)
         {
             this.isLastColumn = isLastColumn;
+            this.stageBackground = stageBackground;
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -47,6 +53,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             bool hasLeftLine = leftLineWidth > 0;
             bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
                                 || isLastColumn;
+            bool hasHitTarget = Column.Index == 0 || stageBackground == null;
 
             hitPosition = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.HitPosition)?.Value
                           ?? Stage.HIT_TARGET_POSITION;
@@ -63,18 +70,29 @@ namespace osu.Game.Rulesets.Mania.Skinning
             Color4 lightColour = GetColumnSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLightColour)?.Value
                                  ?? Color4.White;
 
-            InternalChildren = new Drawable[]
+            Drawable background;
+
+            InternalChildren = new[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = backgroundColour
                 },
-                borderLineContainer = new Container
+                hitTargetContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
+                        // In legacy skins, the hit target takes on the full stage size and is sandwiched between the column background and the column light.
+                        // To simulate this effect in lazer's hierarchy, the hit target is added to the first column's background and manually extended to the full size of the stage.
+                        // Adding to the first columns allows depth issues to be resolved - if it were added to the last column, the previous column lights would appear below it.
+                        // This still means that the hit target will appear below the next column backgrounds, but that's a much easier problem to solve by proxying the backgrounds below.
+                        hitTarget = new LegacyHitTarget
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            Alpha = hasHitTarget ? 1 : 0
+                        },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Y,
@@ -113,6 +131,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 }
             };
 
+            // Resolve depth issues with the hit target appearing under the next column backgrounds by proxying to the stage background (always below the columns).
+            stageBackground?.AddColumnBackground(background.CreateProxy());
+
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
         }
@@ -124,15 +145,21 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 lightContainer.Anchor = Anchor.TopCentre;
                 lightContainer.Scale = new Vector2(1, -1);
 
-                borderLineContainer.Padding = new MarginPadding { Top = hitPosition };
+                hitTargetContainer.Padding = new MarginPadding { Top = hitPosition };
             }
             else
             {
                 lightContainer.Anchor = Anchor.BottomCentre;
                 lightContainer.Scale = Vector2.One;
 
-                borderLineContainer.Padding = new MarginPadding { Bottom = hitPosition };
+                hitTargetContainer.Padding = new MarginPadding { Bottom = hitPosition };
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            hitTarget.Width = stageBackground?.DrawWidth ?? DrawWidth;
         }
 
         public bool OnPressed(ManiaAction action)
