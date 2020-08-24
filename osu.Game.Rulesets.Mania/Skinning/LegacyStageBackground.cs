@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
     {
         private Drawable leftSprite;
         private Drawable rightSprite;
+        private Container columnBackgroundContainer;
 
         public LegacyStageBackground()
         {
@@ -44,7 +45,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     Origin = Anchor.TopLeft,
                     X = -0.05f,
                     Texture = skin.GetTexture(rightImage)
-                }
+                },
+                columnBackgroundContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
         }
 
@@ -58,5 +60,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             if (rightSprite?.Height > 0)
                 rightSprite.Scale = new Vector2(1, DrawHeight / rightSprite.Height);
         }
+
+        public void AddColumnBackground(Drawable background) => columnBackgroundContainer.Add(background);
     }
 }
