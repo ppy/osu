@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly Container<CatcherTrailSprite> hyperDashTrails;
         private readonly Container<CatcherTrailSprite> endGlowSprites;
 
-        private Color4 hyperDashTrailsColour;
+        private Color4 hyperDashTrailsColour = Catcher.DEFAULT_HYPER_DASH_COLOUR;
 
         public Color4 HyperDashTrailsColour
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private Color4 endGlowSpritesColour;
+        private Color4 endGlowSpritesColour = Catcher.DEFAULT_HYPER_DASH_COLOUR;
 
         public Color4 EndGlowSpritesColour
         {
