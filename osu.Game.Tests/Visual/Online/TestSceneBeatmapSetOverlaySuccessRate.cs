@@ -88,6 +88,18 @@ namespace osu.Game.Tests.Visual.Online
                 () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 100));
         }
 
+        [Test]
+        public void TestEmptyMetrics()
+        {
+            AddStep("set beatmap", () => successRate.Beatmap = new BeatmapInfo
+            {
+                Metrics = new BeatmapMetrics()
+            });
+
+            AddAssert("graph max values correct",
+                () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 0));
+        }
+
         private class GraphExposingSuccessRate : SuccessRate
         {
             public new FailRetryGraph Graph => base.Graph;
