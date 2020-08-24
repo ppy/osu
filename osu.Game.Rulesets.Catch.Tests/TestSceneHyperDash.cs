@@ -19,24 +19,42 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         protected override bool Autoplay => true;
 
+        private int hyperDashCount;
+        private bool inHyperDash;
+
         [Test]
         public void TestHyperDash()
         {
-            AddAssert("First note is hyperdash", () => Beatmap.Value.Beatmap.HitObjects[0] is Fruit f && f.HyperDash);
-            AddUntilStep("wait for right movement", () => getCatcher().Scale.X > 0); // don't check hyperdashing as it happens too fast.
-
-            AddUntilStep("wait for left movement", () => getCatcher().Scale.X < 0);
-
-            for (int i = 0; i < 3; i++)
+            AddStep("reset count", () =>
             {
-                AddUntilStep("wait for right hyperdash", () => getCatcher().Scale.X > 0 && getCatcher().HyperDashing);
-                AddUntilStep("wait for left hyperdash", () => getCatcher().Scale.X < 0 && getCatcher().HyperDashing);
+                inHyperDash = false;
+                hyperDashCount = 0;
+
+                // this needs to be done within the frame stable context due to how quickly hyperdash state changes occur.
+                Player.DrawableRuleset.FrameStableComponents.OnUpdate += d =>
+                {
+                    var catcher = Player.ChildrenOfType<CatcherArea>().FirstOrDefault()?.MovableCatcher;
+
+                    if (catcher == null)
+                        return;
+
+                    if (catcher.HyperDashing != inHyperDash)
+                    {
+                        inHyperDash = catcher.HyperDashing;
+                        if (catcher.HyperDashing)
+                            hyperDashCount++;
+                    }
+                };
+            });
+
+            AddAssert("First note is hyperdash", () => Beatmap.Value.Beatmap.HitObjects[0] is Fruit f && f.HyperDash);
+
+            for (int i = 0; i < 9; i++)
+            {
+                int count = i + 1;
+                AddUntilStep($"wait for hyperdash #{count}", () => hyperDashCount >= count);
             }
-
-            AddUntilStep("wait for right hyperdash", () => getCatcher().Scale.X > 0 && getCatcher().HyperDashing);
         }
-
-        private Catcher getCatcher() => Player.ChildrenOfType<CatcherArea>().First().MovableCatcher;
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
