@@ -27,6 +27,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Users;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Beatmaps
@@ -93,6 +94,30 @@ namespace osu.Game.Beatmaps
             new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
+
+        public WorkingBeatmap CreateNew(RulesetInfo ruleset)
+        {
+            var set = new BeatmapSetInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Artist = "unknown",
+                    Title = "unknown",
+                    Author = User.SYSTEM_USER,
+                },
+                Beatmaps = new List<BeatmapInfo>
+                {
+                    new BeatmapInfo
+                    {
+                        BaseDifficulty = new BeatmapDifficulty(),
+                        Ruleset = ruleset
+                    }
+                }
+            };
+
+            var working = Import(set).Result;
+            return GetWorkingBeatmap(working.Beatmaps.First());
+        }
 
         protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {

@@ -98,7 +98,11 @@ namespace osu.Game.Screens.Menu
                     {
                         buttons = new ButtonSystem
                         {
-                            OnEdit = delegate { this.Push(new Editor()); },
+                            OnEdit = delegate
+                            {
+                                Beatmap.SetDefault();
+                                this.Push(new Editor());
+                            },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = confirmAndExit,
