@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     return;
 
                 hyperDashTrailsColour = value;
-                hyperDashTrails.FadeColour(hyperDashTrailsColour, Catcher.HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                hyperDashTrails.Colour = hyperDashTrailsColour;
             }
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     return;
 
                 endGlowSpritesColour = value;
-                endGlowSprites.FadeColour(endGlowSpritesColour, Catcher.HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                endGlowSprites.Colour = endGlowSpritesColour;
             }
         }
 
