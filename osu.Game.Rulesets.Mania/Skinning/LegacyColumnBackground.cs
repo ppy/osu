@@ -70,30 +70,27 @@ namespace osu.Game.Rulesets.Mania.Skinning
             Color4 lightColour = GetColumnSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLightColour)?.Value
                                  ?? Color4.White;
 
-            Drawable background;
+            Container backgroundLayer;
+            Drawable leftLine;
+            Drawable rightLine;
 
             InternalChildren = new[]
             {
-                background = new Box
+                backgroundLayer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = backgroundColour
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = backgroundColour
+                    },
                 },
                 hitTargetContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        // In legacy skins, the hit target takes on the full stage size and is sandwiched between the column background and the column light.
-                        // To simulate this effect in lazer's hierarchy, the hit target is added to the first column's background and manually extended to the full size of the stage.
-                        // Adding to the first columns allows depth issues to be resolved - if it were added to the last column, the previous column lights would appear below it.
-                        // This still means that the hit target will appear below the next column backgrounds, but that's a much easier problem to solve by proxying the backgrounds below.
-                        hitTarget = new LegacyHitTarget
-                        {
-                            RelativeSizeAxes = Axes.Y,
-                            Alpha = hasHitTarget ? 1 : 0
-                        },
-                        new Box
+                        leftLine = new Box
                         {
                             RelativeSizeAxes = Axes.Y,
                             Width = leftLineWidth,
@@ -101,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                             Colour = lineColour,
                             Alpha = hasLeftLine ? 1 : 0
                         },
-                        new Box
+                        rightLine = new Box
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -110,7 +107,16 @@ namespace osu.Game.Rulesets.Mania.Skinning
                             Scale = new Vector2(0.740f, 1),
                             Colour = lineColour,
                             Alpha = hasRightLine ? 1 : 0
-                        }
+                        },
+                        // In legacy skins, the hit target takes on the full stage size and is sandwiched between the column background and the column light.
+                        // To simulate this effect in lazer's hierarchy, the hit target is added to the first column's background and manually extended to the full size of the stage.
+                        // Adding to the first columns allows depth issues to be resolved - if it were added to the last column, the previous column lights would appear below it.
+                        // This still means that the hit target will appear below the next column backgrounds, but that's a much easier problem to solve by proxying the background layer below.
+                        hitTarget = new LegacyHitTarget
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            Alpha = hasHitTarget ? 1 : 0
+                        },
                     }
                 },
                 lightContainer = new Container
@@ -132,7 +138,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
             };
 
             // Resolve depth issues with the hit target appearing under the next column backgrounds by proxying to the stage background (always below the columns).
-            stageBackground?.AddColumnBackground(background.CreateProxy());
+            backgroundLayer.Add(leftLine.CreateProxy());
+            backgroundLayer.Add(rightLine.CreateProxy());
+            stageBackground?.AddColumnBackground(backgroundLayer.CreateProxy());
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
