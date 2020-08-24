@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Skinning;
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Audio.Sample;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Legacy;
@@ -57,8 +58,6 @@ namespace osu.Game.Rulesets.Mania.Skinning
         /// </summary>
         private Lazy<bool> hasKeyTexture;
 
-        private LegacyStageBackground stageBackground;
-
         public ManiaLegacySkinTransformer(ISkinSource source, IBeatmap beatmap)
             : base(source)
         {
@@ -90,10 +89,11 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     switch (maniaComponent.Component)
                     {
                         case ManiaSkinComponents.ColumnBackground:
-                            return new LegacyColumnBackground(maniaComponent.TargetColumn == beatmap.TotalColumns - 1, stageBackground);
+                            return new LegacyColumnBackground();
 
                         case ManiaSkinComponents.HitTarget:
-                            // Created within the column background, but should not fall back. See comments in LegacyColumnBackground.
+                            // Legacy skins sandwich the hit target between the column background and the column light.
+                            // To preserve this ordering, it's created manually inside LegacyStageBackground.
                             return Drawable.Empty();
 
                         case ManiaSkinComponents.KeyArea:
@@ -115,7 +115,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
                             return new LegacyHitExplosion();
 
                         case ManiaSkinComponents.StageBackground:
-                            return stageBackground = new LegacyStageBackground();
+                            Debug.Assert(maniaComponent.StageDefinition != null);
+                            return new LegacyStageBackground(maniaComponent.StageDefinition.Value);
 
                         case ManiaSkinComponents.StageForeground:
                             return new LegacyStageForeground();
