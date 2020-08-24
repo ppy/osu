@@ -19,6 +19,9 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         protected override bool Autoplay => true;
 
+        private int hyperDashCount;
+        private bool inHyperDash;
+
         [Test]
         public void TestHyperDash()
         {
@@ -26,6 +29,22 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 inHyperDash = false;
                 hyperDashCount = 0;
+
+                // this needs to be done within the frame stable context due to how quickly hyperdash state changes occur.
+                Player.DrawableRuleset.FrameStableComponents.OnUpdate += d =>
+                {
+                    var catcher = Player.ChildrenOfType<CatcherArea>().FirstOrDefault()?.MovableCatcher;
+
+                    if (catcher == null)
+                        return;
+
+                    if (catcher.HyperDashing != inHyperDash)
+                    {
+                        inHyperDash = catcher.HyperDashing;
+                        if (catcher.HyperDashing)
+                            hyperDashCount++;
+                    }
+                };
             });
 
             AddAssert("First note is hyperdash", () => Beatmap.Value.Beatmap.HitObjects[0] is Fruit f && f.HyperDash);
@@ -33,25 +52,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             for (int i = 0; i < 9; i++)
             {
                 int count = i + 1;
-                AddUntilStep("wait for next hyperdash", () => hyperDashCount >= count);
-            }
-        }
-
-        private int hyperDashCount;
-        private bool inHyperDash;
-
-        protected override void Update()
-        {
-            var catcher = Player.ChildrenOfType<CatcherArea>().FirstOrDefault()?.MovableCatcher;
-
-            if (catcher == null)
-                return;
-
-            if (catcher.HyperDashing != inHyperDash)
-            {
-                inHyperDash = catcher.HyperDashing;
-                if (catcher.HyperDashing)
-                    hyperDashCount++;
+                AddUntilStep($"wait for hyperdash #{count}", () => hyperDashCount >= count);
             }
         }
 
