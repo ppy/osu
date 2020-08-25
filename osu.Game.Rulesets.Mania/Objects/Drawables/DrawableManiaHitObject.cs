@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     break;
 
                 case ArmedState.Hit:
-                    this.FadeOut(150, Easing.OutQuint);
+                    this.FadeOut();
                     break;
             }
         }
