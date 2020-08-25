@@ -20,11 +20,6 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         private Container directionContainer;
 
-        public LegacyHitTarget()
-        {
-            RelativeSizeAxes = Axes.Both;
-        }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
