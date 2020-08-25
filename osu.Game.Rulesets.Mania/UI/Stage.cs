@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -11,7 +10,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -31,14 +29,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public const float HIT_TARGET_POSITION = 110;
 
-        public IReadOnlyList<Column> Columns => columnFlow.Children;
-        private readonly FillFlowContainer<Column> columnFlow;
+        public IReadOnlyList<Column> Columns => columnFlow.Content;
+        private readonly ColumnFlow<Column> columnFlow;
 
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
         private readonly DrawablePool<DrawableManiaJudgement> judgementPool;
 
         private readonly Drawable barLineContainer;
-        private readonly Container topLevelContainer;
 
         private readonly Dictionary<ColumnType, Color4> columnColours = new Dictionary<ColumnType, Color4>
         {
@@ -62,6 +59,8 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
+            Container topLevelContainer;
+
             InternalChildren = new Drawable[]
             {
                 judgementPool = new DrawablePool<DrawableManiaJudgement>(2),
@@ -73,16 +72,13 @@ namespace osu.Game.Rulesets.Mania.UI
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground), _ => new DefaultStageBackground())
+                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground, stageDefinition: definition), _ => new DefaultStageBackground())
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        columnFlow = new FillFlowContainer<Column>
+                        columnFlow = new ColumnFlow<Column>(definition)
                         {
-                            Name = "Columns",
                             RelativeSizeAxes = Axes.Y,
-                            AutoSizeAxes = Axes.X,
-                            Direction = FillDirection.Horizontal,
                             Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
                         },
                         new Container
@@ -102,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 RelativeSizeAxes = Axes.Y,
                             }
                         },
-                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground), _ => null)
+                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground, stageDefinition: definition), _ => null)
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -121,58 +117,20 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < definition.Columns; i++)
             {
                 var columnType = definition.GetTypeOfColumn(i);
+
                 var column = new Column(firstColumnIndex + i)
                 {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 1,
                     ColumnType = columnType,
                     AccentColour = columnColours[columnType],
                     Action = { Value = columnType == ColumnType.Special ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
-                AddColumn(column);
+                topLevelContainer.Add(column.TopLevelContainer.CreateProxy());
+                columnFlow.SetContentForColumn(i, column);
+                AddNested(column);
             }
-        }
-
-        private ISkin currentSkin;
-
-        [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
-        {
-            currentSkin = skin;
-            skin.SourceChanged += onSkinChanged;
-
-            onSkinChanged();
-        }
-
-        private void onSkinChanged()
-        {
-            foreach (var col in columnFlow)
-            {
-                if (col.Index > 0)
-                {
-                    float spacing = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                                                   new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnSpacing, col.Index - 1))
-                                               ?.Value ?? COLUMN_SPACING;
-
-                    col.Margin = new MarginPadding { Left = spacing };
-                }
-
-                float? width = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnWidth, col.Index))
-                                          ?.Value;
-
-                if (width == null)
-                    // only used by default skin (legacy skins get defaults set in LegacyManiaSkinConfiguration)
-                    col.Width = col.IsSpecial ? Column.SPECIAL_COLUMN_WIDTH : Column.COLUMN_WIDTH;
-                else
-                    col.Width = width.Value;
-            }
-        }
-
-        public void AddColumn(Column c)
-        {
-            topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
-            columnFlow.Add(c);
-            AddNested(c);
         }
 
         public override void Add(DrawableHitObject h)
