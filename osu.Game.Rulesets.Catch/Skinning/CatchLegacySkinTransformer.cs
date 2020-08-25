@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
                     if (result == null)
                         return null;
 
-                    result.Value = result.Value.ToLegacyColour();
+                    result.Value = LegacyColourCompatibility.DisallowZeroAlpha(result.Value);
                     return (IBindable<TValue>)result;
             }
 

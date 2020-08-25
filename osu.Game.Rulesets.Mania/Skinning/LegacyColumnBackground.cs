@@ -58,14 +58,20 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
             InternalChildren = new Drawable[]
             {
-                new Box { RelativeSizeAxes = Axes.Both }.WithLegacyColour(backgroundColour),
+                LegacyColourCompatibility.ApplyWithDoubledAlpha(new Box
+                {
+                    RelativeSizeAxes = Axes.Both
+                }, backgroundColour),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = leftLineWidth,
                     Scale = new Vector2(0.740f, 1),
                     Alpha = hasLeftLine ? 1 : 0,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }.WithLegacyColour(lineColour)
+                    Child = LegacyColourCompatibility.ApplyWithDoubledAlpha(new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }, lineColour)
                 },
                 new Container
                 {
@@ -75,7 +81,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     Width = rightLineWidth,
                     Scale = new Vector2(0.740f, 1),
                     Alpha = hasRightLine ? 1 : 0,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }.WithLegacyColour(lineColour)
+                    Child = LegacyColourCompatibility.ApplyWithDoubledAlpha(new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }, lineColour)
                 },
                 lightContainer = new Container
                 {
@@ -86,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Colour = lightColour.ToLegacyColour(),
+                        Colour = LegacyColourCompatibility.DisallowZeroAlpha(lightColour),
                         Texture = skin.GetTexture(lightImage),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,

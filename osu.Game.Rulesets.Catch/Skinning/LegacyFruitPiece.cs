@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
         {
             base.LoadComplete();
 
-            accentColour.BindValueChanged(colour => colouredSprite.Colour = colour.NewValue.ToLegacyColour(), true);
+            accentColour.BindValueChanged(colour => colouredSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
         }
     }
 }
