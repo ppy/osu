@@ -108,37 +108,38 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
                 InternalChildren = new Drawable[]
                 {
-                    new Container
+                    LegacyColourCompatibility.ApplyWithDoubledAlpha(new Box
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = backgroundColour
-                        },
-                    },
+                        RelativeSizeAxes = Axes.Both
+                    }, backgroundColour),
                     new HitTargetInsetContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Children = new[]
                         {
-                            new Box
+                            new Container
                             {
                                 RelativeSizeAxes = Axes.Y,
                                 Width = leftLineWidth,
                                 Scale = new Vector2(0.740f, 1),
-                                Colour = lineColour,
-                                Alpha = hasLeftLine ? 1 : 0
+                                Alpha = hasLeftLine ? 1 : 0,
+                                Child = LegacyColourCompatibility.ApplyWithDoubledAlpha(new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both
+                                }, lineColour)
                             },
-                            new Box
+                            new Container
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Y,
                                 Width = rightLineWidth,
                                 Scale = new Vector2(0.740f, 1),
-                                Colour = lineColour,
-                                Alpha = hasRightLine ? 1 : 0
+                                Alpha = hasRightLine ? 1 : 0,
+                                Child = LegacyColourCompatibility.ApplyWithDoubledAlpha(new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both
+                                }, lineColour)
                             },
                         }
                     }
