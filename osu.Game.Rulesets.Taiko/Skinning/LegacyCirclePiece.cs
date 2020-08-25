@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
         private void updateAccentColour()
         {
-            backgroundLayer.Colour = accentColour.ToLegacyColour();
+            backgroundLayer.Colour = LegacyColourCompatibility.DisallowZeroAlpha(accentColour);
         }
     }
 }

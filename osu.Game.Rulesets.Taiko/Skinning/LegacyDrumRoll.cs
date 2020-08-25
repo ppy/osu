@@ -76,9 +76,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
         private void updateAccentColour()
         {
-            headCircle.AccentColour = accentColour.ToLegacyColour();
-            body.Colour = accentColour.ToLegacyColour();
-            end.Colour = accentColour.ToLegacyColour();
+            headCircle.AccentColour = LegacyColourCompatibility.DisallowZeroAlpha(accentColour);
+            body.Colour = LegacyColourCompatibility.DisallowZeroAlpha(accentColour);
+            end.Colour = LegacyColourCompatibility.DisallowZeroAlpha(accentColour);
         }
     }
 }
