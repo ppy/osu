@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Multi.Play
             {
                 failed = true;
 
-                Logger.Error(e, "Failed to retrieve a score submission token.\n\nThis may happen if you are running an old or non-official release of osu! (ie. you are self-compiling).");
+                Logger.Error(e, "检索分数提交令牌失败，将不会上传成绩。\n\n这可能是因为您在使用一个旧版或非官方构建的lazer");
 
                 Schedule(() =>
                 {
