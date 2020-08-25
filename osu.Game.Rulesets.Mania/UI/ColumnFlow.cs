@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     /// <summary>
     /// A <see cref="Drawable"/> which flows its contents according to the <see cref="Column"/>s in a <see cref="Stage"/>.
-    /// Content can be added to individual columns via <see cref="SetColumn"/>.
+    /// Content can be added to individual columns via <see cref="SetContentForColumn"/>.
     /// </summary>
     /// <typeparam name="TContent">The type of content in each column.</typeparam>
     public class ColumnFlow<TContent> : CompositeDrawable
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         /// <param name="column">The index of the column to set the content of.</param>
         /// <param name="content">The content.</param>
-        public void SetColumn(int column, TContent content) => columns[column].Child = content;
+        public void SetContentForColumn(int column, TContent content) => columns[column].Child = content;
 
         public new MarginPadding Padding
         {

@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             };
 
             for (int i = 0; i < stageDefinition.Columns; i++)
-                columnBackgrounds.SetColumn(i, new ColumnBackground(i, i == stageDefinition.Columns - 1));
+                columnBackgrounds.SetContentForColumn(i, new ColumnBackground(i, i == stageDefinition.Columns - 1));
         }
 
         protected override void Update()

@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 };
 
                 topLevelContainer.Add(column.TopLevelContainer.CreateProxy());
-                columnFlow.SetColumn(i, column);
+                columnFlow.SetContentForColumn(i, column);
                 AddNested(column);
             }
         }
