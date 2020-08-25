@@ -60,12 +60,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                         Column = column.Key,
                         StartTime = locations[i].startTime,
                         Duration = duration,
-                        Samples = locations[i].samples,
-                        NodeSamples = new List<IList<HitSampleInfo>>
-                        {
-                            locations[i].samples,
-                            locations[i + 1].samples
-                        }
+                        NodeSamples = new List<IList<HitSampleInfo>> { locations[i].samples, Array.Empty<HitSampleInfo>() }
                     });
                 }
 
