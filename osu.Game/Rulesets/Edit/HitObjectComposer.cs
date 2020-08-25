@@ -293,7 +293,13 @@ namespace osu.Game.Rulesets.Edit
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
         {
-            var snappedEndTime = BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
+            double actualDuration = referenceTime + DistanceToDuration(referenceTime, distance);
+
+            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, referenceTime);
+
+            // we don't want to exceed the actual duration and snap to a point in the future.
+            if (snappedEndTime > actualDuration)
+                snappedEndTime -= BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
 
             return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
         }
