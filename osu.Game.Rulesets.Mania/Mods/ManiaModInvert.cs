@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModInvert : Mod, IApplicableAfterBeatmapConversion
     {
-        public override string Name => "反键模式";
+        public override string Name => "反键";
 
         public override string Acronym => "IN";
         public override double ScoreMultiplier => 1;
 
-        public override string Description => "全部变成反键(FULL LN)！";
+        public override string Description => "FULL LN！";
 
         public override IconUsage? Icon => FontAwesome.Solid.YinYang;
 
