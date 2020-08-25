@@ -36,7 +36,6 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly DrawablePool<DrawableManiaJudgement> judgementPool;
 
         private readonly Drawable barLineContainer;
-        private readonly Container topLevelContainer;
 
         private readonly Dictionary<ColumnType, Color4> columnColours = new Dictionary<ColumnType, Color4>
         {
@@ -59,6 +58,8 @@ namespace osu.Game.Rulesets.Mania.UI
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
+
+            Container topLevelContainer;
 
             InternalChildren = new Drawable[]
             {
@@ -116,6 +117,7 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < definition.Columns; i++)
             {
                 var columnType = definition.GetTypeOfColumn(i);
+
                 var column = new Column(firstColumnIndex + i)
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -125,15 +127,10 @@ namespace osu.Game.Rulesets.Mania.UI
                     Action = { Value = columnType == ColumnType.Special ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
-                AddColumn(column);
+                topLevelContainer.Add(column.TopLevelContainer.CreateProxy());
+                columnFlow.SetColumn(i, column);
+                AddNested(column);
             }
-        }
-
-        public void AddColumn(Column c)
-        {
-            topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
-            columnFlow.SetColumn(c.Index, c);
-            AddNested(c);
         }
 
         public override void Add(DrawableHitObject h)
