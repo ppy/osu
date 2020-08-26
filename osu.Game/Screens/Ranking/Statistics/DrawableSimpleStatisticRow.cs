@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         /// <param name="columnCount">The number of columns to layout the <paramref name="items"/> into.</param>
         /// <param name="items">The <see cref="SimpleStatisticItem"/>s to display in this row.</param>
-        public DrawableSimpleStatisticRow(int columnCount, IEnumerable<SimpleStatisticItem> items)
+        public DrawableSimpleStatisticRow(int columnCount, [ItemNotNull] IEnumerable<SimpleStatisticItem> items)
         {
             if (columnCount < 1)
                 throw new ArgumentOutOfRangeException(nameof(columnCount));
