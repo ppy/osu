@@ -20,7 +20,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
@@ -75,9 +74,6 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public float Magnitude { get; set; } = 1;
 
-        [Resolved]
-        private MusicController musicController { get; set; }
-
         private readonly float[] frequencyAmplitudes = new float[256];
 
         private IShader shader;
@@ -107,15 +103,15 @@ namespace osu.Game.Screens.Menu
 
         private void updateAmplitudes()
         {
-            var effect = beatmap.Value.BeatmapLoaded && musicController.TrackLoaded
-                ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(musicController.CurrentTrack.CurrentTime)
+            var effect = beatmap.Value.BeatmapLoaded && beatmap.Value.TrackLoaded
+                ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(beatmap.Value.Track.CurrentTime)
                 : null;
 
             for (int i = 0; i < temporalAmplitudes.Length; i++)
                 temporalAmplitudes[i] = 0;
 
-            if (musicController.TrackLoaded)
-                addAmplitudesFromSource(musicController.CurrentTrack);
+            if (beatmap.Value.TrackLoaded)
+                addAmplitudesFromSource(beatmap.Value.Track);
 
             foreach (var source in amplitudeSources)
                 addAmplitudesFromSource(source);

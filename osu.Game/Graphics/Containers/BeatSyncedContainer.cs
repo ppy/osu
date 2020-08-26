@@ -7,16 +7,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
     public class BeatSyncedContainer : Container
     {
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-
-        [Resolved]
-        private MusicController musicController { get; set; }
 
         private int lastBeat;
         private TimingControlPoint lastTimingPoint;
@@ -58,9 +54,9 @@ namespace osu.Game.Graphics.Containers
             TimingControlPoint timingPoint = null;
             EffectControlPoint effectPoint = null;
 
-            if (musicController.TrackLoaded && Beatmap.Value.BeatmapLoaded)
+            if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
             {
-                track = musicController.CurrentTrack;
+                track = Beatmap.Value.Track;
                 beatmap = Beatmap.Value.Beatmap;
             }
 
