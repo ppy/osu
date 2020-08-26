@@ -193,30 +193,44 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        public override IStatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new IStatisticRow[]
+        public override IStatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
         {
-            new StatisticRow
+            var timedHitEvents = score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
+
+            return new IStatisticRow[]
             {
-                Columns = new[]
+                new StatisticRow
                 {
-                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList())
+                    Columns = new[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 250
-                    }),
-                }
-            },
-            new StatisticRow
-            {
-                Columns = new[]
+                        new StatisticItem("Timing Distribution",
+                            new HitEventTimingDistributionGraph(timedHitEvents)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 250
+                            }),
+                    }
+                },
+                new StatisticRow
                 {
-                    new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
+                    Columns = new[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 250
-                    }),
+                        new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }),
+                    }
+                },
+                new SimpleStatisticRow
+                {
+                    Columns = 3,
+                    Items = new SimpleStatisticItem[]
+                    {
+                        new UnstableRate(timedHitEvents)
+                    }
                 }
-            }
-        };
+            };
+        }
     }
 }

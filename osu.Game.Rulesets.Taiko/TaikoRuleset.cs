@@ -161,19 +161,32 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 
-        public override IStatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new IStatisticRow[]
+        public override IStatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
         {
-            new StatisticRow
+            var timedHitEvents = score.HitEvents.Where(e => e.HitObject is Hit).ToList();
+
+            return new IStatisticRow[]
             {
-                Columns = new[]
+                new StatisticRow
                 {
-                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents.Where(e => e.HitObject is Hit).ToList())
+                    Columns = new[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 250
-                    }),
+                        new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(timedHitEvents)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }),
+                    }
+                },
+                new SimpleStatisticRow
+                {
+                    Columns = 3,
+                    Items = new SimpleStatisticItem[]
+                    {
+                        new UnstableRate(timedHitEvents)
+                    }
                 }
-            }
-        };
+            };
+        }
     }
 }

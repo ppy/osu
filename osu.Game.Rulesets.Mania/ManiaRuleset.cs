@@ -326,6 +326,14 @@ namespace osu.Game.Rulesets.Mania
                         Height = 250
                     }),
                 }
+            },
+            new SimpleStatisticRow
+            {
+                Columns = 3,
+                Items = new SimpleStatisticItem[]
+                {
+                    new UnstableRate(score.HitEvents)
+                }
             }
         };
     }
