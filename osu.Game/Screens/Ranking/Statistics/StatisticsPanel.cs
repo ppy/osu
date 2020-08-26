@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         RelativeSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(30, 15),
+                        Alpha = 0
                     };
 
                     rows.AddRange(newScore.Ruleset.CreateInstance()
@@ -111,6 +112,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                         spinner.Hide();
                         content.Add(d);
+                        d.FadeIn(250, Easing.OutQuint);
                     }, localCancellationSource.Token);
                 }), localCancellationSource.Token);
             }
