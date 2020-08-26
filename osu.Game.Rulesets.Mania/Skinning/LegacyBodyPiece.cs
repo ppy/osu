@@ -59,7 +59,13 @@ namespace osu.Game.Rulesets.Mania.Skinning
             });
 
             if (light != null)
-                lightContainer = new HitTargetInsetContainer { Child = light };
+            {
+                lightContainer = new HitTargetInsetContainer
+                {
+                    Alpha = 0,
+                    Child = light
+                };
+            }
 
             bodySprite = skin.GetAnimation(imageName, WrapMode.ClampToEdge, WrapMode.ClampToEdge, true, true).With(d =>
             {
@@ -99,14 +105,24 @@ namespace osu.Game.Rulesets.Mania.Skinning
             {
                 if (isHitting.NewValue)
                 {
-                    Column.TopLevelContainer.Add(lightContainer);
+                    // Clear the fade out and, more importantly, the removal.
+                    lightContainer.ClearTransforms();
 
-                    // The light must be seeked only after being loaded, otherwise a nullref happens (https://github.com/ppy/osu-framework/issues/3847).
+                    // Only add the container if the removal has taken place.
+                    if (lightContainer.Parent == null)
+                        Column.TopLevelContainer.Add(lightContainer);
+
+                    // The light must be seeked only after being loaded, otherwise a nullref occurs (https://github.com/ppy/osu-framework/issues/3847).
                     if (light is TextureAnimation lightAnimation)
                         lightAnimation.GotoFrame(0);
+
+                    lightContainer.FadeIn(80);
                 }
                 else
-                    Column.TopLevelContainer.Remove(lightContainer);
+                {
+                    lightContainer.FadeOut(120)
+                                  .OnComplete(d => Column.TopLevelContainer.Remove(d));
+                }
             }
         }
 
