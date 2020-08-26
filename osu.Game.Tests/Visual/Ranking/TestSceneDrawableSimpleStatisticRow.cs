@@ -13,7 +13,7 @@ using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneSimpleStatisticRow : OsuTestScene
+    public class TestSceneDrawableSimpleStatisticRow : OsuTestScene
     {
         private Container container;
 
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestEmpty()
         {
             AddStep("create with no items",
-                () => container.Add(new SimpleStatisticRow(2, Enumerable.Empty<SimpleStatisticItem>())));
+                () => container.Add(new DrawableSimpleStatisticRow(2, Enumerable.Empty<SimpleStatisticItem>())));
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Ranking
                                           Value = RNG.Next(100)
                                       });
 
-                container.Add(new SimpleStatisticRow(columnCount, items));
+                container.Add(new DrawableSimpleStatisticRow(columnCount, items));
             });
         }
     }
