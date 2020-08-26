@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly Container<CatcherTrailSprite> hyperDashTrails;
         private readonly Container<CatcherTrailSprite> endGlowSprites;
 
-        private Color4 hyperDashTrailsColour;
+        private Color4 hyperDashTrailsColour = Catcher.DEFAULT_HYPER_DASH_COLOUR;
 
         public Color4 HyperDashTrailsColour
         {
@@ -35,11 +35,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     return;
 
                 hyperDashTrailsColour = value;
-                hyperDashTrails.FadeColour(hyperDashTrailsColour, Catcher.HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                hyperDashTrails.Colour = hyperDashTrailsColour;
             }
         }
 
-        private Color4 endGlowSpritesColour;
+        private Color4 endGlowSpritesColour = Catcher.DEFAULT_HYPER_DASH_COLOUR;
 
         public Color4 EndGlowSpritesColour
         {
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     return;
 
                 endGlowSpritesColour = value;
-                endGlowSprites.FadeColour(endGlowSpritesColour, Catcher.HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                endGlowSprites.Colour = endGlowSpritesColour;
             }
         }
 
