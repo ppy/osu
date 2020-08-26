@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 
@@ -26,9 +25,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [Resolved]
         private EditorClock editorClock { get; set; }
-
-        [Resolved]
-        private MusicController musicController { get; set; }
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
