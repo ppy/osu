@@ -101,6 +101,10 @@ namespace osu.Game.Skinning
                         parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
                         break;
 
+                    case "LightingLWidth":
+                        parseArrayValue(pair.Value, currentConfig.HoldNoteLightWidth);
+                        break;
+
                     case "WidthForNoteHeightScale":
                         float minWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         if (minWidth > 0)
