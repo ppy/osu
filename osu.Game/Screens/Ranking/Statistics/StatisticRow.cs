@@ -21,8 +21,6 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         public Drawable CreateDrawableStatisticRow() => new GridContainer
         {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
             Content = new[]
