@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// The width of the catcher which can receive fruit. Equivalent to "catchMargin" in osu-stable.
         /// </summary>
-        private const float allowed_catch_range = 0.8f;
+        public const float ALLOWED_CATCH_RANGE = 0.8f;
 
         /// <summary>
         /// The drawable catcher for <see cref="CurrentState"/>.
@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         /// <param name="scale">The scale of the catcher.</param>
         internal static float CalculateCatchWidth(Vector2 scale)
-            => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * allowed_catch_range;
+            => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * ALLOWED_CATCH_RANGE;
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
@@ -229,9 +229,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 catchObjectPosition >= catcherPosition - halfCatchWidth &&
                 catchObjectPosition <= catcherPosition + halfCatchWidth;
 
-            // only update hyperdash state if we are catching a fruit.
-            // exceptions are Droplets and JuiceStreams.
-            if (!(fruit is Fruit)) return validCatch;
+            // only update hyperdash state if we are not catching a tiny droplet.
+            if (fruit is TinyDroplet) return validCatch;
 
             if (validCatch && fruit.HyperDash)
             {
@@ -286,8 +285,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void runHyperDashStateTransition(bool hyperDashing)
         {
-            trails.HyperDashTrailsColour = hyperDashColour;
-            trails.EndGlowSpritesColour = hyperDashEndGlowColour;
             updateTrailVisibility();
 
             if (hyperDashing)
@@ -403,6 +400,9 @@ namespace osu.Game.Rulesets.Catch.UI
             hyperDashEndGlowColour =
                 skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ??
                 hyperDashColour;
+
+            trails.HyperDashTrailsColour = hyperDashColour;
+            trails.EndGlowSpritesColour = hyperDashEndGlowColour;
 
             runHyperDashStateTransition(HyperDashing);
         }
