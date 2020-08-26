@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("enable autoplay", () => autoplay = true);
             base.SetUpSteps();
-            AddUntilStep("wait for track to start running", () => MusicController.IsPlaying);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
 
             double startTime = hitObjects[sliderIndex].StartTime;
             retrieveDrawableSlider(sliderIndex);
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("have autoplay", () => autoplay = true);
             base.SetUpSteps();
-            AddUntilStep("wait for track to start running", () => MusicController.IsPlaying);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
 
             double startTime = hitObjects[sliderIndex].StartTime;
             retrieveDrawableSlider(sliderIndex);

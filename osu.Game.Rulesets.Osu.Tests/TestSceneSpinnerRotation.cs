@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             base.SetUpSteps();
 
-            AddUntilStep("wait for track to start running", () => MusicController.IsPlaying);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
             AddStep("retrieve spinner", () => drawableSpinner = (DrawableSpinner)Player.DrawableRuleset.Playfield.AllHitObjects.First());
         }
 
