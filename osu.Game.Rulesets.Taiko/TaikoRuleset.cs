@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 
-        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
+        public override IStatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new IStatisticRow[]
         {
             new StatisticRow
             {

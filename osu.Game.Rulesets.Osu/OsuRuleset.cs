@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
+        public override IStatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new IStatisticRow[]
         {
             new StatisticRow
             {
