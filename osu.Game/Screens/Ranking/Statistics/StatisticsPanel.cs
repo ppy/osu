@@ -98,7 +98,11 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                     rows.AddRange(newScore.Ruleset.CreateInstance()
                                           .CreateStatisticsForScore(newScore, playableBeatmap)
-                                          .Select(row => row.CreateDrawableStatisticRow()));
+                                          .Select(row => row.CreateDrawableStatisticRow().With(r =>
+                                          {
+                                              r.Anchor = Anchor.TopCentre;
+                                              r.Origin = Anchor.TopCentre;
+                                          })));
 
                     LoadComponentAsync(rows, d =>
                     {
