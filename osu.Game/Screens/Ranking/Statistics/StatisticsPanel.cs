@@ -97,13 +97,27 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Alpha = 0
                     };
 
-                    rows.AddRange(newScore.Ruleset.CreateInstance()
-                                          .CreateStatisticsForScore(newScore, playableBeatmap)
-                                          .Select(row => row.CreateDrawableStatisticRow().With(r =>
-                                          {
-                                              r.Anchor = Anchor.TopCentre;
-                                              r.Origin = Anchor.TopCentre;
-                                          })));
+                    foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
+                    {
+                        rows.Add(new GridContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Content = new[]
+                            {
+                                row.Columns?.Select(c => new StatisticContainer(c)
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                }).Cast<Drawable>().ToArray()
+                            },
+                            ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0)
+                                                         .Select(i => row.Columns[i].Dimension ?? new Dimension()).ToArray(),
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
+                        });
+                    }
 
                     LoadComponentAsync(rows, d =>
                     {
