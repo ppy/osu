@@ -193,11 +193,11 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        public override IStatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
         {
             var timedHitEvents = score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
 
-            return new IStatisticRow[]
+            return new[]
             {
                 new StatisticRow
                 {
@@ -222,14 +222,6 @@ namespace osu.Game.Rulesets.Osu
                         }),
                     }
                 },
-                new SimpleStatisticRow
-                {
-                    Columns = 3,
-                    Items = new SimpleStatisticItem[]
-                    {
-                        new UnstableRate(timedHitEvents)
-                    }
-                }
             };
         }
     }

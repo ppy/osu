@@ -314,7 +314,7 @@ namespace osu.Game.Rulesets.Mania
             return (PlayfieldType)Enum.GetValues(typeof(PlayfieldType)).Cast<int>().OrderByDescending(i => i).First(v => variant >= v);
         }
 
-        public override IStatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new IStatisticRow[]
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
             new StatisticRow
             {
@@ -327,14 +327,6 @@ namespace osu.Game.Rulesets.Mania
                     }),
                 }
             },
-            new SimpleStatisticRow
-            {
-                Columns = 3,
-                Items = new SimpleStatisticItem[]
-                {
-                    new UnstableRate(score.HitEvents)
-                }
-            }
         };
     }
 

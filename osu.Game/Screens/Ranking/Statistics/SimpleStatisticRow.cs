@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// <summary>
     /// Contains textual statistic data to display in a <see cref="DrawableSimpleStatisticRow"/>.
     /// </summary>
-    public class SimpleStatisticRow : IStatisticRow
+    public class SimpleStatisticRow
     {
         /// <summary>
         /// The number of columns to layout the <see cref="Items"/> in.
