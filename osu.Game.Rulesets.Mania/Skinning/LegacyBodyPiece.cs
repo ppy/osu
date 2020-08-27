@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,8 +21,13 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<bool> isHitting = new Bindable<bool>();
 
+        [CanBeNull]
         private Drawable bodySprite;
+
+        [CanBeNull]
         private Drawable lightContainer;
+
+        [CanBeNull]
         private Drawable light;
 
         public LegacyBodyPiece()
