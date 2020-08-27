@@ -173,6 +173,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ShowJudgementLine:
                     return SkinUtils.As<TValue>(new Bindable<bool>(existing.ShowJudgementLine));
 
+                case LegacyManiaSkinConfigurationLookups.ExplosionImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "LightingN"));
+
                 case LegacyManiaSkinConfigurationLookups.ExplosionScale:
                     Debug.Assert(maniaLookup.TargetColumn != null);
 
