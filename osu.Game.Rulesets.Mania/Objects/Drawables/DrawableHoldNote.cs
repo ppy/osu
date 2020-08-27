@@ -252,6 +252,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
+            if (CheckHittable?.Invoke(this, Time.Current) == false)
+                return false;
+
             // The tail has a lenience applied to it which is factored into the miss window (i.e. the miss judgement will be delayed).
             // But the hold cannot ever be started within the late-lenience window, so we should skip trying to begin the hold during that time.
             // Note: Unlike below, we use the tail's start time to determine the time offset.
