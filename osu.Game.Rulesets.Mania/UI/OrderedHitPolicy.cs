@@ -48,14 +48,14 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             foreach (var obj in hitObjectContainer.AliveObjects)
             {
-                if (obj.HitObject.StartTime >= targetTime)
+                if (obj.HitObject.GetEndTime() >= targetTime)
                     yield break;
 
                 yield return obj;
 
                 foreach (var nestedObj in obj.NestedHitObjects)
                 {
-                    if (nestedObj.HitObject.StartTime >= targetTime)
+                    if (nestedObj.HitObject.GetEndTime() >= targetTime)
                         break;
 
                     yield return nestedObj;
