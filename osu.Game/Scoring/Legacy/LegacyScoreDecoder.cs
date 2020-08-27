@@ -241,12 +241,15 @@ namespace osu.Game.Scoring.Legacy
                 }
 
                 var diff = Parsing.ParseFloat(split[0]);
+                var mouseX = Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE);
+                var mouseY = Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE);
 
                 lastTime += diff;
 
-                if (i == 0 && diff == 0)
-                    // osu-stable adds a zero-time frame before potentially valid negative user frames.
-                    // we need to ignore this.
+                if (i < 2 && mouseX == 256 && mouseY == -500)
+                    // at the start of the replay, stable places two replay frames, at time 0 and SkipBoundary - 1, respectively.
+                    // both frames use a position of (256, -500).
+                    // ignore these frames as they serve no real purpose (and can even mislead ruleset-specific handlers - see mania)
                     continue;
 
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
@@ -255,8 +258,8 @@ namespace osu.Game.Scoring.Legacy
                     continue;
 
                 currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
-                    Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE),
-                    Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE),
+                    mouseX,
+                    mouseY,
                     (ReplayButtonState)Parsing.ParseInt(split[3])), currentFrame);
 
                 replay.Frames.Add(currentFrame);
