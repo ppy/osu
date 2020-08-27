@@ -101,8 +101,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                     {
                         rows.Add(new GridContainer
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Content = new[]
