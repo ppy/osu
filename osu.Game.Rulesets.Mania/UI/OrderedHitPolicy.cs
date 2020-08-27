@@ -11,6 +11,9 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
+    /// <summary>
+    /// Ensures that only the most recent <see cref="HitObject"/> is hittable, affectionately known as "note lock".
+    /// </summary>
     public class OrderedHitPolicy
     {
         private readonly HitObjectContainer hitObjectContainer;
@@ -20,6 +23,15 @@ namespace osu.Game.Rulesets.Mania.UI
             this.hitObjectContainer = hitObjectContainer;
         }
 
+        /// <summary>
+        /// Determines whether a <see cref="DrawableHitObject"/> can be hit at a point in time.
+        /// </summary>
+        /// <remarks>
+        /// Only the most recent <see cref="DrawableHitObject"/> can be hit, a previous hitobject's window cannot extend past the next one.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to check.</param>
+        /// <param name="time">The time to check.</param>
+        /// <returns>Whether <paramref name="hitObject"/> can be hit at the given <paramref name="time"/>.</returns>
         public bool IsHittable(DrawableHitObject hitObject, double time)
         {
             var nextObject = hitObjectContainer.AliveObjects.GetNext(hitObject);
