@@ -29,14 +29,28 @@ namespace osu.Game.Screens.Select.Details
 
                 var retries = Metrics?.Retries ?? Array.Empty<int>();
                 var fails = Metrics?.Fails ?? Array.Empty<int>();
+                var retriesAndFails = sumRetriesAndFails(retries, fails);
 
-                float maxValue = fails.Any() ? fails.Zip(retries, (fail, retry) => fail + retry).Max() : 0;
+                float maxValue = retriesAndFails.Any() ? retriesAndFails.Max() : 0;
                 failGraph.MaxValue = maxValue;
                 retryGraph.MaxValue = maxValue;
 
-                failGraph.Values = fails.Select(f => (float)f);
-                retryGraph.Values = retries.Zip(fails, (retry, fail) => retry + Math.Clamp(fail, 0, maxValue));
+                failGraph.Values = fails.Select(v => (float)v);
+                retryGraph.Values = retriesAndFails.Select(v => (float)v);
             }
+        }
+
+        private int[] sumRetriesAndFails(int[] retries, int[] fails)
+        {
+            var result = new int[Math.Max(retries.Length, fails.Length)];
+
+            for (int i = 0; i < retries.Length; ++i)
+                result[i] = retries[i];
+
+            for (int i = 0; i < fails.Length; ++i)
+                result[i] += fails[i];
+
+            return result;
         }
 
         public FailRetryGraph()
