@@ -101,28 +101,28 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 bodyAnimation.IsPlaying = isHitting.NewValue;
             }
 
-            if (lightContainer != null)
+            if (lightContainer == null)
+                return;
+
+            if (isHitting.NewValue)
             {
-                if (isHitting.NewValue)
-                {
-                    // Clear the fade out and, more importantly, the removal.
-                    lightContainer.ClearTransforms();
+                // Clear the fade out and, more importantly, the removal.
+                lightContainer.ClearTransforms();
 
-                    // Only add the container if the removal has taken place.
-                    if (lightContainer.Parent == null)
-                        Column.TopLevelContainer.Add(lightContainer);
+                // Only add the container if the removal has taken place.
+                if (lightContainer.Parent == null)
+                    Column.TopLevelContainer.Add(lightContainer);
 
-                    // The light must be seeked only after being loaded, otherwise a nullref occurs (https://github.com/ppy/osu-framework/issues/3847).
-                    if (light is TextureAnimation lightAnimation)
-                        lightAnimation.GotoFrame(0);
+                // The light must be seeked only after being loaded, otherwise a nullref occurs (https://github.com/ppy/osu-framework/issues/3847).
+                if (light is TextureAnimation lightAnimation)
+                    lightAnimation.GotoFrame(0);
 
-                    lightContainer.FadeIn(80);
-                }
-                else
-                {
-                    lightContainer.FadeOut(120)
-                                  .OnComplete(d => Column.TopLevelContainer.Remove(d));
-                }
+                lightContainer.FadeIn(80);
+            }
+            else
+            {
+                lightContainer.FadeOut(120)
+                              .OnComplete(d => Column.TopLevelContainer.Remove(d));
             }
         }
 
