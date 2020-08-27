@@ -50,5 +50,6 @@ namespace osu.Game.Skinning
         Hit100,
         Hit50,
         Hit0,
+        KeysUnderNotes,
     }
 }
