@@ -64,6 +64,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
+            if (CheckHittable?.Invoke(this, Time.Current) == false)
+                return false;
+
             return UpdateResult(true);
         }
 
