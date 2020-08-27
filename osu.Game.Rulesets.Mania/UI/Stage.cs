@@ -79,7 +79,6 @@ namespace osu.Game.Rulesets.Mania.UI
                         columnFlow = new ColumnFlow<Column>(definition)
                         {
                             RelativeSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
                         },
                         new Container
                         {
