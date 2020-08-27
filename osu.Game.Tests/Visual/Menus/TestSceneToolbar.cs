@@ -91,7 +91,12 @@ namespace osu.Game.Tests.Visual.Menus
 
         public class TestToolbar : Toolbar
         {
-            public new Bindable<OverlayActivation> OverlayActivationMode => base.OverlayActivationMode;
+            public TestToolbar()
+            {
+                base.OverlayActivationMode.BindTo(OverlayActivationMode);
+            }
+
+            public new Bindable<OverlayActivation> OverlayActivationMode { get; } = new Bindable<OverlayActivation>(OverlayActivation.All);
         }
     }
 }
