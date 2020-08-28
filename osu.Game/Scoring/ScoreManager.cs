@@ -108,6 +108,8 @@ namespace osu.Game.Scoring
                 ScoringMode.BindValueChanged(onScoringModeChanged, true);
             }
 
+            private IBindable<StarDifficulty> difficultyBindable;
+
             private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
             {
                 int? beatmapMaxCombo = score.Beatmap.MaxCombo;
@@ -121,19 +123,25 @@ namespace osu.Game.Scoring
                         return;
                     }
 
-                    // We can compute the max combo locally.
-                    beatmapMaxCombo = difficulties().GetDifficulty(score.Beatmap, score.Ruleset, score.Mods).MaxCombo;
+                    // We can compute the max combo locally after the async beatmap difficulty computation.
+                    difficultyBindable = difficulties().GetBindableDifficulty(score.Beatmap, score.Ruleset, score.Mods);
+                    difficultyBindable.BindValueChanged(d => updateScore(d.NewValue.MaxCombo), true);
                 }
+                else
+                    updateScore(beatmapMaxCombo.Value);
+            }
 
+            private void updateScore(int beatmapMaxCombo)
+            {
                 var ruleset = score.Ruleset.CreateInstance();
                 var scoreProcessor = ruleset.CreateScoreProcessor();
 
                 scoreProcessor.Mods.Value = score.Mods;
 
-                double maxBaseScore = 300 * beatmapMaxCombo.Value;
-                double maxHighestCombo = beatmapMaxCombo.Value;
+                double maxBaseScore = 300 * beatmapMaxCombo;
+                double maxHighestCombo = beatmapMaxCombo;
 
-                Value = Math.Round(scoreProcessor.GetScore(mode.NewValue, maxBaseScore, maxHighestCombo, score.Accuracy, score.MaxCombo / maxHighestCombo, 0)).ToString("N0");
+                Value = Math.Round(scoreProcessor.GetScore(ScoringMode.Value, maxBaseScore, maxHighestCombo, score.Accuracy, score.MaxCombo / maxHighestCombo, 0)).ToString("N0");
             }
         }
     }
