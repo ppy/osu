@@ -86,14 +86,16 @@ namespace osu.Game.Scoring
             => base.CheckLocalAvailability(model, items)
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
 
-        public Bindable<string> GetTotalScore(ScoreInfo score)
+        public Bindable<long> GetTotalScore(ScoreInfo score)
         {
             var bindable = new TotalScoreBindable(score, difficulties);
             configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
             return bindable;
         }
 
-        private class TotalScoreBindable : Bindable<string>
+        public Bindable<string> GetTotalScoreString(ScoreInfo score) => new TotalScoreStringBindable(GetTotalScore(score));
+
+        private class TotalScoreBindable : Bindable<long>
         {
             public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
 
@@ -105,7 +107,7 @@ namespace osu.Game.Scoring
                 this.score = score;
                 this.difficulties = difficulties;
 
-                Value = "0";
+                Value = 0;
 
                 ScoringMode.BindValueChanged(onScoringModeChanged, true);
             }
@@ -121,7 +123,7 @@ namespace osu.Game.Scoring
                     if (score.Beatmap.ID == 0 || difficulties == null)
                     {
                         // We don't have enough information (max combo) to compute the score, so let's use the provided score.
-                        Value = score.TotalScore.ToString("N0");
+                        Value = score.TotalScore;
                         return;
                     }
 
@@ -137,7 +139,7 @@ namespace osu.Game.Scoring
             {
                 if (beatmapMaxCombo == 0)
                 {
-                    Value = "0";
+                    Value = 0;
                     return;
                 }
 
@@ -149,7 +151,19 @@ namespace osu.Game.Scoring
                 double maxBaseScore = 300 * beatmapMaxCombo;
                 double maxHighestCombo = beatmapMaxCombo;
 
-                Value = Math.Round(scoreProcessor.GetScore(ScoringMode.Value, maxBaseScore, maxHighestCombo, score.Accuracy, score.MaxCombo / maxHighestCombo, 0)).ToString("N0");
+                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, maxBaseScore, maxHighestCombo, score.Accuracy, score.MaxCombo / maxHighestCombo, 0));
+            }
+        }
+
+        private class TotalScoreStringBindable : Bindable<string>
+        {
+            // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (need to hold a reference)
+            private readonly IBindable<long> totalScore;
+
+            public TotalScoreStringBindable(IBindable<long> totalScore)
+            {
+                this.totalScore = totalScore;
+                this.totalScore.BindValueChanged(v => Value = v.NewValue.ToString("N0"), true);
             }
         }
     }

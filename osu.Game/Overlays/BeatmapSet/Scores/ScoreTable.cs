@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
-                    Current = scoreManager.GetTotalScore(score),
+                    Current = scoreManager.GetTotalScoreString(score),
                     Font = OsuFont.GetFont(size: text_size, weight: index == 0 ? FontWeight.Bold : FontWeight.Medium)
                 },
                 new OsuSpriteText
