@@ -8,9 +8,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
@@ -35,13 +37,17 @@ namespace osu.Game.Scoring
         [CanBeNull]
         private readonly Func<BeatmapDifficultyManager> difficulties;
 
+        [CanBeNull]
+        private readonly OsuConfigManager configManager;
+
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
-                            Func<BeatmapDifficultyManager> difficulties = null)
+                            Func<BeatmapDifficultyManager> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
             this.difficulties = difficulties;
+            this.configManager = configManager;
         }
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
@@ -80,25 +86,55 @@ namespace osu.Game.Scoring
             => base.CheckLocalAvailability(model, items)
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
 
-        public long GetTotalScore(ScoreInfo score)
+        public Bindable<string> GetTotalScore(ScoreInfo score)
         {
-            int? beatmapMaxCombo = score.Beatmap.MaxCombo;
+            var bindable = new TotalScoreBindable(score, difficulties);
+            configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
+            return bindable;
+        }
 
-            if (beatmapMaxCombo == null)
+        private class TotalScoreBindable : Bindable<string>
+        {
+            public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
+
+            private readonly ScoreInfo score;
+            private readonly Func<BeatmapDifficultyManager> difficulties;
+
+            public TotalScoreBindable(ScoreInfo score, Func<BeatmapDifficultyManager> difficulties)
             {
-                if (score.Beatmap.ID == 0 || difficulties == null)
-                    return score.TotalScore; // Can't do anything.
+                this.score = score;
+                this.difficulties = difficulties;
 
-                // We can compute the max combo locally.
-                beatmapMaxCombo = difficulties().GetDifficulty(score.Beatmap, score.Ruleset, score.Mods).MaxCombo;
+                ScoringMode.BindValueChanged(onScoringModeChanged, true);
             }
 
-            var ruleset = score.Ruleset.CreateInstance();
-            var scoreProcessor = ruleset.CreateScoreProcessor();
+            private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
+            {
+                int? beatmapMaxCombo = score.Beatmap.MaxCombo;
 
-            scoreProcessor.Mods.Value = score.Mods;
+                if (beatmapMaxCombo == null)
+                {
+                    if (score.Beatmap.ID == 0 || difficulties == null)
+                    {
+                        // We don't have enough information (max combo) to compute the score, so let's use the provided score.
+                        Value = score.TotalScore.ToString("N0");
+                        return;
+                    }
 
-            return (long)Math.Round(scoreProcessor.GetScore(score.Accuracy, (double)score.MaxCombo / beatmapMaxCombo.Value, 0, ScoringMode.Standardised));
+                    // We can compute the max combo locally.
+                    beatmapMaxCombo = difficulties().GetDifficulty(score.Beatmap, score.Ruleset, score.Mods).MaxCombo;
+                }
+
+                var ruleset = score.Ruleset.CreateInstance();
+                var scoreProcessor = ruleset.CreateScoreProcessor();
+
+                scoreProcessor.Mods.Value = score.Mods;
+
+                double maxBaseScore = 300 * beatmapMaxCombo.Value;
+                double maxHighestCombo = beatmapMaxCombo.Value;
+
+                Value = Math.Round(scoreProcessor.GetScore(mode.NewValue, maxBaseScore, maxHighestCombo, score.Accuracy, score.MaxCombo / maxHighestCombo, 0)).ToString("N0");
+            }
         }
     }
 }
