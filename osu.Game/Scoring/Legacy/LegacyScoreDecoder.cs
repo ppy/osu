@@ -13,7 +13,6 @@ using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
 
@@ -123,12 +122,12 @@ namespace osu.Game.Scoring.Legacy
 
         protected void CalculateAccuracy(ScoreInfo score)
         {
-            score.Statistics.TryGetValue(HitResult.Miss, out int countMiss);
-            score.Statistics.TryGetValue(HitResult.Meh, out int count50);
-            score.Statistics.TryGetValue(HitResult.Good, out int count100);
-            score.Statistics.TryGetValue(HitResult.Great, out int count300);
-            score.Statistics.TryGetValue(HitResult.Perfect, out int countGeki);
-            score.Statistics.TryGetValue(HitResult.Ok, out int countKatu);
+            int countMiss = score.GetCountMiss() ?? 0;
+            int count50 = score.GetCount50() ?? 0;
+            int count100 = score.GetCount100() ?? 0;
+            int count300 = score.GetCount300() ?? 0;
+            int countGeki = score.GetCountGeki() ?? 0;
+            int countKatu = score.GetCountKatu() ?? 0;
 
             switch (score.Ruleset.ID)
             {
