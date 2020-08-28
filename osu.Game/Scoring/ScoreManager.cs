@@ -105,6 +105,8 @@ namespace osu.Game.Scoring
                 this.score = score;
                 this.difficulties = difficulties;
 
+                Value = "0";
+
                 ScoringMode.BindValueChanged(onScoringModeChanged, true);
             }
 
@@ -133,6 +135,12 @@ namespace osu.Game.Scoring
 
             private void updateScore(int beatmapMaxCombo)
             {
+                if (beatmapMaxCombo == 0)
+                {
+                    Value = "0";
+                    return;
+                }
+
                 var ruleset = score.Ruleset.CreateInstance();
                 var scoreProcessor = ruleset.CreateScoreProcessor();
 
