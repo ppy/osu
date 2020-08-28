@@ -36,6 +36,7 @@ namespace osu.Game.Skinning
         public float HitPosition = (480 - 402) * POSITION_SCALE_FACTOR;
         public float LightPosition = (480 - 413) * POSITION_SCALE_FACTOR;
         public bool ShowJudgementLine = true;
+        public bool KeysUnderNotes;
 
         public LegacyManiaSkinConfiguration(int keys)
         {
