@@ -116,6 +116,12 @@ namespace osu.Game.Scoring
 
             private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
             {
+                if (score.Beatmap == null)
+                {
+                    Value = score.TotalScore;
+                    return;
+                }
+
                 int? beatmapMaxCombo = score.Beatmap.MaxCombo;
 
                 if (beatmapMaxCombo == null)
