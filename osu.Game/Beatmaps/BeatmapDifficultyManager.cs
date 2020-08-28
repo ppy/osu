@@ -251,7 +251,7 @@ namespace osu.Game.Beatmaps
             updateScheduler?.Dispose();
         }
 
-        private readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
+        public readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
         {
             public readonly int BeatmapId;
             public readonly int RulesetId;
@@ -267,7 +267,7 @@ namespace osu.Game.Beatmaps
             public bool Equals(DifficultyCacheLookup other)
                 => BeatmapId == other.BeatmapId
                    && RulesetId == other.RulesetId
-                   && Mods.SequenceEqual(other.Mods);
+                   && Mods.Select(m => m.Acronym).SequenceEqual(other.Mods.Select(m => m.Acronym));
 
             public override int GetHashCode()
             {
