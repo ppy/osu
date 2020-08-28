@@ -272,6 +272,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.Hit300:
                 case LegacyManiaSkinConfigurationLookups.Hit300g:
                     return SkinUtils.As<TValue>(getManiaImage(existing, maniaLookup.Lookup.ToString()));
+
+                case LegacyManiaSkinConfigurationLookups.KeysUnderNotes:
+                    return SkinUtils.As<TValue>(new Bindable<bool>(existing.KeysUnderNotes));
             }
 
             return null;
