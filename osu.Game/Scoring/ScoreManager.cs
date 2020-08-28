@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -15,6 +16,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
@@ -30,11 +32,16 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
+        [CanBeNull]
+        private readonly Func<BeatmapDifficultyManager> difficulties;
+
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
+                            Func<BeatmapDifficultyManager> difficulties = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
+            this.difficulties = difficulties;
         }
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
@@ -72,5 +79,26 @@ namespace osu.Game.Scoring
         protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
             => base.CheckLocalAvailability(model, items)
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
+
+        public long GetTotalScore(ScoreInfo score)
+        {
+            int? beatmapMaxCombo = score.Beatmap.MaxCombo;
+
+            if (beatmapMaxCombo == null)
+            {
+                if (score.Beatmap.ID == 0 || difficulties == null)
+                    return score.TotalScore; // Can't do anything.
+
+                // We can compute the max combo locally.
+                beatmapMaxCombo = difficulties().GetDifficulty(score.Beatmap, score.Ruleset, score.Mods).MaxCombo;
+            }
+
+            var ruleset = score.Ruleset.CreateInstance();
+            var scoreProcessor = ruleset.CreateScoreProcessor();
+
+            scoreProcessor.Mods.Value = score.Mods;
+
+            return (long)Math.Round(scoreProcessor.GetScore(score.Accuracy, (double)score.MaxCombo / beatmapMaxCombo.Value, 0, ScoringMode.Standardised));
+        }
     }
 }
