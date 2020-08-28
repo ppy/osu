@@ -238,7 +238,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (Tail.AllJudged)
+            {
                 ApplyResult(r => r.Type = HitResult.Perfect);
+                endHold();
+            }
 
             if (Tail.Result.Type == HitResult.Miss)
                 HasBroken = true;

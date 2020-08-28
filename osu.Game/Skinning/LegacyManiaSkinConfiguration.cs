@@ -31,6 +31,7 @@ namespace osu.Game.Skinning
         public readonly float[] ColumnSpacing;
         public readonly float[] ColumnWidth;
         public readonly float[] ExplosionWidth;
+        public readonly float[] HoldNoteLightWidth;
 
         public float HitPosition = (480 - 402) * POSITION_SCALE_FACTOR;
         public float LightPosition = (480 - 413) * POSITION_SCALE_FACTOR;
@@ -45,6 +46,7 @@ namespace osu.Game.Skinning
             ColumnSpacing = new float[keys - 1];
             ColumnWidth = new float[keys];
             ExplosionWidth = new float[keys];
+            HoldNoteLightWidth = new float[keys];
 
             ColumnLineWidth.AsSpan().Fill(2);
             ColumnWidth.AsSpan().Fill(DEFAULT_COLUMN_SIZE);
