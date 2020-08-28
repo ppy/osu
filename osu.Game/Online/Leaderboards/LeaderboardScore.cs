@@ -194,7 +194,7 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             TextColour = Color4.White,
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
-                                            Text = scoreManager.GetTotalScore(score).ToString(@"N0"),
+                                            Current = scoreManager.GetTotalScore(score),
                                             Font = OsuFont.Numeric.With(size: 23),
                                         },
                                         RankContainer = new Container

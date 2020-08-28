@@ -204,10 +204,10 @@ namespace osu.Game.Rulesets.Scoring
 
         private double getScore(ScoringMode mode)
         {
-            return GetScore(baseScore / maxBaseScore, HighestCombo.Value / maxHighestCombo, bonusScore, mode);
+            return GetScore(mode, maxBaseScore, maxHighestCombo, baseScore / maxBaseScore, HighestCombo.Value / maxHighestCombo, bonusScore);
         }
 
-        public double GetScore(double accuracyRatio, double comboRatio, double bonus, ScoringMode mode)
+        public double GetScore(ScoringMode mode, double maxBaseScore, double maxHighestCombo, double accuracyRatio, double comboRatio, double bonusScore)
         {
             switch (mode)
             {
@@ -216,11 +216,11 @@ namespace osu.Game.Rulesets.Scoring
                     double accuracyScore = accuracyPortion * accuracyRatio;
                     double comboScore = comboPortion * comboRatio;
 
-                    return (max_score * (accuracyScore + comboScore) + bonus) * scoreMultiplier;
+                    return (max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier;
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return bonus + (accuracyRatio * maxBaseScore) * (1 + Math.Max(0, (comboRatio * maxHighestCombo) - 1) * scoreMultiplier / 25);
+                    return bonusScore + (accuracyRatio * maxBaseScore) * (1 + Math.Max(0, (comboRatio * maxHighestCombo) - 1) * scoreMultiplier / 25);
             }
         }
 
