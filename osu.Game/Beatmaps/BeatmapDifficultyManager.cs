@@ -89,8 +89,14 @@ namespace osu.Game.Beatmaps
             if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
                 return existing;
 
-            return await Task.Factory.StartNew(() => computeDifficulty(key, beatmapInfo, rulesetInfo), cancellationToken,
-                TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            return await Task.Factory.StartNew(() =>
+            {
+                // Computation may have finished in a previous task.
+                if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out existing, out _))
+                    return existing;
+
+                return computeDifficulty(key, beatmapInfo, rulesetInfo);
+            }, cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         /// <summary>
