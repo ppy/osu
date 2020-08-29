@@ -28,7 +28,8 @@ namespace osu.Game.Rulesets.Catch.UI
         public const float CENTER_X = WIDTH / 2;
 
         internal readonly CatcherArea CatcherArea;
-        private readonly CatchComboDisplay comboDisplay;
+
+        private CatchComboDisplay comboDisplay => CatcherArea.ComboDisplay;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             // only check the X position; handle all vertical space.
@@ -49,22 +50,12 @@ namespace osu.Game.Rulesets.Catch.UI
                 Origin = Anchor.TopLeft,
             };
 
-            comboDisplay = new CatchComboDisplay
-            {
-                RelativeSizeAxes = Axes.None,
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.Centre,
-                Y = 30f,
-            };
-
             InternalChildren = new[]
             {
                 explodingFruitContainer,
                 CatcherArea.MovableCatcher.CreateProxiedContent(),
                 HitObjectContainer,
                 CatcherArea,
-                comboDisplay,
             };
         }
 
@@ -79,12 +70,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             var fruit = (DrawableCatchHitObject)h;
             fruit.CheckPosition = CheckIfWeCanCatch;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            comboDisplay.X = CatcherArea.MovableCatcher.X;
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
