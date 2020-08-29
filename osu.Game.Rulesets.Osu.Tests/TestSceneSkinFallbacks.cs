@@ -80,15 +80,18 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public class CustomSkinWorkingBeatmap : ClockBackedTestWorkingBeatmap
         {
-            private readonly ISkinSource skin;
+            private readonly ISkinSource skinSource;
 
             public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock frameBasedClock, AudioManager audio, ISkinSource skin)
                 : base(beatmap, storyboard, frameBasedClock, audio)
             {
-                this.skin = skin;
+                if (!(skinSource is IBeatmapSkin))
+                    throw new ArgumentException("The provided skin source must be of type IBeatmapSkin.");
+
+                skinSource = skin;
             }
 
-            protected override ISkin GetSkin() => skin;
+            protected override IBeatmapSkin GetSkin() => (IBeatmapSkin)skinSource;
         }
 
         public class SkinProvidingPlayer : TestPlayer

@@ -116,7 +116,8 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("sample playback rate matches mod rates", () => sample.Channel.AggregateFrequency.Value == expectedRate);
         }
 
-        private class TestSkin : LegacySkin
+        // TODO: adding IBeatmapSkin changes are as minimal as possible, but this shouldn't exist or should be reworked to work with LegacyBeatmapSkin
+        private class TestSkin : LegacySkin, IBeatmapSkin
         {
             public TestSkin(string resourceName, AudioManager audioManager)
                 : base(DefaultLegacySkin.Info, new TestResourceStore(resourceName), audioManager, "skin.ini")
@@ -156,7 +157,7 @@ namespace osu.Game.Tests.Gameplay
                 this.audio = audio;
             }
 
-            protected override ISkin GetSkin() => new TestSkin("test-sample", audio);
+            protected override IBeatmapSkin GetSkin() => new TestSkin("test-sample", audio);
         }
 
         private class TestDrawableStoryboardSample : DrawableStoryboardSample
