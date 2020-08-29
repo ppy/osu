@@ -41,7 +41,7 @@ namespace osu.Game.Screens
         /// <summary>
         /// Whether overlays should be able to be opened when this screen is current.
         /// </summary>
-        public Bindable<OverlayActivation> OverlayActivationMode { get; }
+        Bindable<OverlayActivation> OverlayActivationMode { get; }
 
         /// <summary>
         /// The amount of parallax to be applied while this screen is displayed.
