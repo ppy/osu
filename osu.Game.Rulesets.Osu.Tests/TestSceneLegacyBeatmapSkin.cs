@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 this.hasColours = hasColours;
             }
 
-            protected override ISkin GetSkin() => new TestBeatmapSkin(BeatmapInfo, hasColours);
+            protected override IBeatmapSkin GetSkin() => new TestBeatmapSkin(BeatmapInfo, hasColours);
         }
 
         private class TestBeatmapSkin : LegacyBeatmapSkin
