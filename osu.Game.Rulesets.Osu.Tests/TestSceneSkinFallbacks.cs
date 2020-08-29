@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public TestSceneSkinFallbacks()
         {
             testUserSkin = new TestSource("user");
-            testBeatmapSkin = new TestSource("beatmap");
+            testBeatmapSkin = new BeatmapTestSource();
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock frameBasedClock, AudioManager audio, ISkinSource skin)
                 : base(beatmap, storyboard, frameBasedClock, audio)
             {
-                if (!(skinSource is IBeatmapSkin))
+                if (!(skin is IBeatmapSkin))
                     throw new ArgumentException("The provided skin source must be of type IBeatmapSkin.");
 
                 skinSource = skin;
@@ -112,6 +112,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                 dependencies.CacheAs<ISkinSource>(userSkin);
 
                 return dependencies;
+            }
+        }
+
+        public class BeatmapTestSource : TestSource, IBeatmapSkin
+        {
+            public BeatmapTestSource()
+                : base("beatmap")
+            {
             }
         }
 
