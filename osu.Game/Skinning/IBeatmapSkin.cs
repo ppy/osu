@@ -3,6 +3,9 @@
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// Marker interface for skins that originate from beatmaps.
+    /// </summary>
     public interface IBeatmapSkin : ISkin
     {
     }
