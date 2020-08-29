@@ -60,12 +60,15 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var reader = new LineBufferedReader(stream))
             {
                 var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
-                beatmap.BeatmapInfo.BeatmapSet.Files = new List<BeatmapSetFileInfo>
+                beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo
                 {
-                    new BeatmapSetFileInfo
+                    Files = new List<BeatmapSetFileInfo>
                     {
-                        Filename = name,
-                        FileInfo = new osu.Game.IO.FileInfo { Hash = name }
+                        new BeatmapSetFileInfo
+                        {
+                            Filename = name,
+                            FileInfo = new osu.Game.IO.FileInfo { Hash = name }
+                        }
                     }
                 };
 
