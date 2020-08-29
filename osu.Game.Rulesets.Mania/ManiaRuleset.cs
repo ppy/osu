@@ -126,6 +126,9 @@ namespace osu.Game.Rulesets.Mania
 
             if (mods.HasFlag(LegacyMods.Random))
                 yield return new ManiaModRandom();
+
+            if (mods.HasFlag(LegacyMods.Mirror))
+                yield return new ManiaModMirror();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -174,6 +177,10 @@ namespace osu.Game.Rulesets.Mania
 
                     case ManiaModFadeIn _:
                         value |= LegacyMods.FadeIn;
+                        break;
+
+                    case ManiaModMirror _:
+                        value |= LegacyMods.Mirror;
                         break;
                 }
             }
