@@ -214,7 +214,7 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
-        public void TestDownloadButtonInitallyDisabled()
+        public void TestDownloadButtonInitiallyDisabled()
         {
             TestResultsScreen screen = null;
 
