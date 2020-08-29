@@ -116,7 +116,7 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("sample playback rate matches mod rates", () => sample.Channel.AggregateFrequency.Value == expectedRate);
         }
 
-        // TODO: adding IBeatmapSkin changes are as minimal as possible, but this shouldn't exist or should be reworked to work with LegacyBeatmapSkin
+        // TODO: adding IBeatmapSkin to keep changes as minimal as possible, but this shouldn't exist or should be reworked to inherit LegacyBeatmapSkin
         private class TestSkin : LegacySkin, IBeatmapSkin
         {
             public TestSkin(string resourceName, AudioManager audioManager)
