@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
@@ -212,6 +213,25 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("expanded panel still on screen", () => this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded).ScreenSpaceDrawQuad.TopLeft.X > 0);
         }
 
+        [Test]
+        public void TestDownloadButtonInitallyDisabled()
+        {
+            TestResultsScreen screen = null;
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+
+            AddAssert("download button is disabled", () => !screen.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+
+            AddStep("click contracted panel", () =>
+            {
+                var contractedPanel = this.ChildrenOfType<ScorePanel>().First(p => p.State == PanelState.Contracted && p.ScreenSpaceDrawQuad.TopLeft.X > screen.ScreenSpaceDrawQuad.TopLeft.X);
+                InputManager.MoveMouseTo(contractedPanel);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("download button is enabled", () => screen.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+        }
+
         private class TestResultsContainer : Container
         {
             [Cached(typeof(Player))]
@@ -255,6 +275,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
                     score.TotalScore += 10 - i;
+                    score.Hash = $"test{i}";
                     scores.Add(score);
                 }
 
