@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps.Formats
         /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
-        /// <param name="skin">An optional skin, for encoding the beatmap's combo colours.</param>
+        /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
         public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] IBeatmapSkin skin)
         {
             this.beatmap = beatmap;
