@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
@@ -61,22 +63,57 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
 
-                beatmap.BeatmapInfo.Path = name;
-                beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo
+                using (var rs = new MemoryBeatmapResourceStore(stream, name))
                 {
-                    Files = new List<BeatmapSetFileInfo>
-                    {
-                        new BeatmapSetFileInfo
-                        {
-                            Filename = name,
-                            FileInfo = new osu.Game.IO.FileInfo { Hash = name }
-                        }
-                    },
-                };
-
-                var beatmapSkin = new TestLegacySkin(beatmap, beatmaps_resource_store, name);
-                return (convert(beatmap), beatmapSkin);
+                    var beatmapSkin = new TestLegacySkin(beatmap, rs, name);
+                    return (convert(beatmap), beatmapSkin);
+                }
             }
+        }
+
+        private class MemoryBeatmapResourceStore : IResourceStore<byte[]>
+        {
+            private readonly Stream beatmapData;
+            private readonly string beatmapName;
+
+            public MemoryBeatmapResourceStore(Stream beatmapData, string beatmapName)
+            {
+                this.beatmapData = beatmapData;
+                this.beatmapName = beatmapName;
+            }
+
+            public void Dispose() => beatmapData.Dispose();
+
+            public byte[] Get(string name)
+            {
+                if (name != beatmapName)
+                    return null;
+
+                byte[] buffer = new byte[beatmapData.Length];
+                beatmapData.Read(buffer, 0, buffer.Length);
+                return buffer;
+            }
+
+            public async Task<byte[]> GetAsync(string name)
+            {
+                if (name != beatmapName)
+                    return null;
+
+                byte[] buffer = new byte[beatmapData.Length];
+                await beatmapData.ReadAsync(buffer.AsMemory());
+                return buffer;
+            }
+
+            public Stream GetStream(string name)
+            {
+                if (name != beatmapName)
+                    return null;
+
+                beatmapData.Seek(0, SeekOrigin.Begin);
+                return beatmapData;
+            }
+
+            public IEnumerable<string> GetAvailableResources() => beatmapName.Yield();
         }
 
         private class TestLegacySkin : LegacySkin, IBeatmapSkin
