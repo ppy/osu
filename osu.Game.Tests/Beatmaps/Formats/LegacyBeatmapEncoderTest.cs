@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)
         {
-            var decoded = decodeFromLegacy(TestResources.GetStore().GetStream(name), name);
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
             var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
 
             sort(decoded);
