@@ -15,6 +15,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
@@ -47,6 +48,8 @@ namespace osu.Game.Screens.Edit
 
         public readonly IBeatmap PlayableBeatmap;
 
+        public readonly IBeatmapSkin BeatmapSkin;
+
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
@@ -54,9 +57,10 @@ namespace osu.Game.Screens.Edit
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap)
+        public EditorBeatmap(IBeatmap playableBeatmap, IBeatmapSkin beatmapSkin = null)
         {
             PlayableBeatmap = playableBeatmap;
+            BeatmapSkin = beatmapSkin;
 
             beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset?.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
 
