@@ -11,7 +11,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A container which overrides existing skin options with beatmap-local values.
     /// </summary>
-    public class BeatmapSkinProvidingContainer : SkinProvidingContainer
+    public class BeatmapSkinProvidingContainer : SkinProvidingContainer, IBeatmapSkin
     {
         private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
         private readonly Bindable<bool> beatmapHitsounds = new Bindable<bool>();
@@ -21,7 +21,7 @@ namespace osu.Game.Skinning
         protected override bool AllowTextureLookup(string componentName) => beatmapSkins.Value;
         protected override bool AllowSampleLookup(ISampleInfo componentName) => beatmapHitsounds.Value;
 
-        public BeatmapSkinProvidingContainer(ISkin skin)
+        public BeatmapSkinProvidingContainer(IBeatmapSkin skin)
             : base(skin)
         {
         }

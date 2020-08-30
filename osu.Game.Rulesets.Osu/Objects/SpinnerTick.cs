@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             public override bool AffectsCombo => false;
 
-            protected override int NumericResultFor(HitResult result) => SCORE_PER_TICK;
+            protected override int NumericResultFor(HitResult result) => result == MaxResult ? SCORE_PER_TICK : 0;
 
             protected override double HealthIncreaseFor(HitResult result) => result == MaxResult ? 0.6 * base.HealthIncreaseFor(result) : 0;
         }

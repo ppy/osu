@@ -20,7 +20,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
-                TextSize = 40,
                 Margin = new MarginPadding(20),
             };
             Add(score);
@@ -30,7 +29,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Margin = new MarginPadding(10),
-                TextSize = 40,
             };
             Add(comboCounter);
 
