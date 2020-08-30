@@ -4,12 +4,11 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableDroplet : PalpableCatchHitObject<Droplet>
+    public class DrawableDroplet : PalpableDrawableCatchHitObject<Droplet>
     {
         public override bool StaysOnPlate => false;
 
@@ -21,11 +20,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            ScaleContainer.Child = new SkinnableDrawable(new CatchSkinComponent(CatchSkinComponents.Droplet), _ => new Pulp
-            {
-                Size = Size / 4,
-                AccentColour = { BindTarget = AccentColour }
-            });
+            ScaleContainer.Child = new SkinnableDrawable(new CatchSkinComponent(CatchSkinComponents.Droplet), _ => new DropletPiece());
         }
 
         protected override void UpdateInitialTransforms()

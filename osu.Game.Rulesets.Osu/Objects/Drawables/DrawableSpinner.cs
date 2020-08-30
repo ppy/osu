@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
@@ -30,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SpinnerBonusDisplay bonusDisplay;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+
+        private bool spinnerFrequencyModulate;
 
         public DrawableSpinner(Spinner s)
             : base(s)
@@ -82,6 +85,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         private SkinnableSound spinningSample;
+        private const float spinning_sample_initial_frequency = 1.0f;
+        private const float spinning_sample_modulated_base_frequency = 0.5f;
 
         protected override void LoadSamples()
         {
@@ -101,6 +106,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     Volume = { Value = 0 },
                     Looping = true,
+                    Frequency = { Value = spinning_sample_initial_frequency }
                 });
             }
         }
@@ -171,6 +177,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
+            base.ApplySkin(skin, allowFallback);
+            spinnerFrequencyModulate = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerFrequencyModulate)?.Value ?? true;
+        }
+
         /// <summary>
         /// The completion progress of this spinner from 0..1 (clamped).
         /// </summary>
@@ -220,9 +232,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (HandleUserInput)
                 RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
 
-            if (spinningSample != null)
-                // todo: implement SpinnerFrequencyModulate
-                spinningSample.Frequency.Value = 0.5f + Progress;
+            if (spinningSample != null && spinnerFrequencyModulate)
+                spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
         }
 
         protected override void UpdateAfterChildren()
