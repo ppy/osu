@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.IsTrue(decoded.beatmapSkin.Configuration.Equals(decodedAfterEncode.beatmapSkin.Configuration));
         }
 
-        private void sort((IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) tuple)
+        private void sort((IBeatmap beatmap, IBeatmapSkin beatmapSkin) tuple)
         {
             // Sort control points to ensure a sane ordering, as they may be parsed in different orders. This works because each group contains only uniquely-typed control points.
             foreach (var g in tuple.beatmap.ControlPointInfo.Groups)
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private Stream encodeToLegacy((IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) fullBeatmap)
+        private Stream encodeToLegacy((IBeatmap beatmap, IBeatmapSkin beatmapSkin) fullBeatmap)
         {
             var (beatmap, beatmapSkin) = fullBeatmap;
             var stream = new MemoryStream();

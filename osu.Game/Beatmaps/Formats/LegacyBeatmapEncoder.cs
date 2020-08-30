@@ -25,14 +25,14 @@ namespace osu.Game.Beatmaps.Formats
         public const int LATEST_VERSION = 128;
 
         private readonly IBeatmap beatmap;
-        private readonly LegacyBeatmapSkin skin;
+        private readonly IBeatmapSkin skin;
 
         /// <summary>
         /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">An optional skin, for encoding the beatmap's combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] LegacyBeatmapSkin skin)
+        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] IBeatmapSkin skin)
         {
             this.beatmap = beatmap;
             this.skin = skin;
@@ -211,10 +211,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleComboColours(TextWriter writer)
         {
-            if (!(skin is LegacyBeatmapSkin legacySkin))
-                return;
-
-            var colours = legacySkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+            var colours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
 
             if (colours == null || colours.Count == 0)
                 return;
