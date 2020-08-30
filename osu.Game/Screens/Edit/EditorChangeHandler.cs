@@ -8,7 +8,6 @@ using System.Text;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
@@ -26,7 +25,6 @@ namespace osu.Game.Screens.Edit
         private int currentState = -1;
 
         private readonly EditorBeatmap editorBeatmap;
-        private readonly IBeatmapSkin beatmapSkin;
         private int bulkChangesStarted;
         private bool isRestoring;
 
@@ -36,8 +34,7 @@ namespace osu.Game.Screens.Edit
         /// Creates a new <see cref="EditorChangeHandler"/>.
         /// </summary>
         /// <param name="editorBeatmap">The <see cref="EditorBeatmap"/> to track the <see cref="HitObject"/>s of.</param>
-        /// <param name="beatmapSkin">The skin to track the inline skin configuration of.</param>
-        public EditorChangeHandler(EditorBeatmap editorBeatmap, IBeatmapSkin beatmapSkin)
+        public EditorChangeHandler(EditorBeatmap editorBeatmap)
         {
             this.editorBeatmap = editorBeatmap;
 
@@ -46,8 +43,6 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.HitObjectUpdated += hitObjectUpdated;
 
             patcher = new LegacyEditorBeatmapPatcher(editorBeatmap);
-
-            this.beatmapSkin = beatmapSkin;
 
             // Initial state.
             SaveState();
@@ -90,7 +85,7 @@ namespace osu.Game.Screens.Edit
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(editorBeatmap, beatmapSkin).Encode(sw);
+                    new LegacyBeatmapEncoder(editorBeatmap, editorBeatmap.BeatmapSkin).Encode(sw);
 
                 savedStates.Add(stream.ToArray());
             }

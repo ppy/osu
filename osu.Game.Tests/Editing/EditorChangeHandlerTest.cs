@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Editing
         [Test]
         public void TestSaveRestoreState()
         {
-            var handler = new EditorChangeHandler(new EditorBeatmap(new Beatmap()), null);
+            var handler = new EditorChangeHandler(new EditorBeatmap(new Beatmap()));
 
             Assert.That(handler.CanUndo.Value, Is.False);
             Assert.That(handler.CanRedo.Value, Is.False);
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Editing
         [Test]
         public void TestMaxStatesSaved()
         {
-            var handler = new EditorChangeHandler(new EditorBeatmap(new Beatmap()), null);
+            var handler = new EditorChangeHandler(new EditorBeatmap(new Beatmap()));
 
             Assert.That(handler.CanUndo.Value, Is.False);
 
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Editing
         [Test]
         public void TestMaxStatesExceeded()
         {
-            var handler = new EditorChangeHandler(new EditorBeatmap(new Beatmap()), null);
+            var handler = new EditorChangeHandler(new EditorBeatmap(new Beatmap()));
 
             Assert.That(handler.CanUndo.Value, Is.False);
 
