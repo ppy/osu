@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             sort(decodedAfterEncode);
 
             Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
-            Assert.IsTrue(decoded.beatmapSkin.Configuration.Equals(decodedAfterEncode.beatmapSkin.Configuration));
+            Assert.IsTrue(decodedAfterEncode.beatmapSkin.Configuration.Equals(decoded.beatmapSkin.Configuration));
         }
 
         private void sort((IBeatmap beatmap, IBeatmapSkin beatmapSkin) tuple)
@@ -55,11 +55,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private (IBeatmap beatmap, LegacyBeatmapSkin beatmapSkin) decodeFromLegacy(Stream stream, string name)
+        private (IBeatmap beatmap, TestLegacySkin beatmapSkin) decodeFromLegacy(Stream stream, string name)
         {
             using (var reader = new LineBufferedReader(stream))
             {
                 var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
+
+                beatmap.BeatmapInfo.Path = name;
                 beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo
                 {
                     Files = new List<BeatmapSetFileInfo>
@@ -69,11 +71,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
                             Filename = name,
                             FileInfo = new osu.Game.IO.FileInfo { Hash = name }
                         }
-                    }
+                    },
                 };
 
-                var beatmapSkin = new LegacyBeatmapSkin(beatmap.BeatmapInfo, beatmaps_resource_store, null);
+                var beatmapSkin = new TestLegacySkin(beatmap, beatmaps_resource_store, name);
                 return (convert(beatmap), beatmapSkin);
+            }
+        }
+
+        private class TestLegacySkin : LegacySkin, IBeatmapSkin
+        {
+            public TestLegacySkin(Beatmap beatmap, IResourceStore<byte[]> storage, string fileName)
+                : base(new SkinInfo() { Name = "Test Skin", Creator = "Craftplacer" }, storage, null, fileName)
+            {
             }
         }
 
