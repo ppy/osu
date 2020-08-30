@@ -226,7 +226,8 @@ namespace osu.Game.Beatmaps.Formats
                 writer.Write(FormattableString.Invariant($"{(byte)(comboColour.R * byte.MaxValue)},"));
                 writer.Write(FormattableString.Invariant($"{(byte)(comboColour.G * byte.MaxValue)},"));
                 writer.Write(FormattableString.Invariant($"{(byte)(comboColour.B * byte.MaxValue)},"));
-                writer.WriteLine(FormattableString.Invariant($"{(byte)(comboColour.A * byte.MaxValue)}"));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.A * byte.MaxValue)}"));
+                writer.WriteLine();
             }
         }
 
