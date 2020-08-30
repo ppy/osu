@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Edit
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
         private EditorChangeHandler changeHandler;
-        private LegacyBeatmapSkin beatmapSkin;
+        private IBeatmapSkin beatmapSkin;
 
         private DependencyContainer dependencies;
 
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Edit
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
             dependencies.CacheAs(editorBeatmap);
 
-            beatmapSkin = (Beatmap.Value.Skin is LegacyBeatmapSkin legacy) ? legacy : null;
+            beatmapSkin = Beatmap.Value.Skin;
             changeHandler = new EditorChangeHandler(editorBeatmap, beatmapSkin);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
