@@ -46,7 +46,7 @@ namespace osu.Game.Screens
         /// <summary>
         /// The initial initial overlay activation mode to use when this screen is entered for the first time.
         /// </summary>
-        public virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
+        protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
         public Bindable<OverlayActivation> OverlayActivationMode { get; }
 

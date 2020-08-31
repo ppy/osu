@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         /// <summary>
         /// Whether gameplay should pause when the game window focus is lost.
