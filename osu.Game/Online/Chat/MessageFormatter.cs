@@ -119,7 +119,7 @@ namespace osu.Game.Online.Chat
                 case "http":
                 case "https":
                     // length > 3 since all these links need another argument to work
-                    if (args.Length > 3 && (args[1] == "osu.ppy.sh" || args[1] == "new.ppy.sh"))
+                    if (args.Length > 3 && args[1] == "osu.ppy.sh")
                     {
                         switch (args[2])
                         {

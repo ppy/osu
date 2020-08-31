@@ -68,8 +68,6 @@ namespace osu.Game.Rulesets.Mania.UI
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
         }
 
-        public override Axes RelativeSizeAxes => Axes.Y;
-
         public ColumnType ColumnType { get; set; }
 
         public bool IsSpecial => ColumnType == ColumnType.Special;

@@ -94,14 +94,15 @@ namespace osu.Game.Screens.Ranking.Statistics
                         RelativeSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(30, 15),
+                        Alpha = 0
                     };
 
                     foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
                     {
                         rows.Add(new GridContainer
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Content = new[]
@@ -125,6 +126,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                         spinner.Hide();
                         content.Add(d);
+                        d.FadeIn(250, Easing.OutQuint);
                     }, localCancellationSource.Token);
                 }), localCancellationSource.Token);
             }

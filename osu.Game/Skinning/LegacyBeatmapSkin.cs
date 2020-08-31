@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyBeatmapSkin : LegacySkin
+    public class LegacyBeatmapSkin : LegacySkin, IBeatmapSkin
     {
         protected override bool AllowManiaSkin => false;
         protected override bool UseCustomSampleBanks => true;
