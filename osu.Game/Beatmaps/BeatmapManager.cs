@@ -195,7 +195,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
-        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, or null if not to be changed.</param>
+        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
         public void Save(BeatmapInfo info, IBeatmap beatmapContent, IBeatmapSkin beatmapSkin = null)
         {
             var setInfo = QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == info.ID));
