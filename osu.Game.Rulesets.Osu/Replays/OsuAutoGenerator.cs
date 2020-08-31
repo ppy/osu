@@ -156,6 +156,9 @@ namespace osu.Game.Rulesets.Osu.Replays
             // TODO: Shouldn't the spinner always spin in the same direction?
             if (h is Spinner)
             {
+                if ((h as Spinner).Duration == 0)
+                    return;
+
                 calcSpinnerStartPosAndDirection(((OsuReplayFrame)Frames[^1]).Position, out startPosition, out spinnerDirection);
 
                 Vector2 spinCentreOffset = SPINNER_CENTRE - ((OsuReplayFrame)Frames[^1]).Position;
