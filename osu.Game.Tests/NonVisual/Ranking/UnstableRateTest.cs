@@ -37,7 +37,7 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             var unstableRate = new UnstableRate(events);
 
-            Assert.IsTrue(Precision.AlmostEquals(0, unstableRate.Value));
+            Assert.AreEqual(0, unstableRate.Value);
         }
     }
 }
