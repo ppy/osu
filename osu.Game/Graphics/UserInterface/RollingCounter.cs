@@ -65,12 +65,6 @@ namespace osu.Game.Graphics.UserInterface
         protected RollingCounter()
         {
             AutoSizeAxes = Axes.Both;
-
-            Current.ValueChanged += val =>
-            {
-                if (IsLoaded)
-                    TransformCount(DisplayedCount, val.NewValue);
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -79,6 +73,13 @@ namespace osu.Game.Graphics.UserInterface
             displayedCountSpriteText = CreateSpriteText();
             displayedCountSpriteText.Text = FormatCount(DisplayedCount);
             Child = displayedCountSpriteText;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(val => TransformCount(DisplayedCount, val.NewValue), true);
         }
 
         /// <summary>
