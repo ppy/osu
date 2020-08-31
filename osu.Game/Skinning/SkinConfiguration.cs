@@ -47,6 +47,6 @@ namespace osu.Game.Skinning
 
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
 
-        public readonly SortedDictionary<string, string> ConfigDictionary = new SortedDictionary<string, string>();
+        public readonly Dictionary<string, string> ConfigDictionary = new Dictionary<string, string>();
     }
 }
