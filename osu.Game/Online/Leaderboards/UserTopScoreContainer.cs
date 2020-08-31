@@ -31,6 +31,7 @@ namespace osu.Game.Online.Leaderboards
         public UserTopScoreContainer(Func<TScoreInfo, LeaderboardScore> createScoreDelegate)
         {
             this.createScoreDelegate = createScoreDelegate;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
