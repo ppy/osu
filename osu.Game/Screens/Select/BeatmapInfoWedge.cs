@@ -229,6 +229,7 @@ namespace osu.Game.Screens.Select
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
+                                Margin = new MarginPadding { Bottom = 5 }
                             },
                             StatusPill = new BeatmapSetOnlineStatusPill
                             {
