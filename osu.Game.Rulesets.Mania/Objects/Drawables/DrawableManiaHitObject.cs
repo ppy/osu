@@ -36,6 +36,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
+        /// <summary>
+        /// Whether this <see cref="DrawableManiaHitObject"/> can be hit, given a time value.
+        /// If non-null, judgements will be ignored (resulting in a shake) whilst the function returns false.
+        /// </summary>
         public Func<DrawableHitObject, double, bool> CheckHittable;
 
         protected DrawableManiaHitObject(ManiaHitObject hitObject)
