@@ -57,8 +57,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public abstract void Increment(T amount);
-
         /// <summary>
         /// Skeleton of a numeric counter which value rolls over time.
         /// </summary>
