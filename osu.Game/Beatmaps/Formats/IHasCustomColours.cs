@@ -8,6 +8,6 @@ namespace osu.Game.Beatmaps.Formats
 {
     public interface IHasCustomColours
     {
-        IDictionary<string, Color4> CustomColours { get; }
+        Dictionary<string, Color4> CustomColours { get; }
     }
 }
