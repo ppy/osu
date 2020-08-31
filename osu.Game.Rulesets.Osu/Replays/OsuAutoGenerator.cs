@@ -154,9 +154,9 @@ namespace osu.Game.Rulesets.Osu.Replays
             // The startPosition for the slider should not be its .Position, but the point on the circle whose tangent crosses the current cursor position
             // We also modify spinnerDirection so it spins in the direction it enters the spin circle, to make a smooth transition.
             // TODO: Shouldn't the spinner always spin in the same direction?
-            if (h is Spinner)
+            if (h is Spinner spinner)
             {
-                if ((h as Spinner).Duration == 0)
+                if (spinner.Duration < reactionTime)
                     return;
 
                 calcSpinnerStartPosAndDirection(((OsuReplayFrame)Frames[^1]).Position, out startPosition, out spinnerDirection);
