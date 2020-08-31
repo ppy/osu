@@ -223,14 +223,13 @@ namespace osu.Game.Screens.Select
                         Direction = FillDirection.Vertical,
                         Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        Children = new[]
                         {
-                            new StarRatingDisplay(beatmapInfo)
+                            createStarRatingDisplay(beatmapInfo).With(display =>
                             {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                Margin = new MarginPadding { Bottom = 5 }
-                            },
+                                display.Anchor = Anchor.CentreRight;
+                                display.Origin = Anchor.CentreRight;
+                            }),
                             StatusPill = new BeatmapSetOnlineStatusPill
                             {
                                 Anchor = Anchor.CentreRight,
@@ -290,6 +289,13 @@ namespace osu.Game.Screens.Select
                 if (beatmapInfo.Version == null)
                     StatusPill.Hide();
             }
+
+            private static Drawable createStarRatingDisplay(BeatmapInfo beatmapInfo) => beatmapInfo.StarDifficulty > 0
+                ? new StarRatingDisplay(beatmapInfo)
+                {
+                    Margin = new MarginPadding { Bottom = 5 }
+                }
+                : Empty();
 
             private void setMetadata(string source)
             {
