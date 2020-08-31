@@ -7,10 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
@@ -44,7 +42,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
             sort(decodedAfterEncode);
 
             Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
-            Assert.IsTrue(decodedAfterEncode.beatmapSkin.Configuration.Equals(decoded.beatmapSkin.Configuration));
+            Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+        }
+
+        private bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
+        {
+            // equal to null, no need to SequenceEqual
+            if (a.ComboColours == null && b.ComboColours == null)
+                return true;
+
+            if (a.ComboColours == null || b.ComboColours == null)
+                return false;
+
+            return a.ComboColours.SequenceEqual(b.ComboColours);
         }
 
         private void sort((IBeatmap beatmap, IBeatmapSkin beatmapSkin) tuple)
@@ -62,63 +72,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var reader = new LineBufferedReader(stream))
             {
                 var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
-
-                using (var rs = new MemoryBeatmapResourceStore(stream, name))
-                {
-                    var beatmapSkin = new TestLegacySkin(beatmap, rs, name);
-                    return (convert(beatmap), beatmapSkin);
-                }
+                var beatmapSkin = new TestLegacySkin(beatmaps_resource_store, name);
+                return (convert(beatmap), beatmapSkin);
             }
-        }
-
-        private class MemoryBeatmapResourceStore : IResourceStore<byte[]>
-        {
-            private readonly Stream beatmapData;
-            private readonly string beatmapName;
-
-            public MemoryBeatmapResourceStore(Stream beatmapData, string beatmapName)
-            {
-                this.beatmapData = beatmapData;
-                this.beatmapName = beatmapName;
-            }
-
-            public void Dispose() => beatmapData.Dispose();
-
-            public byte[] Get(string name)
-            {
-                if (name != beatmapName)
-                    return null;
-
-                byte[] buffer = new byte[beatmapData.Length];
-                beatmapData.Read(buffer, 0, buffer.Length);
-                return buffer;
-            }
-
-            public async Task<byte[]> GetAsync(string name)
-            {
-                if (name != beatmapName)
-                    return null;
-
-                byte[] buffer = new byte[beatmapData.Length];
-                await beatmapData.ReadAsync(buffer.AsMemory());
-                return buffer;
-            }
-
-            public Stream GetStream(string name)
-            {
-                if (name != beatmapName)
-                    return null;
-
-                beatmapData.Seek(0, SeekOrigin.Begin);
-                return beatmapData;
-            }
-
-            public IEnumerable<string> GetAvailableResources() => beatmapName.Yield();
         }
 
         private class TestLegacySkin : LegacySkin, IBeatmapSkin
         {
-            public TestLegacySkin(Beatmap beatmap, IResourceStore<byte[]> storage, string fileName)
+            public TestLegacySkin(IResourceStore<byte[]> storage, string fileName)
                 : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, storage, null, fileName)
             {
             }
