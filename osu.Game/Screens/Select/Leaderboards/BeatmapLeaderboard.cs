@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             req.Success += r =>
             {
                 scoresCallback?.Invoke(r.Scores.Select(s => s.CreateScoreInfo(rulesets)));
-                TopScore = r.UserScore.CreateScoreInfo(rulesets);
+                TopScore = r.UserScore?.CreateScoreInfo(rulesets);
             };
 
             return req;
