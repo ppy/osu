@@ -25,6 +25,8 @@ namespace osu.Game.Beatmaps.Formats
         public const int LATEST_VERSION = 128;
 
         private readonly IBeatmap beatmap;
+
+        [CanBeNull]
         private readonly IBeatmapSkin skin;
 
         /// <summary>
@@ -64,7 +66,7 @@ namespace osu.Game.Beatmaps.Formats
             handleControlPoints(writer);
 
             writer.WriteLine();
-            handleComboColours(writer);
+            handleColours(writer);
 
             writer.WriteLine();
             handleHitObjects(writer);
@@ -209,9 +211,9 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleComboColours(TextWriter writer)
+        private void handleColours(TextWriter writer)
         {
-            var colours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+            var colours = skin?.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
 
             if (colours == null || colours.Count == 0)
                 return;
