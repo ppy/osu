@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             if (roomId.Value == null)
                 return null;
 
-            var req = new GetRoomScoresRequest(roomId.Value ?? 0);
+            var req = new GetRoomLeaderboardRequest(roomId.Value ?? 0);
 
             req.Success += r =>
             {
