@@ -14,8 +14,6 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
     {
-        public Action<IEnumerable<APIUserScoreAggregate>> ScoresLoaded;
-
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<int?> roomId { get; set; }
 
@@ -43,8 +41,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             req.Success += r =>
             {
-                scoresCallback?.Invoke(r);
-                ScoresLoaded?.Invoke(r);
+                scoresCallback?.Invoke(r.Leaderboard);
+                TopScore = r.OwnScore;
             };
 
             return req;
