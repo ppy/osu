@@ -156,7 +156,8 @@ namespace osu.Game.Rulesets.Osu.Replays
             // TODO: Shouldn't the spinner always spin in the same direction?
             if (h is Spinner spinner)
             {
-                if (spinner.Duration < reactionTime)
+                // spinners with 0 spins required will auto-complete - don't bother
+                if (spinner.SpinsRequired == 0)
                     return;
 
                 calcSpinnerStartPosAndDirection(((OsuReplayFrame)Frames[^1]).Position, out startPosition, out spinnerDirection);
