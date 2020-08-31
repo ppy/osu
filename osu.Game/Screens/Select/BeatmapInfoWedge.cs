@@ -27,6 +27,7 @@ using osu.Framework.Logging;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Ranking.Expanded;
 
 namespace osu.Game.Screens.Select
 {
@@ -224,8 +225,15 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
+                            new StarRatingDisplay(beatmapInfo)
+                            {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                            },
                             StatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
                                 TextSize = 11,
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapInfo.Status,
