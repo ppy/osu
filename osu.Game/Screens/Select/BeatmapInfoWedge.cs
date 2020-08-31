@@ -227,13 +227,13 @@ namespace osu.Game.Screens.Select
                         {
                             createStarRatingDisplay(beatmapInfo).With(display =>
                             {
-                                display.Anchor = Anchor.CentreRight;
-                                display.Origin = Anchor.CentreRight;
+                                display.Anchor = Anchor.TopRight;
+                                display.Origin = Anchor.TopRight;
                             }),
                             StatusPill = new BeatmapSetOnlineStatusPill
                             {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
                                 TextSize = 11,
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapInfo.Status,
