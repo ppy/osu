@@ -237,10 +237,20 @@ namespace osu.Game.Beatmaps
                 using (ContextFactory.GetForWrite())
                 {
                     var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
+                    var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
+
+                    // metadata may have changed; update the path with the standard format.
+                    beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}]";
+
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 
+                    var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo
+                    {
+                        Filename = beatmapInfo.Path
+                    };
+
                     stream.Seek(0, SeekOrigin.Begin);
-                    UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                    UpdateFile(setInfo, fileInfo, stream);
                 }
             }
 
