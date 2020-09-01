@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             req.Success += r =>
             {
                 scoresCallback?.Invoke(r.Leaderboard);
-                TopScore = r.OwnScore;
+                TopScore = r.UserScore;
             };
 
             return req;

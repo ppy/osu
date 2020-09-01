@@ -12,7 +12,7 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("leaderboard")]
         public List<APIUserScoreAggregate> Leaderboard;
 
-        [JsonProperty("own_score")]
-        public APIUserScoreAggregate OwnScore;
+        [JsonProperty("user_score")]
+        public APIUserScoreAggregate UserScore;
     }
 }
