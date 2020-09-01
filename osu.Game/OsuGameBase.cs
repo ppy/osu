@@ -26,6 +26,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -54,6 +55,8 @@ namespace osu.Game
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
+
+        protected CollectionManager CollectionManager;
 
         protected ScoreManager ScoreManager;
 
@@ -221,6 +224,10 @@ namespace osu.Game
             var difficultyManager = new BeatmapDifficultyManager();
             dependencies.Cache(difficultyManager);
             AddInternal(difficultyManager);
+
+            var collectionManager = new CollectionManager();
+            dependencies.Cache(collectionManager);
+            AddInternal(collectionManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
