@@ -52,6 +52,9 @@ namespace osu.Game.Screens.Play
 
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
+        // We are managing our own adjustments (see OnEntering/OnExiting).
+        public override bool AllowRateAdjustments => false;
+
         /// <summary>
         /// Whether gameplay should pause when the game window focus is lost.
         /// </summary>
@@ -627,6 +630,10 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
+
+            Beatmap.Value.Track.ResetSpeedAdjustments();
+            foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
+                mod.ApplyToTrack(Beatmap.Value.Track);
         }
 
         public override void OnSuspending(IScreen next)
@@ -659,6 +666,8 @@ namespace osu.Game.Screens.Play
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
             GameplayClockContainer?.StopUsingBeatmapClock();
+
+            Beatmap.Value.Track.ResetSpeedAdjustments();
 
             fadeOut();
             return base.OnExiting(next);
