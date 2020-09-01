@@ -42,9 +42,9 @@ namespace osu.Game.Beatmaps
         Storyboard Storyboard { get; }
 
         /// <summary>
-        /// Retrieves the <see cref="IBeatmapSkin"/> which this <see cref="WorkingBeatmap"/> provides.
+        /// Retrieves the <see cref="Skin"/> which this <see cref="WorkingBeatmap"/> provides.
         /// </summary>
-        IBeatmapSkin Skin { get; }
+        ISkin Skin { get; }
 
         /// <summary>
         /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
