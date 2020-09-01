@@ -27,6 +27,7 @@ using osu.Framework.Logging;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Ranking.Expanded;
 
 namespace osu.Game.Screens.Select
 {
@@ -222,10 +223,20 @@ namespace osu.Game.Screens.Select
                         Direction = FillDirection.Vertical,
                         Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        Shear = wedged_container_shear,
+                        Children = new[]
                         {
+                            createStarRatingDisplay(beatmapInfo).With(display =>
+                            {
+                                display.Anchor = Anchor.TopRight;
+                                display.Origin = Anchor.TopRight;
+                                display.Shear = -wedged_container_shear;
+                            }),
                             StatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Shear = -wedged_container_shear,
                                 TextSize = 11,
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapInfo.Status,
@@ -281,6 +292,13 @@ namespace osu.Game.Screens.Select
                 if (beatmapInfo.Version == null)
                     StatusPill.Hide();
             }
+
+            private static Drawable createStarRatingDisplay(BeatmapInfo beatmapInfo) => beatmapInfo.StarDifficulty > 0
+                ? new StarRatingDisplay(beatmapInfo)
+                {
+                    Margin = new MarginPadding { Bottom = 5 }
+                }
+                : Empty();
 
             private void setMetadata(string source)
             {
