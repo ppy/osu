@@ -29,12 +29,12 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestSceneSkinFallbacks : TestSceneOsuPlayer
     {
         private readonly TestSource testUserSkin;
-        private readonly BeatmapTestSource testBeatmapSkin;
+        private readonly TestSource testBeatmapSkin;
 
         public TestSceneSkinFallbacks()
         {
             testUserSkin = new TestSource("user");
-            testBeatmapSkin = new BeatmapTestSource();
+            testBeatmapSkin = new TestSource("beatmap");
         }
 
         [Test]
@@ -80,15 +80,15 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public class CustomSkinWorkingBeatmap : ClockBackedTestWorkingBeatmap
         {
-            private readonly IBeatmapSkin skin;
+            private readonly ISkinSource skin;
 
-            public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock frameBasedClock, AudioManager audio, IBeatmapSkin skin)
+            public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock frameBasedClock, AudioManager audio, ISkinSource skin)
                 : base(beatmap, storyboard, frameBasedClock, audio)
             {
                 this.skin = skin;
             }
 
-            protected override IBeatmapSkin GetSkin() => skin;
+            protected override ISkin GetSkin() => skin;
         }
 
         public class SkinProvidingPlayer : TestPlayer
@@ -109,14 +109,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 dependencies.CacheAs<ISkinSource>(userSkin);
 
                 return dependencies;
-            }
-        }
-
-        private class BeatmapTestSource : TestSource, IBeatmapSkin
-        {
-            public BeatmapTestSource()
-                : base("beatmap")
-            {
             }
         }
 
