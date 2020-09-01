@@ -36,8 +36,5 @@ namespace osu.Game.Screens.Ranking.Expanded
             s.Font = OsuFont.Torus.With(size: 60, weight: FontWeight.Light, fixedWidth: true);
             s.Spacing = new Vector2(-5, 0);
         });
-
-        public override void Increment(long amount)
-            => Current.Value += amount;
     }
 }
