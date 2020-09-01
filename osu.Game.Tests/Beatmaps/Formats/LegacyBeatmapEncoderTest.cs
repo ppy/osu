@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             return a.ComboColours.SequenceEqual(b.ComboColours);
         }
 
-        private void sort((IBeatmap beatmap, IBeatmapSkin beatmapSkin) tuple)
+        private void sort((IBeatmap beatmap, ISkin beatmapSkin) tuple)
         {
             // Sort control points to ensure a sane ordering, as they may be parsed in different orders. This works because each group contains only uniquely-typed control points.
             foreach (var g in tuple.beatmap.ControlPointInfo.Groups)
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private class TestLegacySkin : LegacySkin, IBeatmapSkin
+        private class TestLegacySkin : LegacySkin, ISkin
         {
             public TestLegacySkin(IResourceStore<byte[]> storage, string fileName)
                 : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, storage, null, fileName)
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private Stream encodeToLegacy((IBeatmap beatmap, IBeatmapSkin beatmapSkin) fullBeatmap)
+        private Stream encodeToLegacy((IBeatmap beatmap, ISkin beatmapSkin) fullBeatmap)
         {
             var (beatmap, beatmapSkin) = fullBeatmap;
             var stream = new MemoryStream();
