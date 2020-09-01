@@ -27,14 +27,14 @@ namespace osu.Game.Beatmaps.Formats
         private readonly IBeatmap beatmap;
 
         [CanBeNull]
-        private readonly IBeatmapSkin skin;
+        private readonly ISkin skin;
 
         /// <summary>
         /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] IBeatmapSkin skin)
+        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] ISkin skin)
         {
             this.beatmap = beatmap;
             this.skin = skin;

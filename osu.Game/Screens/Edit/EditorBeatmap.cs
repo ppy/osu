@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit
 
         public readonly IBeatmap PlayableBeatmap;
 
-        public readonly IBeatmapSkin BeatmapSkin;
+        public readonly ISkin BeatmapSkin;
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap, IBeatmapSkin beatmapSkin = null)
+        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null)
         {
             PlayableBeatmap = playableBeatmap;
             BeatmapSkin = beatmapSkin;
