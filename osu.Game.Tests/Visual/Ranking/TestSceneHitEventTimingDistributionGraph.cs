@@ -35,6 +35,18 @@ namespace osu.Game.Tests.Visual.Ranking
             createTest(new List<HitEvent>());
         }
 
+        [Test]
+        public void TestMissesDontShow()
+        {
+            createTest(Enumerable.Range(0, 100).Select(i =>
+            {
+                if (i % 2 == 0)
+                    return new HitEvent(0, HitResult.Perfect, new HitCircle(), new HitCircle(), null);
+
+                return new HitEvent(30, HitResult.Miss, new HitCircle(), new HitCircle(), null);
+            }).ToList());
+        }
+
         private void createTest(List<HitEvent> events) => AddStep("create test", () =>
         {
             Children = new Drawable[]
