@@ -40,10 +40,5 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override OsuSpriteText CreateSpriteText()
             => base.CreateSpriteText().With(s => s.Font = s.Font.With(size: 20f, fixedWidth: true));
-
-        public override void Increment(double amount)
-        {
-            Current.Value += amount;
-        }
     }
 }

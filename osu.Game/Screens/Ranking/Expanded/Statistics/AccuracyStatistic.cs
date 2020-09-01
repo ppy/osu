@@ -46,9 +46,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
             protected override string FormatCount(double count) => count.FormatAccuracy();
 
-            public override void Increment(double amount)
-                => Current.Value += amount;
-
             protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
             {
                 s.Font = OsuFont.Torus.With(size: 20, fixedWidth: true);
