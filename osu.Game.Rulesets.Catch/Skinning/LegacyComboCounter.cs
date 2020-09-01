@@ -145,8 +145,6 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 this.fontOverlap = fontOverlap;
             }
 
-            public override void Increment(int amount) => Current.Value += amount;
-
             protected override double GetProportionalDuration(int currentValue, int newValue)
             {
                 return Math.Abs(newValue - currentValue) * 75.0;
