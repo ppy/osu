@@ -97,20 +97,24 @@ namespace osu.Game.Beatmaps
 
         public WorkingBeatmap CreateNew(RulesetInfo ruleset)
         {
+            var metadata = new BeatmapMetadata
+            {
+                Artist = "artist",
+                Title = "title",
+                Author = User.SYSTEM_USER,
+            };
+
             var set = new BeatmapSetInfo
             {
-                Metadata = new BeatmapMetadata
-                {
-                    Artist = "unknown",
-                    Title = "unknown",
-                    Author = User.SYSTEM_USER,
-                },
+                Metadata = metadata,
                 Beatmaps = new List<BeatmapInfo>
                 {
                     new BeatmapInfo
                     {
                         BaseDifficulty = new BeatmapDifficulty(),
-                        Ruleset = ruleset
+                        Ruleset = ruleset,
+                        Metadata = metadata,
+                        Version = "difficulty"
                     }
                 }
             };

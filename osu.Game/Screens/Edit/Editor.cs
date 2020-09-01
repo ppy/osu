@@ -28,6 +28,7 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.API;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
@@ -72,6 +73,9 @@ namespace osu.Game.Screens.Edit
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host)
         {
@@ -95,6 +99,7 @@ namespace osu.Game.Screens.Edit
             {
                 isNewBeatmap = true;
                 Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value);
+                Beatmap.Value.BeatmapSetInfo.Metadata.Author = api.LocalUser.Value;
             }
 
             try
@@ -408,7 +413,14 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!clock.IsRunning, amount);
         }
 
-        private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
+        private void saveBeatmap()
+        {
+            // apply any set-level metadata changes.
+            beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
+
+            // save the loaded beatmap's data stream.
+            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
+        }
 
         private void exportBeatmap()
         {
