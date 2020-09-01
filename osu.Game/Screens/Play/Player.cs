@@ -80,6 +80,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         private SampleChannel sampleRestart;
 
         public BreakOverlay BreakOverlay;
@@ -631,9 +634,12 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
 
-            Beatmap.Value.Track.ResetSpeedAdjustments();
+            // Our mods are local copies of the global mods so they need to be re-applied to the track.
+            // This is done through the music controller (for now), because resetting speed adjustments on the beatmap track also removes adjustments provided by DrawableTrack.
+            // Todo: In the future, player will receive in a track and will probably not have to worry about this...
+            musicController.ResetTrackAdjustments();
             foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
-                mod.ApplyToTrack(Beatmap.Value.Track);
+                mod.ApplyToTrack(musicController.CurrentTrack);
         }
 
         public override void OnSuspending(IScreen next)
@@ -667,7 +673,7 @@ namespace osu.Game.Screens.Play
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
             GameplayClockContainer?.StopUsingBeatmapClock();
 
-            Beatmap.Value.Track.ResetSpeedAdjustments();
+            musicController.ResetTrackAdjustments();
 
             fadeOut();
             return base.OnExiting(next);
