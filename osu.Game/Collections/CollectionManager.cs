@@ -4,23 +4,33 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
-using osu.Framework.Logging;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.IO.Legacy;
 
 namespace osu.Game.Collections
 {
-    public class CollectionManager
+    public class CollectionManager : CompositeDrawable
     {
-        private const string import_from_stable_path = "collection.db";
+        private const string database_name = "collection.db";
 
-        private readonly BeatmapManager beatmaps;
+        public IBindableList<BeatmapCollection> Collections => collections;
+        private readonly BindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
 
-        public CollectionManager(BeatmapManager beatmaps)
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
         {
-            this.beatmaps = beatmaps;
+            if (host.Storage.Exists(database_name))
+            {
+                using (var stream = host.Storage.GetStream(database_name))
+                    collections.AddRange(readCollection(stream));
+            }
         }
 
         /// <summary>
@@ -31,26 +41,25 @@ namespace osu.Game.Collections
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync()
-        {
-            var stable = GetStableStorage?.Invoke();
-
-            if (stable == null)
-            {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
-            if (!stable.ExistsDirectory(import_from_stable_path))
-            {
-                // This handles situations like when the user does not have a Skins folder
-                Logger.Log($"No {import_from_stable_path} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
-            return Task.Run(async () => await Import(GetStableImportPaths(GetStableStorage()).Select(f => stable.GetFullPath(f)).ToArray()));
-        }
-
+        // public Task ImportFromStableAsync()
+        // {
+        //     var stable = GetStableStorage?.Invoke();
+        //
+        //     if (stable == null)
+        //     {
+        //         Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
+        //         return Task.CompletedTask;
+        //     }
+        //
+        //     if (!stable.ExistsDirectory(database_name))
+        //     {
+        //         // This handles situations like when the user does not have a Skins folder
+        //         Logger.Log($"No {database_name} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
+        //         return Task.CompletedTask;
+        //     }
+        //
+        //     return Task.Run(async () => await Import(GetStableImportPaths(GetStableStorage()).Select(f => stable.GetFullPath(f)).ToArray()));
+        // }
         private List<BeatmapCollection> readCollection(Stream stream)
         {
             var result = new List<BeatmapCollection>();
@@ -77,6 +86,8 @@ namespace osu.Game.Collections
                         if (beatmap != null)
                             collection.Beatmaps.Add(beatmap);
                     }
+
+                    result.Add(collection);
                 }
             }
 
