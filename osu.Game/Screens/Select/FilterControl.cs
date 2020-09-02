@@ -288,6 +288,11 @@ namespace osu.Game.Screens.Select
 
             private class CollectionDropdownMenu : OsuDropdownMenu
             {
+                public CollectionDropdownMenu()
+                {
+                    MaxHeight = 200;
+                }
+
                 protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new CollectionDropdownMenuItem(item);
             }
 
