@@ -224,7 +224,6 @@ namespace osu.Game.Screens.Select
             {
                 base.LoadComplete();
 
-                beatmaps.CollectionChanged += filterBeatmapsChanged;
                 Current.BindValueChanged(filterChanged, true);
             }
 
@@ -247,11 +246,15 @@ namespace osu.Game.Screens.Select
             /// </summary>
             private void filterChanged(ValueChangedEvent<CollectionFilter> filter)
             {
+                beatmaps.CollectionChanged -= filterBeatmapsChanged;
+
                 if (filter.OldValue?.Collection != null)
                     beatmaps.UnbindFrom(filter.OldValue.Collection.Beatmaps);
 
                 if (filter.NewValue?.Collection != null)
                     beatmaps.BindTo(filter.NewValue.Collection.Beatmaps);
+
+                beatmaps.CollectionChanged += filterBeatmapsChanged;
             }
 
             /// <summary>
