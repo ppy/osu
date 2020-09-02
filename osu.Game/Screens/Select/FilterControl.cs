@@ -347,6 +347,8 @@ namespace osu.Game.Screens.Select
                 {
                     Debug.Assert(collectionBeatmaps != null);
 
+                    addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
+
                     if (collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo))
                     {
                         addOrRemoveButton.Icon = FontAwesome.Solid.MinusSquare;
