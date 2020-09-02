@@ -108,7 +108,7 @@ namespace osu.Game.Collections
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Failed to read collections");
+                Logger.Error(e, "Failed to read collection database.");
             }
 
             return result;
@@ -168,7 +168,7 @@ namespace osu.Game.Collections
                     // Since this code is not thread-safe, we may run into random exceptions (such as collection enumeration or out of range indexing).
                     // Failures are thus only alerted if they exceed a threshold (once) to indicate "actual" errors having occurred.
                     if (++saveFailures == 10)
-                        Logger.Error(e, "Failed to save collections");
+                        Logger.Error(e, "Failed to save collection database!");
                 }
 
                 return false;
