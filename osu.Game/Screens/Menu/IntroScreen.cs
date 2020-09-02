@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Menu
 
         private WorkingBeatmap initialBeatmap;
 
-        protected Track Track => initialBeatmap?.Track;
+        protected ITrack Track { get; private set; }
 
         private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
 
@@ -62,6 +62,7 @@ namespace osu.Game.Screens.Menu
 
         /// <summary>
         /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
+        /// Only valid during or after <see cref="LogoArriving"/>.
         /// </summary>
         protected bool UsingThemedIntro { get; private set; }
 
@@ -111,7 +112,6 @@ namespace osu.Game.Screens.Menu
                 if (setInfo != null)
                 {
                     initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-                    UsingThemedIntro = !(Track is TrackVirtual);
                 }
 
                 return UsingThemedIntro;
@@ -164,6 +164,8 @@ namespace osu.Game.Screens.Menu
             if (!resuming)
             {
                 beatmap.Value = initialBeatmap;
+                Track = initialBeatmap.Track;
+                UsingThemedIntro = !initialBeatmap.Track.IsDummyDevice;
 
                 logo.MoveTo(new Vector2(0.5f));
                 logo.ScaleTo(Vector2.One);

@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Multi.Lounge
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private MusicController music { get; set; }
 
         private bool joiningRoom;
