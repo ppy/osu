@@ -334,7 +334,7 @@ namespace osu.Game.Screens.Select
                     if (collectionBeatmaps != null)
                     {
                         collectionBeatmaps.CollectionChanged += (_, __) => collectionChanged();
-                        collectionChanged();
+                        beatmap.BindValueChanged(_ => collectionChanged(), true);
                     }
                 }
 
