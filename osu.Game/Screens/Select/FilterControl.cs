@@ -2,12 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -21,7 +26,8 @@ namespace osu.Game.Screens.Select
 {
     public class FilterControl : Container
     {
-        public const float HEIGHT = 100;
+        public const float HEIGHT = 2 * side_margin + 85;
+        private const float side_margin = 20;
 
         public Action<FilterCriteria> FilterChanged;
 
@@ -41,6 +47,7 @@ namespace osu.Game.Screens.Select
                 Sort = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
                 Ruleset = ruleset.Value,
+                Collection = collectionDropdown?.Current.Value
             };
 
             if (!minimumStars.IsDefault)
@@ -54,6 +61,7 @@ namespace osu.Game.Screens.Select
         }
 
         private SeekLimitedSearchTextBox searchTextBox;
+        private CollectionFilterDropdown collectionDropdown;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             base.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
@@ -90,73 +98,169 @@ namespace osu.Game.Screens.Select
                 },
                 new Container
                 {
-                    Padding = new MarginPadding(20),
+                    Padding = new MarginPadding(side_margin),
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Children = new Drawable[]
+                    Child = new GridContainer
                     {
-                        searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
-                        new Box
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 1,
-                            Colour = OsuColour.Gray(80),
-                            Origin = Anchor.BottomLeft,
-                            Anchor = Anchor.BottomLeft,
+                            new Dimension(GridSizeMode.Absolute, 60),
+                            new Dimension(GridSizeMode.Absolute, 5),
+                            new Dimension(GridSizeMode.Absolute, 20),
                         },
-                        new FillFlowContainer
+                        Content = new[]
                         {
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            Direction = FillDirection.Horizontal,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
-                            Children = new Drawable[]
+                            new Drawable[]
                             {
-                                new OsuTabControlCheckbox
+                                new Container
                                 {
-                                    Text = "Show converted",
-                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
-                                },
-                                sortTabs = new OsuTabControl<SortMode>
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 1,
+                                            Colour = OsuColour.Gray(80),
+                                            Origin = Anchor.BottomLeft,
+                                            Anchor = Anchor.BottomLeft,
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.BottomRight,
+                                            Origin = Anchor.BottomRight,
+                                            Direction = FillDirection.Horizontal,
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
+                                            Children = new Drawable[]
+                                            {
+                                                new OsuTabControlCheckbox
+                                                {
+                                                    Text = "Show converted",
+                                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                },
+                                                sortTabs = new OsuTabControl<SortMode>
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Width = 0.5f,
+                                                    Height = 24,
+                                                    AutoSort = true,
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                    AccentColour = colours.GreenLight,
+                                                    Current = { BindTarget = sortMode }
+                                                },
+                                                new OsuSpriteText
+                                                {
+                                                    Text = "Sort by",
+                                                    Font = OsuFont.GetFont(size: 14),
+                                                    Margin = new MarginPadding(5),
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                },
+                                            }
+                                        },
+                                    }
+                                }
+                            },
+                            null,
+                            new Drawable[]
+                            {
+                                new Container
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    Width = 0.5f,
-                                    Height = 24,
-                                    AutoSort = true,
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
-                                    AccentColour = colours.GreenLight,
-                                    Current = { BindTarget = sortMode }
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = "Sort by",
-                                    Font = OsuFont.GetFont(size: 14),
-                                    Margin = new MarginPadding(5),
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
-                                },
-                            }
-                        },
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        collectionDropdown = new CollectionFilterDropdown
+                                        {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            RelativeSizeAxes = Axes.X,
+                                            Width = 0.4f,
+                                        }
+                                    }
+                                }
+                            },
+                        }
                     }
                 }
             };
 
-            searchTextBox.Current.ValueChanged += _ => FilterChanged?.Invoke(CreateCriteria());
+            collectionDropdown.Current.ValueChanged += _ => updateCriteria();
+            searchTextBox.Current.ValueChanged += _ => updateCriteria();
 
             updateCriteria();
+        }
+
+        private class CollectionFilterDropdown : OsuDropdown<CollectionFilter>
+        {
+            private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
+            private readonly BindableList<CollectionFilter> filters = new BindableList<CollectionFilter>();
+
+            public CollectionFilterDropdown()
+            {
+                ItemSource = filters;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(CollectionManager collectionManager)
+            {
+                collections.BindTo(collectionManager.Collections);
+                collections.CollectionChanged += (_, __) => updateItems();
+                updateItems();
+            }
+
+            private void updateItems()
+            {
+                var selectedItem = SelectedItem?.Value?.Collection;
+
+                filters.Clear();
+                filters.Add(new CollectionFilter(null));
+                filters.AddRange(collections.Select(c => new CollectionFilter(c)));
+
+                Current.Value = filters.FirstOrDefault(f => f.Collection == selectedItem) ?? filters[0];
+            }
+
+            protected override string GenerateItemText(CollectionFilter item) => item.Collection?.Name ?? "All beatmaps";
+
+            protected override DropdownHeader CreateHeader() => new CollectionDropdownHeader();
+
+            private class CollectionDropdownHeader : OsuDropdownHeader
+            {
+                public CollectionDropdownHeader()
+                {
+                    Height = 25;
+                    Icon.Size = new Vector2(16);
+                    Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
+                }
+            }
+        }
+
+        public class CollectionFilter
+        {
+            [CanBeNull]
+            public readonly BeatmapCollection Collection;
+
+            public CollectionFilter([CanBeNull] BeatmapCollection collection)
+            {
+                Collection = collection;
+            }
+
+            public virtual bool ContainsBeatmap(BeatmapInfo beatmap)
+                => Collection?.Beatmaps.Any(b => b.Equals(beatmap)) ?? true;
         }
 
         public void Deactivate()
         {
             searchTextBox.ReadOnly = true;
-
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
                 GetContainingInputManager().ChangeFocus(searchTextBox);
