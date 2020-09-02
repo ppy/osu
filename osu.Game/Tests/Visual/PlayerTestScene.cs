@@ -29,8 +29,6 @@ namespace osu.Game.Tests.Visual
         {
             Dependencies.Cache(LocalConfig = new OsuConfigManager(LocalStorage));
             LocalConfig.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
-
-            MusicController.AllowRateAdjustments = true;
         }
 
         [SetUpSteps]
