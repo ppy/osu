@@ -159,18 +159,16 @@ namespace osu.Game.Collections
                         }
                     }
 
-                    saveFailures = 0;
+                    if (saveFailures < 10)
+                        saveFailures = 0;
                     return true;
                 }
                 catch (Exception e)
                 {
                     // Since this code is not thread-safe, we may run into random exceptions (such as collection enumeration or out of range indexing).
-                    // Failures are thus only alerted if they exceed a threshold to indicate "actual" errors.
-                    if (++saveFailures >= 10)
-                    {
+                    // Failures are thus only alerted if they exceed a threshold (once) to indicate "actual" errors having occurred.
+                    if (++saveFailures == 10)
                         Logger.Error(e, "Failed to save collections");
-                        saveFailures = 0;
-                    }
                 }
 
                 return false;
