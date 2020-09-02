@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                 items.Add(new OsuMenuItem("Add all to...")
                 {
-                    Items = collectionManager.Collections.Take(3).Select(createCollectionMenuItem)
+                    Items = collectionManager.Collections.OrderByDescending(c => c.LastModifyTime).Take(3).Select(createCollectionMenuItem)
                                              .Append(new OsuMenuItem("More...", MenuItemType.Standard, () => { }))
                                              .ToArray()
                 });

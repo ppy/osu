@@ -98,5 +98,14 @@ namespace osu.Game.Collections
         public string Name;
 
         public readonly BindableList<BeatmapInfo> Beatmaps = new BindableList<BeatmapInfo>();
+
+        public DateTimeOffset LastModifyTime { get; private set; }
+
+        public BeatmapCollection()
+        {
+            LastModifyTime = DateTimeOffset.UtcNow;
+
+            Beatmaps.CollectionChanged += (_, __) => LastModifyTime = DateTimeOffset.Now;
+        }
     }
 }
