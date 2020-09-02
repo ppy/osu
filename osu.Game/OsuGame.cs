@@ -88,6 +88,9 @@ namespace osu.Game
 
         private IdleTracker idleTracker;
 
+        /// <summary>
+        /// Whether overlays should be able to be opened game-wide. Value is sourced from the current active screen.
+        /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         protected OsuScreenStack ScreenStack;

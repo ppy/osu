@@ -44,7 +44,7 @@ namespace osu.Game.Screens
         public virtual bool HideOverlaysOnEnter => false;
 
         /// <summary>
-        /// The initial initial overlay activation mode to use when this screen is entered for the first time.
+        /// The initial overlay activation mode to use when this screen is entered for the first time.
         /// </summary>
         protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
