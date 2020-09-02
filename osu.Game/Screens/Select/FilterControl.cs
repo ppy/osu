@@ -204,6 +204,7 @@ namespace osu.Game.Screens.Select
         private class CollectionFilterDropdown : OsuDropdown<CollectionFilter>
         {
             private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
+            private readonly IBindableList<BeatmapInfo> beatmaps = new BindableList<BeatmapInfo>();
             private readonly BindableList<CollectionFilter> filters = new BindableList<CollectionFilter>();
 
             public CollectionFilterDropdown()
@@ -223,7 +224,8 @@ namespace osu.Game.Screens.Select
             {
                 base.LoadComplete();
 
-                Current.BindValueChanged(filterChanged);
+                beatmaps.CollectionChanged += filterBeatmapsChanged;
+                Current.BindValueChanged(filterChanged, true);
             }
 
             /// <summary>
@@ -246,10 +248,10 @@ namespace osu.Game.Screens.Select
             private void filterChanged(ValueChangedEvent<CollectionFilter> filter)
             {
                 if (filter.OldValue?.Collection != null)
-                    filter.OldValue.Collection.Beatmaps.CollectionChanged -= filterBeatmapsChanged;
+                    beatmaps.UnbindFrom(filter.OldValue.Collection.Beatmaps);
 
                 if (filter.NewValue?.Collection != null)
-                    filter.NewValue.Collection.Beatmaps.CollectionChanged += filterBeatmapsChanged;
+                    beatmaps.BindTo(filter.NewValue.Collection.Beatmaps);
             }
 
             /// <summary>
