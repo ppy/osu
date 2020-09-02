@@ -225,9 +225,8 @@ namespace osu.Game
             dependencies.Cache(difficultyManager);
             AddInternal(difficultyManager);
 
-            var collectionManager = new CollectionManager();
-            dependencies.Cache(collectionManager);
-            AddInternal(collectionManager);
+            dependencies.Cache(CollectionManager = new CollectionManager());
+            AddInternal(CollectionManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));

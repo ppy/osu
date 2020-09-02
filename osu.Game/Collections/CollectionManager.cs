@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -25,11 +27,12 @@ namespace osu.Game.Collections
 
         private const string database_name = "collection.db";
 
+        public readonly BindableList<BeatmapCollection> Collections = new BindableList<BeatmapCollection>();
+
+        public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
+
         [Resolved]
         private GameHost host { get; set; }
-
-        public IBindableList<BeatmapCollection> Collections => collections;
-        private readonly BindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -40,12 +43,12 @@ namespace osu.Game.Collections
             if (host.Storage.Exists(database_name))
             {
                 using (var stream = host.Storage.GetStream(database_name))
-                    collections.AddRange(readCollection(stream));
+                    importCollections(readCollections(stream));
             }
 
-            foreach (var c in collections)
+            foreach (var c in Collections)
                 c.Changed += backgroundSave;
-            collections.CollectionChanged += (_, __) => backgroundSave();
+            Collections.CollectionChanged += (_, __) => backgroundSave();
         }
 
         /// <summary>
@@ -56,26 +59,55 @@ namespace osu.Game.Collections
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        // public Task ImportFromStableAsync()
-        // {
-        //     var stable = GetStableStorage?.Invoke();
-        //
-        //     if (stable == null)
-        //     {
-        //         Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-        //         return Task.CompletedTask;
-        //     }
-        //
-        //     if (!stable.ExistsDirectory(database_name))
-        //     {
-        //         // This handles situations like when the user does not have a Skins folder
-        //         Logger.Log($"No {database_name} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
-        //         return Task.CompletedTask;
-        //     }
-        //
-        //     return Task.Run(async () => await Import(GetStableImportPaths(GetStableStorage()).Select(f => stable.GetFullPath(f)).ToArray()));
-        // }
-        private List<BeatmapCollection> readCollection(Stream stream)
+        public Task ImportFromStableAsync()
+        {
+            var stable = GetStableStorage?.Invoke();
+
+            if (stable == null)
+            {
+                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
+                return Task.CompletedTask;
+            }
+
+            if (!stable.Exists(database_name))
+            {
+                // This handles situations like when the user does not have a collections.db file
+                Logger.Log($"No {database_name} available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
+                return Task.CompletedTask;
+            }
+
+            return Task.Run(() =>
+            {
+                var storage = GetStableStorage();
+
+                if (storage.Exists(database_name))
+                {
+                    using (var stream = storage.GetStream(database_name))
+                    {
+                        var collection = readCollections(stream);
+                        Schedule(() => importCollections(collection));
+                    }
+                }
+            });
+        }
+
+        private void importCollections(List<BeatmapCollection> newCollections)
+        {
+            foreach (var newCol in newCollections)
+            {
+                var existing = Collections.FirstOrDefault(c => c.Name == newCol.Name);
+                if (existing == null)
+                    Collections.Add(existing = new BeatmapCollection { Name = newCol.Name });
+
+                foreach (var newBeatmap in newCol.Beatmaps)
+                {
+                    if (!existing.Beatmaps.Contains(newBeatmap))
+                        existing.Beatmaps.Add(newBeatmap);
+                }
+            }
+        }
+
+        private List<BeatmapCollection> readCollections(Stream stream)
         {
             var result = new List<BeatmapCollection>();
 
@@ -147,9 +179,9 @@ namespace osu.Game.Collections
                     using (var sw = new SerializationWriter(host.Storage.GetStream(database_name, FileAccess.Write)))
                     {
                         sw.Write(database_version);
-                        sw.Write(collections.Count);
+                        sw.Write(Collections.Count);
 
-                        foreach (var c in collections)
+                        foreach (var c in Collections)
                         {
                             sw.Write(c.Name);
                             sw.Write(c.Beatmaps.Count);
