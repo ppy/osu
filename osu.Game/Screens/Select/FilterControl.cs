@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -10,12 +11,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -271,6 +274,8 @@ namespace osu.Game.Screens.Select
 
             protected override DropdownHeader CreateHeader() => new CollectionDropdownHeader();
 
+            protected override DropdownMenu CreateMenu() => new CollectionDropdownMenu();
+
             private class CollectionDropdownHeader : OsuDropdownHeader
             {
                 public CollectionDropdownHeader()
@@ -278,6 +283,83 @@ namespace osu.Game.Screens.Select
                     Height = 25;
                     Icon.Size = new Vector2(16);
                     Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
+                }
+            }
+
+            private class CollectionDropdownMenu : OsuDropdownMenu
+            {
+                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new CollectionDropdownMenuItem(item);
+            }
+
+            private class CollectionDropdownMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
+            {
+                [Resolved]
+                private OsuColour colours { get; set; }
+
+                [Resolved]
+                private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+                [CanBeNull]
+                private readonly BindableList<BeatmapInfo> collectionBeatmaps;
+
+                private IconButton addOrRemoveButton;
+
+                public CollectionDropdownMenuItem(MenuItem item)
+                    : base(item)
+                {
+                    collectionBeatmaps = ((DropdownMenuItem<CollectionFilter>)item).Value.Collection?.Beatmaps.GetBoundCopy();
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    AddRangeInternal(new Drawable[]
+                    {
+                        addOrRemoveButton = new IconButton
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            X = -OsuScrollContainer.SCROLL_BAR_HEIGHT,
+                            Scale = new Vector2(0.75f),
+                            Alpha = collectionBeatmaps == null ? 0 : 1,
+                            Action = addOrRemove
+                        }
+                    });
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    if (collectionBeatmaps != null)
+                    {
+                        collectionBeatmaps.CollectionChanged += (_, __) => collectionChanged();
+                        collectionChanged();
+                    }
+                }
+
+                private void collectionChanged()
+                {
+                    Debug.Assert(collectionBeatmaps != null);
+
+                    if (collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo))
+                    {
+                        addOrRemoveButton.Icon = FontAwesome.Solid.MinusSquare;
+                        addOrRemoveButton.IconColour = colours.Red;
+                    }
+                    else
+                    {
+                        addOrRemoveButton.Icon = FontAwesome.Solid.PlusSquare;
+                        addOrRemoveButton.IconColour = colours.Green;
+                    }
+                }
+
+                private void addOrRemove()
+                {
+                    Debug.Assert(collectionBeatmaps != null);
+
+                    if (!collectionBeatmaps.Remove(beatmap.Value.BeatmapInfo))
+                        collectionBeatmaps.Add(beatmap.Value.BeatmapInfo);
                 }
             }
         }
