@@ -93,13 +93,12 @@ namespace osu.Game.Online.Leaderboards
             get => topScoreContainer.Score.Value;
             set
             {
+                topScoreContainer.Score.Value = value;
+
                 if (value == null)
                     topScoreContainer.Hide();
                 else
-                {
                     topScoreContainer.Show();
-                    topScoreContainer.Score.Value = value;
-                }
             }
         }
 
