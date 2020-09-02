@@ -74,9 +74,7 @@ namespace osu.Game.Collections
                 for (int i = 0; i < collectionCount; i++)
                 {
                     var collection = new BeatmapCollection { Name = reader.ReadString() };
-
                     int mapCount = reader.ReadInt32();
-                    collection.Beatmaps.Capacity = mapCount;
 
                     for (int j = 0; j < mapCount; j++)
                     {
@@ -99,6 +97,6 @@ namespace osu.Game.Collections
     {
         public string Name;
 
-        public readonly List<BeatmapInfo> Beatmaps = new List<BeatmapInfo>();
+        public readonly BindableList<BeatmapInfo> Beatmaps = new BindableList<BeatmapInfo>();
     }
 }
