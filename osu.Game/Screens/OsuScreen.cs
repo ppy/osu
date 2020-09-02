@@ -48,7 +48,9 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
-        public Bindable<OverlayActivation> OverlayActivationMode { get; }
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode;
+
+        IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
 
         public virtual bool CursorVisible => true;
 
