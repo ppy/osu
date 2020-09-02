@@ -4,9 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.IO.Legacy;
@@ -15,7 +18,15 @@ namespace osu.Game.Collections
 {
     public class CollectionManager : CompositeDrawable
     {
+        /// <summary>
+        /// Database version in YYYYMMDD format (matching stable).
+        /// </summary>
+        private const int database_version = 30000000;
+
         private const string database_name = "collection.db";
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         public IBindableList<BeatmapCollection> Collections => collections;
         private readonly BindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
@@ -24,13 +35,17 @@ namespace osu.Game.Collections
         private BeatmapManager beatmaps { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load()
         {
             if (host.Storage.Exists(database_name))
             {
                 using (var stream = host.Storage.GetStream(database_name))
                     collections.AddRange(readCollection(stream));
             }
+
+            foreach (var c in collections)
+                c.Changed += backgroundSave;
+            collections.CollectionChanged += (_, __) => backgroundSave();
         }
 
         /// <summary>
@@ -64,37 +79,112 @@ namespace osu.Game.Collections
         {
             var result = new List<BeatmapCollection>();
 
-            using (var reader = new SerializationReader(stream))
+            try
             {
-                reader.ReadInt32(); // Version
-
-                int collectionCount = reader.ReadInt32();
-                result.Capacity = collectionCount;
-
-                for (int i = 0; i < collectionCount; i++)
+                using (var sr = new SerializationReader(stream))
                 {
-                    var collection = new BeatmapCollection { Name = reader.ReadString() };
-                    int mapCount = reader.ReadInt32();
+                    sr.ReadInt32(); // Version
 
-                    for (int j = 0; j < mapCount; j++)
+                    int collectionCount = sr.ReadInt32();
+                    result.Capacity = collectionCount;
+
+                    for (int i = 0; i < collectionCount; i++)
                     {
-                        string checksum = reader.ReadString();
+                        var collection = new BeatmapCollection { Name = sr.ReadString() };
+                        int mapCount = sr.ReadInt32();
 
-                        var beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == checksum);
-                        if (beatmap != null)
-                            collection.Beatmaps.Add(beatmap);
+                        for (int j = 0; j < mapCount; j++)
+                        {
+                            string checksum = sr.ReadString();
+
+                            var beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == checksum);
+                            if (beatmap != null)
+                                collection.Beatmaps.Add(beatmap);
+                        }
+
+                        result.Add(collection);
                     }
-
-                    result.Add(collection);
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to read collections");
             }
 
             return result;
+        }
+
+        private readonly object saveLock = new object();
+        private int lastSave;
+        private int saveFailures;
+
+        /// <summary>
+        /// Perform a save with debounce.
+        /// </summary>
+        private void backgroundSave()
+        {
+            var current = Interlocked.Increment(ref lastSave);
+            Task.Delay(100).ContinueWith(task =>
+            {
+                if (current != lastSave)
+                    return;
+
+                if (!save())
+                    backgroundSave();
+            });
+        }
+
+        private bool save()
+        {
+            lock (saveLock)
+            {
+                Interlocked.Increment(ref lastSave);
+
+                try
+                {
+                    // This is NOT thread-safe!!
+
+                    using (var sw = new SerializationWriter(host.Storage.GetStream(database_name, FileAccess.Write)))
+                    {
+                        sw.Write(database_version);
+                        sw.Write(collections.Count);
+
+                        foreach (var c in collections)
+                        {
+                            sw.Write(c.Name);
+                            sw.Write(c.Beatmaps.Count);
+
+                            foreach (var b in c.Beatmaps)
+                                sw.Write(b.MD5Hash);
+                        }
+                    }
+
+                    saveFailures = 0;
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    // Since this code is not thread-safe, we may run into random exceptions (such as collection enumeration or out of range indexing).
+                    // Failures are thus only alerted if they exceed a threshold to indicate "actual" errors.
+                    if (++saveFailures >= 10)
+                    {
+                        Logger.Error(e, "Failed to save collections");
+                        saveFailures = 0;
+                    }
+                }
+
+                return false;
+            }
         }
     }
 
     public class BeatmapCollection
     {
+        /// <summary>
+        /// Invoked whenever any change occurs on this <see cref="BeatmapCollection"/>.
+        /// </summary>
+        public event Action Changed;
+
         public string Name;
 
         public readonly BindableList<BeatmapInfo> Beatmaps = new BindableList<BeatmapInfo>();
@@ -105,7 +195,11 @@ namespace osu.Game.Collections
         {
             LastModifyTime = DateTimeOffset.UtcNow;
 
-            Beatmaps.CollectionChanged += (_, __) => LastModifyTime = DateTimeOffset.Now;
+            Beatmaps.CollectionChanged += (_, __) =>
+            {
+                LastModifyTime = DateTimeOffset.Now;
+                Changed?.Invoke();
+            };
         }
     }
 }
