@@ -549,6 +549,8 @@ namespace osu.Game
             ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
+            CollectionManager.GetStableStorage = GetStorageForStableInstall;
+
             Container logoContainer;
             BackButton.Receptor receptor;
 
