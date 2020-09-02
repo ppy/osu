@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,6 +18,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -45,6 +47,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private BeatmapDifficultyManager difficultyManager { get; set; }
+
+        [Resolved]
+        private CollectionManager collectionManager { get; set; }
 
         private IBindable<StarDifficulty> starDifficultyBindable;
         private CancellationTokenSource starDifficultyCancellationSource;
@@ -219,8 +224,29 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmap.OnlineBeatmapID.HasValue && beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
 
+                items.Add(new OsuMenuItem("Add to...")
+                {
+                    Items = collectionManager.Collections.Take(3).Select(createCollectionMenuItem)
+                                             .Append(new OsuMenuItem("More...", MenuItemType.Standard, () => { }))
+                                             .ToArray()
+                });
+
                 return items.ToArray();
             }
+        }
+
+        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
+        {
+            return new ToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
+            {
+                if (s)
+                    collection.Beatmaps.Add(beatmap);
+                else
+                    collection.Beatmaps.Remove(beatmap);
+            })
+            {
+                State = { Value = collection.Beatmaps.Contains(beatmap) }
+            };
         }
 
         protected override void Dispose(bool isDisposing)
