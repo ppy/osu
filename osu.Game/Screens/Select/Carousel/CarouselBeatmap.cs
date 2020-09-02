@@ -60,6 +60,9 @@ namespace osu.Game.Screens.Select.Carousel
                     match &= terms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0);
             }
 
+            if (match)
+                match &= criteria.Collection?.ContainsBeatmap(Beatmap) ?? true;
+
             Filtered.Value = !match;
         }
 

@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        public FilterControl.CollectionFilter Collection;
+
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct
         {
