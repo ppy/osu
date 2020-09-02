@@ -176,6 +176,12 @@ namespace osu.Game.Collections
                 return false;
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            save();
+        }
     }
 
     public class BeatmapCollection
