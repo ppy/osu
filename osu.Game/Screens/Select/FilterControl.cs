@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Specialized;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -214,11 +215,21 @@ namespace osu.Game.Screens.Select
             private void load(CollectionManager collectionManager)
             {
                 collections.BindTo(collectionManager.Collections);
-                collections.CollectionChanged += (_, __) => updateItems();
-                updateItems();
+                collections.CollectionChanged += (_, __) => collectionsChanged();
+                collectionsChanged();
             }
 
-            private void updateItems()
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Current.BindValueChanged(filterChanged);
+            }
+
+            /// <summary>
+            /// Occurs when a collection has been added or removed.
+            /// </summary>
+            private void collectionsChanged()
             {
                 var selectedItem = SelectedItem?.Value?.Collection;
 
@@ -226,7 +237,29 @@ namespace osu.Game.Screens.Select
                 filters.Add(new CollectionFilter(null));
                 filters.AddRange(collections.Select(c => new CollectionFilter(c)));
 
-                Current.Value = filters.FirstOrDefault(f => f.Collection == selectedItem) ?? filters[0];
+                Current.Value = filters.SingleOrDefault(f => f.Collection == selectedItem) ?? filters[0];
+            }
+
+            /// <summary>
+            /// Occurs when the <see cref="CollectionFilter"/> selection has changed.
+            /// </summary>
+            private void filterChanged(ValueChangedEvent<CollectionFilter> filter)
+            {
+                if (filter.OldValue?.Collection != null)
+                    filter.OldValue.Collection.Beatmaps.CollectionChanged -= filterBeatmapsChanged;
+
+                if (filter.NewValue?.Collection != null)
+                    filter.NewValue.Collection.Beatmaps.CollectionChanged += filterBeatmapsChanged;
+            }
+
+            /// <summary>
+            /// Occurs when the beatmaps contained by a <see cref="BeatmapCollection"/> have changed.
+            /// </summary>
+            private void filterBeatmapsChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                // The filtered beatmaps have changed, without the filter having changed itself. So a change in filter must be notified.
+                // Note that this does NOT propagate to bound bindables, so the FilterControl must bind directly to the value change event of this bindable.
+                Current.TriggerChange();
             }
 
             protected override string GenerateItemText(CollectionFilter item) => item.Collection?.Name ?? "All beatmaps";
