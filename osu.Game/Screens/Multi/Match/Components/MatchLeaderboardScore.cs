@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         private readonly APIUserScoreAggregate score;
 
-        public MatchLeaderboardScore(APIUserScoreAggregate score, int rank, bool allowHighlight = true)
+        public MatchLeaderboardScore(APIUserScoreAggregate score, int? rank, bool allowHighlight = true)
             : base(score.CreateScoreInfo(), rank, allowHighlight)
         {
             this.score = score;
