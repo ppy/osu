@@ -9,6 +9,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -62,7 +63,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             drawableSpinner = new TestDrawableSpinner(spinner, auto)
             {
                 Anchor = Anchor.Centre,
-                Depth = depthIndex++
+                Depth = depthIndex++,
+                Scale = new Vector2(0.75f)
             };
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())

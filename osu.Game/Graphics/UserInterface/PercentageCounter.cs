@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
@@ -23,12 +25,11 @@ namespace osu.Game.Graphics.UserInterface
 
         public PercentageCounter()
         {
-            DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
             Current.Value = DisplayedCount = 1.0f;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
+        private void load(OsuColour colours) => Colour = colours.BlueLighter;
 
         protected override string FormatCount(double count) => count.FormatAccuracy();
 
@@ -37,9 +38,7 @@ namespace osu.Game.Graphics.UserInterface
             return Math.Abs(currentValue - newValue) * RollingDuration * 100.0f;
         }
 
-        public override void Increment(double amount)
-        {
-            Current.Value += amount;
-        }
+        protected override OsuSpriteText CreateSpriteText()
+            => base.CreateSpriteText().With(s => s.Font = s.Font.With(size: 20f, fixedWidth: true));
     }
 }
