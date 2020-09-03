@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -341,10 +342,13 @@ namespace osu.Game.Overlays
             // but the mutation of the hierarchy is scheduled to avoid exceptions.
             Schedule(() =>
             {
-                lastTrack.Expire();
+                lastTrack.VolumeTo(0, 500, Easing.Out).Expire();
 
                 if (queuedTrack == CurrentTrack)
+                {
                     AddInternal(queuedTrack);
+                    queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
+                }
                 else
                 {
                     // If the track has changed since the call to changeTrack, it is safe to dispose the
