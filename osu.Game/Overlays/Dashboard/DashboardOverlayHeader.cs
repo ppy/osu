@@ -12,7 +12,8 @@ namespace osu.Game.Overlays.Dashboard
             public DashboardTitle()
             {
                 Title = "dashboard";
-                IconTexture = "Icons/changelog";
+                Description = "View your friends and other top level information";
+                IconTexture = "Icons/hexacons/dashboard";
             }
         }
     }

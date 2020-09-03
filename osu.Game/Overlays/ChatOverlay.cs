@@ -26,8 +26,12 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/chat";
+        public string Title => "Chat";
+        public string Description => "Join the real-time discussion";
+
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 

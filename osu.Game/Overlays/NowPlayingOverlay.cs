@@ -25,8 +25,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class NowPlayingOverlay : OsuFocusedOverlayContainer
+    public class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/music";
+        public string Title => "Now playing";
+        public string Description => "Manage the currently playing track";
+
         private const float player_height = 130;
         private const float transition_length = 800;
         private const float progress_height = 10;

@@ -55,7 +55,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new RankingsOverlayHeader
+                            Header = header = new RankingsOverlayHeader
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,

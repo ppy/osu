@@ -19,7 +19,6 @@ namespace osu.Game.Overlays
 
         private Container content;
         private LoadingLayer loading;
-        private NewsHeader header;
         private OverlayScrollContainer scrollFlow;
 
         public NewsOverlay()
@@ -48,7 +47,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new NewsHeader
+                            Header = new NewsHeader
                             {
                                 ShowFrontPage = ShowFrontPage
                             },
@@ -109,6 +108,8 @@ namespace osu.Game.Overlays
         {
             cancellationToken?.Cancel();
             loading.Show();
+
+            var header = (NewsHeader)Header;
 
             if (e.NewValue == null)
             {

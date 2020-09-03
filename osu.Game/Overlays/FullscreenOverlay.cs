@@ -12,8 +12,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class FullscreenOverlay : WaveOverlayContainer, IOnlineComponent
+    public abstract class FullscreenOverlay : WaveOverlayContainer, IOnlineComponent, INamedOverlayComponent
     {
+        public virtual string IconTexture => Header?.Title.IconTexture ?? string.Empty;
+        public virtual string Title => Header?.Title.Title ?? string.Empty;
+        public virtual string Description => Header?.Title.Description ?? string.Empty;
+
+        public OverlayHeader Header { get; protected set; }
+
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
