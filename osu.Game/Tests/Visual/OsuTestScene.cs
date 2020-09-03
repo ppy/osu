@@ -20,6 +20,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -135,6 +136,9 @@ namespace osu.Game.Tests.Visual
         [Resolved]
         protected AudioManager Audio { get; private set; }
 
+        [Resolved]
+        protected MusicController MusicController { get; private set; }
+
         /// <summary>
         /// Creates the ruleset to be used for this test scene.
         /// </summary>
@@ -164,8 +168,8 @@ namespace osu.Game.Tests.Visual
 
             rulesetDependencies?.Dispose();
 
-            if (Beatmap?.Value.TrackLoaded == true)
-                Beatmap.Value.Track.Stop();
+            if (MusicController?.TrackLoaded == true)
+                MusicController.CurrentTrack.Stop();
 
             if (contextFactory.IsValueCreated)
                 contextFactory.Value.ResetDatabase();
@@ -219,7 +223,7 @@ namespace osu.Game.Tests.Visual
                 store?.Dispose();
             }
 
-            protected override Track GetTrack() => track;
+            protected override Track GetBeatmapTrack() => track;
 
             public class TrackVirtualStore : AudioCollectionManager<Track>, ITrackStore
             {
