@@ -16,7 +16,9 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Select;
 
@@ -143,6 +145,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
             AddAssert("new item has id 2", () => Room.Playlist.Last().ID == 2);
+        }
+
+        /// <summary>
+        /// Tests that the same <see cref="Mod"/> instances are not shared between two playlist items.
+        /// </summary>
+        [Test]
+        public void TestNewItemHasNewModInstances()
+        {
+            AddStep("set dt mod", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
+            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
+            AddStep("change mod rate", () => ((OsuModDoubleTime)SelectedMods.Value[0]).SpeedChange.Value = 2);
+            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
+
+            AddAssert("item 1 has rate 1.5", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)Room.Playlist.First().RequiredMods[0]).SpeedChange.Value));
+            AddAssert("item 2 has rate 2", () => Precision.AlmostEquals(2, ((OsuModDoubleTime)Room.Playlist.Last().RequiredMods[0]).SpeedChange.Value));
         }
 
         private class TestMatchSongSelect : MatchSongSelect

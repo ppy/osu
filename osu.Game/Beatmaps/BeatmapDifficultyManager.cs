@@ -89,8 +89,14 @@ namespace osu.Game.Beatmaps
             if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
                 return existing;
 
-            return await Task.Factory.StartNew(() => computeDifficulty(key, beatmapInfo, rulesetInfo), cancellationToken,
-                TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            return await Task.Factory.StartNew(() =>
+            {
+                // Computation may have finished in a previous task.
+                if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out existing, out _))
+                    return existing;
+
+                return computeDifficulty(key, beatmapInfo, rulesetInfo);
+            }, cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         /// <summary>
@@ -245,7 +251,7 @@ namespace osu.Game.Beatmaps
             updateScheduler?.Dispose();
         }
 
-        private readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
+        public readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
         {
             public readonly int BeatmapId;
             public readonly int RulesetId;
@@ -261,7 +267,7 @@ namespace osu.Game.Beatmaps
             public bool Equals(DifficultyCacheLookup other)
                 => BeatmapId == other.BeatmapId
                    && RulesetId == other.RulesetId
-                   && Mods.SequenceEqual(other.Mods);
+                   && Mods.Select(m => m.Acronym).SequenceEqual(other.Mods.Select(m => m.Acronym));
 
             public override int GetHashCode()
             {

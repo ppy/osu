@@ -47,6 +47,7 @@ namespace osu.Game.Rulesets.Edit
 
         /// <summary>
         /// Converts an unsnapped distance to a snapped distance.
+        /// The returned distance will always be floored (as to never exceed the provided <paramref name="distance"/>.
         /// </summary>
         /// <param name="referenceTime">The time of the timing point which <paramref name="distance"/> resides in.</param>
         /// <param name="distance">The distance to convert.</param>
