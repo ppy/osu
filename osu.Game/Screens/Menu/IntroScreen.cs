@@ -126,6 +126,12 @@ namespace osu.Game.Screens.Menu
 
             double fadeOutTime = exit_delay;
 
+            var track = musicController.CurrentTrack;
+
+            // ensure the track doesn't change or loop as we are exiting.
+            track.Looping = false;
+            Beatmap.Disabled = true;
+
             // we also handle the exit transition.
             if (MenuVoice.Value)
             {
@@ -134,16 +140,16 @@ namespace osu.Game.Screens.Menu
                 // if playing the outro voice, we have more time to have fun with the background track.
                 // initially fade to almost silent then ramp out over the remaining time.
                 const double initial_fade = 200;
-                musicController.CurrentTrack
-                               .VolumeTo(0.03f, initial_fade).Then()
-                               .VolumeTo(0, fadeOutTime - initial_fade, Easing.In);
+                track
+                    .VolumeTo(0.03f, initial_fade).Then()
+                    .VolumeTo(0, fadeOutTime - initial_fade, Easing.In);
             }
             else
             {
                 fadeOutTime = 500;
 
                 // if outro voice is turned off, just do a simple fade out.
-                musicController.CurrentTrack.VolumeTo(0, fadeOutTime, Easing.Out);
+                track.VolumeTo(0, fadeOutTime, Easing.Out);
             }
 
             //don't want to fade out completely else we will stop running updates.
