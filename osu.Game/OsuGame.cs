@@ -67,11 +67,11 @@ namespace osu.Game
         [NotNull]
         private readonly NotificationOverlay notifications = new NotificationOverlay();
 
-        private NowPlayingOverlay nowPlaying;
-
         private BeatmapListingOverlay beatmapListing;
 
         private DashboardOverlay dashboard;
+
+        private NewsOverlay news;
 
         private UserProfileOverlay userProfile;
 
@@ -88,7 +88,10 @@ namespace osu.Game
 
         private IdleTracker idleTracker;
 
-        public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
+        /// <summary>
+        /// Whether overlays should be able to be opened game-wide. Value is sourced from the current active screen.
+        /// </summary>
+        public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         protected OsuScreenStack ScreenStack;
 
@@ -425,23 +428,7 @@ namespace osu.Game
 
             updateModDefaults();
 
-            var newBeatmap = beatmap.NewValue;
-
-            if (newBeatmap != null)
-            {
-                newBeatmap.Track.Completed += () => Scheduler.AddOnce(() => trackCompleted(newBeatmap));
-                newBeatmap.BeginAsyncLoad();
-            }
-
-            void trackCompleted(WorkingBeatmap b)
-            {
-                // the source of track completion is the audio thread, so the beatmap may have changed before firing.
-                if (Beatmap.Value != b)
-                    return;
-
-                if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
-                    MusicController.NextTrack();
-            }
+            beatmap.NewValue?.BeginAsyncLoad();
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -615,8 +602,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
-            loadComponentSingleFile(MusicController = new MusicController(), Add, true);
-
             loadComponentSingleFile(notifications.With(d =>
             {
                 d.GetToolbarHeight = () => ToolbarOffset;
@@ -632,6 +617,7 @@ namespace osu.Game
             // overlay elements
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
@@ -647,7 +633,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(nowPlaying = new NowPlayingOverlay
+            loadComponentSingleFile(new NowPlayingOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -682,14 +668,13 @@ namespace osu.Game
             {
                 overlay.State.ValueChanged += state =>
                 {
-                    if (state.NewValue == Visibility.Hidden) return;
-
-                    informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+                    if (state.NewValue != Visibility.Hidden)
+                        showOverlayAboveOthers(overlay, informationalOverlays);
                 };
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
 
             foreach (var overlay in singleDisplayOverlays)
             {
@@ -698,9 +683,8 @@ namespace osu.Game
                     // informational overlays should be dismissed on a show or hide of a full overlay.
                     informationalOverlays.ForEach(o => o.Hide());
 
-                    if (state.NewValue == Visibility.Hidden) return;
-
-                    singleDisplayOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+                    if (state.NewValue != Visibility.Hidden)
+                        showOverlayAboveOthers(overlay, singleDisplayOverlays);
                 };
             }
 
@@ -723,6 +707,15 @@ namespace osu.Game
 
             Settings.State.ValueChanged += _ => updateScreenOffset();
             notifications.State.ValueChanged += _ => updateScreenOffset();
+        }
+
+        private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
+        {
+            otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+
+            // show above others if not visible at all, else leave at current depth.
+            if (!overlay.IsPresent)
+                overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
         }
 
         public class GameIdleTracker : IdleTracker
@@ -859,18 +852,6 @@ namespace osu.Game
 
             switch (action)
             {
-                case GlobalAction.ToggleNowPlaying:
-                    nowPlaying.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleChat:
-                    chatOverlay.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleSocial:
-                    dashboard.ToggleVisibility();
-                    return true;
-
                 case GlobalAction.ResetInputSettings:
                     var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
@@ -884,18 +865,6 @@ namespace osu.Game
 
                 case GlobalAction.ToggleToolbar:
                     Toolbar.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleSettings:
-                    Settings.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleDirect:
-                    beatmapListing.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleNotifications:
-                    notifications.ToggleVisibility();
                     return true;
 
                 case GlobalAction.ToggleGameplayMouseButtons:
@@ -936,8 +905,6 @@ namespace osu.Game
         private FrameworkConfigManager frameworkConfig { get; set; }
 
         private ScalingContainer screenContainer;
-
-        protected MusicController MusicController { get; private set; }
 
         protected override bool OnExiting()
         {
@@ -988,9 +955,12 @@ namespace osu.Game
                     break;
             }
 
+            if (current is IOsuScreen currentOsuScreen)
+                OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
+
             if (newScreen is IOsuScreen newOsuScreen)
             {
-                OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
+                OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
 
                 MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 

@@ -126,6 +126,9 @@ namespace osu.Game.Rulesets.Mania
 
             if (mods.HasFlag(LegacyMods.Random))
                 yield return new ManiaModRandom();
+
+            if (mods.HasFlag(LegacyMods.Mirror))
+                yield return new ManiaModMirror();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -175,6 +178,10 @@ namespace osu.Game.Rulesets.Mania
                     case ManiaModFadeIn _:
                         value |= LegacyMods.FadeIn;
                         break;
+
+                    case ManiaModMirror _:
+                        value |= LegacyMods.Mirror;
+                        break;
                 }
             }
 
@@ -220,6 +227,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
                         new ManiaModDifficultyAdjust(),
+                        new ManiaModInvert(),
                     };
 
                 case ModType.Automation:
@@ -324,6 +332,16 @@ namespace osu.Game.Rulesets.Mania
                         RelativeSizeAxes = Axes.X,
                         Height = 250
                     }),
+                }
+            },
+            new StatisticRow
+            {
+                Columns = new[]
+                {
+                    new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                    {
+                        new UnstableRate(score.HitEvents)
+                    }))
                 }
             }
         };

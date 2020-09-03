@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarRankingsButton()
         {
             SetIcon(FontAwesome.Regular.ChartBar);
+            TooltipMain = "Ranking";
+            TooltipSub = "Find out who's the best right now";
         }
 
         [BackgroundDependencyLoader(true)]

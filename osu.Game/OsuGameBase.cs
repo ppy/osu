@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -29,12 +30,14 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Overlays;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK.Input;
+using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
 {
@@ -71,6 +74,8 @@ namespace osu.Game
 
         protected MenuCursorContainer MenuCursorContainer;
 
+        protected MusicController MusicController;
+
         private Container content;
 
         protected override Container<Drawable> Content => content;
@@ -96,6 +101,11 @@ namespace osu.Game
         private Bindable<bool> fpsDisplayVisible;
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
+
+        /// <summary>
+        /// MD5 representation of the game executable.
+        /// </summary>
+        public string VersionHash { get; private set; }
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
@@ -128,6 +138,18 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
+            try
+            {
+                using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
+                    VersionHash = str.ComputeMD5Hash();
+            }
+            catch
+            {
+                // special case for android builds, which can't read DLLs from a packed apk.
+                // should eventually be handled in a better way.
+                VersionHash = $"{Version}-{RuntimeInfo.OS}".ComputeMD5Hash();
+            }
+
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
@@ -219,16 +241,6 @@ namespace osu.Game
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 
-            // ScheduleAfterChildren is safety against something in the current frame accessing the previous beatmap's track
-            // and potentially causing a reload of it after just unloading.
-            // Note that the reason for this being added *has* been resolved, so it may be feasible to removed this if required.
-            Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
-            {
-                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
-                if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
-                    b.OldValue.RecycleTrack();
-            }));
-
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
 
@@ -255,6 +267,9 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
+
+            AddInternal(MusicController = new MusicController());
+            dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }

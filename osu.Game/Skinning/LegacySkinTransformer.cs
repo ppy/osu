@@ -8,6 +8,7 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Legacy;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Skinning
 {
@@ -38,7 +39,7 @@ namespace osu.Game.Skinning
             if (!(sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample))
                 return Source.GetSample(sampleInfo);
 
-            var playLayeredHitSounds = GetConfig<GlobalSkinConfiguration, bool>(GlobalSkinConfiguration.LayeredHitSounds);
+            var playLayeredHitSounds = GetConfig<LegacySetting, bool>(LegacySetting.LayeredHitSounds);
             if (legacySample.IsLayered && playLayeredHitSounds?.Value == false)
                 return new SampleChannelVirtual();
 

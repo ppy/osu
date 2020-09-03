@@ -89,8 +89,14 @@ namespace osu.Game.Beatmaps
             if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
                 return existing;
 
-            return await Task.Factory.StartNew(() => computeDifficulty(key, beatmapInfo, rulesetInfo), cancellationToken,
-                TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            return await Task.Factory.StartNew(() =>
+            {
+                // Computation may have finished in a previous task.
+                if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out existing, out _))
+                    return existing;
+
+                return computeDifficulty(key, beatmapInfo, rulesetInfo);
+            }, cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         /// <summary>
@@ -109,23 +115,56 @@ namespace osu.Game.Beatmaps
         }
 
         private CancellationTokenSource trackedUpdateCancellationSource;
+        private readonly List<CancellationTokenSource> linkedCancellationSources = new List<CancellationTokenSource>();
 
         /// <summary>
         /// Updates all tracked <see cref="BindableStarDifficulty"/> using the current ruleset and mods.
         /// </summary>
         private void updateTrackedBindables()
         {
-            trackedUpdateCancellationSource?.Cancel();
+            cancelTrackedBindableUpdate();
             trackedUpdateCancellationSource = new CancellationTokenSource();
 
             foreach (var b in trackedBindables)
             {
-                if (trackedUpdateCancellationSource.IsCancellationRequested)
-                    break;
+                var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken);
+                linkedCancellationSources.Add(linkedSource);
 
-                using (var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken))
-                    updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
+                updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
             }
+        }
+
+        /// <summary>
+        /// Cancels the existing update of all tracked <see cref="BindableStarDifficulty"/> via <see cref="updateTrackedBindables"/>.
+        /// </summary>
+        private void cancelTrackedBindableUpdate()
+        {
+            trackedUpdateCancellationSource?.Cancel();
+            trackedUpdateCancellationSource = null;
+
+            if (linkedCancellationSources != null)
+            {
+                foreach (var c in linkedCancellationSources)
+                    c.Dispose();
+
+                linkedCancellationSources.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="BindableStarDifficulty"/> and triggers an initial value update.
+        /// </summary>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> that star difficulty should correspond to.</param>
+        /// <param name="initialRulesetInfo">The initial <see cref="RulesetInfo"/> to get the difficulty with.</param>
+        /// <param name="initialMods">The initial <see cref="Mod"/>s to get the difficulty with.</param>
+        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
+        /// <returns>The <see cref="BindableStarDifficulty"/>.</returns>
+        private BindableStarDifficulty createBindable([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo initialRulesetInfo, [CanBeNull] IEnumerable<Mod> initialMods,
+                                                      CancellationToken cancellationToken)
+        {
+            var bindable = new BindableStarDifficulty(beatmapInfo, cancellationToken);
+            updateBindable(bindable, initialRulesetInfo, initialMods, cancellationToken);
+            return bindable;
         }
 
         /// <summary>
@@ -146,22 +185,6 @@ namespace osu.Game.Beatmaps
                         bindable.Value = t.Result;
                 });
             }, cancellationToken);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="BindableStarDifficulty"/> and triggers an initial value update.
-        /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> that star difficulty should correspond to.</param>
-        /// <param name="initialRulesetInfo">The initial <see cref="RulesetInfo"/> to get the difficulty with.</param>
-        /// <param name="initialMods">The initial <see cref="Mod"/>s to get the difficulty with.</param>
-        /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
-        /// <returns>The <see cref="BindableStarDifficulty"/>.</returns>
-        private BindableStarDifficulty createBindable([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo initialRulesetInfo, [CanBeNull] IEnumerable<Mod> initialMods,
-                                                      CancellationToken cancellationToken)
-        {
-            var bindable = new BindableStarDifficulty(beatmapInfo, cancellationToken);
-            updateBindable(bindable, initialRulesetInfo, initialMods, cancellationToken);
-            return bindable;
         }
 
         /// <summary>
@@ -220,7 +243,15 @@ namespace osu.Game.Beatmaps
             return difficultyCache.TryGetValue(key, out existingDifficulty);
         }
 
-        private readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            cancelTrackedBindableUpdate();
+            updateScheduler?.Dispose();
+        }
+
+        public readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
         {
             public readonly int BeatmapId;
             public readonly int RulesetId;
@@ -236,7 +267,7 @@ namespace osu.Game.Beatmaps
             public bool Equals(DifficultyCacheLookup other)
                 => BeatmapId == other.BeatmapId
                    && RulesetId == other.RulesetId
-                   && Mods.SequenceEqual(other.Mods);
+                   && Mods.Select(m => m.Acronym).SequenceEqual(other.Mods.Select(m => m.Acronym));
 
             public override int GetHashCode()
             {
