@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
 using osuTK;
@@ -43,7 +44,7 @@ namespace osu.Game.Screens.Menu
 
         private WorkingBeatmap initialBeatmap;
 
-        protected Track Track => initialBeatmap?.Track;
+        protected ITrack Track { get; private set; }
 
         private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
 
@@ -60,8 +61,12 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private AudioManager audio { get; set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         /// <summary>
         /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
+        /// Only valid during or after <see cref="LogoArriving"/>.
         /// </summary>
         protected bool UsingThemedIntro { get; private set; }
 
@@ -111,7 +116,6 @@ namespace osu.Game.Screens.Menu
                 if (setInfo != null)
                 {
                     initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-                    UsingThemedIntro = !(Track is TrackVirtual);
                 }
 
                 return UsingThemedIntro;
@@ -164,6 +168,11 @@ namespace osu.Game.Screens.Menu
             if (!resuming)
             {
                 beatmap.Value = initialBeatmap;
+                Track = initialBeatmap.Track;
+                UsingThemedIntro = !initialBeatmap.Track.IsDummyDevice;
+
+                // ensure the track starts at maximum volume
+                musicController.CurrentTrack.FinishTransforms();
 
                 logo.MoveTo(new Vector2(0.5f));
                 logo.ScaleTo(Vector2.One);

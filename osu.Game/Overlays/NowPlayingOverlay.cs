@@ -234,9 +234,9 @@ namespace osu.Game.Overlays
                 pendingBeatmapSwitch = null;
             }
 
-            var track = beatmap.Value?.TrackLoaded ?? false ? beatmap.Value.Track : null;
+            var track = musicController.CurrentTrack;
 
-            if (track?.IsDummyDevice == false)
+            if (!track.IsDummyDevice)
             {
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;

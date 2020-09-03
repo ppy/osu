@@ -41,13 +41,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     Text = Name,
                     Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft
+                    Origin = Anchor.CentreLeft,
+                    Font = OsuFont.GetFont(size: 14)
                 },
                 value = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Font = OsuFont.Torus.With(weight: FontWeight.Bold)
+                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
                 }
             });
         }
@@ -58,12 +59,19 @@ namespace osu.Game.Screens.Ranking.Statistics
     /// </summary>
     public class SimpleStatisticItem<TValue> : SimpleStatisticItem
     {
+        private TValue value;
+
         /// <summary>
         /// The statistic's value to be displayed.
         /// </summary>
         public new TValue Value
         {
-            set => base.Value = DisplayValue(value);
+            get => value;
+            set
+            {
+                this.value = value;
+                base.Value = DisplayValue(value);
+            }
         }
 
         /// <summary>
