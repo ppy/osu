@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.News
             {
                 Title = "news";
                 Description = "Get up-to-date on community happenings";
-                IconTexture = "Icons/news";
+                IconTexture = "Icons/Hexacons/news";
             }
         }
     }

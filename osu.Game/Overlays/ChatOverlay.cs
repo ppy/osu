@@ -28,8 +28,8 @@ namespace osu.Game.Overlays
 {
     public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
-        public string IconTexture => "Icons/chat";
-        public string Title => "Chat";
+        public string IconTexture => "Icons/Hexacons/messaging";
+        public string Title => "chat";
         public string Description => "Join the real-time discussion";
 
         private const float textbox_height = 60;
