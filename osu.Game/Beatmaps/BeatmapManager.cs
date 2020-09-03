@@ -243,15 +243,15 @@ namespace osu.Game.Beatmaps
                     var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
+                    // grab the original file (or create a new one if not found).
+                    var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
+
                     // metadata may have changed; update the path with the standard format.
                     beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}]";
-
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 
-                    var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo
-                    {
-                        Filename = beatmapInfo.Path
-                    };
+                    // update existing or populate new file's filename.
+                    fileInfo.Filename = beatmapInfo.Path;
 
                     stream.Seek(0, SeekOrigin.Begin);
                     UpdateFile(setInfo, fileInfo, stream);
