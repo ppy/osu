@@ -32,6 +32,13 @@ namespace osu.Game.Overlays.Toolbar
                     Action = stateContainer.ToggleVisibility;
                     overlayState.BindTo(stateContainer.State);
                 }
+
+                if (stateContainer is INamedOverlayComponent named)
+                {
+                    TooltipMain = named.Title;
+                    TooltipSub = named.Description;
+                    SetIcon(named.IconTexture);
+                }
             }
         }
 
