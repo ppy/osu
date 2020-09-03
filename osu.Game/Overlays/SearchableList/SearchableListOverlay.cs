@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.SearchableList
     {
         private readonly Container scrollContainer;
 
-        protected readonly SearchableListHeader<THeader> Header;
+        protected new readonly SearchableListHeader<THeader> Header;
         protected readonly SearchableListFilterControl<TTab, TCategory> Filter;
         protected readonly FillFlowContainer ScrollFlow;
 

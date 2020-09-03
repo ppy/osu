@@ -35,17 +35,6 @@ namespace osu.Game.Overlays.Toolbar
             IconContainer.Show();
         }
 
-        public void SetIcon(IconUsage icon) => SetIcon(new SpriteIcon
-        {
-            Size = new Vector2(20),
-            Icon = icon
-        });
-
-        public IconUsage Icon
-        {
-            set => SetIcon(value);
-        }
-
         public string Text
         {
             get => DrawableText.Text;

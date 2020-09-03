@@ -24,7 +24,9 @@ namespace osu.Game.Overlays
         public const float X_PADDING = 40;
         public const float Y_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
-        protected readonly Header Header;
+
+        //todo: should be an OverlayHeader? or maybe not?
+        protected new readonly Header Header;
 
         [Resolved]
         private RulesetStore rulesets { get; set; }

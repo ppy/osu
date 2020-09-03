@@ -25,9 +25,9 @@ namespace osu.Game.Overlays
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
-        protected ChangelogHeader Header;
-
         private Container<ChangelogContent> content;
+
+        protected new ChangelogHeader Header;
 
         private SampleChannel sampleBack;
 
@@ -61,9 +61,10 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            Header = new ChangelogHeader
+                            base.Header = Header = new ChangelogHeader
                             {
                                 ListingSelected = ShowListing,
+                                Build = { BindTarget = Current }
                             },
                             content = new Container<ChangelogContent>
                             {
@@ -76,8 +77,6 @@ namespace osu.Game.Overlays
             };
 
             sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
-
-            Header.Build.BindTo(Current);
 
             Current.BindValueChanged(e =>
             {

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
-        protected ProfileHeader Header;
+        protected new ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
         private ProfileSectionTabControl tabs;
 
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays
 
             Add(sectionsContainer = new ProfileSectionsContainer
             {
-                ExpandableHeader = Header = new ProfileHeader(),
+                ExpandableHeader = base.Header = Header = new ProfileHeader(),
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
