@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps
         {
             const double excess_length = 1000;
 
-            var lastObject = Beatmap.HitObjects.LastOrDefault();
+            var lastObject = Beatmap?.HitObjects.LastOrDefault();
 
             double length;
 

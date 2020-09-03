@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
             protected override IBeatmap GetBeatmap()
             {
                 if (BeatmapInfo.Path == null)
-                    return BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapConverter(new Beatmap()).Beatmap;
+                    return BeatmapInfo?.Ruleset.CreateInstance().CreateBeatmapConverter(new Beatmap { BeatmapInfo = BeatmapInfo }).Beatmap;
 
                 try
                 {
