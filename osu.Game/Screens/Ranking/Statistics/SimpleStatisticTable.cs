@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,10 +14,10 @@ using osu.Framework.Graphics.Shapes;
 namespace osu.Game.Screens.Ranking.Statistics
 {
     /// <summary>
-    /// Represents a statistic row with simple statistics (ones that only need textual display).
+    /// Represents a table with simple statistics (ones that only need textual display).
     /// Richer visualisations should be done with <see cref="StatisticRow"/>s and <see cref="StatisticItem"/>s.
     /// </summary>
-    public class SimpleStatisticRow : CompositeDrawable
+    public class SimpleStatisticTable : CompositeDrawable
     {
         private readonly SimpleStatisticItem[] items;
         private readonly int columnCount;
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         /// <param name="columnCount">The number of columns to layout the <paramref name="items"/> into.</param>
         /// <param name="items">The <see cref="SimpleStatisticItem"/>s to display in this row.</param>
-        public SimpleStatisticRow(int columnCount, IEnumerable<SimpleStatisticItem> items)
+        public SimpleStatisticTable(int columnCount, [ItemNotNull] IEnumerable<SimpleStatisticItem> items)
         {
             if (columnCount < 1)
                 throw new ArgumentOutOfRangeException(nameof(columnCount));

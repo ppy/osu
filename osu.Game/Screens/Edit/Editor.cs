@@ -284,7 +284,7 @@ namespace osu.Game.Screens.Edit
             // this is a special case to handle the "pivot" scenario.
             // if we are precise scrolling in one direction then change our mind and scroll backwards,
             // the existing accumulation should be applied in the inverse direction to maintain responsiveness.
-            if (Math.Sign(scrollAccumulation) != scrollDirection)
+            if (scrollAccumulation != 0 && Math.Sign(scrollAccumulation) != scrollDirection)
                 scrollAccumulation = scrollDirection * (precision - Math.Abs(scrollAccumulation));
 
             scrollAccumulation += scrollComponent * (e.IsPrecise ? 0.1 : 1);

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -33,6 +35,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return (float)HitObject.Column / playfield.TotalColumns;
             }
         }
+
+        /// <summary>
+        /// Whether this <see cref="DrawableManiaHitObject"/> can be hit, given a time value.
+        /// If non-null, judgements will be ignored whilst the function returns false.
+        /// </summary>
+        public Func<DrawableHitObject, double, bool> CheckHittable;
 
         protected DrawableManiaHitObject(ManiaHitObject hitObject)
             : base(hitObject)
@@ -124,6 +132,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     break;
             }
         }
+
+        /// <summary>
+        /// Causes this <see cref="DrawableManiaHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
+        /// </summary>
+        public void MissForcefully() => ApplyResult(r => r.Type = HitResult.Miss);
     }
 
     public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject

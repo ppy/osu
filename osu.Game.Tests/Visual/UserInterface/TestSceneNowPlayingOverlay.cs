@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -11,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -19,8 +21,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         [Cached]
         private MusicController musicController = new MusicController();
-
-        private WorkingBeatmap currentBeatmap;
 
         private NowPlayingOverlay nowPlayingOverlay;
 
@@ -76,16 +76,21 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             }).Wait(), 5);
 
-            AddStep(@"Next track", () => musicController.NextTrack());
-            AddStep("Store track", () => currentBeatmap = Beatmap.Value);
+            WorkingBeatmap currentBeatmap = null;
+
+            AddStep("import beatmap with track", () =>
+            {
+                var setWithTrack = manager.Import(TestResources.GetTestBeatmapForImport()).Result;
+                Beatmap.Value = currentBeatmap = manager.GetWorkingBeatmap(setWithTrack.Beatmaps.First());
+            });
 
             AddStep(@"Seek track to 6 second", () => musicController.SeekTo(6000));
-            AddUntilStep(@"Wait for current time to update", () => currentBeatmap.Track.CurrentTime > 5000);
+            AddUntilStep(@"Wait for current time to update", () => musicController.CurrentTrack.CurrentTime > 5000);
 
             AddStep(@"Set previous", () => musicController.PreviousTrack());
 
             AddAssert(@"Check beatmap didn't change", () => currentBeatmap == Beatmap.Value);
-            AddUntilStep("Wait for current time to update", () => currentBeatmap.Track.CurrentTime < 5000);
+            AddUntilStep("Wait for current time to update", () => musicController.CurrentTrack.CurrentTime < 5000);
 
             AddStep(@"Set previous", () => musicController.PreviousTrack());
             AddAssert(@"Check beatmap did change", () => currentBeatmap != Beatmap.Value);
