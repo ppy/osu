@@ -126,15 +126,6 @@ namespace osu.Game.Skinning
 
                     break;
 
-                case LegacySkinConfiguration.LegacySetting legacy:
-                    switch (legacy)
-                    {
-                        case LegacySkinConfiguration.LegacySetting.Version:
-                            return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
-                    }
-
-                    break;
-
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
 
@@ -148,28 +139,11 @@ namespace osu.Game.Skinning
 
                     break;
 
+                case LegacySkinConfiguration.LegacySetting legacy:
+                    return legacySettingLookup<TValue>(legacy);
+
                 default:
-                    // handles lookups like GlobalSkinConfiguration
-
-                    try
-                    {
-                        if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
-                        {
-                            // special case for handling skins which use 1 or 0 to signify a boolean state.
-                            if (typeof(TValue) == typeof(bool))
-                                val = val == "1" ? "true" : "false";
-
-                            var bindable = new Bindable<TValue>();
-                            if (val != null)
-                                bindable.Parse(val);
-                            return bindable;
-                        }
-                    }
-                    catch
-                    {
-                    }
-
-                    break;
+                    return genericLookup<TLookup, TValue>(lookup);
             }
 
             return null;
@@ -198,6 +172,9 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ShowJudgementLine:
                     return SkinUtils.As<TValue>(new Bindable<bool>(existing.ShowJudgementLine));
+
+                case LegacyManiaSkinConfigurationLookups.ExplosionImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "LightingN"));
 
                 case LegacyManiaSkinConfigurationLookups.ExplosionScale:
                     Debug.Assert(maniaLookup.TargetColumn != null);
@@ -243,6 +220,20 @@ namespace osu.Game.Skinning
                     Debug.Assert(maniaLookup.TargetColumn != null);
                     return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}L"));
 
+                case LegacyManiaSkinConfigurationLookups.HoldNoteLightImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "LightingL"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteLightScale:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+
+                    if (GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<float>(1));
+
+                    if (existing.HoldNoteLightWidth[maniaLookup.TargetColumn.Value] != 0)
+                        return SkinUtils.As<TValue>(new Bindable<float>(existing.HoldNoteLightWidth[maniaLookup.TargetColumn.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.TargetColumn.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
                 case LegacyManiaSkinConfigurationLookups.KeyImage:
                     Debug.Assert(maniaLookup.TargetColumn != null);
                     return SkinUtils.As<TValue>(getManiaImage(existing, $"KeyImage{maniaLookup.TargetColumn}"));
@@ -281,6 +272,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.Hit300:
                 case LegacyManiaSkinConfigurationLookups.Hit300g:
                     return SkinUtils.As<TValue>(getManiaImage(existing, maniaLookup.Lookup.ToString()));
+
+                case LegacyManiaSkinConfigurationLookups.KeysUnderNotes:
+                    return SkinUtils.As<TValue>(new Bindable<bool>(existing.KeysUnderNotes));
             }
 
             return null;
@@ -291,6 +285,43 @@ namespace osu.Game.Skinning
 
         private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
             => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
+
+        [CanBeNull]
+        private IBindable<TValue> legacySettingLookup<TValue>(LegacySkinConfiguration.LegacySetting legacySetting)
+        {
+            switch (legacySetting)
+            {
+                case LegacySkinConfiguration.LegacySetting.Version:
+                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
+
+                default:
+                    return genericLookup<LegacySkinConfiguration.LegacySetting, TValue>(legacySetting);
+            }
+        }
+
+        [CanBeNull]
+        private IBindable<TValue> genericLookup<TLookup, TValue>(TLookup lookup)
+        {
+            try
+            {
+                if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
+                {
+                    // special case for handling skins which use 1 or 0 to signify a boolean state.
+                    if (typeof(TValue) == typeof(bool))
+                        val = val == "1" ? "true" : "false";
+
+                    var bindable = new Bindable<TValue>();
+                    if (val != null)
+                        bindable.Parse(val);
+                    return bindable;
+                }
+            }
+            catch
+            {
+            }
+
+            return null;
+        }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {

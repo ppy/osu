@@ -65,12 +65,6 @@ namespace osu.Game.Overlays.Toolbar
                 Parent.Click();
                 return base.OnClick(e);
             }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                IconContainer.Scale *= 1.4f;
-            }
         }
     }
 }

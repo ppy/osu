@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -127,21 +128,29 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private class MatchScoreCounter : ScoreCounter
         {
+            private OsuSpriteText displayedSpriteText;
+
             public MatchScoreCounter()
             {
                 Margin = new MarginPadding { Top = bar_height, Horizontal = 10 };
-
-                Winning = false;
-
-                DisplayedCountSpriteText.Spacing = new Vector2(-6);
             }
 
             public bool Winning
             {
-                set => DisplayedCountSpriteText.Font = value
+                set => updateFont(value);
+            }
+
+            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
+            {
+                displayedSpriteText = s;
+                displayedSpriteText.Spacing = new Vector2(-6);
+                updateFont(false);
+            });
+
+            private void updateFont(bool winning)
+                => displayedSpriteText.Font = winning
                     ? OsuFont.Torus.With(weight: FontWeight.Bold, size: 50, fixedWidth: true)
                     : OsuFont.Torus.With(weight: FontWeight.Regular, size: 40, fixedWidth: true);
-            }
         }
     }
 }

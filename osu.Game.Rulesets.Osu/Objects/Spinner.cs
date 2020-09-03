@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -45,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             double minimumRotationsPerSecond = stable_matching_fudge * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
 
-            SpinsRequired = (int)Math.Max(1, (secondsDuration * minimumRotationsPerSecond));
+            SpinsRequired = (int)(secondsDuration * minimumRotationsPerSecond);
             MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration);
         }
 

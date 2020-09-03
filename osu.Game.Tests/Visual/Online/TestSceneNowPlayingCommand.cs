@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Set activity", () => API.Activity.Value = new UserActivity.InLobby());
 
-            AddStep("Set beatmap", () => Beatmap.Value = new DummyWorkingBeatmap(null, null)
+            AddStep("Set beatmap", () => Beatmap.Value = new DummyWorkingBeatmap(Audio, null)
             {
                 BeatmapInfo = { OnlineBeatmapID = hasOnlineId ? 1234 : (int?)null }
             });

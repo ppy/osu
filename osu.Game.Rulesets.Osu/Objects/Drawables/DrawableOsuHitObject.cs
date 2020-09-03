@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override float SamplePlaybackPosition => HitObject.X / OsuPlayfield.BASE_SIZE.X;
 
         /// <summary>
-        /// Whether this <see cref="DrawableOsuHitObject"/> can be hit.
+        /// Whether this <see cref="DrawableOsuHitObject"/> can be hit, given a time value.
         /// If non-null, judgements will be ignored (resulting in a shake) whilst the function returns false.
         /// </summary>
         public Func<DrawableHitObject, double, bool> CheckHittable;
