@@ -9,31 +9,29 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
-using osu.Game.Scoring;
 using osuTK;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Online.Leaderboards
 {
-    public class UserTopScoreContainer : VisibilityContainer
+    public class UserTopScoreContainer<TScoreInfo> : VisibilityContainer
     {
         private const int duration = 500;
 
+        public Bindable<TScoreInfo> Score = new Bindable<TScoreInfo>();
+
         private readonly Container scoreContainer;
-
-        public Bindable<APILegacyUserTopScoreInfo> Score = new Bindable<APILegacyUserTopScoreInfo>();
-
-        public Action<ScoreInfo> ScoreSelected;
+        private readonly Func<TScoreInfo, LeaderboardScore> createScoreDelegate;
 
         protected override bool StartHidden => true;
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        public UserTopScoreContainer()
+        public UserTopScoreContainer(Func<TScoreInfo, LeaderboardScore> createScoreDelegate)
         {
+            this.createScoreDelegate = createScoreDelegate;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -72,7 +70,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private CancellationTokenSource loadScoreCancellation;
 
-        private void onScoreChanged(ValueChangedEvent<APILegacyUserTopScoreInfo> score)
+        private void onScoreChanged(ValueChangedEvent<TScoreInfo> score)
         {
             var newScore = score.NewValue;
 
@@ -82,12 +80,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (newScore == null)
                 return;
 
-            var scoreInfo = newScore.Score.CreateScoreInfo(rulesets);
-
-            LoadComponentAsync(new LeaderboardScore(scoreInfo, newScore.Position, false)
-            {
-                Action = () => ScoreSelected?.Invoke(scoreInfo)
-            }, drawableScore =>
+            LoadComponentAsync(createScoreDelegate(newScore), drawableScore =>
             {
                 scoreContainer.Child = drawableScore;
                 drawableScore.FadeInFromZero(duration, Easing.OutQuint);

@@ -1,17 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public class GetRoomScoresRequest : APIRequest<List<APIUserScoreAggregate>>
+    public class GetRoomLeaderboardRequest : APIRequest<APILeaderboard>
     {
         private readonly int roomId;
 
-        public GetRoomScoresRequest(int roomId)
+        public GetRoomLeaderboardRequest(int roomId)
         {
             this.roomId = roomId;
         }
