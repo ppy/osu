@@ -18,7 +18,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             private const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
 
-            protected new float CalculatedBorderPortion => base.CalculatedBorderPortion * 0.77f;
+            protected new float CalculatedBorderPortion
+                // Roughly matches osu!stable's slider border portions.
+                => base.CalculatedBorderPortion * 0.77f;
 
             public new Color4 AccentColour => new Color4(base.AccentColour.R, base.AccentColour.G, base.AccentColour.B, base.AccentColour.A * 0.70f);
 
