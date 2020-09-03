@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -22,20 +21,20 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 new BeatmapStatistic
                 {
                     Name = @"Hit Count",
+                    CreateIcon = () => new BeatmapStatisticSprite("circles"),
                     Content = hits.ToString(),
-                    Icon = FontAwesome.Regular.Circle
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Drumroll Count",
+                    CreateIcon = () => new BeatmapStatisticSprite("sliders"),
                     Content = drumrolls.ToString(),
-                    Icon = FontAwesome.Regular.Circle
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Swell Count",
+                    CreateIcon = () => new BeatmapStatisticSprite("spinners"),
                     Content = swells.ToString(),
-                    Icon = FontAwesome.Regular.Circle
                 }
             };
         }

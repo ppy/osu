@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
@@ -41,14 +40,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 new BeatmapStatistic
                 {
                     Name = @"Note Count",
+                    CreateIcon = () => new BeatmapStatisticSprite("circles"),
                     Content = notes.ToString(),
-                    Icon = FontAwesome.Regular.Circle
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Hold Note Count",
+                    CreateIcon = () => new BeatmapStatisticSprite("sliders"),
                     Content = holdnotes.ToString(),
-                    Icon = FontAwesome.Regular.Circle
                 },
             };
         }
