@@ -14,7 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.SearchableList;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             {
                                                 new Container
                                                 {
-                                                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                                                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.WIDTH_PADDING },
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
                                                     Children = new Drawable[]
