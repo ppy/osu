@@ -88,7 +88,10 @@ namespace osu.Game
 
         private IdleTracker idleTracker;
 
-        public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
+        /// <summary>
+        /// Whether overlays should be able to be opened game-wide. Value is sourced from the current active screen.
+        /// </summary>
+        public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         protected OsuScreenStack ScreenStack;
 
@@ -952,9 +955,12 @@ namespace osu.Game
                     break;
             }
 
+            if (current is IOsuScreen currentOsuScreen)
+                OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
+
             if (newScreen is IOsuScreen newOsuScreen)
             {
-                OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
+                OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
 
                 MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 

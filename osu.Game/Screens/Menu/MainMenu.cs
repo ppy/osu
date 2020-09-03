@@ -276,6 +276,7 @@ namespace osu.Game.Screens.Menu
             }
 
             buttons.State = ButtonSystemState.Exit;
+            OverlayActivationMode.Value = OverlayActivation.Disabled;
 
             songTicker.Hide();
 
