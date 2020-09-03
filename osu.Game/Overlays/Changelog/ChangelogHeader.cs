@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Changelog
             {
                 Title = "changelog";
                 Description = "Track recent dev updates in the osu! ecosystem";
-                IconTexture = "Icons/changelog";
+                IconTexture = "Icons/Hexacons/devtools";
             }
         }
     }

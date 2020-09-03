@@ -28,7 +28,7 @@ namespace osu.Game.Overlays
     public class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/music";
-        public string Title => "Now playing";
+        public string Title => "now playing";
         public string Description => "Manage the currently playing track";
 
         private const float player_height = 130;

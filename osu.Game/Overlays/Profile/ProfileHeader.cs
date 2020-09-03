@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Profile
             public ProfileHeaderTitle()
             {
                 Title = "player info";
-                IconTexture = "Icons/profile";
+                IconTexture = "Icons/Hexacons/profile";
             }
         }
 
