@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Beatmaps
                 this.resourceStore = resourceStore;
             }
 
-            protected override IBeatmapSkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, AudioManager);
+            protected override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, AudioManager);
         }
     }
 }

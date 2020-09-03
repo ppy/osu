@@ -59,7 +59,10 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("create container", () =>
             {
-                Add(gameplayContainer = new GameplayClockContainer(CreateWorkingBeatmap(new OsuRuleset().RulesetInfo), Array.Empty<Mod>(), 0));
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                working.LoadTrack();
+
+                Add(gameplayContainer = new GameplayClockContainer(working, 0));
 
                 gameplayContainer.Add(sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
                 {
@@ -103,7 +106,7 @@ namespace osu.Game.Tests.Gameplay
                 Beatmap.Value = new TestCustomSkinWorkingBeatmap(new OsuRuleset().RulesetInfo, Audio);
                 SelectedMods.Value = new[] { testedMod };
 
-                Add(gameplayContainer = new GameplayClockContainer(Beatmap.Value, SelectedMods.Value, 0));
+                Add(gameplayContainer = new GameplayClockContainer(Beatmap.Value, 0));
 
                 gameplayContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
@@ -116,7 +119,7 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("sample playback rate matches mod rates", () => sample.Channel.AggregateFrequency.Value == expectedRate);
         }
 
-        private class TestSkin : LegacySkin, IBeatmapSkin
+        private class TestSkin : LegacySkin
         {
             public TestSkin(string resourceName, AudioManager audioManager)
                 : base(DefaultLegacySkin.Info, new TestResourceStore(resourceName), audioManager, "skin.ini")
@@ -156,7 +159,7 @@ namespace osu.Game.Tests.Gameplay
                 this.audio = audio;
             }
 
-            protected override IBeatmapSkin GetSkin() => new TestSkin("test-sample", audio);
+            protected override ISkin GetSkin() => new TestSkin("test-sample", audio);
         }
 
         private class TestDrawableStoryboardSample : DrawableStoryboardSample

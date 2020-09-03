@@ -26,6 +26,28 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private EditorClock editorClock { get; set; }
 
+        /// <summary>
+        /// The timeline's scroll position in the last frame.
+        /// </summary>
+        private float lastScrollPosition;
+
+        /// <summary>
+        /// The track time in the last frame.
+        /// </summary>
+        private double lastTrackTime;
+
+        /// <summary>
+        /// Whether the user is currently dragging the timeline.
+        /// </summary>
+        private bool handlingDragInput;
+
+        /// <summary>
+        /// Whether the track was playing before a user drag event.
+        /// </summary>
+        private bool trackWasPlaying;
+
+        private Track track;
+
         public Timeline()
         {
             ZoomDuration = 200;
@@ -59,6 +81,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 waveform.Waveform = b.NewValue.Waveform;
                 track = b.NewValue.Track;
 
+                // todo: i don't think this is safe, the track may not be loaded yet.
                 if (track.Length > 0)
                 {
                     MaxZoom = getZoomLevelForVisibleMilliseconds(500);
@@ -68,29 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }, true);
         }
 
-        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(track.Length / milliseconds);
-
-        /// <summary>
-        /// The timeline's scroll position in the last frame.
-        /// </summary>
-        private float lastScrollPosition;
-
-        /// <summary>
-        /// The track time in the last frame.
-        /// </summary>
-        private double lastTrackTime;
-
-        /// <summary>
-        /// Whether the user is currently dragging the timeline.
-        /// </summary>
-        private bool handlingDragInput;
-
-        /// <summary>
-        /// Whether the track was playing before a user drag event.
-        /// </summary>
-        private bool trackWasPlaying;
-
-        private Track track;
+        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => Math.Max(1, (float)(track.Length / milliseconds));
 
         protected override void Update()
         {

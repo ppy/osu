@@ -4,10 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Framework.Threading;
@@ -21,7 +25,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// Handles playback of the global music track.
     /// </summary>
-    public class MusicController : Component, IKeyBindingHandler<GlobalAction>
+    public class MusicController : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -61,6 +65,9 @@ namespace osu.Game.Overlays
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
+        [NotNull]
+        public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
+
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
 
@@ -73,12 +80,9 @@ namespace osu.Game.Overlays
             managerRemoved.BindValueChanged(beatmapRemoved);
 
             beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal, true).OrderBy(_ => RNG.Next()));
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
+            // Todo: These binds really shouldn't be here, but are unlikely to cause any issues for now.
+            // They are placed here for now since some tests rely on setting the beatmap _and_ their hierarchies inside their load(), which runs before the MusicController's load().
             beatmap.BindValueChanged(beatmapChanged, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
@@ -95,9 +99,14 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
-        /// Returns whether the current beatmap track is playing.
+        /// Returns whether the beatmap track is playing.
         /// </summary>
-        public bool IsPlaying => current?.Track.IsRunning ?? false;
+        public bool IsPlaying => CurrentTrack.IsRunning;
+
+        /// <summary>
+        /// Returns whether the beatmap track is loaded.
+        /// </summary>
+        public bool TrackLoaded => CurrentTrack.TrackLoaded;
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
@@ -130,7 +139,7 @@ namespace osu.Game.Overlays
             seekDelegate = Schedule(() =>
             {
                 if (!beatmap.Disabled)
-                    current?.Track.Seek(position);
+                    CurrentTrack.Seek(position);
             });
         }
 
@@ -142,9 +151,7 @@ namespace osu.Game.Overlays
         {
             if (IsUserPaused) return;
 
-            var track = current?.Track;
-
-            if (track == null || track is TrackVirtual)
+            if (CurrentTrack.IsDummyDevice)
             {
                 if (beatmap.Disabled)
                     return;
@@ -163,17 +170,12 @@ namespace osu.Game.Overlays
         /// <returns>Whether the operation was successful.</returns>
         public bool Play(bool restart = false)
         {
-            var track = current?.Track;
-
             IsUserPaused = false;
 
-            if (track == null)
-                return false;
-
             if (restart)
-                track.Restart();
+                CurrentTrack.Restart();
             else if (!IsPlaying)
-                track.Start();
+                CurrentTrack.Start();
 
             return true;
         }
@@ -183,11 +185,9 @@ namespace osu.Game.Overlays
         /// </summary>
         public void Stop()
         {
-            var track = current?.Track;
-
             IsUserPaused = true;
-            if (track?.IsRunning == true)
-                track.Stop();
+            if (CurrentTrack.IsRunning)
+                CurrentTrack.Stop();
         }
 
         /// <summary>
@@ -196,9 +196,7 @@ namespace osu.Game.Overlays
         /// <returns>Whether the operation was successful.</returns>
         public bool TogglePause()
         {
-            var track = current?.Track;
-
-            if (track?.IsRunning == true)
+            if (CurrentTrack.IsRunning)
                 Stop();
             else
                 Play();
@@ -220,7 +218,7 @@ namespace osu.Game.Overlays
             if (beatmap.Disabled)
                 return PreviousTrackResult.None;
 
-            var currentTrackPosition = current?.Track.CurrentTime;
+            var currentTrackPosition = CurrentTrack.CurrentTime;
 
             if (currentTrackPosition >= restart_cutoff_point)
             {
@@ -234,9 +232,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                if (beatmap is Bindable<WorkingBeatmap> working)
-                    working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
-
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
                 restartTrack();
                 return PreviousTrackResult.Previous;
             }
@@ -260,9 +256,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                if (beatmap is Bindable<WorkingBeatmap> working)
-                    working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
-
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
                 restartTrack();
                 return true;
             }
@@ -274,21 +268,25 @@ namespace osu.Game.Overlays
         {
             // if not scheduled, the previously track will be stopped one frame later (see ScheduleAfterChildren logic in GameBase).
             // we probably want to move this to a central method for switching to a new working beatmap in the future.
-            Schedule(() => beatmap.Value.Track.Restart());
+            Schedule(() => CurrentTrack.Restart());
         }
 
         private WorkingBeatmap current;
 
         private TrackChangeDirection? queuedDirection;
 
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap) => changeBeatmap(beatmap.NewValue);
+
+        private void changeBeatmap(WorkingBeatmap newWorking)
         {
+            var lastWorking = current;
+
             TrackChangeDirection direction = TrackChangeDirection.None;
+
+            bool audioEquals = newWorking?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
 
             if (current != null)
             {
-                bool audioEquals = beatmap.NewValue?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
-
                 if (audioEquals)
                     direction = TrackChangeDirection.None;
                 else if (queuedDirection.HasValue)
@@ -300,18 +298,74 @@ namespace osu.Game.Overlays
                 {
                     // figure out the best direction based on order in playlist.
                     var last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap.NewValue == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
+                    var next = newWorking == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != newWorking.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }
             }
 
-            current = beatmap.NewValue;
+            current = newWorking;
+
+            if (!audioEquals || CurrentTrack.IsDummyDevice)
+            {
+                changeTrack();
+            }
+            else
+            {
+                // transfer still valid track to new working beatmap
+                current.TransferTrack(lastWorking.Track);
+            }
+
             TrackChanged?.Invoke(current, direction);
 
             ResetTrackAdjustments();
 
             queuedDirection = null;
+
+            // this will be a noop if coming from the beatmapChanged event.
+            // the exception is local operations like next/prev, where we want to complete loading the track before sending out a change.
+            if (beatmap.Value != current && beatmap is Bindable<WorkingBeatmap> working)
+                working.Value = current;
+        }
+
+        private void changeTrack()
+        {
+            var lastTrack = CurrentTrack;
+
+            var queuedTrack = new DrawableTrack(current.LoadTrack());
+            queuedTrack.Completed += () => onTrackCompleted(current);
+
+            CurrentTrack = queuedTrack;
+
+            // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.
+            // CurrentTrack is immediately updated above for situations where a immediate knowledge about the new track is required,
+            // but the mutation of the hierarchy is scheduled to avoid exceptions.
+            Schedule(() =>
+            {
+                lastTrack.VolumeTo(0, 500, Easing.Out).Expire();
+
+                if (queuedTrack == CurrentTrack)
+                {
+                    AddInternal(queuedTrack);
+                    queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
+                }
+                else
+                {
+                    // If the track has changed since the call to changeTrack, it is safe to dispose the
+                    // queued track rather than consume it.
+                    queuedTrack.Dispose();
+                }
+            });
+        }
+
+        private void onTrackCompleted(WorkingBeatmap workingBeatmap)
+        {
+            // the source of track completion is the audio thread, so the beatmap may have changed before firing.
+            if (current != workingBeatmap)
+                return;
+
+            if (!CurrentTrack.Looping && !beatmap.Disabled)
+                NextTrack();
         }
 
         private bool allowRateAdjustments;
@@ -332,18 +386,20 @@ namespace osu.Game.Overlays
             }
         }
 
+        /// <summary>
+        /// Resets the speed adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowRateAdjustments"/> is <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// Does not reset speed adjustments applied directly to the beatmap track.
+        /// </remarks>
         public void ResetTrackAdjustments()
         {
-            var track = current?.Track;
-            if (track == null)
-                return;
-
-            track.ResetSpeedAdjustments();
+            CurrentTrack.ResetSpeedAdjustments();
 
             if (allowRateAdjustments)
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
-                    mod.ApplyToTrack(track);
+                    mod.ApplyToTrack(CurrentTrack);
             }
         }
 
