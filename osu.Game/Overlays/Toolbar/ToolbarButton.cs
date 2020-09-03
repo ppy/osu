@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -25,8 +26,6 @@ namespace osu.Game.Overlays.Toolbar
 {
     public abstract class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        public const float WIDTH = Toolbar.HEIGHT * 1.4f;
-
         protected GlobalAction? Hotkey { get; set; }
 
         public void SetIcon(Drawable icon)
@@ -80,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
         protected ToolbarButton()
             : base(HoverSampleSet.Loud)
         {
-            Width = WIDTH;
+            Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
 
             Children = new Drawable[]
@@ -114,7 +113,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Size = new Vector2(20),
+                            Size = new Vector2(26),
                             Alpha = 0,
                         },
                         DrawableText = new OsuSpriteText

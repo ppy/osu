@@ -10,6 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarSettingsButton()
         {
+            Width *= 1.4f;
             Hotkey = GlobalAction.ToggleSettings;
         }
 
