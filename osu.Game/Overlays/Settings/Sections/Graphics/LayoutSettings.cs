@@ -163,8 +163,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 scalingSettings.ForEach(s => s.TransferValueOnCommit = mode.NewValue == ScalingMode.Everything);
             }, true);
 
-            windowModes.ItemsAdded += _ => windowModesChanged();
-            windowModes.ItemsRemoved += _ => windowModesChanged();
+            windowModes.CollectionChanged += (sender, args) => windowModesChanged();
 
             windowModesChanged();
         }
