@@ -44,6 +44,9 @@ namespace osu.Game.Overlays
             if (user.Id == Header?.User.Value?.Id)
                 return;
 
+            if (sectionsContainer != null)
+                sectionsContainer.ExpandableHeader = null;
+
             userReq?.Cancel();
             Clear();
             lastSection = null;
