@@ -15,6 +15,8 @@ namespace osu.Game.Skinning
         public enum LegacySetting
         {
             Version,
+            AnimationFramerate,
+            LayeredHitSounds,
         }
     }
 }
