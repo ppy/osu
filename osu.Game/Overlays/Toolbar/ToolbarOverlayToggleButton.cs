@@ -1,14 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
@@ -20,9 +17,6 @@ namespace osu.Game.Overlays.Toolbar
         private OverlayContainer stateContainer;
 
         private readonly Bindable<Visibility> overlayState = new Bindable<Visibility>();
-
-        [Resolved]
-        private TextureStore textures { get; set; }
 
         public OverlayContainer StateContainer
         {
@@ -43,10 +37,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     TooltipMain = named.Title;
                     TooltipSub = named.Description;
-                    SetIcon(new Sprite
-                    {
-                        Texture = textures.Get(named.IconTexture),
-                    });
+                    SetIcon(named.IconTexture);
                 }
             }
         }
