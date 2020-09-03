@@ -698,9 +698,9 @@ namespace osu.Game
                 float offset = 0;
 
                 if (Settings.State.Value == Visibility.Visible)
-                    offset += ToolbarButton.WIDTH / 2;
+                    offset += Toolbar.HEIGHT / 2;
                 if (notifications.State.Value == Visibility.Visible)
-                    offset -= ToolbarButton.WIDTH / 2;
+                    offset -= Toolbar.HEIGHT / 2;
 
                 screenContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
             }
