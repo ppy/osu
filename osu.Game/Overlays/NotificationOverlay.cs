@@ -18,7 +18,7 @@ namespace osu.Game.Overlays
 {
     public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
-        public string IconTexture => "Icons/Hexacons/";
+        public string IconTexture => "Icons/Hexacons/notification";
         public string Title => "Notifications";
         public string Description => "Waiting for 'ya";
 

@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 Title = "beatmap listing";
                 Description = "Browse for new beatmaps";
-                IconTexture = "Icons/Hexacons/music";
+                IconTexture = "Icons/Hexacons/beatmap";
             }
         }
     }
