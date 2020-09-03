@@ -35,6 +35,15 @@ namespace osu.Game.Overlays.Toolbar
             IconContainer.Show();
         }
 
+        [Resolved]
+        private TextureStore textures { get; set; }
+
+        public void SetIcon(string texture) =>
+            SetIcon(new Sprite
+            {
+                Texture = textures.Get(texture),
+            });
+
         public string Text
         {
             get => DrawableText.Text;
