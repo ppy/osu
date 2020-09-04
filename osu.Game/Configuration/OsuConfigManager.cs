@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
@@ -13,6 +14,7 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Configuration
 {
+    [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>
     {
         protected override void InitialiseDefaults()
