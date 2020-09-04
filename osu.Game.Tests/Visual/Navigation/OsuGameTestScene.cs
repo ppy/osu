@@ -14,6 +14,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -108,6 +109,8 @@ namespace osu.Game.Tests.Visual.Navigation
             public new MusicController MusicController => base.MusicController;
 
             public new OsuConfigManager LocalConfig => base.LocalConfig;
+
+            public new GlobalActionContainer GlobalBinding => base.GlobalBinding;
 
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 
