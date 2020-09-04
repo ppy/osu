@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $"Failed to load ruleset settings");
+                    Logger.Error(e, "Failed to load ruleset settings");
                 }
             }
         }
