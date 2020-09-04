@@ -18,6 +18,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Resources;
+using osu.Game.Users;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
@@ -767,7 +768,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = loadOsu(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo);
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
 
                     manager.Save(working.BeatmapInfo, working.Beatmap);
 
@@ -794,7 +795,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = loadOsu(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo);
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
 
                     ((Beatmap)working.Beatmap).HitObjects.Add(new HitCircle { StartTime = 5000 });
 

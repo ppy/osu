@@ -95,13 +95,13 @@ namespace osu.Game.Beatmaps
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 
-        public WorkingBeatmap CreateNew(RulesetInfo ruleset)
+        public WorkingBeatmap CreateNew(RulesetInfo ruleset, User user)
         {
             var metadata = new BeatmapMetadata
             {
                 Artist = "artist",
                 Title = "title",
-                Author = User.SYSTEM_USER,
+                Author = user,
             };
 
             var set = new BeatmapSetInfo
