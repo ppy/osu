@@ -318,14 +318,14 @@ namespace osu.Game.Screens.Select
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
-                        CreateIcon = () => new BeatmapStatisticSprite("length"),
+                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
                         Content = TimeSpan.FromMilliseconds(b.BeatmapInfo.Length).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "BPM",
-                        CreateIcon = () => new BeatmapStatisticSprite("bpm"),
+                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Bpm),
                         Content = getBPMRange(b),
                     }));
 
