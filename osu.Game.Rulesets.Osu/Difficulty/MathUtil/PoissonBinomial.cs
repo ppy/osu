@@ -12,6 +12,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
     /// approximate poisson binomial CDF defined by miss probabilities
     /// see "Refined Normal Approximation (RNA)" from
     /// https://www.researchgate.net/publication/257017356_On_computing_the_distribution_function_for_the_Poisson_binomial_distribution
+    /// Hong, Y. (2013). On computing the distribution function for the Poisson binomial distribution. Computational Statistics and Data Analysis, Vol. 59, pp. 41-51.
+    ///
+    /// This has been verified agains a reference implementation provided by the authors in the R package "poibin" which can be viewed here:
+    /// https://rdrr.io/cran/poibin/man/poibin-package.html
     /// </summary>
     public class PoissonBinomial
     {
@@ -37,6 +41,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 
         public double Cdf(double count)
         {
+            if (sigma == 0)
+                return 1;
             double k = (count + 0.5 - mu) / sigma;
 
             double result = Normal.CDF(0, 1, k) + v * (1 - k * k) * Normal.PDF(0, 1, k);
