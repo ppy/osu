@@ -74,23 +74,33 @@ namespace osu.Game.Screens.Ranking
             {
                 button.State.Value = state.NewValue;
 
-                switch (replayAvailability)
-                {
-                    case ReplayAvailability.Local:
-                        button.TooltipText = @"观看回放";
-                        break;
-
-                    case ReplayAvailability.Online:
-                        button.TooltipText = @"下载回放";
-                        break;
-
-                    default:
-                        button.TooltipText = @"没有回放";
-                        break;
-                }
+                updateTooltip();
             }, true);
 
-            button.Enabled.Value = replayAvailability != ReplayAvailability.NotAvailable;
+            Model.BindValueChanged(_ =>
+            {
+                button.Enabled.Value = replayAvailability != ReplayAvailability.NotAvailable;
+
+                updateTooltip();
+            }, true);
+        }
+
+        private void updateTooltip()
+        {
+            switch (replayAvailability)
+            {
+                case ReplayAvailability.Local:
+                    button.TooltipText = @"观看回放";
+                    break;
+
+                case ReplayAvailability.Online:
+                    button.TooltipText = @"下载回放";
+                    break;
+
+                default:
+                    button.TooltipText = @"没有回放";
+                    break;
+            }
         }
 
         private enum ReplayAvailability

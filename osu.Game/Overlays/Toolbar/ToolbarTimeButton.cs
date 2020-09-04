@@ -2,17 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarTimeButton : ToolbarButton
+    public class ToolbarTimeButton : ToolbarOverlayToggleButton
     {
         public string DateTimeString;
 
         public ToolbarTimeButton()
         {
-            SetIcon(FontAwesome.Solid.Clock);
             TooltipMain = "时间";
         }
 
@@ -27,6 +26,12 @@ namespace osu.Game.Overlays.Toolbar
             base.Update();
 
             DateTimeString = TooltipSub = GetTimeInfo().ToString() ?? "未知";
+        }
+        
+        [BackgroundDependencyLoader(true)]
+        private void load(TimeOverlay time)
+        {
+            StateContainer = time;
         }
     }
 }

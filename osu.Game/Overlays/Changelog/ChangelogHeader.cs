@@ -115,7 +115,8 @@ namespace osu.Game.Overlays.Changelog
             public ChangelogHeaderTitle()
             {
                 Title = "更新日志";
-                IconTexture = "Icons/changelog";
+                Description = "追踪最新的开发进度！";
+                IconTexture = "Icons/Hexacons/devtools";
             }
         }
     }

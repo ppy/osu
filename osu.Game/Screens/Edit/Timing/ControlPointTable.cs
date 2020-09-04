@@ -112,8 +112,7 @@ namespace osu.Game.Screens.Edit.Timing
                 };
 
                 controlPoints = group.ControlPoints.GetBoundCopy();
-                controlPoints.ItemsAdded += _ => createChildren();
-                controlPoints.ItemsRemoved += _ => createChildren();
+                controlPoints.CollectionChanged += (_, __) => createChildren();
 
                 createChildren();
             }

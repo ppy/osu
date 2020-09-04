@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Music
         {
             if (set.ID == (beatmap.Value?.BeatmapSetInfo?.ID ?? -1))
             {
-                beatmap.Value?.Track?.Seek(0);
+                beatmap.Value?.Track.Seek(0);
                 return;
             }
 

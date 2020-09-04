@@ -11,14 +11,13 @@ using osu.Game.Overlays.MfMenu.Sections;
 
 namespace osu.Game.Overlays
 {
-    public class MfMenuOverlay : FullscreenOverlay
+    public class MfMenuOverlay : FullscreenOverlay<MfMenuHeader>
     {
-        private MfMenuHeader header;
         private MfMenuSectionsContainer sectionContainer;
         private MfMenuHeaderTabControl tabControl;
 
         public MfMenuOverlay()
-            : base(OverlayColourScheme.Blue1)
+            : base(OverlayColourScheme.Blue1, new MfMenuHeader())
         {
             Children = new Drawable[]
             {
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays
                 },
                 sectionContainer = new MfMenuSectionsContainer
                 {
-                    ExpandableHeader = header = new MfMenuHeader(),
+                    ExpandableHeader = Header,
                     FixedHeader = tabControl = new MfMenuHeaderTabControl
                     {
                         Anchor = Anchor.TopCentre,

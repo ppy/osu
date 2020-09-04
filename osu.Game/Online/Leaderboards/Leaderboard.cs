@@ -27,6 +27,7 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly OsuScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
+        private readonly UserTopScoreContainer<TScoreInfo> topScoreContainer;
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
@@ -84,6 +85,20 @@ namespace osu.Game.Online.Leaderboards
 
                     scrollContainer.ScrollTo(0f, false);
                 }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
+            }
+        }
+
+        public TScoreInfo TopScore
+        {
+            get => topScoreContainer.Score.Value;
+            set
+            {
+                topScoreContainer.Score.Value = value;
+
+                if (value == null)
+                    topScoreContainer.Hide();
+                else
+                    topScoreContainer.Show();
             }
         }
 
@@ -198,8 +213,9 @@ namespace osu.Game.Online.Leaderboards
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
+                                    Child = topScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore)
                                 },
-                            }
+                            },
                         },
                     },
                 },
@@ -367,5 +383,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
+
+        protected abstract LeaderboardScore CreateDrawableTopScore(TScoreInfo model);
     }
 }

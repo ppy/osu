@@ -17,6 +17,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -36,6 +37,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly ColumnHitObjectArea HitObjectArea;
         internal readonly Container TopLevelContainer;
         private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        private readonly OrderedHitPolicy hitPolicy;
 
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
@@ -65,10 +67,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
+            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
         }
-
-        public override Axes RelativeSizeAxes => Axes.Y;
 
         public ColumnType ColumnType { get; set; }
 
@@ -92,6 +94,9 @@ namespace osu.Game.Rulesets.Mania.UI
             hitObject.AccentColour.Value = AccentColour;
             hitObject.OnNewResult += OnNewResult;
 
+            DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)hitObject;
+            maniaObject.CheckHittable = hitPolicy.IsHittable;
+
             HitObjectContainer.Add(hitObject);
         }
 
@@ -106,6 +111,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
+            if (result.IsHit)
+                hitPolicy.HandleHit(judgedObject);
+
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 

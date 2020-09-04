@@ -24,7 +24,6 @@ using osu.Game.Scoring;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
 using osuTK;
-using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -33,18 +32,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private AudioManager audioManager { get; set; }
 
-        private TrackVirtualManual track;
-
         protected override bool Autoplay => true;
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new ScoreExposedPlayer();
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
-        {
-            var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
-            track = (TrackVirtualManual)working.Track;
-            return working;
-        }
+            => new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
 
         private DrawableSpinner drawableSpinner;
         private SpriteIcon spinnerSymbol => drawableSpinner.ChildrenOfType<SpriteIcon>().Single();
@@ -54,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             base.SetUpSteps();
 
-            AddUntilStep("wait for track to start running", () => track.IsRunning);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
             AddStep("retrieve spinner", () => drawableSpinner = (DrawableSpinner)Player.DrawableRuleset.Playfield.AllHitObjects.First());
         }
 
@@ -192,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addSeekStep(0);
 
-            AddStep("adjust track rate", () => track.AddAdjustment(AdjustableProperty.Tempo, new BindableDouble(rate)));
+            AddStep("adjust track rate", () => MusicController.CurrentTrack.AddAdjustment(AdjustableProperty.Tempo, new BindableDouble(rate)));
             // autoplay replay frames use track time;
             // if a spin takes 1000ms in track time and we're playing with a 2x rate adjustment, the spin will take 500ms of *real* time.
             // therefore we need to apply the rate adjustment to the replay itself to change from track time to real time,
@@ -221,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void addSeekStep(double time)
         {
-            AddStep($"seek to {time}", () => track.Seek(time));
+            AddStep($"seek to {time}", () => MusicController.SeekTo(time));
 
             AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
         }

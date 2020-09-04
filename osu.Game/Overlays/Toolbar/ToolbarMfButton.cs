@@ -10,9 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarMfButton()
         {
-            Icon = FontAwesome.Solid.Gift;
-            TooltipMain = "Mf-osu";
-            TooltipSub = "这是一个官方lazer的分支,祝游玩愉快(｡･ω･)ﾉﾞ";
+            Width *= 1.4f;
         }
 
         [BackgroundDependencyLoader(true)]
