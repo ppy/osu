@@ -67,7 +67,7 @@ namespace osu.Game.Collections
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 CornerRadius = item_height / 2,
-                                Text = collection.Name
+                                Current = collection.Name
                             },
                         }
                     },

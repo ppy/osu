@@ -97,7 +97,7 @@ namespace osu.Game.Collections
             {
                 var existing = Collections.FirstOrDefault(c => c.Name == newCol.Name);
                 if (existing == null)
-                    Collections.Add(existing = new BeatmapCollection { Name = newCol.Name });
+                    Collections.Add(existing = new BeatmapCollection { Name = { Value = newCol.Name.Value } });
 
                 foreach (var newBeatmap in newCol.Beatmaps)
                 {
@@ -122,7 +122,7 @@ namespace osu.Game.Collections
 
                     for (int i = 0; i < collectionCount; i++)
                     {
-                        var collection = new BeatmapCollection { Name = sr.ReadString() };
+                        var collection = new BeatmapCollection { Name = { Value = sr.ReadString() } };
                         int mapCount = sr.ReadInt32();
 
                         for (int j = 0; j < mapCount; j++)
@@ -183,7 +183,7 @@ namespace osu.Game.Collections
 
                         foreach (var c in Collections)
                         {
-                            sw.Write(c.Name);
+                            sw.Write(c.Name.Value);
                             sw.Write(c.Beatmaps.Count);
 
                             foreach (var b in c.Beatmaps)
@@ -221,7 +221,7 @@ namespace osu.Game.Collections
         /// </summary>
         public event Action Changed;
 
-        public string Name;
+        public readonly Bindable<string> Name = new Bindable<string>();
 
         public readonly BindableList<BeatmapInfo> Beatmaps = new BindableList<BeatmapInfo>();
 

@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private MenuItem createCollectionMenuItem(BeatmapCollection collection)
         {
-            return new ToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
+            return new ToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
             {
                 if (s)
                     collection.Beatmaps.Add(beatmap);
