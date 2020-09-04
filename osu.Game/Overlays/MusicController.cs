@@ -207,7 +207,18 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
-        public void PreviousTrack() => Schedule(() => prev());
+        /// <param name="onSuccess">
+        /// Invoked when the operation has been performed successfully.
+        /// The result isn't returned directly to the caller because
+        /// the operation is scheduled and isn't performed immediately.
+        /// </param>
+        /// <returns>A <see cref="ScheduledDelegate"/> of the operation.</returns>
+        public ScheduledDelegate PreviousTrack(Action<PreviousTrackResult> onSuccess = null) => Schedule(() =>
+        {
+            PreviousTrackResult res = prev();
+            if (res != PreviousTrackResult.None)
+                onSuccess?.Invoke(res);
+        });
 
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
@@ -243,7 +254,18 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the next random or playlist track.
         /// </summary>
-        public void NextTrack() => Schedule(() => next());
+        /// <param name="onSuccess">
+        /// Invoked when the operation has been performed successfully.
+        /// The result isn't returned directly to the caller because
+        /// the operation is scheduled and isn't performed immediately.
+        /// </param>
+        /// <returns>A <see cref="ScheduledDelegate"/> of the operation.</returns>
+        public ScheduledDelegate NextTrack(Action onSuccess = null) => Schedule(() =>
+        {
+            bool res = next();
+            if (res)
+                onSuccess?.Invoke();
+        });
 
         private bool next()
         {
