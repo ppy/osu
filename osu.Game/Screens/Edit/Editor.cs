@@ -98,8 +98,7 @@ namespace osu.Game.Screens.Edit
             if (Beatmap.Value is DummyWorkingBeatmap)
             {
                 isNewBeatmap = true;
-                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value);
-                Beatmap.Value.BeatmapSetInfo.Metadata.Author = api.LocalUser.Value;
+                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
             }
 
             try
