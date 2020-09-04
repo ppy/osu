@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps
         public BeatmapStatistic()
         {
 #pragma warning disable 618
-            CreateIcon = () => new SpriteIcon { Icon = Icon, Scale = new Vector2(0.6f) };
+            CreateIcon = () => new SpriteIcon { Icon = Icon, Scale = new Vector2(0.7f) };
 #pragma warning restore 618
         }
     }

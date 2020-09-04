@@ -428,7 +428,7 @@ namespace osu.Game.Screens.Select
                                     i.Origin = Anchor.Centre;
                                     i.RelativeSizeAxes = Axes.Both;
                                     i.Colour = Color4Extensions.FromHex(@"f7dd55");
-                                    i.Size = new Vector2(0.8f);
+                                    i.Size = new Vector2(0.64f);
                                 }),
                             }
                         },
