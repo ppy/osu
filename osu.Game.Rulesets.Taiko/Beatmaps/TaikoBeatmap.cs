@@ -21,19 +21,19 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 new BeatmapStatistic
                 {
                     Name = @"Hit Count",
-                    CreateIcon = () => new BeatmapStatisticSprite("circles"),
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = hits.ToString(),
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Drumroll Count",
-                    CreateIcon = () => new BeatmapStatisticSprite("sliders"),
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = drumrolls.ToString(),
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Swell Count",
-                    CreateIcon = () => new BeatmapStatisticSprite("spinners"),
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                     Content = swells.ToString(),
                 }
             };

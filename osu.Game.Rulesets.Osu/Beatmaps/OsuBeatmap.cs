@@ -22,19 +22,19 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 {
                     Name = @"Circle Count",
                     Content = circles.ToString(),
-                    CreateIcon = () => new BeatmapStatisticSprite("circles"),
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Slider Count",
                     Content = sliders.ToString(),
-                    CreateIcon = () => new BeatmapStatisticSprite("sliders"),
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Spinner Count",
                     Content = spinners.ToString(),
-                    CreateIcon = () => new BeatmapStatisticSprite("spinners"),
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                 }
             };
         }

@@ -295,7 +295,8 @@ namespace osu.Game.Overlays
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
-            // The provided beatmap is same as current, no need to do any changes.
+            // This method can potentially be triggered multiple times as it is eagerly fired in next() / prev() to ensure correct execution order
+            // (changeBeatmap must be called before consumers receive the bindable changed event, which is not the case when the local beatmap bindable is updated directly).
             if (newWorking == current)
                 return;
 
