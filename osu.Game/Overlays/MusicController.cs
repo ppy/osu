@@ -279,7 +279,7 @@ namespace osu.Game.Overlays
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
-            // The provided beatmap is same as current, no need to do any changes.
+            // If the provided beatmap is same as current, then there is no need to do any changes.
             if (newWorking == current)
                 return;
 
