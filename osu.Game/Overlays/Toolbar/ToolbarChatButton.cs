@@ -2,19 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarChatButton : ToolbarOverlayToggleButtonRightSide
+    public class ToolbarChatButton : ToolbarOverlayToggleButton
     {
         public ToolbarChatButton()
         {
-            SetIcon(FontAwesome.Solid.Comments);
-            TooltipMain = "聊天";
-            TooltipSub = "在这里和全球各地的人们聊天";
-
             Hotkey = GlobalAction.ToggleChat;
         }
 

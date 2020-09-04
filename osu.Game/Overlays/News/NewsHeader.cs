@@ -57,7 +57,8 @@ namespace osu.Game.Overlays.News
             public NewsHeaderTitle()
             {
                 Title = "新闻";
-                IconTexture = "Icons/news";
+                Description = "看看社区上都发生了什么";
+                IconTexture = "Icons/Hexacons/news";
             }
         }
     }

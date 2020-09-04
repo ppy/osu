@@ -17,19 +17,18 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class UserProfileOverlay : FullscreenOverlay
+    public class UserProfileOverlay : FullscreenOverlay<ProfileHeader>
     {
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
-        protected ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
         private ProfileSectionTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
 
         public UserProfileOverlay()
-            : base(OverlayColourScheme.Pink)
+            : base(OverlayColourScheme.Pink, new ProfileHeader())
         {
         }
 
@@ -44,6 +43,9 @@ namespace osu.Game.Overlays
 
             if (user.Id == Header?.User.Value?.Id)
                 return;
+
+            if (sectionsContainer != null)
+                sectionsContainer.ExpandableHeader = null;
 
             userReq?.Cancel();
             Clear();
@@ -78,7 +80,7 @@ namespace osu.Game.Overlays
 
             Add(sectionsContainer = new ProfileSectionsContainer
             {
-                ExpandableHeader = Header = new ProfileHeader(),
+                ExpandableHeader = Header,
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {

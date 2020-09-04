@@ -3,21 +3,16 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarMusicButton : ToolbarOverlayToggleButtonRightSide
+    public class ToolbarMusicButton : ToolbarOverlayToggleButton
     {
         protected override Anchor TooltipAnchor => Anchor.TopRight;
 
         public ToolbarMusicButton()
         {
-            Icon = FontAwesome.Solid.Music;
-            TooltipMain = "音乐";
-            TooltipSub = "在这里播放音乐";
-
             Hotkey = GlobalAction.ToggleNowPlaying;
         }
 

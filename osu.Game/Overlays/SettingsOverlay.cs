@@ -13,8 +13,12 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsOverlay : SettingsPanel
+    public class SettingsOverlay : SettingsPanel, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/settings";
+        public string Title => "设置";
+        public string Description => "在这里更改osu!的设置";
+
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {
             new MfSection(createSubPanel(new MfSettingsPanel())),
@@ -31,7 +35,7 @@ namespace osu.Game.Overlays
 
         private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();
 
-        protected override Drawable CreateHeader() => new SettingsHeader("设置", "在这里更改osu!的设置");
+        protected override Drawable CreateHeader() => new SettingsHeader(Title, Description);
         protected override Drawable CreateFooter() => new SettingsFooter();
 
         public SettingsOverlay()

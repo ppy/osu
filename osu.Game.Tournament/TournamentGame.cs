@@ -87,30 +87,7 @@ namespace osu.Game.Tournament
                         },
                     }
                 },
-                heightWarning = new Container
-                {
-                    Masking = true,
-                    CornerRadius = 5,
-                    Depth = float.MinValue,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = Color4.Red,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new TournamentSpriteText
-                        {
-                            Text = "窗口太窄了, 拉宽一些",
-                            Font = OsuFont.Torus.With(weight: FontWeight.Bold),
-                            Colour = Color4.White,
-                            Padding = new MarginPadding(20)
-                        }
-                    }
-                },
+                heightWarning = new WarningBox("窗口太窄了, 拉宽一些"),
                 new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,

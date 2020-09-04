@@ -14,7 +14,8 @@ namespace osu.Game.Overlays.Dashboard
             public DashboardTitle()
             {
                 Title = "看板";
-                IconTexture = "Icons/changelog";
+                Description = "在这里查看好友和其他的信息";
+                IconTexture = "Icons/Hexacons/social";
             }
         }
     }

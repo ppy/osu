@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -23,8 +22,6 @@ namespace osu.Game.Overlays.SearchableList
         private readonly Drawable filterContainer;
         private readonly Drawable rightFilterContainer;
         private readonly Box tabStrip;
-
-        public readonly Bindable<bool> Disabled = new Bindable<bool>();
 
         public readonly SearchTextBox Search;
         public readonly PageTabControl<TTab> Tabs;
@@ -39,7 +36,7 @@ namespace osu.Game.Overlays.SearchableList
         /// <summary>
         /// The amount of padding added to content (does not affect background or tab control strip).
         /// </summary>
-        protected virtual float ContentHorizontalPadding => SearchableListOverlay.WIDTH_PADDING;
+        protected virtual float ContentHorizontalPadding => WaveOverlayContainer.WIDTH_PADDING;
 
         protected SearchableListFilterControl()
         {

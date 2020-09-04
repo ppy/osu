@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 ModeButtonLine = new Container
                 {
-                    Size = new Vector2(ToolbarButton.WIDTH, 3),
+                    Size = new Vector2(Toolbar.HEIGHT, 3),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,

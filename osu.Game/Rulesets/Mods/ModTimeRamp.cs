@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private Track track;
+        private ITrack track;
 
         protected ModTimeRamp()
         {
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
-        public void ApplyToTrack(Track track)
+        public void ApplyToTrack(ITrack track)
         {
             this.track = track;
 

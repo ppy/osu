@@ -34,7 +34,8 @@ namespace osu.Game.Overlays.Rankings
             public RankingsTitle()
             {
                 Title = "排名";
-                IconTexture = "Icons/rankings";
+                Description = "看看谁是最强osu!玩家";
+                IconTexture = "Icons/Hexacons/rankings";
             }
         }
     }
