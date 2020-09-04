@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Beatmaps
 {
@@ -23,7 +24,7 @@ namespace osu.Game.Beatmaps
         public BeatmapStatistic()
         {
 #pragma warning disable 618
-            CreateIcon = () => new SpriteIcon { Icon = Icon };
+            CreateIcon = () => new SpriteIcon { Icon = Icon, Scale = new Vector2(0.6f) };
 #pragma warning restore 618
         }
     }
