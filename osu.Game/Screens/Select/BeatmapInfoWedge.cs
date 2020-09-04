@@ -420,15 +420,15 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4Extensions.FromHex(@"f7dd55"),
                                     Icon = FontAwesome.Regular.Circle,
-                                    Scale = new Vector2(0.8f)
+                                    Size = new Vector2(0.8f)
                                 },
                                 statistic.CreateIcon().With(i =>
                                 {
                                     i.Anchor = Anchor.Centre;
                                     i.Origin = Anchor.Centre;
                                     i.RelativeSizeAxes = Axes.Both;
-                                    i.Size = new Vector2(1.2f);
                                     i.Colour = Color4Extensions.FromHex(@"f7dd55");
+                                    i.Size = new Vector2(0.8f);
                                 }),
                             }
                         },
