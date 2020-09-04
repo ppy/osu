@@ -38,6 +38,9 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private CollectionManager collectionManager { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private CollectionDialog collectionDialog { get; set; }
+
         private readonly BeatmapSetInfo beatmapSet;
 
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
@@ -145,12 +148,11 @@ namespace osu.Game.Screens.Select.Carousel
                 if (dialogOverlay != null)
                     items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));
 
-                items.Add(new OsuMenuItem("Add all to...")
-                {
-                    Items = collectionManager.Collections.OrderByDescending(c => c.LastModifyTime).Take(3).Select(createCollectionMenuItem)
-                                             .Append(new OsuMenuItem("More...", MenuItemType.Standard, () => { }))
-                                             .ToArray()
-                });
+                var collectionItems = collectionManager.Collections.OrderByDescending(c => c.LastModifyTime).Take(3).Select(createCollectionMenuItem).ToList();
+                if (collectionDialog != null)
+                    collectionItems.Add(new OsuMenuItem("More...", MenuItemType.Standard, collectionDialog.Show));
+
+                items.Add(new OsuMenuItem("Add all to...") { Items = collectionItems });
 
                 return items.ToArray();
             }
