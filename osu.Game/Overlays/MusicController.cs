@@ -279,6 +279,10 @@ namespace osu.Game.Overlays
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
+            // The provided beatmap is same as current, no need to do any changes.
+            if (newWorking == current)
+                return;
+
             var lastWorking = current;
 
             TrackChangeDirection direction = TrackChangeDirection.None;
