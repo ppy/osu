@@ -767,7 +767,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = loadOsu(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var working = osu.Dependencies.Get<BeatmapManager>().CreateNew(new OsuRuleset().RulesetInfo);
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo);
 
                     manager.Save(working.BeatmapInfo, working.Beatmap);
 
@@ -794,7 +794,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = loadOsu(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var working = osu.Dependencies.Get<BeatmapManager>().CreateNew(new OsuRuleset().RulesetInfo);
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo);
 
                     ((Beatmap)working.Beatmap).HitObjects.Add(new HitCircle { StartTime = 5000 });
 
