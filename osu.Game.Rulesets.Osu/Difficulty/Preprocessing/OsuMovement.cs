@@ -17,166 +17,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             new[] { -1.0, 1.0 },
             new[] { 1.1, 0 });
 
-        // number of coefficients in the formula for correction0/3
-        private const int num_coeffs = 4;
-
-        // correction0 flow
-        private static readonly double[] ds0_flow = { 0, 1, 1.35, 1.7, 2.3, 3 };
-        private static readonly double[] ks0_flow = { -11.5, -5.9, -5.4, -5.6, -2, -2 };
-        private static readonly double[] scales0_flow = { 1, 1, 1, 1, 1, 1 };
-
-        private static readonly double[,,] coeffs0_flow =
-        {
-            {
-                { 0, -0.5, -1.15, -1.8, -2, -2 },
-                { 0, 0, 0, 0, 0, 0 },
-                { 1, 1, 1, 1, 1, 1 },
-                { 6, 1, 1, 1, 1, 1 }
-            },
-            {
-                { 0, -0.8, -0.9, -1, -1, -1 },
-                { 0, 0.5, 0.75, 1, 2, 2 },
-                { 1, 0.5, 0.4, 0.3, 0, 0 },
-                { 3, 0.7, 0.7, 0.7, 1, 1 }
-            },
-            {
-                { 0, -0.8, -0.9, -1, -1, -1 },
-                { 0, -0.5, -0.75, -1, -2, -2 },
-                { 1, 0.5, 0.4, 0.3, 0, 0 },
-                { 3, 0.7, 0.7, 0.7, 1, 1 }
-            },
-            {
-                { 0, 0, 0, 0, 0, 0 },
-                { 0, 0.95, 0.975, 1, 0, 0 },
-                { 0, 0, 0, 0, 0, 0 },
-                { 0, 0.7, 0.55, 0.4, 0, 0 }
-            },
-            {
-                { 0, 0, 0, 0, 0, 0 },
-                { 0, -0.95, -0.975, -1, 0, 0 },
-                { 0, 0, 0, 0, 0, 0 },
-                { 0, 0.7, 0.55, 0.4, 0, 0 }
-            }
-        };
-
-        // correction0 snap
-        private static readonly double[] ds0_snap = { 0, 1.5, 2.5, 4, 6, 8 };
-        private static readonly double[] ks0_snap = { -1, -5, -6.7, -6.5, -4.3, -4.3 };
-        private static readonly double[] scales0_snap = { 1, 0.85, 0.6, 0.8, 1, 1 };
-
-        private static readonly double[,,] coeffs0_snap =
-        {
-            {
-                { 0.5, 2, 2.8, 5, 5, 5 },
-                { 0, 0, 0, 0, 0, 0 },
-                { 1, 1, 1, 0, 0, 0 },
-                { 0.6, 1, 0.8, 0.6, 0.2, 0.2 }
-            },
-            {
-                { 0.25, 1, 0.7, 2, 2, 2 },
-                { 0.5, 2, 2.8, 4, 6, 6 },
-                { 1, 1, 1, 1, 1, 1 },
-                { 0.6, 1, 0.8, 0.3, 0.2, 0.2 }
-            },
-            {
-                { 0.25, 1, 0.7, 2, 2, 2 },
-                { -0.5, -2, -2.8, -4, -6, -6 },
-                { 1, 1, 1, 1, 1, 1 },
-                { 0.6, 1, 0.8, 0.3, 0.2, 0.2 }
-            },
-            {
-                { 0, 0, -0.5, -2, -3, -3 },
-                { 0, 0, 0, 0, 0, 0 },
-                { 1, 1, 1, 1, 1, 1 },
-                { -0.7, -1, -0.9, -0.1, -0.1, -0.1 }
-            }
-        };
-
-        // correction3 flow
-        private static readonly double[] ds3_flow = { 0, 1, 2, 3, 4 };
-        private static readonly double[] ks3_flow = { -4, -5.3, -5.2, -2.5, -2.5 };
-        private static readonly double[] scales3_flow = { 1, 1, 1, 1, 1 };
-
-        private static readonly double[,,] coeffs3_flow =
-        {
-            {
-                { 0, 1.2, 2, 2, 2 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 1.5, 1, 0.4, 0, 0 }
-            },
-            {
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 2, 1.5, 2.5, 3.5, 3.5 }
-            },
-            {
-                { 0, 0.3, 0.6, 0.6, 0.6 },
-                { 0, 1, 2.4, 2.4, 2.4 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0.4, 0.4, 0, 0 }
-            },
-            {
-                { 0, 0.3, 0.6, 0.6, 0.6 },
-                { 0, -1, -2.4, -2.4, -2.4 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0.4, 0.4, 0, 0 }
-            }
-        };
-
-        // correction3 snap
-        private static readonly double[] ds3_snap = { 1, 1.5, 2.5, 4, 6, 8 };
-        private static readonly double[] ks3_snap = { -2, -2, -3, -5.4, -4.9, -4.9 };
-        private static readonly double[] scales3_snap = { 1, 1, 1, 1, 1, 1 };
-
-        private static readonly double[,,] coeffs3_snap =
-        {
-            {
-                { -2, -2, -3, -4, -6, -6 },
-                { 0, 0, 0, 0, 0, 0 },
-                { 1, 1, 1, 0, 0, 0 },
-                { 0.4, 0.4, 0.2, 0.4, 0.3, 0.3 }
-            },
-            {
-                { -1, -1, -1.5, -2, -3, -3 },
-                { 1.4, 1.4, 2.1, 2, 3, 3 },
-                { 1, 1, 1, 1, 1, 1 },
-                { 0.4, 0.4, 0.2, 0.4, 0.2, 0.2 }
-            },
-            {
-                { -1, -1, -1.5, -2, -3, -3 },
-                { -1.4, -1.4, -2.1, -2, -3, -3 },
-                { 1, 1, 1, 1, 1, 1 },
-                { 0.4, 0.4, 0.2, 0.4, 0.2, 0.2 }
-            },
-            {
-                { 0, 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0, 0 },
-                { 0, 0, 1, 0.6, 0.6, 0.6 }
-            },
-            {
-                { 1, 1, 1.5, 2, 3, 3 },
-                { 0, 0, 0, 0, 0, 0 },
-                { 1, 1, 1, 1, 1, 1 },
-                { 0, 0, -0.6, -0.4, -0.3, -0.3 }
-            }
-        };
-
-        private static LinearSpline k0FlowInterp;
-        private static LinearSpline scale0FlowInterp;
-        private static LinearSpline[,] coeffs0FlowInterps;
-        private static LinearSpline k0SnapInterp;
-        private static LinearSpline scale0SnapInterp;
-        private static LinearSpline[,] coeffs0SnapInterps;
-        private static LinearSpline k3FlowInterp;
-        private static LinearSpline scale3FlowInterp;
-        private static LinearSpline[,] coeffs3FlowInterps;
-        private static LinearSpline k3SnapInterp;
-        private static LinearSpline scale3SnapInterp;
-        private static LinearSpline[,] coeffs3SnapInterps;
-
         private const double t_ratio_threshold = 1.4;
         private const double correction0_still = 0;
 
@@ -348,8 +188,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     double x0 = normalizedPos0.DotProduct(s12) / d12;
                     double y0 = (normalizedPos0 - x0 * s12 / d12).L2Norm();
 
-                    double correction0Flow = calcCorrection0Or3(d12, x0, y0, k0FlowInterp, scale0FlowInterp, coeffs0FlowInterps);
-                    double correction0Snap = calcCorrection0Or3(d12, x0, y0, k0SnapInterp, scale0SnapInterp, coeffs0SnapInterps);
+                    double correction0Flow = MultiL2NormCorrection.FLOW_0.Evaluate(d12, x0, y0);
+                    double correction0Snap = MultiL2NormCorrection.SNAP_0.Evaluate(d12, x0, y0);
                     double correction0Stop = calcCorrection0Stop(d12, x0, y0);
 
                     flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
@@ -401,8 +241,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     double x3 = normalizedPos3.DotProduct(s12) / d12;
                     double y3 = (normalizedPos3 - x3 * s12 / d12).L2Norm();
 
-                    double correction3Flow = calcCorrection0Or3(d12, x3, y3, k3FlowInterp, scale3FlowInterp, coeffs3FlowInterps);
-                    double correction3Snap = calcCorrection0Or3(d12, x3, y3, k3SnapInterp, scale3SnapInterp, coeffs3SnapInterps);
+                    double correction3Flow = MultiL2NormCorrection.FLOW_3.Evaluate(d12, x3, y3);
+                    double correction3Snap = MultiL2NormCorrection.SNAP_3.Evaluate(d12, x3, y3);
 
                     flowiness123 = SpecialFunctions.Logistic((correction3Snap - correction3Flow - 0.05) * 20);
 
@@ -577,63 +417,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             };
         }
 
-        /// <summary>
-        /// Gets the interpolations for correction0/3 ready for use.
-        /// This needs to be called before any ExtractMovement calls.
-        /// </summary>
-        public static void Initialize()
-        {
-            prepareInterp(ds0_flow, ks0_flow, scales0_flow, coeffs0_flow, out k0FlowInterp, out scale0FlowInterp, out coeffs0FlowInterps);
-            prepareInterp(ds0_snap, ks0_snap, scales0_snap, coeffs0_snap, out k0SnapInterp, out scale0SnapInterp, out coeffs0SnapInterps);
-            prepareInterp(ds3_flow, ks3_flow, scales3_flow, coeffs3_flow, out k3FlowInterp, out scale3FlowInterp, out coeffs3FlowInterps);
-            prepareInterp(ds3_snap, ks3_snap, scales3_snap, coeffs3_snap, out k3SnapInterp, out scale3SnapInterp, out coeffs3SnapInterps);
-        }
-
-        private static void prepareInterp(double[] ds, double[] ks, double[] scales, double[,,] coeffs,
-                                          out LinearSpline kInterp, out LinearSpline scaleInterp, out LinearSpline[,] coeffsInterps)
-        {
-            kInterp = LinearSpline.InterpolateSorted(ds, ks);
-            scaleInterp = LinearSpline.InterpolateSorted(ds, scales);
-
-            coeffsInterps = new LinearSpline[coeffs.GetLength(0), num_coeffs];
-
-            for (int i = 0; i < coeffs.GetLength(0); i++)
-            {
-                for (int j = 0; j < num_coeffs; j++)
-                {
-                    double[] coeffij = new double[coeffs.GetLength(2)];
-
-                    for (int k = 0; k < coeffs.GetLength(2); k++)
-                    {
-                        coeffij[k] = coeffs[i, j, k];
-                    }
-
-                    coeffsInterps[i, j] = LinearSpline.InterpolateSorted(ds, coeffij);
-                }
-            }
-        }
-
-        private static double calcCorrection0Or3(double d, double x, double y,
-                                                 LinearSpline kInterp, LinearSpline scaleInterp, LinearSpline[,] coeffsInterps)
-        {
-            double correctionRaw = kInterp.Interpolate(d);
-
-            for (int i = 0; i < coeffsInterps.GetLength(0); i++)
-            {
-                double[] cs = new double[num_coeffs];
-
-                for (int j = 0; j < num_coeffs; j++)
-                {
-                    cs[j] = coeffsInterps[i, j].Interpolate(d);
-                }
-
-                correctionRaw += cs[3] * Math.Sqrt(Math.Pow((x - cs[0]), 2) +
-                                                   Math.Pow((y - cs[1]), 2) +
-                                                   cs[2]);
-            }
-
-            return SpecialFunctions.Logistic(correctionRaw) * scaleInterp.Interpolate(d);
-        }
 
         private static double calcCorrection0Stop(double d, double x, double y)
         {

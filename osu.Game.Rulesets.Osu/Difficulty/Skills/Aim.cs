@@ -99,7 +99,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory,
                                                          bool hidden = false, List<double> noteDensities = null)
         {
-            OsuMovement.Initialize();
             var movements = new List<OsuMovement>();
 
             if (hitObjects.Count == 0)
