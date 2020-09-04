@@ -97,7 +97,7 @@ namespace osu.Game.Collections
                                     Size = Vector2.One,
                                     Padding = new MarginPadding(10),
                                     Text = "Create new collection",
-                                    Action = () => collectionManager.Collections.Add(new BeatmapCollection { Name = "My new collection" })
+                                    Action = () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "My new collection" } })
                                 },
                             },
                         }
@@ -120,6 +120,9 @@ namespace osu.Game.Collections
 
             this.FadeOut(exit_duration, Easing.OutQuint);
             this.ScaleTo(0.9f, exit_duration);
+
+            // Ensure that textboxes commit
+            GetContainingInputManager()?.TriggerFocusContention(this);
         }
     }
 }

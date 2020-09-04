@@ -15,7 +15,7 @@ namespace osu.Game.Collections
         public DeleteCollectionDialog(BeatmapCollection collection)
         {
             HeaderText = "Confirm deletion of";
-            BodyText = collection.Name;
+            BodyText = collection.Name.Value;
 
             Icon = FontAwesome.Regular.TrashAlt;
 

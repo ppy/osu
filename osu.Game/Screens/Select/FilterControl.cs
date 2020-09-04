@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Select
                 Current.TriggerChange();
             }
 
-            protected override string GenerateItemText(CollectionFilter item) => item.Collection?.Name ?? "All beatmaps";
+            protected override string GenerateItemText(CollectionFilter item) => item.Collection?.Name.Value ?? "All beatmaps";
 
             protected override DropdownHeader CreateHeader() => new CollectionDropdownHeader();
 
