@@ -40,13 +40,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 new BeatmapStatistic
                 {
                     Name = @"Note Count",
-                    CreateIcon = () => new BeatmapStatisticSprite("circles"),
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = notes.ToString(),
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Hold Note Count",
-                    CreateIcon = () => new BeatmapStatisticSprite("sliders"),
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = holdnotes.ToString(),
                 },
             };

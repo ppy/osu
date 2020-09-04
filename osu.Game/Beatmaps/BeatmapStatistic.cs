@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps
         public IconUsage Icon = FontAwesome.Regular.QuestionCircle;
 
         /// <summary>
-        /// A function to create the icon for display purposes.
+        /// A function to create the icon for display purposes. Use default icons available via <see cref="BeatmapStatisticIcon"/> whenever possible for conformity.
         /// </summary>
         public Func<Drawable> CreateIcon;
 
