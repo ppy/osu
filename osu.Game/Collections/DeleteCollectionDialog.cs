@@ -10,7 +10,7 @@ namespace osu.Game.Collections
     public class DeleteCollectionDialog : PopupDialog
     {
         [Resolved]
-        private CollectionManager collectionManager { get; set; }
+        private BeatmapCollectionManager collectionManager { get; set; }
 
         public DeleteCollectionDialog(BeatmapCollection collection)
         {

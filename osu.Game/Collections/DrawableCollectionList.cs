@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Collections
 {
-    public class CollectionList : OsuRearrangeableListContainer<BeatmapCollection>
+    public class DrawableCollectionList : OsuRearrangeableListContainer<BeatmapCollection>
     {
         protected override ScrollContainer<Drawable> CreateScrollContainer() => base.CreateScrollContainer().With(d =>
         {
@@ -22,6 +22,6 @@ namespace osu.Game.Collections
             Spacing = new Vector2(0, 2)
         };
 
-        protected override OsuRearrangeableListItem<BeatmapCollection> CreateOsuDrawable(BeatmapCollection item) => new CollectionListItem(item);
+        protected override OsuRearrangeableListItem<BeatmapCollection> CreateOsuDrawable(BeatmapCollection item) => new DrawableCollectionListItem(item);
     }
 }

@@ -56,7 +56,7 @@ namespace osu.Game
 
         protected BeatmapManager BeatmapManager;
 
-        protected CollectionManager CollectionManager;
+        protected BeatmapCollectionManager CollectionManager;
 
         protected ScoreManager ScoreManager;
 
@@ -225,7 +225,7 @@ namespace osu.Game
             dependencies.Cache(difficultyManager);
             AddInternal(difficultyManager);
 
-            dependencies.Cache(CollectionManager = new CollectionManager());
+            dependencies.Cache(CollectionManager = new BeatmapCollectionManager());
             AddInternal(CollectionManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
