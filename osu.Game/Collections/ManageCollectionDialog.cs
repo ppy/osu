@@ -13,15 +13,15 @@ using osuTK;
 
 namespace osu.Game.Collections
 {
-    public class CollectionDialog : OsuFocusedOverlayContainer
+    public class ManageCollectionDialog : OsuFocusedOverlayContainer
     {
         private const double enter_duration = 500;
         private const double exit_duration = 200;
 
         [Resolved]
-        private CollectionManager collectionManager { get; set; }
+        private BeatmapCollectionManager collectionManager { get; set; }
 
-        public CollectionDialog()
+        public ManageCollectionDialog()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -79,7 +79,7 @@ namespace osu.Game.Collections
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = colours.GreySeafoamDarker
                                         },
-                                        new CollectionList
+                                        new DrawableCollectionList
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Items = { BindTarget = collectionManager.Collections }

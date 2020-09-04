@@ -18,7 +18,7 @@ using osu.Game.IO.Legacy;
 
 namespace osu.Game.Collections
 {
-    public class CollectionManager : CompositeDrawable
+    public class BeatmapCollectionManager : CompositeDrawable
     {
         /// <summary>
         /// Database version in YYYYMMDD format (matching stable).

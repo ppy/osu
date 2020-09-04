@@ -18,11 +18,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Collections
 {
-    public class CollectionListItem : OsuRearrangeableListItem<BeatmapCollection>
+    public class DrawableCollectionListItem : OsuRearrangeableListItem<BeatmapCollection>
     {
         private const float item_height = 35;
 
-        public CollectionListItem(BeatmapCollection item)
+        public DrawableCollectionListItem(BeatmapCollection item)
             : base(item)
         {
             Padding = new MarginPadding { Right = 20 };

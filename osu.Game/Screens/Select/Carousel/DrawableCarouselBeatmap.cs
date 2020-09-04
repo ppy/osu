@@ -49,10 +49,10 @@ namespace osu.Game.Screens.Select.Carousel
         private BeatmapDifficultyManager difficultyManager { get; set; }
 
         [Resolved]
-        private CollectionManager collectionManager { get; set; }
+        private BeatmapCollectionManager collectionManager { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private CollectionDialog collectionDialog { get; set; }
+        private ManageCollectionDialog manageCollectionDialog { get; set; }
 
         private IBindable<StarDifficulty> starDifficultyBindable;
         private CancellationTokenSource starDifficultyCancellationSource;
@@ -228,8 +228,8 @@ namespace osu.Game.Screens.Select.Carousel
                     items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
 
                 var collectionItems = collectionManager.Collections.OrderByDescending(c => c.LastModifyTime).Take(3).Select(createCollectionMenuItem).ToList();
-                if (collectionDialog != null)
-                    collectionItems.Add(new OsuMenuItem("More...", MenuItemType.Standard, collectionDialog.Show));
+                if (manageCollectionDialog != null)
+                    collectionItems.Add(new OsuMenuItem("More...", MenuItemType.Standard, manageCollectionDialog.Show));
 
                 items.Add(new OsuMenuItem("Add to...") { Items = collectionItems });
 

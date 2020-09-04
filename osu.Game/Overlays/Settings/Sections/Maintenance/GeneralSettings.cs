@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton undeleteButton;
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, CollectionManager collections, DialogOverlay dialogOverlay)
+        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, BeatmapCollectionManager collectionManager, DialogOverlay dialogOverlay)
         {
             if (beatmaps.SupportsImportFromStable)
             {
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (collections.SupportsImportFromStable)
+            if (collectionManager.SupportsImportFromStable)
             {
                 Add(importCollectionsButton = new SettingsButton
                 {
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importCollectionsButton.Enabled.Value = false;
-                        collections.ImportFromStableAsync().ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
+                        collectionManager.ImportFromStableAsync().ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
                     }
                 });
             }
@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = "Delete ALL collections",
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() => collections.Collections.Clear()));
+                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() => collectionManager.Collections.Clear()));
                 }
             });
 
