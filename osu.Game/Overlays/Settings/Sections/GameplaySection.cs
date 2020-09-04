@@ -36,18 +36,16 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             foreach (Ruleset ruleset in rulesets.AvailableRulesets.Select(info => info.CreateInstance()))
             {
-                SettingsSubsection section = ruleset.CreateSettings();
-
-                if (section != null)
+                try
                 {
-                    try
-                    {
+                    SettingsSubsection section = ruleset.CreateSettings();
+
+                    if (section != null)
                         Add(section);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $"Failed to load ruleset settings");
-                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Failed to load ruleset settings");
                 }
             }
         }
