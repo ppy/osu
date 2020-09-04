@@ -12,7 +12,8 @@ namespace osu.Game.Overlays.BeatmapListing
             public BeatmapListingTitle()
             {
                 Title = "beatmap listing";
-                IconTexture = "Icons/changelog";
+                Description = "Browse for new beatmaps";
+                IconTexture = "Icons/Hexacons/beatmap";
             }
         }
     }
