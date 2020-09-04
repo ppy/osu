@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         // We are managing our own adjustments (see OnEntering/OnExiting).
         public override bool AllowRateAdjustments => false;
