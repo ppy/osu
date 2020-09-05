@@ -8,6 +8,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -118,7 +119,7 @@ namespace osu.Game.Tests.Gameplay
 
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();
 
-            public Texture GetTexture(string componentName) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
             public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 

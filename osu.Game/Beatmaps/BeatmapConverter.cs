@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps
 
             beatmap.BeatmapInfo = original.BeatmapInfo;
             beatmap.ControlPointInfo = original.ControlPointInfo;
-            beatmap.HitObjects = convertHitObjects(original.HitObjects, original);
+            beatmap.HitObjects = convertHitObjects(original.HitObjects, original).OrderBy(s => s.StartTime).ToList();
             beatmap.Breaks = original.Breaks;
 
             return beatmap;

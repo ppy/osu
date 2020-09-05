@@ -270,9 +270,6 @@ namespace osu.Game.Screens.Menu
                 ButtonSystemState lastState = state;
                 state = value;
 
-                if (game != null)
-                    game.OverlayActivationMode.Value = state == ButtonSystemState.Exit ? OverlayActivation.Disabled : OverlayActivation.All;
-
                 updateLogoState(lastState);
 
                 Logger.Log($"{nameof(ButtonSystem)}'s state changed from {lastState} to {state}");
@@ -324,10 +321,9 @@ namespace osu.Game.Screens.Menu
 
                             bool impact = logo.Scale.X > 0.6f;
 
-                            if (lastState == ButtonSystemState.Initial)
-                                logo.ScaleTo(0.5f, 200, Easing.In);
+                            logo.ScaleTo(0.5f, 200, Easing.In);
 
-                            logoTrackingContainer.StartTracking(logo, lastState == ButtonSystemState.EnteringMode ? 0 : 200, Easing.In);
+                            logoTrackingContainer.StartTracking(logo, 200, Easing.In);
 
                             logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>

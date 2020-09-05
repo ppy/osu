@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             const double time_slider = 1500;
             const double time_circle = 1510;
             Vector2 positionCircle = Vector2.Zero;
-            Vector2 positionSlider = new Vector2(80);
+            Vector2 positionSlider = new Vector2(30);
 
             var hitObjects = new List<OsuHitObject>
             {

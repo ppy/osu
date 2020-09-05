@@ -18,6 +18,7 @@ using osu.Game.Screens.Menu;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -63,13 +64,14 @@ namespace osu.Game
 
         private ChannelManager channelManager;
 
-        private NotificationOverlay notifications;
-
-        private NowPlayingOverlay nowPlaying;
+        [NotNull]
+        private readonly NotificationOverlay notifications = new NotificationOverlay();
 
         private BeatmapListingOverlay beatmapListing;
 
         private DashboardOverlay dashboard;
+
+        private NewsOverlay news;
 
         private UserProfileOverlay userProfile;
 
@@ -82,11 +84,14 @@ namespace osu.Game
 
         public virtual Storage GetStorageForStableInstall() => null;
 
-        public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
+        public float ToolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
         private IdleTracker idleTracker;
 
-        public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
+        /// <summary>
+        /// Whether overlays should be able to be opened game-wide. Value is sourced from the current active screen.
+        /// </summary>
+        public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         protected OsuScreenStack ScreenStack;
 
@@ -250,7 +255,7 @@ namespace osu.Game
                 case LinkAction.OpenEditorTimestamp:
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
-                    waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
+                    waitForReady(() => notifications, _ => notifications.Post(new SimpleNotification
                     {
                         Text = @"This link type is not yet supported!",
                         Icon = FontAwesome.Solid.LifeRing,
@@ -423,23 +428,7 @@ namespace osu.Game
 
             updateModDefaults();
 
-            var newBeatmap = beatmap.NewValue;
-
-            if (newBeatmap != null)
-            {
-                newBeatmap.Track.Completed += () => Scheduler.AddOnce(() => trackCompleted(newBeatmap));
-                newBeatmap.BeginAsyncLoad();
-            }
-
-            void trackCompleted(WorkingBeatmap b)
-            {
-                // the source of track completion is the audio thread, so the beatmap may have changed before firing.
-                if (Beatmap.Value != b)
-                    return;
-
-                if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
-                    MusicController.NextTrack();
-            }
+            beatmap.NewValue?.BeginAsyncLoad();
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -536,14 +525,14 @@ namespace osu.Game
             MenuCursorContainer.CanShowCursor = menuScreen?.CursorVisible ?? false;
 
             // todo: all archive managers should be able to be looped here.
-            SkinManager.PostNotification = n => notifications?.Post(n);
+            SkinManager.PostNotification = n => notifications.Post(n);
             SkinManager.GetStableStorage = GetStorageForStableInstall;
 
-            BeatmapManager.PostNotification = n => notifications?.Post(n);
+            BeatmapManager.PostNotification = n => notifications.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
-            ScoreManager.PostNotification = n => notifications?.Post(n);
+            ScoreManager.PostNotification = n => notifications.Post(n);
             ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
@@ -573,7 +562,9 @@ namespace osu.Game
                             Origin = Anchor.BottomLeft,
                             Action = () =>
                             {
-                                if ((ScreenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                                var currentScreen = ScreenStack.CurrentScreen as IOsuScreen;
+
+                                if (currentScreen?.AllowBackButton == true && !currentScreen.OnBackButton())
                                     ScreenStack.Exit();
                             }
                         },
@@ -611,14 +602,12 @@ namespace osu.Game
 
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
-            loadComponentSingleFile(MusicController = new MusicController(), Add, true);
-
-            loadComponentSingleFile(notifications = new NotificationOverlay
+            loadComponentSingleFile(notifications.With(d =>
             {
-                GetToolbarHeight = () => ToolbarOffset,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
+                d.GetToolbarHeight = () => ToolbarOffset;
+                d.Anchor = Anchor.TopRight;
+                d.Origin = Anchor.TopRight;
+            }), rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(screenshotManager, Add);
 
@@ -628,6 +617,7 @@ namespace osu.Game
             // overlay elements
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
@@ -643,7 +633,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(nowPlaying = new NowPlayingOverlay
+            loadComponentSingleFile(new NowPlayingOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -678,14 +668,13 @@ namespace osu.Game
             {
                 overlay.State.ValueChanged += state =>
                 {
-                    if (state.NewValue == Visibility.Hidden) return;
-
-                    informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+                    if (state.NewValue != Visibility.Hidden)
+                        showOverlayAboveOthers(overlay, informationalOverlays);
                 };
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
 
             foreach (var overlay in singleDisplayOverlays)
             {
@@ -694,9 +683,8 @@ namespace osu.Game
                     // informational overlays should be dismissed on a show or hide of a full overlay.
                     informationalOverlays.ForEach(o => o.Hide());
 
-                    if (state.NewValue == Visibility.Hidden) return;
-
-                    singleDisplayOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+                    if (state.NewValue != Visibility.Hidden)
+                        showOverlayAboveOthers(overlay, singleDisplayOverlays);
                 };
             }
 
@@ -710,15 +698,24 @@ namespace osu.Game
                 float offset = 0;
 
                 if (Settings.State.Value == Visibility.Visible)
-                    offset += ToolbarButton.WIDTH / 2;
+                    offset += Toolbar.HEIGHT / 2;
                 if (notifications.State.Value == Visibility.Visible)
-                    offset -= ToolbarButton.WIDTH / 2;
+                    offset -= Toolbar.HEIGHT / 2;
 
                 screenContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
             }
 
             Settings.State.ValueChanged += _ => updateScreenOffset();
             notifications.State.ValueChanged += _ => updateScreenOffset();
+        }
+
+        private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
+        {
+            otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+
+            // show above others if not visible at all, else leave at current depth.
+            if (!overlay.IsPresent)
+                overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
         }
 
         public class GameIdleTracker : IdleTracker
@@ -756,7 +753,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
-                        Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
+                        Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
                     }));
                 }
                 else if (recentLogCount == short_term_display_limit)
@@ -855,18 +852,6 @@ namespace osu.Game
 
             switch (action)
             {
-                case GlobalAction.ToggleNowPlaying:
-                    nowPlaying.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleChat:
-                    chatOverlay.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleSocial:
-                    dashboard.ToggleVisibility();
-                    return true;
-
                 case GlobalAction.ResetInputSettings:
                     var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
@@ -880,14 +865,6 @@ namespace osu.Game
 
                 case GlobalAction.ToggleToolbar:
                     Toolbar.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleSettings:
-                    Settings.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleDirect:
-                    beatmapListing.ToggleVisibility();
                     return true;
 
                 case GlobalAction.ToggleGameplayMouseButtons:
@@ -928,8 +905,6 @@ namespace osu.Game
         private FrameworkConfigManager frameworkConfig { get; set; }
 
         private ScalingContainer screenContainer;
-
-        protected MusicController MusicController { get; private set; }
 
         protected override bool OnExiting()
         {
@@ -980,9 +955,12 @@ namespace osu.Game
                     break;
             }
 
+            if (current is IOsuScreen currentOsuScreen)
+                OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
+
             if (newScreen is IOsuScreen newOsuScreen)
             {
-                OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
+                OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
 
                 MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 

@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
@@ -13,6 +14,7 @@ namespace osu.Game.Tests.Visual.Editing
     public class TestSceneTimingScreen : EditorClockTestScene
     {
         [Cached(typeof(EditorBeatmap))]
+        [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
 
         public TestSceneTimingScreen()

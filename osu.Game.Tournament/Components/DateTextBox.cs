@@ -22,11 +22,12 @@ namespace osu.Game.Tournament.Components
         }
 
         // hold a reference to the provided bindable so we don't have to in every settings section.
-        private Bindable<DateTimeOffset> bindable;
+        private Bindable<DateTimeOffset> bindable = new Bindable<DateTimeOffset>();
 
         public DateTextBox()
         {
             base.Bindable = new Bindable<string>();
+
             ((OsuTextBox)Control).OnCommit = (sender, newText) =>
             {
                 try

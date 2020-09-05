@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osuTK;
@@ -43,14 +44,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
             protected override Easing RollingEasing => AccuracyCircle.ACCURACY_TRANSFORM_EASING;
 
-            public Counter()
+            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
             {
-                DisplayedCountSpriteText.Font = OsuFont.Torus.With(size: 20, fixedWidth: true);
-                DisplayedCountSpriteText.Spacing = new Vector2(-2, 0);
-            }
-
-            public override void Increment(int amount)
-                => Current.Value += amount;
+                s.Font = OsuFont.Torus.With(size: 20, fixedWidth: true);
+                s.Spacing = new Vector2(-2, 0);
+            });
         }
     }
 }

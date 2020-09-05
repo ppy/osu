@@ -10,6 +10,12 @@ namespace osu.Game.Beatmaps.ControlPoints
     {
         public const string DEFAULT_BANK = "normal";
 
+        public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
+        {
+            SampleBankBindable = { Disabled = true },
+            SampleVolumeBindable = { Disabled = true }
+        };
+
         /// <summary>
         /// The default sample bank at this control point.
         /// </summary>

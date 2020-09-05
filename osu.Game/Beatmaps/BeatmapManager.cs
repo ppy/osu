@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -63,16 +64,16 @@ namespace osu.Game.Beatmaps
         private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;
         private readonly AudioManager audioManager;
-        private readonly GameHost host;
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
+        private readonly TextureStore textureStore;
+        private readonly ITrackStore trackStore;
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
             this.audioManager = audioManager;
-            this.host = host;
 
             DefaultBeatmap = defaultBeatmap;
 
@@ -83,6 +84,9 @@ namespace osu.Game.Beatmaps
             beatmaps.ItemUpdated += removeWorkingCache;
 
             onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+
+            textureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
+            trackStore = audioManager.GetTrackStore(Files.Store);
         }
 
         protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
@@ -218,7 +222,7 @@ namespace osu.Game.Beatmaps
             removeWorkingCache(info);
         }
 
-        private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
+        private readonly WeakList<BeatmapManagerWorkingBeatmap> workingCache = new WeakList<BeatmapManagerWorkingBeatmap>();
 
         /// <summary>
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
@@ -246,16 +250,13 @@ namespace osu.Game.Beatmaps
             lock (workingCache)
             {
                 var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+                if (working != null)
+                    return working;
 
-                if (working == null)
-                {
-                    beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
+                beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
-                    workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store,
-                        new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager));
-                }
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, textureStore, trackStore, beatmapInfo, audioManager));
 
-                previous?.TransferTo(working);
                 return working;
             }
         }
@@ -283,14 +284,16 @@ namespace osu.Game.Beatmaps
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(IncludedDetails includes = IncludedDetails.All) => GetAllUsableBeatmapSetsEnumerable(includes).ToList();
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(IncludedDetails includes = IncludedDetails.All, bool includeProtected = false) =>
+            GetAllUsableBeatmapSetsEnumerable(includes, includeProtected).ToList();
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s. Note that files are not populated.
         /// </summary>
         /// <param name="includes">The level of detail to include in the returned objects.</param>
+        /// <param name="includeProtected">Whether to include protected (system) beatmaps. These should not be included for gameplay playable use cases.</param>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes)
+        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes, bool includeProtected = false)
         {
             IQueryable<BeatmapSetInfo> queryable;
 
@@ -312,7 +315,7 @@ namespace osu.Game.Beatmaps
             // AsEnumerable used here to avoid applying the WHERE in sql. When done so, ef core 2.x uses an incorrect ORDER BY
             // clause which causes queries to take 5-10x longer.
             // TODO: remove if upgrading to EF core 3.x.
-            return queryable.AsEnumerable().Where(s => !s.DeletePending && !s.Protected);
+            return queryable.AsEnumerable().Where(s => !s.DeletePending && (includeProtected || !s.Protected));
         }
 
         /// <summary>
@@ -457,7 +460,7 @@ namespace osu.Game.Beatmaps
 
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
-            protected override Track GetTrack() => null;
+            protected override Track GetBeatmapTrack() => null;
         }
     }
 

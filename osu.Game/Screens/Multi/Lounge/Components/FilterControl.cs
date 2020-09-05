@@ -12,11 +12,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class FilterControl : SearchableListFilterControl<PrimaryFilter, SecondaryFilter>
+    public class FilterControl : SearchableListFilterControl<RoomStatusFilter, RoomCategoryFilter>
     {
         protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
-        protected override PrimaryFilter DefaultTab => PrimaryFilter.Open;
-        protected override SecondaryFilter DefaultCategory => SecondaryFilter.Public;
+        protected override RoomStatusFilter DefaultTab => RoomStatusFilter.Open;
+        protected override RoomCategoryFilter DefaultCategory => RoomCategoryFilter.Any;
 
         protected override float ContentHorizontalPadding => base.ContentHorizontalPadding + OsuScreen.HORIZONTAL_OVERFLOW_PADDING;
 
@@ -43,6 +43,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             ruleset.BindValueChanged(_ => updateFilter());
             Search.Current.BindValueChanged(_ => scheduleUpdateFilter());
+            Dropdown.Current.BindValueChanged(_ => updateFilter());
             Tabs.Current.BindValueChanged(_ => updateFilter(), true);
         }
 
@@ -61,26 +62,27 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             filter.Value = new FilterCriteria
             {
                 SearchString = Search.Current.Value ?? string.Empty,
-                PrimaryFilter = Tabs.Current.Value,
-                SecondaryFilter = DisplayStyleControl.Dropdown.Current.Value,
+                StatusFilter = Tabs.Current.Value,
+                RoomCategoryFilter = Dropdown.Current.Value,
                 Ruleset = ruleset.Value
             };
         }
     }
 
-    public enum PrimaryFilter
+    public enum RoomStatusFilter
     {
         Open,
 
         [Description("Recently Ended")]
-        RecentlyEnded,
+        Ended,
         Participated,
         Owned,
     }
 
-    public enum SecondaryFilter
+    public enum RoomCategoryFilter
     {
-        Public,
-        //Private,
+        Any,
+        Normal,
+        Spotlight
     }
 }

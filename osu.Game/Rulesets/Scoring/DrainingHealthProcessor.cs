@@ -114,7 +114,9 @@ namespace osu.Game.Rulesets.Scoring
         protected override void ApplyResultInternal(JudgementResult result)
         {
             base.ApplyResultInternal(result);
-            healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
+
+            if (!result.Judgement.IsBonus)
+                healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
         }
 
         protected override void Reset(bool storeResults)

@@ -44,6 +44,7 @@ namespace osu.Game.Tests.Visual
             typeof(NotificationOverlay),
             typeof(BeatmapListingOverlay),
             typeof(DashboardOverlay),
+            typeof(NewsOverlay),
             typeof(ChannelManager),
             typeof(ChatOverlay),
             typeof(SettingsOverlay),

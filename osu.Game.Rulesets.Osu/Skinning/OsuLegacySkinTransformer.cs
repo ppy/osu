@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 case OsuSkinComponents.HitCircleText:
                     var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCirclePrefix)?.Value ?? "default";
-                    var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? 0;
+                    var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? -2;
 
                     return !hasFont(font)
                         ? null
@@ -102,6 +102,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             Scale = new Vector2(0.8f),
                             Spacing = new Vector2(-overlap, 0)
                         };
+
+                case OsuSkinComponents.SpinnerBody:
+                    bool hasBackground = Source.GetTexture("spinner-background") != null;
+
+                    if (Source.GetTexture("spinner-top") != null && !hasBackground)
+                        return new LegacyNewStyleSpinner();
+                    else if (hasBackground)
+                        return new LegacyOldStyleSpinner();
+
+                    return null;
             }
 
             return null;

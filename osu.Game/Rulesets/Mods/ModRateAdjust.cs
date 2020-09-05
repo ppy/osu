@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public abstract BindableNumber<double> SpeedChange { get; }
 
-        public virtual void ApplyToTrack(Track track)
+        public virtual void ApplyToTrack(ITrack track)
         {
             track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
         }

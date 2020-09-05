@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -263,7 +264,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void moveLogoFacade()
         {
-            if (logoFacade?.Transforms.Count == 0 && transferContainer?.Transforms.Count == 0)
+            if (!(logoFacade?.Transforms).Any() && !(transferContainer?.Transforms).Any())
             {
                 Random random = new Random();
                 trackingContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent.DrawWidth), random.Next(0, (int)logo.Parent.DrawHeight)), 300);

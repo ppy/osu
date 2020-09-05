@@ -58,6 +58,9 @@ namespace osu.Game.Online.Leaderboards
         [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private SongSelect songSelect { get; set; }
+
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
             this.score = score;
@@ -79,20 +82,10 @@ namespace osu.Game.Online.Leaderboards
 
             Children = new Drawable[]
             {
-                new Container
+                new RankLabel(rank)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = rank_width,
-                    Children = new[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
-                        },
-                    },
                 },
                 content = new Container
                 {
@@ -353,6 +346,25 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
+        private class RankLabel : Container, IHasTooltip
+        {
+            public RankLabel(int? rank)
+            {
+                if (rank >= 1000)
+                    TooltipText = $"#{rank:N0}";
+
+                Child = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.GetFont(size: 20, italics: true),
+                    Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                };
+            }
+
+            public string TooltipText { get; }
+        }
+
         public class LeaderboardScoreStatistic
         {
             public IconUsage Icon;
@@ -372,6 +384,9 @@ namespace osu.Game.Online.Leaderboards
             get
             {
                 List<MenuItem> items = new List<MenuItem>();
+
+                if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
 
                 if (score.ID != 0)
                     items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));

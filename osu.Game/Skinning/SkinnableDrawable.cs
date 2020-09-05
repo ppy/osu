@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -49,6 +50,11 @@ namespace osu.Game.Skinning
 
             RelativeSizeAxes = Axes.Both;
         }
+
+        /// <summary>
+        /// Seeks to the 0-th frame if the content of this <see cref="SkinnableDrawable"/> is an <see cref="IFramedAnimation"/>.
+        /// </summary>
+        public void ResetAnimation() => (Drawable as IFramedAnimation)?.GotoFrame(0);
 
         private readonly Func<ISkinComponent, Drawable> createDefault;
 

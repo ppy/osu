@@ -14,8 +14,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
-using osuTK;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {

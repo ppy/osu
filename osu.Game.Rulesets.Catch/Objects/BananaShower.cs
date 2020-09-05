@@ -30,15 +30,21 @@ namespace osu.Game.Rulesets.Catch.Objects
             if (spacing <= 0)
                 return;
 
-            for (double i = StartTime; i <= EndTime; i += spacing)
+            double time = StartTime;
+            int i = 0;
+
+            while (time <= EndTime)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 AddNested(new Banana
                 {
-                    Samples = Samples,
-                    StartTime = i
+                    StartTime = time,
+                    BananaIndex = i,
                 });
+
+                time += spacing;
+                i++;
             }
         }
 

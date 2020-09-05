@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mods
         public BindableNumber<float> DrainRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
-            MinValue = 1,
+            MinValue = 0,
             MaxValue = 10,
             Default = 5,
             Value = 5,
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mods
         public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
         {
             Precision = 0.1f,
-            MinValue = 1,
+            MinValue = 0,
             MaxValue = 10,
             Default = 5,
             Value = 5,

@@ -7,6 +7,11 @@ namespace osu.Game.Beatmaps.ControlPoints
 {
     public class DifficultyControlPoint : ControlPoint
     {
+        public static readonly DifficultyControlPoint DEFAULT = new DifficultyControlPoint
+        {
+            SpeedMultiplierBindable = { Disabled = true },
+        };
+
         /// <summary>
         /// The speed multiplier at this control point.
         /// </summary>
