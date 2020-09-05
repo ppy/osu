@@ -18,9 +18,9 @@ namespace osu.Game.Tests.Visual.Menus
         public void TestMusicPlayAction()
         {
             AddStep("ensure playing something", () => Game.MusicController.EnsurePlayingSomething());
-            AddStep("trigger music playback toggle action", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicPlay));
+            AddStep("toggle playback", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicPlay));
             AddAssert("music paused", () => !Game.MusicController.IsPlaying && Game.MusicController.IsUserPaused);
-            AddStep("trigger music playback toggle action", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicPlay));
+            AddStep("toggle playback", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicPlay));
             AddAssert("music resumed", () => Game.MusicController.IsPlaying && !Game.MusicController.IsUserPaused);
         }
 
@@ -62,16 +62,16 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("seek track to 6 second", () => Game.MusicController.SeekTo(6000));
             AddUntilStep("wait for current time to update", () => Game.MusicController.CurrentTrack.CurrentTime > 5000);
 
-            AddStep("trigger music prev action", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicPrev));
+            AddStep("press previous", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicPrev));
             AddAssert("no track change", () => trackChangeQueue.Count == 0);
             AddUntilStep("track restarted", () => Game.MusicController.CurrentTrack.CurrentTime < 5000);
 
-            AddStep("trigger music prev action", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicPrev));
+            AddStep("press previous", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicPrev));
             AddAssert("track changed to previous", () =>
                 trackChangeQueue.Count == 1 &&
                 trackChangeQueue.Dequeue().changeDirection == TrackChangeDirection.Prev);
 
-            AddStep("trigger music next action", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicNext));
+            AddStep("press next", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicNext));
             AddAssert("track changed to next", () =>
                 trackChangeQueue.Count == 1 &&
                 trackChangeQueue.Dequeue().changeDirection == TrackChangeDirection.Next);
