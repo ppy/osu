@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Menus
         public void TestMusicNavigationActions()
         {
             int importId = 0;
-            Queue<(WorkingBeatmap working, TrackChangeDirection dir)> trackChangeQueue = null;
+            Queue<(WorkingBeatmap working, TrackChangeDirection changeDirection)> trackChangeQueue = null;
 
             // ensure we have at least two beatmaps available to identify the direction the music controller navigated to.
             AddRepeatStep("import beatmap", () => Game.BeatmapManager.Import(new BeatmapSetInfo
@@ -55,8 +55,8 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("bind to track change", () =>
             {
-                trackChangeQueue = new Queue<(WorkingBeatmap working, TrackChangeDirection dir)>();
-                Game.MusicController.TrackChanged += (working, dir) => trackChangeQueue.Enqueue((working, dir));
+                trackChangeQueue = new Queue<(WorkingBeatmap, TrackChangeDirection)>();
+                Game.MusicController.TrackChanged += (working, changeDirection) => trackChangeQueue.Enqueue((working, changeDirection));
             });
 
             AddStep("seek track to 6 second", () => Game.MusicController.SeekTo(6000));
@@ -69,12 +69,12 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("trigger music prev action", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicPrev));
             AddAssert("track changed to previous", () =>
                 trackChangeQueue.Count == 1 &&
-                trackChangeQueue.Dequeue().dir == TrackChangeDirection.Prev);
+                trackChangeQueue.Dequeue().changeDirection == TrackChangeDirection.Prev);
 
             AddStep("trigger music next action", () => Game.GlobalBinding.TriggerPressed(GlobalAction.MusicNext));
             AddAssert("track changed to next", () =>
                 trackChangeQueue.Count == 1 &&
-                trackChangeQueue.Dequeue().dir == TrackChangeDirection.Next);
+                trackChangeQueue.Dequeue().changeDirection == TrackChangeDirection.Next);
         }
     }
 }
