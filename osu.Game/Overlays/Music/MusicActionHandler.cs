@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Music
         [Resolved]
         private MusicController musicController { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
         public bool OnPressed(GlobalAction action)
@@ -34,14 +34,14 @@ namespace osu.Game.Overlays.Music
             {
                 case GlobalAction.MusicPlay:
                     if (musicController.TogglePause())
-                        onScreenDisplay.Display(new MusicActionToast(musicController.IsPlaying ? "Play track" : "Pause track"));
+                        onScreenDisplay?.Display(new MusicActionToast(musicController.IsPlaying ? "Play track" : "Pause track"));
 
                     return true;
 
                 case GlobalAction.MusicNext:
                     musicController.NextTrack(() =>
                     {
-                        onScreenDisplay.Display(new MusicActionToast("Next track"));
+                        onScreenDisplay?.Display(new MusicActionToast("Next track"));
                     }).RunTask();
 
                     return true;
@@ -52,11 +52,11 @@ namespace osu.Game.Overlays.Music
                         switch (res)
                         {
                             case PreviousTrackResult.Restart:
-                                onScreenDisplay.Display(new MusicActionToast("Restart track"));
+                                onScreenDisplay?.Display(new MusicActionToast("Restart track"));
                                 break;
 
                             case PreviousTrackResult.Previous:
-                                onScreenDisplay.Display(new MusicActionToast("Previous track"));
+                                onScreenDisplay?.Display(new MusicActionToast("Previous track"));
                                 break;
                         }
                     }).RunTask();
