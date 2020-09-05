@@ -275,11 +275,22 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            scrollAccumulation += (e.ScrollDelta.X + e.ScrollDelta.Y) * (e.IsPrecise ? 0.1 : 1);
+            const double precision = 1;
 
-            const int precision = 1;
+            double scrollComponent = e.ScrollDelta.X + e.ScrollDelta.Y;
 
-            while (Math.Abs(scrollAccumulation) > precision)
+            double scrollDirection = Math.Sign(scrollComponent);
+
+            // this is a special case to handle the "pivot" scenario.
+            // if we are precise scrolling in one direction then change our mind and scroll backwards,
+            // the existing accumulation should be applied in the inverse direction to maintain responsiveness.
+            if (scrollAccumulation != 0 && Math.Sign(scrollAccumulation) != scrollDirection)
+                scrollAccumulation = scrollDirection * (precision - Math.Abs(scrollAccumulation));
+
+            scrollAccumulation += scrollComponent * (e.IsPrecise ? 0.1 : 1);
+
+            // because we are doing snapped seeking, we need to add up precise scrolls until they accumulate to an arbitrary cut-off.
+            while (Math.Abs(scrollAccumulation) >= precision)
             {
                 if (scrollAccumulation > 0)
                     seek(e, -1);

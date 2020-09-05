@@ -12,19 +12,27 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayTitle : CompositeDrawable
+    public abstract class OverlayTitle : CompositeDrawable, INamedOverlayComponent
     {
-        private readonly OsuSpriteText title;
+        private readonly OsuSpriteText titleText;
         private readonly Container icon;
 
-        protected string Title
+        private string title;
+
+        public string Title
         {
-            set => title.Text = value;
+            get => title;
+            protected set => titleText.Text = title = value;
         }
 
-        protected string IconTexture
+        public string Description { get; protected set; }
+
+        private string iconTexture;
+
+        public string IconTexture
         {
-            set => icon.Child = new OverlayTitleIcon(value);
+            get => iconTexture;
+            protected set => icon.Child = new OverlayTitleIcon(iconTexture = value);
         }
 
         protected OverlayTitle()
@@ -45,7 +53,7 @@ namespace osu.Game.Overlays
                         Margin = new MarginPadding { Horizontal = 5 }, // compensates for osu-web sprites having around 5px of whitespace on each side
                         Size = new Vector2(30)
                     },
-                    title = new OsuSpriteText
+                    titleText = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

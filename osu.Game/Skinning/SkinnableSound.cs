@@ -4,23 +4,40 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Audio;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableSound : SkinReloadableDrawable
+    public class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         private readonly ISampleInfo[] hitSamples;
 
         [Resolved]
         private ISampleStore samples { get; set; }
+
+        private bool requestedPlaying;
+
+        public override bool RemoveWhenNotAlive => false;
+        public override bool RemoveCompletedTransforms => false;
+
+        /// <summary>
+        /// Whether to play the underlying sample when aggregate volume is zero.
+        /// Note that this is checked at the point of calling <see cref="Play"/>; changing the volume post-play will not begin playback.
+        /// Defaults to false unless <see cref="Looping"/>.
+        /// </summary>
+        /// <remarks>
+        /// Can serve as an optimisation if it is known ahead-of-time that this behaviour is allowed in a given use case.
+        /// </remarks>
+        protected bool PlayWhenZeroVolume => Looping;
+
+        private readonly AudioContainer<DrawableSample> samplesContainer;
 
         public SkinnableSound(ISampleInfo hitSamples)
             : this(new[] { hitSamples })
@@ -33,45 +50,28 @@ namespace osu.Game.Skinning
             InternalChild = samplesContainer = new AudioContainer<DrawableSample>();
         }
 
+        private Bindable<bool> gameplayClockPaused;
+
+        [BackgroundDependencyLoader(true)]
+        private void load(GameplayClock gameplayClock)
+        {
+            // if in a gameplay context, pause sample playback when gameplay is paused.
+            gameplayClockPaused = gameplayClock?.IsPaused.GetBoundCopy();
+            gameplayClockPaused?.BindValueChanged(paused =>
+            {
+                if (requestedPlaying)
+                {
+                    if (paused.NewValue)
+                        stop();
+                    // it's not easy to know if a sample has finished playing (to end).
+                    // to keep things simple only resume playing looping samples.
+                    else if (Looping)
+                        play();
+                }
+            });
+        }
+
         private bool looping;
-
-        private readonly AudioContainer<DrawableSample> samplesContainer;
-
-        public BindableNumber<double> Volume => samplesContainer.Volume;
-
-        public BindableNumber<double> Balance => samplesContainer.Balance;
-
-        public BindableNumber<double> Frequency => samplesContainer.Frequency;
-
-        public BindableNumber<double> Tempo => samplesContainer.Tempo;
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Volume"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<DrawableAudioWrapper> VolumeTo(double newVolume, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.VolumeTo(newVolume, duration, easing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Balance"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<DrawableAudioWrapper> BalanceTo(double newBalance, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.BalanceTo(newBalance, duration, easing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Frequency"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<DrawableAudioWrapper> FrequencyTo(double newFrequency, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.FrequencyTo(newFrequency, duration, easing);
-
-        /// <summary>
-        /// Smoothly adjusts <see cref="Tempo"/> over time.
-        /// </summary>
-        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public TransformSequence<DrawableAudioWrapper> TempoTo(double newTempo, double duration = 0, Easing easing = Easing.None) =>
-            samplesContainer.TempoTo(newTempo, duration, easing);
 
         public bool Looping
         {
@@ -86,15 +86,31 @@ namespace osu.Game.Skinning
             }
         }
 
-        public void Play() => samplesContainer.ForEach(c =>
+        public void Play()
         {
-            if (c.AggregateVolume.Value > 0)
-                c.Play();
-        });
+            requestedPlaying = true;
+            play();
+        }
 
-        public void Stop() => samplesContainer.ForEach(c => c.Stop());
+        private void play()
+        {
+            samplesContainer.ForEach(c =>
+            {
+                if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
+                    c.Play();
+            });
+        }
 
-        public override bool IsPresent => Scheduler.HasPendingTasks;
+        public void Stop()
+        {
+            requestedPlaying = false;
+            stop();
+        }
+
+        private void stop()
+        {
+            samplesContainer.ForEach(c => c.Stop());
+        }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
@@ -121,6 +137,32 @@ namespace osu.Game.Skinning
             }).Where(c => c != null);
 
             samplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
+
+            if (requestedPlaying)
+                Play();
         }
+
+        #region Re-expose AudioContainer
+
+        public BindableNumber<double> Volume => samplesContainer.Volume;
+
+        public BindableNumber<double> Balance => samplesContainer.Balance;
+
+        public BindableNumber<double> Frequency => samplesContainer.Frequency;
+
+        public BindableNumber<double> Tempo => samplesContainer.Tempo;
+
+        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+            => samplesContainer.AddAdjustment(type, adjustBindable);
+
+        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+            => samplesContainer.RemoveAdjustment(type, adjustBindable);
+
+        public void RemoveAllAdjustments(AdjustableProperty type)
+            => samplesContainer.RemoveAllAdjustments(type);
+
+        public bool IsPlaying => samplesContainer.Any(s => s.Playing);
+
+        #endregion
     }
 }

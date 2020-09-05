@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarBeatmapListingButton()
         {
-            SetIcon(OsuIcon.ChevronDownCircle);
+            Hotkey = GlobalAction.ToggleDirect;
         }
 
         [BackgroundDependencyLoader(true)]

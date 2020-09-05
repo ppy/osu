@@ -91,6 +91,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.FadePlayfieldWhenHealthLow, true);
             Set(OsuSetting.KeyOverlay, false);
             Set(OsuSetting.PositionalHitSounds, true);
+            Set(OsuSetting.AlwaysPlayFirstComboBreak, true);
             Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
             Set(OsuSetting.FloatingComments, false);
@@ -98,6 +99,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
+            Set(OsuSetting.GameplayDisableWinKey, true);
 
             Set(OsuSetting.ShowPlayfieldBorder, false);
 
@@ -182,6 +184,7 @@ namespace osu.Game.Configuration
         ShowStoryboard,
         KeyOverlay,
         PositionalHitSounds,
+        AlwaysPlayFirstComboBreak,
         ScoreMeter,
         FloatingComments,
         ShowInterface,
@@ -230,6 +233,7 @@ namespace osu.Game.Configuration
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource,
-        ShowPlayfieldBorder
+        ShowPlayfieldBorder,
+        GameplayDisableWinKey
     }
 }

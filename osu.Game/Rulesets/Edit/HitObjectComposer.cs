@@ -26,7 +26,7 @@ using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
-using Key = osuTK.Input.Key;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -294,7 +294,16 @@ namespace osu.Game.Rulesets.Edit
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
         {
-            var snappedEndTime = BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
+            double actualDuration = referenceTime + DistanceToDuration(referenceTime, distance);
+
+            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, referenceTime);
+
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
+
+            // we don't want to exceed the actual duration and snap to a point in the future.
+            // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
+            if (snappedEndTime > actualDuration + 1)
+                snappedEndTime -= beatLength;
 
             return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
         }

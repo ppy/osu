@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
@@ -40,7 +41,6 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack(1000));
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
@@ -108,6 +108,15 @@ namespace osu.Game.Beatmaps
 
                 // Convert
                 IBeatmap converted = converter.Convert();
+
+                // Apply conversion mods to the result
+                foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
+                {
+                    if (cancellationSource.IsCancellationRequested)
+                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
+
+                    mod.ApplyToBeatmap(converted);
+                }
 
                 // Apply difficulty mods
                 if (mods.Any(m => m is IApplicableToDifficulty))
@@ -250,10 +259,39 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
-        public virtual bool TrackLoaded => track.IsResultAvailable;
-        public Track Track => track.Value;
-        protected abstract Track GetTrack();
-        private RecyclableLazy<Track> track;
+        private Track loadedTrack;
+
+        [NotNull]
+        public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+
+        /// <summary>
+        /// Transfer a valid audio track into this working beatmap. Used as an optimisation to avoid reload / track swap
+        /// across difficulties in the same beatmap set.
+        /// </summary>
+        /// <param name="track">The track to transfer.</param>
+        public void TransferTrack([NotNull] Track track) => loadedTrack = track ?? throw new ArgumentNullException(nameof(track));
+
+        /// <summary>
+        /// Whether this beatmap's track has been loaded via <see cref="LoadTrack"/>.
+        /// </summary>
+        public virtual bool TrackLoaded => loadedTrack != null;
+
+        /// <summary>
+        /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
+        /// This generally happens via MusicController when changing the global beatmap.
+        /// </summary>
+        public Track Track
+        {
+            get
+            {
+                if (!TrackLoaded)
+                    throw new InvalidOperationException($"Cannot access {nameof(Track)} without first calling {nameof(LoadTrack)}.");
+
+                return loadedTrack;
+            }
+        }
+
+        protected abstract Track GetBeatmapTrack();
 
         public bool WaveformLoaded => waveform.IsResultAvailable;
         public Waveform Waveform => waveform.Value;
@@ -270,22 +308,6 @@ namespace osu.Game.Beatmaps
 
         protected virtual ISkin GetSkin() => new DefaultSkin();
         private readonly RecyclableLazy<ISkin> skin;
-
-        /// <summary>
-        /// Transfer pieces of a beatmap to a new one, where possible, to save on loading.
-        /// </summary>
-        /// <param name="other">The new beatmap which is being switched to.</param>
-        public virtual void TransferTo(WorkingBeatmap other)
-        {
-            if (track.IsResultAvailable && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
-                other.track = track;
-        }
-
-        /// <summary>
-        /// Eagerly dispose of the audio track associated with this <see cref="WorkingBeatmap"/> (if any).
-        /// Accessing track again will load a fresh instance.
-        /// </summary>
-        public virtual void RecycleTrack() => track.Recycle();
 
         ~WorkingBeatmap()
         {

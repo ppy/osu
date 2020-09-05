@@ -55,10 +55,11 @@ namespace osu.Game.Storyboards.Drawables
 
             if (video == null) return;
 
-            video.PlaybackPosition = Clock.CurrentTime - Video.StartTime;
-
-            using (video.BeginAbsoluteSequence(0))
+            using (video.BeginAbsoluteSequence(Video.StartTime))
+            {
+                Schedule(() => video.PlaybackPosition = Time.Current - Video.StartTime);
                 video.FadeIn(500);
+            }
         }
     }
 }

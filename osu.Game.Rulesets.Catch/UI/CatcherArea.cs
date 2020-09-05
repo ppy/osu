@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> CreateDrawableRepresentation;
 
+        public readonly Catcher MovableCatcher;
+
         public Container ExplodingFruitTarget
         {
             set => MovableCatcher.ExplodingFruitTarget = value;
@@ -53,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     lastPlateableFruit.OnLoadComplete += _ => action();
             }
 
-            if (result.IsHit && fruit.CanBePlated)
+            if (result.IsHit && fruit.HitObject.CanBePlated)
             {
                 // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
                 var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
@@ -104,7 +106,5 @@ namespace osu.Game.Rulesets.Catch.UI
             if (state?.CatcherX != null)
                 MovableCatcher.X = state.CatcherX.Value;
         }
-
-        protected internal readonly Catcher MovableCatcher;
     }
 }

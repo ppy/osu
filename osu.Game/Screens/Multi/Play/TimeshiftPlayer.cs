@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -59,13 +58,13 @@ namespace osu.Game.Screens.Multi.Play
             if (!playlistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
 
-            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
+            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID, Game.VersionHash);
             req.Success += r => token = r.ID;
             req.Failure += e =>
             {
                 failed = true;
 
-                Logger.Error(e, "Failed to retrieve a score submission token.");
+                Logger.Error(e, "Failed to retrieve a score submission token.\n\nThis may happen if you are running an old or non-official release of osu! (ie. you are self-compiling).");
 
                 Schedule(() =>
                 {

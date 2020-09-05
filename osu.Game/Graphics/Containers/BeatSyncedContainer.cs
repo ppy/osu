@@ -43,19 +43,11 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public double MinimumBeatLength { get; set; }
 
-        /// <summary>
-        /// Default length of a beat in milliseconds. Used whenever there is no beatmap or track playing.
-        /// </summary>
-        private const double default_beat_length = 60000.0 / 60.0;
-
-        private TimingControlPoint defaultTiming;
-        private EffectControlPoint defaultEffect;
-
         protected bool IsBeatSyncedWithTrack { get; private set; }
 
         protected override void Update()
         {
-            Track track = null;
+            ITrack track = null;
             IBeatmap beatmap = null;
 
             double currentTrackTime = 0;
@@ -81,8 +73,8 @@ namespace osu.Game.Graphics.Containers
             if (timingPoint == null || !IsBeatSyncedWithTrack)
             {
                 currentTrackTime = Clock.CurrentTime;
-                timingPoint = defaultTiming;
-                effectPoint = defaultEffect;
+                timingPoint = TimingControlPoint.DEFAULT;
+                effectPoint = EffectControlPoint.DEFAULT;
             }
 
             double beatLength = timingPoint.BeatLength / Divisor;
@@ -116,17 +108,6 @@ namespace osu.Game.Graphics.Containers
         private void load(IBindable<WorkingBeatmap> beatmap)
         {
             Beatmap.BindTo(beatmap);
-
-            defaultTiming = new TimingControlPoint
-            {
-                BeatLength = default_beat_length,
-            };
-
-            defaultEffect = new EffectControlPoint
-            {
-                KiaiMode = false,
-                OmitFirstBarLine = false
-            };
         }
 
         protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
