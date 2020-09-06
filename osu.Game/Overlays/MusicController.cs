@@ -279,6 +279,11 @@ namespace osu.Game.Overlays
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
+            // This method can potentially be triggered multiple times as it is eagerly fired in next() / prev() to ensure correct execution order
+            // (changeBeatmap must be called before consumers receive the bindable changed event, which is not the case when the local beatmap bindable is updated directly).
+            if (newWorking == current)
+                return;
+
             var lastWorking = current;
 
             TrackChangeDirection direction = TrackChangeDirection.None;
