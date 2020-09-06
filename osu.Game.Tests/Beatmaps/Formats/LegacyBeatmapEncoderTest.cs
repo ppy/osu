@@ -38,8 +38,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
             var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
 
-            sort(decoded);
-            sort(decodedAfterEncode);
+            sort(decoded.beatmap);
+            sort(decodedAfterEncode.beatmap);
 
             Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
             Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
@@ -57,10 +57,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             return a.ComboColours.SequenceEqual(b.ComboColours);
         }
 
-        private void sort((IBeatmap beatmap, ISkin beatmapSkin) tuple)
+        private void sort(IBeatmap beatmap)
         {
             // Sort control points to ensure a sane ordering, as they may be parsed in different orders. This works because each group contains only uniquely-typed control points.
-            foreach (var g in tuple.beatmap.ControlPointInfo.Groups)
+            foreach (var g in beatmap.ControlPointInfo.Groups)
             {
                 ArrayList.Adapter((IList)g.ControlPoints).Sort(
                     Comparer<ControlPoint>.Create((c1, c2) => string.Compare(c1.GetType().ToString(), c2.GetType().ToString(), StringComparison.Ordinal)));
