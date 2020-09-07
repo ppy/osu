@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private PaginatedContainerHeader header;
 
-        public PaginatedContainerWithHeader(Bindable<User> user, string headerText, CounterVisibilityState counterVisibilityState, string missing = "")
+        protected PaginatedContainerWithHeader(Bindable<User> user, string headerText, CounterVisibilityState counterVisibilityState, string missing = "")
             : base(user, missing)
         {
             this.headerText = headerText;

@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Sections
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
 
-            Children = new Drawable[]
+            Children = new[]
             {
                 CreateHeaderContent,
                 ItemsContainer = new FillFlowContainer
