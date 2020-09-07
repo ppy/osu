@@ -228,7 +228,7 @@ namespace osu.Game
             dependencies.Cache(difficultyManager);
             AddInternal(difficultyManager);
 
-            dependencies.Cache(CollectionManager = new BeatmapCollectionManager());
+            dependencies.Cache(CollectionManager = new BeatmapCollectionManager(Storage));
             AddInternal(CollectionManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
