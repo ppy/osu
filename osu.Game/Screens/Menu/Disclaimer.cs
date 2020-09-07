@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Menu
             {
                 "You can press Ctrl-T anywhere in the game to toggle the toolbar!",
                 "You can press Ctrl-O anywhere in the game to access options!",
-                "All settings are dynamic and take effect in real-time. Try changing the skin while playing!",
+                "All settings are dynamic and take effect in real-time. Try pausing and changing the skin while playing!",
                 "New features are coming online every update. Make sure to stay up-to-date!",
                 "If you find the UI too large or small, try adjusting UI scale in settings!",
                 "Try adjusting the \"Screen Scaling\" mode to change your gameplay or UI area, even in fullscreen!",
