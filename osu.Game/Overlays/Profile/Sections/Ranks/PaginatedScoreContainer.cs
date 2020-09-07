@@ -17,24 +17,17 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing)
-            : base(user, header, missing)
+        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string missing)
+            : base(user, missing)
         {
             this.type = type;
 
             ItemsPerPage = 5;
-
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
             new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
-
-        protected override int GetCount(User user) => type switch
-        {
-            ScoreType.Firsts => user.ScoresFirstCount,
-            _ => 0
-        };
 
         protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
         {

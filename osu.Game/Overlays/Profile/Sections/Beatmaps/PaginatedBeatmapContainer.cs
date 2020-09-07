@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private const float panel_padding = 10f;
         private readonly BeatmapSetType type;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
-            : base(user, header, missing)
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user)
+            : base(user, "None... yet.")
         {
             this.type = type;
 
@@ -38,15 +38,5 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
             };
-
-        protected override int GetCount(User user) => type switch
-        {
-            BeatmapSetType.Favourite => user.FavouriteBeatmapsetCount,
-            BeatmapSetType.Graveyard => user.GraveyardBeatmapsetCount,
-            BeatmapSetType.Loved => user.LovedBeatmapsetCount,
-            BeatmapSetType.RankedAndApproved => user.RankedAndApprovedBeatmapsetCount,
-            BeatmapSetType.Unranked => user.UnrankedBeatmapsetCount,
-            _ => 0
-        };
     }
 }

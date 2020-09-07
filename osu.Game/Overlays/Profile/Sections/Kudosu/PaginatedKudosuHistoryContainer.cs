@@ -13,8 +13,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public class PaginatedKudosuHistoryContainer : PaginatedContainer<APIKudosuHistory>
     {
-        public PaginatedKudosuHistoryContainer(Bindable<User> user, string header, string missing)
-            : base(user, header, missing)
+        public PaginatedKudosuHistoryContainer(Bindable<User> user, string missing)
+            : base(user, missing)
         {
             ItemsPerPage = 5;
         }
