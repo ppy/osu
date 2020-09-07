@@ -19,6 +19,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Select
 {
+    /// <summary>
+    /// A dropdown to select the <see cref="CollectionFilter"/> to filter beatmaps using.
+    /// </summary>
     public class CollectionFilterDropdown : OsuDropdown<CollectionFilter>
     {
         private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
@@ -64,6 +67,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private void filterChanged(ValueChangedEvent<CollectionFilter> filter)
         {
+            // Binding the beatmaps will trigger a collection change event, which results in an infinite-loop. This is rebound later, when it's safe to do so.
             beatmaps.CollectionChanged -= filterBeatmapsChanged;
 
             if (filter.OldValue?.Collection != null)
@@ -122,7 +126,7 @@ namespace osu.Game.Screens.Select
             private void updateBindable()
             {
                 collectionName.UnbindAll();
-                collectionName.BindTo(SelectedItem.Value.Collection?.Name ?? new Bindable<string>("All beatmaps"));
+                collectionName.BindTo(SelectedItem.Value.CollectionName);
                 collectionName.BindValueChanged(_ => updateText(), true);
             }
 
@@ -164,7 +168,7 @@ namespace osu.Game.Screens.Select
                 : base(item)
             {
                 collectionBeatmaps = Item.Collection?.Beatmaps.GetBoundCopy();
-                collectionName = Item.Collection?.Name.GetBoundCopy() ?? new Bindable<string>("All beatmaps");
+                collectionName = Item.CollectionName.GetBoundCopy();
             }
 
             [BackgroundDependencyLoader]

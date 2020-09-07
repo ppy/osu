@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Collections
 {
-    public class ManageCollectionDialog : OsuFocusedOverlayContainer
+    public class ManageCollectionsDialog : OsuFocusedOverlayContainer
     {
         private const double enter_duration = 500;
         private const double exit_duration = 200;
@@ -21,7 +21,7 @@ namespace osu.Game.Collections
         [Resolved]
         private BeatmapCollectionManager collectionManager { get; set; }
 
-        public ManageCollectionDialog()
+        public ManageCollectionsDialog()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
