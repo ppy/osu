@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,7 +13,7 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal class TimingSection : Section<TimingControlPoint>
     {
-        private SettingsSlider<double> bpm;
+        private SettingsSlider<double> bpmSlider;
         private SettingsEnumDropdown<TimeSignatures> timeSignature;
 
         [BackgroundDependencyLoader]
@@ -20,7 +21,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Flow.AddRange(new Drawable[]
             {
-                bpm = new BPMSlider
+                bpmSlider = new BPMSlider
                 {
                     Bindable = new TimingControlPoint().BeatLengthBindable,
                     LabelText = "BPM",
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             if (point.NewValue != null)
             {
-                bpm.Bindable = point.NewValue.BeatLengthBindable;
+                bpmSlider.Bindable = point.NewValue.BeatLengthBindable;
                 timeSignature.Bindable = point.NewValue.TimeSignatureBindable;
             }
         }
@@ -54,6 +55,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private class BPMSlider : SettingsSlider<double>
         {
+            private const double sane_minimum = 60;
+            private const double sane_maximum = 200;
+
             private readonly BindableDouble beatLengthBindable = new BindableDouble();
 
             private BindableDouble bpmBindable;
@@ -63,20 +67,37 @@ namespace osu.Game.Screens.Edit.Timing
                 get => base.Bindable;
                 set
                 {
-                    // incoming will be beatlength
-
+                    // incoming will be beat length, not bpm
                     beatLengthBindable.UnbindBindings();
                     beatLengthBindable.BindTo(value);
 
-                    base.Bindable = bpmBindable = new BindableDouble(beatLengthToBpm(beatLengthBindable.Value))
+                    double initial = beatLengthToBpm(beatLengthBindable.Value);
+
+                    bpmBindable = new BindableDouble(initial)
                     {
-                        MinValue = beatLengthToBpm(beatLengthBindable.MaxValue),
-                        MaxValue = beatLengthToBpm(beatLengthBindable.MinValue),
                         Default = beatLengthToBpm(beatLengthBindable.Default),
                     };
 
-                    bpmBindable.BindValueChanged(bpm => beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
+                    updateCurrent(initial);
+
+                    bpmBindable.BindValueChanged(bpm =>
+                    {
+                        updateCurrent(bpm.NewValue);
+                        beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue);
+                    });
+
+                    base.Bindable = bpmBindable;
                 }
+            }
+
+            private void updateCurrent(double newValue)
+            {
+                // we use a more sane range for the slider display unless overridden by the user.
+                // if a value comes in outside our range, we should expand temporarily.
+                bpmBindable.MinValue = Math.Min(newValue, sane_minimum);
+                bpmBindable.MaxValue = Math.Max(newValue, sane_maximum);
+
+                bpmBindable.Value = newValue;
             }
 
             private double beatLengthToBpm(double beatLength) => 60000 / beatLength;
