@@ -23,15 +23,8 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Flow.AddRange(new Drawable[]
             {
-                bpmTextEntry = new BPMTextBox
-                {
-                    Bindable = new TimingControlPoint().BeatLengthBindable,
-                    Label = "BPM",
-                },
-                bpmSlider = new BPMSlider
-                {
-                    Bindable = new TimingControlPoint().BeatLengthBindable,
-                },
+                bpmTextEntry = new BPMTextBox(),
+                bpmSlider = new BPMSlider(),
                 timeSignature = new SettingsEnumDropdown<TimeSignatures>
                 {
                     LabelText = "Time Signature"
@@ -62,8 +55,12 @@ namespace osu.Game.Screens.Edit.Timing
 
         private class BPMTextBox : LabelledTextBox
         {
+            private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
+
             public BPMTextBox()
             {
+                Label = "BPM";
+
                 OnCommit += (val, isNew) =>
                 {
                     if (!isNew) return;
@@ -84,11 +81,9 @@ namespace osu.Game.Screens.Edit.Timing
 
                 beatLengthBindable.BindValueChanged(val =>
                 {
-                    Current.Value = beatLengthToBpm(val.NewValue).ToString();
-                });
+                    Current.Value = beatLengthToBpm(val.NewValue).ToString("N2");
+                }, true);
             }
-
-            private readonly BindableDouble beatLengthBindable = new BindableDouble();
 
             public Bindable<double> Bindable
             {
@@ -107,12 +102,12 @@ namespace osu.Game.Screens.Edit.Timing
             private const double sane_minimum = 60;
             private const double sane_maximum = 200;
 
-            private readonly BindableDouble beatLengthBindable = new BindableDouble();
+            private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
             private readonly BindableDouble bpmBindable = new BindableDouble();
 
             public BPMSlider()
             {
-                beatLengthBindable.BindValueChanged(beatLength => updateCurrent(beatLengthToBpm(beatLength.NewValue)));
+                beatLengthBindable.BindValueChanged(beatLength => updateCurrent(beatLengthToBpm(beatLength.NewValue)), true);
                 bpmBindable.BindValueChanged(bpm => bpmBindable.Default = beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
 
                 base.Bindable = bpmBindable;
