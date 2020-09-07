@@ -56,7 +56,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             }
         }
 
-
         protected override APIRequest<List<APIBeatmapSet>> CreateRequest() =>
             new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
