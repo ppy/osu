@@ -107,6 +107,8 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected virtual void UpdateItems(List<TModel> items) => Schedule(() =>
         {
+            OnItemsReceived(items);
+
             if (!items.Any() && VisiblePages == 1)
             {
                 moreButton.Hide();
@@ -131,6 +133,10 @@ namespace osu.Game.Overlays.Profile.Sections
         protected virtual void OnUserChanged(User user)
         {
             showMore();
+        }
+
+        protected virtual void OnItemsReceived(List<TModel> items)
+        {
         }
 
         protected virtual Drawable CreateHeaderContent => Empty();
