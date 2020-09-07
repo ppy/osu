@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
     {
         public string IconTexture => "Icons/Hexacons/messaging";
         public string Title => "chat";
-        public string Description => "Join the real-time discussion";
+        public string Description => "join the real-time discussion";
 
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
