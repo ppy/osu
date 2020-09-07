@@ -21,7 +21,7 @@ namespace osu.Game.Collections
     public class BeatmapCollectionManager : CompositeDrawable
     {
         /// <summary>
-        /// Database version in YYYYMMDD format (matching stable).
+        /// Database version in stable-compatible YYYYMMDD format.
         /// </summary>
         private const int database_version = 30000000;
 
@@ -211,31 +211,6 @@ namespace osu.Game.Collections
         {
             base.Dispose(isDisposing);
             save();
-        }
-    }
-
-    public class BeatmapCollection
-    {
-        /// <summary>
-        /// Invoked whenever any change occurs on this <see cref="BeatmapCollection"/>.
-        /// </summary>
-        public event Action Changed;
-
-        public readonly Bindable<string> Name = new Bindable<string>();
-
-        public readonly BindableList<BeatmapInfo> Beatmaps = new BindableList<BeatmapInfo>();
-
-        public DateTimeOffset LastModifyTime { get; private set; }
-
-        public BeatmapCollection()
-        {
-            LastModifyTime = DateTimeOffset.UtcNow;
-
-            Beatmaps.CollectionChanged += (_, __) =>
-            {
-                LastModifyTime = DateTimeOffset.Now;
-                Changed?.Invoke();
-            };
         }
     }
 }

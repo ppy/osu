@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Collections
         {
             Children = new Drawable[]
             {
-                new ManageCollectionDialog { State = { Value = Visibility.Visible } },
+                new ManageCollectionsDialog { State = { Value = Visibility.Visible } },
                 dialogOverlay = new DialogOverlay()
             };
         }
