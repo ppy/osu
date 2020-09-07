@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected readonly FillFlowContainer ItemsContainer;
         protected RulesetStore Rulesets;
 
-        protected PaginatedContainer(Bindable<User> user, string missing)
+        protected PaginatedContainer(Bindable<User> user, string missing = "")
         {
             User.BindTo(user);
 
@@ -107,7 +107,10 @@ namespace osu.Game.Overlays.Profile.Sections
             {
                 moreButton.Hide();
                 moreButton.IsLoading = false;
-                missingText.Show();
+
+                if (!string.IsNullOrEmpty(missingText.Text))
+                    missingText.Show();
+
                 return;
             }
 

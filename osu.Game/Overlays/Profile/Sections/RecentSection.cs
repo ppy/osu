@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new[]
             {
-                new PaginatedRecentActivityContainer(User, "This user hasn't done anything notable recently!"),
+                new PaginatedRecentActivityContainer(User),
             };
         }
     }
