@@ -15,10 +15,9 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     public class PaginatedMostPlayedBeatmapContainer : PaginatedContainer<APIUserMostPlayedBeatmap>
     {
         public PaginatedMostPlayedBeatmapContainer(Bindable<User> user)
-            : base(user, "Most Played Beatmaps", "No records. :(")
+            : base(user, "No records. :(")
         {
             ItemsPerPage = 5;
-
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
