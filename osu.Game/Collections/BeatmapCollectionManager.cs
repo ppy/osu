@@ -76,20 +76,32 @@ namespace osu.Game.Collections
                 return Task.CompletedTask;
             }
 
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
                 var storage = GetStableStorage();
 
                 if (storage.Exists(database_name))
                 {
                     using (var stream = storage.GetStream(database_name))
-                    {
-                        var collection = readCollections(stream);
-                        Schedule(() => importCollections(collection));
-                    }
+                        await Import(stream);
                 }
             });
         }
+
+        public async Task Import(Stream stream) => await Task.Run(async () =>
+        {
+            var collection = readCollections(stream);
+            bool importCompleted = false;
+
+            Schedule(() =>
+            {
+                importCollections(collection);
+                importCompleted = true;
+            });
+
+            while (!IsDisposed && !importCompleted)
+                await Task.Delay(10);
+        });
 
         private void importCollections(List<BeatmapCollection> newCollections)
         {
