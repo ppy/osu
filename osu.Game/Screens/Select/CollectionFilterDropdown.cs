@@ -19,11 +19,11 @@ using osuTK;
 
 namespace osu.Game.Screens.Select
 {
-    public class CollectionFilterDropdown : OsuDropdown<FilterControl.CollectionFilter>
+    public class CollectionFilterDropdown : OsuDropdown<CollectionFilter>
     {
         private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
         private readonly IBindableList<BeatmapInfo> beatmaps = new BindableList<BeatmapInfo>();
-        private readonly BindableList<FilterControl.CollectionFilter> filters = new BindableList<FilterControl.CollectionFilter>();
+        private readonly BindableList<CollectionFilter> filters = new BindableList<CollectionFilter>();
 
         public CollectionFilterDropdown()
         {
@@ -53,16 +53,16 @@ namespace osu.Game.Screens.Select
             var selectedItem = SelectedItem?.Value?.Collection;
 
             filters.Clear();
-            filters.Add(new FilterControl.CollectionFilter(null));
-            filters.AddRange(collections.Select(c => new FilterControl.CollectionFilter(c)));
+            filters.Add(new CollectionFilter(null));
+            filters.AddRange(collections.Select(c => new CollectionFilter(c)));
 
             Current.Value = filters.SingleOrDefault(f => f.Collection == selectedItem) ?? filters[0];
         }
 
         /// <summary>
-        /// Occurs when the <see cref="FilterControl.CollectionFilter"/> selection has changed.
+        /// Occurs when the <see cref="CollectionFilter"/> selection has changed.
         /// </summary>
-        private void filterChanged(ValueChangedEvent<FilterControl.CollectionFilter> filter)
+        private void filterChanged(ValueChangedEvent<CollectionFilter> filter)
         {
             beatmaps.CollectionChanged -= filterBeatmapsChanged;
 
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Select
             Current.TriggerChange();
         }
 
-        protected override string GenerateItemText(FilterControl.CollectionFilter item) => item.Collection?.Name.Value ?? "All beatmaps";
+        protected override string GenerateItemText(CollectionFilter item) => item.Collection?.Name.Value ?? "All beatmaps";
 
         protected override DropdownHeader CreateHeader() => new CollectionDropdownHeader
         {
@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Select
 
         private class CollectionDropdownHeader : OsuDropdownHeader
         {
-            public readonly Bindable<FilterControl.CollectionFilter> SelectedItem = new Bindable<FilterControl.CollectionFilter>();
+            public readonly Bindable<CollectionFilter> SelectedItem = new Bindable<CollectionFilter>();
             private readonly Bindable<string> collectionName = new Bindable<string>();
 
             protected override string Label
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Select
         private class CollectionDropdownMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
         {
             [NotNull]
-            protected new FilterControl.CollectionFilter Item => ((DropdownMenuItem<FilterControl.CollectionFilter>)base.Item).Value;
+            protected new CollectionFilter Item => ((DropdownMenuItem<CollectionFilter>)base.Item).Value;
 
             [Resolved]
             private OsuColour colours { get; set; }

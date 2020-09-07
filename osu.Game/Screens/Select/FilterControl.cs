@@ -2,16 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -197,20 +193,6 @@ namespace osu.Game.Screens.Select
             searchTextBox.Current.ValueChanged += _ => updateCriteria();
 
             updateCriteria();
-        }
-
-        public class CollectionFilter
-        {
-            [CanBeNull]
-            public readonly BeatmapCollection Collection;
-
-            public CollectionFilter([CanBeNull] BeatmapCollection collection)
-            {
-                Collection = collection;
-            }
-
-            public virtual bool ContainsBeatmap(BeatmapInfo beatmap)
-                => Collection?.Beatmaps.Any(b => b.Equals(beatmap)) ?? true;
         }
 
         public void Deactivate()
