@@ -761,7 +761,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestCreateNewEmptyBeatmap()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapFile)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestCreateNewEmptyBeatmap)))
             {
                 try
                 {
@@ -788,7 +788,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestCreateNewBeatmapWithObject()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapFile)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestCreateNewBeatmapWithObject)))
             {
                 try
                 {
