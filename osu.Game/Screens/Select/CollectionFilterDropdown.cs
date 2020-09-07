@@ -211,12 +211,12 @@ namespace osu.Game.Screens.Select
 
                 if (collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo))
                 {
-                    addOrRemoveButton.Icon = FontAwesome.Solid.MinusSquare;
+                    addOrRemoveButton.Icon = FontAwesome.Solid.MinusCircle;
                     addOrRemoveButton.IconColour = colours.Red;
                 }
                 else
                 {
-                    addOrRemoveButton.Icon = FontAwesome.Solid.PlusSquare;
+                    addOrRemoveButton.Icon = FontAwesome.Solid.PlusCircle;
                     addOrRemoveButton.IconColour = colours.Green;
                 }
             }

@@ -151,13 +151,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
-            AddAssert("button disabled", () => !getAddOrRemoveButton(1).Enabled.Value);
 
             AddStep("select available beatmap", () => Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0]));
             AddAssert("button enabled", () => getAddOrRemoveButton(1).Enabled.Value);
 
             AddStep("set dummy beatmap", () => Beatmap.SetDefault());
-            AddAssert("button enabled", () => !getAddOrRemoveButton(1).Enabled.Value);
+            AddAssert("button disabled", () => !getAddOrRemoveButton(1).Enabled.Value);
         }
 
         [Test]
@@ -172,13 +171,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select available beatmap", () => Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0]));
 
             AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
+            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusCircle));
 
             AddStep("add beatmap to collection", () => collectionManager.Collections[0].Beatmaps.Add(Beatmap.Value.BeatmapInfo));
-            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
+            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusCircle));
 
             AddStep("remove beatmap from collection", () => collectionManager.Collections[0].Beatmaps.Clear());
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
+            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusCircle));
         }
 
         [Test]
@@ -193,15 +192,15 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select available beatmap", () => Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0]));
 
             AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
+            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusCircle));
 
             addClickAddOrRemoveButtonStep(1);
             AddAssert("collection contains beatmap", () => collectionManager.Collections[0].Beatmaps.Contains(Beatmap.Value.BeatmapInfo));
-            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
+            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusCircle));
 
             addClickAddOrRemoveButtonStep(1);
             AddAssert("collection does not contain beatmap", () => !collectionManager.Collections[0].Beatmaps.Contains(Beatmap.Value.BeatmapInfo));
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
+            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusCircle));
         }
 
         private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
