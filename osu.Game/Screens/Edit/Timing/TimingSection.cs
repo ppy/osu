@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -15,16 +16,21 @@ namespace osu.Game.Screens.Edit.Timing
     {
         private SettingsSlider<double> bpmSlider;
         private SettingsEnumDropdown<TimeSignatures> timeSignature;
+        private BPMTextBox bpmTextEntry;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Flow.AddRange(new Drawable[]
             {
+                bpmTextEntry = new BPMTextBox
+                {
+                    Bindable = new TimingControlPoint().BeatLengthBindable,
+                    Label = "BPM",
+                },
                 bpmSlider = new BPMSlider
                 {
                     Bindable = new TimingControlPoint().BeatLengthBindable,
-                    LabelText = "BPM",
                 },
                 timeSignature = new SettingsEnumDropdown<TimeSignatures>
                 {
@@ -38,6 +44,7 @@ namespace osu.Game.Screens.Edit.Timing
             if (point.NewValue != null)
             {
                 bpmSlider.Bindable = point.NewValue.BeatLengthBindable;
+                bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
                 timeSignature.Bindable = point.NewValue.TimeSignatureBindable;
             }
         }
@@ -53,14 +60,63 @@ namespace osu.Game.Screens.Edit.Timing
             };
         }
 
+        private class BPMTextBox : LabelledTextBox
+        {
+            public BPMTextBox()
+            {
+                OnCommit += (val, isNew) =>
+                {
+                    if (!isNew) return;
+
+                    if (double.TryParse(Current.Value, out double doubleVal))
+                    {
+                        try
+                        {
+                            beatLengthBindable.Value = beatLengthToBpm(doubleVal);
+                        }
+                        catch
+                        {
+                            // will restore the previous text value on failure.
+                            beatLengthBindable.TriggerChange();
+                        }
+                    }
+                };
+
+                beatLengthBindable.BindValueChanged(val =>
+                {
+                    Current.Value = beatLengthToBpm(val.NewValue).ToString();
+                });
+            }
+
+            private readonly BindableDouble beatLengthBindable = new BindableDouble();
+
+            public Bindable<double> Bindable
+            {
+                get => beatLengthBindable;
+                set
+                {
+                    // incoming will be beat length, not bpm
+                    beatLengthBindable.UnbindBindings();
+                    beatLengthBindable.BindTo(value);
+                }
+            }
+        }
+
         private class BPMSlider : SettingsSlider<double>
         {
             private const double sane_minimum = 60;
             private const double sane_maximum = 200;
 
             private readonly BindableDouble beatLengthBindable = new BindableDouble();
+            private readonly BindableDouble bpmBindable = new BindableDouble();
 
-            private BindableDouble bpmBindable;
+            public BPMSlider()
+            {
+                beatLengthBindable.BindValueChanged(beatLength => updateCurrent(beatLengthToBpm(beatLength.NewValue)));
+                bpmBindable.BindValueChanged(bpm => bpmBindable.Default = beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
+
+                base.Bindable = bpmBindable;
+            }
 
             public override Bindable<double> Bindable
             {
@@ -70,23 +126,6 @@ namespace osu.Game.Screens.Edit.Timing
                     // incoming will be beat length, not bpm
                     beatLengthBindable.UnbindBindings();
                     beatLengthBindable.BindTo(value);
-
-                    double initial = beatLengthToBpm(beatLengthBindable.Value);
-
-                    bpmBindable = new BindableDouble(initial)
-                    {
-                        Default = beatLengthToBpm(beatLengthBindable.Default),
-                    };
-
-                    updateCurrent(initial);
-
-                    bpmBindable.BindValueChanged(bpm =>
-                    {
-                        updateCurrent(bpm.NewValue);
-                        beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue);
-                    });
-
-                    base.Bindable = bpmBindable;
                 }
             }
 
@@ -99,8 +138,8 @@ namespace osu.Game.Screens.Edit.Timing
 
                 bpmBindable.Value = newValue;
             }
-
-            private double beatLengthToBpm(double beatLength) => 60000 / beatLength;
         }
+
+        private static double beatLengthToBpm(double beatLength) => 60000 / beatLength;
     }
 }
