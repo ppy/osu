@@ -718,24 +718,6 @@ namespace osu.Game
                 overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
         }
 
-        public class GameIdleTracker : IdleTracker
-        {
-            private InputManager inputManager;
-
-            public GameIdleTracker(int time)
-                : base(time)
-            {
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                inputManager = GetContainingInputManager();
-            }
-
-            protected override bool AllowIdle => inputManager.FocusedDrawable == null;
-        }
-
         private void forwardLoggedErrorsToNotifications()
         {
             int recentLogCount = 0;
@@ -990,11 +972,5 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
-    }
-
-    public enum ScorePresentType
-    {
-        Results,
-        Gameplay
     }
 }
