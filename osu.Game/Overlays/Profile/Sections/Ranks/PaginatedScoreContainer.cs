@@ -10,20 +10,38 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
 using osu.Game.Online.API;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedContainer<APILegacyScoreInfo>
+    public class PaginatedScoreContainer : PaginatedContainerWithHeader<APILegacyScoreInfo>
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user)
-            : base(user)
+        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string headerText, CounterVisibilityState counterVisibilityState, string missingText = "")
+            : base(user, headerText, counterVisibilityState, missingText)
         {
             this.type = type;
 
             ItemsPerPage = 5;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             ItemsContainer.Direction = FillDirection.Vertical;
+        }
+
+        protected override int GetCount(User user)
+        {
+            switch (type)
+            {
+                case ScoreType.Firsts:
+                    return user.ScoresFirstCount;
+
+                default:
+                    return 0;
+            }
         }
 
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>

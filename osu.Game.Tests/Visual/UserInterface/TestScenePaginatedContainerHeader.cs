@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using NUnit.Framework;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Framework.Testing;
 using System.Linq;
@@ -40,7 +43,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestVisibleWhenZeroCounter()
         {
-            AddStep("Create header", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenNonZero));
+            AddStep("Create header", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenZero));
             AddAssert("Value is 0", () => header.Current.Value == 0);
             AddAssert("Counter is visible", () => header.ChildrenOfType<CounterPill>().First().Alpha == 1);
             AddStep("Set count 10", () => header.Current.Value = 10);
@@ -54,11 +57,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestInitialVisibility()
         {
-            AddStep("Create header with 0 value", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenNonZero, 0));
+            AddStep("Create header with 0 value", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenZero, 0));
             AddAssert("Value is 0", () => header.Current.Value == 0);
             AddAssert("Counter is visible", () => header.ChildrenOfType<CounterPill>().First().Alpha == 1);
 
-            AddStep("Create header with 1 value", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenNonZero, 1));
+            AddStep("Create header with 1 value", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenZero, 1));
             AddAssert("Value is 1", () => header.Current.Value == 1);
             AddAssert("Counter is hidden", () => header.ChildrenOfType<CounterPill>().First().Alpha == 0);
         }
