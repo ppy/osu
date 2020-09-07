@@ -16,11 +16,11 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new[]
             {
-                new PaginatedBeatmapContainer(BeatmapSetType.Favourite, User),
-                new PaginatedBeatmapContainer(BeatmapSetType.RankedAndApproved, User),
-                new PaginatedBeatmapContainer(BeatmapSetType.Loved, User),
-                new PaginatedBeatmapContainer(BeatmapSetType.Unranked, User),
-                new PaginatedBeatmapContainer(BeatmapSetType.Graveyard, User)
+                new PaginatedBeatmapContainer(BeatmapSetType.Favourite, User, "Favourite Beatmaps"),
+                new PaginatedBeatmapContainer(BeatmapSetType.RankedAndApproved, User, "Ranked & Approved Beatmaps"),
+                new PaginatedBeatmapContainer(BeatmapSetType.Loved, User, "Loved Beatmaps"),
+                new PaginatedBeatmapContainer(BeatmapSetType.Unranked, User, "Pending Beatmaps"),
+                new PaginatedBeatmapContainer(BeatmapSetType.Graveyard, User, "Graveyarded Beatmaps")
             };
         }
     }

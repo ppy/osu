@@ -9,15 +9,21 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API;
 using System.Collections.Generic;
 using osuTK;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class PaginatedRecentActivityContainer : PaginatedContainer<APIRecentActivity>
     {
         public PaginatedRecentActivityContainer(Bindable<User> user)
-            : base(user)
+            : base(user, "This user hasn't done anything notable recently!")
         {
             ItemsPerPage = 10;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             ItemsContainer.Spacing = new Vector2(0, 8);
         }
 

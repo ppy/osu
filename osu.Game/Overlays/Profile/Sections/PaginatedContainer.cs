@@ -20,11 +20,6 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class PaginatedContainer<TModel> : FillFlowContainer
     {
-        private readonly ShowMoreButton moreButton;
-        private readonly OsuSpriteText missingText;
-        private APIRequest<List<TModel>> retrievalRequest;
-        private CancellationTokenSource loadCancellation;
-
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -32,19 +27,32 @@ namespace osu.Game.Overlays.Profile.Sections
         protected int ItemsPerPage;
 
         protected readonly Bindable<User> User = new Bindable<User>();
-        protected readonly FillFlowContainer ItemsContainer;
+        protected FillFlowContainer ItemsContainer;
         protected RulesetStore Rulesets;
+
+        private APIRequest<List<TModel>> retrievalRequest;
+        private CancellationTokenSource loadCancellation;
+
+        private readonly string missing;
+        private ShowMoreButton moreButton;
+        private OsuSpriteText missingText;
 
         protected PaginatedContainer(Bindable<User> user, string missing = "")
         {
+            this.missing = missing;
             User.BindTo(user);
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
+        {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
 
             Children = new Drawable[]
             {
+                CreateHeaderContent,
                 ItemsContainer = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
@@ -66,11 +74,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Alpha = 0,
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
             Rulesets = rulesets;
 
             User.ValueChanged += onUserChanged;
@@ -87,7 +91,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
             if (e.NewValue != null)
             {
-                showMore();
+                OnUserChanged(e.NewValue);
             }
         }
 
@@ -123,6 +127,13 @@ namespace osu.Game.Overlays.Profile.Sections
                 ItemsContainer.AddRange(drawables);
             }, loadCancellation.Token);
         });
+
+        protected virtual void OnUserChanged(User user)
+        {
+            showMore();
+        }
+
+        protected virtual Drawable CreateHeaderContent => Empty();
 
         protected abstract APIRequest<List<TModel>> CreateRequest();
 

@@ -1,4 +1,7 @@
-﻿using osu.Framework.Allocation;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -103,7 +106,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 case CounterVisibilityState.AlwaysVisible:
                     return 1;
 
-                case CounterVisibilityState.VisibleWhenNonZero:
+                case CounterVisibilityState.VisibleWhenZero:
                     return current.Value == 0 ? 1 : 0;
 
                 default:
@@ -113,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void onCurrentChanged(ValueChangedEvent<int> countValue)
         {
-            if (counterState == CounterVisibilityState.VisibleWhenNonZero)
+            if (counterState == CounterVisibilityState.VisibleWhenZero)
             {
                 counterPill.Alpha = countValue.NewValue == 0 ? 1 : 0;
             }
@@ -124,6 +127,6 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         AlwaysHidden,
         AlwaysVisible,
-        VisibleWhenNonZero
+        VisibleWhenZero
     }
 }
