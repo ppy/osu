@@ -9,6 +9,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.UI;
@@ -18,6 +19,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// The base class for gameplay modifiers.
     /// </summary>
+    [ExcludeFromDynamicCompile]
     public abstract class Mod : IMod, IJsonSerializable
     {
         /// <summary>
