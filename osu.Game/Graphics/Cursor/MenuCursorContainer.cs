@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.Cursor
         {
             base.Update();
 
-            var lastMouseSource = GetContainingInputManager().CurrentState.Mouse.LastSource;
+            var lastMouseSource = inputManager.CurrentState.Mouse.LastSource;
             bool hasValidInput = lastMouseSource != null && !(lastMouseSource is ISourcedFromTouch);
 
             if (!hasValidInput || !CanShowCursor)
