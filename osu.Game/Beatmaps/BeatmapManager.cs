@@ -27,6 +27,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Skinning;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Beatmaps
@@ -198,14 +199,15 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
-        public void Save(BeatmapInfo info, IBeatmap beatmapContent)
+        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
+        public void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
         {
             var setInfo = QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == info.ID));
 
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(beatmapContent).Encode(sw);
+                    new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
 
                 stream.Seek(0, SeekOrigin.Begin);
 
