@@ -44,6 +44,19 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             }
         }
 
+        protected override void OnItemsReceived(List<APILegacyScoreInfo> items)
+        {
+            base.OnItemsReceived(items);
+
+            if (type == ScoreType.Recent)
+            {
+                var count = items.Count;
+
+                Header.Current.Value = count == 0 ? 0 : -1;
+                Header.Current.TriggerChange();
+            }
+        }
+
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
             new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
