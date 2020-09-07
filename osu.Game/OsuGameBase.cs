@@ -31,6 +31,7 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Overlays;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -75,6 +76,8 @@ namespace osu.Game
         protected IAPIProvider API;
 
         protected MenuCursorContainer MenuCursorContainer;
+
+        protected MusicController MusicController;
 
         private Container content;
 
@@ -244,16 +247,6 @@ namespace osu.Game
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 
-            // ScheduleAfterChildren is safety against something in the current frame accessing the previous beatmap's track
-            // and potentially causing a reload of it after just unloading.
-            // Note that the reason for this being added *has* been resolved, so it may be feasible to removed this if required.
-            Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
-            {
-                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
-                if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
-                    b.OldValue.RecycleTrack();
-            }));
-
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
 
@@ -280,6 +273,9 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
+
+            AddInternal(MusicController = new MusicController());
+            dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }

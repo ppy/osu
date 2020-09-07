@@ -89,7 +89,10 @@ namespace osu.Game
 
         private IdleTracker idleTracker;
 
-        public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
+        /// <summary>
+        /// Whether overlays should be able to be opened game-wide. Value is sourced from the current active screen.
+        /// </summary>
+        public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         protected OsuScreenStack ScreenStack;
 
@@ -426,23 +429,7 @@ namespace osu.Game
 
             updateModDefaults();
 
-            var newBeatmap = beatmap.NewValue;
-
-            if (newBeatmap != null)
-            {
-                newBeatmap.Track.Completed += () => Scheduler.AddOnce(() => trackCompleted(newBeatmap));
-                newBeatmap.BeginAsyncLoad();
-            }
-
-            void trackCompleted(WorkingBeatmap b)
-            {
-                // the source of track completion is the audio thread, so the beatmap may have changed before firing.
-                if (Beatmap.Value != b)
-                    return;
-
-                if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
-                    MusicController.NextTrack();
-            }
+            beatmap.NewValue?.BeginAsyncLoad();
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -618,8 +605,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
-            loadComponentSingleFile(MusicController = new MusicController(), Add, true);
-
             loadComponentSingleFile(notifications.With(d =>
             {
                 d.GetToolbarHeight = () => ToolbarOffset;
@@ -717,9 +702,9 @@ namespace osu.Game
                 float offset = 0;
 
                 if (Settings.State.Value == Visibility.Visible)
-                    offset += ToolbarButton.WIDTH / 2;
+                    offset += Toolbar.HEIGHT / 2;
                 if (notifications.State.Value == Visibility.Visible)
-                    offset -= ToolbarButton.WIDTH / 2;
+                    offset -= Toolbar.HEIGHT / 2;
 
                 screenContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
             }
@@ -735,24 +720,6 @@ namespace osu.Game
             // show above others if not visible at all, else leave at current depth.
             if (!overlay.IsPresent)
                 overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
-        }
-
-        public class GameIdleTracker : IdleTracker
-        {
-            private InputManager inputManager;
-
-            public GameIdleTracker(int time)
-                : base(time)
-            {
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                inputManager = GetContainingInputManager();
-            }
-
-            protected override bool AllowIdle => inputManager.FocusedDrawable == null;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -925,8 +892,6 @@ namespace osu.Game
 
         private ScalingContainer screenContainer;
 
-        protected MusicController MusicController { get; private set; }
-
         protected override bool OnExiting()
         {
             if (ScreenStack.CurrentScreen is Loader)
@@ -976,9 +941,12 @@ namespace osu.Game
                     break;
             }
 
+            if (current is IOsuScreen currentOsuScreen)
+                OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
+
             if (newScreen is IOsuScreen newOsuScreen)
             {
-                OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
+                OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
 
                 MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 
@@ -1008,11 +976,5 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
-    }
-
-    public enum ScorePresentType
-    {
-        Results,
-        Gameplay
     }
 }

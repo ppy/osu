@@ -11,8 +11,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.SearchableList;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Multi
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
+                    Padding = new MarginPadding { Left = WaveOverlayContainer.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
                         title = new MultiHeaderTitle

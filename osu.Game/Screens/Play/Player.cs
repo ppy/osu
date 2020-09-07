@@ -50,7 +50,10 @@ namespace osu.Game.Screens.Play
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
+
+        // We are managing our own adjustments (see OnEntering/OnExiting).
+        public override bool AllowRateAdjustments => false;
 
         /// <summary>
         /// Whether gameplay should pause when the game window focus is lost.
@@ -76,6 +79,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         private SampleChannel sampleRestart;
 
@@ -178,7 +184,7 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, Mods.Value, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
             AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
@@ -196,6 +202,10 @@ namespace osu.Game.Screens.Play
                 BreakOverlay.Hide();
                 skipOverlay.Hide();
             }
+
+            DrawableRuleset.IsPaused.BindValueChanged(_ => updateOverlayActivationMode());
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateOverlayActivationMode());
+            breakTracker.IsBreakTime.BindValueChanged(_ => updateOverlayActivationMode());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
@@ -339,6 +349,16 @@ namespace osu.Game.Screens.Play
         {
             updatePauseOnFocusLostState();
             HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
+        }
+
+        private void updateOverlayActivationMode()
+        {
+            bool canTriggerOverlays = DrawableRuleset.IsPaused.Value || breakTracker.IsBreakTime.Value;
+
+            if (DrawableRuleset.HasReplayLoaded.Value || canTriggerOverlays)
+                OverlayActivationMode.Value = OverlayActivation.UserTriggered;
+            else
+                OverlayActivationMode.Value = OverlayActivation.Disabled;
         }
 
         private void updatePauseOnFocusLostState() =>
@@ -627,6 +647,15 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
+
+            // Our mods are local copies of the global mods so they need to be re-applied to the track.
+            // This is done through the music controller (for now), because resetting speed adjustments on the beatmap track also removes adjustments provided by DrawableTrack.
+            // Todo: In the future, player will receive in a track and will probably not have to worry about this...
+            musicController.ResetTrackAdjustments();
+            foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
+                mod.ApplyToTrack(musicController.CurrentTrack);
+
+            updateOverlayActivationMode();
         }
 
         public override void OnSuspending(IScreen next)
@@ -659,6 +688,8 @@ namespace osu.Game.Screens.Play
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
             GameplayClockContainer?.StopUsingBeatmapClock();
+
+            musicController.ResetTrackAdjustments();
 
             fadeOut();
             return base.OnExiting(next);

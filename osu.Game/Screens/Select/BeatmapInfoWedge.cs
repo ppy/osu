@@ -318,14 +318,14 @@ namespace osu.Game.Screens.Select
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
-                        Icon = FontAwesome.Regular.Clock,
+                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
                         Content = TimeSpan.FromMilliseconds(b.BeatmapInfo.Length).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "BPM",
-                        Icon = FontAwesome.Regular.Circle,
+                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Bpm),
                         Content = getBPMRange(b),
                     }));
 
@@ -418,10 +418,18 @@ namespace osu.Game.Screens.Select
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
-                                    Scale = new Vector2(0.8f),
                                     Colour = Color4Extensions.FromHex(@"f7dd55"),
-                                    Icon = statistic.Icon,
+                                    Icon = FontAwesome.Regular.Circle,
+                                    Size = new Vector2(0.8f)
                                 },
+                                statistic.CreateIcon().With(i =>
+                                {
+                                    i.Anchor = Anchor.Centre;
+                                    i.Origin = Anchor.Centre;
+                                    i.RelativeSizeAxes = Axes.Both;
+                                    i.Colour = Color4Extensions.FromHex(@"f7dd55");
+                                    i.Size = new Vector2(0.64f);
+                                }),
                             }
                         },
                         new OsuSpriteText
