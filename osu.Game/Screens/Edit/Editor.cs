@@ -113,9 +113,8 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, Beatmap.Value.Skin));
             dependencies.CacheAs(editorBeatmap);
-
             changeHandler = new EditorChangeHandler(editorBeatmap);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
@@ -418,7 +417,7 @@ namespace osu.Game.Screens.Edit
             beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
 
             // save the loaded beatmap's data stream.
-            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
+            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
         }
 
         private void exportBeatmap()
