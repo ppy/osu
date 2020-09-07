@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
@@ -14,6 +15,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Beatmaps
 {
+    [ExcludeFromDynamicCompile]
     [Serializable]
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
