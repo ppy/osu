@@ -87,7 +87,7 @@ namespace osu.Game.Collections
             }
         }
 
-        private class DeleteButton : CompositeDrawable
+        public class DeleteButton : CompositeDrawable
         {
             public Func<Vector2, bool> IsTextBoxHovered;
 

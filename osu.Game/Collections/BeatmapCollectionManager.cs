@@ -37,12 +37,19 @@ namespace osu.Game.Collections
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        private readonly Storage storage;
+
+        public BeatmapCollectionManager(Storage storage)
+        {
+            this.storage = storage;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (host.Storage.Exists(database_name))
+            if (storage.Exists(database_name))
             {
-                using (var stream = host.Storage.GetStream(database_name))
+                using (var stream = storage.GetStream(database_name))
                     importCollections(readCollections(stream));
             }
 
@@ -78,11 +85,9 @@ namespace osu.Game.Collections
 
             return Task.Run(async () =>
             {
-                var storage = GetStableStorage();
-
-                if (storage.Exists(database_name))
+                if (stable.Exists(database_name))
                 {
-                    using (var stream = storage.GetStream(database_name))
+                    using (var stream = stable.GetStream(database_name))
                         await Import(stream);
                 }
             });
@@ -188,7 +193,7 @@ namespace osu.Game.Collections
                 {
                     // This is NOT thread-safe!!
 
-                    using (var sw = new SerializationWriter(host.Storage.GetStream(database_name, FileAccess.Write)))
+                    using (var sw = new SerializationWriter(storage.GetStream(database_name, FileAccess.Write)))
                     {
                         sw.Write(database_version);
                         sw.Write(Collections.Count);
