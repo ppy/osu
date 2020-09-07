@@ -101,9 +101,8 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, Beatmap.Value.Skin));
             dependencies.CacheAs(editorBeatmap);
-
             changeHandler = new EditorChangeHandler(editorBeatmap);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
@@ -399,7 +398,7 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!clock.IsRunning, amount);
         }
 
-        private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
+        private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
 
         private void exportBeatmap()
         {

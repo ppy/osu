@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
 using osuTK;
@@ -45,8 +46,6 @@ namespace osu.Game.Screens.Menu
 
         protected ITrack Track { get; private set; }
 
-        private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
-
         private const int exit_delay = 3000;
 
         private SampleChannel seeya;
@@ -59,6 +58,9 @@ namespace osu.Game.Screens.Menu
 
         [Resolved]
         private AudioManager audio { get; set; }
+
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         /// <summary>
         /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
@@ -123,17 +125,35 @@ namespace osu.Game.Screens.Menu
             this.FadeIn(300);
 
             double fadeOutTime = exit_delay;
+
+            var track = musicController.CurrentTrack;
+
+            // ensure the track doesn't change or loop as we are exiting.
+            track.Looping = false;
+            Beatmap.Disabled = true;
+
             // we also handle the exit transition.
             if (MenuVoice.Value)
+            {
                 seeya.Play();
+
+                // if playing the outro voice, we have more time to have fun with the background track.
+                // initially fade to almost silent then ramp out over the remaining time.
+                const double initial_fade = 200;
+                track
+                    .VolumeTo(0.03f, initial_fade).Then()
+                    .VolumeTo(0, fadeOutTime - initial_fade, Easing.In);
+            }
             else
+            {
                 fadeOutTime = 500;
 
-            audio.AddAdjustment(AdjustableProperty.Volume, exitingVolumeFade);
-            this.TransformBindableTo(exitingVolumeFade, 0, fadeOutTime).OnComplete(_ => this.Exit());
+                // if outro voice is turned off, just do a simple fade out.
+                track.VolumeTo(0, fadeOutTime, Easing.Out);
+            }
 
             //don't want to fade out completely else we will stop running updates.
-            Game.FadeTo(0.01f, fadeOutTime);
+            Game.FadeTo(0.01f, fadeOutTime).OnComplete(_ => this.Exit());
 
             base.OnResuming(last);
         }
@@ -166,6 +186,9 @@ namespace osu.Game.Screens.Menu
                 beatmap.Value = initialBeatmap;
                 Track = initialBeatmap.Track;
                 UsingThemedIntro = !initialBeatmap.Track.IsDummyDevice;
+
+                // ensure the track starts at maximum volume
+                musicController.CurrentTrack.FinishTransforms();
 
                 logo.MoveTo(new Vector2(0.5f));
                 logo.ScaleTo(Vector2.One);

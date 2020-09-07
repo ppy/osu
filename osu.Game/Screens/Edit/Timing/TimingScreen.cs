@@ -124,8 +124,7 @@ namespace osu.Game.Screens.Edit.Timing
                 selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
 
                 controlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
-                controlGroups.ItemsAdded += _ => createContent();
-                controlGroups.ItemsRemoved += _ => createContent();
+                controlGroups.CollectionChanged += (sender, args) => createContent();
                 createContent();
             }
 
