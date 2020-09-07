@@ -87,18 +87,47 @@ namespace osu.Game.Screens.Select
 
         protected override string GenerateItemText(FilterControl.CollectionFilter item) => item.Collection?.Name.Value ?? "All beatmaps";
 
-        protected override DropdownHeader CreateHeader() => new CollectionDropdownHeader();
+        protected override DropdownHeader CreateHeader() => new CollectionDropdownHeader
+        {
+            SelectedItem = { BindTarget = Current }
+        };
 
         protected override DropdownMenu CreateMenu() => new CollectionDropdownMenu();
 
         private class CollectionDropdownHeader : OsuDropdownHeader
         {
+            public readonly Bindable<FilterControl.CollectionFilter> SelectedItem = new Bindable<FilterControl.CollectionFilter>();
+            private readonly Bindable<string> collectionName = new Bindable<string>();
+
+            protected override string Label
+            {
+                get => base.Label;
+                set { } // See updateText().
+            }
+
             public CollectionDropdownHeader()
             {
                 Height = 25;
                 Icon.Size = new Vector2(16);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
             }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                SelectedItem.BindValueChanged(_ => updateBindable(), true);
+            }
+
+            private void updateBindable()
+            {
+                collectionName.UnbindAll();
+                collectionName.BindTo(SelectedItem.Value.Collection?.Name ?? new Bindable<string>("All beatmaps"));
+                collectionName.BindValueChanged(_ => updateText(), true);
+            }
+
+            // Dropdowns don't bind to value changes, so the real name is copied directly from the selected item here.
+            private void updateText() => base.Label = collectionName.Value;
         }
 
         private class CollectionDropdownMenu : OsuDropdownMenu
@@ -113,6 +142,9 @@ namespace osu.Game.Screens.Select
 
         private class CollectionDropdownMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
         {
+            [NotNull]
+            protected new FilterControl.CollectionFilter Item => ((DropdownMenuItem<FilterControl.CollectionFilter>)base.Item).Value;
+
             [Resolved]
             private OsuColour colours { get; set; }
 
@@ -122,12 +154,17 @@ namespace osu.Game.Screens.Select
             [CanBeNull]
             private readonly BindableList<BeatmapInfo> collectionBeatmaps;
 
+            [NotNull]
+            private readonly Bindable<string> collectionName;
+
             private IconButton addOrRemoveButton;
+            private Content content;
 
             public CollectionDropdownMenuItem(MenuItem item)
                 : base(item)
             {
-                collectionBeatmaps = ((DropdownMenuItem<FilterControl.CollectionFilter>)item).Value.Collection?.Beatmaps.GetBoundCopy();
+                collectionBeatmaps = Item.Collection?.Beatmaps.GetBoundCopy();
+                collectionName = Item.Collection?.Name.GetBoundCopy() ?? new Bindable<string>("All beatmaps");
             }
 
             [BackgroundDependencyLoader]
@@ -156,6 +193,10 @@ namespace osu.Game.Screens.Select
                     collectionBeatmaps.CollectionChanged += (_, __) => collectionChanged();
                     beatmap.BindValueChanged(_ => collectionChanged(), true);
                 }
+
+                // Although the DrawableMenuItem binds to value changes of the item's text, the item is an internal implementation detail of Dropdown that has no knowledge
+                // of the underlying CollectionFilter value and its accompanying name, so the real name has to be copied here. Without this, the collection name wouldn't update when changed.
+                collectionName.BindValueChanged(name => content.Text = name.NewValue, true);
             }
 
             private void collectionChanged()
@@ -183,6 +224,8 @@ namespace osu.Game.Screens.Select
                 if (!collectionBeatmaps.Remove(beatmap.Value.BeatmapInfo))
                     collectionBeatmaps.Add(beatmap.Value.BeatmapInfo);
             }
+
+            protected override Drawable CreateContent() => content = (Content)base.CreateContent();
         }
     }
 }
