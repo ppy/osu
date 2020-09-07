@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Timing
         private class BPMSlider : SettingsSlider<double>
         {
             private const double sane_minimum = 60;
-            private const double sane_maximum = 200;
+            private const double sane_maximum = 240;
 
             private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
             private readonly BindableDouble bpmBindable = new BindableDouble();
