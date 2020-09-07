@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
     {
         public string IconTexture => "Icons/Hexacons/music";
         public string Title => "now playing";
-        public string Description => "Manage the currently playing track";
+        public string Description => "manage the currently playing track";
 
         private const float player_height = 130;
         private const float transition_length = 800;
