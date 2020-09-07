@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Select
 
         protected override DropdownMenu CreateMenu() => new CollectionDropdownMenu();
 
-        private class CollectionDropdownHeader : OsuDropdownHeader
+        public class CollectionDropdownHeader : OsuDropdownHeader
         {
             public readonly Bindable<CollectionFilter> SelectedItem = new Bindable<CollectionFilter>();
             private readonly Bindable<string> collectionName = new Bindable<string>();
@@ -126,7 +126,10 @@ namespace osu.Game.Screens.Select
             private void updateBindable()
             {
                 collectionName.UnbindAll();
-                collectionName.BindTo(SelectedItem.Value.CollectionName);
+
+                if (SelectedItem.Value != null)
+                    collectionName.BindTo(SelectedItem.Value.CollectionName);
+
                 collectionName.BindValueChanged(_ => updateText(), true);
             }
 
@@ -174,17 +177,14 @@ namespace osu.Game.Screens.Select
             [BackgroundDependencyLoader]
             private void load()
             {
-                AddRangeInternal(new Drawable[]
+                AddInternal(addOrRemoveButton = new IconButton
                 {
-                    addOrRemoveButton = new IconButton
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        X = -OsuScrollContainer.SCROLL_BAR_HEIGHT,
-                        Scale = new Vector2(0.75f),
-                        Alpha = collectionBeatmaps == null ? 0 : 1,
-                        Action = addOrRemove
-                    }
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    X = -OsuScrollContainer.SCROLL_BAR_HEIGHT,
+                    Scale = new Vector2(0.75f),
+                    Alpha = collectionBeatmaps == null ? 0 : 1,
+                    Action = addOrRemove
                 });
             }
 
@@ -211,12 +211,12 @@ namespace osu.Game.Screens.Select
 
                 if (collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo))
                 {
-                    addOrRemoveButton.Icon = FontAwesome.Solid.MinusSquare;
+                    addOrRemoveButton.Icon = FontAwesome.Regular.MinusSquare;
                     addOrRemoveButton.IconColour = colours.Red;
                 }
                 else
                 {
-                    addOrRemoveButton.Icon = FontAwesome.Solid.PlusSquare;
+                    addOrRemoveButton.Icon = FontAwesome.Regular.PlusSquare;
                     addOrRemoveButton.IconColour = colours.Green;
                 }
             }
