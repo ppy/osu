@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             protected override Texture GetBackground() => throw new NotImplementedException();
 
-            protected override Track GetTrack() => throw new NotImplementedException();
+            protected override Track GetBeatmapTrack() => throw new NotImplementedException();
         }
     }
 }

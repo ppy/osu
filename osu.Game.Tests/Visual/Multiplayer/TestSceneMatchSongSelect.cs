@@ -162,6 +162,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("item 2 has rate 2", () => Precision.AlmostEquals(2, ((OsuModDoubleTime)Room.Playlist.Last().RequiredMods[0]).SpeedChange.Value));
         }
 
+        /// <summary>
+        /// Tests that the global mod instances are not retained by the rooms, as global mod instances are retained and re-used by the mod select overlay.
+        /// </summary>
+        [Test]
+        public void TestGlobalModInstancesNotRetained()
+        {
+            OsuModDoubleTime mod = null;
+
+            AddStep("set dt mod and store", () =>
+            {
+                SelectedMods.Value = new[] { new OsuModDoubleTime() };
+
+                // Mod select overlay replaces our mod.
+                mod = (OsuModDoubleTime)SelectedMods.Value[0];
+            });
+
+            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
+
+            AddStep("change stored mod rate", () => mod.SpeedChange.Value = 2);
+            AddAssert("item has rate 1.5", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)Room.Playlist.First().RequiredMods[0]).SpeedChange.Value));
+        }
+
         private class TestMatchSongSelect : MatchSongSelect
         {
             public new MatchBeatmapDetailArea BeatmapDetails => (MatchBeatmapDetailArea)base.BeatmapDetails;

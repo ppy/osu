@@ -270,9 +270,6 @@ namespace osu.Game.Screens.Menu
                 ButtonSystemState lastState = state;
                 state = value;
 
-                if (game != null)
-                    game.OverlayActivationMode.Value = state == ButtonSystemState.Exit ? OverlayActivation.Disabled : OverlayActivation.All;
-
                 updateLogoState(lastState);
 
                 Logger.Log($"{nameof(ButtonSystem)}'s state changed from {lastState} to {state}");

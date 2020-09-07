@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
 
-        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
