@@ -30,6 +30,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
+    [ExcludeFromDynamicCompile]
     public abstract class OsuTestScene : TestScene
     {
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; }
