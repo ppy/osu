@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private readonly BeatmapSetType type;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user)
-            : base(user, "None... yet.")
+            : base(user)
         {
             this.type = type;
 
