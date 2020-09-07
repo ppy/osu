@@ -231,6 +231,6 @@ namespace osu.Game.Configuration
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource,
-        GameplayDisableWinKey
+        GameplayDisableWinKey,
     }
 }
