@@ -120,11 +120,8 @@ namespace osu.Game.Collections
 
             return Task.Run(async () =>
             {
-                if (stable.Exists(database_name))
-                {
-                    using (var stream = stable.GetStream(database_name))
-                        await Import(stream);
-                }
+                using (var stream = stable.GetStream(database_name))
+                    await Import(stream);
             });
         }
 
