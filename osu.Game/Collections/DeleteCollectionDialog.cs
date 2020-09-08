@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
@@ -9,10 +9,7 @@ namespace osu.Game.Collections
 {
     public class DeleteCollectionDialog : PopupDialog
     {
-        [Resolved]
-        private BeatmapCollectionManager collectionManager { get; set; }
-
-        public DeleteCollectionDialog(BeatmapCollection collection)
+        public DeleteCollectionDialog(BeatmapCollection collection, Action deleteAction)
         {
             HeaderText = "Confirm deletion of";
             BodyText = collection.Name.Value;
@@ -24,7 +21,7 @@ namespace osu.Game.Collections
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Go for it.",
-                    Action = () => collectionManager.Collections.Remove(collection)
+                    Action = deleteAction
                 },
                 new PopupDialogCancelButton
                 {

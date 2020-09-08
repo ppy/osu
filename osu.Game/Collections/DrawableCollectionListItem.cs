@@ -95,6 +95,9 @@ namespace osu.Game.Collections
             [Resolved(CanBeNull = true)]
             private DialogOverlay dialogOverlay { get; set; }
 
+            [Resolved]
+            private BeatmapCollectionManager collectionManager { get; set; }
+
             private readonly BeatmapCollection collection;
 
             private Drawable background;
@@ -146,9 +149,16 @@ namespace osu.Game.Collections
             protected override bool OnClick(ClickEvent e)
             {
                 background.FlashColour(Color4.White, 150);
-                dialogOverlay?.Push(new DeleteCollectionDialog(collection));
+
+                if (collection.Beatmaps.Count == 0)
+                    deleteCollection();
+                else
+                    dialogOverlay?.Push(new DeleteCollectionDialog(collection, deleteCollection));
+
                 return true;
             }
+
+            private void deleteCollection() => collectionManager.Collections.Remove(collection);
         }
     }
 }
