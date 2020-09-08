@@ -26,7 +26,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        [Cached]
         private readonly BeatmapCollectionManager collectionManager;
 
         private RulesetStore rulesets;

@@ -19,30 +19,30 @@ namespace osu.Game.Tests.Visual.Collections
 {
     public class TestSceneManageCollectionsDialog : OsuManualInputManagerTestScene
     {
-        [Cached]
-        private readonly DialogOverlay dialogOverlay;
-
         protected override Container<Drawable> Content => content;
 
         private readonly Container content;
+        private readonly DialogOverlay dialogOverlay;
+        private readonly BeatmapCollectionManager manager;
 
-        private BeatmapCollectionManager manager;
         private ManageCollectionsDialog dialog;
 
         public TestSceneManageCollectionsDialog()
         {
             base.Content.AddRange(new Drawable[]
             {
+                manager = new BeatmapCollectionManager(LocalStorage),
                 content = new Container { RelativeSizeAxes = Axes.Both },
                 dialogOverlay = new DialogOverlay()
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Dependencies.Cache(manager = new BeatmapCollectionManager(LocalStorage));
-            Add(manager);
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.Cache(manager);
+            dependencies.Cache(dialogOverlay);
+            return dependencies;
         }
 
         [SetUp]
@@ -120,6 +120,8 @@ namespace osu.Game.Tests.Visual.Collections
                 new BeatmapCollection { Name = { Value = "2" } },
             }));
 
+            assertCollectionCount(2);
+
             AddStep("click first delete button", () =>
             {
                 InputManager.MoveMouseTo(dialog.ChildrenOfType<DrawableCollectionListItem.DeleteButton>().First(), new Vector2(5, 0));
@@ -145,6 +147,8 @@ namespace osu.Game.Tests.Visual.Collections
                 new BeatmapCollection { Name = { Value = "1" } },
                 new BeatmapCollection { Name = { Value = "2" } },
             }));
+
+            assertCollectionCount(2);
 
             AddStep("click first delete button", () =>
             {
@@ -185,14 +189,16 @@ namespace osu.Game.Tests.Visual.Collections
                 new BeatmapCollection { Name = { Value = "2" } },
             }));
 
+            assertCollectionCount(2);
+
             AddStep("change first collection name", () => dialog.ChildrenOfType<TextBox>().First().Text = "First");
             AddAssert("collection has new name", () => manager.Collections[0].Name.Value == "First");
         }
 
         private void assertCollectionCount(int count)
-            => AddAssert($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count() == count);
+            => AddUntilStep($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count() == count);
 
         private void assertCollectionName(int index, string name)
-            => AddAssert($"item {index + 1} has correct name", () => dialog.ChildrenOfType<DrawableCollectionListItem>().ElementAt(index).ChildrenOfType<TextBox>().First().Text == name);
+            => AddUntilStep($"item {index + 1} has correct name", () => dialog.ChildrenOfType<DrawableCollectionListItem>().ElementAt(index).ChildrenOfType<TextBox>().First().Text == name);
     }
 }
