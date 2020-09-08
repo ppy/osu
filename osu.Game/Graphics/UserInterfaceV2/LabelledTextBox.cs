@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
@@ -30,6 +31,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public string Text
         {
             set => Component.Text = value;
+        }
+
+        public Container TabbableContentContainer
+        {
+            set => Component.TabbableContentContainer = value;
         }
 
         [BackgroundDependencyLoader]
