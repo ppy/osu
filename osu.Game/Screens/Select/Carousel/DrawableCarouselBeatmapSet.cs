@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmapSet.OnlineBeatmapSetID != null && viewDetails != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineBeatmapSetID.Value)));
 
-                var collectionItems = collectionManager.Collections.OrderByDescending(c => c.LastModifyDate).Take(3).Select(createCollectionMenuItem).ToList();
+                var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
                 if (manageCollectionsDialog != null)
                     collectionItems.Add(new OsuMenuItem("More...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
