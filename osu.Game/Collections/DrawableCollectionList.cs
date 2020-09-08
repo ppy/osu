@@ -13,13 +13,14 @@ namespace osu.Game.Collections
         protected override ScrollContainer<Drawable> CreateScrollContainer() => base.CreateScrollContainer().With(d =>
         {
             d.ScrollbarVisible = false;
+            d.Padding = new MarginPadding(10);
         });
 
         protected override FillFlowContainer<RearrangeableListItem<BeatmapCollection>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<BeatmapCollection>>
         {
             LayoutDuration = 200,
             LayoutEasing = Easing.OutQuint,
-            Spacing = new Vector2(0, 2)
+            Spacing = new Vector2(0, 5)
         };
 
         protected override OsuRearrangeableListItem<BeatmapCollection> CreateOsuDrawable(BeatmapCollection item) => new DrawableCollectionListItem(item);

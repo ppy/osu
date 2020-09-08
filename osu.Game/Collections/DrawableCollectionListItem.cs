@@ -25,7 +25,6 @@ namespace osu.Game.Collections
         public DrawableCollectionListItem(BeatmapCollection item)
             : base(item)
         {
-            Padding = new MarginPadding { Right = 20 };
         }
 
         protected override Drawable CreateContent() => new ItemContent(Model);
