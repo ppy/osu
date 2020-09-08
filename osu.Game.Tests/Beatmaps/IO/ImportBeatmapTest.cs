@@ -15,8 +15,10 @@ using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Resources;
+using osu.Game.Users;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
@@ -32,7 +34,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportWhenClosed()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportWhenClosed)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -49,7 +51,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenDelete()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenDelete)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -70,7 +72,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImport)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -96,7 +98,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithReZip()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithReZip)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -154,7 +156,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithChangedFile()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithChangedFile)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -205,7 +207,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithDifferentFilename()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithDifferentFilename)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -257,7 +259,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportCorruptThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportCorruptThenImport)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -299,7 +301,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestRollbackOnFailure()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestRollbackOnFailure)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -376,7 +378,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenDeleteThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenDeleteThenImport)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -404,7 +406,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenDeleteThenImportWithOnlineIDMismatch(bool set)
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(TestImportThenDeleteThenImportWithOnlineIDMismatch)}-{set}"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(set.ToString()))
             {
                 try
                 {
@@ -438,7 +440,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportWithDuplicateBeatmapIDs()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportWithDuplicateBeatmapIDs)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -524,7 +526,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWhenFileOpen()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportWhenFileOpen)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -546,7 +548,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWithDuplicateHashes()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportWithDuplicateHashes)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -588,7 +590,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportNestedStructure()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportNestedStructure)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -633,7 +635,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWithIgnoredDirectoryInArchive()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportWithIgnoredDirectoryInArchive)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -687,7 +689,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestUpdateBeatmapInfo()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapInfo)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -717,7 +719,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestUpdateBeatmapFile()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapFile)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -748,6 +750,63 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
                     Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
                     Assert.That(updatedBeatmap.BeatmapInfo.MD5Hash, Is.Not.EqualTo(oldMd5Hash));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestCreateNewEmptyBeatmap()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+
+                    manager.Save(working.BeatmapInfo, working.Beatmap);
+
+                    var retrievedSet = manager.GetAllUsableBeatmapSets()[0];
+
+                    // Check that the new file is referenced correctly by attempting a retrieval
+                    Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(retrievedSet.Beatmaps[0]).Beatmap;
+                    Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(0));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestCreateNewBeatmapWithObject()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+
+                    ((Beatmap)working.Beatmap).HitObjects.Add(new HitCircle { StartTime = 5000 });
+
+                    manager.Save(working.BeatmapInfo, working.Beatmap);
+
+                    var retrievedSet = manager.GetAllUsableBeatmapSets()[0];
+
+                    // Check that the new file is referenced correctly by attempting a retrieval
+                    Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(retrievedSet.Beatmaps[0]).Beatmap;
+                    Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
+                    Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
                 }
                 finally
                 {
