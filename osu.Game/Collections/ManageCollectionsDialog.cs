@@ -5,9 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Collections
@@ -56,13 +58,31 @@ namespace osu.Game.Collections
                         {
                             new Drawable[]
                             {
-                                new OsuSpriteText
+                                new Container
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Text = "Manage collections",
-                                    Font = OsuFont.GetFont(size: 30),
-                                    Padding = new MarginPadding { Vertical = 10 },
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Text = "Manage collections",
+                                            Font = OsuFont.GetFont(size: 30),
+                                            Padding = new MarginPadding { Vertical = 10 },
+                                        },
+                                        new IconButton
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Icon = FontAwesome.Solid.Times,
+                                            Colour = colours.GreySeafoamDarker,
+                                            Scale = new Vector2(0.8f),
+                                            X = -10,
+                                            Action = () => State.Value = Visibility.Hidden
+                                        }
+                                    }
                                 }
                             },
                             new Drawable[]
