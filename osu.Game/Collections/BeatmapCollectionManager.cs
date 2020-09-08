@@ -33,6 +33,11 @@ namespace osu.Game.Collections
 
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
+        /// <summary>
+        /// Whether the user's database has finished loading.
+        /// </summary>
+        public bool DatabaseLoaded { get; private set; }
+
         [Resolved]
         private GameHost host { get; set; }
 
@@ -86,6 +91,8 @@ namespace osu.Game.Collections
                 using (var stream = storage.GetStream(database_name))
                     await import(stream);
             }
+
+            DatabaseLoaded = true;
         });
 
         /// <summary>
