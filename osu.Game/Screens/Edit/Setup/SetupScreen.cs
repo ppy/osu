@@ -27,65 +27,77 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            Child = new Container
             {
-                new Box
-                {
-                    Colour = colours.Gray0,
-                    Alpha = 0.4f,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new OsuScrollContainer
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(50),
+                Child = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(50),
-                    Child = flow = new FillFlowContainer
+                    Masking = true,
+                    CornerRadius = 10,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(20),
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        new Box
                         {
-                            new Container
+                            Colour = colours.GreySeafoamDark,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new OsuScrollContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding(10),
+                            Child = flow = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 250,
-                                Masking = true,
-                                CornerRadius = 50,
-                                Child = new BeatmapBackgroundSprite(Beatmap.Value)
+                                AutoSizeAxes = Axes.Y,
+                                Spacing = new Vector2(20),
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    FillMode = FillMode.Fill,
-                                },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = 250,
+                                        Masking = true,
+                                        CornerRadius = 10,
+                                        Child = new BeatmapBackgroundSprite(Beatmap.Value)
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            FillMode = FillMode.Fill,
+                                        },
+                                    },
+                                    new OsuSpriteText
+                                    {
+                                        Text = "Beatmap metadata"
+                                    },
+                                    artistTextBox = new LabelledTextBox
+                                    {
+                                        Label = "Artist",
+                                        Current = { Value = Beatmap.Value.Metadata.Artist }
+                                    },
+                                    titleTextBox = new LabelledTextBox
+                                    {
+                                        Label = "Title",
+                                        Current = { Value = Beatmap.Value.Metadata.Title }
+                                    },
+                                    creatorTextBox = new LabelledTextBox
+                                    {
+                                        Label = "Creator",
+                                        Current = { Value = Beatmap.Value.Metadata.AuthorString }
+                                    },
+                                    difficultyTextBox = new LabelledTextBox
+                                    {
+                                        Label = "Difficulty Name",
+                                        Current = { Value = Beatmap.Value.BeatmapInfo.Version }
+                                    },
+                                }
                             },
-                            new OsuSpriteText
-                            {
-                                Text = "Beatmap metadata"
-                            },
-                            artistTextBox = new LabelledTextBox
-                            {
-                                Label = "Artist",
-                                Current = { Value = Beatmap.Value.Metadata.Artist }
-                            },
-                            titleTextBox = new LabelledTextBox
-                            {
-                                Label = "Title",
-                                Current = { Value = Beatmap.Value.Metadata.Title }
-                            },
-                            creatorTextBox = new LabelledTextBox
-                            {
-                                Label = "Creator",
-                                Current = { Value = Beatmap.Value.Metadata.AuthorString }
-                            },
-                            difficultyTextBox = new LabelledTextBox
-                            {
-                                Label = "Difficulty Name",
-                                Current = { Value = Beatmap.Value.BeatmapInfo.Version }
-                            },
-                        }
-                    },
-                },
+                        },
+                    }
+                }
             };
 
             foreach (var item in flow.OfType<LabelledTextBox>())
