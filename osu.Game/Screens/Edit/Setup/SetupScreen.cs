@@ -76,22 +76,26 @@ namespace osu.Game.Screens.Edit.Setup
                                     artistTextBox = new LabelledTextBox
                                     {
                                         Label = "Artist",
-                                        Current = { Value = Beatmap.Value.Metadata.Artist }
+                                        Current = { Value = Beatmap.Value.Metadata.Artist },
+                                        TabbableContentContainer = this
                                     },
                                     titleTextBox = new LabelledTextBox
                                     {
                                         Label = "Title",
-                                        Current = { Value = Beatmap.Value.Metadata.Title }
+                                        Current = { Value = Beatmap.Value.Metadata.Title },
+                                        TabbableContentContainer = this
                                     },
                                     creatorTextBox = new LabelledTextBox
                                     {
                                         Label = "Creator",
-                                        Current = { Value = Beatmap.Value.Metadata.AuthorString }
+                                        Current = { Value = Beatmap.Value.Metadata.AuthorString },
+                                        TabbableContentContainer = this
                                     },
                                     difficultyTextBox = new LabelledTextBox
                                     {
                                         Label = "Difficulty Name",
-                                        Current = { Value = Beatmap.Value.BeatmapInfo.Version }
+                                        Current = { Value = Beatmap.Value.BeatmapInfo.Version },
+                                        TabbableContentContainer = this
                                     },
                                 }
                             },
