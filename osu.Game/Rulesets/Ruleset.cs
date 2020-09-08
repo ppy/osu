@@ -23,10 +23,12 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using JetBrains.Annotations;
+using osu.Framework.Testing;
 using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets
 {
+    [ExcludeFromDynamicCompile]
     public abstract class Ruleset
     {
         public RulesetInfo RulesetInfo { get; internal set; }
