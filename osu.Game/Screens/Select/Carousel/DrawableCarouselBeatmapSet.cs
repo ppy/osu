@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (manageCollectionsDialog != null)
                     collectionItems.Add(new OsuMenuItem("More...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                items.Add(new OsuMenuItem("Add all to...") { Items = collectionItems });
+                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
 
                 return items.ToArray();
             }
