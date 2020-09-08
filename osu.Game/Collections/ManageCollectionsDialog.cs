@@ -111,7 +111,7 @@ namespace osu.Game.Collections
             base.PopIn();
 
             this.FadeIn(enter_duration, Easing.OutQuint);
-            this.ScaleTo(0.9f).Then().ScaleTo(1f, enter_duration, Easing.OutElastic);
+            this.ScaleTo(0.9f).Then().ScaleTo(1f, enter_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
