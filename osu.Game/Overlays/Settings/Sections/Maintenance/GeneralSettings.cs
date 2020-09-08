@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = "Delete ALL collections",
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() => collectionManager.Collections.Clear()));
+                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(collectionManager.DeleteAll));
                 }
             });
 

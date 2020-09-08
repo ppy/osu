@@ -57,6 +57,10 @@ namespace osu.Game.Collections
                 c.Changed += backgroundSave;
             Collections.CollectionChanged += (_, __) => backgroundSave();
         }
+        /// <summary>
+        /// Set an endpoint for notifications to be posted to.
+        /// </summary>
+        public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
         /// Set a storage with access to an osu-stable install for import purposes.
@@ -93,9 +97,25 @@ namespace osu.Game.Collections
             });
         }
 
-        public async Task Import(Stream stream) => await Task.Run(async () =>
+        public async Task Import(Stream stream)
         {
-            var collection = readCollections(stream);
+            var notification = new ProgressNotification
+            {
+                State = ProgressNotificationState.Active,
+                Text = "Collections import is initialising..."
+            };
+
+            PostNotification?.Invoke(notification);
+
+            await import(stream, notification);
+        }
+
+        private async Task import(Stream stream, ProgressNotification notification = null) => await Task.Run(async () =>
+        {
+            if (notification != null)
+                notification.Progress = 0;
+
+            var collection = readCollections(stream, notification);
             bool importCompleted = false;
 
             Schedule(() =>
@@ -106,6 +126,12 @@ namespace osu.Game.Collections
 
             while (!IsDisposed && !importCompleted)
                 await Task.Delay(10);
+
+            if (notification != null)
+            {
+                notification.CompletionText = $"Imported {collection.Count} collections";
+                notification.State = ProgressNotificationState.Completed;
+            }
         });
 
         private void importCollections(List<BeatmapCollection> newCollections)
@@ -124,8 +150,14 @@ namespace osu.Game.Collections
             }
         }
 
-        private List<BeatmapCollection> readCollections(Stream stream)
+        private List<BeatmapCollection> readCollections(Stream stream, ProgressNotification notification = null)
         {
+            if (notification != null)
+            {
+                notification.Text = "Reading collections...";
+                notification.Progress = 0;
+            }
+
             var result = new List<BeatmapCollection>();
 
             try
@@ -139,16 +171,28 @@ namespace osu.Game.Collections
 
                     for (int i = 0; i < collectionCount; i++)
                     {
+                        if (notification?.CancellationToken.IsCancellationRequested == true)
+                            return result;
+
                         var collection = new BeatmapCollection { Name = { Value = sr.ReadString() } };
                         int mapCount = sr.ReadInt32();
 
                         for (int j = 0; j < mapCount; j++)
                         {
+                            if (notification?.CancellationToken.IsCancellationRequested == true)
+                                return result;
+
                             string checksum = sr.ReadString();
 
                             var beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == checksum);
                             if (beatmap != null)
                                 collection.Beatmaps.Add(beatmap);
+                        }
+
+                        if (notification != null)
+                        {
+                            notification.Text = $"Imported {i + 1} of {collectionCount} collections";
+                            notification.Progress = (float)(i + 1) / collectionCount;
                         }
 
                         result.Add(collection);
@@ -161,6 +205,12 @@ namespace osu.Game.Collections
             }
 
             return result;
+        }
+
+        public void DeleteAll()
+        {
+            Collections.Clear();
+            PostNotification?.Invoke(new SimpleNotification { Text = "Deleted all collections!" });
         }
 
         private readonly object saveLock = new object();
