@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,19 +22,32 @@ namespace osu.Game.Collections
     public class DrawableCollectionListItem : OsuRearrangeableListItem<BeatmapCollection>
     {
         private const float item_height = 35;
-
         private const float button_width = item_height * 0.75f;
 
-        public DrawableCollectionListItem(BeatmapCollection item)
+        private readonly Bindable<bool> isCreated = new Bindable<bool>();
+
+        public DrawableCollectionListItem(BeatmapCollection item, bool isCreated)
             : base(item)
         {
+            this.isCreated.Value = isCreated;
+
+            ShowDragHandle.BindTo(this.isCreated);
         }
 
-        protected override Drawable CreateContent() => new ItemContent(Model);
+        protected override Drawable CreateContent() => new ItemContent(Model)
+        {
+            IsCreated = { BindTarget = isCreated }
+        };
 
         private class ItemContent : CircularContainer
         {
+            public readonly Bindable<bool> IsCreated = new Bindable<bool>();
+
+            private readonly IBindable<string> collectionName;
             private readonly BeatmapCollection collection;
+
+            [Resolved]
+            private BeatmapCollectionManager collectionManager { get; set; }
 
             private ItemTextBox textBox;
 
@@ -44,6 +58,8 @@ namespace osu.Game.Collections
                 RelativeSizeAxes = Axes.X;
                 Height = item_height;
                 Masking = true;
+
+                collectionName = collection.Name.GetBoundCopy();
             }
 
             [BackgroundDependencyLoader]
@@ -55,6 +71,7 @@ namespace osu.Game.Collections
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
+                        IsCreated = { BindTarget = IsCreated },
                         IsTextBoxHovered = v => textBox.ReceivePositionalInputAt(v)
                     },
                     new Container
@@ -68,11 +85,36 @@ namespace osu.Game.Collections
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 CornerRadius = item_height / 2,
-                                Current = collection.Name
+                                Current = collection.Name,
+                                PlaceholderText = IsCreated.Value ? string.Empty : "Create a new collection"
                             },
                         }
                     },
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                collectionName.BindValueChanged(_ => createNewCollection(), true);
+            }
+
+            private void createNewCollection()
+            {
+                if (IsCreated.Value)
+                    return;
+
+                if (string.IsNullOrEmpty(collectionName.Value))
+                    return;
+
+                // Add the new collection and disable our placeholder. If all text is removed, the placeholder should not show back again.
+                collectionManager.Collections.Add(collection);
+                textBox.PlaceholderText = string.Empty;
+
+                // When this item changes from placeholder to non-placeholder (via changing containers), its textbox will lose focus, so it needs to be re-focused.
+                Schedule(() => GetContainingInputManager().ChangeFocus(textBox));
+
+                IsCreated.Value = true;
             }
         }
 
@@ -90,6 +132,8 @@ namespace osu.Game.Collections
 
         public class DeleteButton : CompositeDrawable
         {
+            public readonly IBindable<bool> IsCreated = new Bindable<bool>();
+
             public Func<Vector2, bool> IsTextBoxHovered;
 
             [Resolved(CanBeNull = true)]
@@ -100,6 +144,7 @@ namespace osu.Game.Collections
 
             private readonly BeatmapCollection collection;
 
+            private Drawable fadeContainer;
             private Drawable background;
 
             public DeleteButton(BeatmapCollection collection)
@@ -108,42 +153,51 @@ namespace osu.Game.Collections
                 RelativeSizeAxes = Axes.Y;
 
                 Width = button_width + item_height / 2; // add corner radius to cover with fill
-
-                Alpha = 0.1f;
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                InternalChildren = new[]
+                InternalChild = fadeContainer = new Container
                 {
-                    background = new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.1f,
+                    Children = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.Red
-                    },
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.Centre,
-                        X = -button_width * 0.6f,
-                        Size = new Vector2(10),
-                        Icon = FontAwesome.Solid.Trash
+                        background = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.Red
+                        },
+                        new SpriteIcon
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.Centre,
+                            X = -button_width * 0.6f,
+                            Size = new Vector2(10),
+                            Icon = FontAwesome.Solid.Trash
+                        }
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                IsCreated.BindValueChanged(created => Alpha = created.NewValue ? 1 : 0, true);
             }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) && !IsTextBoxHovered(screenSpacePos);
 
             protected override bool OnHover(HoverEvent e)
             {
-                this.FadeTo(1f, 100, Easing.Out);
+                fadeContainer.FadeTo(1f, 100, Easing.Out);
                 return false;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                this.FadeTo(0.1f, 100);
+                fadeContainer.FadeTo(0.1f, 100);
             }
 
             protected override bool OnClick(ClickEvent e)

@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Collections
@@ -51,9 +50,7 @@ namespace osu.Game.Collections
                         RelativeSizeAxes = Axes.Both,
                         RowDimensions = new[]
                         {
-                            new Dimension(GridSizeMode.Absolute, 50),
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Absolute, 50),
+                            new Dimension(GridSizeMode.AutoSize),
                         },
                         Content = new[]
                         {
@@ -65,6 +62,7 @@ namespace osu.Game.Collections
                                     Origin = Anchor.Centre,
                                     Text = "Manage collections",
                                     Font = OsuFont.GetFont(size: 30),
+                                    Padding = new MarginPadding { Vertical = 10 },
                                 }
                             },
                             new Drawable[]
@@ -86,19 +84,6 @@ namespace osu.Game.Collections
                                         }
                                     }
                                 }
-                            },
-                            new Drawable[]
-                            {
-                                new OsuButton
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Size = Vector2.One,
-                                    Padding = new MarginPadding(10),
-                                    Text = "Create new collection",
-                                    Action = () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "My new collection" } })
-                                },
                             },
                         }
                     }
