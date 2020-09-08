@@ -22,6 +22,8 @@ namespace osu.Game.Collections
     {
         private const float item_height = 35;
 
+        private const float button_width = item_height * 0.75f;
+
         public DrawableCollectionListItem(BeatmapCollection item)
             : base(item)
         {
@@ -58,7 +60,7 @@ namespace osu.Game.Collections
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Right = item_height / 2 },
+                        Padding = new MarginPadding { Right = button_width },
                         Children = new Drawable[]
                         {
                             textBox = new ItemTextBox
@@ -100,8 +102,9 @@ namespace osu.Game.Collections
             public DeleteButton(BeatmapCollection collection)
             {
                 this.collection = collection;
-                RelativeSizeAxes = Axes.Both;
-                FillMode = FillMode.Fit;
+                RelativeSizeAxes = Axes.Y;
+
+                Width = button_width + item_height / 2; // add corner radius to cover with fill
 
                 Alpha = 0.1f;
             }
@@ -119,8 +122,8 @@ namespace osu.Game.Collections
                     new SpriteIcon
                     {
                         Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        X = -6,
+                        Origin = Anchor.Centre,
+                        X = -button_width * 0.6f,
                         Size = new Vector2(10),
                         Icon = FontAwesome.Solid.Trash
                     }
