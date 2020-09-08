@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select
             filters.Clear();
             filters.Add(new AllBeatmapCollectionFilter());
             filters.AddRange(collections.Select(c => new CollectionFilter(c)));
-            filters.Add(new NewCollectionFilter());
+            filters.Add(new ManageCollectionsFilter());
 
             Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection == selectedItem) ?? filters[0];
         }
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Select
 
             // Never select the manage collection filter - rollback to the previous filter.
             // This is done after the above since it is important that bindable is unbound from OldValue, which is lost after forcing it back to the old value.
-            if (filter.NewValue is NewCollectionFilter)
+            if (filter.NewValue is ManageCollectionsFilter)
             {
                 Current.Value = filter.OldValue;
                 manageCollectionsDialog?.Show();

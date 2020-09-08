@@ -54,12 +54,12 @@ namespace osu.Game.Screens.Select
         }
     }
 
-    public class NewCollectionFilter : CollectionFilter
+    public class ManageCollectionsFilter : CollectionFilter
     {
-        public NewCollectionFilter()
+        public ManageCollectionsFilter()
             : base(null)
         {
-            CollectionName.Value = "New collection...";
+            CollectionName.Value = "Manage collections...";
         }
     }
 }

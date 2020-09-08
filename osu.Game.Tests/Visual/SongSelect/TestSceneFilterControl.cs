@@ -185,7 +185,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestNewCollectionFilterIsNotSelected()
+        public void TestManageCollectionsFilterIsNotSelected()
         {
             addExpandHeaderStep();
 
