@@ -221,9 +221,6 @@ namespace osu.Game.Screens.Select.Carousel
                 if (editRequested != null)
                     items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested(beatmap)));
 
-                if (hideRequested != null)
-                    items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested(beatmap)));
-
                 if (beatmap.OnlineBeatmapID.HasValue && beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
 
@@ -232,6 +229,9 @@ namespace osu.Game.Screens.Select.Carousel
                     collectionItems.Add(new OsuMenuItem("More...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
                 items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+
+                if (hideRequested != null)
+                    items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested(beatmap)));
 
                 return items.ToArray();
             }
