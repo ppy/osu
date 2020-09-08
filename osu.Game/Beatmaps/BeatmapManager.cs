@@ -27,6 +27,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Users;
 using osu.Game.Skinning;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
@@ -94,6 +95,34 @@ namespace osu.Game.Beatmaps
             new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
+
+        public WorkingBeatmap CreateNew(RulesetInfo ruleset, User user)
+        {
+            var metadata = new BeatmapMetadata
+            {
+                Artist = "artist",
+                Title = "title",
+                Author = user,
+            };
+
+            var set = new BeatmapSetInfo
+            {
+                Metadata = metadata,
+                Beatmaps = new List<BeatmapInfo>
+                {
+                    new BeatmapInfo
+                    {
+                        BaseDifficulty = new BeatmapDifficulty(),
+                        Ruleset = ruleset,
+                        Metadata = metadata,
+                        Version = "difficulty"
+                    }
+                }
+            };
+
+            var working = Import(set).Result;
+            return GetWorkingBeatmap(working.Beatmaps.First());
+        }
 
         protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
@@ -214,10 +243,20 @@ namespace osu.Game.Beatmaps
                 using (ContextFactory.GetForWrite())
                 {
                     var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
+                    var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
+
+                    // grab the original file (or create a new one if not found).
+                    var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
+
+                    // metadata may have changed; update the path with the standard format.
+                    beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu";
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 
+                    // update existing or populate new file's filename.
+                    fileInfo.Filename = beatmapInfo.Path;
+
                     stream.Seek(0, SeekOrigin.Begin);
-                    UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                    UpdateFile(setInfo, fileInfo, stream);
                 }
             }
 
