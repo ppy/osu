@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
@@ -166,6 +167,7 @@ namespace osu.Game.Screens.Select
 
             private IconButton addOrRemoveButton;
             private Content content;
+            private bool beatmapInCollection;
 
             public CollectionDropdownMenuItem(MenuItem item)
                 : base(item)
@@ -182,9 +184,10 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     X = -OsuScrollContainer.SCROLL_BAR_HEIGHT,
-                    Scale = new Vector2(0.75f),
+                    Scale = new Vector2(0.7f),
+                    AlwaysPresent = true,
                     Alpha = collectionBeatmaps == null ? 0 : 1,
-                    Action = addOrRemove
+                    Action = addOrRemove,
                 });
             }
 
@@ -203,23 +206,32 @@ namespace osu.Game.Screens.Select
                 collectionName.BindValueChanged(name => content.Text = name.NewValue, true);
             }
 
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateButtonVisibility();
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateButtonVisibility();
+                base.OnHoverLost(e);
+            }
+
             private void collectionChanged()
             {
                 Debug.Assert(collectionBeatmaps != null);
 
-                addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
+                beatmapInCollection = collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo);
 
-                if (collectionBeatmaps.Contains(beatmap.Value.BeatmapInfo))
-                {
-                    addOrRemoveButton.Icon = FontAwesome.Solid.MinusCircle;
-                    addOrRemoveButton.IconColour = colours.Red;
-                }
-                else
-                {
-                    addOrRemoveButton.Icon = FontAwesome.Solid.PlusCircle;
-                    addOrRemoveButton.IconColour = colours.Green;
-                }
+                addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
+                addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
+                addOrRemoveButton.TooltipText = beatmapInCollection ? "Remove selected beatmap" : "Add selected beatmap";
+
+                updateButtonVisibility();
             }
+
+            private void updateButtonVisibility() => addOrRemoveButton.Alpha = IsHovered || beatmapInCollection ? 1 : 0;
 
             private void addOrRemove()
             {
