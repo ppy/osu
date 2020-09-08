@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -16,6 +18,12 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public class SetupScreen : EditorScreen
     {
+        private FillFlowContainer flow;
+        private LabelledTextBox artistTextBox;
+        private LabelledTextBox titleTextBox;
+        private LabelledTextBox creatorTextBox;
+        private LabelledTextBox difficultyTextBox;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -24,13 +32,14 @@ namespace osu.Game.Screens.Edit.Setup
                 new Box
                 {
                     Colour = colours.Gray0,
+                    Alpha = 0.4f,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding(50),
-                    Child = new FillFlowContainer
+                    Child = flow = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -54,22 +63,22 @@ namespace osu.Game.Screens.Edit.Setup
                             {
                                 Text = "Beatmap metadata"
                             },
-                            new LabelledTextBox
+                            artistTextBox = new LabelledTextBox
                             {
                                 Label = "Artist",
                                 Current = { Value = Beatmap.Value.Metadata.Artist }
                             },
-                            new LabelledTextBox
+                            titleTextBox = new LabelledTextBox
                             {
                                 Label = "Title",
                                 Current = { Value = Beatmap.Value.Metadata.Title }
                             },
-                            new LabelledTextBox
+                            creatorTextBox = new LabelledTextBox
                             {
                                 Label = "Creator",
                                 Current = { Value = Beatmap.Value.Metadata.AuthorString }
                             },
-                            new LabelledTextBox
+                            difficultyTextBox = new LabelledTextBox
                             {
                                 Label = "Difficulty Name",
                                 Current = { Value = Beatmap.Value.BeatmapInfo.Version }
@@ -78,6 +87,21 @@ namespace osu.Game.Screens.Edit.Setup
                     },
                 },
             };
+
+            foreach (var item in flow.OfType<LabelledTextBox>())
+                item.OnCommit += onCommit;
+        }
+
+        private void onCommit(TextBox sender, bool newText)
+        {
+            if (!newText) return;
+
+            // for now, update these on commit rather than making BeatmapMetadata bindables.
+            // after switching database engines we can reconsider if switching to bindables is a good direction.
+            Beatmap.Value.Metadata.Artist = artistTextBox.Current.Value;
+            Beatmap.Value.Metadata.Title = titleTextBox.Current.Value;
+            Beatmap.Value.Metadata.AuthorString = creatorTextBox.Current.Value;
+            Beatmap.Value.BeatmapInfo.Version = difficultyTextBox.Current.Value;
         }
     }
 }
