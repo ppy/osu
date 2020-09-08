@@ -49,12 +49,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.OnItemsReceived(items);
 
             if (type == ScoreType.Recent)
-            {
-                var count = items.Count;
-
-                Header.Current.Value = count == 0 ? 0 : -1;
-                Header.Current.TriggerChange();
-            }
+                Header.Current.Value = items.Count;
         }
 
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
