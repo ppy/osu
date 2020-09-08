@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -15,6 +16,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.IO.Legacy;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Collections
 {
@@ -47,16 +49,45 @@ namespace osu.Game.Collections
         [BackgroundDependencyLoader]
         private void load()
         {
+            Collections.CollectionChanged += collectionsChanged;
+            loadDatabase();
+        }
+
+        private void collectionsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (var c in e.NewItems.Cast<BeatmapCollection>())
+                        c.Changed += backgroundSave;
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var c in e.OldItems.Cast<BeatmapCollection>())
+                        c.Changed -= backgroundSave;
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    foreach (var c in e.OldItems.Cast<BeatmapCollection>())
+                        c.Changed -= backgroundSave;
+
+                    foreach (var c in e.NewItems.Cast<BeatmapCollection>())
+                        c.Changed += backgroundSave;
+                    break;
+            }
+
+            backgroundSave();
+        }
+
+        private void loadDatabase() => Task.Run(async () =>
+        {
             if (storage.Exists(database_name))
             {
                 using (var stream = storage.GetStream(database_name))
-                    importCollections(readCollections(stream));
+                    await import(stream);
             }
+        });
 
-            foreach (var c in Collections)
-                c.Changed += backgroundSave;
-            Collections.CollectionChanged += (_, __) => backgroundSave();
-        }
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
