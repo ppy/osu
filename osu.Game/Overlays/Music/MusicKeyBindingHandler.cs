@@ -39,10 +39,7 @@ namespace osu.Game.Overlays.Music
                     return true;
 
                 case GlobalAction.MusicNext:
-                    musicController.NextTrack(() =>
-                    {
-                        onScreenDisplay?.Display(new MusicActionToast("Next track"));
-                    }).RunTask();
+                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast("Next track")));
 
                     return true;
 
@@ -59,7 +56,7 @@ namespace osu.Game.Overlays.Music
                                 onScreenDisplay?.Display(new MusicActionToast("Previous track"));
                                 break;
                         }
-                    }).RunTask();
+                    });
 
                     return true;
             }
