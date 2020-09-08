@@ -60,6 +60,7 @@ namespace osu.Game.Collections
             [Resolved]
             private BeatmapCollectionManager collectionManager { get; set; }
 
+            private Container textBoxPaddingContainer;
             private ItemTextBox textBox;
 
             public ItemContent(BeatmapCollection collection)
@@ -85,7 +86,7 @@ namespace osu.Game.Collections
                         IsCreated = { BindTarget = IsCreated },
                         IsTextBoxHovered = v => textBox.ReceivePositionalInputAt(v)
                     },
-                    new Container
+                    textBoxPaddingContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Right = button_width },
@@ -107,7 +108,9 @@ namespace osu.Game.Collections
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
                 collectionName.BindValueChanged(_ => createNewCollection(), true);
+                IsCreated.BindValueChanged(created => textBoxPaddingContainer.Padding = new MarginPadding { Right = created.NewValue ? button_width : 0 }, true);
             }
 
             private void createNewCollection()
