@@ -231,7 +231,13 @@ namespace osu.Game.Screens.Select
                 updateButtonVisibility();
             }
 
-            private void updateButtonVisibility() => addOrRemoveButton.Alpha = IsHovered || beatmapInCollection ? 1 : 0;
+            protected override void OnSelectChange()
+            {
+                base.OnSelectChange();
+                updateButtonVisibility();
+            }
+
+            private void updateButtonVisibility() => addOrRemoveButton.Alpha = IsHovered || IsPreSelected || beatmapInCollection ? 1 : 0;
 
             private void addOrRemove()
             {
