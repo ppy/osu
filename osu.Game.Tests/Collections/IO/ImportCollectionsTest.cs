@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Tests.Resources;
 
@@ -21,11 +21,11 @@ namespace osu.Game.Tests.Collections.IO
         [Test]
         public async Task TestImportEmptyDatabase()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportEmptyDatabase"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = loadOsu(host);
 
                     var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
                     await collectionManager.Import(new MemoryStream());
@@ -42,11 +42,11 @@ namespace osu.Game.Tests.Collections.IO
         [Test]
         public async Task TestImportWithNoBeatmaps()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWithNoBeatmaps"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = loadOsu(host);
 
                     var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
                     await collectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
@@ -69,11 +69,11 @@ namespace osu.Game.Tests.Collections.IO
         [Test]
         public async Task TestImportWithBeatmaps()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWithBeatmaps"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
-                    var osu = await loadOsu(host, true);
+                    var osu = loadOsu(host, true);
 
                     var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
                     await collectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
@@ -99,13 +99,13 @@ namespace osu.Game.Tests.Collections.IO
             bool exceptionThrown = false;
             UnhandledExceptionEventHandler setException = (_, __) => exceptionThrown = true;
 
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportMalformedDatabase"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
                     AppDomain.CurrentDomain.UnhandledException += setException;
 
-                    var osu = await loadOsu(host, true);
+                    var osu = loadOsu(host, true);
 
                     var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
 
@@ -137,11 +137,11 @@ namespace osu.Game.Tests.Collections.IO
         [Test]
         public async Task TestSaveAndReload()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestSaveAndReload"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
-                    var osu = await loadOsu(host, true);
+                    var osu = loadOsu(host, true);
 
                     var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
                     await collectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
@@ -163,7 +163,7 @@ namespace osu.Game.Tests.Collections.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host, true);
+                    var osu = loadOsu(host, true);
 
                     var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
 
@@ -182,9 +182,9 @@ namespace osu.Game.Tests.Collections.IO
             }
         }
 
-        private async Task<OsuGameBase> loadOsu(GameHost host, bool withBeatmap = false)
+        private OsuGameBase loadOsu(GameHost host, bool withBeatmap = false)
         {
-            var osu = new OsuGameBase();
+            var osu = new TestOsuGameBase(withBeatmap);
 
 #pragma warning disable 4014
             Task.Run(() => host.Run(osu));
@@ -192,12 +192,8 @@ namespace osu.Game.Tests.Collections.IO
 
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
 
-            if (withBeatmap)
-            {
-                var beatmapFile = TestResources.GetTestBeatmapForImport();
-                var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
-                await beatmapManager.Import(beatmapFile);
-            }
+            var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
+            waitForOrAssert(() => collectionManager.DatabaseLoaded, "Collection database did not load in a reasonable amount of time");
 
             return osu;
         }
@@ -210,6 +206,25 @@ namespace osu.Game.Tests.Collections.IO
             });
 
             Assert.IsTrue(task.Wait(timeout), failureMessage);
+        }
+
+        private class TestOsuGameBase : OsuGameBase
+        {
+            private readonly bool withBeatmap;
+
+            public TestOsuGameBase(bool withBeatmap)
+            {
+                this.withBeatmap = withBeatmap;
+            }
+
+            protected override void AddInternal(Drawable drawable)
+            {
+                // The beatmap must be imported just before the collection manager is loaded.
+                if (drawable is BeatmapCollectionManager && withBeatmap)
+                    BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
+
+                base.AddInternal(drawable);
+            }
         }
     }
 }
