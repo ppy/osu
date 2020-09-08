@@ -15,8 +15,10 @@ using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Resources;
+using osu.Game.Users;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
@@ -748,6 +750,63 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
                     Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
                     Assert.That(updatedBeatmap.BeatmapInfo.MD5Hash, Is.Not.EqualTo(oldMd5Hash));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestCreateNewEmptyBeatmap()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestCreateNewEmptyBeatmap)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+
+                    manager.Save(working.BeatmapInfo, working.Beatmap);
+
+                    var retrievedSet = manager.GetAllUsableBeatmapSets()[0];
+
+                    // Check that the new file is referenced correctly by attempting a retrieval
+                    Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(retrievedSet.Beatmaps[0]).Beatmap;
+                    Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(0));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestCreateNewBeatmapWithObject()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestCreateNewBeatmapWithObject)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
+
+                    ((Beatmap)working.Beatmap).HitObjects.Add(new HitCircle { StartTime = 5000 });
+
+                    manager.Save(working.BeatmapInfo, working.Beatmap);
+
+                    var retrievedSet = manager.GetAllUsableBeatmapSets()[0];
+
+                    // Check that the new file is referenced correctly by attempting a retrieval
+                    Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(retrievedSet.Beatmaps[0]).Beatmap;
+                    Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
+                    Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
                 }
                 finally
                 {
