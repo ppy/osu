@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Humanizer;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
@@ -12,7 +13,7 @@ namespace osu.Game.Collections
         public DeleteCollectionDialog(BeatmapCollection collection, Action deleteAction)
         {
             HeaderText = "Confirm deletion of";
-            BodyText = collection.Name.Value;
+            BodyText = $"{collection.Name.Value} ({"beatmap".ToQuantity(collection.Beatmaps.Count)})";
 
             Icon = FontAwesome.Regular.TrashAlt;
 
