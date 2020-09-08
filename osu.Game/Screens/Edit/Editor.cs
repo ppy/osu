@@ -398,7 +398,11 @@ namespace osu.Game.Screens.Edit
                     break;
             }
 
-            LoadComponentAsync(currentScreen, screenContainer.Add);
+            LoadComponentAsync(currentScreen, newScreen =>
+            {
+                if (newScreen == currentScreen)
+                    screenContainer.Add(newScreen);
+            });
         }
 
         private void seek(UIEvent e, int direction)
