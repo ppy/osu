@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Select.Carousel
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested(beatmapSet)));
 
                 if (dialogOverlay != null)
-                    items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));
+                    items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));
                 return items.ToArray();
             }
         }
