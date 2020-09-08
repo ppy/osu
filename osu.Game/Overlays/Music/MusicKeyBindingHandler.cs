@@ -33,9 +33,11 @@ namespace osu.Game.Overlays.Music
             switch (action)
             {
                 case GlobalAction.MusicPlay:
-                    if (musicController.TogglePause())
-                        onScreenDisplay?.Display(new MusicActionToast(musicController.IsPlaying ? "Play track" : "Pause track"));
+                    // use previous state as TogglePause may not update the track's state immediately (state update is run on the audio thread see https://github.com/ppy/osu/issues/9880#issuecomment-674668842)
+                    bool wasPlaying = musicController.IsPlaying;
 
+                    if (musicController.TogglePause())
+                        onScreenDisplay?.Display(new MusicActionToast(wasPlaying ? "Pause track" : "Play track"));
                     return true;
 
                 case GlobalAction.MusicNext:
