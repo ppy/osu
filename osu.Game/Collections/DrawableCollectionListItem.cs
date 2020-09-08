@@ -19,6 +19,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Collections
 {
+    /// <summary>
+    /// Visualises a <see cref="BeatmapCollection"/> inside a <see cref="DrawableCollectionList"/>.
+    /// </summary>
     public class DrawableCollectionListItem : OsuRearrangeableListItem<BeatmapCollection>
     {
         private const float item_height = 35;
@@ -26,6 +29,11 @@ namespace osu.Game.Collections
 
         private readonly Bindable<bool> isCreated = new Bindable<bool>();
 
+        /// <summary>
+        /// Creates a new <see cref="DrawableCollectionListItem"/>.
+        /// </summary>
+        /// <param name="item">The <see cref="BeatmapCollection"/>.</param>
+        /// <param name="isCreated">Whether <paramref name="item"/> currently exists inside the <see cref="BeatmapCollectionManager"/>.</param>
         public DrawableCollectionListItem(BeatmapCollection item, bool isCreated)
             : base(item)
         {
@@ -39,6 +47,9 @@ namespace osu.Game.Collections
             IsCreated = { BindTarget = isCreated }
         };
 
+        /// <summary>
+        /// The main content of the <see cref="DrawableCollectionListItem"/>.
+        /// </summary>
         private class ItemContent : CircularContainer
         {
             public readonly Bindable<bool> IsCreated = new Bindable<bool>();

@@ -10,6 +10,9 @@ using osuTK;
 
 namespace osu.Game.Collections
 {
+    /// <summary>
+    /// Visualises a list of <see cref="BeatmapCollection"/>s.
+    /// </summary>
     public class DrawableCollectionList : OsuRearrangeableListContainer<BeatmapCollection>
     {
         private Scroll scroll;
@@ -29,8 +32,18 @@ namespace osu.Game.Collections
             return new DrawableCollectionListItem(item, true);
         }
 
+        /// <summary>
+        /// The scroll container for this <see cref="DrawableCollectionList"/>.
+        /// Contains the main flow of <see cref="DrawableCollectionListItem"/> and attaches a placeholder item to the end of the list.
+        /// </summary>
+        /// <remarks>
+        /// Use <see cref="ReplacePlaceholder"/> to transfer the placeholder into the main list.
+        /// </remarks>
         private class Scroll : OsuScrollContainer
         {
+            /// <summary>
+            /// The currently-displayed placeholder item.
+            /// </summary>
             public DrawableCollectionListItem PlaceholderItem { get; private set; }
 
             protected override Container<Drawable> Content => content;
@@ -74,6 +87,7 @@ namespace osu.Game.Collections
             /// <summary>
             /// Replaces the current <see cref="PlaceholderItem"/> with a new one, and returns the previous.
             /// </summary>
+            /// <returns>The current <see cref="PlaceholderItem"/>.</returns>
             public DrawableCollectionListItem ReplacePlaceholder()
             {
                 var previous = PlaceholderItem;
@@ -85,6 +99,9 @@ namespace osu.Game.Collections
             }
         }
 
+        /// <summary>
+        /// The flow of <see cref="DrawableCollectionListItem"/>. Disables layout easing unless a drag is in progress.
+        /// </summary>
         private class Flow : FillFlowContainer<RearrangeableListItem<BeatmapCollection>>
         {
             public readonly IBindable<bool> DragActive = new Bindable<bool>();
