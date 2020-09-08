@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Select.Carousel
                     items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested(beatmap)));
 
                 if (beatmap.OnlineBeatmapID.HasValue && beatmapOverlay != null)
-                    items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
 
                 var collectionItems = collectionManager.Collections.OrderByDescending(c => c.LastModifyDate).Take(3).Select(createCollectionMenuItem).ToList();
                 if (manageCollectionsDialog != null)
