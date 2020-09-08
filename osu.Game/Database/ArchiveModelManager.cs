@@ -397,15 +397,24 @@ namespace osu.Game.Database
             }
         }
 
+        /// <summary>
+        /// Update an existing file, or create a new entry if not already part of the <paramref name="model"/>'s files.
+        /// </summary>
+        /// <param name="model">The item to operate on.</param>
+        /// <param name="file">The file model to be updated or added.</param>
+        /// <param name="contents">The new file contents.</param>
         public void UpdateFile(TModel model, TFileModel file, Stream contents)
         {
             using (var usage = ContextFactory.GetForWrite())
             {
                 // Dereference the existing file info, since the file model will be removed.
-                Files.Dereference(file.FileInfo);
+                if (file.FileInfo != null)
+                {
+                    Files.Dereference(file.FileInfo);
 
-                // Remove the file model.
-                usage.Context.Set<TFileModel>().Remove(file);
+                    // Remove the file model.
+                    usage.Context.Set<TFileModel>().Remove(file);
+                }
 
                 // Add the new file info and containing file model.
                 model.Files.Remove(file);

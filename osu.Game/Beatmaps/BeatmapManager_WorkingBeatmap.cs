@@ -33,6 +33,9 @@ namespace osu.Game.Beatmaps
 
             protected override IBeatmap GetBeatmap()
             {
+                if (BeatmapInfo.Path == null)
+                    return new Beatmap { BeatmapInfo = BeatmapInfo };
+
                 try
                 {
                     using (var stream = new LineBufferedReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
@@ -67,6 +70,9 @@ namespace osu.Game.Beatmaps
 
             protected override Track GetBeatmapTrack()
             {
+                if (Metadata?.AudioFile == null)
+                    return null;
+
                 try
                 {
                     return trackStore.Get(getPathForFile(Metadata.AudioFile));
@@ -80,6 +86,9 @@ namespace osu.Game.Beatmaps
 
             protected override Waveform GetWaveform()
             {
+                if (Metadata?.AudioFile == null)
+                    return null;
+
                 try
                 {
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
