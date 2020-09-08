@@ -5,7 +5,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -167,8 +166,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                     var positionData = original as IHasPosition;
 
-                    for (double time = original.StartTime; !Precision.DefinitelyBigger(time, generator.EndTime); time += generator.SegmentDuration)
+                    for (int i = 0; i <= generator.SpanCount; i++)
                     {
+                        double time = original.StartTime + generator.SegmentDuration * i;
+
                         recordNote(time, positionData?.Position ?? Vector2.Zero);
                         computeDensity(time);
                     }
