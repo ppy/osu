@@ -45,4 +45,21 @@ namespace osu.Game.Screens.Select
         public virtual bool ContainsBeatmap(BeatmapInfo beatmap)
             => Collection?.Beatmaps.Any(b => b.Equals(beatmap)) ?? true;
     }
+
+    public class AllBeatmapCollectionFilter : CollectionFilter
+    {
+        public AllBeatmapCollectionFilter()
+            : base(null)
+        {
+        }
+    }
+
+    public class NewCollectionFilter : CollectionFilter
+    {
+        public NewCollectionFilter()
+            : base(null)
+        {
+            CollectionName.Value = "New collection...";
+        }
+    }
 }

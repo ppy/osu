@@ -184,6 +184,29 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 
+        [Test]
+        public void TestNewCollectionFilterIsNotSelected()
+        {
+            addExpandHeaderStep();
+
+            AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
+            AddStep("select collection", () =>
+            {
+                InputManager.MoveMouseTo(getCollectionDropdownItems().ElementAt(1));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            addExpandHeaderStep();
+
+            AddStep("click manage collections filter", () =>
+            {
+                InputManager.MoveMouseTo(getCollectionDropdownItems().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("collection filter still selected", () => control.CreateCriteria().Collection?.CollectionName.Value == "1");
+        }
+
         private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
             => AddAssert($"collection dropdown header displays '{collectionName}'",
                 () => shouldDisplay == (control.ChildrenOfType<CollectionFilterDropdown.CollectionDropdownHeader>().Single().ChildrenOfType<SpriteText>().First().Text == collectionName));
