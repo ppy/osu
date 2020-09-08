@@ -109,11 +109,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 dropdown.Current.Value = dropdown.ItemSource.ElementAt(1);
             });
 
-            AddStep("expand header", () =>
-            {
-                InputManager.MoveMouseTo(control.ChildrenOfType<CollectionFilterDropdown.CollectionDropdownHeader>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            addExpandHeaderStep();
 
             AddStep("change name", () => collectionManager.Collections[0].Name.Value = "First");
 
@@ -124,30 +120,24 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestAllBeatmapFilterDoesNotHaveAddButton()
         {
-            AddAssert("'All beatmaps' filter does not have add button", () => !getCollectionDropdownItems().First().ChildrenOfType<IconButton>().Single().IsPresent);
+            addExpandHeaderStep();
+            AddStep("hover all beatmaps", () => InputManager.MoveMouseTo(getAddOrRemoveButton(0)));
+            AddAssert("'All beatmaps' filter does not have add button", () => !getAddOrRemoveButton(0).IsPresent);
         }
 
         [Test]
         public void TestCollectionFilterHasAddButton()
         {
-            AddStep("expand header", () =>
-            {
-                InputManager.MoveMouseTo(control.ChildrenOfType<CollectionFilterDropdown.CollectionDropdownHeader>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
-
+            addExpandHeaderStep();
             AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
-            AddAssert("collection has add button", () => !getAddOrRemoveButton(0).IsPresent);
+            AddStep("hover collection", () => InputManager.MoveMouseTo(getAddOrRemoveButton(1)));
+            AddAssert("collection has add button", () => getAddOrRemoveButton(1).IsPresent);
         }
 
         [Test]
         public void TestButtonDisabledAndEnabledWithBeatmapChanges()
         {
-            AddStep("expand header", () =>
-            {
-                InputManager.MoveMouseTo(control.ChildrenOfType<CollectionFilterDropdown.CollectionDropdownHeader>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            addExpandHeaderStep();
 
             AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
 
@@ -161,45 +151,37 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestButtonChangesWhenAddedAndRemovedFromCollection()
         {
-            AddStep("expand header", () =>
-            {
-                InputManager.MoveMouseTo(control.ChildrenOfType<CollectionFilterDropdown.CollectionDropdownHeader>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            addExpandHeaderStep();
 
             AddStep("select available beatmap", () => Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0]));
 
             AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusCircle));
+            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
 
             AddStep("add beatmap to collection", () => collectionManager.Collections[0].Beatmaps.Add(Beatmap.Value.BeatmapInfo));
-            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusCircle));
+            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
 
             AddStep("remove beatmap from collection", () => collectionManager.Collections[0].Beatmaps.Clear());
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusCircle));
+            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 
         [Test]
         public void TestButtonAddsAndRemovesBeatmap()
         {
-            AddStep("expand header", () =>
-            {
-                InputManager.MoveMouseTo(control.ChildrenOfType<CollectionFilterDropdown.CollectionDropdownHeader>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            addExpandHeaderStep();
 
             AddStep("select available beatmap", () => Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0]));
 
             AddStep("add collection", () => collectionManager.Collections.Add(new BeatmapCollection { Name = { Value = "1" } }));
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusCircle));
+            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
 
             addClickAddOrRemoveButtonStep(1);
             AddAssert("collection contains beatmap", () => collectionManager.Collections[0].Beatmaps.Contains(Beatmap.Value.BeatmapInfo));
-            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusCircle));
+            AddAssert("button is minus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.MinusSquare));
 
             addClickAddOrRemoveButtonStep(1);
             AddAssert("collection does not contain beatmap", () => !collectionManager.Collections[0].Beatmaps.Contains(Beatmap.Value.BeatmapInfo));
-            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusCircle));
+            AddAssert("button is plus", () => getAddOrRemoveButton(1).Icon.Equals(FontAwesome.Solid.PlusSquare));
         }
 
         private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
@@ -214,14 +196,17 @@ namespace osu.Game.Tests.Visual.SongSelect
         private IconButton getAddOrRemoveButton(int index)
             => getCollectionDropdownItems().ElementAt(index).ChildrenOfType<IconButton>().Single();
 
-        private void addClickAddOrRemoveButtonStep(int index)
+        private void addExpandHeaderStep() => AddStep("expand header", () =>
         {
-            AddStep("click add or remove button", () =>
-            {
-                InputManager.MoveMouseTo(getAddOrRemoveButton(index));
-                InputManager.Click(MouseButton.Left);
-            });
-        }
+            InputManager.MoveMouseTo(control.ChildrenOfType<CollectionFilterDropdown.CollectionDropdownHeader>().Single());
+            InputManager.Click(MouseButton.Left);
+        });
+
+        private void addClickAddOrRemoveButtonStep(int index) => AddStep("click add or remove button", () =>
+        {
+            InputManager.MoveMouseTo(getAddOrRemoveButton(index));
+            InputManager.Click(MouseButton.Left);
+        });
 
         private IEnumerable<Dropdown<CollectionFilter>.DropdownMenu.DrawableDropdownMenuItem> getCollectionDropdownItems()
             => control.ChildrenOfType<CollectionFilterDropdown>().Single().ChildrenOfType<Dropdown<CollectionFilter>.DropdownMenu.DrawableDropdownMenuItem>();
