@@ -184,9 +184,7 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     X = -OsuScrollContainer.SCROLL_BAR_HEIGHT,
-                    Scale = new Vector2(0.7f),
-                    AlwaysPresent = true,
-                    Alpha = collectionBeatmaps == null ? 0 : 1,
+                    Scale = new Vector2(0.65f),
                     Action = addOrRemove,
                 });
             }
@@ -204,6 +202,8 @@ namespace osu.Game.Screens.Select
                 // Although the DrawableMenuItem binds to value changes of the item's text, the item is an internal implementation detail of Dropdown that has no knowledge
                 // of the underlying CollectionFilter value and its accompanying name, so the real name has to be copied here. Without this, the collection name wouldn't update when changed.
                 collectionName.BindValueChanged(name => content.Text = name.NewValue, true);
+
+                updateButtonVisibility();
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -237,7 +237,13 @@ namespace osu.Game.Screens.Select
                 updateButtonVisibility();
             }
 
-            private void updateButtonVisibility() => addOrRemoveButton.Alpha = IsHovered || IsPreSelected || beatmapInCollection ? 1 : 0;
+            private void updateButtonVisibility()
+            {
+                if (collectionBeatmaps == null)
+                    addOrRemoveButton.Alpha = 0;
+                else
+                    addOrRemoveButton.Alpha = IsHovered || IsPreSelected || beatmapInCollection ? 1 : 0;
+            }
 
             private void addOrRemove()
             {
