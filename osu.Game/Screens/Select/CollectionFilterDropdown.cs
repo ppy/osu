@@ -29,6 +29,9 @@ namespace osu.Game.Screens.Select
         private readonly IBindableList<BeatmapInfo> beatmaps = new BindableList<BeatmapInfo>();
         private readonly BindableList<CollectionFilter> filters = new BindableList<CollectionFilter>();
 
+        [Resolved(CanBeNull = true)]
+        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+
         public CollectionFilterDropdown()
         {
             ItemSource = filters;
@@ -57,10 +60,11 @@ namespace osu.Game.Screens.Select
             var selectedItem = SelectedItem?.Value?.Collection;
 
             filters.Clear();
-            filters.Add(new CollectionFilter(null));
+            filters.Add(new AllBeatmapCollectionFilter());
             filters.AddRange(collections.Select(c => new CollectionFilter(c)));
+            filters.Add(new NewCollectionFilter());
 
-            Current.Value = filters.SingleOrDefault(f => f.Collection == selectedItem) ?? filters[0];
+            Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection == selectedItem) ?? filters[0];
         }
 
         /// <summary>
@@ -78,6 +82,14 @@ namespace osu.Game.Screens.Select
                 beatmaps.BindTo(filter.NewValue.Collection.Beatmaps);
 
             beatmaps.CollectionChanged += filterBeatmapsChanged;
+
+            // Never select the manage collection filter - rollback to the previous filter.
+            // This is done after the above since it is important that bindable is unbound from OldValue, which is lost after forcing it back to the old value.
+            if (filter.NewValue is NewCollectionFilter)
+            {
+                Current.Value = filter.OldValue;
+                manageCollectionsDialog?.Show();
+            }
         }
 
         /// <summary>
@@ -90,7 +102,7 @@ namespace osu.Game.Screens.Select
             Current.TriggerChange();
         }
 
-        protected override string GenerateItemText(CollectionFilter item) => item.Collection?.Name.Value ?? "All beatmaps";
+        protected override string GenerateItemText(CollectionFilter item) => item.CollectionName.Value;
 
         protected override DropdownHeader CreateHeader() => new CollectionDropdownHeader
         {
