@@ -42,13 +42,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.Cache(collectionManager);
-            return dependencies;
-        }
-
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
@@ -56,6 +49,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, host, Beatmap.Default));
 
             beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.Cache(collectionManager);
+            return dependencies;
         }
 
         [SetUp]

@@ -27,6 +27,11 @@ namespace osu.Game.Collections
         private const float item_height = 35;
         private const float button_width = item_height * 0.75f;
 
+        /// <summary>
+        /// Whether the <see cref="BeatmapCollection"/> currently exists inside the <see cref="BeatmapCollectionManager"/>.
+        /// </summary>
+        public IBindable<bool> IsCreated => isCreated;
+
         private readonly Bindable<bool> isCreated = new Bindable<bool>();
 
         /// <summary>

@@ -7,11 +7,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Collections;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Rulesets;
+using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
 
@@ -25,6 +28,9 @@ namespace osu.Game.Tests.Visual.Collections
         private readonly DialogOverlay dialogOverlay;
         private readonly BeatmapCollectionManager manager;
 
+        private RulesetStore rulesets;
+        private BeatmapManager beatmapManager;
+
         private ManageCollectionsDialog dialog;
 
         public TestSceneManageCollectionsDialog()
@@ -35,6 +41,15 @@ namespace osu.Game.Tests.Visual.Collections
                 content = new Container { RelativeSizeAxes = Axes.Both },
                 dialogOverlay = new DialogOverlay()
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
+        {
+            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, host, Beatmap.Default));
+
+            beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -66,6 +81,12 @@ namespace osu.Game.Tests.Visual.Collections
         }
 
         [Test]
+        public void TestLastItemIsPlaceholder()
+        {
+            AddAssert("last item is placeholder", () => !manager.Collections.Contains(dialog.ChildrenOfType<DrawableCollectionListItem>().Last().Model));
+        }
+
+        [Test]
         public void TestAddCollectionExternal()
         {
             AddStep("add collection", () => manager.Collections.Add(new BeatmapCollection { Name = { Value = "First collection" } }));
@@ -78,23 +99,34 @@ namespace osu.Game.Tests.Visual.Collections
         }
 
         [Test]
-        public void TestAddCollectionViaButton()
+        public void TestFocusPlaceholderDoesNotCreateCollection()
         {
-            AddStep("press new collection button", () =>
+            AddStep("focus placeholder", () =>
             {
-                InputManager.MoveMouseTo(dialog.ChildrenOfType<OsuButton>().Single());
+                InputManager.MoveMouseTo(dialog.ChildrenOfType<DrawableCollectionListItem>().Last());
                 InputManager.Click(MouseButton.Left);
             });
 
+            assertCollectionCount(0);
+        }
+
+        [Test]
+        public void TestAddCollectionViaPlaceholder()
+        {
+            DrawableCollectionListItem placeholderItem = null;
+
+            AddStep("focus placeholder", () =>
+            {
+                InputManager.MoveMouseTo(placeholderItem = dialog.ChildrenOfType<DrawableCollectionListItem>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            // Done directly via the collection since InputManager methods cannot add text to textbox...
+            AddStep("change collection name", () => placeholderItem.Model.Name.Value = "a");
             assertCollectionCount(1);
+            AddAssert("collection now exists", () => manager.Collections.Contains(placeholderItem.Model));
 
-            AddStep("press again", () =>
-            {
-                InputManager.MoveMouseTo(dialog.ChildrenOfType<OsuButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
-
-            assertCollectionCount(2);
+            AddAssert("last item is placeholder", () => !manager.Collections.Contains(dialog.ChildrenOfType<DrawableCollectionListItem>().Last().Model));
         }
 
         [Test]
@@ -117,10 +149,20 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("add two collections", () => manager.Collections.AddRange(new[]
             {
                 new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "2" } },
+                new BeatmapCollection { Name = { Value = "2" }, Beatmaps = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0] } },
             }));
 
             assertCollectionCount(2);
+
+            AddStep("click first delete button", () =>
+            {
+                InputManager.MoveMouseTo(dialog.ChildrenOfType<DrawableCollectionListItem.DeleteButton>().First(), new Vector2(5, 0));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("dialog not displayed", () => dialogOverlay.CurrentDialog == null);
+            assertCollectionCount(1);
+            assertCollectionName(0, "2");
 
             AddStep("click first delete button", () =>
             {
@@ -135,8 +177,7 @@ namespace osu.Game.Tests.Visual.Collections
                 InputManager.Click(MouseButton.Left);
             });
 
-            assertCollectionCount(1);
-            assertCollectionName(0, "2");
+            assertCollectionCount(0);
         }
 
         [Test]
@@ -144,11 +185,10 @@ namespace osu.Game.Tests.Visual.Collections
         {
             AddStep("add two collections", () => manager.Collections.AddRange(new[]
             {
-                new BeatmapCollection { Name = { Value = "1" } },
-                new BeatmapCollection { Name = { Value = "2" } },
+                new BeatmapCollection { Name = { Value = "1" }, Beatmaps = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0] } },
             }));
 
-            assertCollectionCount(2);
+            assertCollectionCount(1);
 
             AddStep("click first delete button", () =>
             {
@@ -157,13 +197,13 @@ namespace osu.Game.Tests.Visual.Collections
             });
 
             AddAssert("dialog displayed", () => dialogOverlay.CurrentDialog is DeleteCollectionDialog);
-            AddStep("click confirmation", () =>
+            AddStep("click cancellation", () =>
             {
                 InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().Last());
                 InputManager.Click(MouseButton.Left);
             });
 
-            assertCollectionCount(2);
+            assertCollectionCount(1);
         }
 
         [Test]
@@ -196,7 +236,7 @@ namespace osu.Game.Tests.Visual.Collections
         }
 
         private void assertCollectionCount(int count)
-            => AddUntilStep($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count() == count);
+            => AddUntilStep($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count(i => i.IsCreated.Value) == count);
 
         private void assertCollectionName(int index, string name)
             => AddUntilStep($"item {index + 1} has correct name", () => dialog.ChildrenOfType<DrawableCollectionListItem>().ElementAt(index).ChildrenOfType<TextBox>().First().Text == name);
