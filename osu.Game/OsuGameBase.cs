@@ -256,10 +256,11 @@ namespace osu.Game
                 AddInternal(apiAccess);
             AddInternal(RulesetConfigCache);
 
-            GlobalActionContainer globalBinding;
-
             MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
-            MenuCursorContainer.Child = globalBinding = new GlobalActionContainer(this)
+
+            GlobalActionContainer globalBindings;
+
+            MenuCursorContainer.Child = globalBindings = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
@@ -267,8 +268,8 @@ namespace osu.Game
 
             base.Content.Add(CreateScalingContainer().WithChild(MenuCursorContainer));
 
-            KeyBindingStore.Register(globalBinding);
-            dependencies.Cache(globalBinding);
+            KeyBindingStore.Register(globalBindings);
+            dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());

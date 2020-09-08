@@ -39,6 +39,7 @@ using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.Music;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
@@ -652,6 +653,7 @@ namespace osu.Game
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());
+            Add(new MusicKeyBindingHandler());
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, notifications };
