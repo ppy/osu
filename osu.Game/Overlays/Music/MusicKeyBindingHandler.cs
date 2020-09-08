@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Music
     /// <summary>
     /// Handles <see cref="GlobalAction"/> relating to music playback, and displays a <see cref="Toast"/> via the cached <see cref="OnScreenDisplay"/> accordingly.
     /// </summary>
-    public class MusicActionHandler : Component, IKeyBindingHandler<GlobalAction>
+    public class MusicKeyBindingHandler : Component, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
