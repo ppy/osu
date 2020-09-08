@@ -26,6 +26,8 @@ namespace osu.Game.Graphics.UserInterface
             };
 
             ItemsContainer.Padding = new MarginPadding { Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL };
+
+            MaxHeight = 250;
         }
 
         [BackgroundDependencyLoader]
