@@ -12,7 +12,7 @@ using osu.Game.Overlays.OSD;
 namespace osu.Game.Overlays.Music
 {
     /// <summary>
-    /// Handles <see cref="GlobalAction"/> relating to music playback, and displays a <see cref="Toast"/> via the cached <see cref="OnScreenDisplay"/> accordingly.
+    /// Handles <see cref="GlobalAction"/>s related to music playback, and displays <see cref="Toast"/>s via the global <see cref="OnScreenDisplay"/> accordingly.
     /// </summary>
     public class MusicKeyBindingHandler : Component, IKeyBindingHandler<GlobalAction>
     {
