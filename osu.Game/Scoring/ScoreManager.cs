@@ -86,15 +86,34 @@ namespace osu.Game.Scoring
             => base.CheckLocalAvailability(model, items)
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
 
-        public Bindable<long> GetTotalScore(ScoreInfo score)
+        /// <summary>
+        /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <remarks>
+        /// Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </remarks>
+        /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
+        /// <returns>The bindable containing the total score.</returns>
+        public Bindable<long> GetBindableTotalScore(ScoreInfo score)
         {
             var bindable = new TotalScoreBindable(score, difficulties);
             configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
             return bindable;
         }
 
-        public Bindable<string> GetTotalScoreString(ScoreInfo score) => new TotalScoreStringBindable(GetTotalScore(score));
+        /// <summary>
+        /// Retrieves a bindable that represents the formatted total score string of a <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <remarks>
+        /// Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </remarks>
+        /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
+        /// <returns>The bindable containing the formatted total score string.</returns>
+        public Bindable<string> GetBindableTotalScoreString(ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
 
+        /// <summary>
+        /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </summary>
         private class TotalScoreBindable : Bindable<long>
         {
             public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
@@ -102,12 +121,15 @@ namespace osu.Game.Scoring
             private readonly ScoreInfo score;
             private readonly Func<BeatmapDifficultyManager> difficulties;
 
+            /// <summary>
+            /// Creates a new <see cref="TotalScoreBindable"/>.
+            /// </summary>
+            /// <param name="score">The <see cref="ScoreInfo"/> to provide the total score of.</param>
+            /// <param name="difficulties">A function to retrieve the <see cref="BeatmapDifficultyManager"/>.</param>
             public TotalScoreBindable(ScoreInfo score, Func<BeatmapDifficultyManager> difficulties)
             {
                 this.score = score;
                 this.difficulties = difficulties;
-
-                Value = 0;
 
                 ScoringMode.BindValueChanged(onScoringModeChanged, true);
             }
@@ -158,6 +180,9 @@ namespace osu.Game.Scoring
             }
         }
 
+        /// <summary>
+        /// Provides the total score of a <see cref="ScoreInfo"/> as a formatted string. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </summary>
         private class TotalScoreStringBindable : Bindable<string>
         {
             // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (need to hold a reference)

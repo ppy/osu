@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private void load()
         {
             if (score != null)
-                totalScoreColumn.Current = scoreManager.GetTotalScoreString(score);
+                totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(score);
         }
 
         private ScoreInfo score;
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 modsColumn.Mods = value.Mods;
 
                 if (IsLoaded)
-                    totalScoreColumn.Current = scoreManager.GetTotalScoreString(value);
+                    totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(value);
             }
         }
 

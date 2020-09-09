@@ -202,11 +202,17 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = getScore(Mode.Value);
         }
 
-        private double getScore(ScoringMode mode)
-        {
-            return GetScore(mode, maxHighestCombo, baseScore / maxBaseScore, (double)HighestCombo.Value / maxHighestCombo, bonusScore);
-        }
+        private double getScore(ScoringMode mode) => GetScore(mode, maxHighestCombo, baseScore / maxBaseScore, (double)HighestCombo.Value / maxHighestCombo, bonusScore);
 
+        /// <summary>
+        /// Computes the total score.
+        /// </summary>
+        /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
+        /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
+        /// <param name="accuracyRatio">The accuracy percentage achieved by the player.</param>
+        /// <param name="comboRatio">The proportion of <paramref name="maxCombo"/> achieved by the player.</param>
+        /// <param name="bonusScore">Any bonus score to be added.</param>
+        /// <returns>The total score.</returns>
         public double GetScore(ScoringMode mode, int maxCombo, double accuracyRatio, double comboRatio, double bonusScore)
         {
             switch (mode)
