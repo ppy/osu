@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Objects;
 
@@ -23,6 +24,18 @@ namespace osu.Game.Screens.Edit
         private readonly List<byte[]> savedStates = new List<byte[]>();
 
         private int currentState = -1;
+
+        /// <summary>
+        /// A SHA-2 hash representing the current visible editor state.
+        /// </summary>
+        public string CurrentStateHash
+        {
+            get
+            {
+                using (var stream = new MemoryStream(savedStates[currentState]))
+                    return stream.ComputeSHA2Hash();
+            }
+        }
 
         private readonly EditorBeatmap editorBeatmap;
         private int bulkChangesStarted;
