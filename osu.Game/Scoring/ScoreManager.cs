@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
@@ -135,9 +136,13 @@ namespace osu.Game.Scoring
             }
 
             private IBindable<StarDifficulty> difficultyBindable;
+            private CancellationTokenSource difficultyCancellationSource;
 
             private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
             {
+                difficultyCancellationSource?.Cancel();
+                difficultyCancellationSource = null;
+
                 if (score.Beatmap == null)
                 {
                     Value = score.TotalScore;
@@ -156,7 +161,7 @@ namespace osu.Game.Scoring
                     }
 
                     // We can compute the max combo locally after the async beatmap difficulty computation.
-                    difficultyBindable = difficulties().GetBindableDifficulty(score.Beatmap, score.Ruleset, score.Mods);
+                    difficultyBindable = difficulties().GetBindableDifficulty(score.Beatmap, score.Ruleset, score.Mods, (difficultyCancellationSource = new CancellationTokenSource()).Token);
                     difficultyBindable.BindValueChanged(d => updateScore(d.NewValue.MaxCombo), true);
                 }
                 else
