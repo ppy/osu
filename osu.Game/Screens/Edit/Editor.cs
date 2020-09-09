@@ -2,39 +2,40 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK.Graphics;
-using osu.Framework.Screens;
+using System.Collections.Generic;
+using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Components.Timelines.Summary;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
-using osu.Framework.Platform;
-using osu.Framework.Timing;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Screens.Edit.Design;
-using osuTK.Input;
-using System.Collections.Generic;
-using osu.Framework;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Framework.Screens;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit
 {
@@ -53,6 +54,11 @@ namespace osu.Game.Screens.Edit
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private DialogOverlay dialogOverlay { get; set; }
+
+        private bool exitConfirmed;
 
         private Box bottomBackground;
         private Container screenContainer;
@@ -346,10 +352,29 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
+            if (!exitConfirmed && dialogOverlay != null)
+            {
+                dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                return true;
+            }
+
             Background.FadeColour(Color4.White, 500);
             resetTrack();
 
             return base.OnExiting(next);
+        }
+
+        private void confirmExitWithSave()
+        {
+            exitConfirmed = true;
+            saveBeatmap();
+            this.Exit();
+        }
+
+        private void confirmExit()
+        {
+            exitConfirmed = true;
+            this.Exit();
         }
 
         protected void Undo() => changeHandler.RestoreState(-1);
