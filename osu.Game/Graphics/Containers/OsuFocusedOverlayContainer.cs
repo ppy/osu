@@ -112,6 +112,7 @@ namespace osu.Game.Graphics.Containers
                 case Visibility.Visible:
                     if (OverlayActivationMode.Value == OverlayActivation.Disabled)
                     {
+                        // todo: visual/audible feedback that this operation could not complete.
                         State.Value = Visibility.Hidden;
                         return;
                     }
