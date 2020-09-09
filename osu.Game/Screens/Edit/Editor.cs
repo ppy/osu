@@ -52,6 +52,8 @@ namespace osu.Game.Screens.Edit
 
         public override bool AllowRateAdjustments => false;
 
+        public bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
+
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
@@ -356,7 +358,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed && dialogOverlay != null && changeHandler.CurrentStateHash != lastSavedHash)
+            if (!exitConfirmed && dialogOverlay != null && HasUnsavedChanges)
             {
                 dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
                 return true;
