@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host);
 
-                    var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
+                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
                     await collectionManager.Import(new MemoryStream());
 
                     Assert.That(collectionManager.Collections.Count, Is.Zero);
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host);
 
-                    var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
+                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
                     await collectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
 
                     Assert.That(collectionManager.Collections.Count, Is.EqualTo(2));
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host, true);
 
-                    var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
+                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
                     await collectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
 
                     Assert.That(collectionManager.Collections.Count, Is.EqualTo(2));
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Collections.IO
 
                     var osu = loadOsu(host, true);
 
-                    var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
+                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
 
                     using (var ms = new MemoryStream())
                     {
@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host, true);
 
-                    var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
+                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
                     await collectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
 
                     // Move first beatmap from second collection into the first.
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host, true);
 
-                    var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
+                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
 
                     Assert.That(collectionManager.Collections.Count, Is.EqualTo(2));
 
@@ -192,7 +192,7 @@ namespace osu.Game.Tests.Collections.IO
 
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
 
-            var collectionManager = osu.Dependencies.Get<BeatmapCollectionManager>();
+            var collectionManager = osu.Dependencies.Get<CollectionManager>();
             waitForOrAssert(() => collectionManager.DatabaseLoaded, "Collection database did not load in a reasonable amount of time");
 
             return osu;
@@ -220,7 +220,7 @@ namespace osu.Game.Tests.Collections.IO
             protected override void AddInternal(Drawable drawable)
             {
                 // The beatmap must be imported just before the collection manager is loaded.
-                if (drawable is BeatmapCollectionManager && withBeatmap)
+                if (drawable is CollectionManager && withBeatmap)
                     BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
 
                 base.AddInternal(drawable);

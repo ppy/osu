@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Collections
 
         private readonly Container content;
         private readonly DialogOverlay dialogOverlay;
-        private readonly BeatmapCollectionManager manager;
+        private readonly CollectionManager manager;
 
         private RulesetStore rulesets;
         private BeatmapManager beatmapManager;
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Collections
         {
             base.Content.AddRange(new Drawable[]
             {
-                manager = new BeatmapCollectionManager(LocalStorage),
+                manager = new CollectionManager(LocalStorage),
                 content = new Container { RelativeSizeAxes = Axes.Both },
                 dialogOverlay = new DialogOverlay()
             });

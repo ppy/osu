@@ -28,7 +28,7 @@ namespace osu.Game.Collections
         private const float button_width = item_height * 0.75f;
 
         /// <summary>
-        /// Whether the <see cref="BeatmapCollection"/> currently exists inside the <see cref="BeatmapCollectionManager"/>.
+        /// Whether the <see cref="BeatmapCollection"/> currently exists inside the <see cref="CollectionManager"/>.
         /// </summary>
         public IBindable<bool> IsCreated => isCreated;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Collections
         /// Creates a new <see cref="DrawableCollectionListItem"/>.
         /// </summary>
         /// <param name="item">The <see cref="BeatmapCollection"/>.</param>
-        /// <param name="isCreated">Whether <paramref name="item"/> currently exists inside the <see cref="BeatmapCollectionManager"/>.</param>
+        /// <param name="isCreated">Whether <paramref name="item"/> currently exists inside the <see cref="CollectionManager"/>.</param>
         public DrawableCollectionListItem(BeatmapCollection item, bool isCreated)
             : base(item)
         {
@@ -63,7 +63,7 @@ namespace osu.Game.Collections
             private readonly BeatmapCollection collection;
 
             [Resolved]
-            private BeatmapCollectionManager collectionManager { get; set; }
+            private CollectionManager collectionManager { get; set; }
 
             private Container textBoxPaddingContainer;
             private ItemTextBox textBox;
@@ -159,7 +159,7 @@ namespace osu.Game.Collections
             private DialogOverlay dialogOverlay { get; set; }
 
             [Resolved]
-            private BeatmapCollectionManager collectionManager { get; set; }
+            private CollectionManager collectionManager { get; set; }
 
             private readonly BeatmapCollection collection;
 

@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
         private BeatmapDifficultyManager difficultyManager { get; set; }
 
         [Resolved]
-        private BeatmapCollectionManager collectionManager { get; set; }
+        private CollectionManager collectionManager { get; set; }
 
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
