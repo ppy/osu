@@ -103,6 +103,8 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
+        private bool playedPopInSound;
+
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
             switch (state.NewValue)
@@ -115,11 +117,18 @@ namespace osu.Game.Graphics.Containers
                     }
 
                     samplePopIn?.Play();
+                    playedPopInSound = true;
+
                     if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    samplePopOut?.Play();
+                    if (playedPopInSound)
+                    {
+                        samplePopOut?.Play();
+                        playedPopInSound = false;
+                    }
+
                     if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
                     break;
             }
