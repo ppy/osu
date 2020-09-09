@@ -3,6 +3,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -27,8 +28,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton restoreButton;
         private TriangleButton undeleteButton;
 
-        [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, CollectionManager collectionManager, DialogOverlay dialogOverlay)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, DialogOverlay dialogOverlay)
         {
             if (beatmaps.SupportsImportFromStable)
             {
@@ -108,27 +109,30 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (collectionManager.SupportsImportFromStable)
+            if (collectionManager != null)
             {
-                Add(importCollectionsButton = new SettingsButton
+                if (collectionManager.SupportsImportFromStable)
                 {
-                    Text = "Import collections from stable",
+                    Add(importCollectionsButton = new SettingsButton
+                    {
+                        Text = "Import collections from stable",
+                        Action = () =>
+                        {
+                            importCollectionsButton.Enabled.Value = false;
+                            collectionManager.ImportFromStableAsync().ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
+                        }
+                    });
+                }
+
+                Add(new DangerousSettingsButton
+                {
+                    Text = "Delete ALL collections",
                     Action = () =>
                     {
-                        importCollectionsButton.Enabled.Value = false;
-                        collectionManager.ImportFromStableAsync().ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
+                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(collectionManager.DeleteAll));
                     }
                 });
             }
-
-            Add(new DangerousSettingsButton
-            {
-                Text = "Delete ALL collections",
-                Action = () =>
-                {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(collectionManager.DeleteAll));
-                }
-            });
 
             AddRange(new Drawable[]
             {
