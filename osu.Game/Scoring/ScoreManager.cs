@@ -154,10 +154,7 @@ namespace osu.Game.Scoring
 
                 scoreProcessor.Mods.Value = score.Mods;
 
-                double maxBaseScore = 300 * beatmapMaxCombo;
-                double maxHighestCombo = beatmapMaxCombo;
-
-                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, maxBaseScore, maxHighestCombo, score.Accuracy, score.MaxCombo / maxHighestCombo, 0));
+                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, beatmapMaxCombo, score.Accuracy, (double)score.MaxCombo / beatmapMaxCombo, 0));
             }
         }
 
