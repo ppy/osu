@@ -20,8 +20,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     {
         private const int padding = 10;
 
-        protected override string Title => @"ladder";
-
         private SettingsDropdown<TournamentRound> roundDropdown;
         private PlayerCheckbox losersCheckbox;
         private DateTextBox dateTimeBox;
@@ -33,6 +31,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         [Resolved]
         private LadderInfo ladderInfo { get; set; }
+
+        public LadderEditorSettings()
+            : base("ladder")
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()
