@@ -40,11 +40,6 @@ namespace osu.Game.Collections
 
         public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
-        /// <summary>
-        /// Whether the user's database has finished loading.
-        /// </summary>
-        public bool DatabaseLoaded { get; private set; }
-
         [Resolved]
         private GameHost host { get; set; }
 
@@ -62,7 +57,12 @@ namespace osu.Game.Collections
         private void load()
         {
             Collections.CollectionChanged += collectionsChanged;
-            loadDatabase();
+
+            if (storage.Exists(database_name))
+            {
+                using (var stream = storage.GetStream(database_name))
+                    importCollections(readCollections(stream));
+            }
         }
 
         private void collectionsChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -90,17 +90,6 @@ namespace osu.Game.Collections
 
             backgroundSave();
         }
-
-        private void loadDatabase() => Task.Run(async () =>
-        {
-            if (storage.Exists(database_name))
-            {
-                using (var stream = storage.GetStream(database_name))
-                    await import(stream);
-            }
-
-            DatabaseLoaded = true;
-        });
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -149,14 +138,6 @@ namespace osu.Game.Collections
 
             PostNotification?.Invoke(notification);
 
-            await import(stream, notification);
-        }
-
-        private async Task import(Stream stream, ProgressNotification notification = null) => await Task.Run(async () =>
-        {
-            if (notification != null)
-                notification.Progress = 0;
-
             var collection = readCollections(stream, notification);
             bool importCompleted = false;
 
@@ -169,12 +150,9 @@ namespace osu.Game.Collections
             while (!IsDisposed && !importCompleted)
                 await Task.Delay(10);
 
-            if (notification != null)
-            {
-                notification.CompletionText = $"Imported {collection.Count} collections";
-                notification.State = ProgressNotificationState.Completed;
-            }
-        });
+            notification.CompletionText = $"Imported {collection.Count} collections";
+            notification.State = ProgressNotificationState.Completed;
+        }
 
         private void importCollections(List<BeatmapCollection> newCollections)
         {
