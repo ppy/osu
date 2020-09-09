@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private CollectionManager collectionManager { get; set; }
 
         [Resolved(CanBeNull = true)]
@@ -142,11 +142,14 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmapSet.OnlineBeatmapSetID != null && viewDetails != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineBeatmapSetID.Value)));
 
-                var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
-                if (manageCollectionsDialog != null)
-                    collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+                if (collectionManager != null)
+                {
+                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
+                    if (manageCollectionsDialog != null)
+                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                }
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested(beatmapSet)));

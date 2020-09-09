@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -19,7 +20,7 @@ namespace osu.Game.Collections
         private const double enter_duration = 500;
         private const double exit_duration = 200;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private CollectionManager collectionManager { get; set; }
 
         public ManageCollectionsDialog()
@@ -100,7 +101,7 @@ namespace osu.Game.Collections
                                         new DrawableCollectionList
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Items = { BindTarget = collectionManager.Collections }
+                                            Items = { BindTarget = collectionManager?.Collections ?? new BindableList<BeatmapCollection>() }
                                         }
                                     }
                                 }
