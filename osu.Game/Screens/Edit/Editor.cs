@@ -60,6 +60,8 @@ namespace osu.Game.Screens.Edit
 
         private bool exitConfirmed;
 
+        private string lastSavedHash;
+
         private Box bottomBackground;
         private Container screenContainer;
 
@@ -123,6 +125,8 @@ namespace osu.Game.Screens.Edit
             dependencies.CacheAs(editorBeatmap);
             changeHandler = new EditorChangeHandler(editorBeatmap);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
+
+            updateLastSavedHash();
 
             EditorMenuBar menuBar;
             OsuMenuItem undoMenuItem;
@@ -352,7 +356,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed && dialogOverlay != null)
+            if (!exitConfirmed && dialogOverlay != null && changeHandler.CurrentStateHash != lastSavedHash)
             {
                 dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
                 return true;
@@ -447,12 +451,19 @@ namespace osu.Game.Screens.Edit
 
             // save the loaded beatmap's data stream.
             beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
+
+            updateLastSavedHash();
         }
 
         private void exportBeatmap()
         {
             saveBeatmap();
             beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+        }
+
+        private void updateLastSavedHash()
+        {
+            lastSavedHash = changeHandler.CurrentStateHash;
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
