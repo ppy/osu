@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -20,7 +20,7 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Collections
 {
-    public class BeatmapCollectionManager : CompositeDrawable
+    public class BeatmapCollectionManager : Component
     {
         /// <summary>
         /// Database version in stable-compatible YYYYMMDD format.
