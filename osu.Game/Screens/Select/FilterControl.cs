@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Select
                 Sort = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
                 Ruleset = ruleset.Value,
-                Collection = collectionDropdown?.Current.Value
+                Collection = collectionDropdown?.Current.Value.Collection
             };
 
             if (!minimumStars.IsDefault)

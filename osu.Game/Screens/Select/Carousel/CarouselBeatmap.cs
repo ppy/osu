@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             if (match)
-                match &= criteria.Collection?.ContainsBeatmap(Beatmap) ?? true;
+                match &= criteria.Collection?.Beatmaps.Contains(Beatmap) ?? true;
 
             Filtered.Value = !match;
         }

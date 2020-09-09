@@ -204,7 +204,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("collection filter still selected", () => control.CreateCriteria().Collection?.CollectionName.Value == "1");
+            AddAssert("collection filter still selected", () => control.CreateCriteria().Collection?.Name.Value == "1");
         }
 
         private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
