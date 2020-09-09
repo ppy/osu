@@ -21,13 +21,13 @@ using osuTK;
 namespace osu.Game.Screens.Select
 {
     /// <summary>
-    /// A dropdown to select the <see cref="CollectionFilter"/> to filter beatmaps using.
+    /// A dropdown to select the <see cref="CollectionMenuItem"/> to filter beatmaps using.
     /// </summary>
-    public class CollectionFilterDropdown : OsuDropdown<CollectionFilter>
+    public class CollectionFilterDropdown : OsuDropdown<CollectionMenuItem>
     {
         private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
         private readonly IBindableList<BeatmapInfo> beatmaps = new BindableList<BeatmapInfo>();
-        private readonly BindableList<CollectionFilter> filters = new BindableList<CollectionFilter>();
+        private readonly BindableList<CollectionMenuItem> filters = new BindableList<CollectionMenuItem>();
 
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
@@ -62,17 +62,17 @@ namespace osu.Game.Screens.Select
             var selectedItem = SelectedItem?.Value?.Collection;
 
             filters.Clear();
-            filters.Add(new AllBeatmapCollectionFilter());
-            filters.AddRange(collections.Select(c => new CollectionFilter(c)));
-            filters.Add(new ManageCollectionsFilter());
+            filters.Add(new AllBeatmapsCollectionMenuItem());
+            filters.AddRange(collections.Select(c => new CollectionMenuItem(c)));
+            filters.Add(new ManageCollectionsMenuItem());
 
             Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection == selectedItem) ?? filters[0];
         }
 
         /// <summary>
-        /// Occurs when the <see cref="CollectionFilter"/> selection has changed.
+        /// Occurs when the <see cref="CollectionMenuItem"/> selection has changed.
         /// </summary>
-        private void filterChanged(ValueChangedEvent<CollectionFilter> filter)
+        private void filterChanged(ValueChangedEvent<CollectionMenuItem> filter)
         {
             // Binding the beatmaps will trigger a collection change event, which results in an infinite-loop. This is rebound later, when it's safe to do so.
             beatmaps.CollectionChanged -= filterBeatmapsChanged;
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Select
 
             // Never select the manage collection filter - rollback to the previous filter.
             // This is done after the above since it is important that bindable is unbound from OldValue, which is lost after forcing it back to the old value.
-            if (filter.NewValue is ManageCollectionsFilter)
+            if (filter.NewValue is ManageCollectionsMenuItem)
             {
                 Current.Value = filter.OldValue;
                 manageCollectionsDialog?.Show();
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Select
             Current.TriggerChange();
         }
 
-        protected override string GenerateItemText(CollectionFilter item) => item.CollectionName.Value;
+        protected override string GenerateItemText(CollectionMenuItem item) => item.CollectionName.Value;
 
         protected override DropdownHeader CreateHeader() => new CollectionDropdownHeader
         {
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Select
 
         public class CollectionDropdownHeader : OsuDropdownHeader
         {
-            public readonly Bindable<CollectionFilter> SelectedItem = new Bindable<CollectionFilter>();
+            public readonly Bindable<CollectionMenuItem> SelectedItem = new Bindable<CollectionMenuItem>();
             private readonly Bindable<string> collectionName = new Bindable<string>();
 
             protected override string Label
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Select
         private class CollectionDropdownMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
         {
             [NotNull]
-            protected new CollectionFilter Item => ((DropdownMenuItem<CollectionFilter>)base.Item).Value;
+            protected new CollectionMenuItem Item => ((DropdownMenuItem<CollectionMenuItem>)base.Item).Value;
 
             [Resolved]
             private OsuColour colours { get; set; }

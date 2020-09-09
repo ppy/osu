@@ -1,10 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
 using osu.Game.Collections;
 
 namespace osu.Game.Screens.Select
@@ -12,7 +10,7 @@ namespace osu.Game.Screens.Select
     /// <summary>
     /// A <see cref="BeatmapCollection"/> filter.
     /// </summary>
-    public class CollectionFilter
+    public class CollectionMenuItem
     {
         /// <summary>
         /// The collection to filter beatmaps from.
@@ -28,35 +26,27 @@ namespace osu.Game.Screens.Select
         public readonly Bindable<string> CollectionName;
 
         /// <summary>
-        /// Creates a new <see cref="CollectionFilter"/>.
+        /// Creates a new <see cref="CollectionMenuItem"/>.
         /// </summary>
         /// <param name="collection">The collection to filter beatmaps from.</param>
-        public CollectionFilter([CanBeNull] BeatmapCollection collection)
+        public CollectionMenuItem([CanBeNull] BeatmapCollection collection)
         {
             Collection = collection;
             CollectionName = Collection?.Name.GetBoundCopy() ?? new Bindable<string>("All beatmaps");
         }
-
-        /// <summary>
-        /// Whether the collection contains a given beatmap.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to check.</param>
-        /// <returns>Whether <see cref="Collection"/> contains <paramref name="beatmap"/>.</returns>
-        public virtual bool ContainsBeatmap(BeatmapInfo beatmap)
-            => Collection?.Beatmaps.Any(b => b.Equals(beatmap)) ?? true;
     }
 
-    public class AllBeatmapCollectionFilter : CollectionFilter
+    public class AllBeatmapsCollectionMenuItem : CollectionMenuItem
     {
-        public AllBeatmapCollectionFilter()
+        public AllBeatmapsCollectionMenuItem()
             : base(null)
         {
         }
     }
 
-    public class ManageCollectionsFilter : CollectionFilter
+    public class ManageCollectionsMenuItem : CollectionMenuItem
     {
-        public ManageCollectionsFilter()
+        public ManageCollectionsMenuItem()
             : base(null)
         {
             CollectionName.Value = "Manage collections...";
