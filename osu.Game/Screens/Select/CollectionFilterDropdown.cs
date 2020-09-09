@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapCollectionManager collectionManager)
+        private void load(CollectionManager collectionManager)
         {
             collections.BindTo(collectionManager.Collections);
             collections.CollectionChanged += (_, __) => collectionsChanged();

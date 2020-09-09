@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        private readonly BeatmapCollectionManager collectionManager;
+        private readonly CollectionManager collectionManager;
 
         private RulesetStore rulesets;
         private BeatmapManager beatmapManager;
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             base.Content.AddRange(new Drawable[]
             {
-                collectionManager = new BeatmapCollectionManager(LocalStorage),
+                collectionManager = new CollectionManager(LocalStorage),
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }

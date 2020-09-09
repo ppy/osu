@@ -27,7 +27,7 @@ namespace osu.Game.Collections
     /// This is currently reading and writing from the osu-stable file format. This is a temporary arrangement until we refactor the
     /// database backing the game. Going forward writing should be done in a similar way to other model stores.
     /// </remarks>
-    public class BeatmapCollectionManager : Component
+    public class CollectionManager : Component
     {
         /// <summary>
         /// Database version in stable-compatible YYYYMMDD format.
@@ -53,7 +53,7 @@ namespace osu.Game.Collections
 
         private readonly Storage storage;
 
-        public BeatmapCollectionManager(Storage storage)
+        public CollectionManager(Storage storage)
         {
             this.storage = storage;
         }

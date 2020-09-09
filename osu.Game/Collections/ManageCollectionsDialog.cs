@@ -20,7 +20,7 @@ namespace osu.Game.Collections
         private const double exit_duration = 200;
 
         [Resolved]
-        private BeatmapCollectionManager collectionManager { get; set; }
+        private CollectionManager collectionManager { get; set; }
 
         public ManageCollectionsDialog()
         {
