@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -38,6 +39,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             new SpinnerCompositionTool()
         };
 
+        private readonly BindableBool distanceSnapToggle = new BindableBool(true) { Description = "Distance Snap" };
+
+        protected override IEnumerable<BindableBool> Toggles => new[]
+        {
+            distanceSnapToggle
+        };
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -45,6 +53,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();
             EditorBeatmap.PlacementObject.ValueChanged += _ => updateDistanceSnapGrid();
+            distanceSnapToggle.ValueChanged += _ => updateDistanceSnapGrid();
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer(IEnumerable<DrawableHitObject> hitObjects)
@@ -87,6 +96,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             distanceSnapGridContainer.Clear();
             distanceSnapGridCache.Invalidate();
+            distanceSnapGrid = null;
+
+            if (!distanceSnapToggle.Value)
+                return;
 
             switch (BlueprintContainer.CurrentTool)
             {
