@@ -20,6 +20,13 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Collections
 {
+    /// <summary>
+    /// Handles user-defined collections of beatmaps.
+    /// </summary>
+    /// <remarks>
+    /// This is currently reading and writing from the osu-stable file format. This is a temporary arrangement until we refactor the
+    /// database backing the game. Going forward writing should be done in a similar way to other model stores.
+    /// </remarks>
     public class BeatmapCollectionManager : Component
     {
         /// <summary>
