@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Toolbar
             var rInstance = value.CreateInstance();
 
             ruleset.TooltipMain = rInstance.Description;
-            ruleset.TooltipSub = $"Play some {rInstance.Description}";
+            ruleset.TooltipSub = $"play some {rInstance.Description}";
             ruleset.SetIcon(rInstance.CreateIcon());
         }
 
@@ -64,12 +64,6 @@ namespace osu.Game.Overlays.Toolbar
             {
                 Parent.Click();
                 return base.OnClick(e);
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                IconContainer.Scale *= 1.4f;
             }
         }
     }

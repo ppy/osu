@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Scores.IO
         [Test]
         public async Task TestBasicImport()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestBasicImport"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Scores.IO
         [Test]
         public async Task TestImportMods()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportMods"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Scores.IO
         [Test]
         public async Task TestImportStatistics()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportStatistics"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Scores.IO
         [Test]
         public async Task TestImportWithDeletedBeatmapSet()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWithDeletedBeatmapSet"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -159,7 +159,7 @@ namespace osu.Game.Tests.Scores.IO
         [Test]
         public async Task TestOnlineScoreIsAvailableLocally()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestOnlineScoreIsAvailableLocally"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {

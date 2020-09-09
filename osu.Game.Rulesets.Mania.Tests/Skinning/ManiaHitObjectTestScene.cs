@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                 Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
-                    new ColumnTestContainer(0, ManiaAction.Key1)
+                    new ColumnTestContainer(0, ManiaAction.Key1, true)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                             }));
                         })
                     },
-                    new ColumnTestContainer(1, ManiaAction.Key2)
+                    new ColumnTestContainer(1, ManiaAction.Key2, true)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

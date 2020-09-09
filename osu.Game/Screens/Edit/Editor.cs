@@ -28,6 +28,7 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.API;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
@@ -72,6 +73,9 @@ namespace osu.Game.Screens.Edit
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host)
         {
@@ -89,6 +93,14 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
+            bool isNewBeatmap = false;
+
+            if (Beatmap.Value is DummyWorkingBeatmap)
+            {
+                isNewBeatmap = true;
+                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+            }
+
             try
             {
                 playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
@@ -101,9 +113,8 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, Beatmap.Value.Skin));
             dependencies.CacheAs(editorBeatmap);
-
             changeHandler = new EditorChangeHandler(editorBeatmap);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
@@ -148,6 +159,7 @@ namespace osu.Game.Screens.Edit
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.Both,
+                            Mode = { Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose },
                             Items = new[]
                             {
                                 new MenuItem("File")
@@ -284,7 +296,7 @@ namespace osu.Game.Screens.Edit
             // this is a special case to handle the "pivot" scenario.
             // if we are precise scrolling in one direction then change our mind and scroll backwards,
             // the existing accumulation should be applied in the inverse direction to maintain responsiveness.
-            if (Math.Sign(scrollAccumulation) != scrollDirection)
+            if (scrollAccumulation != 0 && Math.Sign(scrollAccumulation) != scrollDirection)
                 scrollAccumulation = scrollDirection * (precision - Math.Abs(scrollAccumulation));
 
             scrollAccumulation += scrollComponent * (e.IsPrecise ? 0.1 : 1);
@@ -386,7 +398,11 @@ namespace osu.Game.Screens.Edit
                     break;
             }
 
-            LoadComponentAsync(currentScreen, screenContainer.Add);
+            LoadComponentAsync(currentScreen, newScreen =>
+            {
+                if (newScreen == currentScreen)
+                    screenContainer.Add(newScreen);
+            });
         }
 
         private void seek(UIEvent e, int direction)
@@ -399,7 +415,14 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!clock.IsRunning, amount);
         }
 
-        private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
+        private void saveBeatmap()
+        {
+            // apply any set-level metadata changes.
+            beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
+
+            // save the loaded beatmap's data stream.
+            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
+        }
 
         private void exportBeatmap()
         {
