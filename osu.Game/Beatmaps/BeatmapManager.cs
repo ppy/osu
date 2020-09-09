@@ -231,7 +231,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
         public void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
         {
-            var setInfo = QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == info.ID));
+            var setInfo = info.BeatmapSet;
 
             using (var stream = new MemoryStream())
             {
