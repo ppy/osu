@@ -2,39 +2,40 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK.Graphics;
-using osu.Framework.Screens;
+using System.Collections.Generic;
+using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Components.Timelines.Summary;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
-using osu.Framework.Platform;
-using osu.Framework.Timing;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Screens.Edit.Design;
-using osuTK.Input;
-using System.Collections.Generic;
-using osu.Framework;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Framework.Screens;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit
 {
@@ -51,8 +52,17 @@ namespace osu.Game.Screens.Edit
 
         public override bool AllowRateAdjustments => false;
 
+        protected bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
+
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private DialogOverlay dialogOverlay { get; set; }
+
+        private bool exitConfirmed;
+
+        private string lastSavedHash;
 
         private Box bottomBackground;
         private Container screenContainer;
@@ -118,13 +128,15 @@ namespace osu.Game.Screens.Edit
             changeHandler = new EditorChangeHandler(editorBeatmap);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
+            updateLastSavedHash();
+
             EditorMenuBar menuBar;
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
 
             var fileMenuItems = new List<MenuItem>
             {
-                new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap)
+                new EditorMenuItem("Save", MenuItemType.Standard, Save)
             };
 
             if (RuntimeInfo.IsDesktop)
@@ -237,6 +249,17 @@ namespace osu.Game.Screens.Edit
             bottomBackground.Colour = colours.Gray2;
         }
 
+        protected void Save()
+        {
+            // apply any set-level metadata changes.
+            beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
+
+            // save the loaded beatmap's data stream.
+            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
+
+            updateLastSavedHash();
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -256,7 +279,7 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case PlatformActionType.Save:
-                    saveBeatmap();
+                    Save();
                     return true;
             }
 
@@ -346,10 +369,29 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
+            if (!exitConfirmed && dialogOverlay != null && HasUnsavedChanges)
+            {
+                dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                return true;
+            }
+
             Background.FadeColour(Color4.White, 500);
             resetTrack();
 
             return base.OnExiting(next);
+        }
+
+        private void confirmExitWithSave()
+        {
+            exitConfirmed = true;
+            Save();
+            this.Exit();
+        }
+
+        private void confirmExit()
+        {
+            exitConfirmed = true;
+            this.Exit();
         }
 
         protected void Undo() => changeHandler.RestoreState(-1);
@@ -415,19 +457,15 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!clock.IsRunning, amount);
         }
 
-        private void saveBeatmap()
-        {
-            // apply any set-level metadata changes.
-            beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
-
-            // save the loaded beatmap's data stream.
-            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
-        }
-
         private void exportBeatmap()
         {
-            saveBeatmap();
+            Save();
             beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+        }
+
+        private void updateLastSavedHash()
+        {
+            lastSavedHash = changeHandler.CurrentStateHash;
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
