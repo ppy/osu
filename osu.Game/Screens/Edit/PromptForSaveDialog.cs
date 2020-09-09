@@ -27,6 +27,10 @@ namespace osu.Game.Screens.Edit
                     Text = @"Forget all changes",
                     Action = exit
                 },
+                new PopupDialogCancelButton
+                {
+                    Text = @"Oops, continue editing",
+                },
             };
         }
     }
