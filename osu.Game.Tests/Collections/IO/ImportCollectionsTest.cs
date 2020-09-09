@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Collections;
 using osu.Game.Tests.Resources;
@@ -27,10 +26,9 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host);
 
-                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
-                    await collectionManager.Import(new MemoryStream());
+                    await osu.CollectionManager.Import(new MemoryStream());
 
-                    Assert.That(collectionManager.Collections.Count, Is.Zero);
+                    Assert.That(osu.CollectionManager.Collections.Count, Is.Zero);
                 }
                 finally
                 {
@@ -48,16 +46,15 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host);
 
-                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
-                    await collectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
+                    await osu.CollectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
 
-                    Assert.That(collectionManager.Collections.Count, Is.EqualTo(2));
+                    Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
-                    Assert.That(collectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(collectionManager.Collections[0].Beatmaps.Count, Is.Zero);
+                    Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
+                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.Zero);
 
-                    Assert.That(collectionManager.Collections[1].Name.Value, Is.EqualTo("Second"));
-                    Assert.That(collectionManager.Collections[1].Beatmaps.Count, Is.Zero);
+                    Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Second"));
+                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.Zero);
                 }
                 finally
                 {
@@ -75,16 +72,15 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host, true);
 
-                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
-                    await collectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
+                    await osu.CollectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
 
-                    Assert.That(collectionManager.Collections.Count, Is.EqualTo(2));
+                    Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
-                    Assert.That(collectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(collectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(1));
+                    Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
+                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(1));
 
-                    Assert.That(collectionManager.Collections[1].Name.Value, Is.EqualTo("Second"));
-                    Assert.That(collectionManager.Collections[1].Beatmaps.Count, Is.EqualTo(12));
+                    Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Second"));
+                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.EqualTo(12));
                 }
                 finally
                 {
@@ -107,8 +103,6 @@ namespace osu.Game.Tests.Collections.IO
 
                     var osu = loadOsu(host, true);
 
-                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
-
                     using (var ms = new MemoryStream())
                     {
                         using (var bw = new BinaryWriter(ms, Encoding.UTF8, true))
@@ -119,12 +113,12 @@ namespace osu.Game.Tests.Collections.IO
 
                         ms.Seek(0, SeekOrigin.Begin);
 
-                        await collectionManager.Import(ms);
+                        await osu.CollectionManager.Import(ms);
                     }
 
                     Assert.That(host.UpdateThread.Running, Is.True);
                     Assert.That(exceptionThrown, Is.False);
-                    Assert.That(collectionManager.Collections.Count, Is.EqualTo(0));
+                    Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(0));
                 }
                 finally
                 {
@@ -143,15 +137,14 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host, true);
 
-                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
-                    await collectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
+                    await osu.CollectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
 
                     // Move first beatmap from second collection into the first.
-                    collectionManager.Collections[0].Beatmaps.Add(collectionManager.Collections[1].Beatmaps[0]);
-                    collectionManager.Collections[1].Beatmaps.RemoveAt(0);
+                    osu.CollectionManager.Collections[0].Beatmaps.Add(osu.CollectionManager.Collections[1].Beatmaps[0]);
+                    osu.CollectionManager.Collections[1].Beatmaps.RemoveAt(0);
 
                     // Rename the second collecction.
-                    collectionManager.Collections[1].Name.Value = "Another";
+                    osu.CollectionManager.Collections[1].Name.Value = "Another";
                 }
                 finally
                 {
@@ -165,15 +158,13 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = loadOsu(host, true);
 
-                    var collectionManager = osu.Dependencies.Get<CollectionManager>();
+                    Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
-                    Assert.That(collectionManager.Collections.Count, Is.EqualTo(2));
+                    Assert.That(osu.CollectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
+                    Assert.That(osu.CollectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(2));
 
-                    Assert.That(collectionManager.Collections[0].Name.Value, Is.EqualTo("First"));
-                    Assert.That(collectionManager.Collections[0].Beatmaps.Count, Is.EqualTo(2));
-
-                    Assert.That(collectionManager.Collections[1].Name.Value, Is.EqualTo("Another"));
-                    Assert.That(collectionManager.Collections[1].Beatmaps.Count, Is.EqualTo(11));
+                    Assert.That(osu.CollectionManager.Collections[1].Name.Value, Is.EqualTo("Another"));
+                    Assert.That(osu.CollectionManager.Collections[1].Beatmaps.Count, Is.EqualTo(11));
                 }
                 finally
                 {
@@ -182,7 +173,7 @@ namespace osu.Game.Tests.Collections.IO
             }
         }
 
-        private OsuGameBase loadOsu(GameHost host, bool withBeatmap = false)
+        private TestOsuGameBase loadOsu(GameHost host, bool withBeatmap = false)
         {
             var osu = new TestOsuGameBase(withBeatmap);
 
@@ -191,9 +182,6 @@ namespace osu.Game.Tests.Collections.IO
 #pragma warning restore 4014
 
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
-
-            var collectionManager = osu.Dependencies.Get<CollectionManager>();
-            waitForOrAssert(() => collectionManager.DatabaseLoaded, "Collection database did not load in a reasonable amount of time");
 
             return osu;
         }
@@ -210,6 +198,8 @@ namespace osu.Game.Tests.Collections.IO
 
         private class TestOsuGameBase : OsuGameBase
         {
+            public CollectionManager CollectionManager { get; private set; }
+
             private readonly bool withBeatmap;
 
             public TestOsuGameBase(bool withBeatmap)
@@ -217,13 +207,14 @@ namespace osu.Game.Tests.Collections.IO
                 this.withBeatmap = withBeatmap;
             }
 
-            protected override void AddInternal(Drawable drawable)
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                // The beatmap must be imported just before the collection manager is loaded.
-                if (drawable is CollectionManager && withBeatmap)
+                // Beatmap must be imported before the collection manager is loaded.
+                if (withBeatmap)
                     BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
 
-                base.AddInternal(drawable);
+                AddInternal(CollectionManager = new CollectionManager(Storage));
             }
         }
     }
