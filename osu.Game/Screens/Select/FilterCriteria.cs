@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
 
@@ -56,7 +57,7 @@ namespace osu.Game.Screens.Select
         /// The collection to filter beatmaps from.
         /// </summary>
         [CanBeNull]
-        public CollectionFilter Collection;
+        public BeatmapCollection Collection;
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct
