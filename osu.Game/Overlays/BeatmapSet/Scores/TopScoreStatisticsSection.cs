@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 statisticsColumns.ChildrenEnumerable = value.SortedStatistics.Select(kvp => createStatisticsColumn(kvp.Key, kvp.Value));
                 modsColumn.Mods = value.Mods;
 
-                if (IsLoaded)
+                if (scoreManager != null)
                     totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(value);
             }
         }
