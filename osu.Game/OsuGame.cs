@@ -538,9 +538,6 @@ namespace osu.Game
             ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
-            CollectionManager.PostNotification = n => notifications.Post(n);
-            CollectionManager.GetStableStorage = GetStorageForStableInstall;
-
             Container logoContainer;
             BackButton.Receptor receptor;
 
@@ -613,6 +610,12 @@ namespace osu.Game
                 d.Anchor = Anchor.TopRight;
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
+
+            loadComponentSingleFile(new CollectionManager(Storage)
+            {
+                PostNotification = n => notifications.Post(n),
+                GetStableStorage = GetStorageForStableInstall
+            }, Add, true);
 
             loadComponentSingleFile(screenshotManager, Add);
 

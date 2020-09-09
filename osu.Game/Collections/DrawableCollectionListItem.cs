@@ -62,7 +62,7 @@ namespace osu.Game.Collections
             private readonly IBindable<string> collectionName;
             private readonly BeatmapCollection collection;
 
-            [Resolved]
+            [Resolved(CanBeNull = true)]
             private CollectionManager collectionManager { get; set; }
 
             private Container textBoxPaddingContainer;
@@ -127,7 +127,7 @@ namespace osu.Game.Collections
                     return;
 
                 // Add the new collection and disable our placeholder. If all text is removed, the placeholder should not show back again.
-                collectionManager.Collections.Add(collection);
+                collectionManager?.Collections.Add(collection);
                 textBox.PlaceholderText = string.Empty;
 
                 // When this item changes from placeholder to non-placeholder (via changing containers), its textbox will lose focus, so it needs to be re-focused.
@@ -158,7 +158,7 @@ namespace osu.Game.Collections
             [Resolved(CanBeNull = true)]
             private DialogOverlay dialogOverlay { get; set; }
 
-            [Resolved]
+            [Resolved(CanBeNull = true)]
             private CollectionManager collectionManager { get; set; }
 
             private readonly BeatmapCollection collection;
@@ -231,7 +231,7 @@ namespace osu.Game.Collections
                 return true;
             }
 
-            private void deleteCollection() => collectionManager.Collections.Remove(collection);
+            private void deleteCollection() => collectionManager?.Collections.Remove(collection);
         }
     }
 }

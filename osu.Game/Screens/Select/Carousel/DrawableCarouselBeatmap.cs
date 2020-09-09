@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private BeatmapDifficultyManager difficultyManager { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private CollectionManager collectionManager { get; set; }
 
         [Resolved(CanBeNull = true)]
@@ -224,11 +224,14 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmap.OnlineBeatmapID.HasValue && beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
 
-                var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
-                if (manageCollectionsDialog != null)
-                    collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+                if (collectionManager != null)
+                {
+                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
+                    if (manageCollectionsDialog != null)
+                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                }
 
                 if (hideRequested != null)
                     items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested(beatmap)));
