@@ -26,9 +26,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private readonly NowPlayingOverlay np;
 
-        [Cached]
-        private MusicController musicController = new MusicController();
-
         public TestSceneBeatSyncedContainer()
         {
             Clock = new FramedClock();
@@ -36,7 +33,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddRange(new Drawable[]
             {
-                musicController,
                 new BeatContainer
                 {
                     Anchor = Anchor.BottomCentre,
@@ -70,6 +66,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             private readonly InfoString timeSinceLastBeat;
 
             private readonly Box flashLayer;
+
+            [Resolved]
+            private MusicController musicController { get; set; }
 
             public BeatContainer()
             {
@@ -165,7 +164,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (timingPoints.Count == 0) return 0;
 
                 if (timingPoints[^1] == current)
-                    return (int)Math.Ceiling((Beatmap.Value.Track.Length - current.Time) / current.BeatLength);
+                    return (int)Math.Ceiling((musicController.CurrentTrack.Length - current.Time) / current.BeatLength);
 
                 return (int)Math.Ceiling((getNextTimingPoint(current).Time - current.Time) / current.BeatLength);
             }

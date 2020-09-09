@@ -97,8 +97,16 @@ namespace osu.Game.Skinning
                         currentConfig.ShowJudgementLine = pair.Value == "1";
                         break;
 
+                    case "KeysUnderNotes":
+                        currentConfig.KeysUnderNotes = pair.Value == "1";
+                        break;
+
                     case "LightingNWidth":
                         parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
+                        break;
+
+                    case "LightingLWidth":
+                        parseArrayValue(pair.Value, currentConfig.HoldNoteLightWidth);
                         break;
 
                     case "WidthForNoteHeightScale":

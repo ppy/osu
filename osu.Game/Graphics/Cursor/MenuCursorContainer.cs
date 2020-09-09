@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
+using osu.Framework.Input.StateChanges;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -47,7 +48,10 @@ namespace osu.Game.Graphics.Cursor
         {
             base.Update();
 
-            if (!CanShowCursor)
+            var lastMouseSource = inputManager.CurrentState.Mouse.LastSource;
+            bool hasValidInput = lastMouseSource != null && !(lastMouseSource is ISourcedFromTouch);
+
+            if (!hasValidInput || !CanShowCursor)
             {
                 currentTarget?.Cursor?.Hide();
                 currentTarget = null;
