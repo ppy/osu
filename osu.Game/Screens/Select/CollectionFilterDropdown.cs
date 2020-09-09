@@ -37,10 +37,12 @@ namespace osu.Game.Screens.Select
             ItemSource = filters;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(CollectionManager collectionManager)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load([CanBeNull] CollectionManager collectionManager)
         {
-            collections.BindTo(collectionManager.Collections);
+            if (collectionManager != null)
+                collections.BindTo(collectionManager.Collections);
+
             collections.CollectionChanged += (_, __) => collectionsChanged();
             collectionsChanged();
         }
