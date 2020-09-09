@@ -94,6 +94,7 @@ namespace osu.Game.Rulesets.Edit
                             Name = "Sidebar",
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Right = 10 },
+                            Spacing = new Vector2(10),
                             Children = new Drawable[]
                             {
                                 new ToolboxGroup("toolbox") { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } },
