@@ -66,12 +66,14 @@ namespace osu.Game.Beatmaps
         private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;
         private readonly AudioManager audioManager;
-        private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
         private readonly TextureStore textureStore;
         private readonly ITrackStore trackStore;
 
+        [CanBeNull]
+        private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
+
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, GameHost host = null,
-                              WorkingBeatmap defaultBeatmap = null)
+                              WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
@@ -85,7 +87,8 @@ namespace osu.Game.Beatmaps
             beatmaps.ItemRemoved += removeWorkingCache;
             beatmaps.ItemUpdated += removeWorkingCache;
 
-            onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+            if (performOnlineLookups)
+                onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
 
             textureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
             trackStore = audioManager.GetTrackStore(Files.Store);
@@ -142,7 +145,8 @@ namespace osu.Game.Beatmaps
 
             bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0);
 
-            await onlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken);
+            if (onlineLookupQueue != null)
+                await onlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken);
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
