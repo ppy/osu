@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool AllowRateAdjustments => false;
 
-        public bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
+        protected bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Edit
 
             var fileMenuItems = new List<MenuItem>
             {
-                new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap)
+                new EditorMenuItem("Save", MenuItemType.Standard, Save)
             };
 
             if (RuntimeInfo.IsDesktop)
@@ -249,6 +249,17 @@ namespace osu.Game.Screens.Edit
             bottomBackground.Colour = colours.Gray2;
         }
 
+        protected void Save()
+        {
+            // apply any set-level metadata changes.
+            beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
+
+            // save the loaded beatmap's data stream.
+            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
+
+            updateLastSavedHash();
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -268,7 +279,7 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case PlatformActionType.Save:
-                    saveBeatmap();
+                    Save();
                     return true;
             }
 
@@ -373,7 +384,7 @@ namespace osu.Game.Screens.Edit
         private void confirmExitWithSave()
         {
             exitConfirmed = true;
-            saveBeatmap();
+            Save();
             this.Exit();
         }
 
@@ -446,20 +457,9 @@ namespace osu.Game.Screens.Edit
                 clock.SeekForward(!clock.IsRunning, amount);
         }
 
-        private void saveBeatmap()
-        {
-            // apply any set-level metadata changes.
-            beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
-
-            // save the loaded beatmap's data stream.
-            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
-
-            updateLastSavedHash();
-        }
-
         private void exportBeatmap()
         {
-            saveBeatmap();
+            Save();
             beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
         }
 
