@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly string headerText;
         private readonly CounterVisibilityState counterVisibilityState;
 
-        protected PaginatedContainerHeader Header;
+        protected PaginatedContainerHeader Header { get; private set; }
 
         protected PaginatedContainerWithHeader(Bindable<User> user, string headerText, CounterVisibilityState counterVisibilityState, string missing = "")
             : base(user, missing)
