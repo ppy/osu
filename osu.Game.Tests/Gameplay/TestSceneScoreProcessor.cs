@@ -28,6 +28,20 @@ namespace osu.Game.Tests.Gameplay
             Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(0.0));
         }
 
+        [Test]
+        public void TestOnlyBonusScore()
+        {
+            var beatmap = new Beatmap<TestBonusHitObject> { HitObjects = { new TestBonusHitObject() } };
+
+            var scoreProcessor = new ScoreProcessor();
+            scoreProcessor.ApplyBeatmap(beatmap);
+
+            // Apply a judgement
+            scoreProcessor.ApplyResult(new JudgementResult(new TestBonusHitObject(), new TestBonusJudgement()) { Type = HitResult.Perfect });
+
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(100));
+        }
+
         private class TestHitObject : HitObject
         {
             public override Judgement CreateJudgement() => new TestJudgement();
@@ -35,6 +49,18 @@ namespace osu.Game.Tests.Gameplay
 
         private class TestJudgement : Judgement
         {
+            protected override int NumericResultFor(HitResult result) => 100;
+        }
+
+        private class TestBonusHitObject : HitObject
+        {
+            public override Judgement CreateJudgement() => new TestBonusJudgement();
+        }
+
+        private class TestBonusJudgement : Judgement
+        {
+            public override bool AffectsCombo => false;
+
             protected override int NumericResultFor(HitResult result) => 100;
         }
     }
