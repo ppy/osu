@@ -189,7 +189,15 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            collectionDropdown.Current.ValueChanged += _ => updateCriteria();
+            collectionDropdown.Current.ValueChanged += val =>
+            {
+                if (val.NewValue == null)
+                    // may be null briefly while menu is repopulated.
+                    return;
+
+                updateCriteria();
+            };
+
             searchTextBox.Current.ValueChanged += _ => updateCriteria();
 
             updateCriteria();
