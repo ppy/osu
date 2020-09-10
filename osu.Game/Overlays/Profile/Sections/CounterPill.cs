@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Margin = new MarginPadding { Horizontal = 10, Bottom = 1 },
-                    Font = OsuFont.GetFont(size: 14 * 0.8f, weight: FontWeight.Bold),
+                    Font = OsuFont.GetFont(size: 11.2f, weight: FontWeight.Bold),
                     Colour = colourProvider.Foreground1
                 }
             };
