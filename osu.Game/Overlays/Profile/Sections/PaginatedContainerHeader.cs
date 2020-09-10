@@ -16,20 +16,13 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public class PaginatedContainerHeader : CompositeDrawable, IHasCurrentValue<int>
     {
+        private readonly BindableWithCurrent<int> current = new BindableWithCurrent<int>();
+
         public Bindable<int> Current
         {
-            get => current;
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-
-                current.UnbindBindings();
-                current.BindTo(value);
-            }
+            get => current.Current;
+            set => current.Current = value;
         }
-
-        private readonly Bindable<int> current = new Bindable<int>();
 
         private readonly string text;
         private readonly CounterVisibilityState counterState;
@@ -82,7 +75,6 @@ namespace osu.Game.Overlays.Profile.Sections
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Alpha = getInitialCounterAlpha(),
                             Current = { BindTarget = current }
                         }
                     }
@@ -93,33 +85,32 @@ namespace osu.Game.Overlays.Profile.Sections
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            current.BindValueChanged(onCurrentChanged);
-        }
-
-        private float getInitialCounterAlpha()
-        {
-            switch (counterState)
-            {
-                case CounterVisibilityState.AlwaysHidden:
-                    return 0;
-
-                case CounterVisibilityState.AlwaysVisible:
-                    return 1;
-
-                case CounterVisibilityState.VisibleWhenZero:
-                    return current.Value == 0 ? 1 : 0;
-
-                default:
-                    throw new NotImplementedException($"{counterState} has an incorrect value.");
-            }
+            current.BindValueChanged(onCurrentChanged, true);
         }
 
         private void onCurrentChanged(ValueChangedEvent<int> countValue)
         {
-            if (counterState == CounterVisibilityState.VisibleWhenZero)
+            float alpha;
+
+            switch (counterState)
             {
-                counterPill.Alpha = countValue.NewValue == 0 ? 1 : 0;
+                case CounterVisibilityState.AlwaysHidden:
+                    alpha = 0;
+                    break;
+
+                case CounterVisibilityState.AlwaysVisible:
+                    alpha = 1;
+                    break;
+
+                case CounterVisibilityState.VisibleWhenZero:
+                    alpha = current.Value == 0 ? 1 : 0;
+                    break;
+
+                default:
+                    throw new NotImplementedException($"{counterState} has an incorrect value.");
             }
+
+            counterPill.Alpha = alpha;
         }
     }
 
