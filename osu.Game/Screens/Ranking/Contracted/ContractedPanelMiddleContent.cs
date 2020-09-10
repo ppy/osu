@@ -30,6 +30,9 @@ namespace osu.Game.Screens.Ranking.Contracted
     {
         private readonly ScoreInfo score;
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         /// <summary>
         /// Creates a new <see cref="ContractedPanelMiddleContent"/>.
         /// </summary>
@@ -160,7 +163,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = score.TotalScore.ToString("N0"),
+                                            Current = scoreManager.GetBindableTotalScoreString(score),
                                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, fixedWidth: true),
                                             Spacing = new Vector2(-1, 0)
                                         },

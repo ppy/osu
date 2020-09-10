@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -13,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -92,9 +94,18 @@ namespace osu.Game.Rulesets.Edit
                             Name = "Sidebar",
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Right = 10 },
+                            Spacing = new Vector2(10),
                             Children = new Drawable[]
                             {
-                                new ToolboxGroup { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } }
+                                new ToolboxGroup("toolbox") { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } },
+                                new ToolboxGroup("toggles")
+                                {
+                                    ChildrenEnumerable = Toggles.Select(b => new SettingsCheckbox
+                                    {
+                                        Bindable = b,
+                                        LabelText = b?.Description ?? "unknown"
+                                    })
+                                }
                             }
                         },
                         new Container
@@ -126,7 +137,7 @@ namespace osu.Game.Rulesets.Edit
 
             toolboxCollection.Items = CompositionTools
                                       .Prepend(new SelectTool())
-                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t)))
+                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
                                       .ToList();
 
             setSelectTool();
@@ -155,6 +166,12 @@ namespace osu.Game.Rulesets.Edit
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+
+        /// <summary>
+        /// A collection of toggles which will be displayed to the user.
+        /// The display name will be decided by <see cref="Bindable{T}.Description"/>.
+        /// </summary>
+        protected virtual IEnumerable<BindableBool> Toggles => Enumerable.Empty<BindableBool>();
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.

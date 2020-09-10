@@ -25,6 +25,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const float row_height = 22;
         private const int text_size = 12;
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         private readonly FillFlowContainer backgroundFlow;
 
         private Color4 highAccuracyColour;
@@ -121,7 +124,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
-                    Text = $@"{score.TotalScore:N0}",
+                    Current = scoreManager.GetBindableTotalScoreString(score),
                     Font = OsuFont.GetFont(size: text_size, weight: index == 0 ? FontWeight.Bold : FontWeight.Medium)
                 },
                 new OsuSpriteText
