@@ -31,6 +31,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -610,12 +611,19 @@ namespace osu.Game
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
 
+            loadComponentSingleFile(new CollectionManager(Storage)
+            {
+                PostNotification = n => notifications.Post(n),
+                GetStableStorage = GetStorageForStableInstall
+            }, Add, true);
+
             loadComponentSingleFile(screenshotManager, Add);
 
             // dependency on notification overlay, dependent by settings overlay
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
 
             // overlay elements
+            loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
