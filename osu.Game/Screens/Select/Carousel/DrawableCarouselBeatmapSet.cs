@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -33,6 +34,12 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private CollectionManager collectionManager { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
         private readonly BeatmapSetInfo beatmapSet;
 
@@ -135,14 +142,59 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmapSet.OnlineBeatmapSetID != null && viewDetails != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineBeatmapSetID.Value)));
 
+                if (collectionManager != null)
+                {
+                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
+                    if (manageCollectionsDialog != null)
+                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+
+                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                }
+
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested(beatmapSet)));
 
                 if (dialogOverlay != null)
-                    items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));
-
+                    items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));
                 return items.ToArray();
             }
+        }
+
+        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
+        {
+            TernaryState state;
+
+            var countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
+
+            if (countExisting == beatmapSet.Beatmaps.Count)
+                state = TernaryState.True;
+            else if (countExisting > 0)
+                state = TernaryState.Indeterminate;
+            else
+                state = TernaryState.False;
+
+            return new TernaryStateMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
+            {
+                foreach (var b in beatmapSet.Beatmaps)
+                {
+                    switch (s)
+                    {
+                        case TernaryState.True:
+                            if (collection.Beatmaps.Contains(b))
+                                continue;
+
+                            collection.Beatmaps.Add(b);
+                            break;
+
+                        case TernaryState.False:
+                            collection.Beatmaps.Remove(b);
+                            break;
+                    }
+                }
+            })
+            {
+                State = { Value = state }
+            };
         }
 
         private class PanelBackground : BufferedContainer

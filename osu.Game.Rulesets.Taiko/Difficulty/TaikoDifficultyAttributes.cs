@@ -8,6 +8,5 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyAttributes : DifficultyAttributes
     {
         public double GreatHitWindow;
-        public int MaxCombo;
     }
 }

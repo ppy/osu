@@ -56,13 +56,14 @@ namespace osu.Game.Online.Leaderboards
                 scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
                 scrollFlow = null;
 
-                loading.Hide();
-
                 showScoresDelegate?.Cancel();
                 showScoresCancellationSource?.Cancel();
 
                 if (scores == null || !scores.Any())
+                {
+                    loading.Hide();
                     return;
+                }
 
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
@@ -84,6 +85,7 @@ namespace osu.Game.Online.Leaderboards
                     }
 
                     scrollContainer.ScrollTo(0f, false);
+                    loading.Hide();
                 }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
             }
         }
