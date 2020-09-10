@@ -38,6 +38,7 @@ using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.Music;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
@@ -647,6 +648,7 @@ namespace osu.Game
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());
+            Add(new MusicKeyBindingHandler());
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, notifications };
@@ -698,9 +700,9 @@ namespace osu.Game
                 float offset = 0;
 
                 if (Settings.State.Value == Visibility.Visible)
-                    offset += ToolbarButton.WIDTH / 2;
+                    offset += Toolbar.HEIGHT / 2;
                 if (notifications.State.Value == Visibility.Visible)
-                    offset -= ToolbarButton.WIDTH / 2;
+                    offset -= Toolbar.HEIGHT / 2;
 
                 screenContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
             }
@@ -716,24 +718,6 @@ namespace osu.Game
             // show above others if not visible at all, else leave at current depth.
             if (!overlay.IsPresent)
                 overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
-        }
-
-        public class GameIdleTracker : IdleTracker
-        {
-            private InputManager inputManager;
-
-            public GameIdleTracker(int time)
-                : base(time)
-            {
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                inputManager = GetContainingInputManager();
-            }
-
-            protected override bool AllowIdle => inputManager.FocusedDrawable == null;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -990,11 +974,5 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
-    }
-
-    public enum ScorePresentType
-    {
-        Results,
-        Gameplay
     }
 }

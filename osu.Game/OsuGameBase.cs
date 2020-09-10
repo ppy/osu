@@ -198,7 +198,7 @@ namespace osu.Game
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap, true));
 
             // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
@@ -250,10 +250,11 @@ namespace osu.Game
                 AddInternal(apiAccess);
             AddInternal(RulesetConfigCache);
 
-            GlobalActionContainer globalBinding;
-
             MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
-            MenuCursorContainer.Child = globalBinding = new GlobalActionContainer(this)
+
+            GlobalActionContainer globalBindings;
+
+            MenuCursorContainer.Child = globalBindings = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
@@ -261,8 +262,8 @@ namespace osu.Game
 
             base.Content.Add(CreateScalingContainer().WithChild(MenuCursorContainer));
 
-            KeyBindingStore.Register(globalBinding);
-            dependencies.Cache(globalBinding);
+            KeyBindingStore.Register(globalBindings);
+            dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());

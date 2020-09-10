@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit
 
         public void Exit()
         {
-            this.FadeOut(250).Expire();
+            Expire();
         }
     }
 }
