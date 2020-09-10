@@ -13,8 +13,6 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TauHitObject>, IApplicableToPlayer
     {
-        public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
-
         private bool hasReplay;
         public void ApplyToPlayer(Player player)
         {
