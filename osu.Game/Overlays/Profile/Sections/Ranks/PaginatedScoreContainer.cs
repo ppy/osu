@@ -14,12 +14,12 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedContainerWithHeader<APILegacyScoreInfo>
+    public class PaginatedScoreContainer : PaginatedContainer<APILegacyScoreInfo>
     {
         private readonly ScoreType type;
 
         public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string headerText, CounterVisibilityState counterVisibilityState, string missingText = "")
-            : base(user, headerText, counterVisibilityState, missingText)
+            : base(user, missingText, headerText, counterVisibilityState)
         {
             this.type = type;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.OnItemsReceived(items);
 
             if (type == ScoreType.Recent)
-                Header.Current.Value = items.Count;
+                SetCount(items.Count);
         }
 
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
