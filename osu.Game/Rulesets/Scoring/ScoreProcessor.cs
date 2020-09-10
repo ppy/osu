@@ -202,7 +202,13 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = getScore(Mode.Value);
         }
 
-        private double getScore(ScoringMode mode) => GetScore(mode, maxHighestCombo, baseScore / maxBaseScore, (double)HighestCombo.Value / maxHighestCombo, bonusScore);
+        private double getScore(ScoringMode mode)
+        {
+            return GetScore(mode, maxHighestCombo,
+                maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
+                maxHighestCombo > 0 ? (double)HighestCombo.Value / maxHighestCombo : 0,
+                bonusScore);
+        }
 
         /// <summary>
         /// Computes the total score.
