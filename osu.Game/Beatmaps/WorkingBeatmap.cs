@@ -13,6 +13,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Statistics;
+using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
@@ -22,6 +23,7 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
+    [ExcludeFromDynamicCompile]
     public abstract class WorkingBeatmap : IWorkingBeatmap
     {
         public readonly BeatmapInfo BeatmapInfo;
@@ -53,7 +55,7 @@ namespace osu.Game.Beatmaps
         {
             const double excess_length = 1000;
 
-            var lastObject = Beatmap.HitObjects.LastOrDefault();
+            var lastObject = Beatmap?.HitObjects.LastOrDefault();
 
             double length;
 

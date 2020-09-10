@@ -26,8 +26,11 @@ namespace osu.Game.Graphics.Containers
             {
                 if (value == expandableHeader) return;
 
-                expandableHeader?.Expire();
+                if (expandableHeader != null)
+                    RemoveInternal(expandableHeader);
+
                 expandableHeader = value;
+
                 if (value == null) return;
 
                 AddInternal(expandableHeader);

@@ -18,6 +18,8 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
+        protected new TestEditor Editor => (TestEditor)base.Editor;
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
@@ -35,6 +37,7 @@ namespace osu.Game.Tests.Visual.Editing
             addUndoSteps();
 
             AddAssert("no change occurred", () => hitObjectCount == editorBeatmap.HitObjects.Count);
+            AddAssert("no unsaved changes", () => !Editor.HasUnsavedChanges);
         }
 
         [Test]
@@ -47,6 +50,7 @@ namespace osu.Game.Tests.Visual.Editing
             addRedoSteps();
 
             AddAssert("no change occurred", () => hitObjectCount == editorBeatmap.HitObjects.Count);
+            AddAssert("no unsaved changes", () => !Editor.HasUnsavedChanges);
         }
 
         [Test]
@@ -64,9 +68,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("add hitobject", () => editorBeatmap.Add(expectedObject = new HitCircle { StartTime = 1000 }));
             AddAssert("hitobject added", () => addedObject == expectedObject);
+            AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
 
             addUndoSteps();
             AddAssert("hitobject removed", () => removedObject == expectedObject);
+            AddAssert("no unsaved changes", () => !Editor.HasUnsavedChanges);
         }
 
         [Test]
@@ -94,6 +100,17 @@ namespace osu.Game.Tests.Visual.Editing
             addRedoSteps();
             AddAssert("hitobject added", () => addedObject.StartTime == expectedObject.StartTime); // Can't compare via equality (new hitobject instance)
             AddAssert("no hitobject removed", () => removedObject == null);
+            AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
+        }
+
+        [Test]
+        public void TestAddObjectThenSaveHasNoUnsavedChanges()
+        {
+            AddStep("add hitobject", () => editorBeatmap.Add(new HitCircle { StartTime = 1000 }));
+
+            AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
+            AddStep("save changes", () => Editor.Save());
+            AddAssert("no unsaved changes", () => !Editor.HasUnsavedChanges);
         }
 
         [Test]
@@ -120,6 +137,7 @@ namespace osu.Game.Tests.Visual.Editing
             addUndoSteps();
             AddAssert("hitobject added", () => addedObject.StartTime == expectedObject.StartTime); // Can't compare via equality (new hitobject instance)
             AddAssert("no hitobject removed", () => removedObject == null);
+            AddAssert("unsaved changes", () => Editor.HasUnsavedChanges); // 2 steps performed, 1 undone
         }
 
         [Test]
@@ -148,19 +166,24 @@ namespace osu.Game.Tests.Visual.Editing
             addRedoSteps();
             AddAssert("hitobject removed", () => removedObject.StartTime == expectedObject.StartTime); // Can't compare via equality (new hitobject instance after undo)
             AddAssert("no hitobject added", () => addedObject == null);
+            AddAssert("no changes", () => !Editor.HasUnsavedChanges); // end result is empty beatmap, matching original state
         }
 
-        private void addUndoSteps() => AddStep("undo", () => ((TestEditor)Editor).Undo());
+        private void addUndoSteps() => AddStep("undo", () => Editor.Undo());
 
-        private void addRedoSteps() => AddStep("redo", () => ((TestEditor)Editor).Redo());
+        private void addRedoSteps() => AddStep("redo", () => Editor.Redo());
 
         protected override Editor CreateEditor() => new TestEditor();
 
-        private class TestEditor : Editor
+        protected class TestEditor : Editor
         {
             public new void Undo() => base.Undo();
 
             public new void Redo() => base.Redo();
+
+            public new void Save() => base.Save();
+
+            public new bool HasUnsavedChanges => base.HasUnsavedChanges;
         }
     }
 }

@@ -203,6 +203,10 @@ namespace osu.Game.Screens.Play
                 skipOverlay.Hide();
             }
 
+            DrawableRuleset.IsPaused.BindValueChanged(_ => updateOverlayActivationMode());
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateOverlayActivationMode());
+            breakTracker.IsBreakTime.BindValueChanged(_ => updateOverlayActivationMode());
+
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
             // bind clock into components that require it
@@ -345,6 +349,16 @@ namespace osu.Game.Screens.Play
         {
             updatePauseOnFocusLostState();
             HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
+        }
+
+        private void updateOverlayActivationMode()
+        {
+            bool canTriggerOverlays = DrawableRuleset.IsPaused.Value || breakTracker.IsBreakTime.Value;
+
+            if (DrawableRuleset.HasReplayLoaded.Value || canTriggerOverlays)
+                OverlayActivationMode.Value = OverlayActivation.UserTriggered;
+            else
+                OverlayActivationMode.Value = OverlayActivation.Disabled;
         }
 
         private void updatePauseOnFocusLostState() =>
@@ -640,6 +654,8 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
             foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(musicController.CurrentTrack);
+
+            updateOverlayActivationMode();
         }
 
         public override void OnSuspending(IScreen next)
