@@ -40,8 +40,17 @@ namespace osu.Game.Rulesets.Difficulty.Utils
 
             this.capacity = capacity;
             array = new T[capacity];
+            Clear();
+        }
+
+        /// <summary>
+        /// Removes all elements from the <see cref="LimitedCapacityQueue{T}"/>.
+        /// </summary>
+        public void Clear()
+        {
             start = 0;
             end = -1;
+            Count = 0;
         }
 
         /// <summary>

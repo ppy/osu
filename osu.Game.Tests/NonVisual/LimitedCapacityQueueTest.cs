@@ -94,5 +94,26 @@ namespace osu.Game.Tests.NonVisual
 
             Assert.Throws<InvalidOperationException>(() => queue.Dequeue());
         }
+
+        [Test]
+        public void TestClearQueue()
+        {
+            queue.Enqueue(3);
+            queue.Enqueue(5);
+            Assert.AreEqual(2, queue.Count);
+
+            queue.Clear();
+            Assert.AreEqual(0, queue.Count);
+            Assert.Throws<ArgumentOutOfRangeException>(() => _ = queue[0]);
+
+            queue.Enqueue(7);
+            Assert.AreEqual(1, queue.Count);
+            Assert.AreEqual(7, queue[0]);
+            Assert.Throws<ArgumentOutOfRangeException>(() => _ = queue[1]);
+
+            queue.Enqueue(9);
+            Assert.AreEqual(2, queue.Count);
+            Assert.AreEqual(9, queue[1]);
+        }
     }
 }

@@ -45,7 +45,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             // hits spaced more than a second apart are also exempt from colour strain.
             if (!(current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000))
             {
-                previousHitType = null;
+                monoHistory.Clear();
+
+                var currentHit = current.BaseObject as Hit;
+                currentMonoLength = currentHit != null ? 1 : 0;
+                previousHitType = currentHit?.Type;
+
                 return 0.0;
             }
 
