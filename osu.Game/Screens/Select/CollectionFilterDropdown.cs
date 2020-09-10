@@ -240,7 +240,7 @@ namespace osu.Game.Screens.Select
 
                 addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                 addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
-                addOrRemoveButton.TooltipText = beatmapInCollection ? "移除已选择的谱面" : "添加已选择的谱面";
+                addOrRemoveButton.TooltipText = beatmapInCollection ? "移除这个谱面" : "添加这个谱面";
 
                 updateButtonVisibility();
             }
