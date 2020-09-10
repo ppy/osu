@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
@@ -13,6 +14,7 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Configuration
 {
+    [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>
     {
         protected override void InitialiseDefaults()
@@ -126,16 +128,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
-
-            Set(OsuSetting.OptUI, true);
-            Set(OsuSetting.TrianglesEnabled, true);
-
-            Set(OsuSetting.MvisParticleAmount, 350, 0, 350);
-            Set(OsuSetting.MvisContentAlpha, 1f, 0f, 1f);
-            Set(OsuSetting.MvisBgBlur, 0.2f, 0f, 1f);
-            Set(OsuSetting.MvisEnableStoryboard, false);
-            Set(OsuSetting.MvisUseOsuLogoVisualisation, false);
-            Set(OsuSetting.MvisIdleBgDim, 0.3f, 0f, 1f);
         }
 
         public OsuConfigManager(Storage storage)
@@ -241,14 +233,6 @@ namespace osu.Game.Configuration
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource,
-        OptUI,
-        TrianglesEnabled,
-        MvisParticleAmount,
-        MvisBgBlur,
-        MvisUseOsuLogoVisualisation,
-        MvisEnableStoryboard,
-        MvisIdleBgDim,
-        MvisContentAlpha,
-        GameplayDisableWinKey
+        GameplayDisableWinKey,
     }
 }

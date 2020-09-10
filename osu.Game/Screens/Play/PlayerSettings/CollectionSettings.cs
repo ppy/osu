@@ -10,7 +10,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class CollectionSettings : PlayerSettingsGroup
     {
-        protected override string Title => @"收藏";
+        public CollectionSettings()
+            : base("收藏夹")
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()

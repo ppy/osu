@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 
@@ -21,21 +20,21 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             {
                 new BeatmapStatistic
                 {
-                    Name = @"Fruit Count",
+                    Name = @"水果数量",
                     Content = fruits.ToString(),
-                    Icon = FontAwesome.Regular.Circle
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Juice Stream Count",
+                    Name = @"滑条数量(Juice Stream Count)",
                     Content = juiceStreams.ToString(),
-                    Icon = FontAwesome.Regular.Circle
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Banana Shower Count",
+                    Name = @"转盘数量(Banana Shower Count)",
                     Content = bananaShowers.ToString(),
-                    Icon = FontAwesome.Regular.Circle
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                 }
             };
         }

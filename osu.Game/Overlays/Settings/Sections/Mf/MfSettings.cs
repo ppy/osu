@@ -19,15 +19,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             Children = new Drawable[]
             {
-                new SettingsButton
-                {
-                    Text = "导入之前的Mf-osu设置",
-                    TooltipText = "导入后的值在下次启动前都将作为对应选项的默认值",
-                    Action = () =>
-                    {
-                        ImportFromOsuConfigManager(config, osuConfig);
-                    }
-                },
                 new SettingsCheckbox
                 {
                     LabelText = "启用Mf自定义UI",
@@ -67,25 +58,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Bindable = config.GetBindable<bool>(MfSetting.IntroLoadDirectToSongSelect)
                 },
             };
-        }
-
-        private void ImportFromOsuConfigManager(MfConfigManager mfConfig, OsuConfigManager osuConfig)
-        {
-            try
-            {
-                mfConfig.Set(MfSetting.OptUI, osuConfig.Get<bool>(OsuSetting.OptUI));
-                mfConfig.Set(MfSetting.TrianglesEnabled, osuConfig.Get<bool>(OsuSetting.TrianglesEnabled));
-                mfConfig.Set(MfSetting.MvisParticleAmount, osuConfig.Get<int>(OsuSetting.MvisParticleAmount));
-                mfConfig.Set(MfSetting.MvisContentAlpha, osuConfig.Get<float>(OsuSetting.MvisContentAlpha));
-                mfConfig.Set(MfSetting.MvisBgBlur, osuConfig.Get<float>(OsuSetting.MvisBgBlur));
-                mfConfig.Set(MfSetting.MvisEnableStoryboard, osuConfig.Get<bool>(OsuSetting.MvisEnableStoryboard));
-                mfConfig.Set(MfSetting.MvisUseOsuLogoVisualisation, osuConfig.Get<bool>(OsuSetting.MvisUseOsuLogoVisualisation));
-                mfConfig.Set(MfSetting.MvisIdleBgDim, osuConfig.Get<float>(OsuSetting.MvisIdleBgDim));
-            }
-            catch( Exception e )
-            {
-                Logger.Error(e, "导入设置时出现错误!");
-            }
         }
     }
 }

@@ -6,15 +6,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
@@ -30,11 +35,20 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
+        [CanBeNull]
+        private readonly Func<BeatmapDifficultyManager> difficulties;
+
+        [CanBeNull]
+        private readonly OsuConfigManager configManager;
+
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
+                            Func<BeatmapDifficultyManager> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
+            this.difficulties = difficulties;
+            this.configManager = configManager;
         }
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
@@ -72,5 +86,118 @@ namespace osu.Game.Scoring
         protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
             => base.CheckLocalAvailability(model, items)
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
+
+        /// <summary>
+        /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <remarks>
+        /// Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </remarks>
+        /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
+        /// <returns>The bindable containing the total score.</returns>
+        public Bindable<long> GetBindableTotalScore(ScoreInfo score)
+        {
+            var bindable = new TotalScoreBindable(score, difficulties);
+            configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
+            return bindable;
+        }
+
+        /// <summary>
+        /// Retrieves a bindable that represents the formatted total score string of a <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <remarks>
+        /// Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </remarks>
+        /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
+        /// <returns>The bindable containing the formatted total score string.</returns>
+        public Bindable<string> GetBindableTotalScoreString(ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
+
+        /// <summary>
+        /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </summary>
+        private class TotalScoreBindable : Bindable<long>
+        {
+            public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
+
+            private readonly ScoreInfo score;
+            private readonly Func<BeatmapDifficultyManager> difficulties;
+
+            /// <summary>
+            /// Creates a new <see cref="TotalScoreBindable"/>.
+            /// </summary>
+            /// <param name="score">The <see cref="ScoreInfo"/> to provide the total score of.</param>
+            /// <param name="difficulties">A function to retrieve the <see cref="BeatmapDifficultyManager"/>.</param>
+            public TotalScoreBindable(ScoreInfo score, Func<BeatmapDifficultyManager> difficulties)
+            {
+                this.score = score;
+                this.difficulties = difficulties;
+
+                ScoringMode.BindValueChanged(onScoringModeChanged, true);
+            }
+
+            private IBindable<StarDifficulty> difficultyBindable;
+            private CancellationTokenSource difficultyCancellationSource;
+
+            private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
+            {
+                difficultyCancellationSource?.Cancel();
+                difficultyCancellationSource = null;
+
+                if (score.Beatmap == null)
+                {
+                    Value = score.TotalScore;
+                    return;
+                }
+
+                int? beatmapMaxCombo = score.Beatmap.MaxCombo;
+
+                if (beatmapMaxCombo == null)
+                {
+                    if (score.Beatmap.ID == 0 || difficulties == null)
+                    {
+                        // We don't have enough information (max combo) to compute the score, so let's use the provided score.
+                        Value = score.TotalScore;
+                        return;
+                    }
+
+                    // We can compute the max combo locally after the async beatmap difficulty computation.
+                    difficultyBindable = difficulties().GetBindableDifficulty(score.Beatmap, score.Ruleset, score.Mods, (difficultyCancellationSource = new CancellationTokenSource()).Token);
+                    difficultyBindable.BindValueChanged(d => updateScore(d.NewValue.MaxCombo), true);
+                }
+                else
+                    updateScore(beatmapMaxCombo.Value);
+            }
+
+            private void updateScore(int beatmapMaxCombo)
+            {
+                if (beatmapMaxCombo == 0)
+                {
+                    Value = 0;
+                    return;
+                }
+
+                var ruleset = score.Ruleset.CreateInstance();
+                var scoreProcessor = ruleset.CreateScoreProcessor();
+
+                scoreProcessor.Mods.Value = score.Mods;
+
+                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, beatmapMaxCombo, score.Accuracy, (double)score.MaxCombo / beatmapMaxCombo, 0));
+            }
+        }
+
+        /// <summary>
+        /// Provides the total score of a <see cref="ScoreInfo"/> as a formatted string. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </summary>
+        private class TotalScoreStringBindable : Bindable<string>
+        {
+            // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (need to hold a reference)
+            private readonly IBindable<long> totalScore;
+
+            public TotalScoreStringBindable(IBindable<long> totalScore)
+            {
+                this.totalScore = totalScore;
+                this.totalScore.BindValueChanged(v => Value = v.NewValue.ToString("N0"), true);
+            }
+        }
     }
 }

@@ -21,7 +21,8 @@ namespace osu.Game.Screens.Select
 {
     public class FilterControl : Container
     {
-        public const float HEIGHT = 100;
+        public const float HEIGHT = 2 * side_margin + 85;
+        private const float side_margin = 20;
 
         public Action<FilterCriteria> FilterChanged;
 
@@ -41,6 +42,7 @@ namespace osu.Game.Screens.Select
                 Sort = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
                 Ruleset = ruleset.Value,
+                Collection = collectionDropdown?.Current.Value.Collection
             };
 
             if (!minimumStars.IsDefault)
@@ -54,6 +56,7 @@ namespace osu.Game.Screens.Select
         }
 
         private SeekLimitedSearchTextBox searchTextBox;
+        private CollectionFilterDropdown collectionDropdown;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             base.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
@@ -91,65 +94,112 @@ namespace osu.Game.Screens.Select
                 },
                 new Container
                 {
-                    Padding = new MarginPadding(20),
+                    Padding = new MarginPadding(side_margin),
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Children = new Drawable[]
+                    Child = new GridContainer
                     {
-                        searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
-                        new Box
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 1,
-                            Colour = OsuColour.Gray(80),
-                            Origin = Anchor.BottomLeft,
-                            Anchor = Anchor.BottomLeft,
+                            new Dimension(GridSizeMode.Absolute, 60),
+                            new Dimension(GridSizeMode.Absolute, 5),
+                            new Dimension(GridSizeMode.Absolute, 20),
                         },
-                        new FillFlowContainer
+                        Content = new[]
                         {
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            Direction = FillDirection.Horizontal,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
-                            Children = new Drawable[]
+                            new Drawable[]
                             {
-                                new OsuTabControlCheckbox
+                                new Container
                                 {
-                                    Text = "显示转谱",
-                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
-                                },
-                                sortTabs = new OsuTabControl<SortMode>
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 1,
+                                            Colour = OsuColour.Gray(80),
+                                            Origin = Anchor.BottomLeft,
+                                            Anchor = Anchor.BottomLeft,
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.BottomRight,
+                                            Origin = Anchor.BottomRight,
+                                            Direction = FillDirection.Horizontal,
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
+                                            Children = new Drawable[]
+                                            {
+                                                new OsuTabControlCheckbox
+                                                {
+                                                    Text = "显示转谱",
+                                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                },
+                                                sortTabs = new OsuTabControl<SortMode>
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Width = 0.5f,
+                                                    Height = 24,
+                                                    AutoSort = true,
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                    AccentColour = colours.GreenLight,
+                                                    Current = { BindTarget = sortMode }
+                                                },
+                                                new OsuSpriteText
+                                                {
+                                                    Text = "排序方式",
+                                                    Font = OsuFont.GetFont(size: 14),
+                                                    Margin = new MarginPadding(5),
+                                                    Anchor = Anchor.BottomRight,
+                                                    Origin = Anchor.BottomRight,
+                                                },
+                                            }
+                                        },
+                                    }
+                                }
+                            },
+                            null,
+                            new Drawable[]
+                            {
+                                new Container
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    Width = 0.5f,
-                                    Height = 24,
-                                    AutoSort = true,
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
-                                    AccentColour = colours.GreenLight,
-                                    Current = { BindTarget = sortMode }
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = "排序方式: ",
-                                    Font = OsuFont.GetFont(size: 18),
-                                    Margin = new MarginPadding(5),
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomRight,
-                                },
-                            }
-                        },
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        collectionDropdown = new CollectionFilterDropdown
+                                        {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            RelativeSizeAxes = Axes.X,
+                                            Width = 0.4f,
+                                        }
+                                    }
+                                }
+                            },
+                        }
                     }
                 }
             };
 
-            searchTextBox.Current.ValueChanged += _ => FilterChanged?.Invoke(CreateCriteria());
+            collectionDropdown.Current.ValueChanged += val =>
+            {
+                if (val.NewValue == null)
+                    // may be null briefly while menu is repopulated.
+                    return;
+
+                updateCriteria();
+            };
+
+            searchTextBox.Current.ValueChanged += _ => updateCriteria();
 
             updateCriteria();
         }
@@ -157,7 +207,6 @@ namespace osu.Game.Screens.Select
         public void Deactivate()
         {
             searchTextBox.ReadOnly = true;
-
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
                 GetContainingInputManager().ChangeFocus(searchTextBox);

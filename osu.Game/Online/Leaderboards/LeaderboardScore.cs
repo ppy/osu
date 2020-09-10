@@ -79,7 +79,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour, MfConfigManager config)
+        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager, MfConfigManager config)
         {
             var user = score.User;
 
@@ -207,7 +207,7 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             TextColour = Color4.White,
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
-                                            Text = score.TotalScore.ToString(@"N0"),
+                                            Current = scoreManager.GetBindableTotalScoreString(score),
                                             Font = OsuFont.Numeric.With(size: 23),
                                         },
                                         RankContainer = new Container

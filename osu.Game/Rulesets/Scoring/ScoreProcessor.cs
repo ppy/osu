@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Scoring
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
-        private double maxHighestCombo;
+        private int maxHighestCombo;
         private double maxBaseScore;
         private double rollingMaxBaseScore;
         private double baseScore;
@@ -203,20 +203,31 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = getScore(Mode.Value);
         }
 
-        private double getScore(ScoringMode mode)
+        private double getScore(ScoringMode mode) => GetScore(mode, maxHighestCombo, baseScore / maxBaseScore, (double)HighestCombo.Value / maxHighestCombo, bonusScore);
+
+        /// <summary>
+        /// Computes the total score.
+        /// </summary>
+        /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
+        /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
+        /// <param name="accuracyRatio">The accuracy percentage achieved by the player.</param>
+        /// <param name="comboRatio">The proportion of <paramref name="maxCombo"/> achieved by the player.</param>
+        /// <param name="bonusScore">Any bonus score to be added.</param>
+        /// <returns>The total score.</returns>
+        public double GetScore(ScoringMode mode, int maxCombo, double accuracyRatio, double comboRatio, double bonusScore)
         {
             switch (mode)
             {
                 default:
                 case ScoringMode.Standardised:
-                    double accuracyScore = accuracyPortion * baseScore / maxBaseScore;
-                    double comboScore = comboPortion * HighestCombo.Value / maxHighestCombo;
+                    double accuracyScore = accuracyPortion * accuracyRatio;
+                    double comboScore = comboPortion * comboRatio;
 
                     return (max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier;
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo.Value - 1) * scoreMultiplier / 25);
+                    return bonusScore + (accuracyRatio * maxCombo * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
             }
         }
 
