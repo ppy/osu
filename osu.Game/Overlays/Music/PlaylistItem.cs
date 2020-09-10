@@ -39,8 +39,6 @@ namespace osu.Game.Overlays.Music
             Padding = new MarginPadding { Left = 5 };
 
             FilterTerms = item.Metadata.SearchableTerms;
-
-            ShowDragHandle.Value = true;
         }
 
         [BackgroundDependencyLoader]

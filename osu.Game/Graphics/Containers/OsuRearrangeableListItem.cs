@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Whether the drag handle should be shown.
         /// </summary>
-        protected readonly Bindable<bool> ShowDragHandle = new Bindable<bool>();
+        protected readonly Bindable<bool> ShowDragHandle = new Bindable<bool>(true);
 
         private Container handleContainer;
         private PlaylistItemHandle handle;
