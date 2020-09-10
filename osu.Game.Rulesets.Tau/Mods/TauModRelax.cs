@@ -1,7 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
@@ -9,16 +6,32 @@ using osu.Game.Rulesets.Tau.Objects;
 using osu.Game.Rulesets.Tau.Objects.Drawables;
 using osu.Game.Rulesets.Tau.UI;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.Tau.Mods
 {
-    public class TauModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TauHitObject>
+    public class TauModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TauHitObject>, IApplicableToPlayer
     {
+        private bool hasReplay;
+        public void ApplyToPlayer(Player player)
+        {
+            if (tauInputManager.ReplayInputHandler != null)
+            {
+                hasReplay = true;
+                return;
+            }
+            tauInputManager.AllowUserPresses = false;
+        }
+
         public void Update(Playfield playfield)
         {
+            if (hasReplay)
+                return;
+
             bool requiresHold = false;
             bool requiresHit = false;
+            bool requiresHardHit = false;
 
             const float relax_leniency = 3;
 
@@ -35,20 +48,28 @@ namespace osu.Game.Rulesets.Tau.Mods
                 if (tauHit.HitObject is IHasDuration hasEnd && time > hasEnd.EndTime || tauHit.IsHit)
                     continue;
 
-                if (tauHit is DrawableTauHitObject)
+                if (tauHit is DrawableBeat)
                 {
                     Debug.Assert(tauHit.HitObject.HitWindows != null);
 
                     var play = (TauPlayfield)playfield;
+
                     if (tauHit.HitObject.HitWindows.CanBeHit(relativetime) && play.CheckIfWeCanValidate(tauHit))
                         requiresHit = true;
+                }
+                else if (tauHit is DrawableHardBeat)
+                {
+                    if (!tauHit.HitObject.HitWindows.CanBeHit(relativetime)) continue;
+
+                    requiresHit = true;
+                    requiresHardHit = true;
                 }
             }
 
             if (requiresHit)
             {
-                addAction(false);
-                addAction(true);
+                addAction(false, requiresHardHit);
+                addAction(true, requiresHardHit);
             }
 
             addAction(requiresHold);
@@ -59,7 +80,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 
         private TauInputManager tauInputManager;
 
-        private void addAction(bool hitting)
+        private void addAction(bool hitting, bool hardhit = false)
         {
             if (wasHit == hitting)
                 return;
@@ -73,8 +94,15 @@ namespace osu.Game.Rulesets.Tau.Mods
 
             if (hitting)
             {
-                state.PressedActions.Add(wasLeft ? TauAction.LeftButton : TauAction.RightButton);
-                wasLeft = !wasLeft;
+                if (hardhit)
+                {
+                    state.PressedActions.Add(TauAction.HardButton);
+                }
+                else
+                {
+                    state.PressedActions.Add(wasLeft ? TauAction.LeftButton : TauAction.RightButton);
+                    wasLeft = !wasLeft;
+                }
             }
 
             state.Apply(tauInputManager.CurrentState, tauInputManager);

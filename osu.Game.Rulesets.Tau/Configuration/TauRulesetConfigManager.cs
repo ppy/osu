@@ -1,7 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using osu.Game.Configuration;
+﻿using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 
 namespace osu.Game.Rulesets.Tau.Configuration
@@ -19,7 +16,7 @@ namespace osu.Game.Rulesets.Tau.Configuration
 
             Set(TauRulesetSettings.ShowVisualizer, true);
             Set(TauRulesetSettings.PlayfieldDim, 0.3f, 0, 1, 0.01f);
-            Set(TauRulesetSettings.BeatSize, 10f, 5, 25, 1f);
+            Set(TauRulesetSettings.BeatSize, 16f, 10, 25, 1f);
         }
     }
 

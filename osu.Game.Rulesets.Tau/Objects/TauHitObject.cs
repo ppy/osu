@@ -1,7 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using osu.Framework.Bindables;
+﻿using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -14,15 +11,20 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Tau.Objects
 {
-    public class TauHitObject : HitObject, IHasComboInformation
+    public abstract class TauHitObject : HitObject, IHasComboInformation, IHasPosition
     {
         public override Judgement CreateJudgement() => new TauJudgement();
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
 
-        public float Angle { get; set; }
-        public Vector2 PositionToEnd { get; set; }
+        public BindableFloat AngleBindable = new BindableFloat();
+
+        public float Angle
+        {
+            get => AngleBindable.Value;
+            set => AngleBindable.Value = value;
+        }
 
         public virtual bool NewCombo { get; set; }
 
@@ -64,8 +66,14 @@ namespace osu.Game.Rulesets.Tau.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            TimePreempt = (float) BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
+            TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
             TimeFadeIn = 100;
         }
+
+        #region Editor Implementation.
+        public float X { get; set; }
+        public float Y { get; set; }
+        public Vector2 Position { get; set; }
+        #endregion
     }
 }

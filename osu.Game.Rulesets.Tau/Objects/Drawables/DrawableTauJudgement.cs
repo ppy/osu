@@ -1,11 +1,9 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
@@ -18,9 +16,11 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
         private SkinnableSprite lighting;
         private Bindable<Color4> lightingColour;
 
-        public DrawableTauJudgement(JudgementResult result, DrawableTauHitObject judgedObject)
+        public DrawableTauJudgement(JudgementResult result, DrawableHitObject judgedObject)
             : base(result, judgedObject)
         {
+            RelativePositionAxes = Axes.Both;
+            Scale = new Vector2(1.66f);
         }
 
         [BackgroundDependencyLoader]

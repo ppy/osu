@@ -1,7 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using osu.Framework.Bindables;
+﻿using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -20,7 +17,7 @@ namespace osu.Game.Rulesets.Tau.Mods
             Value = 5,
         };
 
-        [SettingSource("移动速度", "Override a beatmap's set AR.")]
+        [SettingSource("下落速度", "Override a beatmap's set AR.")]
         public BindableNumber<float> ApproachRate { get; } = new BindableFloat
         {
             Precision = 0.1f,

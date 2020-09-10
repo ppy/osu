@@ -1,10 +1,8 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Tau.Objects;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Tau.Beatmaps
 {
@@ -12,7 +10,8 @@ namespace osu.Game.Rulesets.Tau.Beatmaps
     {
         public override IEnumerable<BeatmapStatistic> GetStatistics()
         {
-            int beats = HitObjects.Count;
+            int beats = HitObjects.Count(b => b is Beat);
+            int hardbeats = HitObjects.Count(b => b is HardBeat);
 
             return new[]
             {
@@ -20,7 +19,11 @@ namespace osu.Game.Rulesets.Tau.Beatmaps
                 {
                     Name = "Beat count",
                     Content = beats.ToString(),
-                    Icon = FontAwesome.Solid.Square
+                },
+                new BeatmapStatistic
+                {
+                    Name = "HardBeat count",
+                    Content = hardbeats.ToString(),
                 }
             };
         }

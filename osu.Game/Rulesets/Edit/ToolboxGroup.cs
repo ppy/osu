@@ -8,9 +8,8 @@ namespace osu.Game.Rulesets.Edit
 {
     public class ToolboxGroup : PlayerSettingsGroup
     {
-        protected override string Title => "工具栏";
-
-        public ToolboxGroup()
+        public ToolboxGroup(string title)
+            : base(title)
         {
             RelativeSizeAxes = Axes.X;
             Width = 1;

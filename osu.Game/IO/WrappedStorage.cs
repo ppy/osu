@@ -25,7 +25,13 @@ namespace osu.Game.IO
             this.subPath = subPath;
         }
 
-        protected virtual string MutatePath(string path) => !string.IsNullOrEmpty(subPath) ? Path.Combine(subPath, path) : path;
+        protected virtual string MutatePath(string path)
+        {
+            if (path == null)
+                return null;
+
+            return !string.IsNullOrEmpty(subPath) ? Path.Combine(subPath, path) : path;
+        }
 
         protected virtual void ChangeTargetStorage(Storage newStorage)
         {

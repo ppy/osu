@@ -1,14 +1,12 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Tau.Difficulty.Skills;
 
 namespace osu.Game.Rulesets.Tau
 {
@@ -26,6 +24,9 @@ namespace osu.Game.Rulesets.Tau
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate) => Enumerable.Empty<DifficultyHitObject>();
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => Array.Empty<Skill>();
+        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        {
+            new SkillPlaceHolder()
+        };
     }
 }

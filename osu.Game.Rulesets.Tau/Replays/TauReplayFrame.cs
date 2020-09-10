@@ -1,6 +1,3 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Replays.Legacy;
@@ -19,7 +16,8 @@ namespace osu.Game.Rulesets.Tau.Replays
         {
         }
 
-        public TauReplayFrame(double time, Vector2 position,  params TauAction[] actions) : base(time)
+        public TauReplayFrame(double time, Vector2 position, params TauAction[] actions)
+            : base(time)
         {
             Position = position;
             Actions.AddRange(actions);

@@ -13,8 +13,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         private const int padding = 10;
 
-        protected override string Title => @"播放";
-
         public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
         {
             Default = 1,
@@ -28,6 +26,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly OsuSpriteText multiplierText;
 
         public PlaybackSettings()
+            : base("播放设置")
         {
             Children = new Drawable[]
             {

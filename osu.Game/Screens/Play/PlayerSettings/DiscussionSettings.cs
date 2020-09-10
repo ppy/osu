@@ -10,7 +10,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class DiscussionSettings : PlayerSettingsGroup
     {
-        protected override string Title => @"交流";
+        public DiscussionSettings()
+            : base("交流")
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

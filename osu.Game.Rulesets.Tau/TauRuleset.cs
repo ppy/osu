@@ -1,8 +1,6 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
@@ -11,16 +9,21 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Tau.Beatmaps;
 using osu.Game.Rulesets.Tau.Configuration;
+using osu.Game.Rulesets.Tau.Edit;
 using osu.Game.Rulesets.Tau.Mods;
 using osu.Game.Rulesets.Tau.Replays;
 using osu.Game.Rulesets.Tau.Scoring;
 using osu.Game.Rulesets.Tau.UI;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Statistics;
+using osuTK;
 
 namespace osu.Game.Rulesets.Tau
 {
@@ -63,7 +66,7 @@ namespace osu.Game.Rulesets.Tau
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new TauModAutoplay(), new ModCinema()),
+                        new MultiMod(new TauModAutoplay(), new TauModCinema()),
                         new TauModRelax(),
                     };
 
@@ -86,7 +89,7 @@ namespace osu.Game.Rulesets.Tau
 
         public override string ShortName => "tau";
 
-        public override string PlayingVerb => "正在搓盘子";
+        public override string PlayingVerb => "Hitting beats";
 
         public override RulesetSettingsSubsection CreateSettings() => new TauSettingsSubsection(this);
 
@@ -103,11 +106,46 @@ namespace osu.Game.Rulesets.Tau
             new KeyBinding(InputKey.Space, TauAction.HardButton),
         };
 
-        public override Drawable CreateIcon() => new Sprite
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
-            Texture = new TextureStore(new TextureLoaderStore(CreateResourceStore()), false).Get("Textures/tau"),
+            new StatisticRow
+            {
+                Columns = new[]
+                {
+                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 250
+                    })
+                }
+            },
+        };
+
+        public override Drawable CreateIcon() => new Container
+        {
+            AutoSizeAxes = Axes.Both,
+            Children = new Drawable[]
+            {
+                new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Icon = FontAwesome.Regular.Circle,
+                },
+                new Sprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(1),
+                    Scale = new Vector2(.625f),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Texture = new TextureStore(new TextureLoaderStore(CreateResourceStore()), false).Get("Textures/tau")
+                }
+            }
         };
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TauReplayFrame();
+
+        public override HitObjectComposer CreateHitObjectComposer() => new TauHitObjectComposer(this);
     }
 }

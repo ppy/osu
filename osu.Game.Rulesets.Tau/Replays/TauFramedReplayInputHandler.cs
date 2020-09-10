@@ -1,7 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
@@ -21,14 +18,14 @@ namespace osu.Game.Rulesets.Tau.Replays
 
         protected override bool IsImportant(TauReplayFrame frame) => frame.Actions.Any();
 
-        protected Vector2? Position
+        protected Vector2 Position
         {
             get
             {
                 var frame = CurrentFrame;
 
                 if (frame == null)
-                    return null;
+                    return Vector2.Zero;
 
                 Debug.Assert(CurrentTime != null);
 
@@ -38,8 +35,14 @@ namespace osu.Game.Rulesets.Tau.Replays
 
         public override void CollectPendingInputs(List<IInput> inputs)
         {
-            inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(Position ?? Vector2.Zero) });
-            inputs.Add(new ReplayState<TauAction> { PressedActions = CurrentFrame?.Actions ?? new List<TauAction>() });
+            inputs.Add(new MousePositionAbsoluteInput
+            {
+                Position = GamefieldToScreenSpace(Position),
+            });
+            inputs.Add(new ReplayState<TauAction>
+            {
+                PressedActions = CurrentFrame?.Actions ?? new List<TauAction>(),
+            });
         }
     }
 }

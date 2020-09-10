@@ -1,7 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -41,7 +38,17 @@ namespace osu.Game.Rulesets.Tau.UI.Cursor
             this.beatmap.BindTo(beatmap);
         }
 
-        public bool CheckForValidation(DrawableTauHitObject h) => h.IntersectArea.ScreenSpaceDrawQuad.AABBFloat.IntersectsWith(defaultCursor.HitReceptor.ScreenSpaceDrawQuad.AABBFloat);
+        public bool CheckForValidation(DrawableTauHitObject h)
+        {
+            switch (h)
+            {
+                case DrawableBeat beat:
+                    return beat.IntersectArea.ScreenSpaceDrawQuad.AABBFloat.IntersectsWith(defaultCursor.HitReceptor.ScreenSpaceDrawQuad.AABBFloat);
+
+                default:
+                    return true;
+            }
+        }
 
         private class DefaultCursor : CompositeDrawable
         {
@@ -63,13 +70,12 @@ namespace osu.Game.Rulesets.Tau.UI.Cursor
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fit,
                     FillAspectRatio = 1, // 1:1 Aspect Ratio.
-                    Size = new Vector2(0.6f),
                     Children = new Drawable[]
                     {
                         HitReceptor = new Box
                         {
                             Height = 50,
-                            Width = (float)convertValue(cs),
+                            Width = (float)convertValue(cs) * 1.6f,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Alpha = 0,
@@ -134,7 +140,6 @@ namespace osu.Game.Rulesets.Tau.UI.Cursor
                             Masking = true,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(0.6f),
                             Children = new Drawable[]
                             {
                                 new CircularProgress
@@ -170,7 +175,7 @@ namespace osu.Game.Rulesets.Tau.UI.Cursor
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                var angle = e.MousePosition.GetDegreesFromPosition(AnchorPosition);
+                var angle = AnchorPosition.GetDegreesFromPosition(e.MousePosition);
 
                 Rotation = angle;
 

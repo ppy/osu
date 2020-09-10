@@ -1,25 +1,21 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using System;
-using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Tau.Configuration;
 using osu.Game.Rulesets.Tau.Objects.Drawables;
+using osu.Game.Rulesets.Tau.UI.Components;
 using osu.Game.Rulesets.Tau.UI.Cursor;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Menu;
 using osuTK;
 using osuTK.Graphics;
 
@@ -28,19 +24,22 @@ namespace osu.Game.Rulesets.Tau.UI
     [Cached]
     public class TauPlayfield : Playfield
     {
-        private Circle playfieldBackground;
-        private TauCursor cursor;
-        private JudgementContainer<DrawableTauJudgement> judgementLayer;
+        private readonly Circle playfieldBackground;
+        private readonly TauCursor cursor;
+        private readonly JudgementContainer<DrawableTauJudgement> judgementLayer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
 
-        public const float UNIVERSAL_SCALE = 0.6f;
         public static readonly Vector2 BASE_SIZE = new Vector2(768, 768);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public TauPlayfield(BeatmapDifficulty difficulty)
         {
+            RelativeSizeAxes = Axes.None;
             cursor = new TauCursor(difficulty);
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+            Size = new Vector2(768);
 
             AddRangeInternal(new Drawable[]
             {
@@ -56,16 +55,12 @@ namespace osu.Game.Rulesets.Tau.UI
                 {
                     Colour = Color4.Black,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(UNIVERSAL_SCALE),
-                    FillAspectRatio = 1,
-                    FillMode = FillMode.Fit,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(UNIVERSAL_SCALE),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
@@ -76,8 +71,6 @@ namespace osu.Game.Rulesets.Tau.UI
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Masking = true,
-                            FillMode = FillMode.Fit,
-                            FillAspectRatio = 1, // 1:1 Aspect ratio to get a perfect circle
                             BorderThickness = 3,
                             BorderColour = Color4.White,
                             Child = new Box
@@ -89,19 +82,7 @@ namespace osu.Game.Rulesets.Tau.UI
                         },
                     }
                 },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fit,
-                    FillAspectRatio = 1,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(UNIVERSAL_SCALE),
-                    Children = new Drawable[]
-                    {
-                        HitObjectContainer,
-                    }
-                },
+                HitObjectContainer,
                 cursor,
                 kiaiExplosionContainer = new Container<KiaiHitExplosion>
                 {
@@ -115,7 +96,7 @@ namespace osu.Game.Rulesets.Tau.UI
             });
         }
 
-        protected Bindable<float> PlayfieldDimLevel = new Bindable<float>(1); // Change the default as you see fit
+        protected Bindable<float> PlayfieldDimLevel = new Bindable<float>(0.3f); // Change the default as you see fit
 
         [BackgroundDependencyLoader(true)]
         private void load(TauRulesetConfigManager config)
@@ -141,10 +122,16 @@ namespace osu.Game.Rulesets.Tau.UI
         {
             base.Add(h);
 
-            var obj = (DrawableTauHitObject)h;
-            obj.CheckValidation = CheckIfWeCanValidate;
+            switch (h)
+            {
+                case DrawableTauHitObject _:
+                    var obj = (DrawableTauHitObject)h;
+                    obj.CheckValidation = CheckIfWeCanValidate;
 
-            obj.OnNewResult += onNewResult;
+                    break;
+            }
+
+            h.OnNewResult += onNewResult;
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
@@ -152,46 +139,61 @@ namespace osu.Game.Rulesets.Tau.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            var tauObj = (DrawableTauHitObject)judgedObject;
-
-            var a = tauObj.HitObject.Angle * (float)(Math.PI / 180);
-
-            DrawableTauJudgement explosion = new DrawableTauJudgement(result, tauObj)
+            DrawableTauJudgement explosion = new DrawableTauJudgement(result, judgedObject)
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Position = new Vector2(-(285 * (float)Math.Cos(a)), -(285 * (float)Math.Sin(a))),
-                Rotation = tauObj.Box.Rotation + 90,
             };
 
-            judgementLayer.Add(explosion);
+            switch (judgedObject)
+            {
+                case DrawableBeat beat:
+                    var angle = beat.HitObject.Angle;
+                    explosion.Position = Extensions.GetCircularPosition(.6f, angle);
+                    explosion.Rotation = angle;
 
-            if (judgedObject.HitObject.Kiai && result.Type != HitResult.Miss)
-                kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject)
-                {
-                    Position = new Vector2(-(215 * (float)Math.Cos(a)), -(215 * (float)Math.Sin(a))),
-                    Rotation = tauObj.Box.Rotation,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                });
+                    if (judgedObject.HitObject.Kiai && result.Type != HitResult.Miss)
+                        kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject.AccentColour.Value)
+                        {
+                            Position = Extensions.GetCircularPosition(.5f, angle),
+                            Angle = angle,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre
+                        });
+
+                    break;
+
+                case DrawableHardBeat _:
+                    explosion.Position = Extensions.GetCircularPosition(.6f, 0);
+
+                    if (judgedObject.HitObject.Kiai && result.Type != HitResult.Miss)
+                        kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject.AccentColour.Value, true)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre
+                        });
+
+                    break;
+            }
+
+            judgementLayer.Add(explosion);
         }
 
         private class VisualisationContainer : BeatSyncedContainer
         {
-            private LogoVisualisation visualisation;
+            private PlayfieldVisualisation visualisation;
             private bool firstKiaiBeat = true;
             private int kiaiBeatIndex;
-            private readonly Bindable<bool> ShowVisualisation = new Bindable<bool>(true);
+            private readonly Bindable<bool> showVisualisation = new Bindable<bool>(true);
 
             [BackgroundDependencyLoader(true)]
             private void load(TauRulesetConfigManager settings)
             {
                 RelativeSizeAxes = Axes.Both;
-                Size = new Vector2(UNIVERSAL_SCALE);
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
-                Child = visualisation = new LogoVisualisation
+                Child = visualisation = new PlayfieldVisualisation
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
@@ -202,15 +204,15 @@ namespace osu.Game.Rulesets.Tau.UI
                     Colour = Color4.Transparent
                 };
 
-                settings?.BindWith(TauRulesetSettings.ShowVisualizer, ShowVisualisation);
-                ShowVisualisation.BindValueChanged(value => { visualisation.FadeTo(value.NewValue ? 1 : 0, 500); });
+                settings?.BindWith(TauRulesetSettings.ShowVisualizer, showVisualisation);
+                showVisualisation.BindValueChanged(value => { visualisation.FadeTo(value.NewValue ? 1 : 0, 500); });
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
                 visualisation.AccentColour = Color4.White;
-                ShowVisualisation.TriggerChange();
+                showVisualisation.TriggerChange();
             }
 
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)

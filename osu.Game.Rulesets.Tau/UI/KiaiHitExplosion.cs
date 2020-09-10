@@ -1,12 +1,8 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using osu.Framework.Extensions.Color4Extensions;
+﻿using System;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Utils;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osuTK.Graphics;
 
@@ -15,114 +11,93 @@ namespace osu.Game.Rulesets.Tau.UI
     public class KiaiHitExplosion : CompositeDrawable
     {
         public override bool RemoveWhenNotAlive => true;
+        private readonly List<Drawable> particles;
+        private readonly bool circular;
 
-        private readonly CircularContainer largeFaint;
-        private readonly CircularContainer mainGlow1;
+        /// <summary>
+        /// Used whenever circular isn't set to True.
+        /// </summary>
+        public float Angle;
 
-        public KiaiHitExplosion(DrawableHitObject judgedObject, bool isSmall = false)
+        public KiaiHitExplosion(Color4 colour, bool circular = false)
         {
-            Height = 10;
-            Width = 10;
+            this.circular = circular;
+            var rng = new Random();
+            particles = new List<Drawable>();
 
-            // scale roughly in-line with visual appearance of notes
-            Scale = new Vector2(1f, 0.5f);
+            RelativePositionAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Both;
 
-            if (isSmall)
-                Scale *= 0.5f;
-
-            const float angle_variangle = 15; // should be less than 45
-
-            const float roundness = 80;
-
-            const float initial_height = 10;
-
-            var colour = Interpolation.ValueAt(0.4f, judgedObject.AccentColour.Value, Color4.White, 0, 1);
-
-            InternalChildren = new Drawable[]
+            if (circular)
             {
-                largeFaint = new CircularContainer
+                const int particle_count = 50;
+
+                for (int i = 0; i < particle_count; i++)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    // we want our size to be very small so the glow dominates it.
-                    Size = new Vector2(0.8f),
-                    Blending = BlendingParameters.Additive,
-                    EdgeEffect = new EdgeEffectParameters
+                    particles.Add(new Box
                     {
-                        Type = EdgeEffectType.Glow,
-                        Colour = Interpolation.ValueAt(0.1f, judgedObject.AccentColour.Value, Color4.White, 0, 1).Opacity(0.3f),
-                        Roundness = 160,
-                        Radius = 200,
-                    },
-                },
-                mainGlow1 = new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Blending = BlendingParameters.Additive,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = Interpolation.ValueAt(0.6f, judgedObject.AccentColour.Value, Color4.White, 0, 1),
-                        Roundness = 20,
-                        Radius = 50,
-                    },
-                },
-                new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Size = new Vector2(0.01f, initial_height),
-                    Blending = BlendingParameters.Additive,
-                    Rotation = RNG.NextSingle(-angle_variangle, angle_variangle),
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = colour,
-                        Roundness = roundness,
-                        Radius = 40,
-                    },
-                },
-                new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Size = new Vector2(0.01f, initial_height),
-                    Blending = BlendingParameters.Additive,
-                    Rotation = RNG.NextSingle(-angle_variangle, angle_variangle),
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = colour,
-                        Roundness = roundness,
-                        Radius = 40,
-                    },
+                        RelativePositionAxes = Axes.Both,
+                        Position = Extensions.GetCircularPosition(((float)(rng.NextDouble() * 0.15f) * 0.15f) + 0.5f, (float)rng.NextDouble() * 360f),
+                        Rotation = (float)rng.NextDouble() * 360f,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.BottomCentre,
+                        Size = new Vector2(rng.Next(1, 15))
+                    });
                 }
-            };
+            }
+            else
+            {
+                const int particle_count = 10;
+
+                for (int i = 0; i < particle_count; i++)
+                {
+                    particles.Add(new Box
+                    {
+                        RelativePositionAxes = Axes.Both,
+                        Position = Extensions.GetCircularPosition((float)(rng.NextDouble() * 0.15f) * 0.15f, ((float)rng.NextDouble() / 10 * 10) + (Angle - 20)),
+                        Rotation = (float)rng.NextDouble() * 360f,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.BottomCentre,
+                        Size = new Vector2(rng.Next(1, 15))
+                    });
+                }
+            }
+
+            AddRangeInternal(particles.ToArray());
         }
 
         protected override void LoadComplete()
         {
-            const double duration = 200;
-
             base.LoadComplete();
 
-            largeFaint
-                .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
-                .FadeOut(duration * 2);
+            foreach (var particle in particles)
+            {
+                const double duration = 1500;
+                var rng = new Random();
 
-            mainGlow1.ScaleTo(1.4f, duration, Easing.OutQuint);
+                if (circular)
+                {
+                    particle.MoveTo(Extensions.GetCircularPosition(((float)(rng.NextDouble() * 0.15f) * 2f) + 0.5f, Vector2.Zero.GetDegreesFromPosition(particle.Position)), duration, Easing.OutQuint)
+                            .ScaleTo(new Vector2(rng.Next(1, 2)), duration, Easing.OutQuint)
+                            .FadeOut(duration, Easing.OutQuint);
+                }
+                else
+                {
+                    particle.MoveTo(Extensions.GetCircularPosition((float)(rng.NextDouble() * 0.15f) * 1f, randomBetween(Angle - 40, Angle + 40)), duration, Easing.OutQuint)
+                            .ResizeTo(new Vector2(rng.Next(0, 5)), duration, Easing.OutQuint)
+                            .FadeOut(duration, Easing.OutQuint);
 
-            this.FadeOut(duration, Easing.Out);
-            Expire(true);
+                    float randomBetween(float smallNumber, float bigNumber)
+                    {
+                        float diff = bigNumber - smallNumber;
+
+                        return ((float)rng.NextDouble() * diff) + smallNumber;
+                    }
+                }
+
+                particle.Expire(true);
+                this.Delay(duration).Expire(true);
+            }
         }
     }
 }

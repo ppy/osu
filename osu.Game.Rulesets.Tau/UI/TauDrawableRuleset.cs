@@ -1,6 +1,3 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Input;
@@ -28,7 +25,20 @@ namespace osu.Game.Rulesets.Tau.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TauFramedReplayInputHandler(replay);
 
-        public override DrawableHitObject<TauHitObject> CreateDrawableRepresentation(TauHitObject h) => new DrawableTauHitObject(h);
+        public override DrawableHitObject<TauHitObject> CreateDrawableRepresentation(TauHitObject h)
+        {
+            switch (h)
+            {
+                case HardBeat _:
+                    return new DrawableHardBeat(h);
+
+                case Beat beat:
+                    return new DrawableBeat(beat);
+
+                default:
+                    return null;
+            }
+        }
 
         protected override PassThroughInputManager CreateInputManager() => new TauInputManager(Ruleset?.RulesetInfo);
 

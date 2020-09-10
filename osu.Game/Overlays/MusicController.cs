@@ -12,12 +12,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Input.Bindings;
-using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays
@@ -25,7 +22,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// Handles playback of the global music track.
     /// </summary>
-    public class MusicController : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public class MusicController : CompositeDrawable
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -61,9 +58,6 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private OnScreenDisplay onScreenDisplay { get; set; }
 
         [NotNull]
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
@@ -207,7 +201,13 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
-        public void PreviousTrack() => Schedule(() => prev());
+        /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
+        public void PreviousTrack(Action<PreviousTrackResult> onSuccess = null) => Schedule(() =>
+        {
+            PreviousTrackResult res = prev();
+            if (res != PreviousTrackResult.None)
+                onSuccess?.Invoke(res);
+        });
 
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
@@ -243,7 +243,14 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the next random or playlist track.
         /// </summary>
-        public void NextTrack() => Schedule(() => next());
+        /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
+        /// <returns>A <see cref="ScheduledDelegate"/> of the operation.</returns>
+        public void NextTrack(Action onSuccess = null) => Schedule(() =>
+        {
+            bool res = next();
+            if (res)
+                onSuccess?.Invoke();
+        });
 
         private bool next()
         {
@@ -279,6 +286,11 @@ namespace osu.Game.Overlays
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
+            // This method can potentially be triggered multiple times as it is eagerly fired in next() / prev() to ensure correct execution order
+            // (changeBeatmap must be called before consumers receive the bindable changed event, which is not the case when the local beatmap bindable is updated directly).
+            if (newWorking == current)
+                return;
+
             var lastWorking = current;
 
             TrackChangeDirection direction = TrackChangeDirection.None;
@@ -400,54 +412,6 @@ namespace osu.Game.Overlays
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(CurrentTrack);
-            }
-        }
-
-        public bool OnPressed(GlobalAction action)
-        {
-            if (beatmap.Disabled)
-                return false;
-
-            switch (action)
-            {
-                case GlobalAction.MusicPlay:
-                    if (TogglePause())
-                        onScreenDisplay?.Display(new MusicControllerToast(IsPlaying ? "开始播放" : "暂停播放"));
-                    return true;
-
-                case GlobalAction.MusicNext:
-                    if (next())
-                        onScreenDisplay?.Display(new MusicControllerToast("下一首"));
-
-                    return true;
-
-                case GlobalAction.MusicPrev:
-                    switch (prev())
-                    {
-                        case PreviousTrackResult.Restart:
-                            onScreenDisplay?.Display(new MusicControllerToast("从头开始"));
-                            break;
-
-                        case PreviousTrackResult.Previous:
-                            onScreenDisplay?.Display(new MusicControllerToast("上一首"));
-                            break;
-                    }
-
-                    return true;
-            }
-
-            return false;
-        }
-
-        public void OnReleased(GlobalAction action)
-        {
-        }
-
-        public class MusicControllerToast : Toast
-        {
-            public MusicControllerToast(string action)
-                : base("音乐播放", action, string.Empty)
-            {
             }
         }
     }

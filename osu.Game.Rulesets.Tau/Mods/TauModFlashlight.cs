@@ -1,7 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
-using System;
+﻿using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -17,7 +14,7 @@ namespace osu.Game.Rulesets.Tau.Mods
     {
         public override double ScoreMultiplier => 1.12;
 
-        private const float default_flashlight_size = 180;
+        private const float defaultFlashlightSize = 180;
 
         private TauFlashlight flashlight;
 
@@ -46,11 +43,12 @@ namespace osu.Game.Rulesets.Tau.Mods
             private float getSizeFor(int combo)
             {
                 if (combo > 200)
-                    return default_flashlight_size * 0.8f;
-                else if (combo > 100)
-                    return default_flashlight_size * 0.9f;
-                else
-                    return default_flashlight_size;
+                    return defaultFlashlightSize * 0.8f;
+
+                if (combo > 100)
+                    return defaultFlashlightSize * 0.9f;
+
+                return defaultFlashlightSize;
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
