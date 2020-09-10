@@ -14,13 +14,13 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
-    public class PaginatedBeatmapContainer : PaginatedContainerWithHeader<APIBeatmapSet>
+    public class PaginatedBeatmapContainer : PaginatedContainer<APIBeatmapSet>
     {
         private const float panel_padding = 10f;
         private readonly BeatmapSetType type;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string headerText)
-            : base(user, headerText, CounterVisibilityState.AlwaysVisible)
+            : base(user, "", headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.type = type;
             ItemsPerPage = 6;

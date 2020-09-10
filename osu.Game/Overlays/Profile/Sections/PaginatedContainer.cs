@@ -36,10 +36,16 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly string missing;
         private ShowMoreButton moreButton;
         private OsuSpriteText missingText;
+        private PaginatedContainerHeader header;
 
-        protected PaginatedContainer(Bindable<User> user, string missing = "")
+        private readonly string headerText;
+        private readonly CounterVisibilityState counterVisibilityState;
+
+        protected PaginatedContainer(Bindable<User> user, string missing = "", string headerText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
         {
+            this.headerText = headerText;
             this.missing = missing;
+            this.counterVisibilityState = counterVisibilityState;
             User.BindTo(user);
         }
 
@@ -50,9 +56,12 @@ namespace osu.Game.Overlays.Profile.Sections
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
 
-            Children = new[]
+            Children = new Drawable[]
             {
-                CreateHeaderContent,
+                header = new PaginatedContainerHeader(headerText, counterVisibilityState)
+                {
+                    Alpha = string.IsNullOrEmpty(headerText) ? 0 : 1
+                },
                 ItemsContainer = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
@@ -91,7 +100,8 @@ namespace osu.Game.Overlays.Profile.Sections
 
             if (e.NewValue != null)
             {
-                OnUserChanged(e.NewValue);
+                showMore();
+                SetCount(GetCount(e.NewValue));
             }
         }
 
@@ -130,16 +140,13 @@ namespace osu.Game.Overlays.Profile.Sections
             }, loadCancellation.Token);
         });
 
-        protected virtual void OnUserChanged(User user)
-        {
-            showMore();
-        }
+        protected virtual int GetCount(User user) => 0;
+
+        protected void SetCount(int value) => header.Current.Value = value;
 
         protected virtual void OnItemsReceived(List<TModel> items)
         {
         }
-
-        protected virtual Drawable CreateHeaderContent => Empty();
 
         protected abstract APIRequest<List<TModel>> CreateRequest();
 
