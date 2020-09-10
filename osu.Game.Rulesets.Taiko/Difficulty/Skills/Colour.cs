@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// <summary>
         /// Length of the current mono pattern.
         /// </summary>
-        private int currentMonoLength = 1;
+        private int currentMonoLength;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
