@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -43,6 +44,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                 GreatHitWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate,
+                MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
                 Skills = skills
             };
         }
