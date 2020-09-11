@@ -256,13 +256,13 @@ namespace osu.Game.Screens.Edit
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
             // todo: BindCollectionChanged
-            editorBeatmap.SelectedHitObjects.CollectionChanged += (_, __) =>
+            editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) =>
             {
                 var hasObjects = editorBeatmap.SelectedHitObjects.Count > 0;
 
                 cutMenuItem.Action.Disabled = !hasObjects;
                 copyMenuItem.Action.Disabled = !hasObjects;
-            };
+            }, true);
 
             clipboard.BindValueChanged(content => pasteMenuItem.Action.Disabled = string.IsNullOrEmpty(content.NewValue));
 
