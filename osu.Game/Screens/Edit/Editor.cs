@@ -369,7 +369,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed && dialogOverlay != null && HasUnsavedChanges)
+            if (!exitConfirmed && dialogOverlay != null && HasUnsavedChanges && !(dialogOverlay.CurrentDialog is PromptForSaveDialog))
             {
                 dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
                 return true;
