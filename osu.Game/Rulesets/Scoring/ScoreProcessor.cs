@@ -210,15 +210,10 @@ namespace osu.Game.Rulesets.Scoring
 
         private double getScore(ScoringMode mode)
         {
-            double calculatedBonusScore = 0;
-
-            calculatedBonusScore += GetStatistic(HitResult.SmallBonusHit) * GetNumericBonusResult(HitResult.SmallBonusHit);
-            calculatedBonusScore += GetStatistic(HitResult.LargeBonusHit) * GetNumericBonusResult(HitResult.LargeBonusHit);
-
             return GetScore(mode, maxHighestCombo,
                 maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
                 maxHighestCombo > 0 ? (double)HighestCombo.Value / maxHighestCombo : 0,
-                calculatedBonusScore);
+                scoreResultCounts);
         }
 
         /// <summary>
@@ -228,9 +223,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
         /// <param name="accuracyRatio">The accuracy percentage achieved by the player.</param>
         /// <param name="comboRatio">The proportion of <paramref name="maxCombo"/> achieved by the player.</param>
-        /// <param name="bonusScore">Any bonus score to be added.</param>
+        /// <param name="statistics">Any statistics to be factored in.</param>
         /// <returns>The total score.</returns>
-        public double GetScore(ScoringMode mode, int maxCombo, double accuracyRatio, double comboRatio, double bonusScore)
+        public double GetScore(ScoringMode mode, int maxCombo, double accuracyRatio, double comboRatio, Dictionary<HitResult, int> statistics)
         {
             switch (mode)
             {
@@ -239,11 +234,11 @@ namespace osu.Game.Rulesets.Scoring
                     double accuracyScore = accuracyPortion * accuracyRatio;
                     double comboScore = comboPortion * comboRatio;
 
-                    return (max_score * (accuracyScore + comboScore) + bonusScore) * scoreMultiplier;
+                    return (max_score * (accuracyScore + comboScore) + GetBonusScore(statistics)) * scoreMultiplier;
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return bonusScore + (accuracyRatio * maxCombo * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
+                    return GetBonusScore(statistics) + (accuracyRatio * maxCombo * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
             }
         }
 
@@ -263,7 +258,11 @@ namespace osu.Game.Rulesets.Scoring
             return ScoreRank.D;
         }
 
-        public int GetStatistic(HitResult result) => scoreResultCounts.GetOrDefault(result);
+        public int GetStatistic(Dictionary<HitResult, int> statistics, HitResult result) => statistics.GetOrDefault(result);
+
+        public double GetBonusScore(Dictionary<HitResult, int> statistics)
+            => GetStatistic(statistics, HitResult.SmallBonusHit) * GetNumericBonusResult(HitResult.SmallBonusHit)
+               + GetStatistic(statistics, HitResult.LargeBonusHit) * GetNumericBonusResult(HitResult.LargeBonusHit);
 
         public double GetStandardisedScore() => getScore(ScoringMode.Standardised);
 
@@ -320,10 +319,14 @@ namespace osu.Game.Rulesets.Scoring
             score.Rank = Rank.Value;
             score.Date = DateTimeOffset.Now;
 
+            // Todo: This is bad.
             var hitWindows = CreateHitWindows();
 
+            // Todo: This is omega bad.
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
-                score.Statistics[result] = GetStatistic(result);
+                score.Statistics[result] = GetStatistic(scoreResultCounts, result);
+            score.Statistics[HitResult.SmallBonusHit] = GetStatistic(scoreResultCounts, HitResult.SmallBonusHit);
+            score.Statistics[HitResult.LargeBonusHit] = GetStatistic(scoreResultCounts, HitResult.LargeBonusHit);
 
             score.HitEvents = hitEvents;
         }

@@ -170,18 +170,15 @@ namespace osu.Game.Scoring
 
             private void updateScore(int beatmapMaxCombo)
             {
-                if (beatmapMaxCombo == 0)
-                {
-                    Value = 0;
-                    return;
-                }
-
                 var ruleset = score.Ruleset.CreateInstance();
-                var scoreProcessor = ruleset.CreateScoreProcessor();
 
+                var scoreProcessor = ruleset.CreateScoreProcessor();
                 scoreProcessor.Mods.Value = score.Mods;
 
-                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, beatmapMaxCombo, score.Accuracy, (double)score.MaxCombo / beatmapMaxCombo, 0));
+                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, beatmapMaxCombo,
+                    beatmapMaxCombo > 0 ? score.Accuracy : 0,
+                    beatmapMaxCombo > 0 ? (double)score.MaxCombo / beatmapMaxCombo : 0,
+                    score.Statistics));
             }
         }
 
