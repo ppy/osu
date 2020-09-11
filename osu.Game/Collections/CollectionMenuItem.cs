@@ -3,9 +3,8 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
-using osu.Game.Collections;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Collections
 {
     /// <summary>
     /// A <see cref="BeatmapCollection"/> filter.

@@ -12,13 +12,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Collections
 {
     /// <summary>
     /// A dropdown to select the <see cref="CollectionMenuItem"/> to filter beatmaps using.
@@ -152,7 +151,7 @@ namespace osu.Game.Screens.Select
             private void updateText() => base.Label = collectionName.Value;
         }
 
-        private class CollectionDropdownMenu : OsuDropdownMenu
+        protected class CollectionDropdownMenu : OsuDropdownMenu
         {
             public CollectionDropdownMenu()
             {
@@ -162,7 +161,7 @@ namespace osu.Game.Screens.Select
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new CollectionDropdownMenuItem(item);
         }
 
-        private class CollectionDropdownMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
+        protected class CollectionDropdownMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
         {
             [NotNull]
             protected new CollectionMenuItem Item => ((DropdownMenuItem<CollectionMenuItem>)base.Item).Value;
