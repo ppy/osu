@@ -87,11 +87,19 @@ namespace osu.Game.Skinning
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 
+        private const string unknown_creator_string = "Unknown";
+
         protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
         {
-            // this is the optimal way to hash legacy skins, but will need to be reconsidered when we move forward with skin implementation.
-            // likely, the skin should expose a real version (ie. the version of the skin, not the skin.ini version it's targeting).
-            return item.ToString().ComputeSHA2Hash();
+            if (item.Creator != null && item.Creator != unknown_creator_string)
+            {
+                // this is the optimal way to hash legacy skins, but will need to be reconsidered when we move forward with skin implementation.
+                // likely, the skin should expose a real version (ie. the version of the skin, not the skin.ini version it's targeting).
+                return item.ToString().ComputeSHA2Hash();
+            }
+
+            // if there was no creator, the ToString above would give the filename, which along isn't really enough to base any decisions on.
+            return base.ComputeHash(item, reader);
         }
 
         protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
@@ -108,7 +116,7 @@ namespace osu.Game.Skinning
             else
             {
                 model.Name = model.Name.Replace(".osk", "");
-                model.Creator ??= "Unknown";
+                model.Creator ??= unknown_creator_string;
             }
         }
 
