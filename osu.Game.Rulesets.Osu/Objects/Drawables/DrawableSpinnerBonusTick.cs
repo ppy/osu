@@ -12,6 +12,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
         }
 
-        internal override void TriggerResult(bool hit) => ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : HitResult.Miss);
+        internal override void TriggerResult(bool hit) => ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : HitResult.LargeBonusMiss);
     }
 }

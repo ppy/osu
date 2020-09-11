@@ -18,9 +18,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public class OsuSpinnerBonusTickJudgement : OsuSpinnerTickJudgement
         {
-            public override HitResult MaxResult => HitResult.SmallBonus;
+            public override HitResult MaxResult => HitResult.LargeBonusHit;
 
-            protected override int NumericResultFor(HitResult result) => result == MaxResult ? SMALL_BONUS_RESULT : 0;
+            protected override int NumericResultFor(HitResult result) => result == MaxResult ? LARGE_BONUS_RESULT : 0;
 
             protected override double HealthIncreaseFor(HitResult result) => base.HealthIncreaseFor(result) * 2;
         }

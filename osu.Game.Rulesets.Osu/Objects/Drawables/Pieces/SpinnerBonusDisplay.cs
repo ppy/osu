@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 return;
 
             displayedCount = count;
-            bonusCounter.Text = $"{SpinnerBonusTick.SCORE_PER_TICK * count}";
+            bonusCounter.Text = $"{OsuJudgement.SMALL_TICK_RESULT * count}";
             bonusCounter.FadeOutFromOne(1500);
             bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
         }
