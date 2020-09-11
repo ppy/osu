@@ -145,10 +145,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         internal void HandleSelected(SelectionBlueprint blueprint)
         {
-            selectedBlueprints.Add(blueprint);
-            EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+            if (!selectedBlueprints.Contains(blueprint))
+            {
+                selectedBlueprints.Add(blueprint);
 
-            UpdateVisibility();
+                // need to check this as well, as there are potentially multiple SelectionHandlers and the above check is not enough.
+                if (!EditorBeatmap.SelectedHitObjects.Contains(blueprint.HitObject))
+                    EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+
+                UpdateVisibility();
+            }
         }
 
         /// <summary>
@@ -157,10 +163,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         internal void HandleDeselected(SelectionBlueprint blueprint)
         {
-            selectedBlueprints.Remove(blueprint);
-            EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
+            if (selectedBlueprints.Remove(blueprint))
+            {
+                EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
-            UpdateVisibility();
+                UpdateVisibility();
+            }
         }
 
         /// <summary>
