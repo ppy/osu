@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -144,8 +143,6 @@ namespace osu.Game.Tests.Skins.IO
 
         private async Task<SkinInfo> loadIntoOsu(OsuGameBase osu, ArchiveReader archive = null)
         {
-            var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
-
             var skinManager = osu.Dependencies.Get<SkinManager>();
             return await skinManager.Import(archive);
         }
@@ -175,22 +172,6 @@ namespace osu.Game.Tests.Skins.IO
             });
 
             Assert.IsTrue(task.Wait(timeout), failureMessage);
-        }
-
-        private class TestArchiveReader : ArchiveReader
-        {
-            public TestArchiveReader()
-                : base("test_archive")
-            {
-            }
-
-            public override Stream GetStream(string name) => new MemoryStream();
-
-            public override void Dispose()
-            {
-            }
-
-            public override IEnumerable<string> Filenames => new[] { "test_file.osr" };
         }
     }
 }
