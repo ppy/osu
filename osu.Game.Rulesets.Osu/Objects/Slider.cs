@@ -112,8 +112,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double TickDistanceMultiplier = 1;
 
-        public HitCircle HeadCircle;
-        public SliderTailCircle TailCircle;
+        public HitCircle HeadCircle { get; protected set; }
+
+        public SliderTailCircle TailCircle { get; protected set; }
 
         public Slider()
         {
