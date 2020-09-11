@@ -17,6 +17,8 @@ namespace osu.Game.Overlays.Music
     /// </summary>
     public class CollectionDropdown : CollectionFilterDropdown
     {
+        protected override bool ShowManageCollectionsItem => false;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {

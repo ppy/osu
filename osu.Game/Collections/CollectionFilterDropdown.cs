@@ -24,6 +24,11 @@ namespace osu.Game.Collections
     /// </summary>
     public class CollectionFilterDropdown : OsuDropdown<CollectionFilterMenuItem>
     {
+        /// <summary>
+        /// Whether to show the "manage collections..." menu item in the dropdown.
+        /// </summary>
+        protected virtual bool ShowManageCollectionsItem => true;
+
         private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
         private readonly IBindableList<BeatmapInfo> beatmaps = new BindableList<BeatmapInfo>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
@@ -63,7 +68,9 @@ namespace osu.Game.Collections
             filters.Clear();
             filters.Add(new AllBeatmapsCollectionFilterMenuItem());
             filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c)));
-            filters.Add(new ManageCollectionsFilterMenuItem());
+
+            if (ShowManageCollectionsItem)
+                filters.Add(new ManageCollectionsFilterMenuItem());
 
             Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection == selectedItem) ?? filters[0];
         }
