@@ -62,6 +62,26 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Indicates a large tick hit.
         /// </summary>
-        LargeTickHit
+        LargeTickHit,
+
+        /// <summary>
+        /// Indicates a small bonus hit.
+        /// </summary>
+        SmallBonusHit,
+
+        /// <summary>
+        /// Indicates a small bonus miss.
+        /// </summary>
+        SmallBonusMiss,
+
+        /// <summary>
+        /// Indicates a large bonus hit.
+        /// </summary>
+        LargeBonusHit,
+
+        /// <summary>
+        /// Indicates a large bonus hit.
+        /// </summary>
+        LargeBonusMiss,
     }
 }

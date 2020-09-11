@@ -8,6 +8,9 @@ namespace osu.Game.Rulesets.Osu.Judgements
 {
     public class OsuJudgement : Judgement
     {
+        public const int SMALL_TICK_RESULT = 10;
+        public const int SMALL_BONUS_RESULT = 50;
+
         public override HitResult MaxResult => HitResult.Great;
 
         protected override int NumericResultFor(HitResult result)
