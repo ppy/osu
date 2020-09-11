@@ -28,6 +28,17 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestSelectedObjects()
+        {
+            HitCircle obj = null;
+            AddStep("add hitobject", () => editorBeatmap.Add(obj = new HitCircle { StartTime = 1000 }));
+            AddStep("select hitobject", () => editorBeatmap.SelectedHitObjects.Add(obj));
+            AddAssert("confirm 1 selected", () => editorBeatmap.SelectedHitObjects.Count == 1);
+            AddStep("deselect hitobject", () => editorBeatmap.SelectedHitObjects.Remove(obj));
+            AddAssert("confirm 0 selected", () => editorBeatmap.SelectedHitObjects.Count == 0);
+        }
+
+        [Test]
         public void TestUndoFromInitialState()
         {
             int hitObjectCount = 0;
