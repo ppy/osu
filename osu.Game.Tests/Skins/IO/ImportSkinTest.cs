@@ -67,6 +67,32 @@ namespace osu.Game.Tests.Skins.IO
         }
 
         [Test]
+        public async Task TestImportTwiceWithNoMetadata()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = await loadOsu(host);
+
+                    // if a user downloads two skins that do have skin.ini files but don't have any creator metadata in the skin.ini, they should both import separately just for safety.
+                    var imported = await loadIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
+                    var imported2 = await loadIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
+
+                    Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Count, Is.EqualTo(2));
+
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().First().Files.First().FileInfoID, Is.EqualTo(imported.Files.First().FileInfoID));
+                    Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Last().Files.First().FileInfoID, Is.EqualTo(imported2.Files.First().FileInfoID));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
         public async Task TestImportTwiceWithDifferentMetadata()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
