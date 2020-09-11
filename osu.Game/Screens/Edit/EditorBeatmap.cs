@@ -79,10 +79,10 @@ namespace osu.Game.Screens.Edit
 
         private void updateHitObject([CanBeNull] HitObject hitObject, bool silent)
         {
-            scheduledUpdate?.Cancel();
-
             if (hitObject != null)
                 pendingUpdates.Add(hitObject);
+
+            if (scheduledUpdate?.Completed == false) return;
 
             scheduledUpdate = Schedule(() =>
             {
@@ -158,10 +158,14 @@ namespace osu.Game.Screens.Edit
         {
             trackStartTime(hitObject);
 
-            mutableHitObjects.Insert(index, hitObject);
-
-            HitObjectAdded?.Invoke(hitObject);
             updateHitObject(hitObject, true);
+
+            // must occur after the batch-scheduled ApplyDefaults.
+            Schedule(() =>
+            {
+                mutableHitObjects.Insert(index, hitObject);
+                HitObjectAdded?.Invoke(hitObject);
+            });
         }
 
         /// <summary>
