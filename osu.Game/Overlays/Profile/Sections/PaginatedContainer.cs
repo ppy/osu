@@ -33,18 +33,18 @@ namespace osu.Game.Overlays.Profile.Sections
         private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
 
-        private readonly string missing;
+        private readonly string missingText;
         private ShowMoreButton moreButton;
-        private OsuSpriteText missingText;
+        private OsuSpriteText missing;
         private PaginatedContainerHeader header;
 
         private readonly string headerText;
         private readonly CounterVisibilityState counterVisibilityState;
 
-        protected PaginatedContainer(Bindable<User> user, string headerText = "", string missing = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        protected PaginatedContainer(Bindable<User> user, string headerText = "", string missingText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
         {
             this.headerText = headerText;
-            this.missing = missing;
+            this.missingText = missingText;
             this.counterVisibilityState = counterVisibilityState;
             User.BindTo(user);
         }
@@ -76,10 +76,10 @@ namespace osu.Game.Overlays.Profile.Sections
                     Margin = new MarginPadding { Top = 10 },
                     Action = showMore,
                 },
-                missingText = new OsuSpriteText
+                missing = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 15),
-                    Text = missing,
+                    Text = missingText,
                     Alpha = 0,
                 },
             };
@@ -124,15 +124,15 @@ namespace osu.Game.Overlays.Profile.Sections
                 moreButton.Hide();
                 moreButton.IsLoading = false;
 
-                if (!string.IsNullOrEmpty(missingText.Text))
-                    missingText.Show();
+                if (!string.IsNullOrEmpty(missing.Text))
+                    missing.Show();
 
                 return;
             }
 
             LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
             {
-                missingText.Hide();
+                missing.Hide();
                 moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
                 moreButton.IsLoading = false;
 

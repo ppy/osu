@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
     public class PaginatedKudosuHistoryContainer : PaginatedContainer<APIKudosuHistory>
     {
         public PaginatedKudosuHistoryContainer(Bindable<User> user)
-            : base(user, missing: "This user hasn't received any kudosu!")
+            : base(user, missingText: "This user hasn't received any kudosu!")
         {
             ItemsPerPage = 5;
         }
