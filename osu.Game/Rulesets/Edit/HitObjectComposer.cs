@@ -112,7 +112,6 @@ namespace osu.Game.Rulesets.Edit
                         {
                             Name = "Content",
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true,
                             Children = new Drawable[]
                             {
                                 // layers below playfield
