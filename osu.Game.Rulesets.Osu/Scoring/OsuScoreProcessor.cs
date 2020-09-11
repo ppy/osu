@@ -27,5 +27,19 @@ namespace osu.Game.Rulesets.Osu.Scoring
         }
 
         public override HitWindows CreateHitWindows() => new OsuHitWindows();
+
+        protected override int GetNumericBonusResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.SmallBonusHit:
+                    return OsuJudgement.SMALL_BONUS_RESULT;
+
+                case HitResult.LargeBonusHit:
+                    return OsuJudgement.LARGE_BONUS_RESULT;
+            }
+
+            return 0;
+        }
     }
 }
