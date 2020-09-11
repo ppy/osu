@@ -138,7 +138,10 @@ namespace osu.Game.Rulesets.Scoring
             if (result.Judgement.IsBonus)
             {
                 if (result.IsHit)
+                {
                     bonusScore += scoreIncrease;
+                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
+                }
             }
             else
             {
@@ -176,7 +179,10 @@ namespace osu.Game.Rulesets.Scoring
             if (result.Judgement.IsBonus)
             {
                 if (result.IsHit)
+                {
                     bonusScore -= scoreIncrease;
+                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
+                }
             }
             else
             {
