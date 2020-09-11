@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private readonly BeatmapSetType type;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string headerText)
-            : base(user, "", headerText, CounterVisibilityState.AlwaysVisible)
+            : base(user, headerText, "", CounterVisibilityState.AlwaysVisible)
         {
             this.type = type;
             ItemsPerPage = 6;
