@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
     public class PaginatedRecentActivityContainer : PaginatedContainer<APIRecentActivity>
     {
         public PaginatedRecentActivityContainer(Bindable<User> user)
-            : base(user, missing: "This user hasn't done anything notable recently!")
+            : base(user, missingText: "This user hasn't done anything notable recently!")
         {
             ItemsPerPage = 10;
         }
