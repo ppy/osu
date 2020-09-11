@@ -65,8 +65,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     {
         protected virtual HitResult HitResult => HitResult.Perfect;
 
-        protected virtual HitResult MissResult => HitResult.Miss;
-
         public virtual bool StaysOnPlate => HitObject.CanBePlated;
 
         public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
@@ -90,7 +88,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             if (CheckPosition == null) return;
 
             if (timeOffset >= 0 && Result != null)
-                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult : MissResult);
+                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult : HitResult.Miss);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)

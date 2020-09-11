@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     {
         protected override HitResult HitResult => HitResult.SmallBonusHit;
 
-        protected override HitResult MissResult => HitResult.SmallBonusMiss;
-
         public DrawableTinyDroplet(TinyDroplet h)
             : base(h)
         {

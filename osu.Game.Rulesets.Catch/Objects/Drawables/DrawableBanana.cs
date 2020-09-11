@@ -13,8 +13,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     {
         protected override HitResult HitResult => HitResult.LargeBonusHit;
 
-        protected override HitResult MissResult => HitResult.LargeBonusMiss;
-
         public DrawableBanana(Banana h)
             : base(h)
         {

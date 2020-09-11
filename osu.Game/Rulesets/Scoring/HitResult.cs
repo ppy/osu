@@ -70,18 +70,8 @@ namespace osu.Game.Rulesets.Scoring
         SmallBonusHit,
 
         /// <summary>
-        /// Indicates a small bonus miss.
-        /// </summary>
-        SmallBonusMiss,
-
-        /// <summary>
         /// Indicates a large bonus hit.
         /// </summary>
         LargeBonusHit,
-
-        /// <summary>
-        /// Indicates a large bonus hit.
-        /// </summary>
-        LargeBonusMiss,
     }
 }
