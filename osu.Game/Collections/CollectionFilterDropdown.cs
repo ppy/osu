@@ -105,12 +105,16 @@ namespace osu.Game.Collections
 
         protected override string GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName.Value;
 
-        protected override DropdownHeader CreateHeader() => new CollectionDropdownHeader
+        protected sealed override DropdownHeader CreateHeader() => CreateCollectionHeader().With(d =>
         {
-            SelectedItem = { BindTarget = Current }
-        };
+            d.SelectedItem.BindTarget = Current;
+        });
 
-        protected override DropdownMenu CreateMenu() => new CollectionDropdownMenu();
+        protected sealed override DropdownMenu CreateMenu() => CreateCollectionMenu();
+
+        protected virtual CollectionDropdownHeader CreateCollectionHeader() => new CollectionDropdownHeader();
+
+        protected virtual CollectionDropdownMenu CreateCollectionMenu() => new CollectionDropdownMenu();
 
         public class CollectionDropdownHeader : OsuDropdownHeader
         {
