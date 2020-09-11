@@ -9,6 +9,10 @@ namespace osu.Game.Rulesets.Catch.Judgements
 {
     public class CatchJudgement : Judgement
     {
+        public const int SMALL_BONUS_RESULT = 10;
+
+        public const int LARGE_BONUS_RESULT = 1100;
+
         public override HitResult MaxResult => HitResult.Perfect;
 
         protected override int NumericResultFor(HitResult result)

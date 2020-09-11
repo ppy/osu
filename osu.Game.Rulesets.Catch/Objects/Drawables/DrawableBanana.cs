@@ -4,12 +4,17 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableBanana : DrawableFruit
     {
+        protected override HitResult HitResult => HitResult.LargeBonusHit;
+
+        protected override HitResult MissResult => HitResult.LargeBonusMiss;
+
         public DrawableBanana(Banana h)
             : base(h)
         {
