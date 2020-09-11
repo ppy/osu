@@ -292,6 +292,18 @@ namespace osu.Game.Screens.Edit
         {
             switch (action.ActionType)
             {
+                case PlatformActionType.Cut:
+                    Cut();
+                    return true;
+
+                case PlatformActionType.Copy:
+                    Copy();
+                    return true;
+
+                case PlatformActionType.Paste:
+                    Paste();
+                    return true;
+
                 case PlatformActionType.Undo:
                     Undo();
                     return true;
