@@ -8,6 +8,9 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoJudgement : Judgement
     {
+        public const int SMALL_BONUS_RESULT = 200;
+        public const int LARGE_BONUS_RESULT = 300;
+
         public override HitResult MaxResult => HitResult.Great;
 
         protected override int NumericResultFor(HitResult result)
