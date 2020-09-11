@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private readonly ScoreType type;
 
         public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string headerText, CounterVisibilityState counterVisibilityState, string missingText = "")
-            : base(user, missingText, headerText, counterVisibilityState)
+            : base(user, headerText, missingText, counterVisibilityState)
         {
             this.type = type;
 

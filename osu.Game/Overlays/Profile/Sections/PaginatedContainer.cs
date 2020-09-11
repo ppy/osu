@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly string headerText;
         private readonly CounterVisibilityState counterVisibilityState;
 
-        protected PaginatedContainer(Bindable<User> user, string missing = "", string headerText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        protected PaginatedContainer(Bindable<User> user, string headerText = "", string missing = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
         {
             this.headerText = headerText;
             this.missing = missing;
