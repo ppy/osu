@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -98,89 +99,80 @@ namespace osu.Game.Screens.Select
                     Width = 0.5f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Child = new GridContainer
+                    // Reverse ChildID so that dropdowns in the top section appear on top of the bottom section.
+                    Child = new ReverseChildIDFillFlowContainer<Drawable>
                     {
                         RelativeSizeAxes = Axes.Both,
-                        RowDimensions = new[]
+                        Spacing = new Vector2(0, 5),
+                        Children = new[]
                         {
-                            new Dimension(GridSizeMode.Absolute, 60),
-                            new Dimension(GridSizeMode.Absolute, 5),
-                            new Dimension(GridSizeMode.Absolute, 20),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
+                            new Container
                             {
-                                new Container
+                                RelativeSizeAxes = Axes.X,
+                                Height = 60,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
+                                    searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
+                                    new Box
                                     {
-                                        searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
-                                        new Box
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = 1,
+                                        Colour = OsuColour.Gray(80),
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.BottomRight,
+                                        Origin = Anchor.BottomRight,
+                                        Direction = FillDirection.Horizontal,
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
+                                        Children = new Drawable[]
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = 1,
-                                            Colour = OsuColour.Gray(80),
-                                            Origin = Anchor.BottomLeft,
-                                            Anchor = Anchor.BottomLeft,
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            Anchor = Anchor.BottomRight,
-                                            Origin = Anchor.BottomRight,
-                                            Direction = FillDirection.Horizontal,
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
-                                            Children = new Drawable[]
+                                            new OsuTabControlCheckbox
                                             {
-                                                new OsuTabControlCheckbox
-                                                {
-                                                    Text = "Show converted",
-                                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
-                                                    Anchor = Anchor.BottomRight,
-                                                    Origin = Anchor.BottomRight,
-                                                },
-                                                sortTabs = new OsuTabControl<SortMode>
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    Width = 0.5f,
-                                                    Height = 24,
-                                                    AutoSort = true,
-                                                    Anchor = Anchor.BottomRight,
-                                                    Origin = Anchor.BottomRight,
-                                                    AccentColour = colours.GreenLight,
-                                                    Current = { BindTarget = sortMode }
-                                                },
-                                                new OsuSpriteText
-                                                {
-                                                    Text = "Sort by",
-                                                    Font = OsuFont.GetFont(size: 14),
-                                                    Margin = new MarginPadding(5),
-                                                    Anchor = Anchor.BottomRight,
-                                                    Origin = Anchor.BottomRight,
-                                                },
-                                            }
-                                        },
-                                    }
+                                                Text = "Show converted",
+                                                Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                                                Anchor = Anchor.BottomRight,
+                                                Origin = Anchor.BottomRight,
+                                            },
+                                            sortTabs = new OsuTabControl<SortMode>
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Width = 0.5f,
+                                                Height = 24,
+                                                AutoSort = true,
+                                                Anchor = Anchor.BottomRight,
+                                                Origin = Anchor.BottomRight,
+                                                AccentColour = colours.GreenLight,
+                                                Current = { BindTarget = sortMode }
+                                            },
+                                            new OsuSpriteText
+                                            {
+                                                Text = "Sort by",
+                                                Font = OsuFont.GetFont(size: 14),
+                                                Margin = new MarginPadding(5),
+                                                Anchor = Anchor.BottomRight,
+                                                Origin = Anchor.BottomRight,
+                                            },
+                                        }
+                                    },
                                 }
                             },
-                            null,
-                            new Drawable[]
+                            new Container
                             {
-                                new Container
+                                RelativeSizeAxes = Axes.X,
+                                Height = 20,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
+                                    collectionDropdown = new CollectionFilterDropdown
                                     {
-                                        collectionDropdown = new CollectionFilterDropdown
-                                        {
-                                            Anchor = Anchor.TopRight,
-                                            Origin = Anchor.TopRight,
-                                            RelativeSizeAxes = Axes.X,
-                                            Width = 0.4f,
-                                        }
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = 0.4f,
                                     }
                                 }
                             },
