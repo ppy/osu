@@ -123,6 +123,8 @@ namespace osu.Game.Rulesets.Scoring
                     case HitResult.None:
                         break;
 
+                    case HitResult.SmallTickMiss:
+                    case HitResult.LargeTickMiss:
                     case HitResult.Miss:
                         Combo.Value = 0;
                         break;
@@ -133,7 +135,7 @@ namespace osu.Game.Rulesets.Scoring
                 }
             }
 
-            double scoreIncrease = result.Type == HitResult.Miss ? 0 : result.Judgement.NumericResultFor(result);
+            double scoreIncrease = result.IsHit ? result.Judgement.NumericResultFor(result) : 0;
 
             if (result.Judgement.IsBonus)
             {
@@ -174,7 +176,7 @@ namespace osu.Game.Rulesets.Scoring
             if (result.FailedAtJudgement)
                 return;
 
-            double scoreIncrease = result.Type == HitResult.Miss ? 0 : result.Judgement.NumericResultFor(result);
+            double scoreIncrease = result.IsHit ? result.Judgement.NumericResultFor(result) : 0;
 
             if (result.Judgement.IsBonus)
             {
