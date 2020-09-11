@@ -204,10 +204,15 @@ namespace osu.Game.Rulesets.Scoring
 
         private double getScore(ScoringMode mode)
         {
+            double calculatedBonusScore = 0;
+
+            calculatedBonusScore += GetStatistic(HitResult.SmallBonusHit) * GetNumericBonusResult(HitResult.SmallBonusHit);
+            calculatedBonusScore += GetStatistic(HitResult.LargeBonusHit) * GetNumericBonusResult(HitResult.LargeBonusHit);
+
             return GetScore(mode, maxHighestCombo,
                 maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
                 maxHighestCombo > 0 ? (double)HighestCombo.Value / maxHighestCombo : 0,
-                bonusScore);
+                calculatedBonusScore);
         }
 
         /// <summary>
@@ -321,6 +326,20 @@ namespace osu.Game.Rulesets.Scoring
         /// Create a <see cref="HitWindows"/> for this processor.
         /// </summary>
         public virtual HitWindows CreateHitWindows() => new HitWindows();
+
+        protected virtual int GetNumericBonusResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.SmallBonusHit:
+                    return 10;
+
+                case HitResult.LargeBonusHit:
+                    return 50;
+            }
+
+            return 0;
+        }
     }
 
     public enum ScoringMode
