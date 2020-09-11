@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
@@ -85,6 +86,13 @@ namespace osu.Game.Skinning
         public List<SkinInfo> GetAllUserSkins() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
+
+        protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
+        {
+            // this is the optimal way to hash legacy skins, but will need to be reconsidered when we move forward with skin implementation.
+            // likely, the skin should expose a real version (ie. the version of the skin, not the skin.ini version it's targeting).
+            return item.ToString().ComputeSHA2Hash();
+        }
 
         protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
