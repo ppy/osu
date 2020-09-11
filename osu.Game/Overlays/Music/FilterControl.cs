@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Music
 
         private FilterCriteria createCriteria() => new FilterCriteria
         {
-            SearchText = Search.Text,
+            SearchText = Search.Current.Value,
             Collection = collectionDropdown.Current.Value?.Collection
         };
 
