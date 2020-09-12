@@ -271,6 +271,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected += onBlueprintSelected;
             blueprint.Deselected += onBlueprintDeselected;
 
+            if (beatmap.SelectedHitObjects.Contains(hitObject))
+                blueprint.Select();
+
             SelectionBlueprints.Add(blueprint);
         }
 
