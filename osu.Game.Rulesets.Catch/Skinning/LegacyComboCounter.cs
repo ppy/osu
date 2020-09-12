@@ -1,13 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
@@ -127,36 +124,6 @@ namespace osu.Game.Rulesets.Catch.Skinning
                      .Expire(true);
 
             lastExplosion = explosion;
-        }
-
-        private class LegacyRollingCounter : RollingCounter<int>
-        {
-            private readonly ISkin skin;
-
-            private readonly string fontName;
-            private readonly float fontOverlap;
-
-            protected override bool IsRollingProportional => true;
-
-            public LegacyRollingCounter(ISkin skin, string fontName, float fontOverlap)
-            {
-                this.skin = skin;
-                this.fontName = fontName;
-                this.fontOverlap = fontOverlap;
-            }
-
-            protected override double GetProportionalDuration(int currentValue, int newValue)
-            {
-                return Math.Abs(newValue - currentValue) * 75.0;
-            }
-
-            protected override OsuSpriteText CreateSpriteText()
-            {
-                return new LegacySpriteText(skin, fontName)
-                {
-                    Spacing = new Vector2(-fontOverlap, 0f)
-                };
-            }
         }
     }
 }
