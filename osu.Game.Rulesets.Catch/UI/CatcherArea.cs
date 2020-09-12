@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> CreateDrawableRepresentation;
 
         public readonly Catcher MovableCatcher;
-        internal readonly CatchComboDisplay ComboDisplay;
+        private readonly CatchComboDisplay comboDisplay;
 
         public Container ExplodingFruitTarget
         {
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
             Children = new Drawable[]
             {
-                ComboDisplay = new CatchComboDisplay
+                comboDisplay = new CatchComboDisplay
                 {
                     RelativeSizeAxes = Axes.None,
                     AutoSizeAxes = Axes.Both,
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
+        public void OnNewResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
             if (result.Judgement is IgnoreJudgement)
                 return;
@@ -99,7 +99,12 @@ namespace osu.Game.Rulesets.Catch.UI
                 else
                     MovableCatcher.Drop();
             }
+
+            comboDisplay.OnNewResult(fruit, result);
         }
+
+        public void OnRevertResult(DrawableCatchHitObject fruit, JudgementResult result)
+            => comboDisplay.OnRevertResult(fruit, result);
 
         public void OnReleased(CatchAction action)
         {
@@ -119,7 +124,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (state?.CatcherX != null)
                 MovableCatcher.X = state.CatcherX.Value;
 
-            ComboDisplay.X = MovableCatcher.X;
+            comboDisplay.X = MovableCatcher.X;
         }
     }
 }

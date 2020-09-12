@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         internal readonly CatcherArea CatcherArea;
 
-        private CatchComboDisplay comboDisplay => CatcherArea.ComboDisplay;
-
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             // only check the X position; handle all vertical space.
             base.ReceivePositionalInputAt(new Vector2(screenSpacePos.X, ScreenSpaceDrawQuad.Centre.Y));
@@ -73,16 +71,9 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
-        {
-            var catchObject = (DrawableCatchHitObject)judgedObject;
-            CatcherArea.OnResult(catchObject, result);
-
-            comboDisplay.OnNewResult(catchObject, result);
-        }
+            => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
 
         private void onRevertResult(DrawableHitObject judgedObject, JudgementResult result)
-        {
-            comboDisplay.OnRevertResult((DrawableCatchHitObject)judgedObject, result);
-        }
+            => CatcherArea.OnRevertResult((DrawableCatchHitObject)judgedObject, result);
     }
 }
