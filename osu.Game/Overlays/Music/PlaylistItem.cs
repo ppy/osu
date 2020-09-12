@@ -95,22 +95,39 @@ namespace osu.Game.Overlays.Music
             return true;
         }
 
+        private bool inSelectedCollection = true;
+
+        public bool InSelectedCollection
+        {
+            get => inSelectedCollection;
+            set
+            {
+                if (inSelectedCollection == value)
+                    return;
+
+                inSelectedCollection = value;
+                updateFilter();
+            }
+        }
+
         public IEnumerable<string> FilterTerms { get; }
 
-        private bool matching = true;
+        private bool matchingFilter = true;
 
         public bool MatchingFilter
         {
-            get => matching;
+            get => matchingFilter && inSelectedCollection;
             set
             {
-                if (matching == value) return;
+                if (matchingFilter == value)
+                    return;
 
-                matching = value;
-
-                this.FadeTo(matching ? 1 : 0, 200);
+                matchingFilter = value;
+                updateFilter();
             }
         }
+
+        private void updateFilter() => this.FadeTo(MatchingFilter ? 1 : 0, 200);
 
         public bool FilteringActive { get; set; }
     }

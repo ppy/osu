@@ -231,7 +231,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             InputManager.Click(MouseButton.Left);
         });
 
-        private IEnumerable<Dropdown<CollectionMenuItem>.DropdownMenu.DrawableDropdownMenuItem> getCollectionDropdownItems()
-            => control.ChildrenOfType<CollectionFilterDropdown>().Single().ChildrenOfType<Dropdown<CollectionMenuItem>.DropdownMenu.DrawableDropdownMenuItem>();
+        private IEnumerable<Dropdown<CollectionFilterMenuItem>.DropdownMenu.DrawableDropdownMenuItem> getCollectionDropdownItems()
+            => control.ChildrenOfType<CollectionFilterDropdown>().Single().ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownMenu.DrawableDropdownMenuItem>();
     }
 }
