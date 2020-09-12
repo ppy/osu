@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             distance: snap0distances,
             offset: new double[] { -1, -5, -6.7, -6.5, -4.3, -4.3 },
             scale: new double[] { 1, 0.85, 0.6, 0.8, 1, 1 },
-            components: new [] {
+            components: new[] {
                 new L2NormCorrection(
                     distance: snap0distances,
                     x_offset: new double[] { 0.5, 2, 2.8, 5, 5, 5 },

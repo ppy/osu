@@ -71,15 +71,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             List<OsuMovement> movementsHidden = createMovements(hitObjects, clockRate, strainHistory,
                 hidden: true, noteDensities: noteDensities);
 
-            var mapHitProbs = new HitProbabilities(movements, default_cheese_level, difficultyCount: combo_tp_count);
+            var comboSectionAmount = combo_tp_count;
+            if (movements.Count < comboSectionAmount)
+                comboSectionAmount = movements.Count;
+
+            var missSectionAmount = miss_tp_count;
+            if (movements.Count < missSectionAmount)
+                missSectionAmount = movements.Count;
+
+            var mapHitProbs = new HitProbabilities(movements, default_cheese_level, difficultyCount: comboSectionAmount);
             double fcProbTp = calculateFcProbTp(movements);
             double fcProbTpHidden = calculateFcProbTp(movementsHidden);
 
             double hiddenFactor = fcProbTpHidden / fcProbTp;
 
-            double[] comboTps = calculateComboTps(mapHitProbs);
+            double[] comboTps = calculateComboTps(mapHitProbs, comboSectionAmount);
             double fcTimeTp = comboTps.Last();
-            var (missTps, missCounts) = calculateMissTpsMissCounts(movements, fcTimeTp);
+            var (missTps, missCounts) = calculateMissTpsMissCounts(movements, fcTimeTp, missSectionAmount);
             var (cheeseLevels, cheeseFactors) = calculateCheeseLevelsCheeseFactors(movements, fcProbTp);
             double cheeseNoteCount = getCheeseNoteCount(movements, fcProbTp);
 
@@ -182,13 +190,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Calculate miss count for a list of throughputs (used to evaluate miss count of plays).
         /// </summary>
-        private static (double[], double[]) calculateMissTpsMissCounts(IList<OsuMovement> movements, double fcTimeTp)
+        private static (double[], double[]) calculateMissTpsMissCounts(IList<OsuMovement> movements, double fcTimeTp, int sectionAmount)
         {
-            double[] missTps = new double[miss_tp_count];
-            double[] missCounts = new double[miss_tp_count];
+            double[] missTps = new double[sectionAmount];
+            double[] missCounts = new double[sectionAmount];
             double fcProb = calculateFcProb(movements, fcTimeTp, default_cheese_level);
 
-            for (int i = 0; i < miss_tp_count; i++)
+            for (int i = 0; i < sectionAmount; i++)
             {
                 double missTp = fcTimeTp * (1 - Math.Pow(i, 1.5) * 0.005);
                 double[] missProbs = getMissProbs(movements, missTp);
@@ -270,11 +278,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// The map is divided into combo_tp_count sections, and a submap can span x sections.
         /// This function calculates fcTimeTp for every possible submap length.
         /// </summary>
-        private static double[] calculateComboTps(HitProbabilities hitProbabilities)
+        private static double[] calculateComboTps(HitProbabilities hitProbabilities, int sectionAmount)
         {
-            double[] comboTps = new double[combo_tp_count];
+            double[] comboTps = new double[sectionAmount];
 
-            for (int i = 1; i <= combo_tp_count; ++i)
+            for (int i = 1; i <= sectionAmount; ++i)
             {
                 comboTps[i - 1] = calculateFcTimeTp(hitProbabilities, i);
             }

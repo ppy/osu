@@ -417,7 +417,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             };
         }
 
-
         private static double calcCorrection0Stop(double d, double x, double y)
         {
             return SpecialFunctions.Logistic(10 * Math.Sqrt(x * x + y * y + 1) - 12);

@@ -73,7 +73,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             return sections[start + sectionCount - 1].EndT - sections[start].StartT;
         }
 
-
         /// <summary>
         /// Average time it takes a player to FC this subset assuming they retry as soon as they miss a note
         /// </summary>
