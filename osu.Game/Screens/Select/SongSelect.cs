@@ -517,6 +517,8 @@ namespace osu.Game.Screens.Select
             FilterControl.Activate();
 
             ModSelect.SelectedMods.BindTo(selectedMods);
+
+            music.TrackChanged += ensureTrackLooping;
         }
 
         private const double logo_transition = 250;
@@ -568,6 +570,7 @@ namespace osu.Game.Screens.Select
             BeatmapDetails.Refresh();
 
             music.CurrentTrack.Looping = true;
+            music.TrackChanged += ensureTrackLooping;
             music.ResetTrackAdjustments();
 
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
@@ -593,6 +596,7 @@ namespace osu.Game.Screens.Select
             BeatmapOptions.Hide();
 
             music.CurrentTrack.Looping = false;
+            music.TrackChanged -= ensureTrackLooping;
 
             this.ScaleTo(1.1f, 250, Easing.InSine);
 
@@ -614,9 +618,13 @@ namespace osu.Game.Screens.Select
             FilterControl.Deactivate();
 
             music.CurrentTrack.Looping = false;
+            music.TrackChanged -= ensureTrackLooping;
 
             return false;
         }
+
+        private void ensureTrackLooping(WorkingBeatmap beatmap, TrackChangeDirection changeDirection)
+            => music.CurrentTrack.Looping = true;
 
         public override bool OnBackButton()
         {
@@ -653,8 +661,6 @@ namespace osu.Game.Screens.Select
             beatmapInfoWedge.Beatmap = beatmap;
 
             BeatmapDetails.Beatmap = beatmap;
-
-            music.CurrentTrack.Looping = true;
         }
 
         private readonly WeakReference<ITrack> lastTrack = new WeakReference<ITrack>(null);
