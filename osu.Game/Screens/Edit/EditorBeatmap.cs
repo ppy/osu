@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
         public void UpdateHitObject([NotNull] HitObject hitObject) => updateHitObject(hitObject, false);
 
-        private void updateHitObject([CanBeNull] HitObject hitObject, bool silent)
+        private void updateHitObject([CanBeNull] HitObject hitObject, bool silent, bool performAdd = false)
         {
             if (hitObject != null)
                 pendingUpdates.Add(hitObject);
@@ -92,6 +92,12 @@ namespace osu.Game.Screens.Edit
                     obj.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
 
                 beatmapProcessor?.PostProcess();
+
+                if (performAdd)
+                {
+                    foreach (var obj in pendingUpdates)
+                        HitObjectAdded?.Invoke(obj);
+                }
 
                 if (!silent)
                 {
@@ -158,14 +164,8 @@ namespace osu.Game.Screens.Edit
         {
             trackStartTime(hitObject);
 
-            updateHitObject(hitObject, true);
-
-            // must occur after the batch-scheduled ApplyDefaults.
-            Schedule(() =>
-            {
-                mutableHitObjects.Insert(index, hitObject);
-                HitObjectAdded?.Invoke(hitObject);
-            });
+            mutableHitObjects.Insert(index, hitObject);
+            updateHitObject(hitObject, true, true);
         }
 
         /// <summary>
