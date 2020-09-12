@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -439,6 +440,9 @@ namespace osu.Game.Screens.Edit
 
         protected void Copy()
         {
+            if (editorBeatmap.SelectedHitObjects.Count == 0)
+                return;
+
             clipboard.Value = new ClipboardContent(editorBeatmap).Serialize();
         }
 
@@ -448,6 +452,9 @@ namespace osu.Game.Screens.Edit
                 return;
 
             var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
+
+            Debug.Assert(objects.Any());
+
             double timeOffset = clock.CurrentTime - objects.First().StartTime;
 
             foreach (var h in objects)
