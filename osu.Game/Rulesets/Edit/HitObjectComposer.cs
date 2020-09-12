@@ -82,57 +82,49 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            InternalChild = new GridContainer
+            const float toolbar_width = 200;
+
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Content = new[]
+                new Container
                 {
-                    new Drawable[]
+                    Name = "Content",
+                    Padding = new MarginPadding { Left = toolbar_width },
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        // layers below playfield
+                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
                         {
-                            Name = "Sidebar",
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = 10 },
-                            Spacing = new Vector2(10),
-                            Children = new Drawable[]
-                            {
-                                new ToolboxGroup("toolbox") { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } },
-                                new ToolboxGroup("toggles")
-                                {
-                                    ChildrenEnumerable = Toggles.Select(b => new SettingsCheckbox
-                                    {
-                                        Bindable = b,
-                                        LabelText = b?.Description ?? "unknown"
-                                    })
-                                }
-                            }
-                        },
-                        new Container
-                        {
-                            Name = "Content",
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                // layers below playfield
-                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
-                                {
-                                    LayerBelowRuleset,
-                                    new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
-                                }),
-                                drawableRulesetWrapper,
-                                // layers above playfield
-                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                                      .WithChild(BlueprintContainer = CreateBlueprintContainer(HitObjects))
-                            }
-                        }
-                    },
+                            LayerBelowRuleset,
+                            new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
+                        }),
+                        drawableRulesetWrapper,
+                        // layers above playfield
+                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
+                                              .WithChild(BlueprintContainer = CreateBlueprintContainer(HitObjects))
+                    }
                 },
-                ColumnDimensions = new[]
+                new FillFlowContainer
                 {
-                    new Dimension(GridSizeMode.Absolute, 200),
-                }
+                    Name = "Sidebar",
+                    RelativeSizeAxes = Axes.Y,
+                    Width = toolbar_width,
+                    Padding = new MarginPadding { Right = 10 },
+                    Spacing = new Vector2(10),
+                    Children = new Drawable[]
+                    {
+                        new ToolboxGroup("toolbox") { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } },
+                        new ToolboxGroup("toggles")
+                        {
+                            ChildrenEnumerable = Toggles.Select(b => new SettingsCheckbox
+                            {
+                                Bindable = b,
+                                LabelText = b?.Description ?? "unknown"
+                            })
+                        }
+                    }
+                },
             };
 
             toolboxCollection.Items = CompositionTools
