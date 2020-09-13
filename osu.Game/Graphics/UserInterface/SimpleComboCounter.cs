@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -19,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
+        private void load(OsuColour colours) => Colour = colours.BlueLighter;
 
         protected override string FormatCount(int count)
         {
@@ -35,5 +37,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             Current.Value += amount;
         }
+
+        protected override OsuSpriteText CreateSpriteText()
+            => base.CreateSpriteText().With(s => s.Font = s.Font.With(size: 20f));
     }
 }
