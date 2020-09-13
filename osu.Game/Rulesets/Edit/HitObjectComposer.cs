@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -13,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -25,7 +27,7 @@ using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
-using Key = osuTK.Input.Key;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -80,53 +82,54 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            InternalChild = new GridContainer
+            const float toolbar_width = 200;
+
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Content = new[]
+                new Container
                 {
-                    new Drawable[]
+                    Name = "Content",
+                    Padding = new MarginPadding { Left = toolbar_width },
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        // layers below playfield
+                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
                         {
-                            Name = "Sidebar",
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = 10 },
-                            Children = new Drawable[]
-                            {
-                                new ToolboxGroup { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } }
-                            }
-                        },
-                        new Container
-                        {
-                            Name = "Content",
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                // layers below playfield
-                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
-                                {
-                                    LayerBelowRuleset,
-                                    new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
-                                }),
-                                drawableRulesetWrapper,
-                                // layers above playfield
-                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                                      .WithChild(BlueprintContainer = CreateBlueprintContainer(HitObjects))
-                            }
-                        }
-                    },
+                            LayerBelowRuleset,
+                            new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
+                        }),
+                        drawableRulesetWrapper,
+                        // layers above playfield
+                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
+                                              .WithChild(BlueprintContainer = CreateBlueprintContainer(HitObjects))
+                    }
                 },
-                ColumnDimensions = new[]
+                new FillFlowContainer
                 {
-                    new Dimension(GridSizeMode.Absolute, 200),
-                }
+                    Name = "Sidebar",
+                    RelativeSizeAxes = Axes.Y,
+                    Width = toolbar_width,
+                    Padding = new MarginPadding { Right = 10 },
+                    Spacing = new Vector2(10),
+                    Children = new Drawable[]
+                    {
+                        new ToolboxGroup("toolbox") { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } },
+                        new ToolboxGroup("toggles")
+                        {
+                            ChildrenEnumerable = Toggles.Select(b => new SettingsCheckbox
+                            {
+                                Bindable = b,
+                                LabelText = b?.Description ?? "unknown"
+                            })
+                        }
+                    }
+                },
             };
 
             toolboxCollection.Items = CompositionTools
                                       .Prepend(new SelectTool())
-                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t)))
+                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
                                       .ToList();
 
             setSelectTool();
@@ -155,6 +158,12 @@ namespace osu.Game.Rulesets.Edit
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+
+        /// <summary>
+        /// A collection of toggles which will be displayed to the user.
+        /// The display name will be decided by <see cref="Bindable{T}.Description"/>.
+        /// </summary>
+        protected virtual IEnumerable<BindableBool> Toggles => Enumerable.Empty<BindableBool>();
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
@@ -293,7 +302,16 @@ namespace osu.Game.Rulesets.Edit
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
         {
-            var snappedEndTime = BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
+            double actualDuration = referenceTime + DistanceToDuration(referenceTime, distance);
+
+            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, referenceTime);
+
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
+
+            // we don't want to exceed the actual duration and snap to a point in the future.
+            // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
+            if (snappedEndTime > actualDuration + 1)
+                snappedEndTime -= beatLength;
 
             return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
         }

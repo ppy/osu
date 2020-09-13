@@ -285,8 +285,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void runHyperDashStateTransition(bool hyperDashing)
         {
-            trails.HyperDashTrailsColour = hyperDashColour;
-            trails.EndGlowSpritesColour = hyperDashEndGlowColour;
             updateTrailVisibility();
 
             if (hyperDashing)
@@ -402,6 +400,9 @@ namespace osu.Game.Rulesets.Catch.UI
             hyperDashEndGlowColour =
                 skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ??
                 hyperDashColour;
+
+            trails.HyperDashTrailsColour = hyperDashColour;
+            trails.EndGlowSpritesColour = hyperDashEndGlowColour;
 
             runHyperDashStateTransition(HyperDashing);
         }

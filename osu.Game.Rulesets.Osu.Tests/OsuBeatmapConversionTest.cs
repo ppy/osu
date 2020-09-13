@@ -12,6 +12,7 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
+    [Timeout(10000)]
     public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";

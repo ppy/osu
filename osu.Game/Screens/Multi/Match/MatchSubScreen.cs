@@ -172,7 +172,7 @@ namespace osu.Game.Screens.Multi.Match
                                                                 new Dimension(GridSizeMode.AutoSize),
                                                                 new Dimension(),
                                                                 new Dimension(GridSizeMode.AutoSize),
-                                                                new Dimension(GridSizeMode.Relative, size: 0.4f, minSize: 240),
+                                                                new Dimension(GridSizeMode.Relative, size: 0.4f, minSize: 120),
                                                             }
                                                         },
                                                         null

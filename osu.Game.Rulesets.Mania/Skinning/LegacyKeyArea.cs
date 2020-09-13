@@ -65,6 +65,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
+
+            if (GetColumnSkinConfig<bool>(skin, LegacyManiaSkinConfigurationLookups.KeysUnderNotes)?.Value ?? false)
+                Column.UnderlayElements.Add(CreateProxy());
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
