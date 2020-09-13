@@ -256,7 +256,6 @@ namespace osu.Game.Screens.Edit
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
-            // todo: BindCollectionChanged
             editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) =>
             {
                 var hasObjects = editorBeatmap.SelectedHitObjects.Count > 0;
