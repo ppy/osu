@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -25,8 +26,12 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/messaging";
+        public string Title => "chat";
+        public string Description => "join the real-time discussion";
+
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
@@ -218,14 +223,13 @@ namespace osu.Game.Overlays
             Schedule(() =>
             {
                 // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
-                channelManager.JoinedChannels.ItemsAdded += onChannelAddedToJoinedChannels;
-                channelManager.JoinedChannels.ItemsRemoved += onChannelRemovedFromJoinedChannels;
+                channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
+
                 foreach (Channel channel in channelManager.JoinedChannels)
                     ChannelTabControl.AddChannel(channel);
 
-                channelManager.AvailableChannels.ItemsAdded += availableChannelsChanged;
-                channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
-                ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+                channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
+                availableChannelsChanged(null, null);
 
                 currentChannel = channelManager.CurrentChannel.GetBoundCopy();
                 currentChannel.BindValueChanged(currentChannelChanged, true);
@@ -384,34 +388,41 @@ namespace osu.Game.Overlays
             base.PopOut();
         }
 
-        private void onChannelAddedToJoinedChannels(IEnumerable<Channel> channels)
+        private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            foreach (Channel channel in channels)
-                ChannelTabControl.AddChannel(channel);
-        }
-
-        private void onChannelRemovedFromJoinedChannels(IEnumerable<Channel> channels)
-        {
-            foreach (Channel channel in channels)
+            switch (args.Action)
             {
-                ChannelTabControl.RemoveChannel(channel);
+                case NotifyCollectionChangedAction.Add:
+                    foreach (Channel channel in args.NewItems.Cast<Channel>())
+                        ChannelTabControl.AddChannel(channel);
+                    break;
 
-                var loaded = loadedChannels.Find(c => c.Channel == channel);
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (Channel channel in args.OldItems.Cast<Channel>())
+                    {
+                        ChannelTabControl.RemoveChannel(channel);
 
-                if (loaded != null)
-                {
-                    loadedChannels.Remove(loaded);
+                        var loaded = loadedChannels.Find(c => c.Channel == channel);
 
-                    // Because the container is only cleared in the async load callback of a new channel, it is forcefully cleared
-                    // to ensure that the previous channel doesn't get updated after it's disposed
-                    currentChannelContainer.Remove(loaded);
-                    loaded.Dispose();
-                }
+                        if (loaded != null)
+                        {
+                            loadedChannels.Remove(loaded);
+
+                            // Because the container is only cleared in the async load callback of a new channel, it is forcefully cleared
+                            // to ensure that the previous channel doesn't get updated after it's disposed
+                            currentChannelContainer.Remove(loaded);
+                            loaded.Dispose();
+                        }
+                    }
+
+                    break;
             }
         }
 
-        private void availableChannelsChanged(IEnumerable<Channel> channels)
-            => ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+        private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -420,10 +431,8 @@ namespace osu.Game.Overlays
             if (channelManager != null)
             {
                 channelManager.CurrentChannel.ValueChanged -= currentChannelChanged;
-                channelManager.JoinedChannels.ItemsAdded -= onChannelAddedToJoinedChannels;
-                channelManager.JoinedChannels.ItemsRemoved -= onChannelRemovedFromJoinedChannels;
-                channelManager.AvailableChannels.ItemsAdded -= availableChannelsChanged;
-                channelManager.AvailableChannels.ItemsRemoved -= availableChannelsChanged;
+                channelManager.JoinedChannels.CollectionChanged -= joinedChannelsChanged;
+                channelManager.AvailableChannels.CollectionChanged -= availableChannelsChanged;
             }
         }
 

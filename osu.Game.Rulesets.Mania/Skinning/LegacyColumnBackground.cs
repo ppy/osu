@@ -5,10 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
@@ -19,17 +17,12 @@ namespace osu.Game.Rulesets.Mania.Skinning
     public class LegacyColumnBackground : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
-        private readonly bool isLastColumn;
 
-        private Container borderLineContainer;
         private Container lightContainer;
         private Sprite light;
 
-        private float hitPosition;
-
-        public LegacyColumnBackground(bool isLastColumn)
+        public LegacyColumnBackground()
         {
-            this.isLastColumn = isLastColumn;
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -39,62 +32,14 @@ namespace osu.Game.Rulesets.Mania.Skinning
             string lightImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.LightImage)?.Value
                                 ?? "mania-stage-light";
 
-            float leftLineWidth = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LeftLineWidth)
-                ?.Value ?? 1;
-            float rightLineWidth = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.RightLineWidth)
-                ?.Value ?? 1;
-
-            bool hasLeftLine = leftLineWidth > 0;
-            bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
-                                || isLastColumn;
-
-            hitPosition = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.HitPosition)?.Value
-                          ?? Stage.HIT_TARGET_POSITION;
-
             float lightPosition = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LightPosition)?.Value
                                   ?? 0;
-
-            Color4 lineColour = GetColumnSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLineColour)?.Value
-                                ?? Color4.White;
-
-            Color4 backgroundColour = GetColumnSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour)?.Value
-                                      ?? Color4.Black;
 
             Color4 lightColour = GetColumnSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLightColour)?.Value
                                  ?? Color4.White;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = backgroundColour
-                },
-                borderLineContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Y,
-                            Width = leftLineWidth,
-                            Scale = new Vector2(0.740f, 1),
-                            Colour = lineColour,
-                            Alpha = hasLeftLine ? 1 : 0
-                        },
-                        new Box
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            RelativeSizeAxes = Axes.Y,
-                            Width = rightLineWidth,
-                            Scale = new Vector2(0.740f, 1),
-                            Colour = lineColour,
-                            Alpha = hasRightLine ? 1 : 0
-                        }
-                    }
-                },
                 lightContainer = new Container
                 {
                     Origin = Anchor.BottomCentre,
@@ -104,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Colour = lightColour,
+                        Colour = LegacyColourCompatibility.DisallowZeroAlpha(lightColour),
                         Texture = skin.GetTexture(lightImage),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,
@@ -123,15 +68,11 @@ namespace osu.Game.Rulesets.Mania.Skinning
             {
                 lightContainer.Anchor = Anchor.TopCentre;
                 lightContainer.Scale = new Vector2(1, -1);
-
-                borderLineContainer.Padding = new MarginPadding { Top = hitPosition };
             }
             else
             {
                 lightContainer.Anchor = Anchor.BottomCentre;
                 lightContainer.Scale = Vector2.One;
-
-                borderLineContainer.Padding = new MarginPadding { Bottom = hitPosition };
             }
         }
 

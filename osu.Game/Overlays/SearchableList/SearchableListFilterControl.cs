@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.SearchableList
         /// <summary>
         /// The amount of padding added to content (does not affect background or tab control strip).
         /// </summary>
-        protected virtual float ContentHorizontalPadding => SearchableListOverlay.WIDTH_PADDING;
+        protected virtual float ContentHorizontalPadding => WaveOverlayContainer.WIDTH_PADDING;
 
         protected SearchableListFilterControl()
         {
