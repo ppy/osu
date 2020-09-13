@@ -23,15 +23,19 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestHitObjectAddEvent()
         {
-            var editorBeatmap = new EditorBeatmap(new OsuBeatmap());
-
-            HitObject addedObject = null;
-            editorBeatmap.HitObjectAdded += h => addedObject = h;
-
             var hitCircle = new HitCircle();
 
-            editorBeatmap.Add(hitCircle);
-            Assert.That(addedObject, Is.EqualTo(hitCircle));
+            HitObject addedObject = null;
+            EditorBeatmap editorBeatmap = null;
+
+            AddStep("add beatmap", () =>
+            {
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+                editorBeatmap.HitObjectAdded += h => addedObject = h;
+            });
+
+            AddStep("add hitobject", () => editorBeatmap.Add(hitCircle));
+            AddAssert("received add event", () => addedObject == hitCircle);
         }
 
         /// <summary>
@@ -41,13 +45,15 @@ namespace osu.Game.Tests.Beatmaps
         public void HitObjectRemoveEvent()
         {
             var hitCircle = new HitCircle();
-            var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
-
             HitObject removedObject = null;
-            editorBeatmap.HitObjectRemoved += h => removedObject = h;
-
-            editorBeatmap.Remove(hitCircle);
-            Assert.That(removedObject, Is.EqualTo(hitCircle));
+            EditorBeatmap editorBeatmap = null;
+            AddStep("add beatmap", () =>
+            {
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
+                editorBeatmap.HitObjectRemoved += h => removedObject = h;
+            });
+            AddStep("remove hitobject", () => editorBeatmap.Remove(editorBeatmap.HitObjects.First()));
+            AddAssert("received remove event", () => removedObject == hitCircle);
         }
 
         /// <summary>
@@ -58,9 +64,7 @@ namespace osu.Game.Tests.Beatmaps
         public void TestInitialHitObjectStartTimeChangeEvent()
         {
             var hitCircle = new HitCircle();
-
             HitObject changedObject = null;
-
             AddStep("add beatmap", () =>
             {
                 EditorBeatmap editorBeatmap;
@@ -68,7 +72,6 @@ namespace osu.Game.Tests.Beatmaps
                 Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
                 editorBeatmap.HitObjectUpdated += h => changedObject = h;
             });
-
             AddStep("change start time", () => hitCircle.StartTime = 1000);
             AddAssert("received change event", () => changedObject == hitCircle);
         }
@@ -82,18 +85,14 @@ namespace osu.Game.Tests.Beatmaps
         {
             EditorBeatmap editorBeatmap = null;
             HitObject changedObject = null;
-
             AddStep("add beatmap", () =>
             {
                 Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap());
                 editorBeatmap.HitObjectUpdated += h => changedObject = h;
             });
-
             var hitCircle = new HitCircle();
-
             AddStep("add object", () => editorBeatmap.Add(hitCircle));
             AddAssert("event not received", () => changedObject == null);
-
             AddStep("change start time", () => hitCircle.StartTime = 1000);
             AddAssert("event received", () => changedObject == hitCircle);
         }
@@ -106,13 +105,10 @@ namespace osu.Game.Tests.Beatmaps
         {
             var hitCircle = new HitCircle();
             var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
-
             HitObject changedObject = null;
             editorBeatmap.HitObjectUpdated += h => changedObject = h;
-
             editorBeatmap.Remove(hitCircle);
             Assert.That(changedObject, Is.Null);
-
             hitCircle.StartTime = 1000;
             Assert.That(changedObject, Is.Null);
         }
@@ -147,6 +143,7 @@ namespace osu.Game.Tests.Beatmaps
         public void TestResortWhenStartTimeChanged()
         {
             var hitCircle = new HitCircle { StartTime = 1000 };
+
             var editorBeatmap = new EditorBeatmap(new OsuBeatmap
             {
                 HitObjects =
@@ -173,7 +170,6 @@ namespace osu.Game.Tests.Beatmaps
             var updatedObjects = new List<HitObject>();
             var allHitObjects = new List<HitObject>();
             EditorBeatmap editorBeatmap = null;
-
             AddStep("add beatmap", () =>
             {
                 updatedObjects.Clear();
@@ -187,11 +183,9 @@ namespace osu.Game.Tests.Beatmaps
                     allHitObjects.Add(h);
                 }
             });
-
             AddStep("change all start times", () =>
             {
                 editorBeatmap.HitObjectUpdated += h => updatedObjects.Add(h);
-
                 for (int i = 0; i < 10; i++)
                     allHitObjects[i].StartTime += 10;
             });
@@ -208,7 +202,6 @@ namespace osu.Game.Tests.Beatmaps
         {
             var updatedObjects = new List<HitObject>();
             EditorBeatmap editorBeatmap = null;
-
             AddStep("add beatmap", () =>
             {
                 updatedObjects.Clear();
@@ -216,15 +209,12 @@ namespace osu.Game.Tests.Beatmaps
                 Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap());
                 editorBeatmap.Add(new HitCircle());
             });
-
             AddStep("change start time twice", () =>
             {
                 editorBeatmap.HitObjectUpdated += h => updatedObjects.Add(h);
-
                 editorBeatmap.HitObjects[0].StartTime = 10;
                 editorBeatmap.HitObjects[0].StartTime = 20;
             });
-
             AddAssert("only updated once", () => updatedObjects.Count == 1);
         }
     }
