@@ -454,7 +454,7 @@ namespace osu.Game.Screens.Edit
 
             Debug.Assert(objects.Any());
 
-            double timeOffset = clock.CurrentTime - objects.First().StartTime;
+            double timeOffset = clock.CurrentTime - objects.Min(o => o.StartTime);
 
             foreach (var h in objects)
                 h.StartTime += timeOffset;
