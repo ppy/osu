@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
