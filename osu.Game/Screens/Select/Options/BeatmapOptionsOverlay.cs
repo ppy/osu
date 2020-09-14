@@ -11,6 +11,8 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input.Events;
+using System.Linq;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -60,9 +62,8 @@ namespace osu.Game.Screens.Select.Options
         /// <param name="secondLine">Text in the second line.</param>
         /// <param name="colour">Colour of the button.</param>
         /// <param name="icon">Icon of the button.</param>
-        /// <param name="hotkey">Hotkey of the button.</param>
         /// <param name="action">Binding the button does.</param>
-        public void AddButton(string firstLine, string secondLine, IconUsage icon, Color4 colour, Action action, Key? hotkey = null)
+        public void AddButton(string firstLine, string secondLine, IconUsage icon, Color4 colour, Action action)
         {
             var button = new BeatmapOptionsButton
             {
@@ -75,7 +76,6 @@ namespace osu.Game.Screens.Select.Options
                     Hide();
                     action?.Invoke();
                 },
-                HotKey = hotkey
             };
 
             buttonsContainer.Add(button);
@@ -106,6 +106,25 @@ namespace osu.Game.Screens.Select.Options
             buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, Easing.InSine);
 
             this.FadeOut(transition_duration, Easing.InQuint);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (!e.Repeat && e.Key >= Key.Number1 && e.Key <= Key.Number9)
+            {
+                int requested = e.Key - Key.Number1;
+
+                // go reverse as buttonsContainer is a ReverseChildIDFillFlowContainer
+                BeatmapOptionsButton found = buttonsContainer.Children.ElementAtOrDefault((buttonsContainer.Children.Count - 1) - requested);
+
+                if (found != null)
+                {
+                    found.Click();
+                    return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
         }
     }
 }
