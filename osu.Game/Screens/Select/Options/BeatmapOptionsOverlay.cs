@@ -27,33 +27,6 @@ namespace osu.Game.Screens.Select.Options
 
         public override bool BlockScreenWideMouse => false;
 
-        protected override void PopIn()
-        {
-            base.PopIn();
-
-            this.FadeIn(transition_duration, Easing.OutQuint);
-
-            if (buttonsContainer.Position.X == 1 || Alpha == 0)
-                buttonsContainer.MoveToX(x_position - x_movement);
-
-            holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, Easing.OutQuint);
-
-            buttonsContainer.MoveToX(x_position, transition_duration, Easing.OutQuint);
-            buttonsContainer.TransformSpacingTo(Vector2.Zero, transition_duration, Easing.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-
-            holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, Easing.InSine);
-
-            buttonsContainer.MoveToX(x_position + x_movement, transition_duration, Easing.InSine);
-            buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, Easing.InSine);
-
-            this.FadeOut(transition_duration, Easing.InQuint);
-        }
-
         public BeatmapOptionsOverlay()
         {
             AutoSizeAxes = Axes.Y;
@@ -106,6 +79,33 @@ namespace osu.Game.Screens.Select.Options
             };
 
             buttonsContainer.Add(button);
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            this.FadeIn(transition_duration, Easing.OutQuint);
+
+            if (buttonsContainer.Position.X == 1 || Alpha == 0)
+                buttonsContainer.MoveToX(x_position - x_movement);
+
+            holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, Easing.OutQuint);
+
+            buttonsContainer.MoveToX(x_position, transition_duration, Easing.OutQuint);
+            buttonsContainer.TransformSpacingTo(Vector2.Zero, transition_duration, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, Easing.InSine);
+
+            buttonsContainer.MoveToX(x_position + x_movement, transition_duration, Easing.InSine);
+            buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, Easing.InSine);
+
+            this.FadeOut(transition_duration, Easing.InQuint);
         }
     }
 }
