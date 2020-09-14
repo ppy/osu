@@ -98,7 +98,7 @@ namespace osu.Game.Skinning
                 return item.ToString().ComputeSHA2Hash();
             }
 
-            // if there was no creator, the ToString above would give the filename, which along isn't really enough to base any decisions on.
+            // if there was no creator, the ToString above would give the filename, which alone isn't really enough to base any decisions on.
             return base.ComputeHash(item, reader);
         }
 
