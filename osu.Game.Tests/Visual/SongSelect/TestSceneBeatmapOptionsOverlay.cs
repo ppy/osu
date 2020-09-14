@@ -17,6 +17,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             var colours = new OsuColour();
 
+            overlay.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, null);
             overlay.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
             overlay.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, null);
             overlay.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, null);
