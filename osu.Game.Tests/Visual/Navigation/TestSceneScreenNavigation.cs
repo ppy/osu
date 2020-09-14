@@ -6,9 +6,11 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps.IO;
@@ -141,6 +143,29 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("Track was completed", () => trackCompleted);
             AddUntilStep("Track was restarted", () => Game.MusicController.IsPlaying);
+        }
+
+        [Test]
+        public void TestModSelectInput()
+        {
+            TestSongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestSongSelect());
+
+            AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
+
+            AddStep("Change ruleset to osu!taiko", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.Number2);
+
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.Number2);
+            });
+
+            AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.ID == 1);
+
+            AddAssert("Mods overlay still visible", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
         }
 
         private void pushEscape() =>
