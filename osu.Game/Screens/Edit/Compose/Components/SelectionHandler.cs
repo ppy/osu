@@ -146,7 +146,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleSelected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Add(blueprint);
-            EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+
+            // there are potentially multiple SelectionHandlers active, but we only want to add hitobjects to the selected list once.
+            if (!EditorBeatmap.SelectedHitObjects.Contains(blueprint.HitObject))
+                EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
 
             UpdateVisibility();
         }
@@ -158,6 +161,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleDeselected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Remove(blueprint);
+
             EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
             UpdateVisibility();
