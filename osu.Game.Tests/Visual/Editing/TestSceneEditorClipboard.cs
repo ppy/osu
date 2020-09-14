@@ -89,6 +89,28 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestCutPasteSpinner()
+        {
+            var addedObject = new Spinner
+            {
+                StartTime = 1000,
+                Duration = 5000
+            };
+
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+
+            AddStep("select added object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
+
+            AddStep("cut hitobject", () => Editor.Cut());
+
+            AddStep("paste hitobject", () => Editor.Paste());
+
+            AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
+
+            AddAssert("duration matches", () => ((Spinner)EditorBeatmap.HitObjects.Single()).Duration == 5000);
+        }
+
+        [Test]
         public void TestCopyPaste()
         {
             var addedObject = new HitCircle { StartTime = 1000 };
