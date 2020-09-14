@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             selectedBlueprints.Add(blueprint);
 
-            // need to check this as well, as there are potentially multiple SelectionHandlers and the above check is not enough.
+            // there are potentially multiple SelectionHandlers active, but we only want to add hitobjects to the selected list once.
             if (!EditorBeatmap.SelectedHitObjects.Contains(blueprint.HitObject))
                 EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
 
