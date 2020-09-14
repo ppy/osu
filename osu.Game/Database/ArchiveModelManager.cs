@@ -321,10 +321,9 @@ namespace osu.Game.Database
                 LogForModel(item, "Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+                item.Hash = ComputeHash(item, archive);
 
                 await Populate(item, archive, cancellationToken);
-
-                item.Hash = ComputeHash(item, archive);
 
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
