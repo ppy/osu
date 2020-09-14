@@ -390,6 +390,9 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            // don't absorb control as ToolbarRulesetSelector uses control + number to navigate
+            if (e.ControlPressed) return false;
+
             switch (e.Key)
             {
                 case Key.Number1:

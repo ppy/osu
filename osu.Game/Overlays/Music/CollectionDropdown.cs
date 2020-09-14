@@ -7,25 +7,29 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.UserInterface;
+using osu.Game.Collections;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Music
 {
-    public class CollectionsDropdown<T> : OsuDropdown<T>
+    /// <summary>
+    /// A <see cref="CollectionFilterDropdown"/> for use in the <see cref="NowPlayingOverlay"/>.
+    /// </summary>
+    public class CollectionDropdown : CollectionFilterDropdown
     {
+        protected override bool ShowManageCollectionsItem => false;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AccentColour = colours.Gray6;
         }
 
-        protected override DropdownHeader CreateHeader() => new CollectionsHeader();
+        protected override CollectionDropdownHeader CreateCollectionHeader() => new CollectionsHeader();
 
-        protected override DropdownMenu CreateMenu() => new CollectionsMenu();
+        protected override CollectionDropdownMenu CreateCollectionMenu() => new CollectionsMenu();
 
-        private class CollectionsMenu : OsuDropdownMenu
+        private class CollectionsMenu : CollectionDropdownMenu
         {
             public CollectionsMenu()
             {
@@ -40,7 +44,7 @@ namespace osu.Game.Overlays.Music
             }
         }
 
-        private class CollectionsHeader : OsuDropdownHeader
+        private class CollectionsHeader : CollectionDropdownHeader
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
