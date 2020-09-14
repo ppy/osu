@@ -146,19 +146,17 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Removes a <see cref="HitObject"/> from this <see cref="EditorBeatmap"/>.
         /// </summary>
-        /// <param name="hitObjects">All <see cref="HitObject"/> to remove.</param>
+        /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
         /// <returns>True if the <see cref="HitObject"/> has been removed, false otherwise.</returns>
-        public void Remove(params HitObject[] hitObjects)
+        public bool Remove(HitObject hitObject)
         {
-            foreach (var h in hitObjects)
-            {
-                int index = FindIndex(h);
+            int index = FindIndex(hitObject);
 
-                if (index == -1)
-                    continue;
+            if (index == -1)
+                return false;
 
-                RemoveAt(index);
-            }
+            RemoveAt(index);
+            return true;
         }
 
         /// <summary>
@@ -195,9 +193,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public void Clear()
         {
-            var removable = HitObjects.ToList();
-
-            foreach (var h in removable)
+            foreach (var h in HitObjects.ToArray())
                 Remove(h);
         }
 
