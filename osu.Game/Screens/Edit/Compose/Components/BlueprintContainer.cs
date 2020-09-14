@@ -367,14 +367,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             selectionHandler.HandleSelected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 1);
-            beatmap.SelectedHitObjects.Add(blueprint.HitObject);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
             selectionHandler.HandleDeselected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 0);
-            beatmap.SelectedHitObjects.Remove(blueprint.HitObject);
         }
 
         #endregion
