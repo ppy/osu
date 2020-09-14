@@ -160,6 +160,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         internal void HandleDeselected(SelectionBlueprint blueprint)
         {
+            selectedBlueprints.Remove(blueprint);
+
             EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
             UpdateVisibility();
