@@ -103,11 +103,8 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private MusicController music { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
-
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections)
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
