@@ -5,9 +5,12 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -50,6 +53,39 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
 
             AddAssert("new object selected", () => EditorBeatmap.SelectedHitObjects.Single().StartTime == newTime);
+        }
+
+        [Test]
+        public void TestCutPasteSlider()
+        {
+            var addedObject = new Slider
+            {
+                StartTime = 1000,
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(100, 0), PathType.Bezier)
+                    }
+                }
+            };
+
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+
+            AddStep("select added object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
+
+            AddStep("cut hitobject", () => Editor.Cut());
+
+            AddStep("paste hitobject", () => Editor.Paste());
+
+            AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
+
+            AddAssert("path matches", () =>
+            {
+                var path = ((Slider)EditorBeatmap.HitObjects.Single()).Path;
+                return path.ControlPoints.Count == 2 && path.ControlPoints.SequenceEqual(addedObject.Path.ControlPoints);
+            });
         }
 
         [Test]
