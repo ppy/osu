@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,6 +24,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.IO.Serialization;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
@@ -131,8 +134,13 @@ namespace osu.Game.Screens.Edit
             updateLastSavedHash();
 
             EditorMenuBar menuBar;
+
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
+
+            EditorMenuItem cutMenuItem;
+            EditorMenuItem copyMenuItem;
+            EditorMenuItem pasteMenuItem;
 
             var fileMenuItems = new List<MenuItem>
             {
@@ -183,7 +191,11 @@ namespace osu.Game.Screens.Edit
                                     Items = new[]
                                     {
                                         undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, Undo),
-                                        redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, Redo)
+                                        redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, Redo),
+                                        new EditorMenuItemSpacer(),
+                                        cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
+                                        copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
+                                        pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
                                     }
                                 }
                             }
@@ -244,6 +256,16 @@ namespace osu.Game.Screens.Edit
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
+            editorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) =>
+            {
+                var hasObjects = editorBeatmap.SelectedHitObjects.Count > 0;
+
+                cutMenuItem.Action.Disabled = !hasObjects;
+                copyMenuItem.Action.Disabled = !hasObjects;
+            }, true);
+
+            clipboard.BindValueChanged(content => pasteMenuItem.Action.Disabled = string.IsNullOrEmpty(content.NewValue));
+
             menuBar.Mode.ValueChanged += onModeChanged;
 
             bottomBackground.Colour = colours.Gray2;
@@ -270,6 +292,18 @@ namespace osu.Game.Screens.Edit
         {
             switch (action.ActionType)
             {
+                case PlatformActionType.Cut:
+                    Cut();
+                    return true;
+
+                case PlatformActionType.Copy:
+                    Copy();
+                    return true;
+
+                case PlatformActionType.Paste:
+                    Paste();
+                    return true;
+
                 case PlatformActionType.Undo:
                     Undo();
                     return true;
@@ -392,6 +426,47 @@ namespace osu.Game.Screens.Edit
         {
             exitConfirmed = true;
             this.Exit();
+        }
+
+        private readonly Bindable<string> clipboard = new Bindable<string>();
+
+        protected void Cut()
+        {
+            Copy();
+            foreach (var h in editorBeatmap.SelectedHitObjects.ToArray())
+                editorBeatmap.Remove(h);
+        }
+
+        protected void Copy()
+        {
+            if (editorBeatmap.SelectedHitObjects.Count == 0)
+                return;
+
+            clipboard.Value = new ClipboardContent(editorBeatmap).Serialize();
+        }
+
+        protected void Paste()
+        {
+            if (string.IsNullOrEmpty(clipboard.Value))
+                return;
+
+            var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
+
+            Debug.Assert(objects.Any());
+
+            double timeOffset = clock.CurrentTime - objects.Min(o => o.StartTime);
+
+            foreach (var h in objects)
+                h.StartTime += timeOffset;
+
+            changeHandler.BeginChange();
+
+            editorBeatmap.SelectedHitObjects.Clear();
+
+            editorBeatmap.AddRange(objects);
+            editorBeatmap.SelectedHitObjects.AddRange(objects);
+
+            changeHandler.EndChange();
         }
 
         protected void Undo() => changeHandler.RestoreState(-1);

@@ -1,41 +1,27 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit;
 
 namespace osu.Game.Tests.Visual.Editing
 {
     public class TestSceneEditorChangeStates : EditorTestScene
     {
-        private EditorBeatmap editorBeatmap;
-
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
-
-        protected new TestEditor Editor => (TestEditor)base.Editor;
-
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
-
-            AddStep("get beatmap", () => editorBeatmap = Editor.ChildrenOfType<EditorBeatmap>().Single());
-        }
 
         [Test]
         public void TestSelectedObjects()
         {
             HitCircle obj = null;
-            AddStep("add hitobject", () => editorBeatmap.Add(obj = new HitCircle { StartTime = 1000 }));
-            AddStep("select hitobject", () => editorBeatmap.SelectedHitObjects.Add(obj));
-            AddAssert("confirm 1 selected", () => editorBeatmap.SelectedHitObjects.Count == 1);
-            AddStep("deselect hitobject", () => editorBeatmap.SelectedHitObjects.Remove(obj));
-            AddAssert("confirm 0 selected", () => editorBeatmap.SelectedHitObjects.Count == 0);
+            AddStep("add hitobject", () => EditorBeatmap.Add(obj = new HitCircle { StartTime = 1000 }));
+            AddStep("select hitobject", () => EditorBeatmap.SelectedHitObjects.Add(obj));
+            AddAssert("confirm 1 selected", () => EditorBeatmap.SelectedHitObjects.Count == 1);
+            AddStep("deselect hitobject", () => EditorBeatmap.SelectedHitObjects.Remove(obj));
+            AddAssert("confirm 0 selected", () => EditorBeatmap.SelectedHitObjects.Count == 0);
         }
 
         [Test]
@@ -43,11 +29,11 @@ namespace osu.Game.Tests.Visual.Editing
         {
             int hitObjectCount = 0;
 
-            AddStep("get initial state", () => hitObjectCount = editorBeatmap.HitObjects.Count);
+            AddStep("get initial state", () => hitObjectCount = EditorBeatmap.HitObjects.Count);
 
             addUndoSteps();
 
-            AddAssert("no change occurred", () => hitObjectCount == editorBeatmap.HitObjects.Count);
+            AddAssert("no change occurred", () => hitObjectCount == EditorBeatmap.HitObjects.Count);
             AddAssert("no unsaved changes", () => !Editor.HasUnsavedChanges);
         }
 
@@ -56,11 +42,11 @@ namespace osu.Game.Tests.Visual.Editing
         {
             int hitObjectCount = 0;
 
-            AddStep("get initial state", () => hitObjectCount = editorBeatmap.HitObjects.Count);
+            AddStep("get initial state", () => hitObjectCount = EditorBeatmap.HitObjects.Count);
 
             addRedoSteps();
 
-            AddAssert("no change occurred", () => hitObjectCount == editorBeatmap.HitObjects.Count);
+            AddAssert("no change occurred", () => hitObjectCount == EditorBeatmap.HitObjects.Count);
             AddAssert("no unsaved changes", () => !Editor.HasUnsavedChanges);
         }
 
@@ -73,11 +59,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("bind removal", () =>
             {
-                editorBeatmap.HitObjectAdded += h => addedObject = h;
-                editorBeatmap.HitObjectRemoved += h => removedObject = h;
+                EditorBeatmap.HitObjectAdded += h => addedObject = h;
+                EditorBeatmap.HitObjectRemoved += h => removedObject = h;
             });
 
-            AddStep("add hitobject", () => editorBeatmap.Add(expectedObject = new HitCircle { StartTime = 1000 }));
+            AddStep("add hitobject", () => EditorBeatmap.Add(expectedObject = new HitCircle { StartTime = 1000 }));
             AddAssert("hitobject added", () => addedObject == expectedObject);
             AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
 
@@ -95,11 +81,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("bind removal", () =>
             {
-                editorBeatmap.HitObjectAdded += h => addedObject = h;
-                editorBeatmap.HitObjectRemoved += h => removedObject = h;
+                EditorBeatmap.HitObjectAdded += h => addedObject = h;
+                EditorBeatmap.HitObjectRemoved += h => removedObject = h;
             });
 
-            AddStep("add hitobject", () => editorBeatmap.Add(expectedObject = new HitCircle { StartTime = 1000 }));
+            AddStep("add hitobject", () => EditorBeatmap.Add(expectedObject = new HitCircle { StartTime = 1000 }));
             addUndoSteps();
 
             AddStep("reset variables", () =>
@@ -117,7 +103,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestAddObjectThenSaveHasNoUnsavedChanges()
         {
-            AddStep("add hitobject", () => editorBeatmap.Add(new HitCircle { StartTime = 1000 }));
+            AddStep("add hitobject", () => EditorBeatmap.Add(new HitCircle { StartTime = 1000 }));
 
             AddAssert("unsaved changes", () => Editor.HasUnsavedChanges);
             AddStep("save changes", () => Editor.Save());
@@ -133,12 +119,12 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("bind removal", () =>
             {
-                editorBeatmap.HitObjectAdded += h => addedObject = h;
-                editorBeatmap.HitObjectRemoved += h => removedObject = h;
+                EditorBeatmap.HitObjectAdded += h => addedObject = h;
+                EditorBeatmap.HitObjectRemoved += h => removedObject = h;
             });
 
-            AddStep("add hitobject", () => editorBeatmap.Add(expectedObject = new HitCircle { StartTime = 1000 }));
-            AddStep("remove object", () => editorBeatmap.Remove(expectedObject));
+            AddStep("add hitobject", () => EditorBeatmap.Add(expectedObject = new HitCircle { StartTime = 1000 }));
+            AddStep("remove object", () => EditorBeatmap.Remove(expectedObject));
             AddStep("reset variables", () =>
             {
                 addedObject = null;
@@ -160,12 +146,12 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("bind removal", () =>
             {
-                editorBeatmap.HitObjectAdded += h => addedObject = h;
-                editorBeatmap.HitObjectRemoved += h => removedObject = h;
+                EditorBeatmap.HitObjectAdded += h => addedObject = h;
+                EditorBeatmap.HitObjectRemoved += h => removedObject = h;
             });
 
-            AddStep("add hitobject", () => editorBeatmap.Add(expectedObject = new HitCircle { StartTime = 1000 }));
-            AddStep("remove object", () => editorBeatmap.Remove(expectedObject));
+            AddStep("add hitobject", () => EditorBeatmap.Add(expectedObject = new HitCircle { StartTime = 1000 }));
+            AddStep("remove object", () => EditorBeatmap.Remove(expectedObject));
             addUndoSteps();
 
             AddStep("reset variables", () =>
@@ -183,18 +169,5 @@ namespace osu.Game.Tests.Visual.Editing
         private void addUndoSteps() => AddStep("undo", () => Editor.Undo());
 
         private void addRedoSteps() => AddStep("redo", () => Editor.Redo());
-
-        protected override Editor CreateEditor() => new TestEditor();
-
-        protected class TestEditor : Editor
-        {
-            public new void Undo() => base.Undo();
-
-            public new void Redo() => base.Redo();
-
-            public new void Save() => base.Save();
-
-            public new bool HasUnsavedChanges => base.HasUnsavedChanges;
-        }
     }
 }
