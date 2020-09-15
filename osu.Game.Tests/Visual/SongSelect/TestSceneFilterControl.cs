@@ -35,6 +35,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
+            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, host, Beatmap.Default));
+
+            beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
+
             base.Content.AddRange(new Drawable[]
             {
                 collectionManager = new CollectionManager(LocalStorage),
@@ -42,10 +47,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             Dependencies.Cache(collectionManager);
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, host, Beatmap.Default));
-
-            beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
         }
 
         [SetUp]
