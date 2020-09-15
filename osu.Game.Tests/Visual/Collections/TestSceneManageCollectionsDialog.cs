@@ -35,6 +35,11 @@ namespace osu.Game.Tests.Visual.Collections
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
+            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, host, Beatmap.Default));
+
+            beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
+
             base.Content.AddRange(new Drawable[]
             {
                 manager = new CollectionManager(LocalStorage),
@@ -44,11 +49,6 @@ namespace osu.Game.Tests.Visual.Collections
 
             Dependencies.Cache(manager);
             Dependencies.Cache(dialogOverlay);
-
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, host, Beatmap.Default));
-
-            beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
         }
 
         [SetUp]
