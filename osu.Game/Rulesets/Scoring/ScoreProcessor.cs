@@ -118,22 +118,13 @@ namespace osu.Game.Rulesets.Scoring
 
             if (result.Judgement.AffectsCombo)
             {
-                switch (result.Type)
-                {
-                    case HitResult.None:
-                        break;
-
-                    case HitResult.Miss:
-                        Combo.Value = 0;
-                        break;
-
-                    default:
-                        Combo.Value++;
-                        break;
-                }
+                if (result.Type > HitResult.Miss)
+                    Combo.Value++;
+                else if (result.Type > HitResult.None)
+                    Combo.Value = 0;
             }
 
-            double scoreIncrease = result.Type == HitResult.Miss ? 0 : result.Judgement.NumericResultFor(result);
+            double scoreIncrease = result.IsHit ? result.Judgement.NumericResultFor(result) : 0;
 
             if (result.Judgement.IsBonus)
             {
@@ -171,7 +162,7 @@ namespace osu.Game.Rulesets.Scoring
             if (result.FailedAtJudgement)
                 return;
 
-            double scoreIncrease = result.Type == HitResult.Miss ? 0 : result.Judgement.NumericResultFor(result);
+            double scoreIncrease = result.IsHit ? result.Judgement.NumericResultFor(result) : 0;
 
             if (result.Judgement.IsBonus)
             {

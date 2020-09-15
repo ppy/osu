@@ -14,6 +14,16 @@ namespace osu.Game.Rulesets.Scoring
         None,
 
         /// <summary>
+        /// Indicates small tick miss.
+        /// </summary>
+        SmallTickMiss,
+
+        /// <summary>
+        /// Indicates a large tick miss.
+        /// </summary>
+        LargeTickMiss,
+
+        /// <summary>
         /// Indicates that the object has been judged as a miss.
         /// </summary>
         /// <remarks>
@@ -45,19 +55,9 @@ namespace osu.Game.Rulesets.Scoring
         Perfect,
 
         /// <summary>
-        /// Indicates small tick miss.
-        /// </summary>
-        SmallTickMiss,
-
-        /// <summary>
         /// Indicates a small tick hit.
         /// </summary>
         SmallTickHit,
-
-        /// <summary>
-        /// Indicates a large tick miss.
-        /// </summary>
-        LargeTickMiss,
 
         /// <summary>
         /// Indicates a large tick hit.

@@ -14,8 +14,10 @@ namespace osu.Game.Tests.Gameplay
     [HeadlessTest]
     public class TestSceneScoreProcessor : OsuTestScene
     {
-        [Test]
-        public void TestNoScoreIncreaseFromMiss()
+        [TestCase(HitResult.Miss)]
+        [TestCase(HitResult.SmallTickMiss)]
+        [TestCase(HitResult.LargeTickMiss)]
+        public void TestNoScoreIncreaseFromMiss(HitResult result)
         {
             var beatmap = new Beatmap<TestHitObject> { HitObjects = { new TestHitObject() } };
 
@@ -23,7 +25,7 @@ namespace osu.Game.Tests.Gameplay
             scoreProcessor.ApplyBeatmap(beatmap);
 
             // Apply a miss judgement
-            scoreProcessor.ApplyResult(new JudgementResult(new TestHitObject(), new TestJudgement()) { Type = HitResult.Miss });
+            scoreProcessor.ApplyResult(new JudgementResult(new TestHitObject(), new TestJudgement()) { Type = result });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(0.0));
         }
@@ -40,6 +42,33 @@ namespace osu.Game.Tests.Gameplay
             scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Perfect });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(100));
+        }
+
+        [TestCase(HitResult.SmallTickHit, HitResult.SmallTickMiss)]
+        [TestCase(HitResult.LargeTickHit, HitResult.LargeTickMiss)]
+        public void TestTickMissBreaksCombo(HitResult hit, HitResult miss)
+        {
+            var beatmap = new Beatmap<TestHitObject>
+            {
+                HitObjects =
+                {
+                    new TestHitObject(maxResult: hit),
+                    new TestHitObject(maxResult: hit),
+                    new TestHitObject(maxResult: hit),
+                }
+            };
+
+            var scoreProcessor = new ScoreProcessor();
+            scoreProcessor.ApplyBeatmap(beatmap);
+
+            // Apply a few hit judgements
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = hit });
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = hit });
+
+            // Apply a miss judgement
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[2], beatmap.HitObjects[2].CreateJudgement()) { Type = miss });
+
+            Assert.That(scoreProcessor.HighestCombo.Value, Is.EqualTo(2));
         }
 
         private class TestHitObject : HitObject
