@@ -13,6 +13,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
@@ -168,6 +169,29 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("Mods overlay still visible", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
         }
 
+        [Test]
+        public void TestBeatmapOptionsInput()
+        {
+            TestSongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestSongSelect());
+
+            AddStep("Show options overlay", () => songSelect.BeatmapOptionsOverlay.Show());
+
+            AddStep("Change ruleset to osu!taiko", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.Number2);
+
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.Number2);
+            });
+
+            AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.ID == 1);
+
+            AddAssert("Options overlay still visible", () => songSelect.BeatmapOptionsOverlay.State.Value == Visibility.Visible);
+        }
+
         private void pushEscape() =>
             AddStep("Press escape", () => pressAndRelease(Key.Escape));
 
@@ -193,6 +217,8 @@ namespace osu.Game.Tests.Visual.Navigation
         private class TestSongSelect : PlaySongSelect
         {
             public ModSelectOverlay ModSelectOverlay => ModSelect;
+
+            public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
         }
     }
 }
