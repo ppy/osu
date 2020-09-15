@@ -110,6 +110,8 @@ namespace osu.Game.Rulesets.Scoring
 
         protected sealed override void ApplyResultInternal(JudgementResult result)
         {
+            Debug.Assert(result.Type > HitResult.None);
+
             result.ComboAtJudgement = Combo.Value;
             result.HighestComboAtJudgement = HighestCombo.Value;
 
@@ -120,7 +122,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 if (result.Type > HitResult.Miss)
                     Combo.Value++;
-                else if (result.Type > HitResult.None)
+                else
                     Combo.Value = 0;
             }
 
@@ -156,6 +158,8 @@ namespace osu.Game.Rulesets.Scoring
 
         protected sealed override void RevertResultInternal(JudgementResult result)
         {
+            Debug.Assert(result.Type > HitResult.None);
+
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
 
