@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
@@ -52,8 +51,6 @@ namespace osu.Game.Screens.Select.Options
             set => secondLine.Text = value;
         }
 
-        public Key? HotKey;
-
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             flash.FadeTo(0.1f, 1000, Easing.OutQuint);
@@ -73,17 +70,6 @@ namespace osu.Game.Screens.Select.Options
             flash.FadeOut(800, Easing.OutExpo);
 
             return base.OnClick(e);
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat && e.Key == HotKey)
-            {
-                Click();
-                return true;
-            }
-
-            return false;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
