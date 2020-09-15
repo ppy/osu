@@ -642,7 +642,9 @@ namespace osu.Game.Screens.Select
             base.Dispose(isDisposing);
 
             decoupledRuleset.UnbindAll();
-            music.TrackChanged -= ensureTrackLooping;
+
+            if (music != null)
+                music.TrackChanged -= ensureTrackLooping;
         }
 
         /// <summary>
