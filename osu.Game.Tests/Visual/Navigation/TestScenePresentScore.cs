@@ -133,6 +133,12 @@ namespace osu.Game.Tests.Visual.Navigation
             return () => imported;
         }
 
+        /// <summary>
+        /// Some tests test waiting for a particular screen twice in a row, but expect a new instance each time.
+        /// There's a case where they may succeed incorrectly if we don't compare against the previous instance.
+        /// </summary>
+        private IScreen lastWaitedScreen;
+
         private void presentAndConfirm(Func<ScoreInfo> getImport, ScorePresentType type)
         {
             AddStep("present score", () => Game.PresentScore(getImport(), type));
@@ -140,13 +146,15 @@ namespace osu.Game.Tests.Visual.Navigation
             switch (type)
             {
                 case ScorePresentType.Results:
-                    AddUntilStep("wait for results", () => Game.ScreenStack.CurrentScreen is ResultsScreen);
+                    AddUntilStep("wait for results", () => lastWaitedScreen != Game.ScreenStack.CurrentScreen && Game.ScreenStack.CurrentScreen is ResultsScreen);
+                    AddStep("store last waited screen", () => lastWaitedScreen = Game.ScreenStack.CurrentScreen);
                     AddUntilStep("correct score displayed", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score.ID == getImport().ID);
                     AddAssert("correct ruleset selected", () => Game.Ruleset.Value.ID == getImport().Ruleset.ID);
                     break;
 
                 case ScorePresentType.Gameplay:
-                    AddUntilStep("wait for player loader", () => Game.ScreenStack.CurrentScreen is ReplayPlayerLoader);
+                    AddUntilStep("wait for player loader", () => lastWaitedScreen != Game.ScreenStack.CurrentScreen && Game.ScreenStack.CurrentScreen is ReplayPlayerLoader);
+                    AddStep("store last waited screen", () => lastWaitedScreen = Game.ScreenStack.CurrentScreen);
                     AddUntilStep("correct score displayed", () => ((ReplayPlayerLoader)Game.ScreenStack.CurrentScreen).Score.ID == getImport().ID);
                     AddAssert("correct ruleset selected", () => Game.Ruleset.Value.ID == getImport().Ruleset.ID);
                     break;
