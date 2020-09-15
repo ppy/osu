@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections)
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -275,9 +275,10 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
-                BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null, Key.Number1);
-                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
-                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number3);
+                BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
+                BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
             }
 
             dialogOverlay = dialog;
@@ -517,6 +518,8 @@ namespace osu.Game.Screens.Select
             FilterControl.Activate();
 
             ModSelect.SelectedMods.BindTo(selectedMods);
+
+            music.TrackChanged += ensureTrackLooping;
         }
 
         private const double logo_transition = 250;
@@ -568,6 +571,7 @@ namespace osu.Game.Screens.Select
             BeatmapDetails.Refresh();
 
             music.CurrentTrack.Looping = true;
+            music.TrackChanged += ensureTrackLooping;
             music.ResetTrackAdjustments();
 
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
@@ -593,6 +597,7 @@ namespace osu.Game.Screens.Select
             BeatmapOptions.Hide();
 
             music.CurrentTrack.Looping = false;
+            music.TrackChanged -= ensureTrackLooping;
 
             this.ScaleTo(1.1f, 250, Easing.InSine);
 
@@ -614,9 +619,13 @@ namespace osu.Game.Screens.Select
             FilterControl.Deactivate();
 
             music.CurrentTrack.Looping = false;
+            music.TrackChanged -= ensureTrackLooping;
 
             return false;
         }
+
+        private void ensureTrackLooping(WorkingBeatmap beatmap, TrackChangeDirection changeDirection)
+            => music.CurrentTrack.Looping = true;
 
         public override bool OnBackButton()
         {
@@ -634,6 +643,9 @@ namespace osu.Game.Screens.Select
             base.Dispose(isDisposing);
 
             decoupledRuleset.UnbindAll();
+
+            if (music != null)
+                music.TrackChanged -= ensureTrackLooping;
         }
 
         /// <summary>
@@ -653,8 +665,6 @@ namespace osu.Game.Screens.Select
             beatmapInfoWedge.Beatmap = beatmap;
 
             BeatmapDetails.Beatmap = beatmap;
-
-            music.CurrentTrack.Looping = true;
         }
 
         private readonly WeakReference<ITrack> lastTrack = new WeakReference<ITrack>(null);
