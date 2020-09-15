@@ -81,6 +81,12 @@ namespace osu.Game.Tests.Visual
             LoadScreen(Player);
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            LocalConfig?.Dispose();
+            base.Dispose(isDisposing);
+        }
+
         /// <summary>
         /// Creates the ruleset for setting up the <see cref="Player"/> component.
         /// </summary>
