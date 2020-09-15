@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -19,7 +20,7 @@ namespace osu.Game.Beatmaps
     {
         private readonly TextureStore textures;
 
-        public DummyWorkingBeatmap(AudioManager audio, TextureStore textures)
+        public DummyWorkingBeatmap([NotNull] AudioManager audio, TextureStore textures)
             : base(new BeatmapInfo
             {
                 Metadata = new BeatmapMetadata
@@ -44,7 +45,7 @@ namespace osu.Game.Beatmaps
 
         protected override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
 
-        protected override Track GetTrack() => GetVirtualTrack();
+        protected override Track GetBeatmapTrack() => GetVirtualTrack();
 
         private class DummyRulesetInfo : RulesetInfo
         {

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
@@ -11,10 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarSettingsButton()
         {
-            Icon = FontAwesome.Solid.Cog;
-            TooltipMain = "Settings";
-            TooltipSub = "Change your settings";
-
+            Width *= 1.4f;
             Hotkey = GlobalAction.ToggleSettings;
         }
 

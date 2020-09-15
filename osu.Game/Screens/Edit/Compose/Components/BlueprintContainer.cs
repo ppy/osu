@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             AddRangeInternal(new[]
             {
-                DragBox = CreateDragBox(select),
+                DragBox = CreateDragBox(selectBlueprintsFromDragRectangle),
                 selectionHandler,
                 SelectionBlueprints = CreateSelectionBlueprintContainer(),
                 selectionHandler.CreateProxy(),
@@ -271,6 +271,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected += onBlueprintSelected;
             blueprint.Deselected += onBlueprintDeselected;
 
+            if (beatmap.SelectedHitObjects.Contains(hitObject))
+                blueprint.Select();
+
             SelectionBlueprints.Add(blueprint);
         }
 
@@ -326,7 +329,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Select all masks in a given rectangle selection area.
         /// </summary>
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
-        private void select(RectangleF rect)
+        private void selectBlueprintsFromDragRectangle(RectangleF rect)
         {
             foreach (var blueprint in SelectionBlueprints)
             {
@@ -367,14 +370,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             selectionHandler.HandleSelected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 1);
-            beatmap.SelectedHitObjects.Add(blueprint.HitObject);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
             selectionHandler.HandleDeselected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 0);
-            beatmap.SelectedHitObjects.Remove(blueprint.HitObject);
         }
 
         #endregion
