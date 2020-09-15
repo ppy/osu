@@ -31,37 +31,49 @@ namespace osu.Game.Tests.Gameplay
         [Test]
         public void TestOnlyBonusScore()
         {
-            var beatmap = new Beatmap<TestBonusHitObject> { HitObjects = { new TestBonusHitObject() } };
+            var beatmap = new Beatmap<TestHitObject> { HitObjects = { new TestHitObject(false) } };
 
             var scoreProcessor = new ScoreProcessor();
             scoreProcessor.ApplyBeatmap(beatmap);
 
             // Apply a judgement
-            scoreProcessor.ApplyResult(new JudgementResult(new TestBonusHitObject(), new TestBonusJudgement()) { Type = HitResult.Perfect });
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Perfect });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(100));
         }
 
         private class TestHitObject : HitObject
         {
-            public override Judgement CreateJudgement() => new TestJudgement();
+            private readonly bool affectsCombo;
+            private readonly int numericResult;
+            private readonly HitResult maxResult;
+
+            public TestHitObject(bool affectsCombo = true, int numericResult = 100, HitResult maxResult = HitResult.Perfect)
+            {
+                this.affectsCombo = affectsCombo;
+                this.numericResult = numericResult;
+                this.maxResult = maxResult;
+            }
+
+            public override Judgement CreateJudgement() => new TestJudgement(affectsCombo, numericResult, maxResult);
         }
 
         private class TestJudgement : Judgement
         {
-            protected override int NumericResultFor(HitResult result) => 100;
-        }
+            private readonly int numericResult;
 
-        private class TestBonusHitObject : HitObject
-        {
-            public override Judgement CreateJudgement() => new TestBonusJudgement();
-        }
+            public TestJudgement(bool affectsCombo = true, int numericResult = 100, HitResult maxResult = HitResult.Perfect)
+            {
+                AffectsCombo = affectsCombo;
+                this.numericResult = numericResult;
+                MaxResult = maxResult;
+            }
 
-        private class TestBonusJudgement : Judgement
-        {
-            public override bool AffectsCombo => false;
+            protected override int NumericResultFor(HitResult result) => numericResult;
 
-            protected override int NumericResultFor(HitResult result) => 100;
+            public override bool AffectsCombo { get; }
+
+            public override HitResult MaxResult { get; }
         }
     }
 }
