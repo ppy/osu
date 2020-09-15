@@ -23,39 +23,29 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneFilterControl : OsuManualInputManagerTestScene
     {
-        protected override Container<Drawable> Content => content;
-        private readonly Container content;
+        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        private readonly CollectionManager collectionManager;
+        private CollectionManager collectionManager;
 
         private RulesetStore rulesets;
         private BeatmapManager beatmapManager;
 
         private FilterControl control;
 
-        public TestSceneFilterControl()
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
         {
             base.Content.AddRange(new Drawable[]
             {
                 collectionManager = new CollectionManager(LocalStorage),
-                content = new Container { RelativeSizeAxes = Axes.Both }
+                Content
             });
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(GameHost host)
-        {
+            Dependencies.Cache(collectionManager);
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, host, Beatmap.Default));
 
             beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.Cache(collectionManager);
-            return dependencies;
         }
 
         [SetUp]

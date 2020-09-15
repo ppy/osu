@@ -22,42 +22,33 @@ namespace osu.Game.Tests.Visual.Collections
 {
     public class TestSceneManageCollectionsDialog : OsuManualInputManagerTestScene
     {
-        protected override Container<Drawable> Content => content;
+        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        private readonly Container content;
-        private readonly DialogOverlay dialogOverlay;
-        private readonly CollectionManager manager;
+        private DialogOverlay dialogOverlay;
+        private CollectionManager manager;
 
         private RulesetStore rulesets;
         private BeatmapManager beatmapManager;
 
         private ManageCollectionsDialog dialog;
 
-        public TestSceneManageCollectionsDialog()
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
         {
             base.Content.AddRange(new Drawable[]
             {
                 manager = new CollectionManager(LocalStorage),
-                content = new Container { RelativeSizeAxes = Axes.Both },
+                Content,
                 dialogOverlay = new DialogOverlay()
             });
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(GameHost host)
-        {
+            Dependencies.Cache(manager);
+            Dependencies.Cache(dialogOverlay);
+
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, host, Beatmap.Default));
 
             beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.Cache(manager);
-            dependencies.Cache(dialogOverlay);
-            return dependencies;
         }
 
         [SetUp]
