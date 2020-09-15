@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual
         private Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
-        private readonly Lazy<DatabaseContextFactory> contextFactory;
+        private Lazy<DatabaseContextFactory> contextFactory;
 
         protected IAPIProvider API
         {
@@ -71,6 +71,17 @@ namespace osu.Game.Tests.Visual
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
+            contextFactory = new Lazy<DatabaseContextFactory>(() =>
+            {
+                var factory = new DatabaseContextFactory(LocalStorage);
+                factory.ResetDatabase();
+                using (var usage = factory.Get())
+                    usage.Migrate();
+                return factory;
+            });
+
+            RecycleLocalStorage();
+
             var baseDependencies = base.CreateChildDependencies(parent);
 
             var providedRuleset = CreateRuleset();
@@ -104,16 +115,6 @@ namespace osu.Game.Tests.Visual
 
         protected OsuTestScene()
         {
-            RecycleLocalStorage();
-            contextFactory = new Lazy<DatabaseContextFactory>(() =>
-            {
-                var factory = new DatabaseContextFactory(LocalStorage);
-                factory.ResetDatabase();
-                using (var usage = factory.Get())
-                    usage.Migrate();
-                return factory;
-            });
-
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
@@ -131,8 +132,13 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            localStorage = new Lazy<Storage>(() => new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
+            localStorage = host is HeadlessGameHost
+                ? new Lazy<Storage>(() => host.Storage)
+                : new Lazy<Storage>(() => new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
         }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [Resolved]
         protected AudioManager Audio { get; private set; }
@@ -172,7 +178,7 @@ namespace osu.Game.Tests.Visual
             if (MusicController?.TrackLoaded == true)
                 MusicController.CurrentTrack.Stop();
 
-            if (contextFactory.IsValueCreated)
+            if (contextFactory?.IsValueCreated == true)
                 contextFactory.Value.ResetDatabase();
 
             RecycleLocalStorage();
