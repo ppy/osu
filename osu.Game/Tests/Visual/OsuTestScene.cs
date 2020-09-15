@@ -118,6 +118,8 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
+        protected virtual bool UseFreshStoragePerRun => false;
+
         public virtual void RecycleLocalStorage()
         {
             if (localStorage?.IsValueCreated == true)
@@ -133,7 +135,7 @@ namespace osu.Game.Tests.Visual
             }
 
             localStorage =
-                new Lazy<Storage>(() => host is HeadlessGameHost ? host.Storage : new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
+                new Lazy<Storage>(() => !UseFreshStoragePerRun && host is HeadlessGameHost ? host.Storage : new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
         }
 
         [Resolved]
