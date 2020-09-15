@@ -132,9 +132,8 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            localStorage = host is HeadlessGameHost
-                ? new Lazy<Storage>(() => host.Storage)
-                : new Lazy<Storage>(() => new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
+            localStorage =
+                new Lazy<Storage>(() => host is HeadlessGameHost ? host.Storage : new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
         }
 
         [Resolved]
