@@ -69,12 +69,26 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected virtual bool UseOnlineAPI => false;
 
+        /// <summary>
+        /// When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
+        /// This is because the host is recycled per TestScene execution in headless at an nunit level.
+        /// </summary>
+        private Storage isolatedHostStorage;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
+            if (!UseFreshStoragePerRun)
+                isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
+
             contextFactory = new Lazy<DatabaseContextFactory>(() =>
             {
                 var factory = new DatabaseContextFactory(LocalStorage);
-                factory.ResetDatabase();
+
+                // only reset the database if not using the host storage.
+                // if we reset the host storage, it will delete global key bindings.
+                if (isolatedHostStorage == null)
+                    factory.ResetDatabase();
+
                 using (var usage = factory.Get())
                     usage.Migrate();
                 return factory;
@@ -135,11 +149,8 @@ namespace osu.Game.Tests.Visual
             }
 
             localStorage =
-                new Lazy<Storage>(() => !UseFreshStoragePerRun && host is HeadlessGameHost ? host.Storage : new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
+                new Lazy<Storage>(() => isolatedHostStorage ?? new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
         }
-
-        [Resolved]
-        private GameHost host { get; set; }
 
         [Resolved]
         protected AudioManager Audio { get; private set; }
