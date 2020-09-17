@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportWhenClosed()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenDelete()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithReZip()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -156,7 +156,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithChangedFile()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -207,7 +207,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithDifferentFilename()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportCorruptThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -301,7 +301,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestRollbackOnFailure()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -378,7 +378,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenDeleteThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -406,7 +406,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenDeleteThenImportWithOnlineIDMismatch(bool set)
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(set.ToString()))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-{set}"))
             {
                 try
                 {
@@ -440,7 +440,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportWithDuplicateBeatmapIDs()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -496,8 +496,8 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Ignore("Binding IPC on Appveyor isn't working (port in use). Need to figure out why")]
         public void TestImportOverIPC()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("host", true))
-            using (HeadlessGameHost client = new CleanRunHeadlessGameHost("client", true))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-host", true))
+            using (HeadlessGameHost client = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-client", true))
             {
                 try
                 {
@@ -526,7 +526,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWhenFileOpen()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -548,7 +548,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWithDuplicateHashes()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -590,7 +590,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportNestedStructure()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -635,7 +635,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWithIgnoredDirectoryInArchive()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -689,7 +689,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestUpdateBeatmapInfo()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -719,7 +719,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestUpdateBeatmapFile()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -761,7 +761,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestCreateNewEmptyBeatmap()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -788,7 +788,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestCreateNewBeatmapWithObject()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
