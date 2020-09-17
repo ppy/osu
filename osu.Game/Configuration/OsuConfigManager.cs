@@ -24,6 +24,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Skin, 0, -1, int.MaxValue);
 
             Set(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
+            Set(OsuSetting.BeatmapDetailModsFilter, false);
 
             Set(OsuSetting.ShowConvertedBeatmaps, true);
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
@@ -200,6 +201,7 @@ namespace osu.Game.Configuration
         CursorRotation,
         MenuParallax,
         BeatmapDetailTab,
+        BeatmapDetailModsFilter,
         Username,
         ReleaseStream,
         SavePassword,
