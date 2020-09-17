@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -48,14 +49,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         public override bool CanConvert() => true;
 
-        protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original)
+        protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
             // Rewrite the beatmap info to add the slider velocity multiplier
             original.BeatmapInfo = original.BeatmapInfo.Clone();
             original.BeatmapInfo.BaseDifficulty = original.BeatmapInfo.BaseDifficulty.Clone();
             original.BeatmapInfo.BaseDifficulty.SliderMultiplier *= LEGACY_VELOCITY_MULTIPLIER;
 
-            Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
+            Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original, cancellationToken);
 
             if (original.BeatmapInfo.RulesetID == 3)
             {
@@ -72,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             return converted;
         }
 
-        protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap)
+        protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap, CancellationToken cancellationToken)
         {
             // Old osu! used hit sounding to determine various hit type information
             IList<HitSampleInfo> samples = obj.Samples;
