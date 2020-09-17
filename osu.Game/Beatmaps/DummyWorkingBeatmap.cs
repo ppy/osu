@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps
 
                     public bool CanConvert() => true;
 
-                    public IBeatmap Convert(CancellationToken cancellationToken)
+                    public IBeatmap Convert(CancellationToken cancellationToken = default)
                     {
                         foreach (var obj in Beatmap.HitObjects)
                             ObjectConverted?.Invoke(obj, obj.Yield());
