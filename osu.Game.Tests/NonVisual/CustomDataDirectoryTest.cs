@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestDefaultDirectory()
         {
-            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestDefaultDirectory)))
+            using (var host = new CustomTestHeadlessGameHost())
             {
                 try
                 {
@@ -45,7 +46,7 @@ namespace osu.Game.Tests.NonVisual
         {
             string customPath = prepareCustomPath();
 
-            using (var host = new CustomTestHeadlessGameHost(nameof(TestCustomDirectory)))
+            using (var host = new CustomTestHeadlessGameHost())
             {
                 using (var storageConfig = new StorageConfigManager(host.InitialStorage))
                     storageConfig.Set(StorageConfig.FullPath, customPath);
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.NonVisual
         {
             string customPath = prepareCustomPath();
 
-            using (var host = new CustomTestHeadlessGameHost(nameof(TestSubDirectoryLookup)))
+            using (var host = new CustomTestHeadlessGameHost())
             {
                 using (var storageConfig = new StorageConfigManager(host.InitialStorage))
                     storageConfig.Set(StorageConfig.FullPath, customPath);
@@ -104,7 +105,7 @@ namespace osu.Game.Tests.NonVisual
         {
             string customPath = prepareCustomPath();
 
-            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigration)))
+            using (var host = new CustomTestHeadlessGameHost())
             {
                 try
                 {
@@ -165,7 +166,7 @@ namespace osu.Game.Tests.NonVisual
             string customPath = prepareCustomPath();
             string customPath2 = prepareCustomPath("-2");
 
-            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigrationBetweenTwoTargets)))
+            using (var host = new CustomTestHeadlessGameHost())
             {
                 try
                 {
@@ -194,7 +195,7 @@ namespace osu.Game.Tests.NonVisual
         {
             string customPath = prepareCustomPath();
 
-            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigrationToSameTargetFails)))
+            using (var host = new CustomTestHeadlessGameHost())
             {
                 try
                 {
@@ -215,7 +216,7 @@ namespace osu.Game.Tests.NonVisual
         {
             string customPath = prepareCustomPath();
 
-            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigrationToNestedTargetFails)))
+            using (var host = new CustomTestHeadlessGameHost())
             {
                 try
                 {
@@ -244,7 +245,7 @@ namespace osu.Game.Tests.NonVisual
         {
             string customPath = prepareCustomPath();
 
-            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigrationToSeeminglyNestedTarget)))
+            using (var host = new CustomTestHeadlessGameHost())
             {
                 try
                 {
@@ -315,14 +316,14 @@ namespace osu.Game.Tests.NonVisual
             return path;
         }
 
-        public class CustomTestHeadlessGameHost : HeadlessGameHost
+        public class CustomTestHeadlessGameHost : CleanRunHeadlessGameHost
         {
             public Storage InitialStorage { get; }
 
-            public CustomTestHeadlessGameHost(string name)
-                : base(name)
+            public CustomTestHeadlessGameHost([CallerMemberName] string callingMethodName = @"")
+                : base(callingMethodName: callingMethodName)
             {
-                string defaultStorageLocation = getDefaultLocationFor(name);
+                string defaultStorageLocation = getDefaultLocationFor(callingMethodName);
 
                 InitialStorage = new DesktopStorage(defaultStorageLocation, this);
                 InitialStorage.DeleteDirectory(string.Empty);
