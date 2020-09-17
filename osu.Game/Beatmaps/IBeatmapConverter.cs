@@ -33,6 +33,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The converted Beatmap.</returns>
-        IBeatmap Convert(CancellationToken cancellationToken);
+        IBeatmap Convert(CancellationToken cancellationToken = default);
     }
 }
