@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Skins.IO
         [Test]
         public async Task TestBasicImport()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
             {
                 try
                 {
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Skins.IO
         [Test]
         public async Task TestImportTwiceWithSameMetadata()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
             {
                 try
                 {
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Skins.IO
         [Test]
         public async Task TestImportTwiceWithNoMetadata()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
             {
                 try
                 {
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Skins.IO
         [Test]
         public async Task TestImportTwiceWithDifferentMetadata()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportSkinTest)))
             {
                 try
                 {
