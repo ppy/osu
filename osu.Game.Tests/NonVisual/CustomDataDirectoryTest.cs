@@ -272,7 +272,15 @@ namespace osu.Game.Tests.NonVisual
         {
             var osu = new OsuGameBase();
             Task.Run(() => host.Run(osu));
+
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
+
+            bool ready = false;
+            // wait for two update frames to be executed. this ensures that all components have had a change to run LoadComplete and hopefully avoid
+            // database access (GlobalActionContainer is one to do this).
+            host.UpdateThread.Scheduler.Add(() => host.UpdateThread.Scheduler.Add(() => ready = true));
+
+            waitForOrAssert(() => ready, @"osu! failed to start in a reasonable amount of time");
 
             return osu;
         }
