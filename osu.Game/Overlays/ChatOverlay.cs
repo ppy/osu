@@ -23,6 +23,7 @@ using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays
 {
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colours)
+        private void load(OsuConfigManager config, OsuColour colours, TextureStore textures)
         {
             const float padding = 5;
 
@@ -163,13 +164,13 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black,
                                 },
-                                new SpriteIcon
+                                new Sprite
                                 {
-                                    Icon = FontAwesome.Solid.Comments,
+                                    Texture = textures.Get(IconTexture),
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Size = new Vector2(20),
-                                    Margin = new MarginPadding(10),
+                                    Size = new Vector2(OverlayTitle.ICON_SIZE),
+                                    Margin = new MarginPadding { Left = 10 },
                                 },
                                 ChannelTabControl = CreateChannelTabControl().With(d =>
                                 {
