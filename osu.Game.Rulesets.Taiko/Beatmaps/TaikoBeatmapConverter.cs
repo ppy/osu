@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -86,6 +87,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     if (shouldConvertSliderToHits(obj, beatmap, distanceData, out var taikoDuration, out var tickSpacing))
                     {
                         List<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
+
+                        if (Precision.AlmostEquals(0, tickSpacing))
+                            yield break;
 
                         int i = 0;
 
