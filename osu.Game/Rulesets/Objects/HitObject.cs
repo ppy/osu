@@ -145,6 +145,7 @@ namespace osu.Game.Rulesets.Objects
 #pragma warning restore 618
         }
 
+        [Obsolete("Use the cancellation-supporting override")] // Can be removed 20210318
         protected virtual void CreateNestedHitObjects()
         {
         }
