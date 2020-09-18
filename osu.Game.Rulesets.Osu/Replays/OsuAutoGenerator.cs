@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Logging;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects;
@@ -356,11 +357,24 @@ namespace osu.Game.Rulesets.Osu.Replays
                     break;
 
                 case Slider slider:
-                    for (double j = FrameDelay; j < slider.Duration; j += FrameDelay)
+                    double sliderSpeed = slider.Duration / slider.RepeatCount;
+                    if (sliderSpeed <= 45 && slider.RepeatCount >= 1)
                     {
-                        Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
-                        AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
+                        for (double j = FrameDelay; j < slider.Duration; j += FrameDelay * sliderSpeed / 9)
+                        {
+                            Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
+                            AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
+                        }
                     }
+                    else
+                    {
+                        for (double j = FrameDelay; j < slider.Duration; j += FrameDelay)
+                        {
+                            Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
+                            AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
+                        }
+                    }
+                    
 
                     AddFrameToReplay(new OsuReplayFrame(slider.EndTime, new Vector2(slider.StackedEndPosition.X, slider.StackedEndPosition.Y), action));
                     break;
