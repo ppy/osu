@@ -4,20 +4,17 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
 using osu.Game.IO.Archives;
 using osu.Game.Skinning;
-using osu.Game.Tests.Resources;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Tests.Skins.IO
 {
-    public class ImportSkinTest
+    public class ImportSkinTest : ImportTest
     {
         [Test]
         public async Task TestBasicImport()
@@ -26,9 +23,9 @@ namespace osu.Game.Tests.Skins.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
-                    var imported = await loadIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
+                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
 
                     Assert.That(imported.Name, Is.EqualTo("test skin"));
                     Assert.That(imported.Creator, Is.EqualTo("skinner"));
@@ -47,10 +44,10 @@ namespace osu.Game.Tests.Skins.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
-                    var imported = await loadIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
-                    var imported2 = await loadIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin2.osk"));
+                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin.osk"));
+                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin", "skinner"), "skin2.osk"));
 
                     Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
                     Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Count, Is.EqualTo(1));
@@ -72,11 +69,11 @@ namespace osu.Game.Tests.Skins.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     // if a user downloads two skins that do have skin.ini files but don't have any creator metadata in the skin.ini, they should both import separately just for safety.
-                    var imported = await loadIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
-                    var imported2 = await loadIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
+                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
+                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk(string.Empty, string.Empty), "download.osk"));
 
                     Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
                     Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Count, Is.EqualTo(2));
@@ -98,10 +95,10 @@ namespace osu.Game.Tests.Skins.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
-                    var imported = await loadIntoOsu(osu, new ZipArchiveReader(createOsk("test skin v2", "skinner"), "skin.osk"));
-                    var imported2 = await loadIntoOsu(osu, new ZipArchiveReader(createOsk("test skin v2.1", "skinner"), "skin2.osk"));
+                    var imported = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin v2", "skinner"), "skin.osk"));
+                    var imported2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOsk("test skin v2.1", "skinner"), "skin2.osk"));
 
                     Assert.That(imported2.ID, Is.Not.EqualTo(imported.ID));
                     Assert.That(osu.Dependencies.Get<SkinManager>().GetAllUserSkins().Count, Is.EqualTo(2));
@@ -141,37 +138,10 @@ namespace osu.Game.Tests.Skins.IO
             return stream;
         }
 
-        private async Task<SkinInfo> loadIntoOsu(OsuGameBase osu, ArchiveReader archive = null)
+        private async Task<SkinInfo> loadSkinIntoOsu(OsuGameBase osu, ArchiveReader archive = null)
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
             return await skinManager.Import(archive);
-        }
-
-        private async Task<OsuGameBase> loadOsu(GameHost host)
-        {
-            var osu = new OsuGameBase();
-
-#pragma warning disable 4014
-            Task.Run(() => host.Run(osu));
-#pragma warning restore 4014
-
-            waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
-
-            var beatmapFile = TestResources.GetTestBeatmapForImport();
-            var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
-            await beatmapManager.Import(beatmapFile);
-
-            return osu;
-        }
-
-        private void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
-        {
-            Task task = Task.Run(() =>
-            {
-                while (!result()) Thread.Sleep(200);
-            });
-
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
     }
 }

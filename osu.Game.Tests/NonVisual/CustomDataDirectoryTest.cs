@@ -5,8 +5,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -18,7 +16,7 @@ using osu.Game.IO;
 namespace osu.Game.Tests.NonVisual
 {
     [TestFixture]
-    public class CustomDataDirectoryTest
+    public class CustomDataDirectoryTest : ImportTest
     {
         [Test]
         public void TestDefaultDirectory()
@@ -29,7 +27,7 @@ namespace osu.Game.Tests.NonVisual
                 {
                     string defaultStorageLocation = getDefaultLocationFor(nameof(TestDefaultDirectory));
 
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
                     var storage = osu.Dependencies.Get<Storage>();
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
@@ -53,7 +51,7 @@ namespace osu.Game.Tests.NonVisual
 
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     // switch to DI'd storage
                     var storage = osu.Dependencies.Get<Storage>();
@@ -79,7 +77,7 @@ namespace osu.Game.Tests.NonVisual
 
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     // switch to DI'd storage
                     var storage = osu.Dependencies.Get<Storage>();
@@ -111,7 +109,7 @@ namespace osu.Game.Tests.NonVisual
                 {
                     string defaultStorageLocation = getDefaultLocationFor(nameof(TestMigration));
 
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
                     var storage = osu.Dependencies.Get<Storage>();
 
                     // Store the current storage's path. We'll need to refer to this for assertions in the original directory after the migration completes.
@@ -170,7 +168,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     const string database_filename = "client.db";
 
@@ -199,7 +197,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
                     Assert.Throws<ArgumentException>(() => osu.Migrate(customPath));
@@ -220,7 +218,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
 
@@ -249,7 +247,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
 
@@ -267,33 +265,6 @@ namespace osu.Game.Tests.NonVisual
                     host.Exit();
                 }
             }
-        }
-
-        private OsuGameBase loadOsu(GameHost host)
-        {
-            var osu = new OsuGameBase();
-            Task.Run(() => host.Run(osu));
-
-            waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
-
-            bool ready = false;
-            // wait for two update frames to be executed. this ensures that all components have had a change to run LoadComplete and hopefully avoid
-            // database access (GlobalActionContainer is one to do this).
-            host.UpdateThread.Scheduler.Add(() => host.UpdateThread.Scheduler.Add(() => ready = true));
-
-            waitForOrAssert(() => ready, @"osu! failed to start in a reasonable amount of time");
-
-            return osu;
-        }
-
-        private static void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
-        {
-            Task task = Task.Run(() =>
-            {
-                while (!result()) Thread.Sleep(200);
-            });
-
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
 
         private static string getDefaultLocationFor(string testTypeName)
