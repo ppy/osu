@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Logging;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects;
