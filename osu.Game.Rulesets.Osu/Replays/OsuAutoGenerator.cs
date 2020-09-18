@@ -358,7 +358,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                 case Slider slider:
                     double sliderSpeed = slider.Duration / slider.RepeatCount;
-                    if (sliderSpeed <= 45 && slider.RepeatCount >= 1)
+                    if (sliderSpeed <= 45 && slider.RepeatCount > 1)
                     {
                         for (double j = FrameDelay; j < slider.Duration; j += FrameDelay * sliderSpeed / 9)
                         {
