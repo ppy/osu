@@ -357,7 +357,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                 case Slider slider:
                     double sliderSpeed = slider.Duration / slider.RepeatCount;
-                    if (sliderSpeed <= 45 && slider.RepeatCount > 1)
+                    if (sliderSpeed <= 100 && slider.RepeatCount > 1)
                     {
                         for (double j = FrameDelay; j < slider.Duration; j += FrameDelay * sliderSpeed / 9)
                         {
@@ -373,17 +373,14 @@ namespace osu.Game.Rulesets.Osu.Replays
                             AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
                         }
                     }
-                    
-
+                   
                     AddFrameToReplay(new OsuReplayFrame(slider.EndTime, new Vector2(slider.StackedEndPosition.X, slider.StackedEndPosition.Y), action));
                     break;
             }
-
             // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!
             if (Frames[^1].Time <= endFrame.Time)
                 AddFrameToReplay(endFrame);
         }
-
         #endregion
     }
 }
