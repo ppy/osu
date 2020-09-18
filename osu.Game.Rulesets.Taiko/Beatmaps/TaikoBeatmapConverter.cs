@@ -89,9 +89,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     {
                         List<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
 
-                        if (Precision.AlmostEquals(0, tickSpacing))
-                            yield break;
-
                         int i = 0;
 
                         for (double j = obj.StartTime; j <= obj.StartTime + taikoDuration + tickSpacing / 8; j += tickSpacing)
@@ -109,6 +106,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             };
 
                             i = (i + 1) % allSamples.Count;
+
+                            if (Precision.AlmostEquals(0, tickSpacing))
+                                break;
                         }
                     }
                     else
