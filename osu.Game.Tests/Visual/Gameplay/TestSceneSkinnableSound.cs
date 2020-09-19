@@ -123,10 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
             AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
 
-            AddStep("trigger skin change", () =>
-            {
-                skinSource.TriggerSourceChanged();
-            });
+            AddStep("trigger skin change", () => skinSource.TriggerSourceChanged());
 
             AddStep("retrieve new sample", () =>
             {
