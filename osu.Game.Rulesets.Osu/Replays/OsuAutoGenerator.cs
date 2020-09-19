@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
@@ -357,10 +356,10 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                 case Slider slider:
                     //Fast short reverse sliders
-                    double pixelPerSec = slider.Duration/slider.RepeatCount;
-                    if (slider.RepeatCount > 1&&slider.Distance<100)
+                    double pixelPerSec = slider.Duration / slider.RepeatCount;
+                    if (slider.RepeatCount > 1 && slider.Distance < 100)
                     {
-                        for (double j = FrameDelay; j < slider.Duration; j += FrameDelay * Math.Ceiling(pixelPerSec/100)*8)
+                        for (double j = FrameDelay; j < slider.Duration; j += FrameDelay * Math.Ceiling(pixelPerSec / 100) * 8)
                         {
                             Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
                             AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
