@@ -125,11 +125,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("trigger skin change", () => skinSource.TriggerSourceChanged());
 
-            AddStep("retrieve new sample", () =>
+            AddAssert("retrieve and ensure current sample is different", () =>
             {
-                DrawableSample newSample = skinnableSound.ChildrenOfType<DrawableSample>().Single();
-                Assert.IsTrue(newSample != sample, "Sample still hasn't been updated after a skin change event");
-                sample = newSample;
+                DrawableSample oldSample = sample;
+                sample = skinnableSound.ChildrenOfType<DrawableSample>().Single();
+                return sample != oldSample;
             });
 
             AddAssert("new sample stopped", () => !sample.Playing);
