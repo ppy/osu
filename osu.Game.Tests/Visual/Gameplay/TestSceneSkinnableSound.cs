@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 sample = newSample;
             });
 
-            AddAssert("new sample paused", () => !sample.Playing);
+            AddAssert("new sample stopped", () => !sample.Playing);
             AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
 
             AddWaitStep("wait a bit", 5);
