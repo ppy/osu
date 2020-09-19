@@ -1,19 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osu.Framework.Utils;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
@@ -351,15 +352,15 @@ namespace osu.Game.Rulesets.Osu.Replays
                     Vector2 endPosition = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
 
                     AddFrameToReplay(new OsuReplayFrame(spinner.EndTime, new Vector2(endPosition.X, endPosition.Y), action));
-
                     endFrame.Position = endPosition;
                     break;
 
                 case Slider slider:
-                    double sliderSpeed = slider.Duration / slider.RepeatCount;
-                    if (sliderSpeed <= 100 && slider.RepeatCount > 1)
+                    //Fast short reverse sliders
+                    double pixelPerSec = slider.Duration/slider.RepeatCount;
+                    if (slider.RepeatCount > 1&&slider.Distance<100)
                     {
-                        for (double j = FrameDelay; j < slider.Duration; j += FrameDelay * sliderSpeed / 9)
+                        for (double j = FrameDelay; j < slider.Duration; j += FrameDelay * Math.Ceiling(pixelPerSec/100)*8)
                         {
                             Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
                             AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
@@ -373,14 +374,15 @@ namespace osu.Game.Rulesets.Osu.Replays
                             AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
                         }
                     }
-                   
                     AddFrameToReplay(new OsuReplayFrame(slider.EndTime, new Vector2(slider.StackedEndPosition.X, slider.StackedEndPosition.Y), action));
                     break;
             }
+
             // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!
             if (Frames[^1].Time <= endFrame.Time)
                 AddFrameToReplay(endFrame);
         }
+
         #endregion
     }
 }
