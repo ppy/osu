@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -17,12 +16,11 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Tests.Resources;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Scores.IO
 {
-    public class ImportScoreTest
+    public class ImportScoreTest : ImportTest
     {
         [Test]
         public async Task TestBasicImport()
@@ -31,7 +29,7 @@ namespace osu.Game.Tests.Scores.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     var toImport = new ScoreInfo
                     {
@@ -45,7 +43,7 @@ namespace osu.Game.Tests.Scores.IO
                         OnlineScoreID = 12345,
                     };
 
-                    var imported = await loadIntoOsu(osu, toImport);
+                    var imported = await loadScoreIntoOsu(osu, toImport);
 
                     Assert.AreEqual(toImport.Rank, imported.Rank);
                     Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
@@ -70,14 +68,14 @@ namespace osu.Game.Tests.Scores.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     var toImport = new ScoreInfo
                     {
                         Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
                     };
 
-                    var imported = await loadIntoOsu(osu, toImport);
+                    var imported = await loadScoreIntoOsu(osu, toImport);
 
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModHardRock));
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModDoubleTime));
@@ -96,7 +94,7 @@ namespace osu.Game.Tests.Scores.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     var toImport = new ScoreInfo
                     {
@@ -107,7 +105,7 @@ namespace osu.Game.Tests.Scores.IO
                         }
                     };
 
-                    var imported = await loadIntoOsu(osu, toImport);
+                    var imported = await loadScoreIntoOsu(osu, toImport);
 
                     Assert.AreEqual(toImport.Statistics[HitResult.Perfect], imported.Statistics[HitResult.Perfect]);
                     Assert.AreEqual(toImport.Statistics[HitResult.Miss], imported.Statistics[HitResult.Miss]);
@@ -126,7 +124,7 @@ namespace osu.Game.Tests.Scores.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     var toImport = new ScoreInfo
                     {
@@ -138,7 +136,7 @@ namespace osu.Game.Tests.Scores.IO
                         }
                     };
 
-                    var imported = await loadIntoOsu(osu, toImport);
+                    var imported = await loadScoreIntoOsu(osu, toImport);
 
                     var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
                     var scoreManager = osu.Dependencies.Get<ScoreManager>();
@@ -146,7 +144,7 @@ namespace osu.Game.Tests.Scores.IO
                     beatmapManager.Delete(beatmapManager.QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == imported.Beatmap.ID)));
                     Assert.That(scoreManager.Query(s => s.ID == imported.ID).DeletePending, Is.EqualTo(true));
 
-                    var secondImport = await loadIntoOsu(osu, imported);
+                    var secondImport = await loadScoreIntoOsu(osu, imported);
                     Assert.That(secondImport, Is.Null);
                 }
                 finally
@@ -163,9 +161,9 @@ namespace osu.Game.Tests.Scores.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = LoadOsuIntoHost(host, true);
 
-                    await loadIntoOsu(osu, new ScoreInfo { OnlineScoreID = 2 }, new TestArchiveReader());
+                    await loadScoreIntoOsu(osu, new ScoreInfo { OnlineScoreID = 2 }, new TestArchiveReader());
 
                     var scoreManager = osu.Dependencies.Get<ScoreManager>();
 
@@ -179,7 +177,7 @@ namespace osu.Game.Tests.Scores.IO
             }
         }
 
-        private async Task<ScoreInfo> loadIntoOsu(OsuGameBase osu, ScoreInfo score, ArchiveReader archive = null)
+        private async Task<ScoreInfo> loadScoreIntoOsu(OsuGameBase osu, ScoreInfo score, ArchiveReader archive = null)
         {
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
 
@@ -190,33 +188,6 @@ namespace osu.Game.Tests.Scores.IO
             await scoreManager.Import(score, archive);
 
             return scoreManager.GetAllUsableScores().FirstOrDefault();
-        }
-
-        private async Task<OsuGameBase> loadOsu(GameHost host)
-        {
-            var osu = new OsuGameBase();
-
-#pragma warning disable 4014
-            Task.Run(() => host.Run(osu));
-#pragma warning restore 4014
-
-            waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
-
-            var beatmapFile = TestResources.GetTestBeatmapForImport();
-            var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
-            await beatmapManager.Import(beatmapFile);
-
-            return osu;
-        }
-
-        private void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
-        {
-            Task task = Task.Run(() =>
-            {
-                while (!result()) Thread.Sleep(200);
-            });
-
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
 
         private class TestArchiveReader : ArchiveReader
