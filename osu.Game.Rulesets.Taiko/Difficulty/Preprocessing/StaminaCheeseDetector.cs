@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -67,6 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             // as that index can be simply subtracted from the current index to get the number of elements in between
             // without off-by-one errors
             int indexBeforeLastRepeat = -1;
+            int lastMarkEnd = 0;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
@@ -87,7 +89,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 if (repeatedLength < roll_min_repetitions)
                     continue;
 
-                markObjectsAsCheese(i, repeatedLength);
+                markObjectsAsCheese(Math.Max(lastMarkEnd, i - repeatedLength + 1), i);
+                lastMarkEnd = i;
             }
         }
 
@@ -113,6 +116,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         private void findTlTap(int parity, HitType type)
         {
             int tlLength = -2;
+            int lastMarkEnd = 0;
 
             for (int i = parity; i < hitObjects.Count; i += 2)
             {
@@ -124,17 +128,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 if (tlLength < tl_min_repetitions)
                     continue;
 
-                markObjectsAsCheese(i, tlLength);
+                markObjectsAsCheese(Math.Max(lastMarkEnd, i - tlLength + 1), i);
+                lastMarkEnd = i;
             }
         }
 
         /// <summary>
-        /// Marks <paramref name="count"/> elements counting backwards from <paramref name="end"/> as <see cref="TaikoDifficultyHitObject.StaminaCheese"/>.
+        /// Marks all objects from <paramref name="start"/> to <paramref name="end"/> (inclusive) as <see cref="TaikoDifficultyHitObject.StaminaCheese"/>.
         /// </summary>
-        private void markObjectsAsCheese(int end, int count)
+        private void markObjectsAsCheese(int start, int end)
         {
-            for (int i = 0; i < count; ++i)
-                hitObjects[end - i].StaminaCheese = true;
+            for (int i = start; i <= end; i++)
+                hitObjects[i].StaminaCheese = true;
         }
     }
 }
