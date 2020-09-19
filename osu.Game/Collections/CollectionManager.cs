@@ -12,6 +12,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -230,7 +231,7 @@ namespace osu.Game.Collections
         public void DeleteAll()
         {
             Collections.Clear();
-            PostNotification?.Invoke(new SimpleNotification { Text = "Deleted all collections!" });
+            PostNotification?.Invoke(new ProgressCompletionNotification { Text = "Deleted all collections!"});
         }
 
         private readonly object saveLock = new object();
