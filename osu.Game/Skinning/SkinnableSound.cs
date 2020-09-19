@@ -140,8 +140,7 @@ namespace osu.Game.Skinning
 
             samplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
 
-            // Sample channels have been reloaded to new ones because skin has changed.
-            // Start playback internally for them if they were playing previously.
+            // Start playback internally for the new samples if the previous ones were playing beforehand.
             if (wasPlaying)
                 play();
         }
