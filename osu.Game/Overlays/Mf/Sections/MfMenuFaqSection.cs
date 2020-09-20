@@ -84,6 +84,11 @@ namespace osu.Game.Overlays.MfMenu
                                     Title = "为什么我突然没法从Sayobot下图了?",
                                     D = faqSayobotFail()
                                 },
+                                new MfMenuDropDownTextBoxContainer
+                                {
+                                    Title = "为什么我没法在Mf-osu上多人游戏?",
+                                    D = faqMultiPlay()
+                                },
                             }
                         },
                     },
@@ -119,6 +124,29 @@ namespace osu.Game.Overlays.MfMenu
             t.AddLink("MATRIX-feather", "mailto:midnightcarnival@outlook.com", AnswerTitleFont);
             t.AddText("并附上日志文件", AnswerTitleFont);
             t.AddParagraph("你也可以通过关闭 Mf-osu>启用Sayobot功能 选项来使用官方源。", AnswerTitleFont);
+            return t;
+        }
+
+        protected Drawable faqMultiPlay()
+        {
+            var t = new MfText();
+
+            t.AddParagraph("这是因为osu!lazer在2020.801.0版本中", AnswerTitleFont);
+            t.AddText("加入了不允许旧版或非官方版lazer进行多人游戏的功能，", AnswerTitleFont);
+
+            t.AddParagraph("虽然汉化版可以通过更改代码来实现绕过这个检测，", AnswerTitleFont);
+            t.AddParagraph("但考虑到该行为不会受到官方认可，", AnswerTitleFont);
+            t.AddText("因此在后期绕过检测的功能被移除。", AnswerTitleFont);
+
+            t.AddParagraph(" ", AnswerTitleFont);
+            t.AddParagraph("相关资料：", AnswerTitleFont);
+            t.AddParagraph("", AnswerTitleFont);
+            t.AddLink("#9818: Improve messaging when timeshift token retrieval fails","https://github.com/ppy/osu/pull/9818", AnswerTitleFont);
+            t.AddLink("#9709: Include executable hash when submitting multiplayer scores","https://github.com/ppy/osu/pull/9709", AnswerTitleFont);
+
+            t.AddParagraph(" ", AnswerTitleFont);
+            t.AddParagraph("另一个主要原因是我没足够的时间和精力去保证汉化版的4个游戏模式和上游完全一致。",t => t.Font = OsuFont.GetFont(size: 14) );
+            t.AddParagraph("如果哪次合并出了问题导致不公平的多人游戏环境那不是得被查水表。",t => t.Font = OsuFont.GetFont(size: 14) );
             return t;
         }
 
