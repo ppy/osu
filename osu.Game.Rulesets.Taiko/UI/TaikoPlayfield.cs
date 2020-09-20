@@ -205,9 +205,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                         X = result.IsHit ? judgedObject.Position.X : 0,
                     });
 
-                    if (!result.IsHit)
-                        break;
-
                     var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
 
                     addExplosion(judgedObject, type);
