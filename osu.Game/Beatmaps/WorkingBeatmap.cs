@@ -109,7 +109,7 @@ namespace osu.Game.Beatmaps
                 }
 
                 // Convert
-                IBeatmap converted = converter.Convert();
+                IBeatmap converted = converter.Convert(cancellationSource.Token);
 
                 // Apply conversion mods to the result
                 foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())

@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Select
         public ImportFromStablePopup(Action importFromStable)
         {
             HeaderText = @"你还没有谱面OAO!";
-            BodyText = "但是我们发现了这台机器上有另一个osu!已被安装\n是否要现在导入所有的皮肤/谱面和成绩?\n注意:这会将现有的文件重新复制一份, 请确保有足够的磁盘空间";
+            BodyText = "但是我们发现了这台机器上有另一个osu!已被安装\n是否要现在导入所有的皮肤/谱面和成绩?\n注意:这会将现有的文件重新复制一份, 请确保您有足够的磁盘空间";
 
             Icon = FontAwesome.Solid.Plane;
 

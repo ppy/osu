@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -76,7 +77,7 @@ namespace osu.Game.Beatmaps
 
                     public bool CanConvert() => true;
 
-                    public IBeatmap Convert()
+                    public IBeatmap Convert(CancellationToken cancellationToken = default)
                     {
                         foreach (var obj in Beatmap.HitObjects)
                             ObjectConverted?.Invoke(obj, obj.Yield());

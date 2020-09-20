@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Select
 
         private Bindable<TabType> selectedTab;
 
+        private Bindable<bool> selectedModsFilter;
+
         public PlayBeatmapDetailArea()
         {
             Add(Leaderboard = new BeatmapLeaderboard { RelativeSizeAxes = Axes.Both });
@@ -39,8 +41,13 @@ namespace osu.Game.Screens.Select
         private void load(OsuConfigManager config)
         {
             selectedTab = config.GetBindable<TabType>(OsuSetting.BeatmapDetailTab);
+            selectedModsFilter = config.GetBindable<bool>(OsuSetting.BeatmapDetailModsFilter);
+
             selectedTab.BindValueChanged(tab => CurrentTab.Value = getTabItemFromTabType(tab.NewValue), true);
             CurrentTab.BindValueChanged(tab => selectedTab.Value = getTabTypeFromTabItem(tab.NewValue));
+
+            selectedModsFilter.BindValueChanged(checkbox => CurrentModsFilter.Value = checkbox.NewValue, true);
+            CurrentModsFilter.BindValueChanged(checkbox => selectedModsFilter.Value = checkbox.NewValue);
         }
 
         public override void Refresh()

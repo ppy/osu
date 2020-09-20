@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections
             Children = new Drawable[]
             {
                 new PaginatedMostPlayedBeatmapContainer(User),
-                new PaginatedScoreContainer(ScoreType.Recent, User, "最近24小时游玩", "啥都没玩(´・ω・`)"),
+                new PaginatedScoreContainer(ScoreType.Recent, User, "最近游玩(24小时)", CounterVisibilityState.VisibleWhenZero),
             };
         }
     }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -21,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects
     {
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
+        [JsonIgnore]
         public double Duration
         {
             get => EndTime - StartTime;
@@ -112,8 +114,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double TickDistanceMultiplier = 1;
 
-        public HitCircle HeadCircle;
-        public SliderTailCircle TailCircle;
+        [JsonIgnore]
+        public HitCircle HeadCircle { get; protected set; }
+
+        [JsonIgnore]
+        public SliderTailCircle TailCircle { get; protected set; }
 
         public Slider()
         {

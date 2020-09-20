@@ -13,8 +13,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public class PaginatedKudosuHistoryContainer : PaginatedContainer<APIKudosuHistory>
     {
-        public PaginatedKudosuHistoryContainer(Bindable<User> user, string header, string missing)
-            : base(user, header, missing)
+        public PaginatedKudosuHistoryContainer(Bindable<User> user)
+            : base(user, missingText: "该用户还没有收到过任何kudosu!")
         {
             ItemsPerPage = 5;
         }
