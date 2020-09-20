@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 {
     public class MvisStoryBoardSettings : SettingsSubsection
     {
-        protected override string Header => "故事版";
+        protected override string Header => "故事版(不稳定)";
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)

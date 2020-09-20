@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 {
     public class MvisAudioSettings : SettingsSubsection
     {
-        protected override string Header => "音频(实验性)";
+        protected override string Header => "音频";
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)

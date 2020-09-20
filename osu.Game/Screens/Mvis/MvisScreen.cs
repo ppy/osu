@@ -21,7 +21,6 @@ using osu.Framework.Input;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays.Music;
-using osu.Framework.Audio.Track;
 using osu.Game.Input.Bindings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Configuration;
@@ -33,6 +32,7 @@ using osu.Game.Input;
 using osu.Framework.Timing;
 using osu.Framework.Audio;
 using osu.Game.Rulesets.Mods;
+using osu.Framework.Graphics.Audio;
 
 namespace osu.Game.Screens
 {
@@ -40,6 +40,7 @@ namespace osu.Game.Screens
     {
         private const float DURATION = 750;
 
+        public override bool HideOverlaysOnEnter => true;
         private bool AllowCursor = false;
         private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
@@ -77,7 +78,7 @@ namespace osu.Game.Screens
         private BottomBarSwitchButton sidebarToggleButton;
         private BottomBarOverlayLockSwitchButton lockButton;
         private BottomBarSwitchButton songProgressButton;
-        private Track Track;
+        private DrawableTrack Track => musicController.CurrentTrack;
         private BackgroundStoryBoardLoader sbLoader;
         private BgTrianglesContainer bgTriangles;
         private LoadingSpinner loadingSpinner;
@@ -99,8 +100,7 @@ namespace osu.Game.Screens
         private Container gameplayBackground;
         private Container particles;
         private NightcoreBeatContainer nightcoreBeatContainer;
-
-        public float BottombarHeight => bottomBar.DrawHeight - bottomFillFlow.Y;
+        private Container buttonsContainer;
 
         public MvisScreen()
         {
@@ -134,17 +134,14 @@ namespace osu.Game.Screens
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                             Direction = FillDirection.Vertical,
+                            LayoutDuration = DURATION,
+                            LayoutEasing = Easing.OutQuint,
                             Children = new Drawable[]
                             {
                                 bottomBar = new BottomBar
                                 {
                                     Children = new Drawable[]
                                     {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex("#333")
-                                        },
                                         new Container
                                         {
                                             Name = "Base Container",
@@ -154,11 +151,7 @@ namespace osu.Game.Screens
                                             RelativeSizeAxes = Axes.Both,
                                             Children = new Drawable[]
                                             {
-                                                progressBarContainer = new HoverableProgressBarContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                },
-                                                new Container
+                                                buttonsContainer = new Container
                                                 {
                                                     Name = "Buttons Container",
                                                     Anchor = Anchor.Centre,
@@ -205,7 +198,7 @@ namespace osu.Game.Screens
                                                                     Anchor = Anchor.Centre,
                                                                     Origin = Anchor.Centre,
                                                                     ButtonIcon = FontAwesome.Solid.StepBackward,
-                                                                    Action = () => musicController?.PreviousTrack(),
+                                                                    Action = () => musicController.PreviousTrack(),
                                                                     TooltipText = "上一首/从头开始",
                                                                 },
                                                                 songProgressButton = new BottomBarSwitchButton()
@@ -229,7 +222,7 @@ namespace osu.Game.Screens
                                                                     Anchor = Anchor.Centre,
                                                                     Origin = Anchor.Centre,
                                                                     ButtonIcon = FontAwesome.Solid.StepForward,
-                                                                    Action = () => musicController?.NextTrack(),
+                                                                    Action = () => musicController.NextTrack(),
                                                                     TooltipText = "下一首",
                                                                 },
                                                             }
@@ -247,7 +240,7 @@ namespace osu.Game.Screens
                                                                 loopToggleButton = new BottomBarSwitchButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Undo,
-                                                                    Action = () => Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value,
+                                                                    Action = () => Track.Looping = loopToggleButton.ToggleableValue.Value,
                                                                     TooltipText = "单曲循环",
                                                                 },
                                                                 soloButton = new BottomBarButton()
@@ -265,6 +258,10 @@ namespace osu.Game.Screens
                                                             }
                                                         },
                                                     }
+                                                },
+                                                progressBarContainer = new HoverableProgressBarContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
                                                 },
                                             }
                                         },
@@ -289,10 +286,12 @@ namespace osu.Game.Screens
                         },
                     }
                 },
-                new MvisScreenContentContainer
+                new Container
                 {
+                    Name = "Content Container",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding{Horizontal = 50},
                     Depth = 1,
-                    SetBottomPadding = () => BottombarHeight,
                     Masking = true,
                     Children = new Drawable[]
                     {
@@ -339,7 +338,7 @@ namespace osu.Game.Screens
                         {
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            Margin = new MarginPadding(60)
+                            Margin = new MarginPadding(115)
                         },
                         sidebarContainer = new SideBarSettingsPanel
                         {
@@ -367,6 +366,7 @@ namespace osu.Game.Screens
                                         RelativeSizeAxes = Axes.X,
                                         Spacing = new Vector2(20),
                                         Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
+                                        Margin = new MarginPadding{Bottom = 50},
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
@@ -523,32 +523,20 @@ namespace osu.Game.Screens
         }
 
         private void SeekTo(double position) =>
-            musicController?.SeekTo(position);
+            musicController.SeekTo(position);
 
         protected override void Update()
         {
             base.Update();
 
-            Track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
-            if (Track?.IsDummyDevice == false)
-            {
-                TrackRunning.Value = Track.IsRunning;
-                progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
-                progressBarContainer.progressBar.EndTime = Track.Length;
-            }
-            else
-            {
-                TrackRunning.Value = false;
-                progressBarContainer.progressBar.CurrentTime = 0;
-                progressBarContainer.progressBar.EndTime = 1;
-            }
+            TrackRunning.Value = Track.IsRunning;
+            progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
+            progressBarContainer.progressBar.EndTime = Track.Length;
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-
-            var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
 
             //各种背景层的动画
             Background?.Delay(250).Then().FadeOut(250);
@@ -565,8 +553,8 @@ namespace osu.Game.Screens
         public override bool OnExiting(IScreen next)
         {
             //重置Track
-            Beatmap.Value.Track.Looping = false;
-            Track = new TrackVirtual(Beatmap.Value.Track.Length);
+            Track.ResetSpeedAdjustments();
+            Track.Looping = false;
 
             //停止beatmapLogo，取消故事版家在任务以及锁定变更
             beatmapLogo.Clock = new DecoupleableInterpolatingFramedClock();
@@ -668,9 +656,8 @@ namespace osu.Game.Screens
         {
             if (lockChanges.Value) return;
 
-            game?.Toolbar.Hide();
-            bottomFillFlow.MoveToY(bottomBar.Height, DURATION, Easing.OutQuint);
-            bottomBar.FadeTo(0.01f, DURATION, Easing.OutQuint);
+            buttonsContainer.MoveToY(bottomBar.Height, DURATION, Easing.OutQuint);
+            bottomBar.FadeTo(0, DURATION, Easing.OutQuint);
 
             AllowBack = false;
             AllowCursor = false;
@@ -682,11 +669,10 @@ namespace osu.Game.Screens
         {
             if (lockChanges.Value) return;
 
-            game?.Toolbar.Show();
             gameplayContent.FadeTo(1, DURATION, Easing.OutQuint);
             dimBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
 
-            bottomFillFlow.MoveToY(0, DURATION, Easing.OutQuint);
+            buttonsContainer.MoveToY(0, DURATION, Easing.OutQuint);
             bottomBar.FadeIn(DURATION, Easing.OutQuint);
 
             AllowCursor = true;
@@ -718,9 +704,9 @@ namespace osu.Game.Screens
         private void TogglePause()
         {
             if (Track?.IsRunning == true)
-                musicController?.Stop();
+                musicController.Stop();
             else
-                musicController?.Play();
+                musicController.Play();
         }
 
         private void UpdateIdleVisuals()
@@ -734,14 +720,13 @@ namespace osu.Game.Screens
 
         private void ApplyTrackAdjustments()
         {
-            var track = Beatmap.Value.Track;
-            track.ResetSpeedAdjustments();
-            track.Looping = loopToggleButton.ToggleableValue.Value;
-            track.RestartPoint = 0;
+            Track.ResetSpeedAdjustments();
+            Track.Looping = loopToggleButton.ToggleableValue.Value;
+            Track.RestartPoint = 0;
             if ( AdjustFreq.Value )
-                track.AddAdjustment(AdjustableProperty.Frequency, MusicSpeed);
+                Track.AddAdjustment(AdjustableProperty.Frequency, MusicSpeed);
             else
-                track.AddAdjustment(AdjustableProperty.Tempo, MusicSpeed);
+                Track.AddAdjustment(AdjustableProperty.Tempo, MusicSpeed);
 
             if ( NightcoreBeat.Value )
                 nightcoreBeatContainer.Show();
@@ -751,7 +736,10 @@ namespace osu.Game.Screens
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            this.Schedule( () => ApplyTrackAdjustments() );
+            this.Schedule( () =>
+            {
+                ApplyTrackAdjustments();
+            } );
 
             sbLoader.UpdateStoryBoardAsync(() =>
             {
