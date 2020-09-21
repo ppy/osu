@@ -38,7 +38,13 @@ If you are looking to install or test osu! without setting up a development envi
 
 If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
 
-## Developing or debugging
+## Developing a custom ruleset
+
+osu! is designed to have extensible modular gameplay modes, called "rulesets". Building one of these allows a developer to harness the power of osu! for their own game style. To get started working on a ruleset, we have some templates available [here](https://github.com/ppy/osu-templates).
+
+You can see some examples of custom rulesets by visiting the [custom ruleset directory](https://github.com/ppy/osu/issues/5852).
+
+## Developing osu!
 
 Please make sure you have the following prerequisites:
 
