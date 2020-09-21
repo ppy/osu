@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -45,23 +42,6 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
-        }
-
-        private IBindable<bool> isBreakTime;
-
-        [Resolved(canBeNull: true)]
-        private GameplayBeatmap beatmap { get; set; }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            isBreakTime = beatmap?.IsBreakTime.GetBoundCopy();
-            isBreakTime?.BindValueChanged(b =>
-            {
-                if (b.NewValue)
-                    this.FadeOut(400.0, Easing.OutQuint);
-            });
         }
 
         public void DisplayInitialCombo(int combo) => updateCombo(combo, null, true);

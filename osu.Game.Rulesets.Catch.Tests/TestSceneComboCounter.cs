@@ -3,8 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
@@ -12,7 +10,6 @@ using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
 
@@ -21,19 +18,8 @@ namespace osu.Game.Rulesets.Catch.Tests
     public class TestSceneComboCounter : CatchSkinnableTestScene
     {
         private ScoreProcessor scoreProcessor;
-        private GameplayBeatmap gameplayBeatmap;
-        private readonly Bindable<bool> isBreakTime = new BindableBool();
 
         private Color4 judgedObjectColour = Color4.White;
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            gameplayBeatmap = new GameplayBeatmap(CreateBeatmapForSkinProvider());
-            gameplayBeatmap.IsBreakTime.BindTo(isBreakTime);
-            Dependencies.Cache(gameplayBeatmap);
-            Add(gameplayBeatmap);
-        }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -54,7 +40,6 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddRepeatStep("perform hit", () => performJudgement(HitResult.Perfect), 20);
             AddStep("perform miss", () => performJudgement(HitResult.Miss));
 
-            AddToggleStep("toggle gameplay break", v => isBreakTime.Value = v);
             AddStep("randomize judged object colour", () =>
             {
                 judgedObjectColour = new Color4(

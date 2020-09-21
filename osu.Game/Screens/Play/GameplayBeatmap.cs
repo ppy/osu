@@ -16,11 +16,6 @@ namespace osu.Game.Screens.Play
     {
         public readonly IBeatmap PlayableBeatmap;
 
-        /// <summary>
-        /// Whether the gameplay is currently in a break.
-        /// </summary>
-        public IBindable<bool> IsBreakTime { get; } = new Bindable<bool>();
-
         public GameplayBeatmap(IBeatmap playableBeatmap)
         {
             PlayableBeatmap = playableBeatmap;
