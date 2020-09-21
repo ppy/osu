@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static readonly double[] angles = { 0, 0.25 * Math.PI, 0.5 * Math.PI, 0.75 * Math.PI, Math.PI};
         private static readonly double[] distances = { 0, 0.5, 1, 1.5, 2, 3, 6,10 };
 
-        private static readonly double[] flowdistances = { 0, 1, 1.5, 2, 3 };
-        private static readonly double[] snapdistances = { 0, 2, 4, 6, 10 };
+        private static readonly double[] flowdistances = { 0, 0.7, 1, 1.3, 1.7, 3};
+        private static readonly double[] snapdistances = { 0, 1, 2, 3, 5, 9};
 
 
         private static readonly double[] flow0distances = { 0.0, 1.0, 1.35, 1.7, 2.3, 3 };
