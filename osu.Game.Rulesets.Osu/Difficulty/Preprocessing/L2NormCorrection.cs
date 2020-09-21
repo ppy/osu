@@ -49,8 +49,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private L2NormCorrection[] components;
         private LinearSpline offset, scale;
 
+        private static readonly double[] angles = { 0, 0.25 * Math.PI, 0.5 * Math.PI, 0.75 * Math.PI, Math.PI};
+        private static readonly double[] distances = { 0, 0.5, 1, 1.5, 2, 3, 6,10 };
+
+        private static readonly double[] flowdistances = { 0, 1, 1.5, 2, 3 };
+        private static readonly double[] snapdistances = { 0, 2, 4, 6, 10 };
+
+
         private static readonly double[] flow0distances = { 0.0, 1.0, 1.35, 1.7, 2.3, 3 };
-        public static readonly MultiL2NormCorrection FLOW_0 = new MultiL2NormCorrection(
+        public static readonly MultiL2NormCorrection FLOW_0_OLD = new MultiL2NormCorrection(
             distance: flow0distances,
             offset: new double[] { -11.5, -5.9, -5.4, -5.6, -2, -2 },
             scale: new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 },
@@ -91,9 +98,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     scale:    new double[] { 0, 0.7, 0.55, 0.4, 0, 0 }
                 )
             });
+        public static readonly AngleCorrection FLOW_0_REPLACEMENT = new AngleCorrection(FLOW_0_OLD, flowdistances, flowdistances, angles, "FLOW_0");
 
         private static readonly double[] snap0distances = { 0, 1.5, 2.5, 4, 6, 8 };
-        public static readonly MultiL2NormCorrection SNAP_0 = new MultiL2NormCorrection(
+        public static readonly MultiL2NormCorrection SNAP_0_OLD = new MultiL2NormCorrection(
             distance: snap0distances,
             offset: new double[] { -1, -5, -6.7, -6.5, -4.3, -4.3 },
             scale: new double[] { 1, 0.85, 0.6, 0.8, 1, 1 },
@@ -127,9 +135,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     scale:    new double[] { -0.7, -1, -0.9, -0.1, -0.1, -0.1 }
                 )
             });
+        public static readonly AngleCorrection SNAP_0_REPLACEMENT = new AngleCorrection(SNAP_0_OLD, snapdistances, snapdistances, angles, "SNAP_0");
 
         private static readonly double[] flow3distances = { 0, 1, 2, 3, 4 };
-        public static readonly MultiL2NormCorrection FLOW_3 = new MultiL2NormCorrection(
+        public static readonly MultiL2NormCorrection FLOW_3_OLD = new MultiL2NormCorrection(
             distance: flow3distances,
             offset: new double[] { -4, -5.3, -5.2, -2.5, -2.5 },
             scale: new double[] { 1, 1, 1, 1, 1 },
@@ -163,9 +172,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     scale:    new double[] { 0, 0.4, 0.4, 0, 0 }
                 ),
             });
+        public static readonly AngleCorrection FLOW_3_REPLACEMENT = new AngleCorrection(FLOW_3_OLD, flowdistances, flowdistances, angles, "FLOW_3");
 
         private static readonly double[] snap3distances = { 1, 1.5, 2.5, 4, 6, 8 };
-        public static readonly MultiL2NormCorrection SNAP_3 = new MultiL2NormCorrection(
+        public static readonly MultiL2NormCorrection SNAP_3_OLD = new MultiL2NormCorrection(
             distance: snap3distances,
             offset: new double[] { -2, -2, -3, -5.4, -4.9, -4.9 },
             scale: new double[] { 1, 1, 1, 1, 1, 1 },
@@ -206,5 +216,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     scale:    new double[] { 0, 0, -0.6, -0.4, -0.3, -0.3 }
                 )
             });
+        public static readonly AngleCorrection SNAP_3_REPLACEMENT = new AngleCorrection(SNAP_3_OLD, snapdistances, snapdistances, angles, "SNAP_3");
+
+
     }
 }
