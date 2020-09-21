@@ -4,18 +4,15 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Platform;
-using osu.Game.Collections;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Collections.IO
 {
     [TestFixture]
-    public class ImportCollectionsTest
+    public class ImportCollectionsTest : ImportTest
     {
         [Test]
         public async Task TestImportEmptyDatabase()
@@ -24,7 +21,7 @@ namespace osu.Game.Tests.Collections.IO
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     await osu.CollectionManager.Import(new MemoryStream());
 
@@ -44,7 +41,7 @@ namespace osu.Game.Tests.Collections.IO
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     await osu.CollectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
 
@@ -70,7 +67,7 @@ namespace osu.Game.Tests.Collections.IO
             {
                 try
                 {
-                    var osu = loadOsu(host, true);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     await osu.CollectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
 
@@ -101,7 +98,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     AppDomain.CurrentDomain.UnhandledException += setException;
 
-                    var osu = loadOsu(host, true);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     using (var ms = new MemoryStream())
                     {
@@ -135,7 +132,7 @@ namespace osu.Game.Tests.Collections.IO
             {
                 try
                 {
-                    var osu = loadOsu(host, true);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     await osu.CollectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
 
@@ -156,7 +153,7 @@ namespace osu.Game.Tests.Collections.IO
             {
                 try
                 {
-                    var osu = loadOsu(host, true);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
@@ -170,51 +167,6 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     host.Exit();
                 }
-            }
-        }
-
-        private TestOsuGameBase loadOsu(GameHost host, bool withBeatmap = false)
-        {
-            var osu = new TestOsuGameBase(withBeatmap);
-
-#pragma warning disable 4014
-            Task.Run(() => host.Run(osu));
-#pragma warning restore 4014
-
-            waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
-
-            return osu;
-        }
-
-        private void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
-        {
-            Task task = Task.Run(() =>
-            {
-                while (!result()) Thread.Sleep(200);
-            });
-
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
-        }
-
-        private class TestOsuGameBase : OsuGameBase
-        {
-            public CollectionManager CollectionManager { get; private set; }
-
-            private readonly bool withBeatmap;
-
-            public TestOsuGameBase(bool withBeatmap)
-            {
-                this.withBeatmap = withBeatmap;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                // Beatmap must be imported before the collection manager is loaded.
-                if (withBeatmap)
-                    BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
-
-                AddInternal(CollectionManager = new CollectionManager(Storage));
             }
         }
     }

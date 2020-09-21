@@ -879,7 +879,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     Ruleset = getRuleset(),
                     OnlineBeatmapID = beatmapId,
-                    Path = "normal.osu",
                     Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                     Length = length,
                     BPM = bpm,

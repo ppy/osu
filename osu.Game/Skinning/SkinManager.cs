@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
@@ -86,21 +87,46 @@ namespace osu.Game.Skinning
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 
+        private const string unknown_creator_string = "Unknown";
+
+        protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
+        {
+            // we need to populate early to create a hash based off skin.ini contents
+            if (item.Name?.Contains(".osk") == true)
+                populateMetadata(item);
+
+            if (item.Creator != null && item.Creator != unknown_creator_string)
+            {
+                // this is the optimal way to hash legacy skins, but will need to be reconsidered when we move forward with skin implementation.
+                // likely, the skin should expose a real version (ie. the version of the skin, not the skin.ini version it's targeting).
+                return item.ToString().ComputeSHA2Hash();
+            }
+
+            // if there was no creator, the ToString above would give the filename, which alone isn't really enough to base any decisions on.
+            return base.ComputeHash(item, reader);
+        }
+
         protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             await base.Populate(model, archive, cancellationToken);
 
-            Skin reference = GetSkin(model);
+            if (model.Name?.Contains(".osk") == true)
+                populateMetadata(model);
+        }
+
+        private void populateMetadata(SkinInfo item)
+        {
+            Skin reference = GetSkin(item);
 
             if (!string.IsNullOrEmpty(reference.Configuration.SkinInfo.Name))
             {
-                model.Name = reference.Configuration.SkinInfo.Name;
-                model.Creator = reference.Configuration.SkinInfo.Creator;
+                item.Name = reference.Configuration.SkinInfo.Name;
+                item.Creator = reference.Configuration.SkinInfo.Creator;
             }
             else
             {
-                model.Name = model.Name.Replace(".osk", "");
-                model.Creator ??= "Unknown";
+                item.Name = item.Name.Replace(".osk", "");
+                item.Creator ??= unknown_creator_string;
             }
         }
 

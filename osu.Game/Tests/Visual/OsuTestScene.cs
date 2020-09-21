@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual
         private Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
-        private readonly Lazy<DatabaseContextFactory> contextFactory;
+        private Lazy<DatabaseContextFactory> contextFactory;
 
         protected IAPIProvider API
         {
@@ -69,8 +69,33 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected virtual bool UseOnlineAPI => false;
 
+        /// <summary>
+        /// When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
+        /// This is because the host is recycled per TestScene execution in headless at an nunit level.
+        /// </summary>
+        private Storage isolatedHostStorage;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
+            if (!UseFreshStoragePerRun)
+                isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
+
+            contextFactory = new Lazy<DatabaseContextFactory>(() =>
+            {
+                var factory = new DatabaseContextFactory(LocalStorage);
+
+                // only reset the database if not using the host storage.
+                // if we reset the host storage, it will delete global key bindings.
+                if (isolatedHostStorage == null)
+                    factory.ResetDatabase();
+
+                using (var usage = factory.Get())
+                    usage.Migrate();
+                return factory;
+            });
+
+            RecycleLocalStorage();
+
             var baseDependencies = base.CreateChildDependencies(parent);
 
             var providedRuleset = CreateRuleset();
@@ -104,18 +129,10 @@ namespace osu.Game.Tests.Visual
 
         protected OsuTestScene()
         {
-            RecycleLocalStorage();
-            contextFactory = new Lazy<DatabaseContextFactory>(() =>
-            {
-                var factory = new DatabaseContextFactory(LocalStorage);
-                factory.ResetDatabase();
-                using (var usage = factory.Get())
-                    usage.Migrate();
-                return factory;
-            });
-
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
+
+        protected virtual bool UseFreshStoragePerRun => false;
 
         public virtual void RecycleLocalStorage()
         {
@@ -131,7 +148,8 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            localStorage = new Lazy<Storage>(() => new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
+            localStorage =
+                new Lazy<Storage>(() => isolatedHostStorage ?? new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
         }
 
         [Resolved]
@@ -172,7 +190,7 @@ namespace osu.Game.Tests.Visual
             if (MusicController?.TrackLoaded == true)
                 MusicController.CurrentTrack.Stop();
 
-            if (contextFactory.IsValueCreated)
+            if (contextFactory?.IsValueCreated == true)
                 contextFactory.Value.ResetDatabase();
 
             RecycleLocalStorage();
