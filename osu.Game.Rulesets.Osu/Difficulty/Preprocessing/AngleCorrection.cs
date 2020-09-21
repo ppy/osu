@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             interp = new TricubicInterp(d1, d2, angles, values);
         }
 
-        public AngleCorrection(MultiL2NormCorrection correction, double[] d1, double[] d2, double[] angle, string print_name = "", bool print = true)
+        public AngleCorrection(MultiL2NormCorrection correction, double[] d1, double[] d2, double[] angle, string print_name = "", bool print = false)
         {
 
             double[][][] values = new double[d1.Length][][];
