@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Play
             speedAdjustmentsApplied = false;
         }
 
-        public class LocalGameplayClock : GameplayClock
+        private class LocalGameplayClock : GameplayClock
         {
             public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
 
