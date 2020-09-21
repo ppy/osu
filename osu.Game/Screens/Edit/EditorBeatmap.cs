@@ -207,14 +207,15 @@ namespace osu.Game.Screens.Edit
                 beatmapProcessor?.PreProcess();
 
                 foreach (var hitObject in pendingUpdates)
-                {
                     processHitObject(hitObject);
-                    HitObjectUpdated?.Invoke(hitObject);
-                }
-
-                pendingUpdates.Clear();
 
                 beatmapProcessor?.PostProcess();
+
+                // explicitly needs to be fired after PostProcess
+                foreach (var hitObject in pendingUpdates)
+                    HitObjectUpdated?.Invoke(hitObject);
+
+                pendingUpdates.Clear();
             }
         }
 
