@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private bool rotationTransferred;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private GameplayClock gameplayClock { get; set; }
 
         protected override void Update()
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             currentRotation += angle;
             // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
             // (see: ModTimeRamp)
-            RateAdjustedRotation += (float)(Math.Abs(angle) * gameplayClock.TrueGameplayRate);
+            RateAdjustedRotation += (float)(Math.Abs(angle) * (gameplayClock?.TrueGameplayRate ?? Clock.Rate));
         }
     }
 }
