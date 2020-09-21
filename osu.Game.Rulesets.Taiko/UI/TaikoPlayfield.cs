@@ -205,9 +205,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                         X = result.IsHit ? judgedObject.Position.X : 0,
                     });
 
-                    if (!result.IsHit)
-                        break;
-
                     var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
 
                     addExplosion(judgedObject, type);
@@ -218,12 +215,16 @@ namespace osu.Game.Rulesets.Taiko.UI
         private void addDrumRollHit(DrawableDrumRollTick drawableTick) =>
             drumRollHitContainer.Add(new DrawableFlyingHit(drawableTick));
 
-        private void addExplosion(DrawableHitObject drawableObject, HitType type)
+        /// <remarks>
+        /// As legacy skins have different explosions for singular and double strong hits,
+        /// explosion addition is scheduled to ensure that both hits are processed if they occur on the same frame.
+        /// </remarks>
+        private void addExplosion(DrawableHitObject drawableObject, HitType type) => Schedule(() =>
         {
             hitExplosionContainer.Add(new HitExplosion(drawableObject));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
-        }
+        });
 
         private class ProxyContainer : LifetimeManagementContainer
         {
