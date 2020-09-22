@@ -34,11 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
                     Alpha = 0.5f,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
-                ring = new RingPiece
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                }
+                ring = new RingPiece()
             };
         }
 
