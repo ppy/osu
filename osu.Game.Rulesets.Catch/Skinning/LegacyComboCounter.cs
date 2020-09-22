@@ -63,6 +63,14 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
             lastDisplayedCombo = combo;
 
+            if (Time.Elapsed < 0)
+            {
+                // needs more work to make rewind somehow look good.
+                // basically we want the previous increment to play... or turning off RemoveCompletedTransforms (not feasible from a performance angle).
+                Hide();
+                return;
+            }
+
             // Combo fell to zero, roll down and fade out the counter.
             if (combo == 0)
             {
@@ -73,7 +81,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
             }
             else
             {
-                this.FadeInFromZero().Delay(1000).FadeOut(300);
+                this.FadeInFromZero().Then().Delay(1000).FadeOut(300);
 
                 counter.ScaleTo(1.5f)
                        .ScaleTo(0.8f, 250, Easing.Out)
