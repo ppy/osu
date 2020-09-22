@@ -86,16 +86,16 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 return;
             }
 
-            counter.ScaleTo(1.5f).ScaleTo(0.8f, 250.0, Easing.Out)
+            counter.ScaleTo(1.5f).ScaleTo(0.8f, 250, Easing.Out)
                    .OnComplete(c => c.SetCountWithoutRolling(combo));
 
-            counter.Delay(250.0).ScaleTo(1f).ScaleTo(1.1f, 60.0).Then().ScaleTo(1f, 30.0);
+            counter.Delay(250).ScaleTo(1f).ScaleTo(1.1f, 60).Then().ScaleTo(1f, 30);
 
             explosion.Colour = hitObjectColour ?? Color4.White;
 
             explosion.SetCountWithoutRolling(combo);
-            explosion.ScaleTo(1.5f).ScaleTo(1.9f, 400.0, Easing.Out)
-                     .FadeOutFromOne(400.0);
+            explosion.ScaleTo(1.5f).ScaleTo(1.9f, 400, Easing.Out)
+                     .FadeOutFromOne(400);
         }
     }
 }
