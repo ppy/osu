@@ -50,12 +50,6 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!result.Judgement.AffectsCombo || !result.HasResult)
                 return;
 
-            if (result.Type == HitResult.Miss)
-            {
-                updateCombo(result.ComboAtJudgement, null);
-                return;
-            }
-
             updateCombo(result.ComboAtJudgement, judgedObject.AccentColour.Value);
         }
 
