@@ -12,7 +12,7 @@ using static osu.Game.Skinning.LegacySkinConfiguration;
 namespace osu.Game.Rulesets.Catch.Skinning
 {
     /// <summary>
-    /// A combo counter implementation that visually behaves almost similar to osu!stable's combo counter.
+    /// A combo counter implementation that visually behaves almost similar to stable's osu!catch combo counter.
     /// </summary>
     public class LegacyComboCounter : CompositeDrawable, ICatchComboCounter
     {
