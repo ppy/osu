@@ -75,7 +75,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                     return null;
 
                 case TaikoSkinComponents.TaikoExplosionGood:
+                case TaikoSkinComponents.TaikoExplosionGoodStrong:
                 case TaikoSkinComponents.TaikoExplosionGreat:
+                case TaikoSkinComponents.TaikoExplosionGreatStrong:
                 case TaikoSkinComponents.TaikoExplosionMiss:
 
                     var sprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
@@ -107,8 +109,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 case TaikoSkinComponents.TaikoExplosionGood:
                     return "taiko-hit100";
 
+                case TaikoSkinComponents.TaikoExplosionGoodStrong:
+                    return "taiko-hit100k";
+
                 case TaikoSkinComponents.TaikoExplosionGreat:
                     return "taiko-hit300";
+
+                case TaikoSkinComponents.TaikoExplosionGreatStrong:
+                    return "taiko-hit300k";
             }
 
             throw new ArgumentOutOfRangeException(nameof(component), "Invalid result type");
