@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -45,24 +47,41 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(JudgedObject.Result?.Type ?? HitResult.Great)), _ => new DefaultHitExplosion());
+            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(JudgedObject)), _ => new DefaultHitExplosion());
         }
 
-        private TaikoSkinComponents getComponentName(HitResult resultType)
+        private TaikoSkinComponents getComponentName(DrawableHitObject judgedObject)
         {
+            var resultType = judgedObject.Result?.Type ?? HitResult.Great;
+
             switch (resultType)
             {
                 case HitResult.Miss:
                     return TaikoSkinComponents.TaikoExplosionMiss;
 
                 case HitResult.Good:
-                    return TaikoSkinComponents.TaikoExplosionGood;
+                    return useStrongExplosion(judgedObject)
+                        ? TaikoSkinComponents.TaikoExplosionGoodStrong
+                        : TaikoSkinComponents.TaikoExplosionGood;
 
                 case HitResult.Great:
-                    return TaikoSkinComponents.TaikoExplosionGreat;
+                    return useStrongExplosion(judgedObject)
+                        ? TaikoSkinComponents.TaikoExplosionGreatStrong
+                        : TaikoSkinComponents.TaikoExplosionGreat;
             }
 
-            throw new ArgumentOutOfRangeException(nameof(resultType), "Invalid result type");
+            throw new ArgumentOutOfRangeException(nameof(judgedObject), "Invalid result type");
+        }
+
+        private bool useStrongExplosion(DrawableHitObject judgedObject)
+        {
+            if (!(judgedObject.HitObject is Hit))
+                return false;
+
+            if (!(judgedObject.NestedHitObjects.SingleOrDefault() is DrawableStrongNestedHit nestedHit))
+                return false;
+
+            return judgedObject.Result.Type == nestedHit.Result.Type;
         }
 
         /// <summary>
