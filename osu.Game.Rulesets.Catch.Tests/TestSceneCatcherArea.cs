@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 Schedule(() =>
                 {
                     area.AttemptCatch(fruit);
-                    area.OnResult(drawable, new JudgementResult(fruit, new CatchJudgement()) { Type = miss ? HitResult.Miss : HitResult.Great });
+                    area.OnNewResult(drawable, new JudgementResult(fruit, new CatchJudgement()) { Type = miss ? HitResult.Miss : HitResult.Great });
 
                     drawable.Expire();
                 });
