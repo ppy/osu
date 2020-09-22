@@ -54,16 +54,14 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
         public void UpdateCombo(int combo, Color4? hitObjectColour = null)
         {
-            bool immediate = Time.Elapsed < 0;
-
             if (combo == lastDisplayedCombo)
                 return;
 
-            lastDisplayedCombo = combo;
-
             // There may still be existing transforms to the counter (including value change after 250ms),
             // finish them immediately before new transforms.
-            counter.FinishTransforms();
+            counter.SetCountWithoutRolling(lastDisplayedCombo);
+
+            lastDisplayedCombo = combo;
 
             // Combo fell to zero, roll down and fade out the counter.
             if (combo == 0)
@@ -71,31 +69,27 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 counter.Current.Value = 0;
                 explosion.Current.Value = 0;
 
-                this.FadeOut(immediate ? 0.0 : 400.0, Easing.Out);
-                return;
+                this.FadeOut(400, Easing.Out);
             }
-
-            this.FadeIn().Delay(1000.0).FadeOut(300.0);
-
-            // For simplicity, in the case of rewinding we'll just set the counter to the current combo value.
-            immediate |= Time.Elapsed < 0;
-
-            if (immediate)
+            else
             {
-                counter.SetCountWithoutRolling(combo);
-                return;
+                this.FadeInFromZero().Delay(1000).FadeOut(300);
+
+                counter.ScaleTo(1.5f)
+                       .ScaleTo(0.8f, 250, Easing.Out)
+                       .OnComplete(c => c.SetCountWithoutRolling(combo));
+
+                counter.Delay(250)
+                       .ScaleTo(1f)
+                       .ScaleTo(1.1f, 60).Then().ScaleTo(1f, 30);
+
+                explosion.Colour = hitObjectColour ?? Color4.White;
+
+                explosion.SetCountWithoutRolling(combo);
+                explosion.ScaleTo(1.5f)
+                         .ScaleTo(1.9f, 400, Easing.Out)
+                         .FadeOutFromOne(400);
             }
-
-            counter.ScaleTo(1.5f).ScaleTo(0.8f, 250, Easing.Out)
-                   .OnComplete(c => c.SetCountWithoutRolling(combo));
-
-            counter.Delay(250).ScaleTo(1f).ScaleTo(1.1f, 60).Then().ScaleTo(1f, 30);
-
-            explosion.Colour = hitObjectColour ?? Color4.White;
-
-            explosion.SetCountWithoutRolling(combo);
-            explosion.ScaleTo(1.5f).ScaleTo(1.9f, 400, Easing.Out)
-                     .FadeOutFromOne(400);
         }
     }
 }
