@@ -89,6 +89,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
             var explosion = new LegacyRollingCounter(skin, fontName, fontOverlap)
             {
                 Alpha = 0.65f,
+                Blending = BlendingParameters.Additive,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Scale = new Vector2(1.5f),
