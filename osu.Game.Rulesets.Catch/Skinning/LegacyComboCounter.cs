@@ -16,19 +16,14 @@ namespace osu.Game.Rulesets.Catch.Skinning
     /// </summary>
     public class LegacyComboCounter : CompositeDrawable, ICatchComboCounter
     {
-        private readonly ISkin skin;
-
-        private readonly string fontName;
-        private readonly float fontOverlap;
-
         private readonly LegacyRollingCounter counter;
+
+        private readonly LegacyRollingCounter explosion;
 
         public LegacyComboCounter(ISkin skin)
         {
-            this.skin = skin;
-
-            fontName = skin.GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score";
-            fontOverlap = skin.GetConfig<LegacySetting, float>(LegacySetting.ComboOverlap)?.Value ?? -2f;
+            var fontName = skin.GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score";
+            var fontOverlap = skin.GetConfig<LegacySetting, float>(LegacySetting.ComboOverlap)?.Value ?? -2f;
 
             AutoSizeAxes = Axes.Both;
 
@@ -37,17 +32,26 @@ namespace osu.Game.Rulesets.Catch.Skinning
             Origin = Anchor.Centre;
             Scale = new Vector2(0.8f);
 
-            InternalChild = counter = new LegacyRollingCounter(skin, fontName, fontOverlap)
+            InternalChildren = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                explosion = new LegacyRollingCounter(skin, fontName, fontOverlap)
+                {
+                    Alpha = 0.65f,
+                    Blending = BlendingParameters.Additive,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(1.5f),
+                },
+                counter = new LegacyRollingCounter(skin, fontName, fontOverlap)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
             };
         }
 
         public void DisplayInitialCombo(int combo) => updateCombo(combo, null, true);
         public void UpdateCombo(int combo, Color4? hitObjectColour) => updateCombo(combo, hitObjectColour, false);
-
-        private LegacyRollingCounter lastExplosion;
 
         private void updateCombo(int combo, Color4? hitObjectColour, bool immediate)
         {
@@ -59,16 +63,11 @@ namespace osu.Game.Rulesets.Catch.Skinning
             if (combo == 0)
             {
                 counter.Current.Value = 0;
-                if (lastExplosion != null)
-                    lastExplosion.Current.Value = 0;
+                explosion.Current.Value = 0;
 
                 this.FadeOut(immediate ? 0.0 : 400.0, Easing.Out);
                 return;
             }
-
-            // Remove last explosion to not conflict with the upcoming one.
-            if (lastExplosion != null)
-                RemoveInternal(lastExplosion);
 
             this.FadeIn().Delay(1000.0).FadeOut(300.0);
 
@@ -86,25 +85,11 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
             counter.Delay(250.0).ScaleTo(1f).ScaleTo(1.1f, 60.0).Then().ScaleTo(1f, 30.0);
 
-            var explosion = new LegacyRollingCounter(skin, fontName, fontOverlap)
-            {
-                Alpha = 0.65f,
-                Blending = BlendingParameters.Additive,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(1.5f),
-                Colour = hitObjectColour ?? Color4.White,
-                Depth = 1f,
-            };
-
-            AddInternal(explosion);
+            explosion.Colour = hitObjectColour ?? Color4.White;
 
             explosion.SetCountWithoutRolling(combo);
-            explosion.ScaleTo(1.9f, 400.0, Easing.Out)
-                     .FadeOut(400.0)
-                     .Expire(true);
-
-            lastExplosion = explosion;
+            explosion.ScaleTo(1.5f).ScaleTo(1.9f, 400.0, Easing.Out)
+                     .FadeOutFromOne(400.0);
         }
     }
 }
