@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             base.SkinChanged(skin, allowFallback);
-            ComboCounter?.DisplayInitialCombo(currentCombo);
+            ComboCounter?.UpdateCombo(currentCombo);
         }
 
         public void OnNewResult(DrawableCatchHitObject judgedObject, JudgementResult result)

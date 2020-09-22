@@ -50,11 +50,17 @@ namespace osu.Game.Rulesets.Catch.Skinning
             };
         }
 
-        public void DisplayInitialCombo(int combo) => updateCombo(combo, null, true);
-        public void UpdateCombo(int combo, Color4? hitObjectColour) => updateCombo(combo, hitObjectColour, false);
+        private int lastDisplayedCombo;
 
-        private void updateCombo(int combo, Color4? hitObjectColour, bool immediate)
+        public void UpdateCombo(int combo, Color4? hitObjectColour = null)
         {
+            bool immediate = Time.Elapsed < 0;
+
+            if (combo == lastDisplayedCombo)
+                return;
+
+            lastDisplayedCombo = combo;
+
             // There may still be existing transforms to the counter (including value change after 250ms),
             // finish them immediately before new transforms.
             counter.FinishTransforms();
