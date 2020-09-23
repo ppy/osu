@@ -114,6 +114,8 @@ namespace osu.Game.Skinning
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
+            bool wasPlaying = IsPlaying;
+
             var channels = hitSamples.Select(s =>
             {
                 var ch = skin.GetSample(s);
@@ -138,8 +140,9 @@ namespace osu.Game.Skinning
 
             samplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
 
-            if (requestedPlaying)
-                Play();
+            // Start playback internally for the new samples if the previous ones were playing beforehand.
+            if (wasPlaying)
+                play();
         }
 
         #region Re-expose AudioContainer
