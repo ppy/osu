@@ -269,6 +269,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             changeHandler?.EndChange();
         }
 
+        /// <summary>
+        /// Set the new combo state of all selected <see cref="HitObject"/>s.
+        /// </summary>
+        /// <param name="state">Whether to set or unset.</param>
+        /// <exception cref="InvalidOperationException">Throws if any selected object doesn't implement <see cref="IHasComboInformation"/></exception>
         public void SetNewCombo(bool state)
         {
             changeHandler?.BeginChange();
