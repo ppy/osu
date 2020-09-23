@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class RingPiece : Container
+    public class RingPiece : CircularContainer
     {
         public RingPiece()
         {
@@ -18,21 +18,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            InternalChild = new CircularContainer
+            Masking = true;
+            BorderThickness = 10;
+            BorderColour = Color4.White;
+
+            Child = new Box
             {
-                Masking = true,
-                BorderThickness = 10,
-                BorderColour = Color4.White,
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        AlwaysPresent = true,
-                        Alpha = 0,
-                        RelativeSizeAxes = Axes.Both
-                    }
-                }
+                AlwaysPresent = true,
+                Alpha = 0,
+                RelativeSizeAxes = Axes.Both
             };
         }
     }
