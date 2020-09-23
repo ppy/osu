@@ -20,6 +20,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -268,6 +269,24 @@ namespace osu.Game.Screens.Edit.Compose.Components
             changeHandler?.EndChange();
         }
 
+        public void SetNewCombo(bool state)
+        {
+            changeHandler?.BeginChange();
+
+            foreach (var h in SelectedHitObjects)
+            {
+                var comboInfo = h as IHasComboInformation;
+
+                if (comboInfo == null)
+                    throw new InvalidOperationException($"Tried to change combo state of a {h.GetType()}, which doesn't implement {nameof(IHasComboInformation)}");
+
+                comboInfo.NewCombo = state;
+                EditorBeatmap?.UpdateHitObject(h);
+            }
+
+            changeHandler?.EndChange();
+        }
+
         /// <summary>
         /// Removes a hit sample from all selected <see cref="HitObject"/>s.
         /// </summary>
@@ -297,6 +316,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 items.AddRange(GetContextMenuItemsForSelection(selectedBlueprints));
 
+                if (selectedBlueprints.All(b => b.HitObject is IHasComboInformation))
+                    items.Add(createNewComboMenuItem());
+
                 if (selectedBlueprints.Count == 1)
                     items.AddRange(selectedBlueprints[0].ContextMenuItems);
 
@@ -325,6 +347,41 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>The relevant menu items.</returns>
         protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)
             => Enumerable.Empty<MenuItem>();
+
+        private MenuItem createNewComboMenuItem()
+        {
+            return new TernaryStateMenuItem("New combo", MenuItemType.Standard, setNewComboState)
+            {
+                State = { Value = getHitSampleState() }
+            };
+
+            void setNewComboState(TernaryState state)
+            {
+                switch (state)
+                {
+                    case TernaryState.False:
+                        SetNewCombo(false);
+                        break;
+
+                    case TernaryState.True:
+                        SetNewCombo(true);
+                        break;
+                }
+            }
+
+            TernaryState getHitSampleState()
+            {
+                int countExisting = selectedBlueprints.Select(b => b.HitObject as IHasComboInformation).Count(h => h.NewCombo);
+
+                if (countExisting == 0)
+                    return TernaryState.False;
+
+                if (countExisting < SelectedHitObjects.Count())
+                    return TernaryState.Indeterminate;
+
+                return TernaryState.True;
+            }
+        }
 
         private MenuItem createHitSampleMenuItem(string name, string sampleName)
         {
