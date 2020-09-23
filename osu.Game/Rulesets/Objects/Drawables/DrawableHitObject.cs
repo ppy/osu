@@ -158,9 +158,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Called to perform sample-related logic.
+        /// Invoked by the base <see cref="DrawableHitObject"/> to populate samples, once on initial load and potentially again on any change to the samples collection.
         /// </summary>
-        /// <param name="changed">True if triggered from a post-load change to samples.</param>
+        /// <param name="changed">True if triggered from a change to the samples collection.</param>
         protected virtual void LoadSamples(bool changed)
         {
             if (Samples != null)
