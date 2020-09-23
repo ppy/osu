@@ -376,7 +376,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             TernaryState getHitSampleState()
             {
-                int countExisting = selectedBlueprints.Select(b => b.HitObject as IHasComboInformation).Count(h => h.NewCombo);
+                int countExisting = selectedBlueprints.Select(b => (IHasComboInformation)b.HitObject).Count(h => h.NewCombo);
 
                 if (countExisting == 0)
                     return TernaryState.False;
