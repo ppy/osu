@@ -141,7 +141,31 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private void load()
         {
             isStrong = HitObject.IsStrongBindable.GetBoundCopy();
-            isStrong.BindValueChanged(_ => RecreatePieces(), true);
+            isStrong.BindValueChanged(_ =>
+            {
+                // will overwrite samples, should only be called on change.
+                updateSamplesFromStrong();
+
+                RecreatePieces();
+            });
+
+            RecreatePieces();
+        }
+
+        private void updateSamplesFromStrong()
+        {
+            var strongSamples = HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
+
+            if (isStrong.Value != strongSamples.Any())
+            {
+                if (isStrong.Value)
+                    HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH });
+                else
+                {
+                    foreach (var sample in strongSamples)
+                        HitObject.Samples.Remove(sample);
+                }
+            }
         }
 
         protected virtual void RecreatePieces()
@@ -150,6 +174,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             MainPiece?.Expire();
             Content.Add(MainPiece = CreateMainPiece());
+
+            LoadSamples();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)

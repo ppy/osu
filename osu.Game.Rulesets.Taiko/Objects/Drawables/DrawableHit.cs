@@ -42,6 +42,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hit)
         {
             FillMode = FillMode.Fit;
+
+            updateActionsFromType();
         }
 
         [BackgroundDependencyLoader]
@@ -50,21 +52,39 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             type = HitObject.TypeBindable.GetBoundCopy();
             type.BindValueChanged(_ =>
             {
-                updateType();
+                updateActionsFromType();
+
+                // will overwrite samples, should only be called on change.
+                updateSamplesFromTypeChange();
+
                 RecreatePieces();
             });
-
-            updateType();
         }
 
-        private void updateType()
+        private void updateSamplesFromTypeChange()
+        {
+            var rimSamples = HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
+
+            bool isRimType = HitObject.Type == HitType.Rim;
+
+            if (isRimType != rimSamples.Any())
+            {
+                if (isRimType)
+                    HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP });
+                else
+                {
+                    foreach (var sample in rimSamples)
+                        HitObject.Samples.Remove(sample);
+                }
+            }
+        }
+
+        private void updateActionsFromType()
         {
             HitActions =
                 HitObject.Type == HitType.Centre
                     ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
                     : new[] { TaikoAction.LeftRim, TaikoAction.RightRim };
-
-            RecreatePieces();
         }
 
         protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre
