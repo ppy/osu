@@ -89,9 +89,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private SkinnableSound slidingSample;
 
-        protected override void LoadSamples()
+        protected override void LoadSamples(bool changed)
         {
-            base.LoadSamples();
+            base.LoadSamples(changed);
 
             slidingSample?.Expire();
             slidingSample = null;
