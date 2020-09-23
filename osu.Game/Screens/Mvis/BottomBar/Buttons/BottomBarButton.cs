@@ -6,18 +6,20 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osu.Framework.Graphics.Containers;
 using osuTK.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
-    public class BottomBarButton : OsuAnimatedButton
+    public class BottomBarButton : OsuClickableContainer
     {
         protected FillFlowContainer contentFillFlow;
         protected readonly Box bgBox;
         private Box flashBox;
+        private Container content;
         public SpriteIcon spriteIcon;
         public IconUsage ButtonIcon;
         public Drawable ExtraDrawable;
@@ -29,36 +31,53 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
             Children = new Drawable[]
             {
-                bgBox = new Box
+                content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("#5a5a5a"),
-                },
-                contentFillFlow = new FillFlowContainer
-                {
-                    Margin = new MarginPadding{ Left = 15, Right = 15 },
-                    AutoSizeAxes = Axes.X,
-                    RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Spacing = new Vector2(5),
+                    Masking = true,
+                    CornerRadius = 5,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 3f,
+                        Colour = Color4.Black.Opacity(0.6f),
+                    },
                     Children = new Drawable[]
                     {
-                        spriteIcon = new SpriteIcon
+                        bgBox = new Box
                         {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4Extensions.FromHex("#5a5a5a"),
+                        },
+                        contentFillFlow = new FillFlowContainer
+                        {
+                            Margin = new MarginPadding{ Left = 15, Right = 15 },
+                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Y,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(13),
-                            Icon = ButtonIcon,
+                            Spacing = new Vector2(5),
+                            Children = new Drawable[]
+                            {
+                                spriteIcon = new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(13),
+                                    Icon = ButtonIcon,
+                                },
+                            }
                         },
+                        flashBox = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.White,
+                            Alpha = 0,
+                        }
                     }
-                },
-                flashBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                    Alpha = 0,
-                },
+                }
             };
         }
 
@@ -75,16 +94,25 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
             if ( NoIcon == true )
                 this.contentFillFlow.Remove(spriteIcon);
+
+            // From OsuAnimatedButton
+            if (AutoSizeAxes != Axes.None)
+            {
+                content.RelativeSizeAxes = (Axes.Both & ~AutoSizeAxes);
+                content.AutoSizeAxes = AutoSizeAxes;
+            }
         }
 
         protected override bool OnMouseDown(Framework.Input.Events.MouseDownEvent e)
         {
+            content.ScaleTo(0.8f, 2000, Easing.OutQuint);
             flashBox.FadeTo(0.8f, 2000, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(Framework.Input.Events.MouseUpEvent e)
         {
+            content.ScaleTo(1f, 1000, Easing.OutElastic);
             flashBox.FadeOut(1000, Easing.OutQuint);
             base.OnMouseUp(e);
         }

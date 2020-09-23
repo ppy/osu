@@ -75,7 +75,9 @@ namespace osu.Game.Storyboards.Drawables
 
         protected override void Dispose(bool isDisposing)
         {
-            Channel?.Stop();
+            //或许可以修好报"Can not stop disposed samples."的问题???
+            Channel?.Dispose();
+            //Channel?.Stop();
             Channel = null;
 
             base.Dispose(isDisposing);

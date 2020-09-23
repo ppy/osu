@@ -79,6 +79,8 @@ namespace osu.Game.Screens.Edit
         private EditorBeatmap editorBeatmap;
         private EditorChangeHandler changeHandler;
 
+        private EditorMenuBar menuBar;
+
         private DependencyContainer dependencies;
 
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
@@ -132,8 +134,6 @@ namespace osu.Game.Screens.Edit
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
             updateLastSavedHash();
-
-            EditorMenuBar menuBar;
 
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
@@ -374,14 +374,32 @@ namespace osu.Game.Screens.Edit
 
         public bool OnPressed(GlobalAction action)
         {
-            if (action == GlobalAction.Back)
+            switch (action)
             {
-                // as we don't want to display the back button, manual handling of exit action is required.
-                this.Exit();
-                return true;
-            }
+                case GlobalAction.Back:
+                    // as we don't want to display the back button, manual handling of exit action is required.
+                    this.Exit();
+                    return true;
 
-            return false;
+                case GlobalAction.EditorComposeMode:
+                    menuBar.Mode.Value = EditorScreenMode.Compose;
+                    return true;
+
+                case GlobalAction.EditorDesignMode:
+                    menuBar.Mode.Value = EditorScreenMode.Design;
+                    return true;
+
+                case GlobalAction.EditorTimingMode:
+                    menuBar.Mode.Value = EditorScreenMode.Timing;
+                    return true;
+
+                case GlobalAction.EditorSetupMode:
+                    menuBar.Mode.Value = EditorScreenMode.SongSetup;
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         public void OnReleased(GlobalAction action)

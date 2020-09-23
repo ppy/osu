@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Game.Overlays;
 using osu.Game.Screens;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -14,6 +15,9 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         [Cached]
         private MusicController musicController = new MusicController();
+
+        [Cached]
+        private IdleTracker idle = new IdleTracker(6000);
 
         private MvisScreen mvisScreen;
 
@@ -32,6 +36,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [BackgroundDependencyLoader]
         private void load()
         {
+            Add(idle);
             Add(musicController);
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
         }
