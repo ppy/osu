@@ -10,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Storyboards.Drawables;
+using osuTK;
 
 namespace osu.Game.Screens.Mvis.Storyboard
 {
@@ -50,13 +51,13 @@ namespace osu.Game.Screens.Mvis.Storyboard
         /// </summary>
         private Action OnComplete;
 
-        private DrawableStoryboard storyboard;
+        private DrawableStoryboard drawableStoryboard;
         private StoryboardClock StoryboardClock = new StoryboardClock();
         private Container ClockContainer;
 
         public Drawable GetOverlayProxy()
         {
-            var proxy = storyboard.OverlayLayer.CreateProxy();
+            var proxy = drawableStoryboard.OverlayLayer.CreateProxy();
             return proxy;
         }
 
@@ -103,29 +104,35 @@ namespace osu.Game.Screens.Mvis.Storyboard
             }
         }
 
-        public bool UpdateComponent(WorkingBeatmap beatmap)
+        private void Cleanup()
+        {
+            StoryboardClock.Stop();
+
+            var oldClockContainer = ClockContainer;
+            var oldStoryboard = drawableStoryboard;
+
+            oldClockContainer?.FadeOut(DURATION, Easing.OutQuint).Finally(_ =>
+            {
+                oldStoryboard?.Dispose();
+                oldStoryboard = null;
+
+                oldClockContainer.Expire();
+                oldClockContainer = null;
+            });
+
+            ClockContainer = null;
+            drawableStoryboard = null;
+        }
+
+        public bool LoadNewStoryboard(WorkingBeatmap beatmap)
         {
             try
             {
-                StoryboardClock.Stop();
-
                 if ( !EnableSB.Value )
                 {
                     IsReady.Value = true;
                     return false;
                 }
-
-                if ( ClockContainer != null )
-                {
-                    if ( storyboard != null )
-                        storyboard.Clock = StoryboardClock;
-
-                    ClockContainer.FadeOut(DURATION, Easing.OutQuint);
-                    ClockContainer.Expire();
-                    ClockContainer = null;
-                }
-    
-                storyboard = null;
 
                 LoadSBTask = LoadComponentAsync(new Container
                 {
@@ -136,7 +143,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     {
                         RelativeSizeAxes = Axes.Both,
                         Clock = StoryboardClock = new StoryboardClock(),
-                        Child = storyboard = beatmap.Storyboard.CreateDrawable()
+                        Child = drawableStoryboard = beatmap.Storyboard.CreateDrawable()
                     }
                 }, newClockContainer =>
                 {
@@ -158,7 +165,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             }
             catch (Exception e)
             {
-                Logger.Error(e, "加载Storyboard时出现错误! 请检查你的谱面!");
+                Logger.Error(e, "加载Storyboard时出现了错误");
                 return false;
             }
 
@@ -195,7 +202,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
                     LogTask = Task.Run( () => 
                     {
-                        UpdateComponent(b.Value);
+                        Cleanup();
+                        LoadNewStoryboard(b.Value);
                     });
 
                     await LogTask;

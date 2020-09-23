@@ -38,7 +38,14 @@ namespace osu.Game.Screens.Select
                 Edit();
             });
 
+            Footer.AddButton(new FooterButtonOpenInMvis(){ Action = OpenInMvis });
+
             ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
+        }
+
+        private void OpenInMvis()
+        {
+            this.Push(new MvisScreen());
         }
 
         protected void PresentScore(ScoreInfo score) =>

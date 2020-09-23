@@ -33,6 +33,7 @@ using osu.Framework.Timing;
 using osu.Framework.Audio;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics.Audio;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens
 {
@@ -126,6 +127,13 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        
+                        loadingSpinner = new LoadingSpinner(true, true)
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Margin = new MarginPadding(115)
+                        },
                         bottomFillFlow = new FillFlowContainer
                         {
                             Name = "Bottom FillFlow",
@@ -334,12 +342,6 @@ namespace osu.Game.Screens
                                 },
                             }
                         },
-                        loadingSpinner = new LoadingSpinner(true, true)
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Margin = new MarginPadding(115)
-                        },
                         sidebarContainer = new SideBarSettingsPanel
                         {
                             Name = "Sidebar Container",
@@ -538,6 +540,9 @@ namespace osu.Game.Screens
         {
             base.OnEntering(last);
 
+            if ( (IScreen)last is PlaySongSelect )
+                Background?.FadeOut(250);
+
             //各种背景层的动画
             Background?.Delay(250).Then().FadeOut(250);
             beatmapCover.FadeOut().Then().Delay(500).FadeIn(500);
@@ -657,7 +662,8 @@ namespace osu.Game.Screens
             if (lockChanges.Value) return;
 
             buttonsContainer.MoveToY(bottomBar.Height, DURATION, Easing.OutQuint);
-            bottomBar.FadeTo(0, DURATION, Easing.OutQuint);
+            progressBarContainer.MoveToY(5, DURATION, Easing.OutQuint);
+            bottomBar.FadeOut(DURATION, Easing.OutQuint);
 
             AllowBack = false;
             AllowCursor = false;
@@ -673,6 +679,7 @@ namespace osu.Game.Screens
             dimBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
 
             buttonsContainer.MoveToY(0, DURATION, Easing.OutQuint);
+            progressBarContainer.MoveToY(0, DURATION, Easing.OutQuint);
             bottomBar.FadeIn(DURATION, Easing.OutQuint);
 
             AllowCursor = true;
