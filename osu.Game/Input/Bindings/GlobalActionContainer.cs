@@ -76,7 +76,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Alt, InputKey.Down }, GlobalAction.DecreaseVolume),
             new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.DecreaseVolume),
 
-            new KeyBinding(InputKey.Mute, GlobalAction.ToggleMute),
+            new KeyBinding(new[] { InputKey.Control, InputKey.F4 }, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.TrackPrevious, GlobalAction.MusicPrev),
             new KeyBinding(InputKey.F1, GlobalAction.MusicPrev),
