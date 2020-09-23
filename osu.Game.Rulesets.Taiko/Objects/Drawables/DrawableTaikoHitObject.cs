@@ -1,19 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
-using System.Linq;
-using osu.Game.Audio;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input.Bindings;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -152,17 +152,27 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RecreatePieces();
         }
 
+        private HitSampleInfo[] strongSamples => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
+
+        protected override void LoadSamples(bool changed)
+        {
+            base.LoadSamples(changed);
+
+            if (changed)
+                isStrong.Value = strongSamples.Any();
+        }
+
         private void updateSamplesFromStrong()
         {
-            var strongSamples = HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
+            var samples = strongSamples;
 
-            if (isStrong.Value != strongSamples.Any())
+            if (isStrong.Value != samples.Any())
             {
                 if (isStrong.Value)
                     HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH });
                 else
                 {
-                    foreach (var sample in strongSamples)
+                    foreach (var sample in samples)
                         HitObject.Samples.Remove(sample);
                 }
             }
@@ -174,8 +184,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             MainPiece?.Expire();
             Content.Add(MainPiece = CreateMainPiece());
-
-            LoadSamples();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)

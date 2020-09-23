@@ -88,9 +88,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
-        protected override void LoadSamples()
+        protected override void LoadSamples(bool changed)
         {
-            base.LoadSamples();
+            base.LoadSamples(changed);
 
             spinningSample?.Expire();
             spinningSample = null;
