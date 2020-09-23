@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Edit
                     }
                 },
             };
+
             LoadComponentAsync(CreateMainContent(), content =>
             {
                 spinner.State.Value = Visibility.Hidden;
