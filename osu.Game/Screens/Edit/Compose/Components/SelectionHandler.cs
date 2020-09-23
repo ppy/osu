@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected EditorBeatmap EditorBeatmap { get; private set; }
 
         [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
+        protected IEditorChangeHandler ChangeHandler { get; private set; }
 
         public SelectionHandler()
         {
@@ -194,12 +194,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void deleteSelected()
         {
-            changeHandler?.BeginChange();
+            ChangeHandler?.BeginChange();
 
             foreach (var h in selectedBlueprints.ToList())
                 EditorBeatmap?.Remove(h.HitObject);
 
-            changeHandler?.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         #endregion
@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
-            changeHandler?.BeginChange();
+            ChangeHandler?.BeginChange();
 
             foreach (var h in SelectedHitObjects)
             {
@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 h.Samples.Add(new HitSampleInfo { Name = sampleName });
             }
 
-            changeHandler?.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         /// <summary>
@@ -276,7 +276,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <exception cref="InvalidOperationException">Throws if any selected object doesn't implement <see cref="IHasComboInformation"/></exception>
         public void SetNewCombo(bool state)
         {
-            changeHandler?.BeginChange();
+            ChangeHandler?.BeginChange();
 
             foreach (var h in SelectedHitObjects)
             {
@@ -289,7 +289,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 EditorBeatmap?.UpdateHitObject(h);
             }
 
-            changeHandler?.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         /// <summary>
@@ -298,12 +298,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
-            changeHandler?.BeginChange();
+            ChangeHandler?.BeginChange();
 
             foreach (var h in SelectedHitObjects)
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
 
-            changeHandler?.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         #endregion
