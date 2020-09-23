@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
                 yield return new TernaryStateMenuItem("Rim", action: state =>
                 {
+                    ChangeHandler.BeginChange();
+
                     foreach (var h in hits)
                     {
                         switch (state)
@@ -35,6 +37,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
                                 break;
                         }
                     }
+
+                    ChangeHandler.EndChange();
                 })
                 {
                     State = { Value = getTernaryState(hits, h => h.Type == HitType.Rim) }
@@ -47,6 +51,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
                 yield return new TernaryStateMenuItem("Strong", action: state =>
                 {
+                    ChangeHandler.BeginChange();
+
                     foreach (var h in hits)
                     {
                         switch (state)
@@ -62,6 +68,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
                         EditorBeatmap?.UpdateHitObject(h);
                     }
+
+                    ChangeHandler.EndChange();
                 })
                 {
                     State = { Value = getTernaryState(hits, h => h.IsStrong) }
