@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> CreateDrawableRepresentation;
 
         public readonly Catcher MovableCatcher;
+        private readonly CatchComboDisplay comboDisplay;
 
         public Container ExplodingFruitTarget
         {
@@ -34,10 +35,22 @@ namespace osu.Game.Rulesets.Catch.UI
         public CatcherArea(BeatmapDifficulty difficulty = null)
         {
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
-            Child = MovableCatcher = new Catcher(this, difficulty) { X = CatchPlayfield.CENTER_X };
+            Children = new Drawable[]
+            {
+                comboDisplay = new CatchComboDisplay
+                {
+                    RelativeSizeAxes = Axes.None,
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.Centre,
+                    Margin = new MarginPadding { Bottom = 350f },
+                    X = CatchPlayfield.CENTER_X
+                },
+                MovableCatcher = new Catcher(this, difficulty) { X = CatchPlayfield.CENTER_X },
+            };
         }
 
-        public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
+        public void OnNewResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
             if (result.Judgement is IgnoreJudgement)
                 return;
@@ -86,7 +99,12 @@ namespace osu.Game.Rulesets.Catch.UI
                 else
                     MovableCatcher.Drop();
             }
+
+            comboDisplay.OnNewResult(fruit, result);
         }
+
+        public void OnRevertResult(DrawableCatchHitObject fruit, JudgementResult result)
+            => comboDisplay.OnRevertResult(fruit, result);
 
         public void OnReleased(CatchAction action)
         {
@@ -105,6 +123,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (state?.CatcherX != null)
                 MovableCatcher.X = state.CatcherX.Value;
+
+            comboDisplay.X = MovableCatcher.X;
         }
     }
 }

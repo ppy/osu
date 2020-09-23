@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.KeyBinding
             Add(new AudioControlKeyBindingsSubsection(manager));
             Add(new MvisBindingsSection(manager));
             Add(new InGameKeyBindingsSubsection(manager));
+            Add(new EditorKeyBindingsSubsection(manager));
         }
         private class MvisBindingsSection : KeyBindingsSubsection
         {
@@ -64,6 +65,17 @@ namespace osu.Game.Overlays.KeyBinding
                 : base(null)
             {
                 Defaults = manager.AudioControlKeyBindings;
+            }
+        }
+
+        private class EditorKeyBindingsSubsection : KeyBindingsSubsection
+        {
+            protected override string Header => "编辑器";
+
+            public EditorKeyBindingsSubsection(GlobalActionContainer manager)
+                : base(null)
+            {
+                Defaults = manager.EditorKeyBindings;
             }
         }
     }

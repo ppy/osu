@@ -160,6 +160,11 @@ namespace osu.Game.Tests.Visual
 
             public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
+                var lookup = base.GetTexture(componentName, wrapModeS, wrapModeT);
+
+                if (lookup != null)
+                    return lookup;
+
                 // extrapolate frames to test longer animations
                 if (extrapolateAnimations)
                 {
@@ -169,7 +174,7 @@ namespace osu.Game.Tests.Visual
                         return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"), wrapModeS, wrapModeT);
                 }
 
-                return base.GetTexture(componentName, wrapModeS, wrapModeT);
+                return null;
             }
         }
     }
