@@ -399,7 +399,7 @@ namespace osu.Game.Screens.Play
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Could not load beatmap sucessfully!");
+                Logger.Error(e, "Could not load beatmap successfully!");
                 //couldn't load, hard abort!
                 return null;
             }
