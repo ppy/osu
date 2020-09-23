@@ -54,6 +54,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();
             EditorBeatmap.PlacementObject.ValueChanged += _ => updateDistanceSnapGrid();
             distanceSnapToggle.ValueChanged += _ => updateDistanceSnapGrid();
+
+            // we may be entering the screen with a selection already active
+            updateDistanceSnapGrid();
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer(IEnumerable<DrawableHitObject> hitObjects)
