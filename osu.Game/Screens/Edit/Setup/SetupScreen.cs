@@ -144,14 +144,29 @@ namespace osu.Game.Screens.Edit.Setup
             var info = new FileInfo(filePath.NewValue);
 
             if (!info.Exists)
+            {
                 audioTrackTextBox.Current.Value = filePath.OldValue;
+                return;
+            }
 
+            var beatmapFiles = Beatmap.Value.BeatmapSetInfo.Files;
+
+            // remove the old file
+            var oldFile = beatmapFiles.FirstOrDefault(f => f.Filename == filePath.OldValue);
+
+            if (oldFile != null)
+            {
+                beatmapFiles.Remove(oldFile);
+                files.Dereference(oldFile.FileInfo);
+            }
+
+            // add the new file
             IO.FileInfo osuFileInfo;
 
             using (var stream = info.OpenRead())
                 osuFileInfo = files.Add(stream);
 
-            Beatmap.Value.BeatmapSetInfo.Files.Add(new BeatmapSetFileInfo
+            beatmapFiles.Add(new BeatmapSetFileInfo
             {
                 FileInfo = osuFileInfo,
                 Filename = info.Name
