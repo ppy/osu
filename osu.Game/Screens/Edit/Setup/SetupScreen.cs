@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,13 +10,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.IO;
 using osuTK;
+using FileInfo = System.IO.FileInfo;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -128,8 +130,34 @@ namespace osu.Game.Screens.Edit.Setup
                 }
             };
 
+            audioTrackTextBox.Current.BindValueChanged(audioTrackChanged);
+
             foreach (var item in flow.OfType<LabelledTextBox>())
                 item.OnCommit += onCommit;
+        }
+
+        [Resolved]
+        private FileStore files { get; set; }
+
+        private void audioTrackChanged(ValueChangedEvent<string> filePath)
+        {
+            var info = new FileInfo(filePath.NewValue);
+
+            if (!info.Exists)
+                audioTrackTextBox.Current.Value = filePath.OldValue;
+
+            IO.FileInfo osuFileInfo;
+
+            using (var stream = info.OpenRead())
+                osuFileInfo = files.Add(stream);
+
+            Beatmap.Value.BeatmapSetInfo.Files.Add(new BeatmapSetFileInfo
+            {
+                FileInfo = osuFileInfo,
+                Filename = info.Name
+            });
+
+            Beatmap.Value.Metadata.AudioFile = info.Name;
         }
 
         private void onCommit(TextBox sender, bool newText)
