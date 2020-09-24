@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit
         private string lastSavedHash;
 
         private Box bottomBackground;
-        private Container screenContainer;
+        private Container<EditorScreen> screenContainer;
 
         private EditorScreen currentScreen;
 
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Edit
                         Name = "Screen container",
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = 40, Bottom = 60 },
-                        Child = screenContainer = new Container
+                        Child = screenContainer = new Container<EditorScreen>
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true
@@ -512,7 +512,21 @@ namespace osu.Game.Screens.Edit
 
         private void onModeChanged(ValueChangedEvent<EditorScreenMode> e)
         {
-            currentScreen?.Exit();
+            var lastScreen = currentScreen;
+
+            lastScreen?
+                .ScaleTo(0.98f, 200, Easing.OutQuint)
+                .FadeOut(200, Easing.OutQuint);
+
+            if ((currentScreen = screenContainer.FirstOrDefault(s => s.Type == e.NewValue)) != null)
+            {
+                screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
+
+                currentScreen
+                    .ScaleTo(1, 200, Easing.OutQuint)
+                    .FadeIn(200, Easing.OutQuint);
+                return;
+            }
 
             switch (e.NewValue)
             {
