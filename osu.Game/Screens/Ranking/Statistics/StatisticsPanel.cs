@@ -91,7 +91,10 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     var rows = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(30, 15),
                         Alpha = 0
