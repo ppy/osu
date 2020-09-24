@@ -36,11 +36,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool pressHandledThisFrame;
 
-        private Bindable<HitType> type;
+        private readonly Bindable<HitType> type;
 
         public DrawableHit(Hit hit)
             : base(hit)
         {
+            type = HitObject.TypeBindable.GetBoundCopy();
             FillMode = FillMode.Fit;
 
             updateActionsFromType();
@@ -49,7 +50,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            type = HitObject.TypeBindable.GetBoundCopy();
             type.BindValueChanged(_ =>
             {
                 updateActionsFromType();
@@ -63,12 +63,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private HitSampleInfo[] getRimSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
 
-        protected override void LoadSamples(bool changed)
+        protected override void LoadSamples()
         {
-            base.LoadSamples(changed);
+            base.LoadSamples();
 
-            if (changed)
-                type.Value = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
+            type.Value = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
         }
 
         private void updateSamplesFromTypeChange()
