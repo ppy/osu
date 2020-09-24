@@ -7,12 +7,12 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    public class TestSceneDirectorySelector : OsuTestScene
+    public class TestSceneFileSelector : OsuTestScene
     {
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(new DirectorySelector { RelativeSizeAxes = Axes.Both });
+            Add(new FileSelector { RelativeSizeAxes = Axes.Both });
         }
     }
 }
