@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("place first object", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(5)));
+            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.02f, 0)));
 
             AddStep("place second object", () => InputManager.Click(MouseButton.Left));
 
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("start slider placement", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("move to place end", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(120, 0)));
+            AddStep("move to place end", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.185f, 0)));
 
             AddStep("end slider placement", () => InputManager.Click(MouseButton.Right));
 
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseKey(Key.Number2);
             });
 
-            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(130, 0)));
+            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.20f, 0)));
 
             AddStep("place second object", () => InputManager.Click(MouseButton.Left));
 
