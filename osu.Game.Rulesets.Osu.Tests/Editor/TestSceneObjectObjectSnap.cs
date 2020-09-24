@@ -27,16 +27,20 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("get playfield", () => playfield = Editor.ChildrenOfType<OsuPlayfield>().First());
         }
 
-        [Test]
-        public void TestHitCircleSnapsToOtherHitCircle()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestHitCircleSnapsToOtherHitCircle(bool distanceSnapEnabled)
         {
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre));
 
-            AddStep("disable distance snap", () =>
+            if (!distanceSnapEnabled)
             {
-                InputManager.PressKey(Key.Q);
-                InputManager.ReleaseKey(Key.Q);
-            });
+                AddStep("disable distance snap", () =>
+                {
+                    InputManager.PressKey(Key.Q);
+                    InputManager.ReleaseKey(Key.Q);
+                });
+            }
 
             AddStep("enter placement mode", () =>
             {
