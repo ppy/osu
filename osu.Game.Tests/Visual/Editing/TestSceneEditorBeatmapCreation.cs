@@ -1,17 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Storyboards;
+using osu.Game.Tests.Resources;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Tests.Visual.Editing
 {
     public class TestSceneEditorBeatmapCreation : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
+
+        protected override bool EditorComponentsReady => Editor.ChildrenOfType<SetupScreen>().FirstOrDefault()?.IsLoaded == true;
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) => new DummyWorkingBeatmap(Audio, null);
 
@@ -20,6 +29,32 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
+        }
+
+        [Test]
+        public void TestAddAudioTrack()
+        {
+            AddAssert("switch track to real track", () =>
+            {
+                var setup = Editor.ChildrenOfType<SetupScreen>().First();
+
+                var temp = TestResources.GetTestBeatmapForImport();
+
+                string extractedFolder = $"{temp}_extracted";
+                Directory.CreateDirectory(extractedFolder);
+
+                using (var zip = ZipArchive.Open(temp))
+                    zip.WriteToDirectory(extractedFolder);
+
+                bool success = setup.ChangeAudioTrack(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3"));
+
+                File.Delete(temp);
+                Directory.Delete(extractedFolder, true);
+
+                return success;
+            });
+
+            AddAssert("track length changed", () => Beatmap.Value.Track.Length > 60000);
         }
     }
 }
