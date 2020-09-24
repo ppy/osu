@@ -73,8 +73,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                     },
                                     new Container
                                     {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Child = Component = CreateComponent().With(d =>
