@@ -61,29 +61,29 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             });
         }
 
-        private HitSampleInfo[] rimSamples => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
+        private HitSampleInfo[] getRimSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
 
         protected override void LoadSamples(bool changed)
         {
             base.LoadSamples(changed);
 
             if (changed)
-                type.Value = rimSamples.Any() ? HitType.Rim : HitType.Centre;
+                type.Value = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
         }
 
         private void updateSamplesFromTypeChange()
         {
-            var samples = rimSamples;
+            var rimSamples = getRimSamples();
 
             bool isRimType = HitObject.Type == HitType.Rim;
 
-            if (isRimType != samples.Any())
+            if (isRimType != rimSamples.Any())
             {
                 if (isRimType)
                     HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP });
                 else
                 {
-                    foreach (var sample in samples)
+                    foreach (var sample in rimSamples)
                         HitObject.Samples.Remove(sample);
                 }
             }

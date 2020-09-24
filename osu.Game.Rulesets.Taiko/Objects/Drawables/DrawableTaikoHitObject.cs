@@ -152,27 +152,27 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RecreatePieces();
         }
 
-        private HitSampleInfo[] strongSamples => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
+        private HitSampleInfo[] getStrongSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
 
         protected override void LoadSamples(bool changed)
         {
             base.LoadSamples(changed);
 
             if (changed)
-                isStrong.Value = strongSamples.Any();
+                isStrong.Value = getStrongSamples().Any();
         }
 
         private void updateSamplesFromStrong()
         {
-            var samples = strongSamples;
+            var strongSamples = getStrongSamples();
 
-            if (isStrong.Value != samples.Any())
+            if (isStrong.Value != strongSamples.Any())
             {
                 if (isStrong.Value)
                     HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH });
                 else
                 {
-                    foreach (var sample in samples)
+                    foreach (var sample in strongSamples)
                         HitObject.Samples.Remove(sample);
                 }
             }
