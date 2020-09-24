@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         protected DragBox DragBox { get; private set; }
 
-        protected Container<SelectionBlueprint> SelectionBlueprints { get; private set; }
+        public Container<SelectionBlueprint> SelectionBlueprints { get; private set; }
 
         private SelectionHandler selectionHandler;
 
