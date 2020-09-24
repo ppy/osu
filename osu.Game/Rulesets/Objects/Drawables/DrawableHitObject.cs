@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Result == null)
                 throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
-            LoadSamples(false);
+            LoadSamples();
         }
 
         protected override void LoadAsyncComplete()
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
-            samplesBindable.CollectionChanged += (_, __) => LoadSamples(true);
+            samplesBindable.CollectionChanged += (_, __) => LoadSamples();
 
             apply(HitObject);
         }
@@ -160,8 +160,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Invoked by the base <see cref="DrawableHitObject"/> to populate samples, once on initial load and potentially again on any change to the samples collection.
         /// </summary>
-        /// <param name="changed">True if triggered from a change to the samples collection.</param>
-        protected virtual void LoadSamples(bool changed)
+        protected virtual void LoadSamples()
         {
             if (Samples != null)
             {

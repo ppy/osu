@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected Vector2 BaseSize;
         protected SkinnableDrawable MainPiece;
 
-        private Bindable<bool> isStrong;
+        private readonly Bindable<bool> isStrong;
 
         private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
@@ -128,6 +128,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hitObject)
         {
             HitObject = hitObject;
+            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
 
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Custom;
@@ -140,7 +141,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
             isStrong.BindValueChanged(_ =>
             {
                 // will overwrite samples, should only be called on change.
@@ -154,12 +154,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private HitSampleInfo[] getStrongSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
 
-        protected override void LoadSamples(bool changed)
+        protected override void LoadSamples()
         {
-            base.LoadSamples(changed);
+            base.LoadSamples();
 
-            if (changed)
-                isStrong.Value = getStrongSamples().Any();
+            isStrong.Value = getStrongSamples().Any();
         }
 
         private void updateSamplesFromStrong()
