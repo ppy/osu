@@ -25,6 +25,11 @@ namespace osu.Game.Screens.Edit
 
         private Container timelineContainer;
 
+        protected EditorScreenWithTimeline(EditorScreenMode type)
+            : base(type)
+        {
+        }
+
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] BindableBeatDivisor beatDivisor)
         {
