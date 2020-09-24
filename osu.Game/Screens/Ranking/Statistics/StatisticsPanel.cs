@@ -75,6 +75,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 return;
 
             if (newScore.HitEvents == null || newScore.HitEvents.Count == 0)
+            {
                 content.Add(new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -90,6 +91,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         },
                     }
                 });
+            }
             else
             {
                 spinner.Show();
