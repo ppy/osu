@@ -4,8 +4,8 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Tests.Beatmaps;
@@ -59,9 +59,50 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 return first.Position == second.Position;
             });
+        }
 
-            // TODO: remove
-            AddWaitStep("wait", 10);
+        [Test]
+        public void TestHitCircleSnapsToSliderEnd()
+        {
+            AddStep("move mouse to centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre));
+
+            AddStep("disable distance snap", () =>
+            {
+                InputManager.PressKey(Key.Q);
+                InputManager.ReleaseKey(Key.Q);
+            });
+
+            AddStep("enter slider placement mode", () =>
+            {
+                InputManager.PressKey(Key.Number3);
+                InputManager.ReleaseKey(Key.Number3);
+            });
+
+            AddStep("start slider placement", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("move to place end", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(120, 0)));
+
+            AddStep("end slider placement", () => InputManager.Click(MouseButton.Right));
+
+            AddStep("enter circle placement mode", () =>
+            {
+                InputManager.PressKey(Key.Number2);
+                InputManager.ReleaseKey(Key.Number2);
+            });
+
+            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(130, 0)));
+
+            AddStep("place second object", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("circle is at slider's end", () =>
+            {
+                var objects = EditorBeatmap.HitObjects;
+
+                var first = (Slider)objects.First();
+                var second = (OsuHitObject)objects.Last();
+
+                return Precision.AlmostEquals(first.EndPosition, second.Position);
+            });
         }
     }
 }
