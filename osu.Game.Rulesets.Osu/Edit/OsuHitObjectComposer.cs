@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -94,12 +95,52 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
+            if (snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
+                return snapResult;
+
+            // will be null if distance snap is disabled or not feasible for the current time value.
             if (distanceSnapGrid == null)
                 return base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
 
             (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
 
             return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, PlayfieldAtScreenSpacePosition(screenSpacePosition));
+        }
+
+        private bool snapToVisibleBlueprints(Vector2 screenSpacePosition, out SnapResult snapResult)
+        {
+            // check other on-screen objects for snapping/stacking
+            var blueprints = BlueprintContainer.SelectionBlueprints.AliveChildren;
+
+            var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
+
+            float snapRadius =
+                playfield.GamefieldToScreenSpace(new Vector2(OsuHitObject.OBJECT_RADIUS / 5)).X -
+                playfield.GamefieldToScreenSpace(Vector2.Zero).X;
+
+            foreach (var b in blueprints)
+            {
+                if (b.IsSelected)
+                    continue;
+
+                var hitObject = b.HitObject;
+
+                Vector2 startPos = ((IHasPosition)hitObject).Position;
+
+                Vector2 objectScreenPos = playfield.GamefieldToScreenSpace(startPos);
+
+                if (Vector2.Distance(objectScreenPos, screenSpacePosition) < snapRadius)
+                {
+                    // bypasses time snapping
+                    {
+                        snapResult = new SnapResult(objectScreenPos, null, playfield);
+                        return true;
+                    }
+                }
+            }
+
+            snapResult = null;
+            return false;
         }
 
         private void updateDistanceSnapGrid()
