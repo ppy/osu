@@ -33,6 +33,15 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledTextBox difficultyTextBox;
         private LabelledTextBox audioTrackTextBox;
 
+        [Resolved]
+        private FileStore files { get; set; }
+
+        [Resolved]
+        private MusicController music { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private Editor editor { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -137,29 +146,17 @@ namespace osu.Game.Screens.Edit.Setup
                 item.OnCommit += onCommit;
         }
 
-        [Resolved]
-        private FileStore files { get; set; }
-
-        [Resolved]
-        private MusicController music { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private Editor editor { get; set; }
-
-        private void audioTrackChanged(ValueChangedEvent<string> filePath)
+        public bool ChangeAudioTrack(string path)
         {
-            var info = new FileInfo(filePath.NewValue);
+            var info = new FileInfo(path);
 
             if (!info.Exists)
-            {
-                audioTrackTextBox.Current.Value = filePath.OldValue;
-                return;
-            }
+                return false;
 
             var beatmapFiles = Beatmap.Value.BeatmapSetInfo.Files;
 
             // remove the old file
-            var oldFile = beatmapFiles.FirstOrDefault(f => f.Filename == filePath.OldValue);
+            var oldFile = beatmapFiles.FirstOrDefault(f => f.Filename == Beatmap.Value.Metadata.AudioFile);
 
             if (oldFile != null)
             {
@@ -184,6 +181,13 @@ namespace osu.Game.Screens.Edit.Setup
             music.ForceReloadCurrentBeatmap();
 
             editor.UpdateClockSource();
+            return true;
+        }
+
+        private void audioTrackChanged(ValueChangedEvent<string> filePath)
+        {
+            if (!ChangeAudioTrack(filePath.NewValue))
+                audioTrackTextBox.Current.Value = filePath.OldValue;
         }
 
         private void onCommit(TextBox sender, bool newText)
