@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -22,11 +23,17 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override bool EditorComponentsReady => Editor.ChildrenOfType<SetupScreen>().FirstOrDefault()?.IsLoaded == true;
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) => new DummyWorkingBeatmap(Audio, null);
+        public override void SetUpSteps()
+        {
+            AddStep("set dummy", () => Beatmap.Value = new DummyWorkingBeatmap(Audio, null));
+
+            base.SetUpSteps();
+        }
 
         [Test]
         public void TestCreateNewBeatmap()
         {
+            AddStep("add random hitobject", () => EditorBeatmap.Metadata.Title = Guid.NewGuid().ToString());
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
         }
