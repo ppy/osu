@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private MusicController music { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private Editor editor { get; set; }
 
         private void audioTrackChanged(ValueChangedEvent<string> filePath)
