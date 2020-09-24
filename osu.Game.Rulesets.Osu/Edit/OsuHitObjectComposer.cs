@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -123,19 +122,27 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (b.IsSelected)
                     continue;
 
-                var hitObject = b.HitObject;
+                var hitObject = (OsuHitObject)b.HitObject;
 
-                Vector2 startPos = ((IHasPosition)hitObject).Position;
+                Vector2? snap = checkSnap(hitObject.Position);
+                if (snap == null && hitObject.Position != hitObject.EndPosition)
+                    snap = checkSnap(hitObject.EndPosition);
 
-                Vector2 objectScreenPos = playfield.GamefieldToScreenSpace(startPos);
-
-                if (Vector2.Distance(objectScreenPos, screenSpacePosition) < snapRadius)
+                if (snap != null)
                 {
-                    // bypasses time snapping
-                    {
-                        snapResult = new SnapResult(objectScreenPos, null, playfield);
-                        return true;
-                    }
+                    // only return distance portion, since time is not really valid
+                    snapResult = new SnapResult(snap.Value, null, playfield);
+                    return true;
+                }
+
+                Vector2? checkSnap(Vector2 checkPos)
+                {
+                    Vector2 checkScreenPos = playfield.GamefieldToScreenSpace(checkPos);
+
+                    if (Vector2.Distance(checkScreenPos, screenSpacePosition) < snapRadius)
+                        return checkScreenPos;
+
+                    return null;
                 }
             }
 
