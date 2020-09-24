@@ -18,6 +18,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.IO;
+using osu.Game.Overlays;
 using osuTK;
 using FileInfo = System.IO.FileInfo;
 
@@ -139,6 +140,12 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private FileStore files { get; set; }
 
+        [Resolved]
+        private MusicController music { get; set; }
+
+        [Resolved]
+        private Editor editor { get; set; }
+
         private void audioTrackChanged(ValueChangedEvent<string> filePath)
         {
             var info = new FileInfo(filePath.NewValue);
@@ -173,6 +180,10 @@ namespace osu.Game.Screens.Edit.Setup
             });
 
             Beatmap.Value.Metadata.AudioFile = info.Name;
+
+            music.ForceReloadCurrentBeatmap();
+
+            editor.UpdateClockSource();
         }
 
         private void onCommit(TextBox sender, bool newText)
