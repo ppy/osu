@@ -10,7 +10,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit.Setup;
-using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
