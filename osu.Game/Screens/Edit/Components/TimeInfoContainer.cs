@@ -22,10 +22,12 @@ namespace osu.Game.Screens.Edit.Components
             {
                 trackTimer = new OsuSpriteText
                 {
-                    Origin = Anchor.BottomLeft,
-                    RelativePositionAxes = Axes.Y,
-                    Font = OsuFont.GetFont(size: 22, fixedWidth: true),
-                    Y = 0.5f,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    // intentionally fudged centre to avoid movement of the number portion when
+                    // going negative.
+                    X = -35,
+                    Font = OsuFont.GetFont(size: 25, fixedWidth: true),
                 }
             };
         }
@@ -34,7 +36,8 @@ namespace osu.Game.Screens.Edit.Components
         {
             base.Update();
 
-            trackTimer.Text = TimeSpan.FromMilliseconds(editorClock.CurrentTime).ToString(@"mm\:ss\:fff");
+            var timespan = TimeSpan.FromMilliseconds(editorClock.CurrentTime);
+            trackTimer.Text = $"{(timespan < TimeSpan.Zero ? "-" : string.Empty)}{timespan:mm\\:ss\\:fff}";
         }
     }
 }
