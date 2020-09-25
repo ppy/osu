@@ -366,32 +366,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
 
             // bring in updates from selection changes
-            EditorBeatmap.HitObjectUpdated += _ => updateTernaryStates();
-            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) => updateTernaryStates();
+            EditorBeatmap.HitObjectUpdated += _ => UpdateTernaryStates();
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) => UpdateTernaryStates();
         }
 
-        private void updateTernaryStates()
+        /// <summary>
+        /// Called when context menu ternary states may need to be recalculated (selection changed or hitobject updated).
+        /// </summary>
+        protected virtual void UpdateTernaryStates()
         {
-            selectionNewComboState.Value = getStateFromBlueprints(selectedBlueprints.Select(b => (IHasComboInformation)b.HitObject).Count(h => h.NewCombo));
+            selectionNewComboState.Value = GetStateFromSelection(SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
 
             foreach (var (sampleName, bindable) in selectionSampleStates)
             {
-                bindable.Value = getStateFromBlueprints(SelectedHitObjects.Count(h => h.Samples.Any(s => s.Name == sampleName)));
+                bindable.Value = GetStateFromSelection(SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
             }
         }
 
         /// <summary>
-        /// Given a count of "true" blueprints, retrieve the correct ternary display state.
+        /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
         /// </summary>
-        private TernaryState getStateFromBlueprints(int count)
+        protected TernaryState GetStateFromSelection<T>(IEnumerable<T> selection, Func<T, bool> func)
         {
-            if (count == 0)
-                return TernaryState.False;
+            if (selection.Any(func))
+                return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;
 
-            if (count < SelectedHitObjects.Count())
-                return TernaryState.Indeterminate;
-
-            return TernaryState.True;
+            return TernaryState.False;
         }
 
         #endregion
