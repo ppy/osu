@@ -186,6 +186,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void onDefaultsApplied(HitObject hitObject)
         {
             apply(hitObject);
+            updateState(state.Value, true);
             DefaultsApplied?.Invoke(this);
         }
 
