@@ -3,6 +3,8 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Utils;
@@ -17,7 +19,11 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
-        public readonly double TrackLength;
+        public IBindable<Track> Track => track;
+
+        private readonly Bindable<Track> track = new Bindable<Track>();
+
+        public double TrackLength => track.Value?.Length ?? 60000;
 
         public ControlPointInfo ControlPointInfo;
 
@@ -35,7 +41,6 @@ namespace osu.Game.Screens.Edit
             this.beatDivisor = beatDivisor;
 
             ControlPointInfo = controlPointInfo;
-            TrackLength = trackLength;
 
             underlyingClock = new DecoupleableInterpolatingFramedClock();
         }
@@ -190,7 +195,11 @@ namespace osu.Game.Screens.Edit
 
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
-        public void ChangeSource(IClock source) => underlyingClock.ChangeSource(source);
+        public void ChangeSource(IClock source)
+        {
+            track.Value = source as Track;
+            underlyingClock.ChangeSource(source);
+        }
 
         public IClock Source => underlyingClock.Source;
 
