@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 var comboInfo = h as IHasComboInformation;
 
                 if (comboInfo == null)
-                    throw new InvalidOperationException($"Tried to change combo state of a {h.GetType()}, which doesn't implement {nameof(IHasComboInformation)}");
+                    continue;
 
                 comboInfo.NewCombo = state;
                 EditorBeatmap?.UpdateHitObject(h);

@@ -66,14 +66,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 if (Beatmap.SelectedHitObjects.Count > 0)
                 {
-                    foreach (var h in Beatmap.SelectedHitObjects)
-                    {
-                        if (h is IHasComboInformation c)
-                        {
-                            c.NewCombo = combo.NewValue;
-                            Beatmap.UpdateHitObject(h);
-                        }
-                    }
+                    SelectionHandler.SetNewCombo(combo.NewValue);
                 }
                 else if (currentPlacement != null)
                 {
