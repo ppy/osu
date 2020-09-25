@@ -4,10 +4,10 @@
 using NUnit.Framework;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Osu.Tests
+namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     [TestFixture]
-    public class TestSceneEditor : EditorTestScene
+    public class TestSceneOsuEditor : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
     }
