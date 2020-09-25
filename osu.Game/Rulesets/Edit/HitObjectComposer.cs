@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Edit
 
         private RadioButtonCollection toolboxCollection;
 
-        private ToolboxGroup togglesCollection;
+        private FillFlowContainer togglesCollection;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -121,10 +121,20 @@ namespace osu.Game.Rulesets.Edit
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
-                        new ToolboxGroup("toolbox") { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } },
-                        togglesCollection = new ToolboxGroup("toggles")
+                        new ToolboxGroup("toolbox")
                         {
-                            ChildrenEnumerable = Toggles.Select(b => new DrawableTernaryButton(b))
+                            Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X }
+                        },
+                        new ToolboxGroup("toggles")
+                        {
+                            Child = togglesCollection = new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 5),
+                                ChildrenEnumerable = Toggles.Select(b => new DrawableTernaryButton(b))
+                            },
                         }
                     }
                 },
