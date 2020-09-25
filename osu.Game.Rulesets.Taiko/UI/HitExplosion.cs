@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public override bool RemoveWhenNotAlive => true;
 
-        [Cached(typeof(DrawableHitObject))]
         public readonly DrawableHitObject JudgedObject;
+        private readonly HitResult result;
 
         private SkinnableDrawable skinnable;
 
@@ -31,9 +31,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override double LifetimeEnd => skinnable.Drawable.LifetimeEnd;
 
-        public HitExplosion(DrawableHitObject judgedObject)
+        public HitExplosion(DrawableHitObject judgedObject, HitResult result)
         {
             JudgedObject = judgedObject;
+            this.result = result;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -47,14 +48,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(JudgedObject)), _ => new DefaultHitExplosion());
+            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(JudgedObject)), _ => new DefaultHitExplosion(JudgedObject, result));
         }
 
         private TaikoSkinComponents getComponentName(DrawableHitObject judgedObject)
         {
-            var resultType = judgedObject.Result?.Type ?? HitResult.Great;
-
-            switch (resultType)
+            switch (result)
             {
                 case HitResult.Miss:
                     return TaikoSkinComponents.TaikoExplosionMiss;
