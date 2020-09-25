@@ -92,10 +92,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120))
             };
 
-            foreach (var statistic in score.SortedStatistics.Take(score.SortedStatistics.Count() - 1))
-                columns.Add(new TableColumn(statistic.Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
-
-            columns.Add(new TableColumn(score.SortedStatistics.LastOrDefault().Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 45, maxSize: 95)));
+            foreach (var (key, _, _) in score.GetStatisticsForDisplay())
+                columns.Add(new TableColumn(key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
 
             if (showPerformancePoints)
                 columns.Add(new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
@@ -148,13 +146,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
             };
 
-            foreach (var kvp in score.SortedStatistics)
+            foreach (var (_, value, maxCount) in score.GetStatisticsForDisplay())
             {
                 content.Add(new OsuSpriteText
                 {
-                    Text = $"{kvp.Value}",
+                    Text = maxCount == null ? $"{value}" : $"{value}/{maxCount}",
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = kvp.Value == 0 ? Color4.Gray : Color4.White
+                    Colour = value == 0 ? Color4.Gray : Color4.White
                 });
             }
 
