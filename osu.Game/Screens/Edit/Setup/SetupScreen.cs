@@ -41,6 +41,11 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved(canBeNull: true)]
         private Editor editor { get; set; }
 
+        public SetupScreen()
+            : base(EditorScreenMode.SongSetup)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
