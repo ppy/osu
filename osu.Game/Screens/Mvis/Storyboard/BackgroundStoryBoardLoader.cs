@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Timing;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,14 +9,20 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Storyboards.Drawables;
-using osuTK;
 
 namespace osu.Game.Screens.Mvis.Storyboard
 {
+    ///<summary>
+    ///bug:
+    ///快速切换时会有Storyboard Container不消失导致一直在那积累
+    ///故事版会莫名奇妙地报个引用空对象错误
+    ///故事版获取Overlay Proxy时会报错(???)
+    ///</summary>
     public class BackgroundStoryBoardLoader : Container
     {
         private const float DURATION = 750;
-        private CancellationTokenSource ChangeSB;
+        private CancellationTokenSource LoadSBTaskCancellationToken;
+        private CancellationTokenSource LoadSBAsyncTaskCancellationToken;
         private BindableBool EnableSB = new BindableBool();
         ///<summary>
         ///用于内部确定故事版是否已加载
@@ -57,7 +62,17 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
         public Drawable GetOverlayProxy()
         {
-            var proxy = drawableStoryboard.OverlayLayer.CreateProxy();
+            Drawable proxy;
+            try
+            {
+                proxy = drawableStoryboard.OverlayLayer.CreateProxy();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "获取Overlay Proxy时出现了错误");
+                proxy = new Container();
+            }
+
             return proxy;
         }
 
@@ -108,18 +123,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             StoryboardClock.Stop();
 
-            var oldClockContainer = ClockContainer;
-            var oldStoryboard = drawableStoryboard;
-
-            oldClockContainer?.FadeOut(DURATION, Easing.OutQuint).Finally(_ =>
-            {
-                oldStoryboard?.Dispose();
-                oldStoryboard = null;
-
-                oldClockContainer.Expire();
-                oldClockContainer = null;
-            });
-
+            ClockContainer?.FadeOut(DURATION, Easing.OutQuint);
+            ClockContainer?.Expire();
             ClockContainer = null;
             drawableStoryboard = null;
         }
@@ -133,6 +138,10 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     IsReady.Value = true;
                     return false;
                 }
+
+                ClockContainer?.FadeOut(DURATION, Easing.OutQuint);
+                ClockContainer?.Expire();
+                ClockContainer = null;
 
                 LoadSBTask = LoadComponentAsync(new Container
                 {
@@ -161,7 +170,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     OnComplete = null;
 
                     Logger.Log($"Load Storyboard for Beatmap \"{beatmap.BeatmapSetInfo}\" complete!");
-                }, (ChangeSB = new CancellationTokenSource()).Token);
+                }, (LoadSBTaskCancellationToken = new CancellationTokenSource()).Token);
             }
             catch (Exception e)
             {
@@ -174,7 +183,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
         public void CancelAllTasks()
         {
-            ChangeSB?.Cancel();
+            LoadSBAsyncTaskCancellationToken?.Cancel();
+            LoadSBTaskCancellationToken?.Cancel();
 
             LoadSBTask = null;
             LoadSBAsyncTask = null;
@@ -190,24 +200,25 @@ namespace osu.Game.Screens.Mvis.Storyboard
             IsReady.Value = false;
             SBLoaded.Value = false;
             NeedToHideTriangles.Value = false;
+            storyboardReplacesBackground.Value = false;
+
+            this.OnComplete = OnComplete;
+            Cleanup();
 
             Schedule(() =>
             {
-                this.OnComplete = OnComplete;
                 LoadSBAsyncTask = Task.Run( async () =>
                 {
                     Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
 
-                    storyboardReplacesBackground.Value = false;
 
                     LogTask = Task.Run( () => 
                     {
-                        Cleanup();
                         LoadNewStoryboard(b.Value);
                     });
 
                     await LogTask;
-                });
+                }, (LoadSBAsyncTaskCancellationToken = new CancellationTokenSource()).Token);
             });
         }
     }

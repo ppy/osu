@@ -401,12 +401,27 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Update an existing file, or create a new entry if not already part of the <paramref name="model"/>'s files.
+        /// Replace an existing file with a new version.
         /// </summary>
         /// <param name="model">The item to operate on.</param>
-        /// <param name="file">The file model to be updated or added.</param>
+        /// <param name="file">The existing file to be replaced.</param>
         /// <param name="contents">The new file contents.</param>
-        public void UpdateFile(TModel model, TFileModel file, Stream contents)
+        /// <param name="filename">An optional filename for the new file. Will use the previous filename if not specified.</param>
+        public void ReplaceFile(TModel model, TFileModel file, Stream contents, string filename = null)
+        {
+            using (ContextFactory.GetForWrite())
+            {
+                DeleteFile(model, file);
+                AddFile(model, contents, filename ?? file.Filename);
+            }
+        }
+
+        /// <summary>
+        /// Delete new file.
+        /// </summary>
+        /// <param name="model">The item to operate on.</param>
+        /// <param name="file">The existing file to be deleted.</param>
+        public void DeleteFile(TModel model, TFileModel file)
         {
             using (var usage = ContextFactory.GetForWrite())
             {
@@ -415,15 +430,28 @@ namespace osu.Game.Database
                 {
                     Files.Dereference(file.FileInfo);
 
-                    // Remove the file model.
+                    // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
+                    // Definitely can be removed once we rework the database backend.
                     usage.Context.Set<TFileModel>().Remove(file);
                 }
 
-                // Add the new file info and containing file model.
                 model.Files.Remove(file);
+            }
+        }
+
+        /// <summary>
+        /// Add a new file.
+        /// </summary>
+        /// <param name="model">The item to operate on.</param>
+        /// <param name="contents">The new file contents.</param>
+        /// <param name="filename">The filename for the new file.</param>
+        public void AddFile(TModel model, Stream contents, string filename)
+        {
+            using (ContextFactory.GetForWrite())
+            {
                 model.Files.Add(new TFileModel
                 {
-                    Filename = file.Filename,
+                    Filename = filename,
                     FileInfo = Files.Add(contents)
                 });
 
