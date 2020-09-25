@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -59,6 +61,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            createStateBindables();
+
             InternalChild = content = new Container
             {
                 Children = new Drawable[]
@@ -308,6 +312,90 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #endregion
 
+        #region Selection State
+
+        private readonly Bindable<TernaryState> selectionNewComboState = new Bindable<TernaryState>();
+
+        private readonly Dictionary<string, Bindable<TernaryState>> selectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
+
+        /// <summary>
+        /// Set up ternary state bindables and bind them to selection/hitobject changes (in both directions)
+        /// </summary>
+        private void createStateBindables()
+        {
+            // hit samples
+            var sampleTypes = new[] { HitSampleInfo.HIT_WHISTLE, HitSampleInfo.HIT_CLAP, HitSampleInfo.HIT_FINISH };
+
+            foreach (var sampleName in sampleTypes)
+            {
+                var bindable = new Bindable<TernaryState>
+                {
+                    Description = sampleName.Replace("hit", string.Empty).Titleize()
+                };
+
+                bindable.ValueChanged += state =>
+                {
+                    switch (state.NewValue)
+                    {
+                        case TernaryState.False:
+                            RemoveHitSample(sampleName);
+                            break;
+
+                        case TernaryState.True:
+                            AddHitSample(sampleName);
+                            break;
+                    }
+                };
+
+                selectionSampleStates[sampleName] = bindable;
+            }
+
+            // new combo
+            selectionNewComboState.ValueChanged += state =>
+            {
+                switch (state.NewValue)
+                {
+                    case TernaryState.False:
+                        SetNewCombo(false);
+                        break;
+
+                    case TernaryState.True:
+                        SetNewCombo(true);
+                        break;
+                }
+            };
+
+            // bring in updates from selection changes
+            EditorBeatmap.HitObjectUpdated += _ => UpdateTernaryStates();
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) => UpdateTernaryStates();
+        }
+
+        /// <summary>
+        /// Called when context menu ternary states may need to be recalculated (selection changed or hitobject updated).
+        /// </summary>
+        protected virtual void UpdateTernaryStates()
+        {
+            selectionNewComboState.Value = GetStateFromSelection(SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
+
+            foreach (var (sampleName, bindable) in selectionSampleStates)
+            {
+                bindable.Value = GetStateFromSelection(SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
+            }
+        }
+
+        /// <summary>
+        /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
+        /// </summary>
+        protected TernaryState GetStateFromSelection<T>(IEnumerable<T> selection, Func<T, bool> func)
+        {
+            if (selection.Any(func))
+                return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;
+
+            return TernaryState.False;
+        }
+
+        #endregion
+
         #region Context Menu
 
         public MenuItem[] ContextMenuItems
@@ -322,7 +410,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 items.AddRange(GetContextMenuItemsForSelection(selectedBlueprints));
 
                 if (selectedBlueprints.All(b => b.HitObject is IHasComboInformation))
-                    items.Add(createNewComboMenuItem());
+                {
+                    items.Add(new TernaryStateMenuItem("New combo") { State = { BindTarget = selectionNewComboState } });
+                }
 
                 if (selectedBlueprints.Count == 1)
                     items.AddRange(selectedBlueprints[0].ContextMenuItems);
@@ -331,12 +421,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     new OsuMenuItem("Sound")
                     {
-                        Items = new[]
-                        {
-                            createHitSampleMenuItem("Whistle", HitSampleInfo.HIT_WHISTLE),
-                            createHitSampleMenuItem("Clap", HitSampleInfo.HIT_CLAP),
-                            createHitSampleMenuItem("Finish", HitSampleInfo.HIT_FINISH)
-                        }
+                        Items = selectionSampleStates.Select(kvp =>
+                            new TernaryStateMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
                     },
                     new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),
                 });
@@ -352,76 +438,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>The relevant menu items.</returns>
         protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)
             => Enumerable.Empty<MenuItem>();
-
-        private MenuItem createNewComboMenuItem()
-        {
-            return new TernaryStateMenuItem("New combo", MenuItemType.Standard, setNewComboState)
-            {
-                State = { Value = getHitSampleState() }
-            };
-
-            void setNewComboState(TernaryState state)
-            {
-                switch (state)
-                {
-                    case TernaryState.False:
-                        SetNewCombo(false);
-                        break;
-
-                    case TernaryState.True:
-                        SetNewCombo(true);
-                        break;
-                }
-            }
-
-            TernaryState getHitSampleState()
-            {
-                int countExisting = selectedBlueprints.Select(b => (IHasComboInformation)b.HitObject).Count(h => h.NewCombo);
-
-                if (countExisting == 0)
-                    return TernaryState.False;
-
-                if (countExisting < SelectedHitObjects.Count())
-                    return TernaryState.Indeterminate;
-
-                return TernaryState.True;
-            }
-        }
-
-        private MenuItem createHitSampleMenuItem(string name, string sampleName)
-        {
-            return new TernaryStateMenuItem(name, MenuItemType.Standard, setHitSampleState)
-            {
-                State = { Value = getHitSampleState() }
-            };
-
-            void setHitSampleState(TernaryState state)
-            {
-                switch (state)
-                {
-                    case TernaryState.False:
-                        RemoveHitSample(sampleName);
-                        break;
-
-                    case TernaryState.True:
-                        AddHitSample(sampleName);
-                        break;
-                }
-            }
-
-            TernaryState getHitSampleState()
-            {
-                int countExisting = SelectedHitObjects.Count(h => h.Samples.Any(s => s.Name == sampleName));
-
-                if (countExisting == 0)
-                    return TernaryState.False;
-
-                if (countExisting < SelectedHitObjects.Count())
-                    return TernaryState.Indeterminate;
-
-                return TernaryState.True;
-            }
-        }
 
         #endregion
     }
