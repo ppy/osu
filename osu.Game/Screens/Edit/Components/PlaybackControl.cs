@@ -62,12 +62,12 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            Track?.AddAdjustment(AdjustableProperty.Tempo, tempo);
+            Track.BindValueChanged(tr => tr.NewValue?.AddAdjustment(AdjustableProperty.Tempo, tempo), true);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            Track?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
+            Track.Value?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
 
             base.Dispose(isDisposing);
         }
