@@ -3,12 +3,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -66,13 +68,51 @@ namespace osu.Game.Screens.Edit.Compose.Components
             NewCombo.BindTo(SelectionHandler.SelectionNewComboState);
 
             // we are responsible for current placement blueprint updated based on state changes.
-            NewCombo.ValueChanged += combo =>
-            {
-                if (currentPlacement == null) return;
+            NewCombo.ValueChanged += _ => updatePlacementNewCombo();
 
-                if (currentPlacement.HitObject is IHasComboInformation c)
-                    c.NewCombo = combo.NewValue == TernaryState.True;
-            };
+            // we own SelectionHandler so don't need to worry about making bindable copies (for simplicity)
+            foreach (var kvp in SelectionHandler.SelectionSampleStates)
+            {
+                kvp.Value.BindValueChanged(_ => updatePlacementSamples());
+            }
+        }
+
+        private void updatePlacementNewCombo()
+        {
+            if (currentPlacement == null) return;
+
+            if (currentPlacement.HitObject is IHasComboInformation c)
+                c.NewCombo = NewCombo.Value == TernaryState.True;
+        }
+
+        private void updatePlacementSamples()
+        {
+            if (currentPlacement == null) return;
+
+            foreach (var kvp in SelectionHandler.SelectionSampleStates)
+                sampleChanged(kvp.Key, kvp.Value.Value);
+        }
+
+        private void sampleChanged(string sampleName, TernaryState state)
+        {
+            if (currentPlacement == null) return;
+
+            var samples = currentPlacement.HitObject.Samples;
+
+            var existingSample = samples.FirstOrDefault(s => s.Name == sampleName);
+
+            switch (state)
+            {
+                case TernaryState.False:
+                    if (existingSample != null)
+                        samples.Remove(existingSample);
+                    break;
+
+                case TernaryState.True:
+                    if (existingSample == null)
+                        samples.Add(new HitSampleInfo { Name = sampleName });
+                    break;
+            }
         }
 
         public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
@@ -89,6 +129,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
             yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = FontAwesome.Regular.DotCircle });
+
+            foreach (var kvp in SelectionHandler.SelectionSampleStates)
+                yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => getIconForSample(kvp.Key));
+        }
+
+        private Drawable getIconForSample(string sampleName)
+        {
+            switch (sampleName)
+            {
+                case HitSampleInfo.HIT_CLAP:
+                    return new SpriteIcon { Icon = FontAwesome.Solid.Hands };
+
+                case HitSampleInfo.HIT_WHISTLE:
+                    return new SpriteIcon { Icon = FontAwesome.Solid.Bullhorn };
+
+                case HitSampleInfo.HIT_FINISH:
+                    return new SpriteIcon { Icon = FontAwesome.Solid.DrumSteelpan };
+            }
+
+            return null;
         }
 
         #region Placement
@@ -156,6 +216,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
                 updatePlacementPosition();
+
+                updatePlacementSamples();
+
+                updatePlacementNewCombo();
             }
         }
 
