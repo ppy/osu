@@ -13,6 +13,11 @@ namespace osu.Game.Screens.Edit.Compose
     {
         private HitObjectComposer composer;
 
+        public ComposeScreen()
+            : base(EditorScreenMode.Compose)
+        {
+        }
+
         protected override Drawable CreateMainContent()
         {
             var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
