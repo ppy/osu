@@ -37,6 +37,11 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens
 {
+    
+    ///<summary>
+    ///bug:
+    ///故事版Overlay Proxy不消失(???)
+    ///</summary>
     public class MvisScreen : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         private const float DURATION = 750;

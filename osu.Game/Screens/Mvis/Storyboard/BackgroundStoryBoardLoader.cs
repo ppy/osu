@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Timing;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,10 +9,15 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Storyboards.Drawables;
-using osuTK;
 
 namespace osu.Game.Screens.Mvis.Storyboard
 {
+    ///<summary>
+    ///bug:
+    ///快速切换时会有Storyboard Container不消失导致一直在那积累
+    ///故事版会莫名奇妙地报个引用空对象错误
+    ///故事版获取Overlay Proxy时会报错(???)
+    ///</summary>
     public class BackgroundStoryBoardLoader : Container
     {
         private const float DURATION = 750;
@@ -58,7 +62,17 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
         public Drawable GetOverlayProxy()
         {
-            var proxy = drawableStoryboard.OverlayLayer.CreateProxy() ?? new Container();
+            Drawable proxy;
+            try
+            {
+                proxy = drawableStoryboard.OverlayLayer.CreateProxy();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "获取Overlay Proxy时出现了错误");
+                proxy = new Container();
+            }
+
             return proxy;
         }
 
@@ -109,23 +123,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             StoryboardClock.Stop();
 
-            var oldClockContainer = ClockContainer;
-
-            oldClockContainer?.FadeOut(DURATION, Easing.OutQuint).Finally(_ =>
-            {
-                oldClockContainer.FinishTransforms();
-
-                foreach(var o in oldClockContainer)
-                {
-                    oldClockContainer.Remove(o);
-                    o.Dispose();
-                }
-
-                this.Remove(oldClockContainer);
-                oldClockContainer.Expire();
-                oldClockContainer = null;
-            });
-
+            ClockContainer?.FadeOut(DURATION, Easing.OutQuint);
+            ClockContainer?.Expire();
             ClockContainer = null;
             drawableStoryboard = null;
         }
@@ -205,6 +204,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
             this.OnComplete = OnComplete;
             Cleanup();
+
             Schedule(() =>
             {
                 LoadSBAsyncTask = Task.Run( async () =>
