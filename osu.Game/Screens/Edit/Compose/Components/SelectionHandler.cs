@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
+        public int SelectedCount => selectedBlueprints.Count;
+
         public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
 
         private Drawable content;
@@ -287,7 +289,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 var comboInfo = h as IHasComboInformation;
 
                 if (comboInfo == null)
-                    throw new InvalidOperationException($"Tried to change combo state of a {h.GetType()}, which doesn't implement {nameof(IHasComboInformation)}");
+                    continue;
 
                 comboInfo.NewCombo = state;
                 EditorBeatmap?.UpdateHitObject(h);
