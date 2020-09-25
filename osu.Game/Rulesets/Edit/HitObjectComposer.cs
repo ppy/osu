@@ -192,6 +192,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+                return false;
+
             if (checkLeftToggleFromKey(e.Key, out var leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
