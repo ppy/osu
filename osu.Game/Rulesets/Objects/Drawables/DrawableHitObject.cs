@@ -157,6 +157,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             updateState(ArmedState.Idle, true);
         }
 
+        /// <summary>
+        /// Invoked by the base <see cref="DrawableHitObject"/> to populate samples, once on initial load and potentially again on any change to the samples collection.
+        /// </summary>
         protected virtual void LoadSamples()
         {
             if (Samples != null)

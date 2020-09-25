@@ -31,6 +31,11 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
+    /// <summary>
+    /// Top level container for editor compose mode.
+    /// Responsible for providing snapping and generally gluing components together.
+    /// </summary>
+    /// <typeparam name="TObject">The base type of supported objects.</typeparam>
     [Cached(Type = typeof(IPlacementHandler))]
     public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
@@ -165,7 +170,7 @@ namespace osu.Game.Rulesets.Edit
         /// A collection of toggles which will be displayed to the user.
         /// The display name will be decided by <see cref="Bindable{T}.Description"/>.
         /// </summary>
-        protected virtual IEnumerable<BindableBool> Toggles => Enumerable.Empty<BindableBool>();
+        protected virtual IEnumerable<Bindable<bool>> Toggles => BlueprintContainer.Toggles;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
@@ -192,6 +197,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+                return false;
+
             if (checkLeftToggleFromKey(e.Key, out var leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
