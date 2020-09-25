@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -147,8 +148,6 @@ namespace osu.Game.Scoring
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
 
-        public IOrderedEnumerable<KeyValuePair<HitResult, int>> SortedStatistics => Statistics.OrderByDescending(pair => pair.Key);
-
         [JsonIgnore]
         [Column("Statistics")]
         public string StatisticsJson
@@ -185,6 +184,48 @@ namespace osu.Game.Scoring
         [NotMapped]
         [JsonProperty("position")]
         public int? Position { get; set; }
+
+        public IEnumerable<(HitResult result, int count, int? maxCount)> GetStatisticsForDisplay()
+        {
+            foreach (var key in OrderAttributeUtils.GetValuesInOrder<HitResult>())
+            {
+                if (key.IsBonus())
+                    continue;
+
+                int value = Statistics.GetOrDefault(key);
+
+                switch (key)
+                {
+                    case HitResult.SmallTickHit:
+                    {
+                        int total = value + Statistics.GetOrDefault(HitResult.SmallTickMiss);
+                        if (total > 0)
+                            yield return (key, value, total);
+
+                        break;
+                    }
+
+                    case HitResult.LargeTickHit:
+                    {
+                        int total = value + Statistics.GetOrDefault(HitResult.LargeTickMiss);
+                        if (total > 0)
+                            yield return (key, value, total);
+
+                        break;
+                    }
+
+                    case HitResult.SmallTickMiss:
+                    case HitResult.LargeTickMiss:
+                        break;
+
+                    default:
+                        if (value > 0 || key == HitResult.Miss)
+                            yield return (key, value, null);
+
+                        break;
+                }
+            }
+        }
 
         [Serializable]
         protected class DeserializedMod : IMod
