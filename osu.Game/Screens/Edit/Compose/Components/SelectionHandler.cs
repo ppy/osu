@@ -331,10 +331,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void createStateBindables()
         {
-            // hit samples
-            var sampleTypes = new[] { HitSampleInfo.HIT_WHISTLE, HitSampleInfo.HIT_CLAP, HitSampleInfo.HIT_FINISH };
-
-            foreach (var sampleName in sampleTypes)
+            foreach (var sampleName in HitSampleInfo.AllAdditions)
             {
                 var bindable = new Bindable<TernaryState>
                 {
