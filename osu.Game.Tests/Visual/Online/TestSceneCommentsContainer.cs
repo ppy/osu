@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestMultipleLoads()
         {
             var comments = exampleComments;
-            int topLevelCommentCount = exampleComments.Comments.Count(comment => comment.IsTopLevel);
+            int topLevelCommentCount = exampleComments.Comments.Count;
 
             AddStep("hide container", () => commentsContainer.Hide());
             setUpCommentsResponse(comments);

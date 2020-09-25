@@ -174,7 +174,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void addMissJudgement()
         {
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new DrawableTestHit(new Hit()), new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = HitResult.Miss });
+            DrawableTestHit h;
+            Add(h = new DrawableTestHit(new Hit(), HitResult.Miss));
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = HitResult.Miss });
         }
 
         private void addBarLine(bool major, double delay = scroll_time)
