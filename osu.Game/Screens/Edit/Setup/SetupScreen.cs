@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             music.ReloadCurrentTrack();
 
-            editor.UpdateClockSource();
+            editor?.UpdateClockSource();
             return true;
         }
 
