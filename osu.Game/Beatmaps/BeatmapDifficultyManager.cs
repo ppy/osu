@@ -133,7 +133,6 @@ namespace osu.Game.Beatmaps
                 var total = calculator.Calculate(null);
 
                 return total;
-
             }, token, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
