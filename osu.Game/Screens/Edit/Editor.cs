@@ -518,7 +518,7 @@ namespace osu.Game.Screens.Edit
                 .ScaleTo(0.98f, 200, Easing.OutQuint)
                 .FadeOut(200, Easing.OutQuint);
 
-            if ((currentScreen = screenContainer.FirstOrDefault(s => s.Type == e.NewValue)) != null)
+            if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
             {
                 screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
 
