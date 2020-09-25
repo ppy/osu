@@ -46,14 +46,24 @@ namespace osu.Game.Rulesets.Osu.Edit
             distanceSnapToggle
         };
 
+        private BindableList<HitObject> selectedHitObjects;
+
+        private Bindable<HitObject> placementObject;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             LayerBelowRuleset.Add(distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both });
 
-            EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();
-            EditorBeatmap.PlacementObject.ValueChanged += _ => updateDistanceSnapGrid();
+            selectedHitObjects = EditorBeatmap.SelectedHitObjects.GetBoundCopy();
+            selectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();
+
+            placementObject = EditorBeatmap.PlacementObject.GetBoundCopy();
+            placementObject.ValueChanged += _ => updateDistanceSnapGrid();
             distanceSnapToggle.ValueChanged += _ => updateDistanceSnapGrid();
+
+            // we may be entering the screen with a selection already active
+            updateDistanceSnapGrid();
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer(IEnumerable<DrawableHitObject> hitObjects)

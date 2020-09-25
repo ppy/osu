@@ -273,10 +273,10 @@ namespace osu.Game.Screens.Ranking
                 detachedPanelContainer.Add(expandedPanel);
 
                 // Move into its original location in the local container first, then to the final location.
-                var origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos);
-                expandedPanel.MoveTo(origLocation)
+                var origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos).X;
+                expandedPanel.MoveToX(origLocation)
                              .Then()
-                             .MoveTo(new Vector2(StatisticsPanel.SIDE_PADDING, origLocation.Y), 150, Easing.OutQuint);
+                             .MoveToX(StatisticsPanel.SIDE_PADDING, 150, Easing.OutQuint);
 
                 // Hide contracted panels.
                 foreach (var contracted in ScorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))

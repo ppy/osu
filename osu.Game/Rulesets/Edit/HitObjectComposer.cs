@@ -58,6 +58,8 @@ namespace osu.Game.Rulesets.Edit
 
         private RadioButtonCollection toolboxCollection;
 
+        private ToolboxGroup togglesCollection;
+
         protected HitObjectComposer(Ruleset ruleset)
         {
             Ruleset = ruleset;
@@ -78,7 +80,7 @@ namespace osu.Game.Rulesets.Edit
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Could not load beatmap sucessfully!");
+                Logger.Error(e, "Could not load beatmap successfully!");
                 return;
             }
 
@@ -115,7 +117,7 @@ namespace osu.Game.Rulesets.Edit
                     Children = new Drawable[]
                     {
                         new ToolboxGroup("toolbox") { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } },
-                        new ToolboxGroup("toggles")
+                        togglesCollection = new ToolboxGroup("toggles")
                         {
                             ChildrenEnumerable = Toggles.Select(b => new SettingsCheckbox
                             {
@@ -190,9 +192,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Key >= Key.Number1 && e.Key <= Key.Number9)
+            if (checkLeftToggleFromKey(e.Key, out var leftIndex))
             {
-                var item = toolboxCollection.Items.ElementAtOrDefault(e.Key - Key.Number1);
+                var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
 
                 if (item != null)
                 {
@@ -201,7 +203,82 @@ namespace osu.Game.Rulesets.Edit
                 }
             }
 
+            if (checkRightToggleFromKey(e.Key, out var rightIndex))
+            {
+                var item = togglesCollection.Children[rightIndex];
+
+                if (item is SettingsCheckbox checkbox)
+                {
+                    checkbox.Bindable.Value = !checkbox.Bindable.Value;
+                    return true;
+                }
+            }
+
             return base.OnKeyDown(e);
+        }
+
+        private bool checkLeftToggleFromKey(Key key, out int index)
+        {
+            if (key < Key.Number1 || key > Key.Number9)
+            {
+                index = -1;
+                return false;
+            }
+
+            index = key - Key.Number1;
+            return true;
+        }
+
+        private bool checkRightToggleFromKey(Key key, out int index)
+        {
+            switch (key)
+            {
+                case Key.Q:
+                    index = 0;
+                    break;
+
+                case Key.W:
+                    index = 1;
+                    break;
+
+                case Key.E:
+                    index = 2;
+                    break;
+
+                case Key.R:
+                    index = 3;
+                    break;
+
+                case Key.T:
+                    index = 4;
+                    break;
+
+                case Key.Y:
+                    index = 5;
+                    break;
+
+                case Key.U:
+                    index = 6;
+                    break;
+
+                case Key.I:
+                    index = 7;
+                    break;
+
+                case Key.O:
+                    index = 8;
+                    break;
+
+                case Key.P:
+                    index = 9;
+                    break;
+
+                default:
+                    index = -1;
+                    break;
+            }
+
+            return index >= 0;
         }
 
         private void selectionChanged(object sender, NotifyCollectionChangedEventArgs changedArgs)
