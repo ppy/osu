@@ -62,7 +62,33 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override string FallbackName => file.Name;
 
-            protected override IconUsage? Icon => FontAwesome.Regular.FileAudio;
+            protected override IconUsage? Icon
+            {
+                get
+                {
+                    switch (file.Extension)
+                    {
+                        case ".ogg":
+                        case ".mp3":
+                        case ".wav":
+                            return FontAwesome.Regular.FileAudio;
+
+                        case ".jpg":
+                        case ".jpeg":
+                        case ".png":
+                            return FontAwesome.Regular.FileImage;
+
+                        case ".mp4":
+                        case ".avi":
+                        case ".mov":
+                        case ".flv":
+                            return FontAwesome.Regular.FileVideo;
+
+                        default:
+                            return FontAwesome.Regular.File;
+                    }
+                }
+            }
         }
     }
 }

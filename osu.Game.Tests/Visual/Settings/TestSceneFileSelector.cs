@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 
@@ -9,10 +9,16 @@ namespace osu.Game.Tests.Visual.Settings
 {
     public class TestSceneFileSelector : OsuTestScene
     {
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestAllFiles()
         {
-            Add(new FileSelector { RelativeSizeAxes = Axes.Both });
+            AddStep("create", () => Child = new FileSelector { RelativeSizeAxes = Axes.Both });
+        }
+
+        [Test]
+        public void TestJpgFilesOnly()
+        {
+            AddStep("create", () => Child = new FileSelector(validFileExtensions: new[] { ".jpg" }) { RelativeSizeAxes = Axes.Both });
         }
     }
 }
