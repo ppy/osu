@@ -260,7 +260,7 @@ namespace osu.Game.Beatmaps
                     fileInfo.Filename = beatmapInfo.Path;
 
                     stream.Seek(0, SeekOrigin.Begin);
-                    UpdateFile(setInfo, fileInfo, stream);
+                    ReplaceFile(setInfo, fileInfo, stream);
                 }
             }
 
