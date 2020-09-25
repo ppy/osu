@@ -46,6 +46,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected virtual OsuTextBox CreateTextBox() => new OsuTextBox
         {
+            CommitOnFocusLost = true,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             RelativeSizeAxes = Axes.X,

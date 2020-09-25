@@ -1,19 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
-using System.Linq;
-using osu.Game.Audio;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input.Bindings;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected Vector2 BaseSize;
         protected SkinnableDrawable MainPiece;
 
-        private Bindable<bool> isStrong;
+        private readonly Bindable<bool> isStrong;
 
         private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
@@ -128,6 +128,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hitObject)
         {
             HitObject = hitObject;
+            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
 
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Custom;
@@ -140,8 +141,40 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
-            isStrong.BindValueChanged(_ => RecreatePieces(), true);
+            isStrong.BindValueChanged(_ =>
+            {
+                // will overwrite samples, should only be called on change.
+                updateSamplesFromStrong();
+
+                RecreatePieces();
+            });
+
+            RecreatePieces();
+        }
+
+        private HitSampleInfo[] getStrongSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
+
+        protected override void LoadSamples()
+        {
+            base.LoadSamples();
+
+            isStrong.Value = getStrongSamples().Any();
+        }
+
+        private void updateSamplesFromStrong()
+        {
+            var strongSamples = getStrongSamples();
+
+            if (isStrong.Value != strongSamples.Any())
+            {
+                if (isStrong.Value)
+                    HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH });
+                else
+                {
+                    foreach (var sample in strongSamples)
+                        HitObject.Samples.Remove(sample);
+                }
+            }
         }
 
         protected virtual void RecreatePieces()
