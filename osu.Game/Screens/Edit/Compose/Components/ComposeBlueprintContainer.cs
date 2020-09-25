@@ -68,19 +68,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
             NewCombo.BindTo(SelectionHandler.SelectionNewComboState);
 
             // we are responsible for current placement blueprint updated based on state changes.
-            NewCombo.ValueChanged += combo =>
-            {
-                if (currentPlacement == null) return;
-
-                if (currentPlacement.HitObject is IHasComboInformation c)
-                    c.NewCombo = combo.NewValue == TernaryState.True;
-            };
+            NewCombo.ValueChanged += _ => updatePlacementNewCombo();
 
             // we own SelectionHandler so don't need to worry about making bindable copies (for simplicity)
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
             {
-                kvp.Value.BindValueChanged(c => sampleChanged(kvp.Key, c.NewValue));
+                kvp.Value.BindValueChanged(_ => updatePlacementSamples());
             }
+        }
+
+        private void updatePlacementNewCombo()
+        {
+            if (currentPlacement == null) return;
+
+            if (currentPlacement.HitObject is IHasComboInformation c)
+                c.NewCombo = NewCombo.Value == TernaryState.True;
+        }
+
+        private void updatePlacementSamples()
+        {
+            if (currentPlacement == null) return;
+
+            foreach (var kvp in SelectionHandler.SelectionSampleStates)
+                sampleChanged(kvp.Key, kvp.Value.Value);
         }
 
         private void sampleChanged(string sampleName, TernaryState state)
@@ -206,6 +216,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
                 updatePlacementPosition();
+
+                updatePlacementSamples();
+
+                updatePlacementNewCombo();
             }
         }
 
