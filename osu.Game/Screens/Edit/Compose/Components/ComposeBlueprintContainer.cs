@@ -7,12 +7,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -48,6 +51,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
+            TernaryStates = CreateTernaryButtons().ToArray();
+
             AddInternal(placementBlueprintContainer);
         }
 
@@ -57,36 +62,34 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             inputManager = GetContainingInputManager();
 
-            Beatmap.SelectedHitObjects.CollectionChanged += (_, __) => updateTogglesFromSelection();
+            // updates to selected are handled for us by SelectionHandler.
+            NewCombo.BindTo(SelectionHandler.SelectionNewComboState);
 
-            // the updated object may be in the selection
-            Beatmap.HitObjectUpdated += _ => updateTogglesFromSelection();
-
+            // we are responsible for current placement blueprint updated based on state changes.
             NewCombo.ValueChanged += combo =>
             {
-                if (Beatmap.SelectedHitObjects.Count > 0)
-                {
-                    SelectionHandler.SetNewCombo(combo.NewValue);
-                }
-                else if (currentPlacement != null)
-                {
-                    // update placement object from toggle
-                    if (currentPlacement.HitObject is IHasComboInformation c)
-                        c.NewCombo = combo.NewValue;
-                }
+                if (currentPlacement == null) return;
+
+                if (currentPlacement.HitObject is IHasComboInformation c)
+                    c.NewCombo = combo.NewValue == TernaryState.True;
             };
         }
 
-        private void updateTogglesFromSelection() =>
-            NewCombo.Value = Beatmap.SelectedHitObjects.OfType<IHasComboInformation>().All(c => c.NewCombo);
+        public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
 
-        public readonly Bindable<bool> NewCombo = new Bindable<bool> { Description = "New Combo" };
+        /// <summary>
+        /// A collection of states which will be displayed to the user in the toolbox.
+        /// </summary>
+        public TernaryButton[] TernaryStates { get; private set; }
 
-        public virtual IEnumerable<Bindable<bool>> Toggles => new[]
+        /// <summary>
+        /// Create all ternary states required to be displayed to the user.
+        /// </summary>
+        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
-            NewCombo
-        };
+            yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = FontAwesome.Regular.DotCircle });
+        }
 
         #region Placement
 
