@@ -94,12 +94,60 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
+            if (snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
+                return snapResult;
+
+            // will be null if distance snap is disabled or not feasible for the current time value.
             if (distanceSnapGrid == null)
                 return base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
 
             (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
 
             return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, PlayfieldAtScreenSpacePosition(screenSpacePosition));
+        }
+
+        private bool snapToVisibleBlueprints(Vector2 screenSpacePosition, out SnapResult snapResult)
+        {
+            // check other on-screen objects for snapping/stacking
+            var blueprints = BlueprintContainer.SelectionBlueprints.AliveChildren;
+
+            var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
+
+            float snapRadius =
+                playfield.GamefieldToScreenSpace(new Vector2(OsuHitObject.OBJECT_RADIUS / 5)).X -
+                playfield.GamefieldToScreenSpace(Vector2.Zero).X;
+
+            foreach (var b in blueprints)
+            {
+                if (b.IsSelected)
+                    continue;
+
+                var hitObject = (OsuHitObject)b.HitObject;
+
+                Vector2? snap = checkSnap(hitObject.Position);
+                if (snap == null && hitObject.Position != hitObject.EndPosition)
+                    snap = checkSnap(hitObject.EndPosition);
+
+                if (snap != null)
+                {
+                    // only return distance portion, since time is not really valid
+                    snapResult = new SnapResult(snap.Value, null, playfield);
+                    return true;
+                }
+
+                Vector2? checkSnap(Vector2 checkPos)
+                {
+                    Vector2 checkScreenPos = playfield.GamefieldToScreenSpace(checkPos);
+
+                    if (Vector2.Distance(checkScreenPos, screenSpacePosition) < snapRadius)
+                        return checkScreenPos;
+
+                    return null;
+                }
+            }
+
+            snapResult = null;
+            return false;
         }
 
         private void updateDistanceSnapGrid()
