@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Edit
         /// A collection of toggles which will be displayed to the user.
         /// The display name will be decided by <see cref="Bindable{T}.Description"/>.
         /// </summary>
-        protected virtual IEnumerable<BindableBool> Toggles => Enumerable.Empty<BindableBool>();
+        protected virtual IEnumerable<Bindable<bool>> Toggles => BlueprintContainer.Toggles;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.

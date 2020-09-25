@@ -41,10 +41,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly BindableBool distanceSnapToggle = new BindableBool(true) { Description = "Distance Snap" };
 
-        protected override IEnumerable<BindableBool> Toggles => new[]
+        protected override IEnumerable<Bindable<bool>> Toggles => base.Toggles.Concat(new[]
         {
             distanceSnapToggle
-        };
+        });
 
         private BindableList<HitObject> selectedHitObjects;
 
