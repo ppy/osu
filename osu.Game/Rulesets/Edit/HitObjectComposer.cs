@@ -14,7 +14,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -24,6 +23,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -124,11 +124,7 @@ namespace osu.Game.Rulesets.Edit
                         new ToolboxGroup("toolbox") { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } },
                         togglesCollection = new ToolboxGroup("toggles")
                         {
-                            ChildrenEnumerable = Toggles.Select(b => new SettingsCheckbox
-                            {
-                                Bindable = b,
-                                LabelText = b?.Description ?? "unknown"
-                            })
+                            ChildrenEnumerable = Toggles.Select(b => new DrawableTernaryButton(b))
                         }
                     }
                 },
@@ -170,7 +166,7 @@ namespace osu.Game.Rulesets.Edit
         /// A collection of toggles which will be displayed to the user.
         /// The display name will be decided by <see cref="Bindable{T}.Description"/>.
         /// </summary>
-        protected virtual IEnumerable<Bindable<bool>> Toggles => BlueprintContainer.Toggles;
+        protected virtual IEnumerable<TernaryButton> Toggles => BlueprintContainer.Toggles;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
@@ -212,9 +208,9 @@ namespace osu.Game.Rulesets.Edit
             {
                 var item = togglesCollection.Children[rightIndex];
 
-                if (item is SettingsCheckbox checkbox)
+                if (item is DrawableTernaryButton button)
                 {
-                    checkbox.Bindable.Value = !checkbox.Bindable.Value;
+                    button.Button.Toggle();
                     return true;
                 }
             }

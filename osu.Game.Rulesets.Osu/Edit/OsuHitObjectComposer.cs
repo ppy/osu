@@ -9,7 +9,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -17,6 +19,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -39,11 +42,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             new SpinnerCompositionTool()
         };
 
-        private readonly BindableBool distanceSnapToggle = new BindableBool(true) { Description = "Distance Snap" };
+        private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
 
-        protected override IEnumerable<Bindable<bool>> Toggles => base.Toggles.Concat(new[]
+        protected override IEnumerable<TernaryButton> Toggles => base.Toggles.Concat(new[]
         {
-            distanceSnapToggle
+            new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
         });
 
         private BindableList<HitObject> selectedHitObjects;
@@ -156,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             distanceSnapGridCache.Invalidate();
             distanceSnapGrid = null;
 
-            if (!distanceSnapToggle.Value)
+            if (distanceSnapToggle.Value != TernaryState.True)
                 return;
 
             switch (BlueprintContainer.CurrentTool)
