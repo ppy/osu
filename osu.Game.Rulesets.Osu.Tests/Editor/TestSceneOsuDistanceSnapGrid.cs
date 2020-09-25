@@ -19,7 +19,7 @@ using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Tests
+namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
     {

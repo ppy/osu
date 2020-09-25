@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Visual;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Tests
+namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public class TestScenePathControlPointVisualiser : OsuTestScene
     {
