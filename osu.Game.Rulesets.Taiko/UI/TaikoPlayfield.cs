@@ -9,6 +9,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
@@ -206,8 +207,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     });
 
                     var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
-
-                    addExplosion(judgedObject, type);
+                    addExplosion(judgedObject, result.Type, type);
                     break;
             }
         }
@@ -219,9 +219,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// As legacy skins have different explosions for singular and double strong hits,
         /// explosion addition is scheduled to ensure that both hits are processed if they occur on the same frame.
         /// </remarks>
-        private void addExplosion(DrawableHitObject drawableObject, HitType type) => Schedule(() =>
+        private void addExplosion(DrawableHitObject drawableObject, HitResult result, HitType type) => Schedule(() =>
         {
-            hitExplosionContainer.Add(new HitExplosion(drawableObject));
+            hitExplosionContainer.Add(new HitExplosion(drawableObject, result));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         });

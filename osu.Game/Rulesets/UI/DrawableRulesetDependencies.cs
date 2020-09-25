@@ -10,6 +10,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Rulesets.Configuration;
@@ -46,12 +47,11 @@ namespace osu.Game.Rulesets.UI
             if (resources != null)
             {
                 TextureStore = new TextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
-                TextureStore.AddStore(parent.Get<TextureStore>());
-                Cache(TextureStore);
+                CacheAs(TextureStore = new FallbackTextureStore(TextureStore, parent.Get<TextureStore>()));
 
                 SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
                 SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-                CacheAs<ISampleStore>(new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
+                CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
             }
 
             RulesetConfigManager = parent.Get<RulesetConfigCache>().GetConfigFor(ruleset);
@@ -82,69 +82,92 @@ namespace osu.Game.Rulesets.UI
             isDisposed = true;
 
             SampleStore?.Dispose();
+            TextureStore?.Dispose();
             RulesetConfigManager = null;
         }
 
         #endregion
-    }
 
-    /// <summary>
-    /// A sample store which adds a fallback source.
-    /// </summary>
-    /// <remarks>
-    /// This is a temporary implementation to workaround ISampleStore limitations.
-    /// </remarks>
-    public class FallbackSampleStore : ISampleStore
-    {
-        private readonly ISampleStore primary;
-        private readonly ISampleStore secondary;
-
-        public FallbackSampleStore(ISampleStore primary, ISampleStore secondary)
+        /// <summary>
+        /// A sample store which adds a fallback source and prevents disposal of the fallback source.
+        /// </summary>
+        private class FallbackSampleStore : ISampleStore
         {
-            this.primary = primary;
-            this.secondary = secondary;
+            private readonly ISampleStore primary;
+            private readonly ISampleStore fallback;
+
+            public FallbackSampleStore(ISampleStore primary, ISampleStore fallback)
+            {
+                this.primary = primary;
+                this.fallback = fallback;
+            }
+
+            public SampleChannel Get(string name) => primary.Get(name) ?? fallback.Get(name);
+
+            public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? fallback.GetAsync(name);
+
+            public Stream GetStream(string name) => primary.GetStream(name) ?? fallback.GetStream(name);
+
+            public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
+
+            public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
+
+            public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
+
+            public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotSupportedException();
+
+            public BindableNumber<double> Volume => throw new NotSupportedException();
+
+            public BindableNumber<double> Balance => throw new NotSupportedException();
+
+            public BindableNumber<double> Frequency => throw new NotSupportedException();
+
+            public BindableNumber<double> Tempo => throw new NotSupportedException();
+
+            public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotSupportedException();
+
+            public IBindable<double> AggregateVolume => throw new NotSupportedException();
+
+            public IBindable<double> AggregateBalance => throw new NotSupportedException();
+
+            public IBindable<double> AggregateFrequency => throw new NotSupportedException();
+
+            public IBindable<double> AggregateTempo => throw new NotSupportedException();
+
+            public int PlaybackConcurrency
+            {
+                get => throw new NotSupportedException();
+                set => throw new NotSupportedException();
+            }
+
+            public void Dispose()
+            {
+                primary?.Dispose();
+            }
         }
 
-        public SampleChannel Get(string name) => primary.Get(name) ?? secondary.Get(name);
-
-        public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? secondary.GetAsync(name);
-
-        public Stream GetStream(string name) => primary.GetStream(name) ?? secondary.GetStream(name);
-
-        public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
-
-        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
-
-        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
-
-        public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotSupportedException();
-
-        public BindableNumber<double> Volume => throw new NotSupportedException();
-
-        public BindableNumber<double> Balance => throw new NotSupportedException();
-
-        public BindableNumber<double> Frequency => throw new NotSupportedException();
-
-        public BindableNumber<double> Tempo => throw new NotSupportedException();
-
-        public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotSupportedException();
-
-        public IBindable<double> AggregateVolume => throw new NotSupportedException();
-
-        public IBindable<double> AggregateBalance => throw new NotSupportedException();
-
-        public IBindable<double> AggregateFrequency => throw new NotSupportedException();
-
-        public IBindable<double> AggregateTempo => throw new NotSupportedException();
-
-        public int PlaybackConcurrency
+        /// <summary>
+        /// A texture store which adds a fallback source and prevents disposal of the fallback source.
+        /// </summary>
+        private class FallbackTextureStore : TextureStore
         {
-            get => throw new NotSupportedException();
-            set => throw new NotSupportedException();
-        }
+            private readonly TextureStore primary;
+            private readonly TextureStore fallback;
 
-        public void Dispose()
-        {
+            public FallbackTextureStore(TextureStore primary, TextureStore fallback)
+            {
+                this.primary = primary;
+                this.fallback = fallback;
+            }
+
+            public override Texture Get(string name, WrapMode wrapModeS, WrapMode wrapModeT)
+                => primary.Get(name, wrapModeS, wrapModeT) ?? fallback.Get(name, wrapModeS, wrapModeT);
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+                primary?.Dispose();
+            }
         }
     }
 }
