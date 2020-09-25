@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private EditorClock editorClock { get; set; }
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        protected EditorBeatmap Beatmap { get; private set; }
 
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
 
@@ -68,10 +68,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
 
-            foreach (var obj in beatmap.HitObjects)
+            foreach (var obj in Beatmap.HitObjects)
                 AddBlueprintFor(obj);
 
-            selectedHitObjects.BindTo(beatmap.SelectedHitObjects);
+            selectedHitObjects.BindTo(Beatmap.SelectedHitObjects);
             selectedHitObjects.CollectionChanged += (selectedObjects, args) =>
             {
                 switch (args.Action)
@@ -94,8 +94,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            beatmap.HitObjectAdded += AddBlueprintFor;
-            beatmap.HitObjectRemoved += removeBlueprintFor;
+            Beatmap.HitObjectAdded += AddBlueprintFor;
+            Beatmap.HitObjectRemoved += removeBlueprintFor;
         }
 
         protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() =>
@@ -271,7 +271,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected += onBlueprintSelected;
             blueprint.Deselected += onBlueprintDeselected;
 
-            if (beatmap.SelectedHitObjects.Contains(hitObject))
+            if (Beatmap.SelectedHitObjects.Contains(hitObject))
                 blueprint.Select();
 
             SelectionBlueprints.Add(blueprint);
@@ -460,10 +460,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Dispose(isDisposing);
 
-            if (beatmap != null)
+            if (Beatmap != null)
             {
-                beatmap.HitObjectAdded -= AddBlueprintFor;
-                beatmap.HitObjectRemoved -= removeBlueprintFor;
+                Beatmap.HitObjectAdded -= AddBlueprintFor;
+                Beatmap.HitObjectRemoved -= removeBlueprintFor;
             }
         }
     }
