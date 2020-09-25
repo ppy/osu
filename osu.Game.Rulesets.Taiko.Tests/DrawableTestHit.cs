@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             Type = type;
 
-            // in order to create nested strong hit
             HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
         }
 
