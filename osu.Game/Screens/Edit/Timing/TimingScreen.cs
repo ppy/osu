@@ -24,6 +24,11 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private EditorClock clock { get; set; }
 
+        public TimingScreen()
+            : base(EditorScreenMode.Timing)
+        {
+        }
+
         protected override Drawable CreateMainContent() => new GridContainer
         {
             RelativeSizeAxes = Axes.Both,
