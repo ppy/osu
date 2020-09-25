@@ -75,7 +75,23 @@ namespace osu.Game.Screens.Ranking.Statistics
                 return;
 
             if (newScore.HitEvents == null || newScore.HitEvents.Count == 0)
-                content.Add(new MessagePlaceholder("Score has no statistics :("));
+            {
+                content.Add(new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new MessagePlaceholder("Extended statistics are only available after watching a replay!"),
+                        new ReplayDownloadButton(newScore)
+                        {
+                            Scale = new Vector2(1.5f),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                    }
+                });
+            }
             else
             {
                 spinner.Show();
