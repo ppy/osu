@@ -427,11 +427,13 @@ namespace osu.Game.Database
             {
                 // Dereference the existing file info, since the file model will be removed.
                 if (file.FileInfo != null)
+                {
                     Files.Dereference(file.FileInfo);
 
-                // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
-                // Definitely can be removed once we rework the database backend.
-                usage.Context.Set<TFileModel>().Remove(file);
+                    // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
+                    // Definitely can be removed once we rework the database backend.
+                    usage.Context.Set<TFileModel>().Remove(file);
+                }
 
                 model.Files.Remove(file);
             }
