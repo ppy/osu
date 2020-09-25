@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             else
             {
                 var beatmap = beatmapManager.GetWorkingBeatmap(score.Beatmap);
-                difficultyManager.CalculateScorePerformance(beatmap, score, cancellationTokenSource.Token)
+                difficultyManager.CalculatePerformance(beatmap, score, cancellationTokenSource.Token)
                                  .ContinueWith(t => Schedule(() => performance.Value = (int)t.Result), cancellationTokenSource.Token);
             }
         }
