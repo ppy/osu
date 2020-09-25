@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -144,8 +143,8 @@ namespace osu.Game.Rulesets.Edit
                                       .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
                                       .ToList();
 
-            Toggles = CreateToggles().ToArray();
-            togglesCollection.AddRange(Toggles.Select(b => new DrawableTernaryButton(b)));
+            TernaryStates = CreateTernaryButtons().ToArray();
+            togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
             setSelectTool();
 
@@ -175,12 +174,14 @@ namespace osu.Game.Rulesets.Edit
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
         /// <summary>
-        /// A collection of toggles which will be displayed to the user.
-        /// The display name will be decided by <see cref="Bindable{T}.Description"/>.
+        /// A collection of states which will be displayed to the user in the toolbox.
         /// </summary>
-        public TernaryButton[] Toggles { get; private set; }
+        public TernaryButton[] TernaryStates { get; private set; }
 
-        protected virtual IEnumerable<TernaryButton> CreateToggles() => BlueprintContainer.Toggles;
+        /// <summary>
+        /// Create all ternary states required to be displayed to the user.
+        /// </summary>
+        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons() => BlueprintContainer.TernaryStates;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.

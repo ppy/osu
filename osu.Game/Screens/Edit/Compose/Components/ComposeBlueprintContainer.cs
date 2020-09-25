@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            Toggles = CreateToggles().ToArray();
+            TernaryStates = CreateTernaryButtons().ToArray();
 
             AddInternal(placementBlueprintContainer);
         }
@@ -77,9 +77,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
 
-        public TernaryButton[] Toggles { get; private set; }
+        /// <summary>
+        /// A collection of states which will be displayed to the user in the toolbox.
+        /// </summary>
+        public TernaryButton[] TernaryStates { get; private set; }
 
-        protected virtual IEnumerable<TernaryButton> CreateToggles()
+        /// <summary>
+        /// Create all ternary states required to be displayed to the user.
+        /// </summary>
+        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
             yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = FontAwesome.Regular.DotCircle });
