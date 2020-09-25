@@ -129,7 +129,7 @@ namespace osu.Game.Tournament.Screens
 
         protected virtual void ChangePath()
         {
-            var target = directorySelector.CurrentDirectory.Value.FullName;
+            var target = directorySelector.CurrentPath.Value.FullName;
             var fileBasedIpc = ipc as FileBasedIPC;
             Logger.Log($"Changing Stable CE location to {target}");
 
