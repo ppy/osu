@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Edit
 
             if (checkRightToggleFromKey(e.Key, out var rightIndex))
             {
-                var item = togglesCollection.Children[rightIndex];
+                var item = togglesCollection.ElementAtOrDefault(rightIndex);
 
                 if (item is SettingsCheckbox checkbox)
                 {
