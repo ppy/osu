@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Editing
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
-        protected override bool EditorComponentsReady => Editor.ChildrenOfType<SetupScreen>().FirstOrDefault()?.IsLoaded == true;
+        protected override bool EditorComponentsReady => Editor.ChildrenOfType<SetupScreen>().SingleOrDefault()?.IsLoaded == true;
 
         public override void SetUpSteps()
         {
