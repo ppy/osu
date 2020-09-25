@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             Beatmap.Value.Metadata.AudioFile = info.Name;
 
-            music.ForceReloadCurrentBeatmap();
+            music.ReloadCurrentTrack();
 
             editor.UpdateClockSource();
             return true;

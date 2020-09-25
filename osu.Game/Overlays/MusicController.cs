@@ -84,7 +84,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Forcefully reload the current <see cref="WorkingBeatmap"/>'s track from disk.
         /// </summary>
-        public void ForceReloadCurrentBeatmap() => changeTrack();
+        public void ReloadCurrentTrack() => changeTrack();
 
         /// <summary>
         /// Change the position of a <see cref="BeatmapSetInfo"/> in the current playlist.
