@@ -121,11 +121,11 @@ namespace osu.Game.Rulesets.Edit
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
-                        new ToolboxGroup("toolbox")
+                        new ToolboxGroup("toolbox (1-9)")
                         {
                             Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X }
                         },
-                        new ToolboxGroup("toggles")
+                        new ToolboxGroup("toggles (Q~P)")
                         {
                             Child = togglesCollection = new FillFlowContainer
                             {
