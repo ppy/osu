@@ -27,15 +27,15 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("set dummy", () => Beatmap.Value = new DummyWorkingBeatmap(Audio, null));
 
             base.SetUpSteps();
+
+            // if we save a beatmap with a hash collision, things fall over.
+            // probably needs a more solid resolution in the future but this will do for now.
+            AddStep("make new beatmap unique", () => EditorBeatmap.Metadata.Title = Guid.NewGuid().ToString());
         }
 
         [Test]
         public void TestCreateNewBeatmap()
         {
-            // if we save a beatmap with a hash collision, things fall over.
-            // probably needs a more solid resolution in the future but this will do for now.
-            AddStep("make new beatmap unique", () => EditorBeatmap.Metadata.Title = Guid.NewGuid().ToString());
-
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
         }
