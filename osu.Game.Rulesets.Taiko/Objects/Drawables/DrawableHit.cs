@@ -36,35 +36,64 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool pressHandledThisFrame;
 
-        private Bindable<HitType> type;
+        private readonly Bindable<HitType> type;
 
         public DrawableHit(Hit hit)
             : base(hit)
         {
+            type = HitObject.TypeBindable.GetBoundCopy();
             FillMode = FillMode.Fit;
+
+            updateActionsFromType();
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            type = HitObject.TypeBindable.GetBoundCopy();
             type.BindValueChanged(_ =>
             {
-                updateType();
+                updateActionsFromType();
+
+                // will overwrite samples, should only be called on change.
+                updateSamplesFromTypeChange();
+
                 RecreatePieces();
             });
-
-            updateType();
         }
 
-        private void updateType()
+        private HitSampleInfo[] getRimSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
+
+        protected override void LoadSamples()
+        {
+            base.LoadSamples();
+
+            type.Value = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
+        }
+
+        private void updateSamplesFromTypeChange()
+        {
+            var rimSamples = getRimSamples();
+
+            bool isRimType = HitObject.Type == HitType.Rim;
+
+            if (isRimType != rimSamples.Any())
+            {
+                if (isRimType)
+                    HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP });
+                else
+                {
+                    foreach (var sample in rimSamples)
+                        HitObject.Samples.Remove(sample);
+                }
+            }
+        }
+
+        private void updateActionsFromType()
         {
             HitActions =
                 HitObject.Type == HitType.Centre
                     ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
                     : new[] { TaikoAction.LeftRim, TaikoAction.RightRim };
-
-            RecreatePieces();
         }
 
         protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre
