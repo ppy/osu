@@ -22,7 +22,9 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public override bool RemoveWhenNotAlive => true;
 
+        [Cached(typeof(DrawableHitObject))]
         public readonly DrawableHitObject JudgedObject;
+
         private readonly HitResult result;
 
         private SkinnableDrawable skinnable;
