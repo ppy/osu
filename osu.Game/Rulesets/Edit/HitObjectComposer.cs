@@ -133,7 +133,6 @@ namespace osu.Game.Rulesets.Edit
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical,
                                 Spacing = new Vector2(0, 5),
-                                ChildrenEnumerable = Toggles.Select(b => new DrawableTernaryButton(b))
                             },
                         }
                     }
@@ -144,6 +143,9 @@ namespace osu.Game.Rulesets.Edit
                                       .Prepend(new SelectTool())
                                       .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
                                       .ToList();
+
+            Toggles = CreateToggles().ToArray();
+            togglesCollection.AddRange(Toggles.Select(b => new DrawableTernaryButton(b)));
 
             setSelectTool();
 
@@ -176,7 +178,9 @@ namespace osu.Game.Rulesets.Edit
         /// A collection of toggles which will be displayed to the user.
         /// The display name will be decided by <see cref="Bindable{T}.Description"/>.
         /// </summary>
-        protected virtual IEnumerable<TernaryButton> Toggles => BlueprintContainer.Toggles;
+        public TernaryButton[] Toggles { get; private set; }
+
+        protected virtual IEnumerable<TernaryButton> CreateToggles() => BlueprintContainer.Toggles;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
