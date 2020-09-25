@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
@@ -29,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             AddStep("Good", () => SetContents(() => getContentFor(createStrongHit(HitResult.Good, hitBoth))));
         }
 
-        private Drawable getContentFor(DrawableTaikoHitObject hit)
+        private Drawable getContentFor(DrawableTestHit hit)
         {
             return new Container
             {
@@ -37,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 Children = new Drawable[]
                 {
                     hit,
-                    new HitExplosion(hit)
+                    new HitExplosion(hit, hit.Type)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -46,9 +45,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             };
         }
 
-        private DrawableTaikoHitObject createHit(HitResult type) => new DrawableTestHit(new Hit { StartTime = Time.Current }, type);
+        private DrawableTestHit createHit(HitResult type) => new DrawableTestHit(new Hit { StartTime = Time.Current }, type);
 
-        private DrawableTaikoHitObject createStrongHit(HitResult type, bool hitBoth)
-            => new DrawableTestStrongHit(Time.Current, type, hitBoth);
+        private DrawableTestHit createStrongHit(HitResult type, bool hitBoth) => new DrawableTestStrongHit(Time.Current, type, hitBoth);
     }
 }
