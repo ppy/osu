@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Taiko.Tests
+namespace osu.Game.Rulesets.Taiko.Tests.Editor
 {
     [TestFixture]
     public class TestSceneEditor : EditorTestScene

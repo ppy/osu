@@ -14,7 +14,7 @@ using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Rulesets.Osu.Tests
+namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public class TestSceneSliderPlacementBlueprint : PlacementBlueprintTestScene
     {

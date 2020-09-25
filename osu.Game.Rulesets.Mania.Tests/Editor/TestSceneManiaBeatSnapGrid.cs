@@ -20,7 +20,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
 using osuTK;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
     public class TestSceneManiaBeatSnapGrid : EditorClockTestScene
     {

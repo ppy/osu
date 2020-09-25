@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
     public class TestSceneHoldNotePlacementBlueprint : ManiaPlacementBlueprintTestScene
     {
