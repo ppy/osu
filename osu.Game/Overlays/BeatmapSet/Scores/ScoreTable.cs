@@ -11,9 +11,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -55,6 +57,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             highAccuracyColour = colours.GreenLight;
         }
 
+        /// <summary>
+        /// The statistics that appear in the table, in order of appearance.
+        /// </summary>
+        private readonly List<HitResult> statisticResultTypes = new List<HitResult>();
+
         private bool showPerformancePoints;
 
         public void DisplayScores(IReadOnlyList<ScoreInfo> scores, bool showPerformanceColumn)
@@ -65,11 +72,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
 
             showPerformancePoints = showPerformanceColumn;
+            statisticResultTypes.Clear();
 
             for (int i = 0; i < scores.Count; i++)
                 backgroundFlow.Add(new ScoreTableRowBackground(i, scores[i], row_height));
 
-            Columns = createHeaders(scores.FirstOrDefault());
+            Columns = createHeaders(scores);
             Content = scores.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
         }
 
@@ -79,7 +87,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             backgroundFlow.Clear();
         }
 
-        private TableColumn[] createHeaders(ScoreInfo score)
+        private TableColumn[] createHeaders(IReadOnlyList<ScoreInfo> scores)
         {
             var columns = new List<TableColumn>
             {
@@ -92,8 +100,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120))
             };
 
-            foreach (var (key, _, _) in score.GetStatisticsForDisplay())
-                columns.Add(new TableColumn(key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
+            // All statistics across all scores, unordered.
+            var allScoreStatistics = scores.SelectMany(s => s.GetStatisticsForDisplay().Select(stat => stat.result)).ToHashSet();
+
+            foreach (var result in OrderAttributeUtils.GetValuesInOrder<HitResult>())
+            {
+                if (!allScoreStatistics.Contains(result))
+                    continue;
+
+                columns.Add(new TableColumn(result.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
+                statisticResultTypes.Add(result);
+            }
 
             if (showPerformancePoints)
                 columns.Add(new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
@@ -146,13 +163,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
             };
 
-            foreach (var (_, value, maxCount) in score.GetStatisticsForDisplay())
+            var availableStatistics = score.GetStatisticsForDisplay().ToDictionary(tuple => tuple.result);
+
+            foreach (var result in statisticResultTypes)
             {
+                if (!availableStatistics.TryGetValue(result, out var stat))
+                    stat = (result, 0, null);
+
                 content.Add(new OsuSpriteText
                 {
-                    Text = maxCount == null ? $"{value}" : $"{value}/{maxCount}",
+                    Text = stat.maxCount == null ? $"{stat.count}" : $"{stat.count}/{stat.maxCount}",
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = value == 0 ? Color4.Gray : Color4.White
+                    Colour = stat.count == 0 ? Color4.Gray : Color4.White
                 });
             }
 
