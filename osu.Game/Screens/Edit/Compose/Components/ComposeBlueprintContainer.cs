@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
+            Toggles = CreateToggles().ToArray();
+
             AddInternal(placementBlueprintContainer);
         }
 
@@ -66,21 +68,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // we are responsible for current placement blueprint updated based on state changes.
             NewCombo.ValueChanged += combo =>
             {
-                if (currentPlacement != null)
-                {
-                    if (currentPlacement.HitObject is IHasComboInformation c)
-                        c.NewCombo = combo.NewValue == TernaryState.True;
-                }
+                if (currentPlacement == null) return;
+
+                if (currentPlacement.HitObject is IHasComboInformation c)
+                    c.NewCombo = combo.NewValue == TernaryState.True;
             };
         }
 
         public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
 
-        public virtual IEnumerable<TernaryButton> Toggles => new[]
+        public TernaryButton[] Toggles { get; private set; }
+
+        protected virtual IEnumerable<TernaryButton> CreateToggles()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
-            new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = FontAwesome.Regular.DotCircle })
-        };
+            yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = FontAwesome.Regular.DotCircle });
+        }
 
         #region Placement
 
