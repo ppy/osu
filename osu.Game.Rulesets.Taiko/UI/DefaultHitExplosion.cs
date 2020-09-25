@@ -15,8 +15,14 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     internal class DefaultHitExplosion : CircularContainer
     {
-        [Resolved]
-        private DrawableHitObject judgedObject { get; set; }
+        private readonly DrawableHitObject judgedObject;
+        private readonly HitResult result;
+
+        public DefaultHitExplosion(DrawableHitObject judgedObject, HitResult result)
+        {
+            this.judgedObject = judgedObject;
+            this.result = result;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -31,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             Alpha = 0.15f;
             Masking = true;
 
-            if (judgedObject.Result.Type == HitResult.Miss)
+            if (result == HitResult.Miss)
                 return;
 
             bool isRim = (judgedObject.HitObject as Hit)?.Type == HitType.Rim;
