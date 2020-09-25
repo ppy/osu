@@ -24,6 +24,11 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledTextBox creatorTextBox;
         private LabelledTextBox difficultyTextBox;
 
+        public SetupScreen()
+            : base(EditorScreenMode.SongSetup)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
