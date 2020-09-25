@@ -23,7 +23,7 @@ using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
     public class TestSceneManiaHitObjectComposer : EditorClockTestScene
     {
