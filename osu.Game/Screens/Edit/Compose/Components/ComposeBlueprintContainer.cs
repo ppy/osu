@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -11,6 +12,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -54,7 +56,44 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+
+            Beatmap.SelectedHitObjects.CollectionChanged += (_, __) => updateTogglesFromSelection();
+
+            // the updated object may be in the selection
+            Beatmap.HitObjectUpdated += _ => updateTogglesFromSelection();
+
+            NewCombo.ValueChanged += combo =>
+            {
+                if (Beatmap.SelectedHitObjects.Count > 0)
+                {
+                    foreach (var h in Beatmap.SelectedHitObjects)
+                    {
+                        if (h is IHasComboInformation c)
+                        {
+                            c.NewCombo = combo.NewValue;
+                            Beatmap.UpdateHitObject(h);
+                        }
+                    }
+                }
+                else if (currentPlacement != null)
+                {
+                    // update placement object from toggle
+                    if (currentPlacement.HitObject is IHasComboInformation c)
+                        c.NewCombo = combo.NewValue;
+                }
+            };
         }
+
+        private void updateTogglesFromSelection() =>
+            NewCombo.Value = Beatmap.SelectedHitObjects.OfType<IHasComboInformation>().All(c => c.NewCombo);
+
+        public readonly Bindable<bool> NewCombo = new Bindable<bool> { Description = "New Combo" };
+
+        public virtual IEnumerable<Bindable<bool>> Toggles => new[]
+        {
+            //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
+            NewCombo
+        };
 
         #region Placement
 
@@ -86,7 +125,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 removePlacement();
 
             if (currentPlacement != null)
+            {
                 updatePlacementPosition();
+            }
         }
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)

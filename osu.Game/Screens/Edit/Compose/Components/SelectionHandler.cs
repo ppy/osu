@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
+        public int SelectedCount => selectedBlueprints.Count;
+
         public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
 
         private Drawable content;
