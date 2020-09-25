@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -195,7 +196,7 @@ namespace osu.Game.Rulesets.UI
         {
             public GameplayClock ParentGameplayClock;
 
-            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock.NonGameplayAdjustments;
+            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
 
             public StabilityGameplayClock(FramedClock underlyingClock)
                 : base(underlyingClock)
