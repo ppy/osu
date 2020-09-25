@@ -210,19 +210,6 @@ namespace osu.Game.Screens.Play
             base.Update();
         }
 
-        private double getTrueGameplayRate()
-        {
-            double baseRate = track.Rate;
-
-            if (speedAdjustmentsApplied)
-            {
-                baseRate /= UserPlaybackRate.Value;
-                baseRate /= pauseFreqAdjust.Value;
-            }
-
-            return baseRate;
-        }
-
         private bool speedAdjustmentsApplied;
 
         private void updateRate()
