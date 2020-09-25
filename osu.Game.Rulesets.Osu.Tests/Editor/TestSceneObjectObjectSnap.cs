@@ -34,19 +34,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre));
 
             if (!distanceSnapEnabled)
-            {
-                AddStep("disable distance snap", () =>
-                {
-                    InputManager.PressKey(Key.Q);
-                    InputManager.ReleaseKey(Key.Q);
-                });
-            }
+                AddStep("disable distance snap", () => InputManager.Key(Key.Q));
 
-            AddStep("enter placement mode", () =>
-            {
-                InputManager.PressKey(Key.Number2);
-                InputManager.ReleaseKey(Key.Number2);
-            });
+            AddStep("enter placement mode", () => InputManager.Key(Key.Number2));
 
             AddStep("place first object", () => InputManager.Click(MouseButton.Left));
 
@@ -70,17 +60,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre));
 
-            AddStep("disable distance snap", () =>
-            {
-                InputManager.PressKey(Key.Q);
-                InputManager.ReleaseKey(Key.Q);
-            });
+            AddStep("disable distance snap", () => InputManager.Key(Key.Q));
 
-            AddStep("enter slider placement mode", () =>
-            {
-                InputManager.PressKey(Key.Number3);
-                InputManager.ReleaseKey(Key.Number3);
-            });
+            AddStep("enter slider placement mode", () => InputManager.Key(Key.Number3));
 
             AddStep("start slider placement", () => InputManager.Click(MouseButton.Left));
 
@@ -88,11 +70,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("end slider placement", () => InputManager.Click(MouseButton.Right));
 
-            AddStep("enter circle placement mode", () =>
-            {
-                InputManager.PressKey(Key.Number2);
-                InputManager.ReleaseKey(Key.Number2);
-            });
+            AddStep("enter circle placement mode", () => InputManager.Key(Key.Number2));
 
             AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.20f, 0)));
 
