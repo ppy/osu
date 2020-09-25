@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public Container<SelectionBlueprint> SelectionBlueprints { get; private set; }
 
-        protected SelectionHandler SelectionHandler;
+        protected SelectionHandler SelectionHandler { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }

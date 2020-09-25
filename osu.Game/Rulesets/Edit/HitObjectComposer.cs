@@ -208,6 +208,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+                return false;
+
             if (checkLeftToggleFromKey(e.Key, out var leftIndex))
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
@@ -221,7 +224,7 @@ namespace osu.Game.Rulesets.Edit
 
             if (checkRightToggleFromKey(e.Key, out var rightIndex))
             {
-                var item = togglesCollection.Children[rightIndex];
+                var item = togglesCollection.ElementAtOrDefault(rightIndex);
 
                 if (item is DrawableTernaryButton button)
                 {
