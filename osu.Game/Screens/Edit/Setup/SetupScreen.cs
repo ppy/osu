@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,10 +18,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.IO;
 using osu.Game.Overlays;
 using osuTK;
-using FileInfo = System.IO.FileInfo;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -34,10 +33,10 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledTextBox audioTrackTextBox;
 
         [Resolved]
-        private FileStore files { get; set; }
+        private MusicController music { get; set; }
 
         [Resolved]
-        private MusicController music { get; set; }
+        private BeatmapManager beatmaps { get; set; }
 
         [Resolved(canBeNull: true)]
         private Editor editor { get; set; }
@@ -153,28 +152,19 @@ namespace osu.Game.Screens.Edit.Setup
             if (!info.Exists)
                 return false;
 
-            var beatmapFiles = Beatmap.Value.BeatmapSetInfo.Files;
+            var set = Beatmap.Value.BeatmapSetInfo;
 
-            // remove the old file
-            var oldFile = beatmapFiles.FirstOrDefault(f => f.Filename == Beatmap.Value.Metadata.AudioFile);
-
-            if (oldFile != null)
-            {
-                beatmapFiles.Remove(oldFile);
-                files.Dereference(oldFile.FileInfo);
-            }
-
-            // add the new file
-            IO.FileInfo osuFileInfo;
+            // remove the previous audio track for now.
+            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
+            var oldFile = set.Files.FirstOrDefault(f => f.Filename == Beatmap.Value.Metadata.AudioFile);
 
             using (var stream = info.OpenRead())
-                osuFileInfo = files.Add(stream);
-
-            beatmapFiles.Add(new BeatmapSetFileInfo
             {
-                FileInfo = osuFileInfo,
-                Filename = info.Name
-            });
+                if (oldFile != null)
+                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
+                else
+                    beatmaps.AddFile(set, stream, info.Name);
+            }
 
             Beatmap.Value.Metadata.AudioFile = info.Name;
 
