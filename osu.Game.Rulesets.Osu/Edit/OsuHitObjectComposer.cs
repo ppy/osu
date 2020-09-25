@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
 
-        protected override IEnumerable<TernaryButton> CreateToggles() => base.CreateToggles().Concat(new[]
+        protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
         {
             new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
         });
