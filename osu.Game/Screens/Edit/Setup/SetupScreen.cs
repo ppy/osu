@@ -235,7 +235,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         public void DisplayFileChooser()
         {
-            Target.Child = new FileSelector("/Users/Dean/.osu/Songs", new[] { ".mp3", ".ogg" })
+            Target.Child = new FileSelector(validFileExtensions: new[] { ".mp3", ".ogg" })
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 400,
