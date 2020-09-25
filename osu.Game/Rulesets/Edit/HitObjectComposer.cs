@@ -31,6 +31,11 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
+    /// <summary>
+    /// Top level container for editor compose mode.
+    /// Responsible for providing snapping and generally gluing components together.
+    /// </summary>
+    /// <typeparam name="TObject">The base type of supported objects.</typeparam>
     [Cached(Type = typeof(IPlacementHandler))]
     public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
