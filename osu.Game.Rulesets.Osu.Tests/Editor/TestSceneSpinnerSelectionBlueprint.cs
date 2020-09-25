@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Tests
+namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public class TestSceneSpinnerSelectionBlueprint : SelectionBlueprintTestScene
     {
