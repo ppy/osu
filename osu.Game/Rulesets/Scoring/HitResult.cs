@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Scoring
     public static class HitResultExtensions
     {
         /// <summary>
-        /// Whether a <see cref="HitResult"/> affects the combo.
+        /// Whether a <see cref="HitResult"/> increases/decreases the combo, and affects the combo portion of the score.
         /// </summary>
         public static bool AffectsCombo(this HitResult result)
         {
@@ -122,12 +122,14 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Whether a <see cref="HitResult"/> should be counted as combo score.
+        /// Whether a <see cref="HitResult"/> affects the accuracy portion of the score.
         /// </summary>
-        /// <remarks>
-        /// This is not the reciprocal of <see cref="AffectsCombo"/>, as <see cref="HitResult.SmallTickHit"/> and <see cref="HitResult.SmallTickMiss"/> do not affect combo
-        /// but are still considered as part of the accuracy (not bonus) portion of the score.
-        /// </remarks>
+        public static bool AffectsAccuracy(this HitResult result)
+            => IsScorable(result) && !IsBonus(result);
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> should be counted as bonus score.
+        /// </summary>
         public static bool IsBonus(this HitResult result)
         {
             switch (result)
