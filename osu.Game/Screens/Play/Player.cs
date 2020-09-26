@@ -186,7 +186,8 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
-            AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
+            AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap) { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } });
+
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
             dependencies.CacheAs(gameplayBeatmap);
@@ -295,7 +296,7 @@ namespace osu.Game.Screens.Play
                         Action = performUserRequestedExit,
                         IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
                     },
-                    PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
+                    PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = gameplayBeatmap.UserPlaybackRate } } },
                     KeyCounter =
                     {
                         AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },

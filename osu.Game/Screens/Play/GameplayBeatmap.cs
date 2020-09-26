@@ -45,6 +45,8 @@ namespace osu.Game.Screens.Play
 
         public IBindable<JudgementResult> LastJudgementResult => lastJudgementResult;
 
+        public BindableNumber<double> UserPlaybackRate { get; } = new BindableNumber<double>();
+
         public void ApplyResult(JudgementResult result) => lastJudgementResult.Value = result;
     }
 }
