@@ -194,7 +194,8 @@ namespace osu.Game.Tests.Visual.Background
             AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(new ScoreInfo
             {
                 User = new User { Username = "osu!" },
-                Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo
+                Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
+                Ruleset = new OsuRuleset().RulesetInfo,
             })));
 
             AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
