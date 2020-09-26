@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             foreach (var playfield in playfields)
             {
                 var hit = new DrawableTestHit(new Hit(), judgementResult.Type);
-                Add(hit);
+                playfield.Add(hit);
 
                 playfield.OnNewResult(hit, judgementResult);
             }
