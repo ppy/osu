@@ -19,6 +19,7 @@ namespace osu.Game.Skinning
             ComboOverlap,
             AnimationFramerate,
             LayeredHitSounds,
+            SpinnerNoBlink
         }
     }
 }
