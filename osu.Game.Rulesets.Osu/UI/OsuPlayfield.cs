@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     RelativeSizeAxes = Axes.Both,
                     Depth = 1,
                 },
-                // Todo: This should not exist, buit currently helps to reduce LOH allocations due to unbinding skin source events on judgement disposal
+                // Todo: This should not exist, but currently helps to reduce LOH allocations due to unbinding skin source events on judgement disposal
                 // Todo: Remove when hitobjects are properly pooled
                 new SkinProvidingContainer(null)
                 {
