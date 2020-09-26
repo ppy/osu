@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Scoring
 
         private double computeDrainRate()
         {
-            if (healthIncreases.Count == 0)
+            if (healthIncreases.Count <= 1)
                 return 0;
 
             int adjustment = 1;
