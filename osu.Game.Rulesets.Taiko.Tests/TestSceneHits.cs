@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            Add(h);
+            drawableRuleset.Playfield.Add(h);
 
             ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
         }
@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            Add(h);
+            drawableRuleset.Playfield.Add(h);
 
             ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
             ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new HitObject(), new TaikoStrongJudgement()) { Type = HitResult.Great });
@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         private void addMissJudgement()
         {
             DrawableTestHit h;
-            Add(h = new DrawableTestHit(new Hit(), HitResult.Miss));
+            drawableRuleset.Playfield.Add(h = new DrawableTestHit(new Hit(), HitResult.Miss));
             ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = HitResult.Miss });
         }
 
