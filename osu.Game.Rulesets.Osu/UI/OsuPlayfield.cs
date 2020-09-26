@@ -46,23 +46,23 @@ namespace osu.Game.Rulesets.Osu.UI
                 followPoints = new FollowPointRenderer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = 2,
-                },
-                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
-                {
-                    RelativeSizeAxes = Axes.Both,
                     Depth = 1,
                 },
-                // Todo: This should not exist, but currently helps to reduce LOH allocations due to unbinding skin source events on judgement disposal
+                // Todo: This should not exist, buit currently helps to reduce LOH allocations due to unbinding skin source events on judgement disposal
                 // Todo: Remove when hitobjects are properly pooled
                 new SkinProvidingContainer(null)
                 {
                     Child = HitObjectContainer,
                 },
-                approachCircles = new ProxyContainer
+                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = -1,
+                },
+                approachCircles = new ProxyContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = -2,
                 },
             };
 
