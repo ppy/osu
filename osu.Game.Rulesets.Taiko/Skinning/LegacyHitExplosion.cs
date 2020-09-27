@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
 {
@@ -11,6 +14,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning
     {
         private readonly Drawable sprite;
         private readonly Drawable strongSprite;
+
+        private DrawableHit hit;
+        private DrawableStrongNestedHit nestedStrongHit;
 
         /// <summary>
         /// Creates a new legacy hit explosion.
@@ -28,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(DrawableHitObject judgedObject)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -39,6 +45,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
             if (strongSprite != null)
                 AddInternal(strongSprite.With(s => s.Alpha = 0));
+
+            if (judgedObject is DrawableHit h)
+            {
+                hit = h;
+                nestedStrongHit = hit.NestedHitObjects.SingleOrDefault() as DrawableStrongNestedHit;
+            }
         }
 
         protected override void LoadComplete()
@@ -55,6 +67,25 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 .Then().ScaleTo(1f, animation_time * 0.2);
 
             Expire(true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (shouldSwitchToStrongSprite() && strongSprite != null)
+            {
+                sprite.FadeOut(50, Easing.OutQuint);
+                strongSprite.FadeIn(50, Easing.OutQuint);
+            }
+        }
+
+        private bool shouldSwitchToStrongSprite()
+        {
+            if (hit == null || nestedStrongHit == null)
+                return false;
+
+            return hit.Result.Type == nestedStrongHit.Result.Type;
         }
     }
 }
