@@ -4,7 +4,6 @@
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
@@ -24,7 +23,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmapManager, BeatmapDifficultyManager difficultyManager)
+        private void load(ScorePerformanceManager performanceManager)
         {
             if (score.PP.HasValue)
             {
@@ -32,9 +31,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             }
             else
             {
-                var beatmap = beatmapManager.GetWorkingBeatmap(score.Beatmap);
-                difficultyManager.CalculatePerformance(beatmap, score, cancellationTokenSource.Token)
-                                 .ContinueWith(t => Schedule(() => performance.Value = (int)t.Result), cancellationTokenSource.Token);
+                performanceManager.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
+                                  .ContinueWith(t => Schedule(() => performance.Value = (int)t.Result), cancellationTokenSource.Token);
             }
         }
 
