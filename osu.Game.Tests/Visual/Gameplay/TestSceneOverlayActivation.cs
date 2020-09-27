@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestGameplayOverlayActivationPaused()
         {
-            AddUntilStep("activation mode is disabled", () => Player.OverlayActivationMode == OverlayActivation.Disabled);
+            AddAssert("activation mode is disabled", () => Player.OverlayActivationMode == OverlayActivation.Disabled);
             AddStep("pause gameplay", () => Player.Pause());
             AddUntilStep("activation mode is user triggered", () => Player.OverlayActivationMode == OverlayActivation.UserTriggered);
         }
