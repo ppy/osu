@@ -12,6 +12,14 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected new OverlayTestPlayer Player => base.Player as OverlayTestPlayer;
 
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddUntilStep("gameplay has started",
+                () => Player.GameplayClockContainer.GameplayClock.CurrentTime > Player.DrawableRuleset.GameplayStartTime);
+        }
+
         [Test]
         public void TestGameplayOverlayActivation()
         {
