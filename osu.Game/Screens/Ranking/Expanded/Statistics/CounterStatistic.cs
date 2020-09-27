@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     {
         private readonly int count;
 
-        private RollingCounter<int> counter;
+        protected RollingCounter<int> Counter;
 
         /// <summary>
         /// Creates a new <see cref="CounterStatistic"/>.
@@ -33,12 +33,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         public override void Appear()
         {
             base.Appear();
-            counter.Current.Value = count;
+            Counter.Current.Value = count;
         }
 
-        protected override Drawable CreateContent() => counter = new Counter();
+        protected override Drawable CreateContent() => Counter = new StatisticCounter();
 
-        private class Counter : RollingCounter<int>
+        private class StatisticCounter : RollingCounter<int>
         {
             protected override double RollingDuration => AccuracyCircle.ACCURACY_TRANSFORM_DURATION;
 
