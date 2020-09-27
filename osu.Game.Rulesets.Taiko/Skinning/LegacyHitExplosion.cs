@@ -41,10 +41,21 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
             AutoSizeAxes = Axes.Both;
 
-            AddInternal(sprite);
+            AddInternal(sprite.With(s =>
+            {
+                s.Anchor = Anchor.Centre;
+                s.Origin = Anchor.Centre;
+            }));
 
             if (strongSprite != null)
-                AddInternal(strongSprite.With(s => s.Alpha = 0));
+            {
+                AddInternal(strongSprite.With(s =>
+                {
+                    s.Alpha = 0;
+                    s.Anchor = Anchor.Centre;
+                    s.Origin = Anchor.Centre;
+                }));
+            }
 
             if (judgedObject is DrawableHit h)
             {
