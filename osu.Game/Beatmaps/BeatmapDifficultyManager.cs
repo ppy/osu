@@ -121,7 +121,6 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmap">The <see cref="WorkingBeatmap"/> to do the calculation on. </param>
         /// <param name="score">The score to do the calculation on. </param>
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
-        /// <returns></returns>
         public async Task<double> CalculatePerformance([NotNull] WorkingBeatmap beatmap, [NotNull] ScoreInfo score, CancellationToken token = default)
         {
             return await Task.Factory.StartNew(() =>
@@ -130,7 +129,7 @@ namespace osu.Game.Beatmaps
                     return default;
 
                 var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(beatmap, score);
-                var total = calculator.Calculate(null);
+                var total = calculator.Calculate();
 
                 return total;
             }, token, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
