@@ -16,7 +16,6 @@ using osu.Framework.Lists;
 using osu.Framework.Threading;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Scoring;
 
 namespace osu.Game.Beatmaps
 {
@@ -113,26 +112,6 @@ namespace osu.Game.Beatmaps
                 return existing;
 
             return computeDifficulty(key, beatmapInfo, rulesetInfo);
-        }
-
-        /// <summary>
-        /// Calculates performance for the given <see cref="ScoreInfo"/> on a given <see cref="WorkingBeatmap"/>.
-        /// </summary>
-        /// <param name="beatmap">The <see cref="WorkingBeatmap"/> to do the calculation on. </param>
-        /// <param name="score">The score to do the calculation on. </param>
-        /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
-        public async Task<double> CalculatePerformance([NotNull] WorkingBeatmap beatmap, [NotNull] ScoreInfo score, CancellationToken token = default)
-        {
-            return await Task.Factory.StartNew(() =>
-            {
-                if (token.IsCancellationRequested)
-                    return default;
-
-                var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(beatmap, score);
-                var total = calculator.Calculate();
-
-                return total;
-            }, token, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         private CancellationTokenSource trackedUpdateCancellationSource;
