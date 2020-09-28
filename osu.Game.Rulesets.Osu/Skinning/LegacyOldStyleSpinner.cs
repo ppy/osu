@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private Sprite metreSprite;
         private Container metre;
 
-        private bool spinnerNoBlink;
+        private bool spinnerBlink;
 
         private const float sprite_scale = 1 / 1.6f;
         private const float final_metre_height = 692 * sprite_scale;
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource source, DrawableHitObject drawableObject)
         {
-            spinnerNoBlink = source.GetConfig<LegacySetting, bool>(LegacySetting.SpinnerNoBlink)?.Value ?? false;
+            spinnerBlink = !source.GetConfig<LegacySetting, bool>(LegacySetting.SpinnerNoBlink)?.Value ?? true;
 
             drawableSpinner = (DrawableSpinner)drawableObject;
 
@@ -125,12 +125,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
             progress *= 100;
 
             // the spinner should still blink at 100% progress.
-            if (!spinnerNoBlink)
+            if (spinnerBlink)
                 progress = Math.Min(99, progress);
 
             int barCount = (int)progress / 10;
 
-            if (!spinnerNoBlink && RNG.NextBool(((int)progress % 10) / 10f))
+            if (spinnerBlink && RNG.NextBool(((int)progress % 10) / 10f))
                 barCount++;
 
             return (float)barCount / total_bars * final_metre_height;
