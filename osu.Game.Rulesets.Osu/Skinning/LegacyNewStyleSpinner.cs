@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -72,10 +71,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
             base.LoadComplete();
 
             this.FadeOut();
-            drawableSpinner.State.BindValueChanged(updateStateTransforms, true);
+            drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
         }
 
-        private void updateStateTransforms(ValueChangedEvent<ArmedState> state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             var spinner = (Spinner)drawableSpinner.HitObject;
 
