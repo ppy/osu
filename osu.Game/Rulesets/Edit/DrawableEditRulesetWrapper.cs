@@ -45,8 +45,12 @@ namespace osu.Game.Rulesets.Edit
             base.LoadComplete();
 
             beatmap.HitObjectAdded += addHitObject;
+            beatmap.HitObjectUpdated += updateReplay;
             beatmap.HitObjectRemoved += removeHitObject;
         }
+
+        private void updateReplay(HitObject obj = null) =>
+            drawableRuleset.RegenerateAutoplay();
 
         private void addHitObject(HitObject hitObject)
         {
@@ -54,6 +58,8 @@ namespace osu.Game.Rulesets.Edit
 
             drawableRuleset.Playfield.Add(drawableObject);
             drawableRuleset.Playfield.PostProcess();
+
+            updateReplay();
         }
 
         private void removeHitObject(HitObject hitObject)
@@ -62,6 +68,8 @@ namespace osu.Game.Rulesets.Edit
 
             drawableRuleset.Playfield.Remove(drawableObject);
             drawableRuleset.Playfield.PostProcess();
+
+            drawableRuleset.RegenerateAutoplay();
         }
 
         public override bool PropagatePositionalInputSubTree => false;

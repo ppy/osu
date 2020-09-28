@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -72,10 +71,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
             base.LoadComplete();
 
             this.FadeOut();
-            drawableSpinner.State.BindValueChanged(updateStateTransforms, true);
+            drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
         }
 
-        private void updateStateTransforms(ValueChangedEvent<ArmedState> state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             var spinner = (Spinner)drawableSpinner.HitObject;
 
@@ -94,6 +93,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
             discBottom.Rotation = discTop.Rotation / 3;
 
             Scale = new Vector2(final_scale * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, drawableSpinner.Progress) * 0.2f));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableSpinner != null)
+                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
