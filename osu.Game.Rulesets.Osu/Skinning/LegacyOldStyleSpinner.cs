@@ -126,5 +126,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             return (float)barCount / total_bars * final_metre_height;
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
+        }
     }
 }
