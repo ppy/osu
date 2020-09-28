@@ -151,8 +151,11 @@ namespace osu.Game.Rulesets.UI
 
         public virtual PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new PlayfieldAdjustmentContainer();
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, CancellationToken? cancellationToken)
+        private void load(CancellationToken? cancellationToken)
         {
             InternalChildren = new Drawable[]
             {
@@ -178,9 +181,16 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            applyRulesetMods(Mods, config);
+            RegenerateAutoplay();
 
             loadObjects(cancellationToken);
+        }
+
+        public void RegenerateAutoplay()
+        {
+            // for now this is applying mods which aren't just autoplay.
+            // we'll need to reconsider this flow in the future.
+            applyRulesetMods(Mods, config);
         }
 
         /// <summary>

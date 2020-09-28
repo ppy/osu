@@ -112,6 +112,9 @@ namespace osu.Game.Graphics.Containers
 
                 CornerRadius = 5;
 
+                // needs to be set initially for the ResizeTo to respect minimum size
+                Size = new Vector2(SCROLL_BAR_HEIGHT);
+
                 const float margin = 3;
 
                 Margin = new MarginPadding
