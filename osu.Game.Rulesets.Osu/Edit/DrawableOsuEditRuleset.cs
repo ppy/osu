@@ -39,7 +39,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             // adjust the visuals of certain object types to make them stay on screen for longer than usual.
             switch (hitObject)
             {
-                case DrawableSlider slider:
+                default:
+                    // there are quite a few drawable hit types we don't want to extent (spinners, ticks etc.)
+                    return;
+
+                case DrawableSlider _:
                     // no specifics to sliders but let them fade slower below.
                     break;
 
@@ -48,10 +52,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                           .FadeOutFromOne(editor_hit_object_fade_out_extension)
                           .Expire();
                     break;
-
-                default:
-                    // there are quite a few drawable hit types we don't want to extent (spinners, ticks etc.)
-                    return;
             }
 
             // Get the existing fade out transform
