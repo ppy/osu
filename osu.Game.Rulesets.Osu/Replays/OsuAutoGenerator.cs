@@ -72,6 +72,9 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         public override Replay Generate()
         {
+            if (Beatmap.HitObjects.Count == 0)
+                return Replay;
+
             buttonIndex = 0;
 
             AddFrameToReplay(new OsuReplayFrame(-100000, new Vector2(256, 500)));
