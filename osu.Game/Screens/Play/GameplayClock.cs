@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Play
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
-    public class GameplayClock : IFrameBasedClock
+    public class GameplayClock : IFrameBasedClock, ISeekableClock
     {
         private readonly IFrameBasedClock underlyingClock;
 

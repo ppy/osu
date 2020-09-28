@@ -7,17 +7,18 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.Utils;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// A decoupled clock which adds editor-specific functionality, such as snapping to a user-defined beat divisor.
     /// </summary>
-    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
+    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock, ISeekableClock
     {
         public IBindable<Track> Track => track;
 
@@ -211,8 +212,25 @@ namespace osu.Game.Screens.Edit
 
         private const double transform_time = 300;
 
+        public bool IsSeeking { get; private set; }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (IsSeeking)
+            {
+                // we are either running a seek tween or doing an immediate seek.
+                // in the case of an immediate seek the seeking bool will be set to false after one update.
+                // this allows for silencing hit sounds and the likes.
+                IsSeeking = Transforms.Any();
+            }
+        }
+
         public void SeekTo(double seekDestination)
         {
+            IsSeeking = true;
+
             if (IsRunning)
                 Seek(seekDestination);
             else
