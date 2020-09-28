@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
-using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -34,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource source, DrawableHitObject drawableObject)
         {
-            spinnerBlink = !source.GetConfig<LegacySetting, bool>(LegacySetting.SpinnerNoBlink)?.Value ?? true;
+            spinnerBlink = !source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value ?? true;
 
             drawableSpinner = (DrawableSpinner)drawableObject;
 
