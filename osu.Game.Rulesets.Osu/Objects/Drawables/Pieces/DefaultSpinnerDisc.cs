@@ -184,5 +184,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 return true;
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
+        }
     }
 }

@@ -94,5 +94,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             Scale = new Vector2(final_scale * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, drawableSpinner.Progress) * 0.2f));
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
+        }
     }
 }
