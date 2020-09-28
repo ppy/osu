@@ -360,7 +360,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [Resolved(canBeNull: true)]
-        private GameplayClock gameplayClock { get; set; }
+        private ISeekableClock seekableClock { get; set; }
 
         /// <summary>
         /// Calculate the position to be used for sample playback at a specified X position (0..1).
@@ -377,7 +377,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether samples should currently be playing. Will be false during seek operations.
         /// </summary>
-        protected bool ShouldPlaySamples => gameplayClock?.IsSeeking != true;
+        protected bool ShouldPlaySamples => seekableClock?.IsSeeking != true;
 
         /// <summary>
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
