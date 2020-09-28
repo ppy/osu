@@ -25,8 +25,15 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         [BackgroundDependencyLoader]
         private void load(ScorePerformanceManager performanceManager)
         {
-            performanceManager.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                              .ContinueWith(t => Schedule(() => performance.Value = (int)t.Result), cancellationTokenSource.Token);
+            if (score.PP.HasValue)
+            {
+                performance.Value = (int)score.PP.Value;
+            }
+            else
+            {
+                performanceManager.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
+                                  .ContinueWith(t => Schedule(() => performance.Value = (int)t.Result), cancellationTokenSource.Token);
+            }
         }
 
         public override void Appear()
@@ -37,7 +44,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         protected override void Dispose(bool isDisposing)
         {
-            cancellationTokenSource.Cancel();
+            cancellationTokenSource?.Cancel();
             base.Dispose(isDisposing);
         }
     }

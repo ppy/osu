@@ -27,9 +27,6 @@ namespace osu.Game.Scoring
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
         public async Task<double> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default)
         {
-            if (score.PP.HasValue)
-                return score.PP.Value;
-
             if (tryGetExisting(score, out var perf, out var lookupKey))
                 return perf;
 

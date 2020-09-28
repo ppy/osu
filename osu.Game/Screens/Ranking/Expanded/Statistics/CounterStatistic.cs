@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     {
         private readonly int count;
 
-        protected RollingCounter<int> Counter;
+        protected RollingCounter<int> Counter { get; private set; }
 
         /// <summary>
         /// Creates a new <see cref="CounterStatistic"/>.
