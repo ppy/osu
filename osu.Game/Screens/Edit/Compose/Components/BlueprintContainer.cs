@@ -201,6 +201,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (isDraggingBlueprint)
             {
+                // handle positional change etc.
+                foreach (var obj in selectedHitObjects)
+                    Beatmap.UpdateHitObject(obj);
+
                 changeHandler?.EndChange();
                 isDraggingBlueprint = false;
             }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -89,23 +90,27 @@ namespace osu.Game.Screens.Edit
             if (isRestoring)
                 return;
 
-            if (currentState < savedStates.Count - 1)
-                savedStates.RemoveRange(currentState + 1, savedStates.Count - currentState - 1);
-
-            if (savedStates.Count > MAX_SAVED_STATES)
-                savedStates.RemoveAt(0);
-
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     new LegacyBeatmapEncoder(editorBeatmap, editorBeatmap.BeatmapSkin).Encode(sw);
 
-                savedStates.Add(stream.ToArray());
+                var newState = stream.ToArray();
+
+                // if the previous state is binary equal we don't need to push a new one, unless this is the initial state.
+                if (savedStates.Count > 0 && newState.SequenceEqual(savedStates.Last())) return;
+
+                if (currentState < savedStates.Count - 1)
+                    savedStates.RemoveRange(currentState + 1, savedStates.Count - currentState - 1);
+
+                if (savedStates.Count > MAX_SAVED_STATES)
+                    savedStates.RemoveAt(0);
+
+                savedStates.Add(newState);
+
+                currentState = savedStates.Count - 1;
+                updateBindables();
             }
-
-            currentState = savedStates.Count - 1;
-
-            updateBindables();
         }
 
         /// <summary>
