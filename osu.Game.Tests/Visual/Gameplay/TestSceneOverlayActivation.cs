@@ -12,6 +12,14 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected new OverlayTestPlayer Player => base.Player as OverlayTestPlayer;
 
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddUntilStep("gameplay has started",
+                () => Player.GameplayClockContainer.GameplayClock.CurrentTime > Player.DrawableRuleset.GameplayStartTime);
+        }
+
         [Test]
         public void TestGameplayOverlayActivation()
         {
@@ -21,7 +29,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestGameplayOverlayActivationPaused()
         {
-            AddUntilStep("activation mode is disabled", () => Player.OverlayActivationMode == OverlayActivation.Disabled);
+            AddAssert("activation mode is disabled", () => Player.OverlayActivationMode == OverlayActivation.Disabled);
             AddStep("pause gameplay", () => Player.Pause());
             AddUntilStep("activation mode is user triggered", () => Player.OverlayActivationMode == OverlayActivation.UserTriggered);
         }
