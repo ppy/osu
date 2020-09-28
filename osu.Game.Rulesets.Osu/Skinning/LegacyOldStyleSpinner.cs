@@ -130,7 +130,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
+
+            if (drawableSpinner != null)
+                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
