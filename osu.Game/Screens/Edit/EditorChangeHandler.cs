@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Objects;
 
