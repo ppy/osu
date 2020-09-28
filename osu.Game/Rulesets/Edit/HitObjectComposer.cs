@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap))
+                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
                 {
                     Clock = EditorClock,
                     ProcessCustomClock = false
