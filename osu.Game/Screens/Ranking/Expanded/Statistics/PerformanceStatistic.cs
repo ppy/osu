@@ -25,15 +25,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         [BackgroundDependencyLoader]
         private void load(ScorePerformanceManager performanceManager)
         {
-            if (score.PP.HasValue)
-            {
-                performance.Value = (int)score.PP.Value;
-            }
-            else
-            {
-                performanceManager.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                                  .ContinueWith(t => Schedule(() => performance.Value = (int)t.Result), cancellationTokenSource.Token);
-            }
+            performanceManager.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
+                              .ContinueWith(t => Schedule(() => performance.Value = (int)t.Result), cancellationTokenSource.Token);
         }
 
         public override void Appear()
