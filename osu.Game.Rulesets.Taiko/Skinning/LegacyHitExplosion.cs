@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             if (hit == null || nestedStrongHit == null)
                 return false;
 
-            return hit.Result.Type == nestedStrongHit.Result.Type;
+            return nestedStrongHit.IsHit;
         }
     }
 }
