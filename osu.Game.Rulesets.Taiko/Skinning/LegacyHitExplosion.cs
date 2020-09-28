@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         private readonly Drawable sprite;
         private readonly Drawable strongSprite;
 
-        private DrawableHit hit;
         private DrawableStrongNestedHit nestedStrongHit;
         private bool switchedToStrongSprite;
 
@@ -58,11 +57,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 }));
             }
 
-            if (judgedObject is DrawableHit h)
-            {
-                hit = h;
+            if (judgedObject is DrawableHit hit)
                 nestedStrongHit = hit.NestedHitObjects.SingleOrDefault() as DrawableStrongNestedHit;
-            }
         }
 
         protected override void LoadComplete()
@@ -95,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
         private bool shouldSwitchToStrongSprite()
         {
-            if (hit == null || nestedStrongHit == null || strongSprite == null)
+            if (nestedStrongHit == null || strongSprite == null)
                 return false;
 
             return nestedStrongHit.IsHit;
