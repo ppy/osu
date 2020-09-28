@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
         private DrawableHit hit;
         private DrawableStrongNestedHit nestedStrongHit;
+        private bool switchedToStrongSprite;
 
         /// <summary>
         /// Creates a new legacy hit explosion.
@@ -84,16 +85,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         {
             base.Update();
 
-            if (shouldSwitchToStrongSprite() && strongSprite != null)
+            if (shouldSwitchToStrongSprite() && !switchedToStrongSprite)
             {
                 sprite.FadeOut(50, Easing.OutQuint);
                 strongSprite.FadeIn(50, Easing.OutQuint);
+                switchedToStrongSprite = true;
             }
         }
 
         private bool shouldSwitchToStrongSprite()
         {
-            if (hit == null || nestedStrongHit == null)
+            if (hit == null || nestedStrongHit == null || strongSprite == null)
                 return false;
 
             return nestedStrongHit.IsHit;
