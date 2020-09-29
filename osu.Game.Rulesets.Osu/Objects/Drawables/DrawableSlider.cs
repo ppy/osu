@@ -110,6 +110,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        public override void StopAllSamples()
+        {
+            base.StopAllSamples();
+            slidingSample?.Stop();
+        }
+
         private void updateSlidingSample(ValueChangedEvent<bool> tracking)
         {
             if (tracking.NewValue)
