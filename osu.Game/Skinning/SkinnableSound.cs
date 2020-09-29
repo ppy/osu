@@ -73,7 +73,8 @@ namespace osu.Game.Skinning
                         // it's not easy to know if a sample has finished playing (to end).
                         // to keep things simple only resume playing looping samples.
                         else if (Looping)
-                            play();
+                            // schedule so we don't start playing a sample which is no longer alive.
+                            Schedule(play);
                     }
                 });
             }
