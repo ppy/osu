@@ -91,9 +91,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Size = new Vector2(circle_size),
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.Centre,
-                RelativePositionAxes = Axes.X,
-                AlwaysPresent = true,
-                Colour = Color4.White,
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
@@ -183,7 +180,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 comboColour = drawableHitObject.AccentColour.GetBoundCopy();
                 comboColour.BindValueChanged(colour =>
                 {
-                    mainComponents.Colour = ColourInfo.GradientHorizontal(drawableHitObject.AccentColour.Value, Color4.White);
+                    if (HitObject is IHasDuration)
+                        mainComponents.Colour = ColourInfo.GradientHorizontal(drawableHitObject.AccentColour.Value, Color4.White);
+                    else
+                        mainComponents.Colour = drawableHitObject.AccentColour.Value;
 
                     var col = mainComponents.Colour.AverageColour.Linear;
                     float brightness = col.R + col.G + col.B;
