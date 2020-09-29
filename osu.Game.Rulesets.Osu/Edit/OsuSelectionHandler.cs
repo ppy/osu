@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -10,7 +12,55 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuSelectionHandler : SelectionHandler
     {
-        public override bool HandleMovement(MoveSelectionEvent moveEvent)
+        public override ComposeSelectionBox CreateSelectionBox()
+            => new ComposeSelectionBox
+            {
+                CanRotate = true,
+                CanScaleX = true,
+                CanScaleY = true,
+
+                // OnRotation = handleRotation,
+                OnScaleX = handleScaleX,
+                OnScaleY = handleScaleY,
+            };
+
+        private void handleScaleY(DragEvent e, Anchor reference)
+        {
+            int direction = (reference & Anchor.y0) > 0 ? -1 : 1;
+
+            if (direction < 0)
+            {
+                // when resizing from a top drag handle, we want to move the selection first
+                if (!moveSelection(new Vector2(0, e.Delta.Y)))
+                    return;
+            }
+
+            scaleSelection(new Vector2(0, direction * e.Delta.Y));
+        }
+
+        private void handleScaleX(DragEvent e, Anchor reference)
+        {
+            int direction = (reference & Anchor.x0) > 0 ? -1 : 1;
+
+            if (direction < 0)
+            {
+                // when resizing from a top drag handle, we want to move the selection first
+                if (!moveSelection(new Vector2(e.Delta.X, 0)))
+                    return;
+            }
+
+            scaleSelection(new Vector2(direction * e.Delta.X, 0));
+        }
+
+        private void handleRotation(DragEvent e)
+        {
+            // selectionArea.Rotation += e.Delta.X;
+        }
+
+        public override bool HandleMovement(MoveSelectionEvent moveEvent) =>
+            moveSelection(moveEvent.InstantDelta);
+
+        private bool scaleSelection(Vector2 scale)
         {
             Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
             Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
@@ -25,8 +75,47 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
 
                 // Stacking is not considered
-                minPosition = Vector2.ComponentMin(minPosition, Vector2.ComponentMin(h.EndPosition + moveEvent.InstantDelta, h.Position + moveEvent.InstantDelta));
-                maxPosition = Vector2.ComponentMax(maxPosition, Vector2.ComponentMax(h.EndPosition + moveEvent.InstantDelta, h.Position + moveEvent.InstantDelta));
+                minPosition = Vector2.ComponentMin(minPosition, Vector2.ComponentMin(h.EndPosition, h.Position));
+                maxPosition = Vector2.ComponentMax(maxPosition, Vector2.ComponentMax(h.EndPosition, h.Position));
+            }
+
+            Vector2 size = maxPosition - minPosition;
+            Vector2 newSize = size + scale;
+
+            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
+            {
+                if (h is Spinner)
+                {
+                    // Spinners don't support position adjustments
+                    continue;
+                }
+
+                if (scale.X != 1)
+                    h.Position = new Vector2(minPosition.X + (h.X - minPosition.X) / size.X * newSize.X, h.Y);
+                if (scale.Y != 1)
+                    h.Position = new Vector2(h.X, minPosition.Y + (h.Y - minPosition.Y) / size.Y * newSize.Y);
+            }
+
+            return true;
+        }
+
+        private bool moveSelection(Vector2 delta)
+        {
+            Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
+
+            // Go through all hitobjects to make sure they would remain in the bounds of the editor after movement, before any movement is attempted
+            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
+            {
+                if (h is Spinner)
+                {
+                    // Spinners don't support position adjustments
+                    continue;
+                }
+
+                // Stacking is not considered
+                minPosition = Vector2.ComponentMin(minPosition, Vector2.ComponentMin(h.EndPosition + delta, h.Position + delta));
+                maxPosition = Vector2.ComponentMax(maxPosition, Vector2.ComponentMax(h.EndPosition + delta, h.Position + delta));
             }
 
             if (minPosition.X < 0 || minPosition.Y < 0 || maxPosition.X > DrawWidth || maxPosition.Y > DrawHeight)
@@ -40,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     continue;
                 }
 
-                h.Position += moveEvent.InstantDelta;
+                h.Position += delta;
             }
 
             return true;
