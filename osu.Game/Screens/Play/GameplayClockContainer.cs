@@ -51,6 +51,7 @@ namespace osu.Game.Screens.Play
         /// The final clock which is exposed to underlying components.
         /// </summary>
         [Cached]
+        [Cached(typeof(ISamplePlaybackDisabler))]
         public readonly GameplayClock GameplayClock;
 
         private Bindable<double> userAudioOffset;
