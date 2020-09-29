@@ -12,6 +12,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
     {
         public double Evaluate(double distance1, double x, double y)
         {
+            x = Transform.Apply(xTransform, distance1, x);
+            y = Transform.Apply(yTransform, distance1, y);
+
             double angle = Math.Abs(Math.Atan2(y, x));
             double distance2 = Math.Sqrt(x * x + y * y);
 
@@ -25,14 +28,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <param name="d2">other distance (either 2 previous to prev, or target note to next)</param>
         /// <param name="angles">angle between notes</param>
         /// <param name="values">Logistic(values[i,j,k]) is the correction value for  d1[i],d2[j],angle[k]</param>
-        public AngleCorrection(double[] d1, double[] d2, double[] angles, double[,,] values)
+        /// <param name="xTransform"></param>
+        /// <param name="yTransform"></param>
+        public AngleCorrection(double[] d1, double[] d2, double[] angles, double[,,] values,
+            Transform xTransform=null, Transform yTransform=null)
         {
+            this.xTransform = xTransform;
+            this.yTransform = yTransform;
             interp = new TricubicInterp(d1, d2, angles, values);
         }
 
-        public AngleCorrection(MultiL2NormCorrection correction, double[] d1, double[] d2, double[] angle, string print_name = "", bool print = false)
+        public AngleCorrection(MultiL2NormCorrection correction, double[] d1, double[] d2, double[] angle, string print_name = "", bool print = false,
+            Transform xTransform = null, Transform yTransform = null)
         {
-
+            this.xTransform = xTransform;
+            this.yTransform = yTransform;
             double[][][] values = new double[d1.Length][][];
             for (int i = 0; i < d1.Length; ++i)
             {
@@ -42,11 +52,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     values[i][j] = new double[angle.Length];
                     for (int k = 0; k < angle.Length; ++k)
                     {
-                        double x = d2[j] * Math.Cos(angle[k]);
-                        double y = d2[j] * Math.Abs(Math.Sin(angle[k]));
-
                         double distance = d1[i];
-                        values[i][j][k] = Math.Clamp(SpecialFunctions.Logit(Math.Clamp(correction.Evaluate(distance, x, y), -0.99999, 0.999999)), -100, 100);
+                        double x = Transform.Inverse(xTransform, distance, d2[j] * Math.Cos(angle[k]));
+                        double y = Transform.Inverse(yTransform, distance, d2[j] * Math.Abs(Math.Sin(angle[k])));
+
+                        values[i][j][k] = Math.Clamp(SpecialFunctions.Logit(Math.Clamp(correction.Evaluate(distance, x, y), -0.999999, 0.9999999)), -100, 100);
                     }
                 }
             }
@@ -82,71 +92,114 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         }
 
         private TricubicInterp interp;
+        private Transform xTransform, yTransform;
+
+
+        private static readonly Transform flow_scale_transform = new Transform { Scale = d => Math.Clamp(d, 0.6, 2) };
 
 
         private static readonly double[] angles = { 0, 0.25 * Math.PI, 0.5 * Math.PI, 0.75 * Math.PI, Math.PI };
 
+        
+        //private static readonly double[] distances = { 0, 0.5, 1, 1.5, 2, 3, 6, 10 };
+
+        private static readonly double[] flow_0_distances = { 0.15, 0.5, 1, 1.3, 1.7, 2.4 };
+        private static readonly double[] flowdistances2 = { 0, 0.6, 1, 1.4, 2.0, 3.3 };
+
+        //private static readonly double[] flowdistances2 = flowdistances;
+        //private static readonly double[] flowdistances2 = { 0, 0.3, 0.7, 1, 1.5, 4 };
+
+        private static readonly double[] snapdistances = { 0, 1, 2, 3, 5, 9 };
+        private static readonly double[] snapdistances2 = snapdistances;
+        //private static readonly double[] snapdistances2 = { 0, 0.5, 1, 1.5, 3 };
+
+        private static readonly double[] flow_3_distances = { 0.15, 0.6, 1, 2, 2.7 };
+
+
+
+        public static readonly AngleCorrection FLOW_0 = new AngleCorrection(MultiL2NormCorrection.FLOW_0_OLD, flow_0_distances, flowdistances2, angles, "FLOW_0"
+            //, xTransform: flow_scale_transform, yTransform: flow_scale_transform
+            );
+
+        public static readonly AngleCorrection SNAP_0 = new AngleCorrection(MultiL2NormCorrection.SNAP_0_OLD, snapdistances, snapdistances2, angles, "SNAP_0");
+        public static readonly AngleCorrection FLOW_3 = new AngleCorrection(MultiL2NormCorrection.FLOW_3_OLD, flow_3_distances, flowdistances2, angles, "FLOW_3"
+    //xTransform: flow_scale_transform, yTransform: flow_scale_transform
+    );
+        public static readonly AngleCorrection SNAP_3 = new AngleCorrection(MultiL2NormCorrection.SNAP_3_OLD, snapdistances, snapdistances2, angles, "SNAP_3");
+        
+        /*
         public static readonly AngleCorrection FLOW_0 = new AngleCorrection(
-            d1: new double[] { 0, 0.7, 1, 1.3, 1.7, 3 },
-            d2: new double[] { 0, 0.7, 1, 1.3, 1.7, 3 },
+            d1: new double[] { 0, 0.3, 0.6, 1, 1.3, 1.7, 2.5 },
+            d2: new double[] { 0, 0.3, 0.7, 1, 1.5, 4 },
             angles: angles,
+            xTransform: flow_scale_transform,
+            yTransform: flow_scale_transform,
             values: new double[,,]{
                 { // d1=0
                     // 0,   45,   90,   135,   180 degrees
                     { 0.50, 0.50, 0.50, 0.50, 0.50 }, // d2=0
-                    { 3.15, 3.15, 3.15, 3.15, 3.15 }, // d2=0.7
-                    { 5.47, 5.47, 5.47, 5.47, 5.47 }, // d2=1
-                    { 8.18, 8.18, 8.18, 8.18, 8.18 }, // d2=1.3
-                    { 12.17, 12.17, 12.17, 12.17, 12.17 }, // d2=1.7
-                    { 13.82, 13.82, 13.82, 13.82, 13.82 }, // d2=3
+                    { 0.69, 0.69, 0.69, 0.69, 0.69 }, // d2=0.3
+                    { 1.52, 1.52, 1.52, 1.52, 1.52 }, // d2=0.7
+                    { 2.49, 2.49, 2.49, 2.49, 2.49 }, // d2=1
+                    { 4.64, 4.64, 4.64, 4.64, 4.64 }, // d2=1.5
+                    { 16.12, 16.12, 16.12, 16.12, 16.12 }, // d2=4
                 },
-                { // d1=0.7
+                { // d1=0.3
                     // 0,   45,   90,   135,   180 degrees
-                    { -1.38, -1.38, -1.38, -1.38, -1.38 }, // d2=0
-                    { 1.26, 0.84, -0.27, -1.12, -1.51 }, // d2=0.7
-                    { 2.77, 2.27, 1.00, -0.19, -0.69 }, // d2=1
-                    { 4.39, 3.84, 2.45, 1.08, 0.49 }, // d2=1.3
-                    { 6.65, 6.05, 4.57, 3.05, 2.41 }, // d2=1.7
-                    { 13.82, 13.71, 12.09, 10.43, 9.72 }, // d2=3
+                    { -0.69, -0.69, -0.69, -0.69, -0.69 }, // d2=0
+                    { -0.21, -0.31, -0.55, -0.76, -0.85 }, // d2=0.3
+                    { 0.86, 0.65, 0.14, -0.35, -0.55 }, // d2=0.7
+                    { 1.89, 1.62, 0.96, 0.30, 0.02 }, // d2=1
+                    { 3.91, 3.57, 2.73, 1.85, 1.49 }, // d2=1.5
+                    { 16.12, 15.99, 14.84, 13.65, 13.15 }, // d2=4
+                },
+                { // d1=0.6
+                    // 0,   45,   90,   135,   180 degrees
+                    { -1.26, -1.26, -1.26, -1.26, -1.26 }, // d2=0
+                    { -0.72, -0.85, -1.16, -1.46, -1.58 }, // d2=0.3
+                    { 0.25, -0.04, -0.76, -1.38, -1.64 }, // d2=0.7
+                    { 1.12, 0.74, -0.25, -1.05, -1.41 }, // d2=1
+                    { 2.76, 2.28, 1.09, -0.07, -0.56 }, // d2=1.5
+                    { 12.34, 11.70, 10.12, 8.47, 7.76 }, // d2=4
                 },
                 { // d1=1
                     // 0,   45,   90,   135,   180 degrees
                     { -1.80, -1.80, -1.80, -1.80, -1.80 }, // d2=0
+                    { -1.26, -1.40, -1.72, -1.98, -2.09 }, // d2=0.3
                     { -0.26, -0.59, -1.37, -1.82, -2.01 }, // d2=0.7
                     { 0.63, 0.22, -0.89, -1.37, -1.61 }, // d2=1
-                    { 1.59, 1.14, 0.03, -0.68, -0.97 }, // d2=1.3
-                    { 2.95, 2.47, 1.35, 0.47, 0.14 }, // d2=1.7
-                    { 7.60, 7.11, 5.97, 4.92, 4.51 }, // d2=3
+                    { 2.26, 1.79, 0.68, -0.13, -0.44 }, // d2=1.5
+                    { 11.29, 10.80, 9.65, 8.57, 8.14 }, // d2=4
                 },
                 { // d1=1.3
                     // 0,   45,   90,   135,   180 degrees
                     { -1.08, -1.08, -1.08, -1.08, -1.08 }, // d2=0
-                    { 0.51, 0.16, -0.73, -1.40, -1.67 }, // d2=0.7
-                    { 1.37, 0.91, -0.35, -1.16, -1.52 }, // d2=1
-                    { 2.29, 1.77, 0.44, -0.68, -1.12 }, // d2=1.3
-                    { 3.56, 3.00, 1.60, 0.26, -0.28 }, // d2=1.7
-                    { 7.92, 7.30, 5.78, 4.22, 3.57 }, // d2=3
+                    { -0.28, -0.49, -0.97, -1.39, -1.56 }, // d2=0.3
+                    { 1.11, 0.67, -0.50, -1.26, -1.59 }, // d2=0.7
+                    { 2.29, 1.77, 0.44, -0.68, -1.12 }, // d2=1
+                    { 4.38, 3.80, 2.36, 0.95, 0.37 }, // d2=1.5
+                    { 15.54, 14.89, 13.31, 11.70, 11.02 }, // d2=4
                 },
                 { // d1=1.7
                     // 0,   45,   90,   135,   180 degrees
                     { -0.62, -0.62, -0.62, -0.62, -0.62 }, // d2=0
-                    { 0.93, 0.56, -0.37, -1.17, -1.49 }, // d2=0.7
-                    { 1.73, 1.24, -0.10, -1.16, -1.59 }, // d2=1
-                    { 2.56, 2.00, 0.50, -0.97, -1.52 }, // d2=1.3
-                    { 3.72, 3.08, 1.42, -0.41, -1.14 }, // d2=1.7
-                    { 7.66, 6.91, 4.96, 2.76, 1.71 }, // d2=3
+                    { 0.46, 0.19, -0.49, -1.09, -1.33 }, // d2=0.3
+                    { 2.25, 1.71, 0.27, -1.06, -1.57 }, // d2=0.7
+                    { 3.72, 3.08, 1.42, -0.41, -1.14 }, // d2=1
+                    { 6.27, 5.55, 3.67, 1.54, 0.54 }, // d2=1.5
+                    { 16.12, 16.12, 16.12, 14.30, 13.27 }, // d2=4
                 },
-                { // d1=3
+                { // d1=2.5
                     // 0,   45,   90,   135,   180 degrees
                     { 4.71, 4.71, 4.71, 4.71, 4.71 }, // d2=0
-                    { 6.13, 5.76, 4.86, 4.01, 3.68 }, // d2=0.7
-                    { 6.82, 6.31, 5.03, 3.83, 3.41 }, // d2=1
-                    { 7.54, 6.92, 5.26, 3.74, 3.27 }, // d2=1.3
-                    { 8.55, 7.79, 5.69, 3.79, 3.28 }, // d2=1.7
-                    { 12.04, 11.04, 8.25, 5.75, 5.07 }, // d2=3
+                    { 5.91, 5.59, 4.82, 4.08, 3.80 }, // d2=0.3
+                    { 7.79, 7.13, 5.35, 3.73, 3.25 }, // d2=0.7
+                    { 9.33, 8.49, 6.12, 3.99, 3.47 }, // d2=1
+                    { 12.04, 11.04, 8.25, 5.75, 5.07 }, // d2=1.5
+                    { 16.12, 16.12, 16.12, 16.12, 16.12 }, // d2=4
                 },
-        });
-
+    });
+        
         public static readonly AngleCorrection SNAP_0 = new AngleCorrection(
             d1: new double[] { 0, 1, 2, 3, 5, 9 },
             d2: new double[] { 0, 1, 2, 3, 5, 9 },
@@ -209,63 +262,74 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             });
 
         public static readonly AngleCorrection FLOW_3 = new AngleCorrection(
-            d1: new double[] { 0, 0.7, 1, 1.3, 1.7, 3 },
-            d2: new double[] { 0, 0.7, 1, 1.3, 1.7, 3 },
+            d1: new double[] { 0, 0.3, 0.6, 1, 1.3, 1.7, 2.5 },
+            d2: new double[] { 0, 0.3, 0.7, 1, 1.5, 4 },
             angles: angles,
+            xTransform: flow_scale_transform,
+            yTransform: flow_scale_transform,
             values: new double[,,]{
                 { // d1=0
                     // 0,   45,   90,   135,   180 degrees
                     { -4.00, -4.00, -4.00, -4.00, -4.00 }, // d2=0
-                    { -1.55, -1.55, -1.55, -1.55, -1.55 }, // d2=0.7
-                    { -0.50, -0.50, -0.50, -0.50, -0.50 }, // d2=1
-                    { 0.55, 0.55, 0.55, 0.55, 0.55 }, // d2=1.3
-                    { 1.95, 1.95, 1.95, 1.95, 1.95 }, // d2=1.7
-                    { 6.50, 6.50, 6.50, 6.50, 6.50 }, // d2=3
+                    { -3.37, -3.37, -3.37, -3.37, -3.37 }, // d2=0.3
+                    { -2.53, -2.53, -2.53, -2.53, -2.53 }, // d2=0.7
+                    { -1.90, -1.90, -1.90, -1.90, -1.90 }, // d2=1
+                    { -0.85, -0.85, -0.85, -0.85, -0.85 }, // d2=1.5
+                    { 4.40, 4.40, 4.40, 4.40, 4.40 }, // d2=4
                 },
-                { // d1=0.7
+                { // d1=0.3
                     // 0,   45,   90,   135,   180 degrees
-                    { -3.53, -3.53, -3.53, -3.53, -3.53 }, // d2=0
-                    { -3.12, -2.62, -2.04, -1.52, -1.34 }, // d2=0.7
-                    { -2.48, -1.88, -1.18, -0.58, -0.36 }, // d2=1
-                    { -1.51, -1.00, -0.24, 0.39, 0.63 }, // d2=1.3
-                    { -0.19, 0.25, 1.04, 1.70, 1.96 }, // d2=1.7
-                    { 4.13, 4.51, 5.31, 6.02, 6.30 }, // d2=3
+                    { -3.83, -3.83, -3.83, -3.83, -3.83 }, // d2=0
+                    { -3.74, -3.63, -3.44, -3.29, -3.23 }, // d2=0.3
+                    { -3.42, -3.10, -2.76, -2.51, -2.42 }, // d2=0.7
+                    { -2.81, -2.56, -2.19, -1.91, -1.80 }, // d2=1
+                    { -1.79, -1.58, -1.20, -0.89, -0.78 }, // d2=1.5
+                    { 3.36, 3.53, 3.90, 4.24, 4.38 }, // d2=4
+                },
+                { // d1=0.6
+                    // 0,   45,   90,   135,   180 degrees
+                    { -3.62, -3.62, -3.62, -3.62, -3.62 }, // d2=0
+                    { -3.54, -3.46, -3.28, -3.12, -3.06 }, // d2=0.3
+                    { -3.40, -3.15, -2.76, -2.42, -2.29 }, // d2=0.7
+                    { -3.26, -2.81, -2.30, -1.86, -1.70 }, // d2=1
+                    { -2.58, -2.05, -1.42, -0.90, -0.71 }, // d2=1.5
+                    { 2.42, 2.76, 3.46, 4.08, 4.32 }, // d2=4
                 },
                 { // d1=1
                     // 0,   45,   90,   135,   180 degrees
                     { -3.26, -3.26, -3.26, -3.26, -3.26 }, // d2=0
+                    { -3.15, -3.04, -2.77, -2.52, -2.42 }, // d2=0.3
                     { -2.89, -2.57, -2.00, -1.43, -1.22 }, // d2=0.7
                     { -2.62, -2.04, -1.31, -0.55, -0.29 }, // d2=1
-                    { -2.12, -1.33, -0.48, 0.36, 0.66 }, // d2=1.3
-                    { -0.87, -0.23, 0.72, 1.61, 1.94 }, // d2=1.7
-                    { 3.30, 3.81, 4.84, 5.79, 6.16 }, // d2=3
+                    { -1.50, -0.80, 0.11, 0.98, 1.30 }, // d2=1.5
+                    { 6.57, 7.05, 8.09, 9.05, 9.43 }, // d2=4
                 },
                 { // d1=1.3
                     // 0,   45,   90,   135,   180 degrees
                     { -2.91, -2.91, -2.91, -2.91, -2.91 }, // d2=0
-                    { -2.24, -2.00, -1.51, -1.02, -0.82 }, // d2=0.7
-                    { -1.87, -1.46, -0.82, -0.14, 0.12 }, // d2=1
-                    { -1.47, -0.81, -0.08, 0.78, 1.08 }, // d2=1.3
-                    { -0.45, 0.23, 1.07, 2.04, 2.39 }, // d2=1.7
-                    { 3.79, 4.28, 5.28, 6.31, 6.71 }, // d2=3
+                    { -2.57, -2.45, -2.16, -1.88, -1.77 }, // d2=0.3
+                    { -1.99, -1.63, -1.03, -0.40, -0.16 }, // d2=0.7
+                    { -1.47, -0.81, -0.08, 0.78, 1.08 }, // d2=1
+                    { 0.35, 0.96, 1.85, 2.85, 3.21 }, // d2=1.5
+                    { 11.19, 11.64, 12.69, 13.73, 14.15 }, // d2=4
                 },
                 { // d1=1.7
                     // 0,   45,   90,   135,   180 degrees
                     { -2.57, -2.57, -2.57, -2.57, -2.57 }, // d2=0
-                    { -1.48, -1.32, -0.95, -0.57, -0.41 }, // d2=0.7
-                    { -0.96, -0.70, -0.20, 0.34, 0.56 }, // d2=1
-                    { -0.40, -0.02, 0.57, 1.28, 1.55 }, // d2=1.3
-                    { 0.39, 1.00, 1.65, 2.56, 2.89 }, // d2=1.7
-                    { 4.63, 5.03, 5.85, 6.94, 7.35 }, // d2=3
+                    { -1.80, -1.68, -1.41, -1.13, -1.01 }, // d2=0.3
+                    { -0.61, -0.28, 0.28, 0.93, 1.19 }, // d2=0.7
+                    { 0.39, 1.00, 1.65, 2.56, 2.89 }, // d2=1
+                    { 3.11, 3.55, 4.31, 5.40, 5.80 }, // d2=1.5
+                    { 16.12, 16.12, 16.12, 16.12, 16.12 }, // d2=4
                 },
-                { // d1=3
+                { // d1=2.5
                     // 0,   45,   90,   135,   180 degrees
-                    { -2.50, -2.50, -2.50, -2.50, -2.50 }, // d2=0
-                    { -0.05, -0.05, -0.05, -0.05, -0.05 }, // d2=0.7
-                    { 1.00, 1.00, 1.00, 1.00, 1.00 }, // d2=1
-                    { 2.05, 2.05, 2.05, 2.05, 2.05 }, // d2=1.3
-                    { 3.45, 3.45, 3.45, 3.45, 3.45 }, // d2=1.7
-                    { 8.00, 8.00, 8.00, 8.00, 8.00 }, // d2=3
+                    { -2.46, -2.46, -2.46, -2.46, -2.46 }, // d2=0
+                    { -0.81, -0.76, -0.64, -0.51, -0.46 }, // d2=0.3
+                    { 1.48, 1.61, 1.84, 2.15, 2.28 }, // d2=0.7
+                    { 3.26, 3.49, 3.75, 4.20, 4.37 }, // d2=1
+                    { 6.71, 6.84, 7.13, 7.68, 7.88 }, // d2=1.5
+                    { 16.12, 16.12, 16.12, 16.12, 16.12 }, // d2=4
                 },
             });
 
@@ -329,5 +393,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     { 8.14, 7.15, 4.72, 1.97, 0.50 }, // d2=9
                 },
             });
+
+    */
     }
 }
