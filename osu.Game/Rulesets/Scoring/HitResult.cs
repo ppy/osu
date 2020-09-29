@@ -13,11 +13,8 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates that the object has not been judged yet.
         /// </summary>
         [Description(@"")]
-        [Order(13)]
+        [Order(14)]
         None,
-
-        [Order(12)]
-        Ignore,
 
         /// <summary>
         /// Indicates that the object has been judged as a miss.
@@ -95,6 +92,12 @@ namespace osu.Game.Rulesets.Scoring
         [Description("L Bonus")]
         [Order(8)]
         LargeBonus,
+
+        [Order(13)]
+        IgnoreMiss,
+
+        [Order(12)]
+        IgnoreHit,
     }
 
     public static class HitResultExtensions
@@ -151,7 +154,7 @@ namespace osu.Game.Rulesets.Scoring
             switch (result)
             {
                 case HitResult.None:
-                case HitResult.Ignore:
+                case HitResult.IgnoreMiss:
                 case HitResult.Miss:
                 case HitResult.SmallTickMiss:
                 case HitResult.LargeTickMiss:
@@ -165,6 +168,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether a <see cref="HitResult"/> is scorable.
         /// </summary>
-        public static bool IsScorable(this HitResult result) => result > HitResult.Ignore;
+        public static bool IsScorable(this HitResult result) => result >= HitResult.Miss && result < HitResult.IgnoreMiss;
     }
 }
