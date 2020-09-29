@@ -13,6 +13,8 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -40,11 +42,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private Bindable<Color4> comboColour;
 
+        private readonly Container mainComponents;
+
+        private readonly OsuSpriteText comboIndexText;
+
+        private Bindable<int> comboIndex;
+
         private const float thickness = 5;
 
         private const float shadow_radius = 5;
 
-        private const float circle_size = 16;
+        private const float circle_size = 24;
 
         public TimelineHitObjectBlueprint(HitObject hitObject)
             : base(hitObject)
@@ -59,6 +67,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
+            AddRangeInternal(new Drawable[]
+            {
+                mainComponents = new Container
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
+                comboIndexText = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.Numeric.With(size: circle_size / 2, weight: FontWeight.Black),
+                },
+            });
 
             circle = new Circle
             {
@@ -83,7 +108,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 DragBar dragBarUnderlay;
                 Container extensionBar;
 
-                AddRangeInternal(new Drawable[]
+                mainComponents.AddRange(new Drawable[]
                 {
                     extensionBar = new Container
                     {
@@ -123,7 +148,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
             else
             {
-                AddInternal(circle);
+                mainComponents.Add(circle);
             }
 
             updateShadows();
@@ -143,12 +168,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
+            if (HitObject is IHasComboInformation comboInfo)
+            {
+                comboIndex = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
+                comboIndex.BindValueChanged(combo =>
+                {
+                    comboIndexText.Text = (combo.NewValue + 1).ToString();
+                }, true);
+            }
+
             if (drawableHitObject != null)
             {
                 comboColour = drawableHitObject.AccentColour.GetBoundCopy();
                 comboColour.BindValueChanged(colour =>
                 {
-                    Colour = drawableHitObject.AccentColour.Value;
+                    mainComponents.Colour = drawableHitObject.AccentColour.Value;
+
+                    var col = mainComponents.Colour.AverageColour.Linear;
+                    float brightness = col.R + col.G + col.B;
+
+                    // decide the combo index colour based on brightness?
+                    comboIndexText.Colour = brightness > 0.5f ? Color4.Black : Color4.White;
                 }, true);
             }
         }
