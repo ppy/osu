@@ -60,10 +60,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case HitResult.Miss:
                     return TaikoSkinComponents.TaikoExplosionMiss;
 
-                case HitResult.Good:
+                case HitResult.Ok:
                     return useStrongExplosion(judgedObject)
-                        ? TaikoSkinComponents.TaikoExplosionGoodStrong
-                        : TaikoSkinComponents.TaikoExplosionGood;
+                        ? TaikoSkinComponents.TaikoExplosionOkStrong
+                        : TaikoSkinComponents.TaikoExplosionOk;
 
                 case HitResult.Great:
                     return useStrongExplosion(judgedObject)

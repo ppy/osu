@@ -217,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 if (Progress >= 1)
                     r.Type = HitResult.Great;
                 else if (Progress > .9)
-                    r.Type = HitResult.Good;
+                    r.Type = HitResult.Ok;
                 else if (Progress > .75)
                     r.Type = HitResult.Meh;
                 else if (Time.Current >= Spinner.EndTime)
