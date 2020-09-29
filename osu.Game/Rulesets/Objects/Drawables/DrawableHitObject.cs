@@ -475,6 +475,21 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
+            // Some (especially older) rulesets use scorable judgements instead of the newer ignorehit/ignoremiss judgements.
+            if (Result.Judgement.MaxResult == HitResult.IgnoreHit)
+            {
+                if (Result.Type == HitResult.Miss)
+                    Result.Type = HitResult.IgnoreMiss;
+                else if (Result.Type >= HitResult.Meh && Result.Type <= HitResult.Perfect)
+                    Result.Type = HitResult.IgnoreHit;
+            }
+
+            if (!Result.Type.IsValidHitResult(Result.Judgement.MinResult, Result.Judgement.MaxResult))
+            {
+                throw new InvalidOperationException(
+                    $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.Judgement.MinResult} ... {Result.Judgement.MaxResult}]).");
+            }
+
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = HitObject.GetEndTime();
 

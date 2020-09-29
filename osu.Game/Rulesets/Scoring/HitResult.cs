@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using System.Diagnostics;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Scoring
@@ -175,5 +176,24 @@ namespace osu.Game.Rulesets.Scoring
         /// Whether a <see cref="HitResult"/> is scorable.
         /// </summary>
         public static bool IsScorable(this HitResult result) => result >= HitResult.Miss && result < HitResult.IgnoreMiss;
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> is valid within a given <see cref="HitResult"/> range.
+        /// </summary>
+        /// <param name="result">The <see cref="HitResult"/> to check.</param>
+        /// <param name="minResult">The minimum <see cref="HitResult"/>.</param>
+        /// <param name="maxResult">The maximum <see cref="HitResult"/>.</param>
+        /// <returns>Whether <see cref="HitResult"/> falls between <paramref name="minResult"/> and <paramref name="maxResult"/>.</returns>
+        public static bool IsValidHitResult(this HitResult result, HitResult minResult, HitResult maxResult)
+        {
+            if (result == HitResult.None)
+                return false;
+
+            if (result == minResult || result == maxResult)
+                return true;
+
+            Debug.Assert(minResult <= maxResult);
+            return result > minResult && result < maxResult;
+        }
     }
 }
