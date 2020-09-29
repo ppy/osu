@@ -17,13 +17,13 @@ namespace osu.Game.Tests.Gameplay
         [Test]
         public void TestNoScoreIncreaseFromMiss()
         {
-            var beatmap = new Beatmap<TestHitObject> { HitObjects = { new TestHitObject() } };
+            var beatmap = new Beatmap<HitObject> { HitObjects = { new HitObject() } };
 
             var scoreProcessor = new ScoreProcessor();
             scoreProcessor.ApplyBeatmap(beatmap);
 
             // Apply a miss judgement
-            scoreProcessor.ApplyResult(new JudgementResult(new TestHitObject(), new TestJudgement()) { Type = HitResult.Miss });
+            scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new TestJudgement()) { Type = HitResult.Miss });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(0.0));
         }
@@ -31,37 +31,25 @@ namespace osu.Game.Tests.Gameplay
         [Test]
         public void TestOnlyBonusScore()
         {
-            var beatmap = new Beatmap<TestBonusHitObject> { HitObjects = { new TestBonusHitObject() } };
+            var beatmap = new Beatmap<HitObject> { HitObjects = { new HitObject() } };
 
             var scoreProcessor = new ScoreProcessor();
             scoreProcessor.ApplyBeatmap(beatmap);
 
             // Apply a judgement
-            scoreProcessor.ApplyResult(new JudgementResult(new TestBonusHitObject(), new TestBonusJudgement()) { Type = HitResult.Perfect });
+            scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new TestJudgement(HitResult.LargeBonus)) { Type = HitResult.LargeBonus });
 
-            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(100));
-        }
-
-        private class TestHitObject : HitObject
-        {
-            public override Judgement CreateJudgement() => new TestJudgement();
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(Judgement.LARGE_BONUS_SCORE));
         }
 
         private class TestJudgement : Judgement
         {
-            protected override int NumericResultFor(HitResult result) => 100;
-        }
+            public override HitResult MaxResult { get; }
 
-        private class TestBonusHitObject : HitObject
-        {
-            public override Judgement CreateJudgement() => new TestBonusJudgement();
-        }
-
-        private class TestBonusJudgement : Judgement
-        {
-            public override bool AffectsCombo => false;
-
-            protected override int NumericResultFor(HitResult result) => 100;
+            public TestJudgement(HitResult maxResult = HitResult.Perfect)
+            {
+                MaxResult = maxResult;
+            }
         }
     }
 }
