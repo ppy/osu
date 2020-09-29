@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A decoupled clock which adds editor-specific functionality, such as snapping to a user-defined beat divisor.
     /// </summary>
-    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock, ISeekableClock
+    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock, ISamplePlaybackDisabler
     {
         public IBindable<Track> Track => track;
 
@@ -31,6 +31,10 @@ namespace osu.Game.Screens.Edit
         private readonly BindableBeatDivisor beatDivisor;
 
         private readonly DecoupleableInterpolatingFramedClock underlyingClock;
+
+        public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
             : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
@@ -167,11 +171,14 @@ namespace osu.Game.Screens.Edit
 
         public void Stop()
         {
+            samplePlaybackDisabled.Value = true;
             underlyingClock.Stop();
         }
 
         public bool Seek(double position)
         {
+            samplePlaybackDisabled.Value = true;
+
             ClearTransforms();
             return underlyingClock.Seek(position);
         }
@@ -212,26 +219,34 @@ namespace osu.Game.Screens.Edit
 
         private const double transform_time = 300;
 
-        public bool IsSeeking { get; private set; }
-
         protected override void Update()
         {
             base.Update();
 
-            if (IsSeeking)
+            updateSeekingState();
+        }
+
+        private void updateSeekingState()
+        {
+            if (samplePlaybackDisabled.Value)
             {
-                bool isPaused = track.Value?.IsRunning != true;
+                if (track.Value?.IsRunning != true)
+                {
+                    // seeking in the editor can happen while the track isn't running.
+                    // in this case we always want to expose ourselves as seeking (to avoid sample playback).
+                    return;
+                }
 
                 // we are either running a seek tween or doing an immediate seek.
                 // in the case of an immediate seek the seeking bool will be set to false after one update.
                 // this allows for silencing hit sounds and the likes.
-                IsSeeking = isPaused || Transforms.Any();
+                samplePlaybackDisabled.Value = Transforms.Any();
             }
         }
 
         public void SeekTo(double seekDestination)
         {
-            IsSeeking = true;
+            samplePlaybackDisabled.Value = true;
 
             if (IsRunning)
                 Seek(seekDestination);

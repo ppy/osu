@@ -50,25 +50,28 @@ namespace osu.Game.Skinning
             InternalChild = samplesContainer = new AudioContainer<DrawableSample>();
         }
 
-        private Bindable<bool> gameplayClockPaused;
+        private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock gameplayClock)
+        private void load(ISamplePlaybackDisabler samplePlaybackDisabler)
         {
             // if in a gameplay context, pause sample playback when gameplay is paused.
-            gameplayClockPaused = gameplayClock?.IsPaused.GetBoundCopy();
-            gameplayClockPaused?.BindValueChanged(paused =>
+            if (samplePlaybackDisabler != null)
             {
-                if (requestedPlaying)
+                samplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
+                samplePlaybackDisabled.BindValueChanged(disabled =>
                 {
-                    if (paused.NewValue)
-                        stop();
-                    // it's not easy to know if a sample has finished playing (to end).
-                    // to keep things simple only resume playing looping samples.
-                    else if (Looping)
-                        play();
-                }
-            });
+                    if (requestedPlaying)
+                    {
+                        if (disabled.NewValue)
+                            stop();
+                        // it's not easy to know if a sample has finished playing (to end).
+                        // to keep things simple only resume playing looping samples.
+                        else if (Looping)
+                            play();
+                    }
+                });
+            }
         }
 
         private bool looping;
@@ -94,6 +97,9 @@ namespace osu.Game.Skinning
 
         private void play()
         {
+            if (samplePlaybackDisabled.Value)
+                return;
+
             samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
