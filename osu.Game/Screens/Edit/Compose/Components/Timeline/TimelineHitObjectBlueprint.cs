@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
@@ -182,7 +183,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 comboColour = drawableHitObject.AccentColour.GetBoundCopy();
                 comboColour.BindValueChanged(colour =>
                 {
-                    mainComponents.Colour = drawableHitObject.AccentColour.Value;
+                    mainComponents.Colour = ColourInfo.GradientHorizontal(drawableHitObject.AccentColour.Value, Color4.White);
 
                     var col = mainComponents.Colour.AverageColour.Linear;
                     float brightness = col.R + col.G + col.B;
