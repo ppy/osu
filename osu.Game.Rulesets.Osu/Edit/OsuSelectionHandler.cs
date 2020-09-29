@@ -83,8 +83,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             Quad quad = getSelectionQuad();
 
-            if (!centre.HasValue)
-                centre = quad.Centre;
+            centre ??= quad.Centre;
 
             foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
             {
