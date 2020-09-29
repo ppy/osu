@@ -74,8 +74,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     return null;
 
-                case TaikoSkinComponents.TaikoExplosionGood:
-                case TaikoSkinComponents.TaikoExplosionGoodStrong:
+                case TaikoSkinComponents.TaikoExplosionOk:
+                case TaikoSkinComponents.TaikoExplosionOkStrong:
                 case TaikoSkinComponents.TaikoExplosionGreat:
                 case TaikoSkinComponents.TaikoExplosionGreatStrong:
                 case TaikoSkinComponents.TaikoExplosionMiss:
@@ -106,10 +106,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 case TaikoSkinComponents.TaikoExplosionMiss:
                     return "taiko-hit0";
 
-                case TaikoSkinComponents.TaikoExplosionGood:
+                case TaikoSkinComponents.TaikoExplosionOk:
                     return "taiko-hit100";
 
-                case TaikoSkinComponents.TaikoExplosionGoodStrong:
+                case TaikoSkinComponents.TaikoExplosionOkStrong:
                     return "taiko-hit100k";
 
                 case TaikoSkinComponents.TaikoExplosionGreat:

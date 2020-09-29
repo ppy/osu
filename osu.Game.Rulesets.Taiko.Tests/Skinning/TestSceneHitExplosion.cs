@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public void TestNormalHit()
         {
             AddStep("Great", () => SetContents(() => getContentFor(createHit(HitResult.Great))));
-            AddStep("Good", () => SetContents(() => getContentFor(createHit(HitResult.Good))));
+            AddStep("Ok", () => SetContents(() => getContentFor(createHit(HitResult.Ok))));
             AddStep("Miss", () => SetContents(() => getContentFor(createHit(HitResult.Miss))));
         }
 
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public void TestStrongHit([Values(false, true)] bool hitBoth)
         {
             AddStep("Great", () => SetContents(() => getContentFor(createStrongHit(HitResult.Great, hitBoth))));
-            AddStep("Good", () => SetContents(() => getContentFor(createStrongHit(HitResult.Good, hitBoth))));
+            AddStep("Good", () => SetContents(() => getContentFor(createStrongHit(HitResult.Ok, hitBoth))));
         }
 
         private Drawable getContentFor(DrawableTestHit hit)
