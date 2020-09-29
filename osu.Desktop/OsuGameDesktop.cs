@@ -138,6 +138,7 @@ namespace osu.Desktop
                 // SDL2 DesktopWindow
                 case DesktopWindow desktopWindow:
                     desktopWindow.CursorState.Value |= CursorState.Hidden;
+                    desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
                     desktopWindow.Title = Name;
                     desktopWindow.DragDrop += f => fileDrop(new[] { f });
                     break;
