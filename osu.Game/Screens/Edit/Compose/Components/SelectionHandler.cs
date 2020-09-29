@@ -32,8 +32,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
-        public const float BORDER_RADIUS = 2;
-
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
@@ -69,19 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Children = new Drawable[]
                 {
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        BorderThickness = BORDER_RADIUS,
-                        BorderColour = colours.YellowDark,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            AlwaysPresent = true,
-                            Alpha = 0
-                        }
-                    },
+                    new ComposeSelectionBox(),
                     new Container
                     {
                         Name = "info text",
