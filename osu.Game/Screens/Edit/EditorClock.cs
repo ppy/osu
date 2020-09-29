@@ -220,10 +220,12 @@ namespace osu.Game.Screens.Edit
 
             if (IsSeeking)
             {
+                bool isPaused = track.Value?.IsRunning != true;
+
                 // we are either running a seek tween or doing an immediate seek.
                 // in the case of an immediate seek the seeking bool will be set to false after one update.
                 // this allows for silencing hit sounds and the likes.
-                IsSeeking = Transforms.Any();
+                IsSeeking = isPaused || Transforms.Any();
             }
         }
 
