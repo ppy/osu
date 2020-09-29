@@ -263,7 +263,7 @@ namespace osu.Game.Tests.Gameplay
             public double Duration { get; set; } = 5000;
 
             public JudgeableLongHitObject()
-                : base(false)
+                : base(HitResult.LargeBonus)
             {
             }
 
