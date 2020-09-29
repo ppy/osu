@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 using osuTK.Graphics;
@@ -33,6 +35,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly DragBar dragBar;
 
         private readonly List<Container> shadowComponents = new List<Container>();
+
+        private DrawableHitObject drawableHitObject;
+
+        private Bindable<Color4> comboColour;
 
         private const float thickness = 5;
 
@@ -121,6 +127,30 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             updateShadows();
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(HitObjectComposer composer)
+        {
+            if (composer != null)
+            {
+                // best effort to get the drawable representation for grabbing colour and what not.
+                drawableHitObject = composer.HitObjects.FirstOrDefault(d => d.HitObject == HitObject);
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (drawableHitObject != null)
+            {
+                comboColour = drawableHitObject.AccentColour.GetBoundCopy();
+                comboColour.BindValueChanged(colour =>
+                {
+                    Colour = drawableHitObject.AccentColour.Value;
+                }, true);
+            }
         }
 
         protected override void Update()
