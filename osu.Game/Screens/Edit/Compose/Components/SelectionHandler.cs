@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Children = new Drawable[]
                 {
-                    new ComposeSelectionBox(),
+                    CreateSelectionBox(),
                     new Container
                     {
                         Name = "info text",
@@ -90,6 +90,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
             };
         }
+
+        public virtual ComposeSelectionBox CreateSelectionBox() => new ComposeSelectionBox();
 
         #region User Input Handling
 
