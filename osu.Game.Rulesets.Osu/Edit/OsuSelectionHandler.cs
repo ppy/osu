@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -54,7 +56,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void handleRotation(DragEvent e)
         {
-            // selectionArea.Rotation += e.Delta.X;
         }
 
         public override bool HandleMovement(MoveSelectionEvent moveEvent) =>
@@ -62,24 +63,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private bool scaleSelection(Vector2 scale)
         {
-            Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
-            Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
+            Quad quad = getSelectionQuad();
 
-            // Go through all hitobjects to make sure they would remain in the bounds of the editor after movement, before any movement is attempted
-            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
-            {
-                if (h is Spinner)
-                {
-                    // Spinners don't support position adjustments
-                    continue;
-                }
+            Vector2 minPosition = quad.TopLeft;
 
-                // Stacking is not considered
-                minPosition = Vector2.ComponentMin(minPosition, Vector2.ComponentMin(h.EndPosition, h.Position));
-                maxPosition = Vector2.ComponentMax(maxPosition, Vector2.ComponentMax(h.EndPosition, h.Position));
-            }
-
-            Vector2 size = maxPosition - minPosition;
+            Vector2 size = quad.Size;
             Vector2 newSize = size + scale;
 
             foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
@@ -133,6 +121,53 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
 
             return true;
+        }
+
+        private Quad getSelectionQuad()
+        {
+            Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
+
+            // Go through all hitobjects to make sure they would remain in the bounds of the editor after movement, before any movement is attempted
+            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
+            {
+                if (h is Spinner)
+                {
+                    // Spinners don't support position adjustments
+                    continue;
+                }
+
+                // Stacking is not considered
+                minPosition = Vector2.ComponentMin(minPosition, Vector2.ComponentMin(h.EndPosition, h.Position));
+                maxPosition = Vector2.ComponentMax(maxPosition, Vector2.ComponentMax(h.EndPosition, h.Position));
+            }
+
+            Vector2 size = maxPosition - minPosition;
+
+            return new Quad(minPosition.X, minPosition.Y, size.X, size.Y);
+        }
+
+        /// <summary>
+        /// Returns rotated position from a given point.
+        /// </summary>
+        /// <param name="p">The point.</param>
+        /// <param name="center">The center to rotate around.</param>
+        /// <param name="angle">The angle to rotate (in degrees).</param>
+        internal static Vector2 Rotate(Vector2 p, Vector2 center, int angle)
+        {
+            angle = -angle;
+
+            p.X -= center.X;
+            p.Y -= center.Y;
+
+            Vector2 ret;
+            ret.X = (float)(p.X * Math.Cos(angle / 180f * Math.PI) + p.Y * Math.Sin(angle / 180f * Math.PI));
+            ret.Y = (float)(p.X * -Math.Sin(angle / 180f * Math.PI) + p.Y * Math.Cos(angle / 180f * Math.PI));
+
+            ret.X += center.X;
+            ret.Y += center.Y;
+
+            return ret;
         }
     }
 }
