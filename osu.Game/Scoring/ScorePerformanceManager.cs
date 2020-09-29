@@ -20,6 +20,9 @@ namespace osu.Game.Scoring
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
+        [Resolved]
+        private BeatmapDifficultyManager difficultyManager { get; set; }
+
         /// <summary>
         /// Calculates performance for the given <see cref="ScoreInfo"/>.
         /// </summary>
@@ -30,10 +33,7 @@ namespace osu.Game.Scoring
             if (tryGetExisting(score, out var perf, out var lookupKey))
                 return perf;
 
-            return await Task.Factory.StartNew(() =>
-            {
-                return computePerformance(score, lookupKey, token);
-            }, token);
+            return await computePerformanceAsync(score, lookupKey, token);
         }
 
         private bool tryGetExisting(ScoreInfo score, out double performance, out PerformanceCacheLookup lookupKey)
@@ -43,14 +43,15 @@ namespace osu.Game.Scoring
             return performanceCache.TryGetValue(lookupKey, out performance);
         }
 
-        private double computePerformance(ScoreInfo score, PerformanceCacheLookup lookupKey, CancellationToken token = default)
+        private async Task<double> computePerformanceAsync(ScoreInfo score, PerformanceCacheLookup lookupKey, CancellationToken token = default)
         {
             var beatmap = beatmapManager.GetWorkingBeatmap(score.Beatmap);
+            var attributes = await difficultyManager.GetDifficultyAsync(score.Beatmap, score.Ruleset, score.Mods, token);
 
             if (token.IsCancellationRequested)
                 return default;
 
-            var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(beatmap, score);
+            var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(beatmap, score, attributes.Attributes);
             var total = calculator.Calculate();
 
             performanceCache[lookupKey] = total;
@@ -74,7 +75,7 @@ namespace osu.Game.Scoring
                 TotalScore = info.TotalScore;
                 Combo = info.Combo;
                 Mods = info.Mods;
-                RulesetId = info.Ruleset.ID.Value;
+                RulesetId = info.Ruleset.ID ?? 0;
             }
 
             public override int GetHashCode()

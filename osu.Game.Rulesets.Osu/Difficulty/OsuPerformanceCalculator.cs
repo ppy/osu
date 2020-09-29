@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
-            : base(ruleset, beatmap, score)
+        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score, DifficultyAttributes attributes)
+            : base(ruleset, beatmap, score, attributes)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
 

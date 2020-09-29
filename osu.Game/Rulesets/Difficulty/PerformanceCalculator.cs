@@ -21,14 +21,14 @@ namespace osu.Game.Rulesets.Difficulty
 
         protected double TimeRate { get; private set; } = 1;
 
-        protected PerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
+        protected PerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score, DifficultyAttributes attributes = null)
         {
             Ruleset = ruleset;
             Score = score;
 
             Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
 
-            Attributes = ruleset.CreateDifficultyCalculator(beatmap).Calculate(score.Mods);
+            Attributes = attributes ?? ruleset.CreateDifficultyCalculator(beatmap).Calculate(score.Mods);
 
             ApplyMods(score.Mods);
         }
