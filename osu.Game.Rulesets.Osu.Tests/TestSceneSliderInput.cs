@@ -312,13 +312,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking dropped", assertMidSliderJudgementFail);
         }
 
-        private bool assertGreatJudge() => judgementResults.Any() && judgementResults.All(t => t.Type == HitResult.Great);
+        private bool assertGreatJudge() => judgementResults.Any() && judgementResults.All(t => t.Type.IsHit());
 
-        private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.Great && judgementResults.First().Type == HitResult.Miss;
+        private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.IgnoreHit && judgementResults.First().Type == HitResult.Miss;
 
-        private bool assertMidSliderJudgements() => judgementResults[^2].Type == HitResult.Great;
+        private bool assertMidSliderJudgements() => judgementResults[^2].Type == HitResult.IgnoreHit;
 
-        private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.Miss;
+        private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.IgnoreMiss;
 
         private ScoreAccessibleReplayPlayer currentPlayer;
 
