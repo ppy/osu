@@ -22,10 +22,24 @@ namespace osu.Game.Rulesets.Osu.Edit
                 CanScaleX = true,
                 CanScaleY = true,
 
+                OperationStarted = onStart,
+                OperationEnded = onEnd,
+
                 OnRotation = handleRotation,
                 OnScaleX = handleScaleX,
                 OnScaleY = handleScaleY,
             };
+
+        private void onEnd()
+        {
+            ChangeHandler.EndChange();
+            centre = null;
+        }
+
+        private void onStart()
+        {
+            ChangeHandler.BeginChange();
+        }
 
         private void handleScaleY(DragEvent e, Anchor reference)
         {
