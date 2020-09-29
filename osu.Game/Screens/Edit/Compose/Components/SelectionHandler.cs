@@ -288,8 +288,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 var comboInfo = h as IHasComboInformation;
 
-                if (comboInfo == null)
-                    continue;
+                if (comboInfo == null || comboInfo.NewCombo == state) continue;
 
                 comboInfo.NewCombo = state;
                 EditorBeatmap?.UpdateHitObject(h);
@@ -316,19 +315,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Selection State
 
-        private readonly Bindable<TernaryState> selectionNewComboState = new Bindable<TernaryState>();
+        /// <summary>
+        /// The state of "new combo" for all selected hitobjects.
+        /// </summary>
+        public readonly Bindable<TernaryState> SelectionNewComboState = new Bindable<TernaryState>();
 
-        private readonly Dictionary<string, Bindable<TernaryState>> selectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
+        /// <summary>
+        /// The state of each sample type for all selected hitobjects. Keys match with <see cref="HitSampleInfo"/> constant specifications.
+        /// </summary>
+        public readonly Dictionary<string, Bindable<TernaryState>> SelectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
 
         /// <summary>
         /// Set up ternary state bindables and bind them to selection/hitobject changes (in both directions)
         /// </summary>
         private void createStateBindables()
         {
-            // hit samples
-            var sampleTypes = new[] { HitSampleInfo.HIT_WHISTLE, HitSampleInfo.HIT_CLAP, HitSampleInfo.HIT_FINISH };
-
-            foreach (var sampleName in sampleTypes)
+            foreach (var sampleName in HitSampleInfo.AllAdditions)
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -349,11 +351,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     }
                 };
 
-                selectionSampleStates[sampleName] = bindable;
+                SelectionSampleStates[sampleName] = bindable;
             }
 
             // new combo
-            selectionNewComboState.ValueChanged += state =>
+            SelectionNewComboState.ValueChanged += state =>
             {
                 switch (state.NewValue)
                 {
@@ -377,9 +379,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void UpdateTernaryStates()
         {
-            selectionNewComboState.Value = GetStateFromSelection(SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
+            SelectionNewComboState.Value = GetStateFromSelection(SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
 
-            foreach (var (sampleName, bindable) in selectionSampleStates)
+            foreach (var (sampleName, bindable) in SelectionSampleStates)
             {
                 bindable.Value = GetStateFromSelection(SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
             }
@@ -413,7 +415,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 if (selectedBlueprints.All(b => b.HitObject is IHasComboInformation))
                 {
-                    items.Add(new TernaryStateMenuItem("New combo") { State = { BindTarget = selectionNewComboState } });
+                    items.Add(new TernaryStateMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } });
                 }
 
                 if (selectedBlueprints.Count == 1)
@@ -423,7 +425,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     new OsuMenuItem("Sound")
                     {
-                        Items = selectionSampleStates.Select(kvp =>
+                        Items = SelectionSampleStates.Select(kvp =>
                             new TernaryStateMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
                     },
                     new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),

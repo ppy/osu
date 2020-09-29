@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
     public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene
     {
