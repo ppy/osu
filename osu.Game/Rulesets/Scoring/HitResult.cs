@@ -32,9 +32,6 @@ namespace osu.Game.Rulesets.Scoring
         [Order(4)]
         Meh,
 
-        /// <summary>
-        /// Optional judgement.
-        /// </summary>
         [Description(@"OK")]
         [Order(3)]
         Ok,
@@ -47,9 +44,6 @@ namespace osu.Game.Rulesets.Scoring
         [Order(1)]
         Great,
 
-        /// <summary>
-        /// Optional judgement.
-        /// </summary>
         [Description(@"Perfect")]
         [Order(0)]
         Perfect,
