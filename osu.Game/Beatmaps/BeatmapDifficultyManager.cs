@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Framework.Threading;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Beatmaps
@@ -207,7 +208,7 @@ namespace osu.Game.Beatmaps
                 var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(beatmapInfo));
                 var attributes = calculator.Calculate(key.Mods);
 
-                return difficultyCache[key] = new StarDifficulty(attributes.StarRating, attributes.MaxCombo);
+                return difficultyCache[key] = new StarDifficulty(attributes.StarRating, attributes.MaxCombo, attributes);
             }
             catch
             {
@@ -300,11 +301,13 @@ namespace osu.Game.Beatmaps
         public readonly double Stars;
         public readonly int MaxCombo;
 
-        public StarDifficulty(double stars, int maxCombo)
+        public readonly DifficultyAttributes Attributes;
+
+        public StarDifficulty(double stars, int maxCombo, DifficultyAttributes attributes = null)
         {
             Stars = stars;
             MaxCombo = maxCombo;
-
+            Attributes = attributes;
             // Todo: Add more members (BeatmapInfo.DifficultyRating? Attributes? Etc...)
         }
     }
