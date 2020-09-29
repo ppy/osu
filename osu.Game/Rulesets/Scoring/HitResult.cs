@@ -87,15 +87,21 @@ namespace osu.Game.Rulesets.Scoring
         SmallBonus = 254,
 
         /// <summary>
-        /// Indicate a large bonus.
+        /// Indicates a large bonus.
         /// </summary>
         [Description("L Bonus")]
         [Order(8)]
         LargeBonus = 320,
 
+        /// <summary>
+        /// Indicates a miss that should be ignored for scoring purposes.
+        /// </summary>
         [Order(13)]
         IgnoreMiss = 384,
 
+        /// <summary>
+        /// Indicates a hit that should be ignored for scoring purposes.
+        /// </summary>
         [Order(12)]
         IgnoreHit,
     }
