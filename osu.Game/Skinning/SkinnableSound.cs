@@ -37,6 +37,8 @@ namespace osu.Game.Skinning
         /// </remarks>
         protected bool PlayWhenZeroVolume => Looping;
 
+        protected virtual bool PlayWhenPaused => false;
+
         private readonly AudioContainer<DrawableSample> samplesContainer;
 
         public SkinnableSound(ISampleInfo hitSamples)
@@ -63,7 +65,7 @@ namespace osu.Game.Skinning
                 {
                     if (requestedPlaying)
                     {
-                        if (disabled.NewValue)
+                        if (disabled.NewValue && !PlayWhenPaused)
                             stop();
                         // it's not easy to know if a sample has finished playing (to end).
                         // to keep things simple only resume playing looping samples.
@@ -97,7 +99,7 @@ namespace osu.Game.Skinning
 
         private void play()
         {
-            if (samplePlaybackDisabled.Value)
+            if (samplePlaybackDisabled.Value && !PlayWhenPaused)
                 return;
 
             samplesContainer.ForEach(c =>
