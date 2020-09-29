@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 CanScaleX = true,
                 CanScaleY = true,
 
-                // OnRotation = handleRotation,
+                OnRotation = handleRotation,
                 OnScaleX = handleScaleX,
                 OnScaleY = handleScaleY,
             };
@@ -54,12 +55,44 @@ namespace osu.Game.Rulesets.Osu.Edit
             scaleSelection(new Vector2(direction * e.Delta.X, 0));
         }
 
+        private Vector2? centre;
+
         private void handleRotation(DragEvent e)
         {
+            rotateSelection(e.Delta.X);
         }
 
         public override bool HandleMovement(MoveSelectionEvent moveEvent) =>
             moveSelection(moveEvent.InstantDelta);
+
+        private bool rotateSelection(in float delta)
+        {
+            Quad quad = getSelectionQuad();
+
+            if (!centre.HasValue)
+                centre = quad.Centre;
+
+            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
+            {
+                if (h is Spinner)
+                {
+                    // Spinners don't support position adjustments
+                    continue;
+                }
+
+                h.Position = Rotate(h.Position, centre.Value, delta);
+
+                if (h is IHasPath path)
+                {
+                    foreach (var point in path.Path.ControlPoints)
+                    {
+                        point.Position.Value = Rotate(point.Position.Value, Vector2.Zero, delta);
+                    }
+                }
+            }
+
+            return true;
+        }
 
         private bool scaleSelection(Vector2 scale)
         {
@@ -153,7 +186,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <param name="p">The point.</param>
         /// <param name="center">The center to rotate around.</param>
         /// <param name="angle">The angle to rotate (in degrees).</param>
-        internal static Vector2 Rotate(Vector2 p, Vector2 center, int angle)
+        internal static Vector2 Rotate(Vector2 p, Vector2 center, float angle)
         {
             angle = -angle;
 
