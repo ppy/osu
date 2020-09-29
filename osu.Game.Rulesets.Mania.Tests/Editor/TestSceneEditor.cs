@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
     [TestFixture]
     public class TestSceneEditor : EditorTestScene

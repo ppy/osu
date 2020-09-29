@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 using osuTK;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
     public class TestSceneNoteSelectionBlueprint : ManiaSelectionBlueprintTestScene
     {

@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Taiko.Tests
+namespace osu.Game.Rulesets.Taiko.Tests.Editor
 {
     public class TestSceneTaikoHitObjectComposer : EditorClockTestScene
     {
