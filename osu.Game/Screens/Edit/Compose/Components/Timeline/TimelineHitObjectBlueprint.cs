@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -123,11 +124,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             updateShadows();
         }
 
-        protected override void Update()
+        [BackgroundDependencyLoader]
+        private void load(EditorBeatmap beatmap)
         {
-            base.Update();
+            if (beatmap.HitObjects.Contains(HitObject))
+            {
+                beatmap.HitObjectUpdated += onUpdated;
+                onUpdated(HitObject);
+            }
+            else
+            {
+                // placement objects don't fire events, so we need to run this every frame.
+                Scheduler.AddDelayed(() => onUpdated(HitObject), 0, true);
+            }
+        }
 
-            // no bindable so we perform this every update
+        private void onUpdated(HitObject obj)
+        {
+            if (obj != HitObject)
+                return;
+
             Width = (float)(HitObject.GetEndTime() - HitObject.StartTime);
         }
 
