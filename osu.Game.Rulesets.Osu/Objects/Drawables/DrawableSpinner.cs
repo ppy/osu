@@ -113,10 +113,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void updateSpinningSample(ValueChangedEvent<bool> tracking)
         {
-            // note that samples will not start playing if exiting a seek operation in the middle of a spinner.
-            // may be something we want to address at a later point, but not so easy to make happen right now
-            // (SkinnableSound would need to expose whether the sample is already playing and this logic would need to run in Update).
-            if (tracking.NewValue && ShouldPlaySamples)
+            if (tracking.NewValue)
             {
                 spinningSample?.Play();
                 spinningSample?.VolumeTo(1, 200);

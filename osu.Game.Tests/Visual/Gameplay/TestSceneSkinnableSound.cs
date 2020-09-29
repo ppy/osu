@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSkinnableSound : OsuTestScene
     {
-        [Cached]
+        [Cached(typeof(ISamplePlaybackDisabler))]
         private GameplayClock gameplayClock = new GameplayClock(new FramedClock());
 
         private TestSkinSourceContainer skinSource;
