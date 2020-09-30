@@ -34,7 +34,7 @@ namespace osu.Game.Skinning
         /// </remarks>
         protected bool PlayWhenZeroVolume => Looping;
 
-        private readonly AudioContainer<DrawableSample> samplesContainer;
+        protected readonly AudioContainer<DrawableSample> SamplesContainer;
 
         public SkinnableSound(ISampleInfo hitSamples)
             : this(new[] { hitSamples })
@@ -44,7 +44,7 @@ namespace osu.Game.Skinning
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
             this.hitSamples = hitSamples.ToArray();
-            InternalChild = samplesContainer = new AudioContainer<DrawableSample>();
+            InternalChild = SamplesContainer = new AudioContainer<DrawableSample>();
         }
 
         private bool looping;
@@ -58,13 +58,13 @@ namespace osu.Game.Skinning
 
                 looping = value;
 
-                samplesContainer.ForEach(c => c.Looping = looping);
+                SamplesContainer.ForEach(c => c.Looping = looping);
             }
         }
 
         public virtual void Play()
         {
-            samplesContainer.ForEach(c =>
+            SamplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
                     c.Play();
@@ -73,7 +73,7 @@ namespace osu.Game.Skinning
 
         public virtual void Stop()
         {
-            samplesContainer.ForEach(c => c.Stop());
+            SamplesContainer.ForEach(c => c.Stop());
         }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
@@ -102,7 +102,7 @@ namespace osu.Game.Skinning
                 return ch;
             }).Where(c => c != null);
 
-            samplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
+            SamplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
 
             // Start playback internally for the new samples if the previous ones were playing beforehand.
             if (wasPlaying)
@@ -111,24 +111,24 @@ namespace osu.Game.Skinning
 
         #region Re-expose AudioContainer
 
-        public BindableNumber<double> Volume => samplesContainer.Volume;
+        public BindableNumber<double> Volume => SamplesContainer.Volume;
 
-        public BindableNumber<double> Balance => samplesContainer.Balance;
+        public BindableNumber<double> Balance => SamplesContainer.Balance;
 
-        public BindableNumber<double> Frequency => samplesContainer.Frequency;
+        public BindableNumber<double> Frequency => SamplesContainer.Frequency;
 
-        public BindableNumber<double> Tempo => samplesContainer.Tempo;
+        public BindableNumber<double> Tempo => SamplesContainer.Tempo;
 
         public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => samplesContainer.AddAdjustment(type, adjustBindable);
+            => SamplesContainer.AddAdjustment(type, adjustBindable);
 
         public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => samplesContainer.RemoveAdjustment(type, adjustBindable);
+            => SamplesContainer.RemoveAdjustment(type, adjustBindable);
 
         public void RemoveAllAdjustments(AdjustableProperty type)
-            => samplesContainer.RemoveAllAdjustments(type);
+            => SamplesContainer.RemoveAllAdjustments(type);
 
-        public bool IsPlaying => samplesContainer.Any(s => s.Playing);
+        public bool IsPlaying => SamplesContainer.Any(s => s.Playing);
 
         #endregion
     }
