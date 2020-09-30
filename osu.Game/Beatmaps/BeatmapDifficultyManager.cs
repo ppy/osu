@@ -307,5 +307,19 @@ namespace osu.Game.Beatmaps
 
             // Todo: Add more members (BeatmapInfo.DifficultyRating? Attributes? Etc...)
         }
+
+        public DifficultyRating DifficultyRating
+        {
+            get
+            {
+                if (Stars < 2.0) return DifficultyRating.Easy;
+                if (Stars < 2.7) return DifficultyRating.Normal;
+                if (Stars < 4.0) return DifficultyRating.Hard;
+                if (Stars < 5.3) return DifficultyRating.Insane;
+                if (Stars < 6.5) return DifficultyRating.Expert;
+
+                return DifficultyRating.ExpertPlus;
+            }
+        }
     }
 }
