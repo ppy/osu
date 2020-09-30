@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Play
         public GameplayClock GameplayClock => localGameplayClock;
 
         [Cached(typeof(GameplayClock))]
+        [Cached(typeof(ISamplePlaybackDisabler))]
         private readonly LocalGameplayClock localGameplayClock;
 
         private Bindable<double> userAudioOffset;
