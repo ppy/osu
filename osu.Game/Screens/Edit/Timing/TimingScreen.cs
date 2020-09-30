@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -56,6 +57,12 @@ namespace osu.Game.Screens.Edit.Timing
                 if (selected.NewValue != null)
                     clock.SeekTo(selected.NewValue.Time);
             });
+        }
+
+        protected override void OnTimelineLoaded(TimelineArea timelineArea)
+        {
+            base.OnTimelineLoaded(timelineArea);
+            timelineArea.Timeline.Zoom = timelineArea.Timeline.MinZoom;
         }
 
         public class ControlPointList : CompositeDrawable
