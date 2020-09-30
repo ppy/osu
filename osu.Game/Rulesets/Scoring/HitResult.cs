@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description(@"")]
         [Order(14)]
-        None = 0,
+        None,
 
         /// <summary>
         /// Indicates that the object has been judged as a miss.
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </remarks>
         [Description(@"Miss")]
         [Order(5)]
-        Miss = 64,
+        Miss,
 
         [Description(@"Meh")]
         [Order(4)]
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates small tick miss.
         /// </summary>
         [Order(11)]
-        SmallTickMiss = 128,
+        SmallTickMiss,
 
         /// <summary>
         /// Indicates a small tick hit.
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a large tick miss.
         /// </summary>
         [Order(10)]
-        LargeTickMiss = 192,
+        LargeTickMiss,
 
         /// <summary>
         /// Indicates a large tick hit.
@@ -84,20 +84,20 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description("S Bonus")]
         [Order(9)]
-        SmallBonus = 254,
+        SmallBonus,
 
         /// <summary>
         /// Indicates a large bonus.
         /// </summary>
         [Description("L Bonus")]
         [Order(8)]
-        LargeBonus = 320,
+        LargeBonus,
 
         /// <summary>
         /// Indicates a miss that should be ignored for scoring purposes.
         /// </summary>
         [Order(13)]
-        IgnoreMiss = 384,
+        IgnoreMiss,
 
         /// <summary>
         /// Indicates a hit that should be ignored for scoring purposes.
