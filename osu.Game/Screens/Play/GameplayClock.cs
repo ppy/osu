@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
-    public class GameplayClock : IFrameBasedClock
+    public class GameplayClock : IFrameBasedClock, ISamplePlaybackDisabler
     {
         private readonly IFrameBasedClock underlyingClock;
 
@@ -72,5 +72,7 @@ namespace osu.Game.Screens.Play
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
         public IClock Source => underlyingClock;
+
+        public IBindable<bool> SamplePlaybackDisabled => IsPaused;
     }
 }
