@@ -5,7 +5,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 
@@ -27,7 +26,15 @@ namespace osu.Game.Tests.Visual.Editing
         private void load()
         {
             Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
+            Beatmap.Disabled = true;
+
             Child = new TimingScreen();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            Beatmap.Disabled = false;
+            base.Dispose(isDisposing);
         }
     }
 }
