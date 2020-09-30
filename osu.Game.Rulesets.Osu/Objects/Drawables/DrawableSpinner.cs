@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             isSpinning.BindValueChanged(updateSpinningSample);
         }
 
-        private SkinnableSound spinningSample;
+        private PausableSkinnableSound spinningSample;
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
                 clone.Name = "spinnerspin";
 
-                AddInternal(spinningSample = new SkinnableSound(clone)
+                AddInternal(spinningSample = new PausableSkinnableSound(clone)
                 {
                     Volume = { Value = 0 },
                     Looping = true,

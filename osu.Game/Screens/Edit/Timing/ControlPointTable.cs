@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -89,7 +90,7 @@ namespace osu.Game.Screens.Edit.Timing
             },
             new OsuSpriteText
             {
-                Text = $"{group.Time:n0}ms",
+                Text = group.Time.ToEditorFormattedString(),
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
             new ControlGroupAttributes(group),

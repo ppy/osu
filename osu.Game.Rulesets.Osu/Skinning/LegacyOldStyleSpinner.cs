@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -86,10 +85,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
             base.LoadComplete();
 
             this.FadeOut();
-            drawableSpinner.State.BindValueChanged(updateStateTransforms, true);
+            drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
         }
 
-        private void updateStateTransforms(ValueChangedEvent<ArmedState> state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             var spinner = drawableSpinner.HitObject;
 
@@ -126,6 +125,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 barCount++;
 
             return (float)barCount / total_bars * final_metre_height;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableSpinner != null)
+                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
