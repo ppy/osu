@@ -43,13 +43,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override bool HandleScale(Vector2 scale, Anchor reference)
         {
-            // cancel out scale in axes we don't care about (based on which drag handle was used).
-            if ((reference & Anchor.x1) > 0) scale.X = 0;
-            if ((reference & Anchor.y1) > 0) scale.Y = 0;
-
-            // reverse the scale direction if dragging from top or left.
-            if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
-            if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
+            adjustScaleFromAnchor(ref scale, reference);
 
             var hitObjects = selectedMovableObjects;
 
@@ -58,11 +52,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             // is not looking to change the duration of the slider but expand the whole pattern.
             if (hitObjects.Length == 1 && hitObjects.First() is Slider slider)
             {
-                var quad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
-                Vector2 delta = Vector2.One + new Vector2(scale.X / quad.Width, scale.Y / quad.Height);
+                Quad quad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
+                Vector2 pathRelativeDeltaScale = new Vector2(1 + scale.X / quad.Width, 1 + scale.Y / quad.Height);
 
                 foreach (var point in slider.Path.ControlPoints)
-                    point.Position.Value *= delta;
+                    point.Position.Value *= pathRelativeDeltaScale;
             }
             else
             {
@@ -72,21 +66,27 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 Quad quad = getSurroundingQuad(hitObjects);
 
-                Vector2 minPosition = quad.TopLeft;
-
-                Vector2 size = quad.Size;
-                Vector2 newSize = size + scale;
-
                 foreach (var h in hitObjects)
                 {
-                    if (scale.X != 1)
-                        h.Position = new Vector2(minPosition.X + (h.X - minPosition.X) / size.X * newSize.X, h.Y);
-                    if (scale.Y != 1)
-                        h.Position = new Vector2(h.X, minPosition.Y + (h.Y - minPosition.Y) / size.Y * newSize.Y);
+                    h.Position = new Vector2(
+                        quad.TopLeft.X + (h.X - quad.TopLeft.X) / quad.Width * (quad.Width + scale.X),
+                        quad.TopLeft.Y + (h.Y - quad.TopLeft.Y) / quad.Height * (quad.Height + scale.Y)
+                    );
                 }
             }
 
             return true;
+        }
+
+        private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
+        {
+            // cancel out scale in axes we don't care about (based on which drag handle was used).
+            if ((reference & Anchor.x1) > 0) scale.X = 0;
+            if ((reference & Anchor.y1) > 0) scale.Y = 0;
+
+            // reverse the scale direction if dragging from top or left.
+            if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
+            if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
         }
 
         public override bool HandleRotation(float delta)
