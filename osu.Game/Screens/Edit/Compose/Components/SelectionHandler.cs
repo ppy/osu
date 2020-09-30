@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// copyright (c) ppy pty ltd <contact@ppy.sh>. licensed under the mit licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -101,8 +101,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationEnded = OnDragOperationEnded,
 
                 OnRotation = e => HandleRotation(e.Delta.X),
-                OnScaleX = (e, anchor) => HandleScaleX(e.Delta.X, anchor),
-                OnScaleY = (e, anchor) => HandleScaleY(e.Delta.Y, anchor),
+                OnScale = (e, anchor) => HandleScale(e.Delta, anchor),
             };
 
         /// <summary>
@@ -145,20 +144,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public virtual bool HandleRotation(float angle) => false;
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being scaled in a vertical direction.
+        /// Handles the selected <see cref="DrawableHitObject"/>s being scaled.
         /// </summary>
-        /// <param name="scale">The delta scale to apply.</param>
+        /// <param name="scale">The delta scale to apply, in playfield local coordinates.</param>
         /// <param name="anchor">The point of reference where the scale is originating from.</param>
         /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
-        public virtual bool HandleScaleY(in float scale, Anchor anchor) => false;
-
-        /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being scaled in a horizontal direction.
-        /// </summary>
-        /// <param name="scale">The delta scale to apply.</param>
-        /// <param name="anchor">The point of reference where the scale is originating from.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
-        public virtual bool HandleScaleX(in float scale, Anchor anchor) => false;
+        public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
 
         public bool OnPressed(PlatformAction action)
         {

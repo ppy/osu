@@ -41,37 +41,16 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         private Vector2? referenceOrigin;
 
-        public override bool HandleScaleY(in float scale, Anchor reference) =>
-            scaleSelection(new Vector2(0, ((reference & Anchor.y0) > 0 ? -1 : 1) * scale), reference);
-
-        public override bool HandleScaleX(in float scale, Anchor reference) =>
-            scaleSelection(new Vector2(((reference & Anchor.x0) > 0 ? -1 : 1) * scale, 0), reference);
-
-        public override bool HandleRotation(float delta)
+        public override bool HandleScale(Vector2 scale, Anchor reference)
         {
-            var hitObjects = selectedMovableObjects;
+            // cancel out scale in axes we don't care about (based on which drag handle was used).
+            if ((reference & Anchor.x1) > 0) scale.X = 0;
+            if ((reference & Anchor.y1) > 0) scale.Y = 0;
 
-            Quad quad = getSurroundingQuad(hitObjects);
+            // reverse the scale direction if dragging from top or left.
+            if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
+            if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
 
-            referenceOrigin ??= quad.Centre;
-
-            foreach (var h in hitObjects)
-            {
-                h.Position = rotatePointAroundOrigin(h.Position, referenceOrigin.Value, delta);
-
-                if (h is IHasPath path)
-                {
-                    foreach (var point in path.Path.ControlPoints)
-                        point.Position.Value = rotatePointAroundOrigin(point.Position.Value, Vector2.Zero, delta);
-                }
-            }
-
-            // this isn't always the case but let's be lenient for now.
-            return true;
-        }
-
-        private bool scaleSelection(Vector2 scale, Anchor reference)
-        {
             var hitObjects = selectedMovableObjects;
 
             // for the time being, allow resizing of slider paths only if the slider is
@@ -107,6 +86,29 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             }
 
+            return true;
+        }
+
+        public override bool HandleRotation(float delta)
+        {
+            var hitObjects = selectedMovableObjects;
+
+            Quad quad = getSurroundingQuad(hitObjects);
+
+            referenceOrigin ??= quad.Centre;
+
+            foreach (var h in hitObjects)
+            {
+                h.Position = rotatePointAroundOrigin(h.Position, referenceOrigin.Value, delta);
+
+                if (h is IHasPath path)
+                {
+                    foreach (var point in path.Path.ControlPoints)
+                        point.Position.Value = rotatePointAroundOrigin(point.Position.Value, Vector2.Zero, delta);
+                }
+            }
+
+            // this isn't always the case but let's be lenient for now.
             return true;
         }
 
