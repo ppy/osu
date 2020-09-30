@@ -103,12 +103,17 @@ namespace osu.Game.Screens.Edit.Timing
             private const double sane_maximum = 240;
 
             private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
-            private readonly BindableDouble bpmBindable = new BindableDouble();
+
+            private readonly BindableDouble bpmBindable = new BindableDouble(60000 / TimingControlPoint.DEFAULT_BEAT_LENGTH)
+            {
+                MinValue = sane_minimum,
+                MaxValue = sane_maximum,
+            };
 
             public BPMSlider()
             {
                 beatLengthBindable.BindValueChanged(beatLength => updateCurrent(beatLengthToBpm(beatLength.NewValue)), true);
-                bpmBindable.BindValueChanged(bpm => bpmBindable.Default = beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
+                bpmBindable.BindValueChanged(bpm => beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
 
                 base.Bindable = bpmBindable;
             }
