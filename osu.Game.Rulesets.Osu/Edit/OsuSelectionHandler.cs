@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -22,24 +23,25 @@ namespace osu.Game.Rulesets.Osu.Edit
                 CanScaleX = true,
                 CanScaleY = true,
 
-                OperationStarted = onStart,
-                OperationEnded = onEnd,
+                OperationStarted = () => ChangeHandler.BeginChange(),
+                OperationEnded = () =>
+                {
+                    ChangeHandler.EndChange();
+                    referenceOrigin = null;
+                },
 
-                OnRotation = handleRotation,
+                OnRotation = e => rotateSelection(e.Delta.X),
                 OnScaleX = handleScaleX,
                 OnScaleY = handleScaleY,
             };
 
-        private void onEnd()
-        {
-            ChangeHandler.EndChange();
-            centre = null;
-        }
+        public override bool HandleMovement(MoveSelectionEvent moveEvent) =>
+            moveSelection(moveEvent.InstantDelta);
 
-        private void onStart()
-        {
-            ChangeHandler.BeginChange();
-        }
+        /// <summary>
+        /// During a transform, the initial origin is stored so it can be used throughout the operation.
+        /// </summary>
+        private Vector2? referenceOrigin;
 
         private void handleScaleY(DragEvent e, Anchor reference)
         {
@@ -61,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (direction < 0)
             {
-                // when resizing from a top drag handle, we want to move the selection first
+                // when resizing from a left drag handle, we want to move the selection first
                 if (!moveSelection(new Vector2(e.Delta.X, 0)))
                     return;
             }
@@ -69,21 +71,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             scaleSelection(new Vector2(direction * e.Delta.X, 0));
         }
 
-        private Vector2? centre;
-
-        private void handleRotation(DragEvent e)
-        {
-            rotateSelection(e.Delta.X);
-        }
-
-        public override bool HandleMovement(MoveSelectionEvent moveEvent) =>
-            moveSelection(moveEvent.InstantDelta);
-
         private bool rotateSelection(in float delta)
         {
             Quad quad = getSelectionQuad();
 
-            centre ??= quad.Centre;
+            referenceOrigin ??= quad.Centre;
 
             foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
             {
@@ -93,13 +85,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                     continue;
                 }
 
-                h.Position = Rotate(h.Position, centre.Value, delta);
+                h.Position = rotatePointAroundOrigin(h.Position, referenceOrigin.Value, delta);
 
                 if (h is IHasPath path)
                 {
                     foreach (var point in path.Path.ControlPoints)
                     {
-                        point.Position.Value = Rotate(point.Position.Value, Vector2.Zero, delta);
+                        point.Position.Value = rotatePointAroundOrigin(point.Position.Value, Vector2.Zero, delta);
                     }
                 }
             }
@@ -194,24 +186,24 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         /// <summary>
-        /// Returns rotated position from a given point.
+        /// Rotate a point around an arbitrary origin.
         /// </summary>
-        /// <param name="p">The point.</param>
-        /// <param name="center">The center to rotate around.</param>
+        /// <param name="point">The point.</param>
+        /// <param name="origin">The centre origin to rotate around.</param>
         /// <param name="angle">The angle to rotate (in degrees).</param>
-        internal static Vector2 Rotate(Vector2 p, Vector2 center, float angle)
+        private static Vector2 rotatePointAroundOrigin(Vector2 point, Vector2 origin, float angle)
         {
             angle = -angle;
 
-            p.X -= center.X;
-            p.Y -= center.Y;
+            point.X -= origin.X;
+            point.Y -= origin.Y;
 
             Vector2 ret;
-            ret.X = (float)(p.X * Math.Cos(angle / 180f * Math.PI) + p.Y * Math.Sin(angle / 180f * Math.PI));
-            ret.Y = (float)(p.X * -Math.Sin(angle / 180f * Math.PI) + p.Y * Math.Cos(angle / 180f * Math.PI));
+            ret.X = (float)(point.X * Math.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * Math.Sin(angle / 180f * Math.PI));
+            ret.Y = (float)(point.X * -Math.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * Math.Cos(angle / 180f * Math.PI));
 
-            ret.X += center.X;
-            ret.Y += center.Y;
+            ret.X += origin.X;
+            ret.Y += origin.Y;
 
             return ret;
         }
