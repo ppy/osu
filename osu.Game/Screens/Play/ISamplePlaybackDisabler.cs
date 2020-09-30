@@ -8,7 +8,7 @@ namespace osu.Game.Screens.Play
 {
     /// <summary>
     /// Allows a component to disable sample playback dynamically as required.
-    /// Handled by <see cref="SkinnableSound"/>.
+    /// Handled by <see cref="PausableSkinnableSound"/>.
     /// </summary>
     public interface ISamplePlaybackDisabler
     {

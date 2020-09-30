@@ -11,7 +11,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Skinning
 {
@@ -21,8 +20,6 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private ISampleStore samples { get; set; }
-
-        private bool requestedPlaying;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -37,8 +34,6 @@ namespace osu.Game.Skinning
         /// </remarks>
         protected bool PlayWhenZeroVolume => Looping;
 
-        protected virtual bool PlayWhenPaused => false;
-
         private readonly AudioContainer<DrawableSample> samplesContainer;
 
         public SkinnableSound(ISampleInfo hitSamples)
@@ -50,30 +45,6 @@ namespace osu.Game.Skinning
         {
             this.hitSamples = hitSamples.ToArray();
             InternalChild = samplesContainer = new AudioContainer<DrawableSample>();
-        }
-
-        private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
-
-        [BackgroundDependencyLoader(true)]
-        private void load(ISamplePlaybackDisabler samplePlaybackDisabler)
-        {
-            // if in a gameplay context, pause sample playback when gameplay is paused.
-            if (samplePlaybackDisabler != null)
-            {
-                samplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
-                samplePlaybackDisabled.BindValueChanged(disabled =>
-                {
-                    if (requestedPlaying)
-                    {
-                        if (disabled.NewValue && !PlayWhenPaused)
-                            stop();
-                        // it's not easy to know if a sample has finished playing (to end).
-                        // to keep things simple only resume playing looping samples.
-                        else if (Looping)
-                            play();
-                    }
-                });
-            }
         }
 
         private bool looping;
@@ -91,17 +62,8 @@ namespace osu.Game.Skinning
             }
         }
 
-        public void Play()
+        public virtual void Play()
         {
-            requestedPlaying = true;
-            play();
-        }
-
-        private void play()
-        {
-            if (samplePlaybackDisabled.Value && !PlayWhenPaused)
-                return;
-
             samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
@@ -109,13 +71,7 @@ namespace osu.Game.Skinning
             });
         }
 
-        public void Stop()
-        {
-            requestedPlaying = false;
-            stop();
-        }
-
-        private void stop()
+        public virtual void Stop()
         {
             samplesContainer.ForEach(c => c.Stop());
         }
@@ -150,7 +106,7 @@ namespace osu.Game.Skinning
 
             // Start playback internally for the new samples if the previous ones were playing beforehand.
             if (wasPlaying)
-                play();
+                Play();
         }
 
         #region Re-expose AudioContainer
