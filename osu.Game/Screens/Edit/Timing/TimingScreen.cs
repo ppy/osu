@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
@@ -29,6 +30,11 @@ namespace osu.Game.Screens.Edit.Timing
             : base(EditorScreenMode.Timing)
         {
         }
+
+        protected override Drawable CreateTimelineContent() => new ControlPointPart
+        {
+            RelativeSizeAxes = Axes.Both,
+        };
 
         protected override Drawable CreateMainContent() => new GridContainer
         {
