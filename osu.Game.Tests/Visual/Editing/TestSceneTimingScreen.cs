@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
@@ -19,7 +20,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         public TestSceneTimingScreen()
         {
-            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+            editorBeatmap = new EditorBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
         }
 
         [BackgroundDependencyLoader]
