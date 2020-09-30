@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     else
                         mainComponents.Colour = drawableHitObject.AccentColour.Value;
 
-                    var col = mainComponents.Colour.AverageColour.Linear;
+                    var col = mainComponents.Colour.TopLeft.Linear;
                     float brightness = col.R + col.G + col.B;
 
                     // decide the combo index colour based on brightness?
