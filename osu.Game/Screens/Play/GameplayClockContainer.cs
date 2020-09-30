@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public GameplayClock GameplayClock => localGameplayClock;
 
-        [Cached]
+        [Cached(typeof(GameplayClock))]
         [Cached(typeof(ISamplePlaybackDisabler))]
         private readonly LocalGameplayClock localGameplayClock;
 
