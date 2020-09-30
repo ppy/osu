@@ -17,7 +17,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Configuration;
-using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -358,9 +357,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual void ApplySkin(ISkinSource skin, bool allowFallback)
         {
         }
-
-        [Resolved(canBeNull: true)]
-        private ISamplePlaybackDisabler samplePlaybackDisabler { get; set; }
 
         /// <summary>
         /// Calculate the position to be used for sample playback at a specified X position (0..1).
