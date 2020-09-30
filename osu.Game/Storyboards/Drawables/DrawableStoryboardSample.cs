@@ -10,7 +10,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSample : SkinnableSound
+    public class DrawableStoryboardSample : PausableSkinnableSound
     {
         /// <summary>
         /// The amount of time allowable beyond the start time of the sample, for the sample to start.
@@ -60,7 +60,7 @@ namespace osu.Game.Storyboards.Drawables
             {
                 // We've passed the start time of the sample. We only play the sample if we're within an allowable range
                 // from the sample's start, to reduce layering if we've been fast-forwarded far into the future
-                if (!PlaybackRequested && Time.Current - sampleInfo.StartTime < allowable_late_start)
+                if (!RequestedPlaying && Time.Current - sampleInfo.StartTime < allowable_late_start)
                     Play();
 
                 // In the case that the user rewinds to a point far behind the start time of the sample,

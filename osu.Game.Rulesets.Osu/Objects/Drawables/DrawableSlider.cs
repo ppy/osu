@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Tracking.BindValueChanged(updateSlidingSample);
         }
 
-        private SkinnableSound slidingSample;
+        private PausableSkinnableSound slidingSample;
 
         protected override void LoadSamples()
         {
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
                 clone.Name = "sliderslide";
 
-                AddInternal(slidingSample = new SkinnableSound(clone)
+                AddInternal(slidingSample = new PausableSkinnableSound(clone)
                 {
                     Looping = true
                 });

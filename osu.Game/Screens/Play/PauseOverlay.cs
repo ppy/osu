@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
             AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
             AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
 
-            AddInternal(pauseLoop = new UnpausableSkinnableSound(new SampleInfo("pause-loop"))
+            AddInternal(pauseLoop = new SkinnableSound(new SampleInfo("pause-loop"))
             {
                 Looping = true,
                 Volume = { Value = 0 }
@@ -53,16 +53,6 @@ namespace osu.Game.Screens.Play
             base.PopOut();
 
             pauseLoop.VolumeTo(0, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
-        }
-
-        private class UnpausableSkinnableSound : SkinnableSound
-        {
-            protected override bool PlayWhenPaused => true;
-
-            public UnpausableSkinnableSound(SampleInfo sampleInfo)
-                : base(sampleInfo)
-            {
-            }
         }
     }
 }

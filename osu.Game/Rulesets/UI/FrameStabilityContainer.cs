@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -59,7 +62,7 @@ namespace osu.Game.Rulesets.UI
         {
             if (clock != null)
             {
-                stabilityGameplayClock.ParentGameplayClock = parentGameplayClock = clock;
+                parentGameplayClock = stabilityGameplayClock.ParentGameplayClock = clock;
                 GameplayClock.IsPaused.BindTo(clock.IsPaused);
             }
         }
@@ -215,7 +218,9 @@ namespace osu.Game.Rulesets.UI
 
         private class StabilityGameplayClock : GameplayClock
         {
-            public IFrameBasedClock ParentGameplayClock;
+            public GameplayClock ParentGameplayClock;
+
+            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
 
             public StabilityGameplayClock(FramedClock underlyingClock)
                 : base(underlyingClock)
