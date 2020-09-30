@@ -191,6 +191,7 @@ namespace osu.Game.Input.Bindings
         MvisToggleTrackLoop,
         [Description("在歌曲选择中打开")]
         MvisOpenInSongSelect,
+
         [Description("返回主页")]
         Home,
 

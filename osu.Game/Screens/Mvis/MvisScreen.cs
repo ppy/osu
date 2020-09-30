@@ -20,7 +20,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
-using osu.Game.Overlays.Music;
 using osu.Game.Input.Bindings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Configuration;
@@ -34,10 +33,12 @@ using osu.Framework.Audio;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics.Audio;
 using osu.Game.Screens.Select;
+using osu.Game.Overlays.Settings;
+using osuTK.Input;
 
 namespace osu.Game.Screens
 {
-    
+
     ///<summary>
     ///bug:
     ///故事版Overlay Proxy不消失(???)
@@ -48,8 +49,7 @@ namespace osu.Game.Screens
 
         public override bool HideOverlaysOnEnter => true;
         private bool AllowCursor = false;
-        private bool AllowBack = false;
-        public override bool AllowBackButton => AllowBack;
+        public override bool AllowBackButton => false;
         public override bool CursorVisible => AllowCursor;
         public override bool AllowRateAdjustments => true;
 
@@ -66,9 +66,6 @@ namespace osu.Game.Screens
 
         [Resolved]
         private MusicController musicController { get; set; }
-
-        [Cached]
-        private PlaylistOverlay playlist;
 
         private InputManager inputManager { get; set; }
         private Box dimBox;
@@ -132,7 +129,7 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        
+
                         loadingSpinner = new LoadingSpinner(true, true)
                         {
                             Anchor = Anchor.BottomCentre,
@@ -259,7 +256,7 @@ namespace osu.Game.Screens
                                                                 soloButton = new BottomBarButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.User,
-                                                                    Action = () => InvokeSolo(),
+                                                                    Action = () => PresentBeatmap(),
                                                                     TooltipText = "在选歌界面中查看",
                                                                 },
                                                                 sidebarToggleButton = new BottomBarSwitchButton()
@@ -381,12 +378,11 @@ namespace osu.Game.Screens
                                             {
                                                 Margin = new MarginPadding { Top = 0 },
                                             },
-                                            playlist = new PlaylistOverlay
+                                            new SettingsButton()
                                             {
-                                                Padding = new MarginPadding{ Left = 5, Right = 10 },
-                                                TakeFocusOnPopIn = false,
-                                                RelativeSizeAxes = Axes.X,
-                                            },
+                                                Text = "歌曲选择",
+                                                Action = () => this.Push(new MvisSongSelect())
+                                            }
                                         }
                                     },
                                 },
@@ -425,14 +421,14 @@ namespace osu.Game.Screens
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
             SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue));
-            ShowParticles.BindValueChanged(v => 
+            ShowParticles.BindValueChanged(v =>
             {
-                switch ( v.NewValue )
+                switch (v.NewValue)
                 {
                     case true:
                         particles.Child = new SpaceParticlesContainer();
                         break;
-                    
+
                     case false:
                         particles.Clear();
                         break;
@@ -469,9 +465,6 @@ namespace osu.Game.Screens
             });
             inputManager = GetContainingInputManager();
             dimBox.ScaleTo(1.1f);
-
-            playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
-            playlist.Show();
 
             progressBarContainer.progressBar.OnSeek = SeekTo;
 
@@ -545,7 +538,7 @@ namespace osu.Game.Screens
         {
             base.OnEntering(last);
 
-            if ( (IScreen)last is PlaySongSelect )
+            if ((IScreen)last is PlaySongSelect)
                 Background?.FadeOut(250);
 
             //各种背景层的动画
@@ -581,6 +574,38 @@ namespace osu.Game.Screens
 
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            Background?.FadeIn(250);
+            beatmapCover.FadeOut(250);
+
+            //背景层的动画
+            Background?.FadeIn(250);
+
+            //非背景层的动画
+            gameplayContent.ScaleTo(0, DURATION, Easing.OutQuint);
+            bottomFillFlow.MoveToY(bottomBar.Height + 30, DURATION, Easing.OutQuint);
+
+            this.FadeOut(DURATION, Easing.OutQuint);
+            base.OnSuspending(next);
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            this.FadeIn(DURATION);
+
+            //背景层的动画
+            Background?.Delay(250).Then().FadeOut(250);
+            beatmapCover.FadeOut().Then().Delay(500).FadeIn(500);
+            gameplayBackground.FadeOut().Then().Delay(250).FadeIn(500);
+
+            //非背景层的动画
+            gameplayContent.ScaleTo(0f).Then().ScaleTo(1f, DURATION, Easing.OutQuint);
+            bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, DURATION, Easing.OutQuint);
         }
 
         public bool OnPressed(GlobalAction action)
@@ -631,6 +656,19 @@ namespace osu.Game.Screens
         {
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    if (!OverlaysHidden)
+                        this.Exit();
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
         protected override bool Handle(UIEvent e)
         {
             switch (e)
@@ -644,7 +682,7 @@ namespace osu.Game.Screens
             }
         }
 
-        private void InvokeSolo()
+        private void PresentBeatmap()
         {
             game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo);
         }
@@ -670,7 +708,6 @@ namespace osu.Game.Screens
             progressBarContainer.MoveToY(5, DURATION, Easing.OutQuint);
             bottomBar.FadeOut(DURATION, Easing.OutQuint);
 
-            AllowBack = false;
             AllowCursor = false;
             OverlaysHidden = true;
             UpdateIdleVisuals();
@@ -688,7 +725,6 @@ namespace osu.Game.Screens
             bottomBar.FadeIn(DURATION, Easing.OutQuint);
 
             AllowCursor = true;
-            AllowBack = true;
             OverlaysHidden = false;
         }
 
@@ -735,12 +771,12 @@ namespace osu.Game.Screens
             Track.ResetSpeedAdjustments();
             Track.Looping = loopToggleButton.ToggleableValue.Value;
             Track.RestartPoint = 0;
-            if ( AdjustFreq.Value )
+            if (AdjustFreq.Value)
                 Track.AddAdjustment(AdjustableProperty.Frequency, MusicSpeed);
             else
                 Track.AddAdjustment(AdjustableProperty.Tempo, MusicSpeed);
 
-            if ( NightcoreBeat.Value )
+            if (NightcoreBeat.Value)
                 nightcoreBeatContainer.Show();
             else
                 nightcoreBeatContainer.Hide();
@@ -748,10 +784,10 @@ namespace osu.Game.Screens
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            this.Schedule( () =>
-            {
-                ApplyTrackAdjustments();
-            } );
+            this.Schedule(() =>
+           {
+               ApplyTrackAdjustments();
+           });
 
             sbLoader.UpdateStoryBoardAsync(() =>
             {
