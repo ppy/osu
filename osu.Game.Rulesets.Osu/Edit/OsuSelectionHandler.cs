@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
@@ -40,84 +41,70 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         private Vector2? referenceOrigin;
 
-        public override bool HandleScaleY(in float scale, Anchor reference)
-        {
-            int direction = (reference & Anchor.y0) > 0 ? -1 : 1;
+        public override bool HandleScaleY(in float scale, Anchor reference) =>
+            scaleSelection(new Vector2(0, ((reference & Anchor.y0) > 0 ? -1 : 1) * scale), reference);
 
-            if (direction < 0)
-            {
-                // when resizing from a top drag handle, we want to move the selection first
-                if (!moveSelection(new Vector2(0, scale)))
-                    return false;
-            }
-
-            return scaleSelection(new Vector2(0, direction * scale));
-        }
-
-        public override bool HandleScaleX(in float scale, Anchor reference)
-        {
-            int direction = (reference & Anchor.x0) > 0 ? -1 : 1;
-
-            if (direction < 0)
-            {
-                // when resizing from a left drag handle, we want to move the selection first
-                if (!moveSelection(new Vector2(scale, 0)))
-                    return false;
-            }
-
-            return scaleSelection(new Vector2(direction * scale, 0));
-        }
+        public override bool HandleScaleX(in float scale, Anchor reference) =>
+            scaleSelection(new Vector2(((reference & Anchor.x0) > 0 ? -1 : 1) * scale, 0), reference);
 
         public override bool HandleRotation(float delta)
         {
-            Quad quad = getSelectionQuad();
+            var hitObjects = selectedMovableObjects;
+
+            Quad quad = getSurroundingQuad(hitObjects);
 
             referenceOrigin ??= quad.Centre;
 
-            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
+            foreach (var h in hitObjects)
             {
-                if (h is Spinner)
-                {
-                    // Spinners don't support position adjustments
-                    continue;
-                }
-
                 h.Position = rotatePointAroundOrigin(h.Position, referenceOrigin.Value, delta);
 
                 if (h is IHasPath path)
                 {
                     foreach (var point in path.Path.ControlPoints)
-                    {
                         point.Position.Value = rotatePointAroundOrigin(point.Position.Value, Vector2.Zero, delta);
-                    }
                 }
             }
 
-            // todo: not always
+            // this isn't always the case but let's be lenient for now.
             return true;
         }
 
-        private bool scaleSelection(Vector2 scale)
+        private bool scaleSelection(Vector2 scale, Anchor reference)
         {
-            Quad quad = getSelectionQuad();
+            var hitObjects = selectedMovableObjects;
 
-            Vector2 minPosition = quad.TopLeft;
-
-            Vector2 size = quad.Size;
-            Vector2 newSize = size + scale;
-
-            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
+            // for the time being, allow resizing of slider paths only if the slider is
+            // the only hit object selected. with a group selection, it's likely the user
+            // is not looking to change the duration of the slider but expand the whole pattern.
+            if (hitObjects.Length == 1 && hitObjects.First() is Slider slider)
             {
-                if (h is Spinner)
-                {
-                    // Spinners don't support position adjustments
-                    continue;
-                }
+                var quad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
+                Vector2 delta = Vector2.One + new Vector2(scale.X / quad.Width, scale.Y / quad.Height);
 
-                if (scale.X != 1)
-                    h.Position = new Vector2(minPosition.X + (h.X - minPosition.X) / size.X * newSize.X, h.Y);
-                if (scale.Y != 1)
-                    h.Position = new Vector2(h.X, minPosition.Y + (h.Y - minPosition.Y) / size.Y * newSize.Y);
+                foreach (var point in slider.Path.ControlPoints)
+                    point.Position.Value *= delta;
+            }
+            else
+            {
+                // move the selection before scaling if dragging from top or left anchors.
+                if ((reference & Anchor.x0) > 0 && !moveSelection(new Vector2(-scale.X, 0))) return false;
+                if ((reference & Anchor.y0) > 0 && !moveSelection(new Vector2(0, -scale.Y))) return false;
+
+                Quad quad = getSurroundingQuad(hitObjects);
+
+                Vector2 minPosition = quad.TopLeft;
+
+                Vector2 size = quad.Size;
+                Vector2 newSize = size + scale;
+
+                foreach (var h in hitObjects)
+                {
+                    if (scale.X != 1)
+                        h.Position = new Vector2(minPosition.X + (h.X - minPosition.X) / size.X * newSize.X, h.Y);
+                    if (scale.Y != 1)
+                        h.Position = new Vector2(h.X, minPosition.Y + (h.Y - minPosition.Y) / size.Y * newSize.Y);
+                }
             }
 
             return true;
@@ -125,44 +112,34 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private bool moveSelection(Vector2 delta)
         {
-            Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
-            Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
+            var hitObjects = selectedMovableObjects;
 
-            // Go through all hitobjects to make sure they would remain in the bounds of the editor after movement, before any movement is attempted
-            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
-            {
-                if (h is Spinner)
-                {
-                    // Spinners don't support position adjustments
-                    continue;
-                }
+            Quad quad = getSurroundingQuad(hitObjects);
 
-                // Stacking is not considered
-                minPosition = Vector2.ComponentMin(minPosition, Vector2.ComponentMin(h.EndPosition + delta, h.Position + delta));
-                maxPosition = Vector2.ComponentMax(maxPosition, Vector2.ComponentMax(h.EndPosition + delta, h.Position + delta));
-            }
-
-            if (minPosition.X < 0 || minPosition.Y < 0 || maxPosition.X > DrawWidth || maxPosition.Y > DrawHeight)
+            if (quad.TopLeft.X + delta.X < 0 ||
+                quad.TopLeft.Y + delta.Y < 0 ||
+                quad.BottomRight.X + delta.X > DrawWidth ||
+                quad.BottomRight.Y + delta.Y > DrawHeight)
                 return false;
 
-            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
-            {
-                if (h is Spinner)
-                {
-                    // Spinners don't support position adjustments
-                    continue;
-                }
-
+            foreach (var h in hitObjects)
                 h.Position += delta;
-            }
 
             return true;
         }
 
         /// <summary>
-        /// Returns a gamefield-space quad surrounding the current selection.
+        /// Returns a gamefield-space quad surrounding the provided hit objects.
         /// </summary>
-        private Quad getSelectionQuad()
+        /// <param name="hitObjects">The hit objects to calculate a quad for.</param>
+        private Quad getSurroundingQuad(OsuHitObject[] hitObjects) =>
+            getSurroundingQuad(hitObjects.SelectMany(h => new[] { h.Position, h.EndPosition }));
+
+        /// <summary>
+        /// Returns a gamefield-space quad surrounding the provided points.
+        /// </summary>
+        /// <param name="points">The points to calculate a quad for.</param>
+        private Quad getSurroundingQuad(IEnumerable<Vector2> points)
         {
             if (!SelectedHitObjects.Any())
                 return new Quad();
@@ -171,23 +148,24 @@ namespace osu.Game.Rulesets.Osu.Edit
             Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
 
             // Go through all hitobjects to make sure they would remain in the bounds of the editor after movement, before any movement is attempted
-            foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
+            foreach (var p in points)
             {
-                if (h is Spinner)
-                {
-                    // Spinners don't support position adjustments
-                    continue;
-                }
-
-                // Stacking is not considered
-                minPosition = Vector2.ComponentMin(minPosition, Vector2.ComponentMin(h.EndPosition, h.Position));
-                maxPosition = Vector2.ComponentMax(maxPosition, Vector2.ComponentMax(h.EndPosition, h.Position));
+                minPosition = Vector2.ComponentMin(minPosition, p);
+                maxPosition = Vector2.ComponentMax(maxPosition, p);
             }
 
             Vector2 size = maxPosition - minPosition;
 
             return new Quad(minPosition.X, minPosition.Y, size.X, size.Y);
         }
+
+        /// <summary>
+        /// All osu! hitobjects which can be moved/rotated/scaled.
+        /// </summary>
+        private OsuHitObject[] selectedMovableObjects => SelectedHitObjects
+                                                         .OfType<OsuHitObject>()
+                                                         .Where(h => !(h is Spinner))
+                                                         .ToArray();
 
         /// <summary>
         /// Rotate a point around an arbitrary origin.
