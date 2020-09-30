@@ -21,7 +21,7 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(SongSelectorBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -48,6 +48,13 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
+        };
+
+        public IEnumerable<KeyBinding> SongSelectorBindings => new[]
+        {
+            new KeyBinding(InputKey.F1, GlobalAction.FooterMods),
+            new KeyBinding(InputKey.F2, GlobalAction.FooterRandom),
+            new KeyBinding(InputKey.F3, GlobalAction.FooterOptions),
         };
 
         public IEnumerable<KeyBinding> EditorKeyBindings => new[]
@@ -119,6 +126,16 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle mute")]
         ToggleMute,
 
+        //Song selector bindings
+        [Description("Choose a random song")]
+        FooterRandom,
+
+        [Description("Change beatmap options")]
+        FooterOptions,
+
+        [Description("Select mods")]
+        FooterMods,
+
         // In-Game Keybindings
         [Description("Skip cutscene")]
         SkipCutscene,
@@ -187,5 +204,7 @@ namespace osu.Game.Input.Bindings
 
         [Description("Timing Mode")]
         EditorTimingMode,
+
+        
     }
 }

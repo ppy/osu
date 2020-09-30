@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics;
 using osuTK.Input;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Screens.Select
             SelectedColour = colours.Blue;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"options";
-            Hotkey = Key.F3;
+            Hotkey = GlobalAction.FooterOptions;
         }
     }
 }

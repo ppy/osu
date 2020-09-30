@@ -9,6 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Input;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
@@ -37,7 +38,7 @@ namespace osu.Game.Screens.Select
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"random";
-            Hotkey = Key.F2;
+            Hotkey = GlobalAction.FooterRandom;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

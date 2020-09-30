@@ -15,6 +15,8 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
+using osu.Game.Input.Bindings;
+
 
 namespace osu.Game.Screens.Select
 {
@@ -57,7 +59,7 @@ namespace osu.Game.Screens.Select
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
             Text = @"mods";
-            Hotkey = Key.F1;
+            Hotkey = GlobalAction.FooterMods;
         }
 
         protected override void LoadComplete()
