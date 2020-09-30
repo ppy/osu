@@ -215,16 +215,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         private void addDrumRollHit(DrawableDrumRollTick drawableTick) =>
             drumRollHitContainer.Add(new DrawableFlyingHit(drawableTick));
 
-        /// <remarks>
-        /// As legacy skins have different explosions for singular and double strong hits,
-        /// explosion addition is scheduled to ensure that both hits are processed if they occur on the same frame.
-        /// </remarks>
-        private void addExplosion(DrawableHitObject drawableObject, HitResult result, HitType type) => Schedule(() =>
+        private void addExplosion(DrawableHitObject drawableObject, HitResult result, HitType type)
         {
             hitExplosionContainer.Add(new HitExplosion(drawableObject, result));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
-        });
+        }
 
         private class ProxyContainer : LifetimeManagementContainer
         {

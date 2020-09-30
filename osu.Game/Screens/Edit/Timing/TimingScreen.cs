@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Timing
             private OsuButton deleteButton;
             private ControlPointTable table;
 
-            private BindableList<ControlPointGroup> controlGroups;
+            private IBindableList<ControlPointGroup> controlGroups;
 
             [Resolved]
             private EditorClock clock { get; set; }
@@ -141,8 +141,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                 selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
 
-                // todo: remove cast after https://github.com/ppy/osu-framework/pull/3906 is merged
-                controlGroups = (BindableList<ControlPointGroup>)Beatmap.Value.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
+                controlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
 
                 controlGroups.BindCollectionChanged((sender, args) =>
                 {
