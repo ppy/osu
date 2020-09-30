@@ -17,6 +17,8 @@ namespace osu.Game.Tests.Visual.Editing
         [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
 
+        protected override bool ScrollUsingMouseWheel => false;
+
         public TestSceneTimingScreen()
         {
             editorBeatmap = new EditorBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
