@@ -17,8 +17,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public class ComposeSelectionBox : CompositeDrawable
     {
         public Action<DragEvent> OnRotation;
-        public Action<DragEvent, Anchor> OnScaleX;
-        public Action<DragEvent, Anchor> OnScaleY;
+        public Action<DragEvent, Anchor> OnScale;
 
         public Action OperationStarted;
         public Action OperationEnded;
@@ -128,20 +127,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 AddRangeInternal(new[]
                 {
-                    new DragHandle
-                    {
-                        Anchor = Anchor.TopCentre,
-                        HandleDrag = e => OnScaleY?.Invoke(e, Anchor.TopCentre),
-                        OperationStarted = operationStarted,
-                        OperationEnded = operationEnded
-                    },
-                    new DragHandle
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        HandleDrag = e => OnScaleY?.Invoke(e, Anchor.BottomCentre),
-                        OperationStarted = operationStarted,
-                        OperationEnded = operationEnded
-                    },
+                    createDragHandle(Anchor.TopCentre),
+                    createDragHandle(Anchor.BottomCentre),
                 });
             }
 
@@ -149,20 +136,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 AddRangeInternal(new[]
                 {
-                    new DragHandle
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        HandleDrag = e => OnScaleX?.Invoke(e, Anchor.CentreLeft),
-                        OperationStarted = operationStarted,
-                        OperationEnded = operationEnded
-                    },
-                    new DragHandle
-                    {
-                        Anchor = Anchor.CentreRight,
-                        HandleDrag = e => OnScaleX?.Invoke(e, Anchor.CentreRight),
-                        OperationStarted = operationStarted,
-                        OperationEnded = operationEnded
-                    },
+                    createDragHandle(Anchor.CentreLeft),
+                    createDragHandle(Anchor.CentreRight),
                 });
             }
 
@@ -170,52 +145,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 AddRangeInternal(new[]
                 {
-                    new DragHandle
-                    {
-                        Anchor = Anchor.TopLeft,
-                        HandleDrag = e =>
-                        {
-                            OnScaleX?.Invoke(e, Anchor.TopLeft);
-                            OnScaleY?.Invoke(e, Anchor.TopLeft);
-                        },
-                        OperationStarted = operationStarted,
-                        OperationEnded = operationEnded
-                    },
-                    new DragHandle
-                    {
-                        Anchor = Anchor.TopRight,
-                        HandleDrag = e =>
-                        {
-                            OnScaleX?.Invoke(e, Anchor.TopRight);
-                            OnScaleY?.Invoke(e, Anchor.TopRight);
-                        },
-                        OperationStarted = operationStarted,
-                        OperationEnded = operationEnded
-                    },
-                    new DragHandle
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        HandleDrag = e =>
-                        {
-                            OnScaleX?.Invoke(e, Anchor.BottomLeft);
-                            OnScaleY?.Invoke(e, Anchor.BottomLeft);
-                        },
-                        OperationStarted = operationStarted,
-                        OperationEnded = operationEnded
-                    },
-                    new DragHandle
-                    {
-                        Anchor = Anchor.BottomRight,
-                        HandleDrag = e =>
-                        {
-                            OnScaleX?.Invoke(e, Anchor.BottomRight);
-                            OnScaleY?.Invoke(e, Anchor.BottomRight);
-                        },
-                        OperationStarted = operationStarted,
-                        OperationEnded = operationEnded
-                    },
+                    createDragHandle(Anchor.TopLeft),
+                    createDragHandle(Anchor.TopRight),
+                    createDragHandle(Anchor.BottomLeft),
+                    createDragHandle(Anchor.BottomRight),
                 });
             }
+
+            ScaleDragHandle createDragHandle(Anchor anchor) =>
+                new ScaleDragHandle(anchor)
+                {
+                    HandleDrag = e => OnScale?.Invoke(e, anchor),
+                    OperationStarted = operationStarted,
+                    OperationEnded = operationEnded
+                };
         }
 
         private int activeOperations;
@@ -230,6 +173,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (activeOperations++ == 0)
                 OperationStarted?.Invoke();
+        }
+
+        private class ScaleDragHandle : DragHandle
+        {
+            public ScaleDragHandle(Anchor anchor)
+            {
+                Anchor = anchor;
+            }
         }
 
         private class RotationDragHandle : DragHandle

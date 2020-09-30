@@ -32,8 +32,7 @@ namespace osu.Game.Tests.Visual.Editing
                             CanScaleY = true,
 
                             OnRotation = handleRotation,
-                            OnScaleX = handleScaleX,
-                            OnScaleY = handleScaleY,
+                            OnScale = handleScale
                         }
                     }
                 });
@@ -43,24 +42,28 @@ namespace osu.Game.Tests.Visual.Editing
             AddToggleStep("toggle y", state => selectionBox.CanScaleY = state);
         }
 
-        private void handleScaleY(DragEvent e, Anchor reference)
+        private void handleScale(DragEvent e, Anchor reference)
         {
-            int direction = (reference & Anchor.y0) > 0 ? -1 : 1;
-            if (direction < 0)
-                selectionArea.Y += e.Delta.Y;
-            selectionArea.Height += direction * e.Delta.Y;
-        }
+            if ((reference & Anchor.y1) == 0)
+            {
+                int directionY = (reference & Anchor.y0) > 0 ? -1 : 1;
+                if (directionY < 0)
+                    selectionArea.Y += e.Delta.Y;
+                selectionArea.Height += directionY * e.Delta.Y;
+            }
 
-        private void handleScaleX(DragEvent e, Anchor reference)
-        {
-            int direction = (reference & Anchor.x0) > 0 ? -1 : 1;
-            if (direction < 0)
-                selectionArea.X += e.Delta.X;
-            selectionArea.Width += direction * e.Delta.X;
+            if ((reference & Anchor.x1) == 0)
+            {
+                int directionX = (reference & Anchor.x0) > 0 ? -1 : 1;
+                if (directionX < 0)
+                    selectionArea.X += e.Delta.X;
+                selectionArea.Width += directionX * e.Delta.X;
+            }
         }
 
         private void handleRotation(DragEvent e)
         {
+            // kinda silly and wrong, but just showing that the drag handles work.
             selectionArea.Rotation += e.Delta.X;
         }
     }
