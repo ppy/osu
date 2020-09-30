@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Children = new Drawable[]
                 {
-                    CreateSelectionBox(),
+                    // todo: should maybe be inside the SelectionBox?
                     new Container
                     {
                         Name = "info text",
@@ -86,7 +86,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 Font = OsuFont.Default.With(size: 11)
                             }
                         }
-                    }
+                    },
+                    CreateSelectionBox(),
                 }
             };
         }
