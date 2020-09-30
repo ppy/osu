@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Select
 
         private class VoidTabItem : BeatmapDetailAreaTabItem
         {
-            public override string Name => "选择该谱面";
+            public override string Name => "";
         }
     }
 }
