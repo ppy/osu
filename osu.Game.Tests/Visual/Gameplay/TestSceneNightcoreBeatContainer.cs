@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Beatmap.Value.Track.Start();
             Beatmap.Value.Track.Seek(Beatmap.Value.Beatmap.HitObjects.First().StartTime - 1000);
 
-            Add(new ModNightcore<HitObject>.NightcoreBeatContainer());
+            Add(new NightcoreBeatContainer());
 
             AddStep("change signature to quadruple", () => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.ForEach(p => p.TimeSignature = TimeSignatures.SimpleQuadruple));
             AddStep("change signature to triple", () => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.ForEach(p => p.TimeSignature = TimeSignatures.SimpleTriple));
