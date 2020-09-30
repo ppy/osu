@@ -74,15 +74,23 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     return null;
 
-                case TaikoSkinComponents.TaikoExplosionGood:
-                case TaikoSkinComponents.TaikoExplosionGoodStrong:
-                case TaikoSkinComponents.TaikoExplosionGreat:
-                case TaikoSkinComponents.TaikoExplosionGreatStrong:
                 case TaikoSkinComponents.TaikoExplosionMiss:
 
-                    var sprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
-                    if (sprite != null)
-                        return new LegacyHitExplosion(sprite);
+                    var missSprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
+                    if (missSprite != null)
+                        return new LegacyHitExplosion(missSprite);
+
+                    return null;
+
+                case TaikoSkinComponents.TaikoExplosionGood:
+                case TaikoSkinComponents.TaikoExplosionGreat:
+
+                    var hitName = getHitName(taikoComponent.Component);
+                    var hitSprite = this.GetAnimation(hitName, true, false);
+                    var strongHitSprite = this.GetAnimation($"{hitName}k", true, false);
+
+                    if (hitSprite != null)
+                        return new LegacyHitExplosion(hitSprite, strongHitSprite);
 
                     return null;
 
@@ -109,17 +117,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 case TaikoSkinComponents.TaikoExplosionGood:
                     return "taiko-hit100";
 
-                case TaikoSkinComponents.TaikoExplosionGoodStrong:
-                    return "taiko-hit100k";
-
                 case TaikoSkinComponents.TaikoExplosionGreat:
                     return "taiko-hit300";
-
-                case TaikoSkinComponents.TaikoExplosionGreatStrong:
-                    return "taiko-hit300k";
             }
 
-            throw new ArgumentOutOfRangeException(nameof(component), "Invalid result type");
+            throw new ArgumentOutOfRangeException(nameof(component), $"Invalid component type: {component}");
         }
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo) => Source.GetSample(new LegacyTaikoSampleInfo(sampleInfo));
