@@ -17,7 +17,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Configuration;
-using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -34,7 +33,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
-        protected SkinnableSound Samples { get; private set; }
+        protected PausableSkinnableSound Samples { get; private set; }
 
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
@@ -179,7 +178,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                     + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            Samples = new SkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
+            Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
             AddInternal(Samples);
         }
 
@@ -358,9 +357,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual void ApplySkin(ISkinSource skin, bool allowFallback)
         {
         }
-
-        [Resolved(canBeNull: true)]
-        private ISamplePlaybackDisabler samplePlaybackDisabler { get; set; }
 
         /// <summary>
         /// Calculate the position to be used for sample playback at a specified X position (0..1).

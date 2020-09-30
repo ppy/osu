@@ -11,7 +11,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Skinning
 {
@@ -21,11 +20,6 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private ISampleStore samples { get; set; }
-
-        /// <summary>
-        /// Whether playback of this sound has been requested, regardless of whether it could be played or not (due to being paused, for instance).
-        /// </summary>
-        protected bool PlaybackRequested;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -40,8 +34,6 @@ namespace osu.Game.Skinning
         /// </remarks>
         protected bool PlayWhenZeroVolume => Looping;
 
-        protected virtual bool PlayWhenPaused => false;
-
         protected readonly AudioContainer<DrawableSample> SamplesContainer;
 
         public SkinnableSound(ISampleInfo hitSamples)
@@ -53,31 +45,6 @@ namespace osu.Game.Skinning
         {
             this.hitSamples = hitSamples.ToArray();
             InternalChild = SamplesContainer = new AudioContainer<DrawableSample>();
-        }
-
-        private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
-
-        [BackgroundDependencyLoader(true)]
-        private void load(ISamplePlaybackDisabler samplePlaybackDisabler)
-        {
-            // if in a gameplay context, pause sample playback when gameplay is paused.
-            if (samplePlaybackDisabler != null)
-            {
-                samplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
-                samplePlaybackDisabled.BindValueChanged(disabled =>
-                {
-                    if (PlaybackRequested)
-                    {
-                        if (disabled.NewValue && !PlayWhenPaused)
-                            stop();
-                        // it's not easy to know if a sample has finished playing (to end).
-                        // to keep things simple only resume playing looping samples.
-                        else if (Looping)
-                            // schedule so we don't start playing a sample which is no longer alive.
-                            Schedule(play);
-                    }
-                });
-            }
         }
 
         private bool looping;
@@ -95,17 +62,8 @@ namespace osu.Game.Skinning
             }
         }
 
-        public void Play()
+        public virtual void Play()
         {
-            PlaybackRequested = true;
-            play();
-        }
-
-        private void play()
-        {
-            if (samplePlaybackDisabled.Value && !PlayWhenPaused)
-                return;
-
             SamplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
@@ -113,13 +71,7 @@ namespace osu.Game.Skinning
             });
         }
 
-        public void Stop()
-        {
-            PlaybackRequested = false;
-            stop();
-        }
-
-        private void stop()
+        public virtual void Stop()
         {
             SamplesContainer.ForEach(c => c.Stop());
         }
@@ -154,7 +106,7 @@ namespace osu.Game.Skinning
 
             // Start playback internally for the new samples if the previous ones were playing beforehand.
             if (wasPlaying)
-                play();
+                Play();
         }
 
         #region Re-expose AudioContainer
