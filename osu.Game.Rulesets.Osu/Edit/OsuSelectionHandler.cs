@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -16,24 +15,22 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuSelectionHandler : SelectionHandler
     {
-        public override ComposeSelectionBox CreateSelectionBox()
-            => new ComposeSelectionBox
-            {
-                CanRotate = true,
-                CanScaleX = true,
-                CanScaleY = true,
+        protected override void OnSelectionChanged()
+        {
+            base.OnSelectionChanged();
 
-                OperationStarted = () => ChangeHandler.BeginChange(),
-                OperationEnded = () =>
-                {
-                    ChangeHandler.EndChange();
-                    referenceOrigin = null;
-                },
+            bool canOperate = SelectedHitObjects.Count() > 1 || SelectedHitObjects.Any(s => s is Slider);
 
-                OnRotation = e => rotateSelection(e.Delta.X),
-                OnScaleX = handleScaleX,
-                OnScaleY = handleScaleY,
-            };
+            SelectionBox.CanRotate = canOperate;
+            SelectionBox.CanScaleX = canOperate;
+            SelectionBox.CanScaleY = canOperate;
+        }
+
+        protected override void OnDragOperationEnded()
+        {
+            base.OnDragOperationEnded();
+            referenceOrigin = null;
+        }
 
         public override bool HandleMovement(MoveSelectionEvent moveEvent) =>
             moveSelection(moveEvent.InstantDelta);
@@ -43,35 +40,35 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         private Vector2? referenceOrigin;
 
-        private void handleScaleY(DragEvent e, Anchor reference)
+        public override bool HandleScaleY(in float scale, Anchor reference)
         {
             int direction = (reference & Anchor.y0) > 0 ? -1 : 1;
 
             if (direction < 0)
             {
                 // when resizing from a top drag handle, we want to move the selection first
-                if (!moveSelection(new Vector2(0, e.Delta.Y)))
-                    return;
+                if (!moveSelection(new Vector2(0, scale)))
+                    return false;
             }
 
-            scaleSelection(new Vector2(0, direction * e.Delta.Y));
+            return scaleSelection(new Vector2(0, direction * scale));
         }
 
-        private void handleScaleX(DragEvent e, Anchor reference)
+        public override bool HandleScaleX(in float scale, Anchor reference)
         {
             int direction = (reference & Anchor.x0) > 0 ? -1 : 1;
 
             if (direction < 0)
             {
                 // when resizing from a left drag handle, we want to move the selection first
-                if (!moveSelection(new Vector2(e.Delta.X, 0)))
-                    return;
+                if (!moveSelection(new Vector2(scale, 0)))
+                    return false;
             }
 
-            scaleSelection(new Vector2(direction * e.Delta.X, 0));
+            return scaleSelection(new Vector2(direction * scale, 0));
         }
 
-        private bool rotateSelection(in float delta)
+        public override bool HandleRotation(float delta)
         {
             Quad quad = getSelectionQuad();
 
@@ -96,6 +93,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             }
 
+            // todo: not always
             return true;
         }
 
@@ -161,8 +159,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             return true;
         }
 
+        /// <summary>
+        /// Returns a gamefield-space quad surrounding the current selection.
+        /// </summary>
         private Quad getSelectionQuad()
         {
+            if (!SelectedHitObjects.Any())
+                return new Quad();
+
             Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
             Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
 
