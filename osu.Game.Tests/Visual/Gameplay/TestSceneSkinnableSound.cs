@@ -22,11 +22,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSkinnableSound : OsuTestScene
     {
-        [Cached]
+        [Cached(typeof(ISamplePlaybackDisabler))]
         private GameplayClock gameplayClock = new GameplayClock(new FramedClock());
 
         private TestSkinSourceContainer skinSource;
-        private SkinnableSound skinnableSound;
+        private PausableSkinnableSound skinnableSound;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     Clock = gameplayClock,
                     RelativeSizeAxes = Axes.Both,
-                    Child = skinnableSound = new SkinnableSound(new SampleInfo("normal-sliderslide"))
+                    Child = skinnableSound = new PausableSkinnableSound(new SampleInfo("normal-sliderslide"))
                 },
             };
         });
