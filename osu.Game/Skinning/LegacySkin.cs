@@ -336,7 +336,7 @@ namespace osu.Game.Skinning
                         case HitResult.Meh:
                             return this.GetAnimation("hit50", true, false);
 
-                        case HitResult.Good:
+                        case HitResult.Ok:
                             return this.GetAnimation("hit100", true, false);
 
                         case HitResult.Great:

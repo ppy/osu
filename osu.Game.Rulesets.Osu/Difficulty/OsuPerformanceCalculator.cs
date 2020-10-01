@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
-        private int countGood;
+        private int countOk;
         private int countMeh;
         private int countMiss;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
             countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
-            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
             countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int amountHitObjectsWithAccuracy = countHitCircles;
 
             if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countGood * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
+                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
             else
                 betterAccuracyPercentage = 0;
 
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return accuracyValue;
         }
 
-        private int totalHits => countGreat + countGood + countMeh + countMiss;
-        private int totalSuccessfulHits => countGreat + countGood + countMeh;
+        private int totalHits => countGreat + countOk + countMeh + countMiss;
+        private int totalSuccessfulHits => countGreat + countOk + countMeh;
     }
 }

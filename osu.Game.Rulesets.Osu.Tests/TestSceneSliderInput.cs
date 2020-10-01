@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
             });
 
-            AddAssert("Tracking retained", assertGreatJudge);
+            AddAssert("Tracking retained", assertMaxJudge);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
             });
 
-            AddAssert("Tracking retained", assertGreatJudge);
+            AddAssert("Tracking retained", assertMaxJudge);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
             });
 
-            AddAssert("Tracking retained", assertGreatJudge);
+            AddAssert("Tracking retained", assertMaxJudge);
         }
 
         /// <summary>
@@ -288,7 +288,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(slider_path_length, OsuHitObject.OBJECT_RADIUS * 1.199f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
             });
 
-            AddAssert("Tracking kept", assertGreatJudge);
+            AddAssert("Tracking kept", assertMaxJudge);
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking dropped", assertMidSliderJudgementFail);
         }
 
-        private bool assertGreatJudge() => judgementResults.Any() && judgementResults.All(t => t.Type.IsHit());
+        private bool assertMaxJudge() => judgementResults.Any() && judgementResults.All(t => t.Type == t.Judgement.MaxResult);
 
         private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.IgnoreHit && judgementResults.First().Type == HitResult.Miss;
 
