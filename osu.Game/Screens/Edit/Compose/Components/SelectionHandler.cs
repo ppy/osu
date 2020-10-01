@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private OsuSpriteText selectionDetailsText;
 
-        protected ComposeSelectionBox SelectionBox { get; private set; }
+        protected SelectionBox SelectionBox { get; private set; }
 
         [Resolved(CanBeNull = true)]
         protected EditorBeatmap EditorBeatmap { get; private set; }
@@ -94,8 +94,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        public ComposeSelectionBox CreateSelectionBox()
-            => new ComposeSelectionBox
+        public SelectionBox CreateSelectionBox()
+            => new SelectionBox
             {
                 OperationStarted = OnOperationBegan,
                 OperationEnded = OnOperationEnded,
