@@ -11,18 +11,6 @@ namespace osu.Game.Rulesets.Catch.Judgements
     {
         public override HitResult MaxResult => HitResult.Perfect;
 
-        protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-
-                case HitResult.Perfect:
-                    return 300;
-            }
-        }
-
         /// <summary>
         /// Whether fruit on the platter should explode or drop.
         /// Note that this is only checked if the owning object is also <see cref="IHasComboInformation.LastInCombo" />
