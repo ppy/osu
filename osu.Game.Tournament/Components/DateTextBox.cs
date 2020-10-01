@@ -28,7 +28,7 @@ namespace osu.Game.Tournament.Components
         {
             base.Bindable = new Bindable<string>();
 
-            ((OsuTextBox)Control).OnCommit = (sender, newText) =>
+            ((OsuTextBox)Control).OnCommit += (sender, newText) =>
             {
                 try
                 {

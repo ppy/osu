@@ -10,7 +10,5 @@ namespace osu.Game.Rulesets.Mania.Scoring
         protected override double DefaultAccuracyPortion => 0.95;
 
         protected override double DefaultComboPortion => 0.05;
-
-        public override HitWindows CreateHitWindows() => new ManiaHitWindows();
     }
 }
