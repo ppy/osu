@@ -15,7 +15,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Framework.Input.Bindings;
 
-
 namespace osu.Game.Screens.Select
 {
     public class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
@@ -170,7 +169,6 @@ namespace osu.Game.Screens.Select
             return base.OnClick(e);
         }
 
-
         public bool OnPressed(GlobalAction action)
         {
 
@@ -184,8 +182,6 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
-        {
-        }
+        public void OnReleased(GlobalAction action ) {}
     }
 }

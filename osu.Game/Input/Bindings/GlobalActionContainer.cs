@@ -50,7 +50,6 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
         };
 
-        
         public IEnumerable<KeyBinding> EditorKeyBindings => new[]
         {
             new KeyBinding(new[] { InputKey.F1 }, GlobalAction.EditorComposeMode),
@@ -98,8 +97,6 @@ namespace osu.Game.Input.Bindings
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
             handler == null ? base.KeyBindingInputQueue : base.KeyBindingInputQueue.Prepend(handler);
     }
-
-
 
     public enum GlobalAction
     {
@@ -209,6 +206,6 @@ namespace osu.Game.Input.Bindings
         [Description("Timing Mode")]
         EditorTimingMode,
 
-        
     }
+
 }
