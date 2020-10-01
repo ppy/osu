@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -68,6 +69,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        private FillFlowContainer buttons;
+
         public const float BORDER_RADIUS = 3;
 
         [Resolved]
@@ -105,71 +108,113 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                     }
                 },
+                buttons = new FillFlowContainer
+                {
+                    Y = 20,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.Centre
+                }
             };
 
-            if (CanRotate)
+            if (CanScaleX) addXScaleComponents();
+            if (CanScaleX && CanScaleY) addFullScaleComponents();
+            if (CanScaleY) addYScaleComponents();
+            if (CanRotate) addRotationComponents();
+        }
+
+        private void addRotationComponents()
+        {
+            const float separation = 40;
+
+            buttons.Insert(-1, new DragHandleButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise")
             {
-                const float separation = 40;
+                OperationStarted = operationStarted,
+                OperationEnded = operationEnded,
+                Action = () => OnRotation?.Invoke(-90)
+            });
 
-                AddRangeInternal(new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = colours.YellowLight,
-                        Blending = BlendingParameters.Additive,
-                        Alpha = 0.3f,
-                        Size = new Vector2(BORDER_RADIUS, separation),
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.BottomCentre,
-                    },
-                    new RotationDragHandle
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Y = -separation,
-                        HandleDrag = e => OnRotation?.Invoke(e),
-                        OperationStarted = operationStarted,
-                        OperationEnded = operationEnded
-                    }
-                });
-            }
-
-            if (CanScaleY)
+            buttons.Add(new DragHandleButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise")
             {
-                AddRangeInternal(new[]
-                {
-                    createDragHandle(Anchor.TopCentre),
-                    createDragHandle(Anchor.BottomCentre),
-                });
-            }
+                OperationStarted = operationStarted,
+                OperationEnded = operationEnded,
+                Action = () => OnRotation?.Invoke(90)
+            });
 
-            if (CanScaleX)
+            AddRangeInternal(new Drawable[]
             {
-                AddRangeInternal(new[]
+                new Box
                 {
-                    createDragHandle(Anchor.CentreLeft),
-                    createDragHandle(Anchor.CentreRight),
-                });
-            }
-
-            if (CanScaleX && CanScaleY)
-            {
-                AddRangeInternal(new[]
+                    Depth = float.MaxValue,
+                    Colour = colours.YellowLight,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0.3f,
+                    Size = new Vector2(BORDER_RADIUS, separation),
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.BottomCentre,
+                },
+                new DragHandleButton(FontAwesome.Solid.Redo, "Free rotate")
                 {
-                    createDragHandle(Anchor.TopLeft),
-                    createDragHandle(Anchor.TopRight),
-                    createDragHandle(Anchor.BottomLeft),
-                    createDragHandle(Anchor.BottomRight),
-                });
-            }
-
-            ScaleDragHandle createDragHandle(Anchor anchor) =>
-                new ScaleDragHandle(anchor)
-                {
-                    HandleDrag = e => OnScale?.Invoke(e, anchor),
+                    Anchor = Anchor.TopCentre,
+                    Y = -separation,
+                    HandleDrag = e => OnRotation?.Invoke(e.Delta.X),
                     OperationStarted = operationStarted,
                     OperationEnded = operationEnded
-                };
+                }
+            });
         }
+
+        private void addYScaleComponents()
+        {
+            buttons.Add(new DragHandleButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically")
+            {
+                OperationStarted = operationStarted,
+                OperationEnded = operationEnded,
+                Action = () => OnFlip?.Invoke(Direction.Vertical)
+            });
+
+            AddRangeInternal(new[]
+            {
+                createDragHandle(Anchor.TopCentre),
+                createDragHandle(Anchor.BottomCentre),
+            });
+        }
+
+        private void addFullScaleComponents()
+        {
+            AddRangeInternal(new[]
+            {
+                createDragHandle(Anchor.TopLeft),
+                createDragHandle(Anchor.TopRight),
+                createDragHandle(Anchor.BottomLeft),
+                createDragHandle(Anchor.BottomRight),
+            });
+        }
+
+        private void addXScaleComponents()
+        {
+            buttons.Add(new DragHandleButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally")
+            {
+                OperationStarted = operationStarted,
+                OperationEnded = operationEnded,
+                Action = () => OnFlip?.Invoke(Direction.Horizontal)
+            });
+
+            AddRangeInternal(new[]
+            {
+                createDragHandle(Anchor.CentreLeft),
+                createDragHandle(Anchor.CentreRight),
+            });
+        }
+
+        private ScaleDragHandle createDragHandle(Anchor anchor) =>
+            new ScaleDragHandle(anchor)
+            {
+                HandleDrag = e => OnScale?.Invoke(e.Delta, anchor),
+                OperationStarted = operationStarted,
+                OperationEnded = operationEnded
+            };
 
         private int activeOperations;
 
@@ -193,23 +238,44 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private class RotationDragHandle : DragHandle
+        private sealed class DragHandleButton : DragHandle, IHasTooltip
         {
             private SpriteIcon icon;
+
+            private readonly IconUsage iconUsage;
+
+            public Action Action;
+
+            public DragHandleButton(IconUsage iconUsage, string tooltip)
+            {
+                this.iconUsage = iconUsage;
+
+                TooltipText = tooltip;
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
 
             [BackgroundDependencyLoader]
             private void load()
             {
                 Size *= 2;
-
                 AddInternal(icon = new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(0.5f),
-                    Icon = FontAwesome.Solid.Redo,
+                    Icon = iconUsage,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 });
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                OperationStarted?.Invoke();
+                Action?.Invoke();
+                OperationEnded?.Invoke();
+                return true;
             }
 
             protected override void UpdateHoverState()
@@ -217,6 +283,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 base.UpdateHoverState();
                 icon.Colour = !HandlingMouse && IsHovered ? Color4.White : Color4.Black;
             }
+
+            public string TooltipText { get; }
         }
 
         private class DragHandle : Container
