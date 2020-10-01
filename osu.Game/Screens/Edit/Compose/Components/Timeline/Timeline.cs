@@ -86,8 +86,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             MidColour = colours.BlueDark,
                             HighColour = colours.BlueDarker,
                         },
-                        controlPoints = new TimelineControlPointDisplay(),
                         ticks = new TimelineTickDisplay(),
+                        controlPoints = new TimelineControlPointDisplay(),
                     }
                 },
             });
