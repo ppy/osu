@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
@@ -17,6 +19,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         public void AttachGroup(ControlPointGroup pointGroup) => controlPointGroup = pointGroup;
 
         public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
+
+        public virtual Color4 GetRepresentingColour(OsuColour colours) => colours.Yellow;
 
         /// <summary>
         /// Determines whether this <see cref="ControlPoint"/> results in a meaningful change when placed alongside another.
