@@ -384,6 +384,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
+        /// <summary>
+        /// Stops playback of all samples. Automatically called when <see cref="DrawableHitObject{TObject}"/>'s lifetime has been exceeded.
+        /// </summary>
+        public virtual void StopAllSamples() => Samples?.Stop();
+
         protected override void Update()
         {
             base.Update();
@@ -451,6 +456,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             foreach (var nested in NestedHitObjects)
                 nested.OnKilled();
+
+            StopAllSamples();
 
             UpdateResult(false);
         }
