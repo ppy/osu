@@ -50,6 +50,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         case TimingControlPoint timingPoint:
                             AddInternal(new TimingPointPiece(timingPoint));
                             break;
+
+                        case SampleControlPoint samplePoint:
+                            AddInternal(new SamplePointPiece(samplePoint));
+                            break;
                     }
                 }
             }, true);

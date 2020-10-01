@@ -41,8 +41,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 },
                 new Container
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
