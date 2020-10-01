@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     switch (point)
                     {
                         case DifficultyControlPoint difficultyPoint:
-                            AddInternal(new DifficultyPointPiece(difficultyPoint));
+                            AddInternal(new DifficultyPointPiece(difficultyPoint) { Depth = -2 });
                             break;
 
                         case TimingControlPoint timingPoint:
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             break;
 
                         case SampleControlPoint samplePoint:
-                            AddInternal(new SamplePointPiece(samplePoint));
+                            AddInternal(new SamplePointPiece(samplePoint) { Depth = -1 });
                             break;
                     }
                 }
