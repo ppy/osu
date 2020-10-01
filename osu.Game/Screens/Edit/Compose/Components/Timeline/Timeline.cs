@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -70,20 +71,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             AddRange(new Drawable[]
             {
-                waveform = new WaveformGraph
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Blue.Opacity(0.2f),
-                    LowColour = colours.BlueLighter,
-                    MidColour = colours.BlueDark,
-                    HighColour = colours.BlueDarker,
-                    Depth = float.MaxValue
+                    Depth = float.MaxValue,
+                    Children = new Drawable[]
+                    {
+                        waveform = new WaveformGraph
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.Blue.Opacity(0.2f),
+                            LowColour = colours.BlueLighter,
+                            MidColour = colours.BlueDark,
+                            HighColour = colours.BlueDarker,
+                        },
+                        controlPoints = new ControlPointPart
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        ticks = new TimelineTickDisplay(),
+                    }
                 },
-                controlPoints = new ControlPointPart
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-                ticks = new TimelineTickDisplay(),
             });
 
             // We don't want the centre marker to scroll
