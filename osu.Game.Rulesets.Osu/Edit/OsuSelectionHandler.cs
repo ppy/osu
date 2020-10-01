@@ -183,8 +183,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             point.Y -= origin.Y;
 
             Vector2 ret;
-            ret.X = point.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Sin(angle / 180f * MathF.PI);
-            ret.Y = point.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Cos(angle / 180f * MathF.PI);
+            ret.X = point.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Sin(MathUtils.DegreesToRadians(angle));
+            ret.Y = point.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Cos(MathUtils.DegreesToRadians(angle));
 
             ret.X += origin.X;
             ret.Y += origin.Y;
