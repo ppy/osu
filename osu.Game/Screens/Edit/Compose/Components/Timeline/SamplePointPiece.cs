@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
 
-            Color4 colour = colours.BlueDarker;
+            Color4 colour = colours.PinkDarker;
 
             InternalChildren = new Drawable[]
             {
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                         new Box
                         {
-                            Colour = colours.Blue,
+                            Colour = colours.Pink,
                             Width = 2,
                             RelativeSizeAxes = Axes.Y,
                         },
