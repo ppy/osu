@@ -24,6 +24,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private bool canRotate;
 
+        /// <summary>
+        /// Whether rotation support should be enabled.
+        /// </summary>
         public bool CanRotate
         {
             get => canRotate;
@@ -36,6 +39,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private bool canScaleX;
 
+        /// <summary>
+        /// Whether vertical scale support should be enabled.
+        /// </summary>
         public bool CanScaleX
         {
             get => canScaleX;
@@ -48,6 +54,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private bool canScaleY;
 
+        /// <summary>
+        /// Whether horizontal scale support should be enabled.
+        /// </summary>
         public bool CanScaleY
         {
             get => canScaleY;
