@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     tick.TriggerResult(false);
                 }
 
-                var hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss;
+                var hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : HitResult.Miss;
 
                 ApplyResult(r => r.Type = hitResult);
             }

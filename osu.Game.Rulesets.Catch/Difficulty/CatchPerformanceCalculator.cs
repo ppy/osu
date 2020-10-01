@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             mods = Score.Mods;
 
-            fruitsHit = Score.Statistics.GetOrDefault(HitResult.Perfect);
+            fruitsHit = Score.Statistics.GetOrDefault(HitResult.Great);
             ticksHit = Score.Statistics.GetOrDefault(HitResult.LargeTickHit);
             tinyTicksHit = Score.Statistics.GetOrDefault(HitResult.SmallTickHit);
             tinyTicksMissed = Score.Statistics.GetOrDefault(HitResult.SmallTickMiss);

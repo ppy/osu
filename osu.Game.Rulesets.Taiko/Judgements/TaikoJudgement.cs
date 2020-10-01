@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
                 case HitResult.Miss:
                     return -1.0;
 
-                case HitResult.Good:
+                case HitResult.Ok:
                     return 1.1;
 
                 case HitResult.Great:
