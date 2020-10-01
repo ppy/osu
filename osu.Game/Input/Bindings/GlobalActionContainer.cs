@@ -92,8 +92,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F2, GlobalAction.FooterRandom),
             new KeyBinding(InputKey.F3, GlobalAction.FooterOptions),
         };
-
-
+        
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
             handler == null ? base.KeyBindingInputQueue : base.KeyBindingInputQueue.Prepend(handler);
     }
