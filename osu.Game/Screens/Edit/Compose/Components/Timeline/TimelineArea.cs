@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             CornerRadius = 5;
 
             OsuCheckbox waveformCheckbox;
+            OsuCheckbox controlPointsCheckbox;
 
             InternalChildren = new Drawable[]
             {
@@ -57,12 +58,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         Origin = Anchor.CentreLeft,
                                         AutoSizeAxes = Axes.Y,
                                         Width = 160,
-                                        Padding = new MarginPadding { Horizontal = 15 },
+                                        Padding = new MarginPadding { Horizontal = 10 },
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
                                         {
-                                            waveformCheckbox = new OsuCheckbox { LabelText = "Waveform" }
+                                            waveformCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "Waveform",
+                                                Current = { Value = true },
+                                            },
+                                            controlPointsCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "Control Points",
+                                                Current = { Value = true },
+                                            }
                                         }
                                     }
                                 }
@@ -119,9 +129,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             };
 
-            waveformCheckbox.Current.Value = true;
-
             Timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
+            Timeline.ControlPointsVisible.BindTo(controlPointsCheckbox.Current);
         }
 
         private void changeZoom(float change) => Timeline.Zoom += change;
