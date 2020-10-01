@@ -12,6 +12,8 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -28,6 +30,11 @@ namespace osu.Game.Screens.Edit.Timing
             : base(EditorScreenMode.Timing)
         {
         }
+
+        protected override Drawable CreateTimelineContent() => new ControlPointPart
+        {
+            RelativeSizeAxes = Axes.Both,
+        };
 
         protected override Drawable CreateMainContent() => new GridContainer
         {
@@ -56,6 +63,12 @@ namespace osu.Game.Screens.Edit.Timing
                 if (selected.NewValue != null)
                     clock.SeekTo(selected.NewValue.Time);
             });
+        }
+
+        protected override void OnTimelineLoaded(TimelineArea timelineArea)
+        {
+            base.OnTimelineLoaded(timelineArea);
+            timelineArea.Timeline.Zoom = timelineArea.Timeline.MinZoom;
         }
 
         public class ControlPointList : CompositeDrawable
@@ -129,11 +142,12 @@ namespace osu.Game.Screens.Edit.Timing
                 selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
 
                 controlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
-                controlGroups.CollectionChanged += (sender, args) => createContent();
-                createContent();
-            }
 
-            private void createContent() => table.ControlGroups = controlGroups;
+                controlGroups.BindCollectionChanged((sender, args) =>
+                {
+                    table.ControlGroups = controlGroups;
+                }, true);
+            }
 
             private void delete()
             {
