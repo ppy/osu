@@ -42,9 +42,9 @@ namespace osu.Game.Rulesets.Taiko.Audio
             }
         }
 
-        private SkinnableSound addSound(HitSampleInfo hitSampleInfo, double lifetimeStart, double lifetimeEnd)
+        private PausableSkinnableSound addSound(HitSampleInfo hitSampleInfo, double lifetimeStart, double lifetimeEnd)
         {
-            var drawable = new SkinnableSound(hitSampleInfo)
+            var drawable = new PausableSkinnableSound(hitSampleInfo)
             {
                 LifetimeStart = lifetimeStart,
                 LifetimeEnd = lifetimeEnd
@@ -57,8 +57,8 @@ namespace osu.Game.Rulesets.Taiko.Audio
 
         public class DrumSample
         {
-            public SkinnableSound Centre;
-            public SkinnableSound Rim;
+            public PausableSkinnableSound Centre;
+            public PausableSkinnableSound Rim;
         }
     }
 }

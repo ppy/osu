@@ -3,18 +3,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 using osuTK.Graphics;
@@ -34,11 +39,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly List<Container> shadowComponents = new List<Container>();
 
+        private DrawableHitObject drawableHitObject;
+
+        private Bindable<Color4> comboColour;
+
+        private readonly Container mainComponents;
+
+        private readonly OsuSpriteText comboIndexText;
+
+        private Bindable<int> comboIndex;
+
         private const float thickness = 5;
 
         private const float shadow_radius = 5;
 
-        private const float circle_size = 16;
+        private const float circle_size = 24;
 
         public TimelineHitObjectBlueprint(HitObject hitObject)
             : base(hitObject)
@@ -54,14 +69,28 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            AddRangeInternal(new Drawable[]
+            {
+                mainComponents = new Container
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
+                comboIndexText = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.Numeric.With(size: circle_size / 2, weight: FontWeight.Black),
+                },
+            });
+
             circle = new Circle
             {
                 Size = new Vector2(circle_size),
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.Centre,
-                RelativePositionAxes = Axes.X,
-                AlwaysPresent = true,
-                Colour = Color4.White,
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
@@ -77,7 +106,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 DragBar dragBarUnderlay;
                 Container extensionBar;
 
-                AddRangeInternal(new Drawable[]
+                mainComponents.AddRange(new Drawable[]
                 {
                     extensionBar = new Container
                     {
@@ -117,10 +146,52 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
             else
             {
-                AddInternal(circle);
+                mainComponents.Add(circle);
             }
 
             updateShadows();
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(HitObjectComposer composer)
+        {
+            if (composer != null)
+            {
+                // best effort to get the drawable representation for grabbing colour and what not.
+                drawableHitObject = composer.HitObjects.FirstOrDefault(d => d.HitObject == HitObject);
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (HitObject is IHasComboInformation comboInfo)
+            {
+                comboIndex = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
+                comboIndex.BindValueChanged(combo =>
+                {
+                    comboIndexText.Text = (combo.NewValue + 1).ToString();
+                }, true);
+            }
+
+            if (drawableHitObject != null)
+            {
+                comboColour = drawableHitObject.AccentColour.GetBoundCopy();
+                comboColour.BindValueChanged(colour =>
+                {
+                    if (HitObject is IHasDuration)
+                        mainComponents.Colour = ColourInfo.GradientHorizontal(drawableHitObject.AccentColour.Value, Color4.White);
+                    else
+                        mainComponents.Colour = drawableHitObject.AccentColour.Value;
+
+                    var col = mainComponents.Colour.TopLeft.Linear;
+                    float brightness = col.R + col.G + col.B;
+
+                    // decide the combo index colour based on brightness?
+                    comboIndexText.Colour = brightness > 0.5f ? Color4.Black : Color4.White;
+                }, true);
+            }
         }
 
         protected override void Update()
