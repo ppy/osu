@@ -171,7 +171,6 @@ namespace osu.Game.Screens.Select
 
         public bool OnPressed(GlobalAction action)
         {
-
             if (action == Hotkey)
             {
                 box.FadeOut(Footer.TRANSITION_LENGTH, Easing.OutQuint);
