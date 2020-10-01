@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = partSize.X / 2.5f / cursorSize.Value;
+                    float interval = partSize.X / 2.5f / Math.Max(cursorSize.Value, 1);
 
                     for (float d = interval; d < distance; d += interval)
                     {
