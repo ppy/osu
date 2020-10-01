@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private void load(ShaderManager shaders, OsuConfigManager config)
         {
             shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
-            cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
+            cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
         }
 
         protected override void LoadComplete()
