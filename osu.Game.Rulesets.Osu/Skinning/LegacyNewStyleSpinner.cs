@@ -72,10 +72,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             this.FadeOut();
             drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
+
+            updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
+            if (!(drawableHitObject is DrawableSpinner))
+                return;
+
             var spinner = (Spinner)drawableSpinner.HitObject;
 
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
