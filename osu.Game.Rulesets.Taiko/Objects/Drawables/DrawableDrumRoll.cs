@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             if (countHit >= HitObject.RequiredGoodHits)
             {
-                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
+                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Ok);
             }
             else
                 ApplyResult(r => r.Type = HitResult.Miss);
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 if (!MainObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = MainObject.IsHit ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = MainObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
             }
 
             public override bool OnPressed(TaikoAction action) => false;
