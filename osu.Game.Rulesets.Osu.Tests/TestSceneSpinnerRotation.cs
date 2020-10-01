@@ -7,7 +7,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -146,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
                 var totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
-                return totalScore == (int)(drawableSpinner.RotationTracker.RateAdjustedRotation / 360) * SpinnerTick.SCORE_PER_TICK;
+                return totalScore == (int)(drawableSpinner.RotationTracker.RateAdjustedRotation / 360) * new SpinnerTick().CreateJudgement().MaxNumericResult;
             });
 
             addSeekStep(0);
@@ -194,13 +193,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addSeekStep(0);
 
-            AddStep("adjust track rate", () => MusicController.CurrentTrack.AddAdjustment(AdjustableProperty.Tempo, new BindableDouble(rate)));
-            // autoplay replay frames use track time;
-            // if a spin takes 1000ms in track time and we're playing with a 2x rate adjustment, the spin will take 500ms of *real* time.
-            // therefore we need to apply the rate adjustment to the replay itself to change from track time to real time,
-            // as real time is what we care about for spinners
-            // (so we're making the spin take 1000ms in real time *always*, regardless of the track clock's rate).
-            transformReplay(replay => applyRateAdjustment(replay, rate));
+            AddStep("adjust track rate", () => Player.GameplayClockContainer.UserPlaybackRate.Value = rate);
 
             addSeekStep(1000);
             AddAssert("progress almost same", () => Precision.AlmostEquals(expectedProgress, drawableSpinner.Progress, 0.05));

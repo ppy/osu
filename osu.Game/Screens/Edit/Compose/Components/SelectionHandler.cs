@@ -288,8 +288,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 var comboInfo = h as IHasComboInformation;
 
-                if (comboInfo == null)
-                    continue;
+                if (comboInfo == null || comboInfo.NewCombo == state) continue;
 
                 comboInfo.NewCombo = state;
                 EditorBeatmap?.UpdateHitObject(h);

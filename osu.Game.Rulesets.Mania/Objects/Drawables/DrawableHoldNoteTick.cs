@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -17,6 +16,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableHoldNoteTick : DrawableManiaHitObject<HoldNoteTick>
     {
+        public override bool DisplayResult => false;
+
         /// <summary>
         /// References the time at which the user started holding the hold note.
         /// </summary>
@@ -73,9 +74,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             var startTime = HoldStartTime?.Invoke();
 
             if (startTime == null || startTime > HitObject.StartTime)
-                ApplyResult(r => r.Type = HitResult.Miss);
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
             else
-                ApplyResult(r => r.Type = HitResult.Perfect);
+                ApplyResult(r => r.Type = r.Judgement.MaxResult);
         }
     }
 }
