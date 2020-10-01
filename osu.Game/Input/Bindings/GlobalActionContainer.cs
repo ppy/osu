@@ -205,7 +205,5 @@ namespace osu.Game.Input.Bindings
 
         [Description("Timing Mode")]
         EditorTimingMode,
-
     }
-
 }

@@ -17,7 +17,6 @@ using osuTK.Graphics;
 using osuTK.Input;
 using osu.Game.Input.Bindings;
 
-
 namespace osu.Game.Screens.Select
 {
     public class FooterButtonMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
