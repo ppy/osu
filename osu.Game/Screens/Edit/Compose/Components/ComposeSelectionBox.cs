@@ -16,8 +16,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public class ComposeSelectionBox : CompositeDrawable
     {
-        public Action<DragEvent> OnRotation;
-        public Action<DragEvent, Anchor> OnScale;
+        public Action<float> OnRotation;
+        public Action<Vector2, Anchor> OnScale;
+        public Action<Direction> OnFlip;
 
         public Action OperationStarted;
         public Action OperationEnded;

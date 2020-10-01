@@ -100,8 +100,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted = OnOperationBegan,
                 OperationEnded = OnOperationEnded,
 
-                OnRotation = e => HandleRotation(e.Delta.X),
-                OnScale = (e, anchor) => HandleScale(e.Delta, anchor),
+                OnRotation = angle => HandleRotation(angle),
+                OnScale = (amount, anchor) => HandleScale(amount, anchor),
+                OnFlip = direction => HandleFlip(direction),
             };
 
         /// <summary>
@@ -150,6 +151,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="anchor">The point of reference where the scale is originating from.</param>
         /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
         public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
+
+        /// <summary>
+        /// Handled the selected <see cref="DrawableHitObject"/>s being flipped.
+        /// </summary>
+        /// <param name="direction">The direction to flip</param>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        public virtual bool HandleFlip(Direction direction) => false;
 
         public bool OnPressed(PlatformAction action)
         {
