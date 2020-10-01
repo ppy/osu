@@ -93,6 +93,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             drawableSpinner.RotationTracker.Complete.BindValueChanged(complete => updateComplete(complete.NewValue, 200));
             drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
+
+            updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
         }
 
         protected override void Update()
@@ -124,6 +126,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
+            if (!(drawableHitObject is DrawableSpinner))
+                return;
+
             centre.ScaleTo(0);
             mainContainer.ScaleTo(0);
 
