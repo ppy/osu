@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource source, DrawableHitObject drawableObject)
         {
-            spinnerBlink = !(source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value) ?? true;
+            spinnerBlink = source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value != true;
 
             drawableSpinner = (DrawableSpinner)drawableObject;
 
