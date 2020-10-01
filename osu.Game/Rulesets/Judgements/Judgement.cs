@@ -82,12 +82,12 @@ namespace osu.Game.Rulesets.Judgements
         public double MaxHealthIncrease => HealthIncreaseFor(MaxResult);
 
         /// <summary>
-        /// Retrieves the numeric score representation of a <see cref="JudgementResult"/>.
+        /// Retrieves the numeric score representation of a <see cref="HitResult"/>.
         /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> to find the numeric score representation for.</param>
+        /// <param name="result">The <see cref="HitResult"/> to find the numeric score representation for.</param>
         /// <returns>The numeric score representation of <paramref name="result"/>.</returns>
-        [Obsolete("Has no effect. Use ToNumericResult(HitResult) (standardised across all rulesets).")] // Can be removed 20210328
-        protected virtual int NumericResultFor(HitResult result) => result == HitResult.Miss ? 0 : 1;
+        [Obsolete("Has no effect. Use ToNumericResult(HitResult) (standardised across all rulesets).")] // Can be made non-virtual 20210328
+        protected virtual int NumericResultFor(HitResult result) => ToNumericResult(result);
 
         /// <summary>
         /// Retrieves the numeric score representation of a <see cref="JudgementResult"/>.
