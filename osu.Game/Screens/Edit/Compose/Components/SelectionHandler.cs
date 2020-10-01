@@ -97,8 +97,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public ComposeSelectionBox CreateSelectionBox()
             => new ComposeSelectionBox
             {
-                OperationStarted = OnDragOperationBegan,
-                OperationEnded = OnDragOperationEnded,
+                OperationStarted = OnOperationBegan,
+                OperationEnded = OnOperationEnded,
 
                 OnRotation = e => HandleRotation(e.Delta.X),
                 OnScale = (e, anchor) => HandleScale(e.Delta, anchor),
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Fired when a drag operation ends from the selection box.
         /// </summary>
-        protected virtual void OnDragOperationBegan()
+        protected virtual void OnOperationBegan()
         {
             ChangeHandler.BeginChange();
         }
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Fired when a drag operation begins from the selection box.
         /// </summary>
-        protected virtual void OnDragOperationEnded()
+        protected virtual void OnOperationEnded()
         {
             ChangeHandler.EndChange();
         }

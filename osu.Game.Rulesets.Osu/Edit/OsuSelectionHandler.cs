@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectionBox.CanScaleY = canOperate;
         }
 
-        protected override void OnDragOperationEnded()
+        protected override void OnOperationEnded()
         {
-            base.OnDragOperationEnded();
+            base.OnOperationEnded();
             referenceOrigin = null;
         }
 
