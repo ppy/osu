@@ -470,7 +470,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected void ApplyResult(Action<JudgementResult> application)
         {
             if (Result.HasResult)
-                throw new InvalidOperationException($"Cannot apply result on a hitobject that already has a result.");
+                throw new InvalidOperationException("Cannot apply result on a hitobject that already has a result.");
 
             application?.Invoke(Result);
 
