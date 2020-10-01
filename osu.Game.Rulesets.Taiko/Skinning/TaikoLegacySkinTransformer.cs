@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     return null;
 
-                case TaikoSkinComponents.TaikoExplosionGood:
+                case TaikoSkinComponents.TaikoExplosionOk:
                 case TaikoSkinComponents.TaikoExplosionGreat:
 
                     var hitName = getHitName(taikoComponent.Component);
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 case TaikoSkinComponents.TaikoExplosionMiss:
                     return "taiko-hit0";
 
-                case TaikoSkinComponents.TaikoExplosionGood:
+                case TaikoSkinComponents.TaikoExplosionOk:
                     return "taiko-hit100";
 
                 case TaikoSkinComponents.TaikoExplosionGreat:

@@ -58,8 +58,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case HitResult.Miss:
                     return TaikoSkinComponents.TaikoExplosionMiss;
 
-                case HitResult.Good:
-                    return TaikoSkinComponents.TaikoExplosionGood;
+                case HitResult.Ok:
+                    return TaikoSkinComponents.TaikoExplosionOk;
 
                 case HitResult.Great:
                     return TaikoSkinComponents.TaikoExplosionGreat;
