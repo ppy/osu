@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
 {
     public class CatchJudgement : Judgement
     {
-        public override HitResult MaxResult => HitResult.Perfect;
+        public override HitResult MaxResult => HitResult.Great;
 
         /// <summary>
         /// Whether fruit on the platter should explode or drop.

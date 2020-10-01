@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         private static readonly DifficultyRange[] taiko_ranges =
         {
             new DifficultyRange(HitResult.Great, 50, 35, 20),
-            new DifficultyRange(HitResult.Good, 120, 80, 50),
+            new DifficultyRange(HitResult.Ok, 120, 80, 50),
             new DifficultyRange(HitResult.Miss, 135, 95, 70),
         };
 
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             switch (result)
             {
                 case HitResult.Great:
-                case HitResult.Good:
+                case HitResult.Ok:
                 case HitResult.Miss:
                     return true;
             }

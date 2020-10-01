@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             if (countHit >= HitObject.RequiredGoodHits)
             {
-                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
+                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Ok);
             }
             else
                 ApplyResult(r => r.Type = HitResult.Miss);
