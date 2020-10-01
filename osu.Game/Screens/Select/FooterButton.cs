@@ -160,7 +160,6 @@ namespace osu.Game.Screens.Select
             box.FadeOut(Footer.TRANSITION_LENGTH, Easing.OutQuint);
             base.OnMouseUp(e);
         }
-
         protected override bool OnClick(ClickEvent e)
         {
             box.ClearTransforms();
@@ -180,7 +179,6 @@ namespace osu.Game.Screens.Select
 
             return false;
         }
-
         public void OnReleased(GlobalAction action){}
     }
 }
