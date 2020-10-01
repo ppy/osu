@@ -181,6 +181,6 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        public void OnReleased(GlobalAction action ) {}
+        public void OnReleased(GlobalAction action){}
     }
 }
