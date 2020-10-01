@@ -21,14 +21,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public TimelineControlPointGroup(ControlPointGroup group)
         {
-            Origin = Anchor.TopCentre;
-
             Group = group;
 
             RelativePositionAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
-
-            Width = 1;
+            AutoSizeAxes = Axes.X;
 
             X = (float)group.Time;
         }
@@ -40,12 +37,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             controlPoints = (BindableList<ControlPoint>)Group.ControlPoints.GetBoundCopy();
             controlPoints.BindCollectionChanged((_, __) =>
             {
+                ClearInternal();
+
                 foreach (var point in controlPoints)
                 {
                     switch (point)
                     {
                         case DifficultyControlPoint difficultyPoint:
                             AddInternal(new DifficultyPointPiece(difficultyPoint));
+                            break;
+
+                        case TimingControlPoint timingPoint:
+                            AddInternal(new TimingPointPiece(timingPoint));
                             break;
                     }
                 }
