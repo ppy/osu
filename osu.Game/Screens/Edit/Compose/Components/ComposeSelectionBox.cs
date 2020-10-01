@@ -208,9 +208,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
         }
 
-        private ScaleDragHandle createDragHandle(Anchor anchor) =>
-            new ScaleDragHandle(anchor)
+        private DragHandle createDragHandle(Anchor anchor) =>
+            new DragHandle
             {
+                Anchor = anchor,
                 HandleDrag = e => OnScale?.Invoke(e.Delta, anchor),
                 OperationStarted = operationStarted,
                 OperationEnded = operationEnded
@@ -228,14 +229,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (activeOperations++ == 0)
                 OperationStarted?.Invoke();
-        }
-
-        private class ScaleDragHandle : DragHandle
-        {
-            public ScaleDragHandle(Anchor anchor)
-            {
-                Anchor = anchor;
-            }
         }
 
         private sealed class DragHandleButton : DragHandle, IHasTooltip
