@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         public TestSceneComposeSelectBox()
         {
-            ComposeSelectionBox selectionBox = null;
+            SelectionBox selectionBox = null;
 
             AddStep("create box", () =>
                 Child = selectionArea = new Container
@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Editing
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        selectionBox = new ComposeSelectionBox
+                        selectionBox = new SelectionBox
                         {
                             CanRotate = true,
                             CanScaleX = true,
