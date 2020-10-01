@@ -167,7 +167,6 @@ namespace osu.Game.Screens.Select
             box.FadeOut(Footer.TRANSITION_LENGTH * 3, Easing.OutQuint);
             return base.OnClick(e);
         }
-
         public bool OnPressed(GlobalAction action)
         {
             if (action == Hotkey)
@@ -179,6 +178,9 @@ namespace osu.Game.Screens.Select
 
             return false;
         }
-        public void OnReleased(GlobalAction action){}
+        public void OnReleased(GlobalAction action)
+        {
+            return;
+        }
     }
 }
