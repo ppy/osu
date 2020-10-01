@@ -14,9 +14,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineArea : Container
     {
-        private readonly Timeline timeline = new Timeline { RelativeSizeAxes = Axes.Both };
+        public readonly Timeline Timeline = new Timeline { RelativeSizeAxes = Axes.Both };
 
-        protected override Container<Drawable> Content => timeline;
+        protected override Container<Drawable> Content => Timeline;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     }
                                 }
                             },
-                            timeline
+                            Timeline
                         },
                     },
                     ColumnDimensions = new[]
@@ -121,9 +121,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             waveformCheckbox.Current.Value = true;
 
-            timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
+            Timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
         }
 
-        private void changeZoom(float change) => timeline.Zoom += change;
+        private void changeZoom(float change) => Timeline.Zoom += change;
     }
 }
