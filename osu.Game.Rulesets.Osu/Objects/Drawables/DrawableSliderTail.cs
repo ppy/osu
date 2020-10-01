@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -46,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered && timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : HitResult.Miss);
+                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         private void updatePosition() => Position = HitObject.Position - slider.Position;

@@ -7,18 +7,6 @@ namespace osu.Game.Rulesets.Mania.Judgements
 {
     public class HoldNoteTickJudgement : ManiaJudgement
     {
-        protected override int NumericResultFor(HitResult result) => result == MaxResult ? 20 : 0;
-
-        protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-
-                case HitResult.Perfect:
-                    return 0.01;
-            }
-        }
+        public override HitResult MaxResult => HitResult.LargeTickHit;
     }
 }

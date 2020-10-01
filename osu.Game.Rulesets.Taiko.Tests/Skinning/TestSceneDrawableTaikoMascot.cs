@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             createDrawableRuleset();
 
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
-            assertStateAfterResult(new JudgementResult(new StrongHitObject(), new TaikoStrongJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Idle);
+            assertStateAfterResult(new JudgementResult(new StrongHitObject(), new TaikoStrongJudgement()) { Type = HitResult.IgnoreMiss }, TaikoMascotAnimationState.Idle);
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             createDrawableRuleset();
 
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Good }, TaikoMascotAnimationState.Kiai);
-            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoStrongJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Kiai);
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoStrongJudgement()) { Type = HitResult.IgnoreMiss }, TaikoMascotAnimationState.Kiai);
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Fail);
         }
 
