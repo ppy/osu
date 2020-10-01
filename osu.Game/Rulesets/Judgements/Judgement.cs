@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// The score awarded for a small bonus.
         /// </summary>
-        public const double SMALL_BONUS_SCORE = 10;
+        public const int SMALL_BONUS_SCORE = 10;
 
         /// <summary>
         /// The score awarded for a large bonus.
         /// </summary>
-        public const double LARGE_BONUS_SCORE = 50;
+        public const int LARGE_BONUS_SCORE = 50;
 
         /// <summary>
         /// The default health increase for a maximum judgement, as a proportion of total health.
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// The numeric score representation for the maximum achievable result.
         /// </summary>
-        public double MaxNumericResult => ToNumericResult(MaxResult);
+        public int MaxNumericResult => ToNumericResult(MaxResult);
 
         /// <summary>
         /// The health increase for the maximum achievable result.
@@ -82,19 +82,19 @@ namespace osu.Game.Rulesets.Judgements
         public double MaxHealthIncrease => HealthIncreaseFor(MaxResult);
 
         /// <summary>
-        /// Retrieves the numeric score representation of a <see cref="JudgementResult"/>.
+        /// Retrieves the numeric score representation of a <see cref="HitResult"/>.
         /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> to find the numeric score representation for.</param>
+        /// <param name="result">The <see cref="HitResult"/> to find the numeric score representation for.</param>
         /// <returns>The numeric score representation of <paramref name="result"/>.</returns>
-        [Obsolete("Has no effect. Use ToNumericResult(HitResult) (standardised across all rulesets).")] // Can be removed 20210328
-        protected virtual int NumericResultFor(HitResult result) => result == HitResult.Miss ? 0 : 1;
+        [Obsolete("Has no effect. Use ToNumericResult(HitResult) (standardised across all rulesets).")] // Can be made non-virtual 20210328
+        protected virtual int NumericResultFor(HitResult result) => ToNumericResult(result);
 
         /// <summary>
         /// Retrieves the numeric score representation of a <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="result">The <see cref="JudgementResult"/> to find the numeric score representation for.</param>
         /// <returns>The numeric score representation of <paramref name="result"/>.</returns>
-        public double NumericResultFor(JudgementResult result) => ToNumericResult(result.Type);
+        public int NumericResultFor(JudgementResult result) => ToNumericResult(result.Type);
 
         /// <summary>
         /// Retrieves the numeric health increase of a <see cref="HitResult"/>.
@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Judgements
 
         public override string ToString() => $"MaxResult:{MaxResult} MaxScore:{MaxNumericResult}";
 
-        public static double ToNumericResult(HitResult result)
+        public static int ToNumericResult(HitResult result)
         {
             switch (result)
             {
@@ -163,25 +163,25 @@ namespace osu.Game.Rulesets.Judgements
                     return 0;
 
                 case HitResult.SmallTickHit:
-                    return 1 / 30d;
+                    return 10;
 
                 case HitResult.LargeTickHit:
-                    return 1 / 10d;
+                    return 30;
 
                 case HitResult.Meh:
-                    return 1 / 6d;
+                    return 50;
 
                 case HitResult.Ok:
-                    return 1 / 3d;
+                    return 100;
 
                 case HitResult.Good:
-                    return 2 / 3d;
+                    return 200;
 
                 case HitResult.Great:
-                    return 1d;
+                    return 300;
 
                 case HitResult.Perfect:
-                    return 7 / 6d;
+                    return 350;
 
                 case HitResult.SmallBonus:
                     return SMALL_BONUS_SCORE;
