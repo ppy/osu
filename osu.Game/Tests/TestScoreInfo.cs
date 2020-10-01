@@ -37,6 +37,12 @@ namespace osu.Game.Tests
             Statistics[HitResult.Meh] = 50;
             Statistics[HitResult.Good] = 100;
             Statistics[HitResult.Great] = 300;
+            Statistics[HitResult.SmallTickHit] = 50;
+            Statistics[HitResult.SmallTickMiss] = 25;
+            Statistics[HitResult.LargeTickHit] = 100;
+            Statistics[HitResult.LargeTickMiss] = 50;
+            Statistics[HitResult.SmallBonus] = 10;
+            Statistics[HitResult.SmallBonus] = 50;
 
             Position = 1;
         }
