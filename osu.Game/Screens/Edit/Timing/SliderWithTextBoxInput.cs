@@ -54,9 +54,12 @@ namespace osu.Game.Screens.Edit.Timing
                 }
                 catch
                 {
-                    // will restore the previous text value on failure.
-                    Current.TriggerChange();
+                    // TriggerChange below will restore the previous text value on failure.
                 }
+
+                // This is run regardless of parsing success as the parsed number may not actually trigger a change
+                // due to bindable clamping. Even in such a case we want to update the textbox to a sane visual state.
+                Current.TriggerChange();
             };
 
             Current.BindValueChanged(val =>
