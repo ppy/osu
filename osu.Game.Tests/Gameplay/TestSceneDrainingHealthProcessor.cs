@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Gameplay
 
             beatmap.HitObjects.Add(new JudgeableHitObject { StartTime = 0 });
             for (double time = 0; time < 5000; time += 100)
-                beatmap.HitObjects.Add(new JudgeableHitObject(false) { StartTime = time });
+                beatmap.HitObjects.Add(new JudgeableHitObject(HitResult.LargeBonus) { StartTime = time });
             beatmap.HitObjects.Add(new JudgeableHitObject { StartTime = 5000 });
 
             createProcessor(beatmap);
@@ -236,23 +236,23 @@ namespace osu.Game.Tests.Gameplay
 
         private class JudgeableHitObject : HitObject
         {
-            private readonly bool affectsCombo;
+            private readonly HitResult maxResult;
 
-            public JudgeableHitObject(bool affectsCombo = true)
+            public JudgeableHitObject(HitResult maxResult = HitResult.Perfect)
             {
-                this.affectsCombo = affectsCombo;
+                this.maxResult = maxResult;
             }
 
-            public override Judgement CreateJudgement() => new TestJudgement(affectsCombo);
+            public override Judgement CreateJudgement() => new TestJudgement(maxResult);
             protected override HitWindows CreateHitWindows() => new HitWindows();
 
             private class TestJudgement : Judgement
             {
-                public override bool AffectsCombo { get; }
+                public override HitResult MaxResult { get; }
 
-                public TestJudgement(bool affectsCombo)
+                public TestJudgement(HitResult maxResult)
                 {
-                    AffectsCombo = affectsCombo;
+                    MaxResult = maxResult;
                 }
             }
         }
@@ -263,7 +263,7 @@ namespace osu.Game.Tests.Gameplay
             public double Duration { get; set; } = 5000;
 
             public JudgeableLongHitObject()
-                : base(false)
+                : base(HitResult.LargeBonus)
             {
             }
 
