@@ -122,7 +122,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public object TooltipContent => shouldShowTooltip ? new DifficultyIconTooltipContent(beatmap, difficultyBindable) : null;
 
-        private class DifficultyRetriever : Drawable
+        private class DifficultyRetriever : Component
         {
             public readonly Bindable<StarDifficulty> StarDifficulty = new Bindable<StarDifficulty>();
 
