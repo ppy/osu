@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             get => canRotate;
             set
             {
+                if (canRotate == value) return;
+
                 canRotate = value;
                 recreate();
             }
@@ -46,6 +48,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             get => canScaleX;
             set
             {
+                if (canScaleX == value) return;
+
                 canScaleX = value;
                 recreate();
             }
@@ -61,6 +65,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             get => canScaleY;
             set
             {
+                if (canScaleY == value) return;
+
                 canScaleY = value;
                 recreate();
             }
