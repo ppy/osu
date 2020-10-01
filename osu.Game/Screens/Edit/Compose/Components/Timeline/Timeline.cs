@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
 
+        public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
+
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         [Resolved]
@@ -61,6 +63,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private WaveformGraph waveform;
         private ControlPointPart controlPoints;
+        private TimelineTickDisplay ticks;
 
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
@@ -80,7 +83,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                new TimelineTickDisplay(),
+                ticks = new TimelineTickDisplay(),
             });
 
             // We don't want the centre marker to scroll
@@ -88,6 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             ControlPointsVisible.ValueChanged += visible => controlPoints.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
             Beatmap.BindValueChanged(b =>

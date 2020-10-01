@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             OsuCheckbox waveformCheckbox;
             OsuCheckbox controlPointsCheckbox;
+            OsuCheckbox ticksCheckbox;
 
             InternalChildren = new Drawable[]
             {
@@ -71,6 +72,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                             controlPointsCheckbox = new OsuCheckbox
                                             {
                                                 LabelText = "Control Points",
+                                                Current = { Value = true },
+                                            },
+                                            ticksCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "Ticks",
                                                 Current = { Value = true },
                                             }
                                         }
@@ -131,6 +137,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             Timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
             Timeline.ControlPointsVisible.BindTo(controlPointsCheckbox.Current);
+            Timeline.TicksVisible.BindTo(ticksCheckbox.Current);
         }
 
         private void changeZoom(float change) => Timeline.Zoom += change;
