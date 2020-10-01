@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
@@ -15,6 +16,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Framework.Timing;
+using osu.Game.Configuration;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Graphics.ES30;
@@ -28,6 +30,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
         private int currentIndex;
         private IShader shader;
+        private Bindable<float> cursorSize;
         private double timeOffset;
         private float time;
 
@@ -48,9 +51,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(ShaderManager shaders, OsuConfigManager config)
         {
             shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
+            cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
         }
 
         protected override void LoadComplete()
@@ -147,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = partSize.X / 2.5f;
+                    float interval = partSize.X / 2.5f / cursorSize.Value;
 
                     for (float d = interval; d < distance; d += interval)
                     {
