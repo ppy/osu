@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public void TestNormalHit()
         {
             AddStep("Great", () => SetContents(() => getContentFor(createHit(HitResult.Great))));
-            AddStep("Good", () => SetContents(() => getContentFor(createHit(HitResult.Good))));
+            AddStep("Ok", () => SetContents(() => getContentFor(createHit(HitResult.Ok))));
             AddStep("Miss", () => SetContents(() => getContentFor(createHit(HitResult.Miss))));
         }
 
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public void TestStrongHit([Values(false, true)] bool hitBoth)
         {
             AddStep("Great", () => SetContents(() => getContentFor(createStrongHit(HitResult.Great, hitBoth))));
-            AddStep("Good", () => SetContents(() => getContentFor(createStrongHit(HitResult.Good, hitBoth))));
+            AddStep("Good", () => SetContents(() => getContentFor(createStrongHit(HitResult.Ok, hitBoth))));
         }
 
         private Drawable getContentFor(DrawableTestHit hit)
@@ -35,7 +35,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    hit,
+                    // the hit needs to be added to hierarchy in order for nested objects to be created correctly.
+                    // setting zero alpha is supposed to prevent the test from looking broken.
+                    hit.With(h => h.Alpha = 0),
                     new HitExplosion(hit, hit.Type)
                     {
                         Anchor = Anchor.Centre,
