@@ -8,12 +8,20 @@ using osu.Game.Rulesets.Scoring;
 namespace osu.Game.Rulesets.Osu.Objects
 {
     /// <summary>
-    /// A hitcircle which is at the end of a slider path (either repeat or final tail).
+    /// A hit circle which is at the end of a slider path (either repeat or final tail).
     /// </summary>
     public abstract class SliderEndCircle : HitCircle
     {
+        private readonly Slider slider;
+
+        protected SliderEndCircle(Slider slider)
+        {
+            this.slider = slider;
+        }
+
         public int RepeatIndex { get; set; }
-        public double SpanDuration { get; set; }
+
+        public double SpanDuration => slider.SpanDuration;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -26,6 +34,14 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                 // The next end circle should appear exactly after the previous circle (on the same end) is hit.
                 TimePreempt = SpanDuration * 2;
+            }
+            else
+            {
+                // taken from osu-stable
+                const float first_end_circle_preempt_adjust = 2 / 3f;
+
+                // The first end circle should fade in with the slider.
+                TimePreempt = (StartTime - slider.StartTime) + slider.TimePreempt * first_end_circle_preempt_adjust;
             }
         }
 
