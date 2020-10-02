@@ -21,10 +21,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
     public class LegacyMainCirclePiece : CompositeDrawable
     {
         private readonly string priorityLookup;
+        private readonly bool hasNumber;
 
-        public LegacyMainCirclePiece(string priorityLookup = null)
+        public LegacyMainCirclePiece(string priorityLookup = null, bool hasNumber = true)
         {
             this.priorityLookup = priorityLookup;
+            this.hasNumber = hasNumber;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
@@ -70,7 +72,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         }
                     }
                 },
-                hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+            };
+
+            if (hasNumber)
+            {
+                AddInternal(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
@@ -78,8 +84,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                },
-            };
+                });
+            }
 
             bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
@@ -107,7 +113,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             state.BindValueChanged(updateState, true);
             accentColour.BindValueChanged(colour => hitCircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
-            indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
+            if (hasNumber)
+                indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
         }
 
         private void updateState(ValueChangedEvent<ArmedState> state)
@@ -120,16 +127,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
                     circleSprites.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                    var legacyVersion = skin.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value;
-
-                    if (legacyVersion >= 2.0m)
-                        // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
-                        hitCircleText.FadeOut(legacy_fade_duration / 4, Easing.Out);
-                    else
+                    if (hasNumber)
                     {
-                        // old skins scale and fade it normally along other pieces.
-                        hitCircleText.FadeOut(legacy_fade_duration, Easing.Out);
-                        hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        var legacyVersion = skin.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value;
+
+                        if (legacyVersion >= 2.0m)
+                            // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
+                            hitCircleText.FadeOut(legacy_fade_duration / 4, Easing.Out);
+                        else
+                        {
+                            // old skins scale and fade it normally along other pieces.
+                            hitCircleText.FadeOut(legacy_fade_duration, Easing.Out);
+                            hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        }
                     }
 
                     break;
