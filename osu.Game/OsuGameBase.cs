@@ -362,7 +362,10 @@ namespace osu.Game
             foreach (var importer in fileImporters)
             {
                 if (importer.HandledExtensions.Contains(extension))
+                {
                     await importer.Import(paths);
+                    continue;
+                }
             }
         }
 
