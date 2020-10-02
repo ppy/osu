@@ -174,10 +174,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                         // we need to use the LegacyLastTick here for compatibility reasons (difficulty).
                         // it is *okay* to use this because the TailCircle is not used for any meaningful purpose in gameplay.
                         // if this is to change, we should revisit this.
-                        AddNested(TailCircle = new SliderTailCircle
+                        AddNested(TailCircle = new SliderTailCircle(this)
                         {
                             RepeatIndex = e.SpanIndex,
-                            SpanDuration = SpanDuration,
                             StartTime = e.Time,
                             Position = EndPosition,
                             StackHeight = StackHeight
@@ -185,10 +184,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new SliderRepeat
+                        AddNested(new SliderRepeat(this)
                         {
                             RepeatIndex = e.SpanIndex,
-                            SpanDuration = SpanDuration,
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,

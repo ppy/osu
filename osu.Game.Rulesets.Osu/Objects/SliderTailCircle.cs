@@ -14,6 +14,11 @@ namespace osu.Game.Rulesets.Osu.Objects
     /// </summary>
     public class SliderTailCircle : SliderEndCircle
     {
+        public SliderTailCircle(Slider slider)
+            : base(slider)
+        {
+        }
+
         public override Judgement CreateJudgement() => new SliderTailJudgement();
 
         public class SliderTailJudgement : OsuJudgement

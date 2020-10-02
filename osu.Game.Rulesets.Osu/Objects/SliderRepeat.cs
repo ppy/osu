@@ -9,6 +9,11 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class SliderRepeat : SliderEndCircle
     {
+        public SliderRepeat(Slider slider)
+            : base(slider)
+        {
+        }
+
         public override Judgement CreateJudgement() => new SliderRepeatJudgement();
 
         public class SliderRepeatJudgement : OsuJudgement
