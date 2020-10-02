@@ -40,7 +40,7 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisBgBlur, 0.2f, 0f, 1f);
             Set(MfSetting.MvisEnableStoryboard, false);
             Set(MfSetting.MvisUseOsuLogoVisualisation, false);
-            Set(MfSetting.MvisIdleBgDim, 0.3f, 0f, 1f);
+            Set(MfSetting.MvisIdleBgDim, 0.6f, 0f, 1f);
             Set(MfSetting.MvisEnableBgTriangles, true);
             Set(MfSetting.MvisEnableSBOverlayProxy, true);
             Set(MfSetting.MvisAdjustMusicWithFreq, true);

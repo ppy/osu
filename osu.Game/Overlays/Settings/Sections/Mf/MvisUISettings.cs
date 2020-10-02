@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "空闲时的背景暗化",
+                    LabelText = "空闲时的背景亮度",
                     Bindable = config.GetBindable<float>(MfSetting.MvisIdleBgDim),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,

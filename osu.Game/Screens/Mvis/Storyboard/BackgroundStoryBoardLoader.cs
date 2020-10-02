@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             }
             catch (Exception e)
             {
-                Logger.Error(e, "加载Storyboard时出现错误! 请检查你的谱面!");
+                Logger.Error(e, "加载故事版时出现错误。");
                 return false;
             }
 

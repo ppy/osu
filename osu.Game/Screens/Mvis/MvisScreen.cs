@@ -35,6 +35,8 @@ using osu.Framework.Graphics.Audio;
 using osu.Game.Screens.Select;
 using osu.Game.Overlays.Settings;
 using osuTK.Input;
+using osu.Game.Screens.Backgrounds;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens
 {
@@ -53,6 +55,8 @@ namespace osu.Game.Screens
         public override bool CursorVisible => AllowCursor;
         public override bool AllowRateAdjustments => true;
 
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
+
         private bool canReallyHide =>
             // don't hide if the user is hovering one of the panes, unless they are idle.
             (IsHovered || IsIdle.Value)
@@ -68,7 +72,6 @@ namespace osu.Game.Screens
         private MusicController musicController { get; set; }
 
         private InputManager inputManager { get; set; }
-        private Box dimBox;
         private BottomBar bottomBar;
         private Container gameplayContent;
         private SideBarSettingsPanel sidebarContainer;
@@ -99,7 +102,6 @@ namespace osu.Game.Screens
         private FillFlowContainer bottomFillFlow;
         private BindableBool lockChanges = new BindableBool();
         private readonly IBindable<bool> IsIdle = new BindableBool();
-        private BufferedBeatmapCover beatmapCover;
         private Container gameplayBackground;
         private Container particles;
         private NightcoreBeatContainer nightcoreBeatContainer;
@@ -114,14 +116,6 @@ namespace osu.Game.Screens
                 nightcoreBeatContainer = new NightcoreBeatContainer
                 {
                     Alpha = 0
-                },
-                new ParallaxContainer
-                {
-                    Depth = float.MaxValue,
-                    Name = "Beatmap Background Parallax",
-                    RelativeSizeAxes = Axes.Both,
-                    ParallaxAmount = 0.02f,
-                    Child = beatmapCover = new BufferedBeatmapCover{ RelativeSizeAxes = Axes.Both }
                 },
                 new Container
                 {
@@ -312,14 +306,7 @@ namespace osu.Game.Screens
                             Children = new Drawable[]
                             {
                                 bgTriangles = new BgTrianglesContainer(),
-                                sbLoader = new BackgroundStoryBoardLoader(),
-                                dimBox = new Box
-                                {
-                                    Name = "Dim Box",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                    Alpha = 0
-                                },
+                                sbLoader = new BackgroundStoryBoardLoader()
                             }
                         },
                         gameplayContent = new Container
@@ -409,7 +396,7 @@ namespace osu.Game.Screens
 
         protected override void LoadComplete()
         {
-            BgBlur.BindValueChanged(v => beatmapCover.BlurTo(new Vector2(v.NewValue * 100), 300), true);
+            BgBlur.BindValueChanged(v => updateBackground(Beatmap.Value));
             ContentAlpha.BindValueChanged(_ => UpdateIdleVisuals());
             IdleBgDim.BindValueChanged(_ => UpdateIdleVisuals());
 
@@ -449,22 +436,8 @@ namespace osu.Game.Screens
                         break;
                 }
             });
-            sbLoader.storyboardReplacesBackground.BindValueChanged(v =>
-            {
-                switch (v.NewValue)
-                {
-                    case true:
-                        beatmapCover.FadeColour(Color4.Black, 300);
-                        break;
-
-                    default:
-                    case false:
-                        beatmapCover.FadeColour(Color4.White, 300);
-                        break;
-                }
-            });
+            sbLoader.storyboardReplacesBackground.BindValueChanged(_ => ApplyBackgroundBrightness());
             inputManager = GetContainingInputManager();
-            dimBox.ScaleTo(1.1f);
 
             progressBarContainer.progressBar.OnSeek = SeekTo;
 
@@ -538,12 +511,7 @@ namespace osu.Game.Screens
         {
             base.OnEntering(last);
 
-            if ((IScreen)last is PlaySongSelect)
-                Background?.FadeOut(250);
-
             //各种背景层的动画
-            Background?.Delay(250).Then().FadeOut(250);
-            beatmapCover.FadeOut().Then().Delay(500).FadeIn(500);
             gameplayBackground.FadeOut().Then().Delay(250).FadeIn(500);
 
             //非背景层的动画
@@ -578,10 +546,10 @@ namespace osu.Game.Screens
 
         public override void OnSuspending(IScreen next)
         {
-            Background?.FadeIn(250);
-            beatmapCover.FadeOut(250);
+            Track.ResetSpeedAdjustments();
 
             //背景层的动画
+            ApplyBackgroundBrightness(false, 1);
             Background?.FadeIn(250);
 
             //非背景层的动画
@@ -597,10 +565,11 @@ namespace osu.Game.Screens
             base.OnResuming(last);
 
             this.FadeIn(DURATION);
+            Track.ResetSpeedAdjustments();
+            ApplyTrackAdjustments();
 
             //背景层的动画
-            Background?.Delay(250).Then().FadeOut(250);
-            beatmapCover.FadeOut().Then().Delay(500).FadeIn(500);
+            ApplyBackgroundBrightness();
             gameplayBackground.FadeOut().Then().Delay(250).FadeIn(500);
 
             //非背景层的动画
@@ -718,7 +687,6 @@ namespace osu.Game.Screens
             if (lockChanges.Value) return;
 
             gameplayContent.FadeTo(1, DURATION, Easing.OutQuint);
-            dimBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
 
             buttonsContainer.MoveToY(0, DURATION, Easing.OutQuint);
             progressBarContainer.MoveToY(0, DURATION, Easing.OutQuint);
@@ -726,6 +694,8 @@ namespace osu.Game.Screens
 
             AllowCursor = true;
             OverlaysHidden = false;
+
+            ApplyBackgroundBrightness();
         }
 
         //下一步优化界面隐藏，显示逻辑
@@ -762,7 +732,7 @@ namespace osu.Game.Screens
             if (!OverlaysHidden)
                 return;
 
-            dimBox.FadeTo(IdleBgDim.Value, DURATION, Easing.OutQuint);
+            ApplyBackgroundBrightness(false, IdleBgDim.Value);
             gameplayContent.FadeTo(ContentAlpha.Value, DURATION, Easing.OutQuint);
         }
 
@@ -782,12 +752,33 @@ namespace osu.Game.Screens
                 nightcoreBeatContainer.Hide();
         }
 
+        private void updateBackground(WorkingBeatmap beatmap)
+        {
+            if ( Background == null ) return;
+
+            var bg = (BackgroundScreenBeatmap)Background;
+            bg.BlurAmount.Value = BgBlur.Value * 100;
+            bg.Beatmap = beatmap;
+            ApplyBackgroundBrightness();
+        }
+
+        private void ApplyBackgroundBrightness(bool auto = true, float brightness = 0)
+        {
+            if ( ! sbLoader.storyboardReplacesBackground.Value )
+                Background?.FadeColour(OsuColour.Gray(auto ? (OverlaysHidden ? IdleBgDim.Value : 0.6f) : brightness), DURATION, Easing.OutQuint);
+            else
+                Background?.FadeColour(Color4.Black, DURATION, Easing.OutQuint);
+            
+            sbLoader?.FadeColour(OsuColour.Gray(auto ? (OverlaysHidden ? IdleBgDim.Value : 0.6f) : brightness), DURATION, Easing.OutQuint);
+        }
+
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
             this.Schedule(() =>
-           {
-               ApplyTrackAdjustments();
-           });
+            {
+                ApplyTrackAdjustments();
+                updateBackground(beatmap);
+            });
 
             sbLoader.UpdateStoryBoardAsync(() =>
             {
