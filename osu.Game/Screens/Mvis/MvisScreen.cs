@@ -248,7 +248,8 @@ namespace osu.Game.Screens
                                                                     {
                                                                         //隐藏界面，锁定更改并隐藏锁定按钮
                                                                         HideOverlays();
-                                                                        sidebarContainer.Hide();
+                                                                        if ( sidebarContainer.Alpha != 0 )
+                                                                            sidebarToggleButton.Click();
 
                                                                         //防止手机端无法退出桌面背景模式
                                                                         if (RuntimeInfo.IsDesktop)
@@ -456,7 +457,7 @@ namespace osu.Game.Screens
                         particles.Clear();
                         break;
                 }
-            });
+            }, true);
 
             sbLoader.NeedToHideTriangles.BindValueChanged(UpdateBgTriangles, true);
             sbLoader.IsReady.BindValueChanged(v =>
