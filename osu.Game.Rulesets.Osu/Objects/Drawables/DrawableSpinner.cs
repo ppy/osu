@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 else if (Progress > .75)
                     r.Type = HitResult.Meh;
                 else if (Time.Current >= Spinner.EndTime)
-                    r.Type = HitResult.Miss;
+                    r.Type = r.Judgement.MinResult;
             });
         }
 

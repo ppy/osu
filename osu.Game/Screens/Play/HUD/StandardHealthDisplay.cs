@@ -13,7 +13,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
 {
