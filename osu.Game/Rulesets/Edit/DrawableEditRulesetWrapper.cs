@@ -69,8 +69,6 @@ namespace osu.Game.Rulesets.Edit
 
             drawableRuleset.Playfield.Add(drawableObject);
             drawableRuleset.Playfield.PostProcess();
-
-            updateReplay();
         }
 
         private void removeHitObject(HitObject hitObject)
@@ -79,8 +77,6 @@ namespace osu.Game.Rulesets.Edit
 
             drawableRuleset.Playfield.Remove(drawableObject);
             drawableRuleset.Playfield.PostProcess();
-
-            updateReplay();
         }
 
         public override bool PropagatePositionalInputSubTree => false;
