@@ -245,6 +245,7 @@ namespace osu.Game.Screens
                                                                     Action = () =>
                                                                     {
                                                                         //隐藏界面，锁定更改并隐藏锁定按钮
+                                                                        lockChanges.Value = false;
                                                                         HideOverlays();
                                                                         if ( sidebarContainer.Alpha != 0 )
                                                                             sidebarToggleButton.Click();
