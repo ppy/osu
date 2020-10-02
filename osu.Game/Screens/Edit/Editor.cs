@@ -107,6 +107,7 @@ namespace osu.Game.Screens.Edit
             UpdateClockSource();
 
             dependencies.CacheAs(clock);
+            dependencies.CacheAs<ISamplePlaybackDisabler>(clock);
             AddInternal(clock);
 
             // todo: remove caching of this and consume via editorBeatmap?

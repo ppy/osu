@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         CursorRotate,
         HitCircleOverlayAboveNumber,
         HitCircleOverlayAboveNumer, // Some old skins will have this typo
-        SpinnerFrequencyModulate
+        SpinnerFrequencyModulate,
+        SpinnerNoBlink
     }
 }

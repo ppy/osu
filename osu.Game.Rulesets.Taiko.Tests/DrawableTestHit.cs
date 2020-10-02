@@ -22,6 +22,12 @@ namespace osu.Game.Rulesets.Taiko.Tests
             HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
         }
 
+        protected override void UpdateInitialTransforms()
+        {
+            // base implementation in DrawableHitObject forces alpha to 1.
+            // suppress locally to allow hiding the visuals wherever necessary.
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {

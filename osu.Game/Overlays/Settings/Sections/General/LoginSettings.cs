@@ -236,7 +236,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         PlaceholderText = "密码",
                         RelativeSizeAxes = Axes.X,
                         TabbableContentContainer = this,
-                        OnCommit = (sender, newText) => performLogin()
                     },
                     new SettingsCheckbox
                     {
@@ -276,6 +275,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         }
                     }
                 };
+
+                password.OnCommit += (sender, newText) => performLogin();
             }
 
             public override bool AcceptsFocus => true;

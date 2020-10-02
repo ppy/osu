@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestCatchComboCounter()
         {
-            AddRepeatStep("perform hit", () => performJudgement(HitResult.Perfect), 20);
+            AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 20);
             AddStep("perform miss", () => performJudgement(HitResult.Miss));
 
             AddStep("randomize judged object colour", () =>
