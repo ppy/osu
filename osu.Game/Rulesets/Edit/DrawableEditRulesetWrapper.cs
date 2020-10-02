@@ -40,17 +40,21 @@ namespace osu.Game.Rulesets.Edit
             Playfield.DisplayJudgements.Value = false;
         }
 
+        [Resolved]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             beatmap.HitObjectAdded += addHitObject;
-            beatmap.HitObjectUpdated += updateReplay;
             beatmap.HitObjectRemoved += removeHitObject;
+
+            // for now only regenerate replay on a finalised state change, not HitObjectUpdated.
+            changeHandler.OnStateChange += updateReplay;
         }
 
-        private void updateReplay(HitObject obj = null) =>
-            drawableRuleset.RegenerateAutoplay();
+        private void updateReplay() => drawableRuleset.RegenerateAutoplay();
 
         private void addHitObject(HitObject hitObject)
         {
@@ -69,7 +73,7 @@ namespace osu.Game.Rulesets.Edit
             drawableRuleset.Playfield.Remove(drawableObject);
             drawableRuleset.Playfield.PostProcess();
 
-            drawableRuleset.RegenerateAutoplay();
+            updateReplay();
         }
 
         public override bool PropagatePositionalInputSubTree => false;
