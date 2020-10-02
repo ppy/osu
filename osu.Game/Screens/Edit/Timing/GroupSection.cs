@@ -93,6 +93,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void changeSelectedGroupTime(in double time)
         {
+            if (time == SelectedGroup.Value.Time)
+                return;
+
             changeHandler?.BeginChange();
 
             var currentGroupItems = SelectedGroup.Value.ControlPoints.ToArray();
