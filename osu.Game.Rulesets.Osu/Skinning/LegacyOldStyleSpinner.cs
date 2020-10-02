@@ -88,9 +88,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             base.LoadComplete();
 
-            this.FadeOut();
             drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
-
             updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
         }
 
@@ -100,6 +98,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 return;
 
             var spinner = drawableSpinner.HitObject;
+
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                this.FadeOut();
 
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
                 this.FadeInFromZero(spinner.TimeFadeIn / 2);
