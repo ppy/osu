@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     // no default for this; only visible in legacy skins.
                     CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty()),
