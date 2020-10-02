@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             };
 
             volume.BindValueChanged(volume => volumeBox.Height = volume.NewValue / 100f, true);
-            bank.BindValueChanged(bank => text.Text = $"{bank.NewValue}", true);
+            bank.BindValueChanged(bank => text.Text = bank.NewValue, true);
         }
     }
 }
