@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                new UpdateableBeatmapBackground
+                updateableBg = new UpdateableBeatmapBackground
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -115,6 +115,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
         private CancellationTokenSource cancellationTokenSource;
         private MenuLogoVisualisation visualisation;
+        private UpdateableBeatmapBackground updateableBg;
 
         private void updateVisuals()
         {
@@ -154,6 +155,16 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                 placeholder.Clear();
                 placeholder.AddRange(loaded);
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+        }
+
+        public override void StopResponseOnBeatmapChanges()
+        {
+            updateableBg.StopResponseOnBeatmapChanges();
+        }
+
+        public override void ResponseOnBeatmapChanges()
+        {
+            updateableBg.ResponseOnBeatmapChanges();
         }
 
         protected override void Update()

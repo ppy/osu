@@ -436,7 +436,7 @@ namespace osu.Game.Screens
                 }
             });
 
-            Beatmap.BindValueChanged(v => updateComponentFromBeatmap(v.NewValue), true);
+            Beatmap.BindValueChanged(OnBeatmapChanged, true);
 
             MusicSpeed.BindValueChanged(_ => ApplyTrackAdjustments());
             AdjustFreq.BindValueChanged(_ => ApplyTrackAdjustments());
@@ -593,6 +593,9 @@ namespace osu.Game.Screens
             bottomFillFlow.MoveToY(bottomBar.Height + 30, DURATION, Easing.OutQuint);
 
             this.FadeOut(DURATION, Easing.OutQuint);
+            beatmapLogo.StopResponseOnBeatmapChanges();
+            Beatmap.UnbindEvents();
+
             base.OnSuspending(next);
         }
 
@@ -604,6 +607,9 @@ namespace osu.Game.Screens
             Track.ResetSpeedAdjustments();
             ApplyTrackAdjustments();
             updateBackground(Beatmap.Value);
+
+            Beatmap.BindValueChanged(OnBeatmapChanged, true);
+            beatmapLogo.ResponseOnBeatmapChanges();
 
             //背景层的动画
             gameplayBackground.FadeOut().Then().Delay(250).FadeIn(500);
@@ -804,8 +810,10 @@ namespace osu.Game.Screens
             sbLoader?.FadeColour(OsuColour.Gray(auto ? (OverlaysHidden ? IdleBgDim.Value : 0.6f) : brightness), DURATION, Easing.OutQuint);
         }
 
-        private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
+        private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
+            var beatmap = v.NewValue;
+
             this.Schedule(() =>
             {
                 ApplyTrackAdjustments();

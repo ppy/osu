@@ -22,5 +22,16 @@ namespace osu.Game.Screens.Mvis.UI.Objects.Helpers
         protected virtual void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
         }
+
+        public virtual void StopResponseOnBeatmapChanges()
+        {
+            Beatmap.UnbindFrom(working);
+        }
+
+        public virtual void ResponseOnBeatmapChanges()
+        {
+            StopResponseOnBeatmapChanges();
+            Beatmap.BindTo(working);
+        }
     }
 }

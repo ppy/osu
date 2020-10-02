@@ -118,6 +118,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     return false;
                 }
 
+                Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
+
                 if (ClockContainer != null)
                 {
                     if (drawableStoryboard != null)
@@ -192,17 +194,14 @@ namespace osu.Game.Screens.Mvis.Storyboard
             Schedule(() =>
             {
                 LoadSBAsyncTask = Task.Run(async () =>
-               {
-                   Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
+                {
+                    LogTask = Task.Run(() =>
+                    {
+                        UpdateComponent(b.Value);
+                    });
 
-
-                   LogTask = Task.Run(() =>
-                   {
-                       UpdateComponent(b.Value);
-                   });
-
-                   await LogTask;
-               });
+                    await LogTask;
+                });
             });
         }
     }
