@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledTextBox creatorTextBox;
         private LabelledTextBox difficultyTextBox;
         private LabelledTextBox audioTrackTextBox;
+        private Container backgroundSpriteContainer;
 
         [Resolved]
         private OsuGameBase game { get; set; }
@@ -95,19 +96,12 @@ namespace osu.Game.Screens.Edit.Setup
                                 Direction = FillDirection.Vertical,
                                 Children = new Drawable[]
                                 {
-                                    new Container
+                                    backgroundSpriteContainer = new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Height = 250,
                                         Masking = true,
                                         CornerRadius = 10,
-                                        Child = new BeatmapBackgroundSprite(Beatmap.Value)
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            FillMode = FillMode.Fill,
-                                        },
                                     },
                                     new OsuSpriteText
                                     {
@@ -156,16 +150,79 @@ namespace osu.Game.Screens.Edit.Setup
                 }
             };
 
+            updateBackgroundSprite();
+
             audioTrackTextBox.Current.BindValueChanged(audioTrackChanged);
 
             foreach (var item in flow.OfType<LabelledTextBox>())
                 item.OnCommit += onCommit;
         }
 
+        Task ICanAcceptFiles.Import(params string[] paths)
+        {
+            Schedule(() =>
+            {
+                var firstFile = new FileInfo(paths.First());
+
+                if (ImageExtensions.Contains(firstFile.Extension))
+                {
+                    ChangeBackgroundImage(firstFile.FullName);
+                }
+                else if (AudioExtensions.Contains(firstFile.Extension))
+                {
+                    audioTrackTextBox.Text = firstFile.FullName;
+                }
+            });
+
+            return Task.CompletedTask;
+        }
+
+        private void updateBackgroundSprite()
+        {
+            LoadComponentAsync(new BeatmapBackgroundSprite(Beatmap.Value)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fill,
+            }, background =>
+            {
+                backgroundSpriteContainer.Child = background;
+                background.FadeInFromZero(500);
+            });
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
             game.RegisterImportHandler(this);
+        }
+
+        public bool ChangeBackgroundImage(string path)
+        {
+            var info = new FileInfo(path);
+
+            if (!info.Exists)
+                return false;
+
+            var set = Beatmap.Value.BeatmapSetInfo;
+
+            // remove the previous background for now.
+            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
+            var oldFile = set.Files.FirstOrDefault(f => f.Filename == Beatmap.Value.Metadata.BackgroundFile);
+
+            using (var stream = info.OpenRead())
+            {
+                if (oldFile != null)
+                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
+                else
+                    beatmaps.AddFile(set, stream, info.Name);
+            }
+
+            Beatmap.Value.Metadata.BackgroundFile = info.Name;
+            updateBackgroundSprite();
+
+            return true;
         }
 
         public bool ChangeAudioTrack(string path)
@@ -213,22 +270,6 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Value.Metadata.Title = titleTextBox.Current.Value;
             Beatmap.Value.Metadata.AuthorString = creatorTextBox.Current.Value;
             Beatmap.Value.BeatmapInfo.Version = difficultyTextBox.Current.Value;
-        }
-
-        public Task Import(params string[] paths)
-        {
-            var firstFile = new FileInfo(paths.First());
-
-            if (ImageExtensions.Contains(firstFile.Extension))
-            {
-                // todo: add image drag drop support
-            }
-            else if (AudioExtensions.Contains(firstFile.Extension))
-            {
-                audioTrackTextBox.Text = firstFile.FullName;
-            }
-
-            return Task.CompletedTask;
         }
 
         protected override void Dispose(bool isDisposing)
