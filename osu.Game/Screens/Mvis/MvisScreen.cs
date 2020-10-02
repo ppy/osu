@@ -556,8 +556,11 @@ namespace osu.Game.Screens
             Background?.FadeIn(250);
 
             //非背景层的动画
-            gameplayContent.ScaleTo(0, DURATION, Easing.OutQuint);
+            gameplayContent.MoveToX(-DrawWidth, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30, DURATION, Easing.OutQuint);
+
+            if ( sidebarContainer.Alpha != 0 )
+                sidebarContainer.Hide();
 
             this.FadeOut(DURATION, Easing.OutQuint);
             beatmapLogo.StopResponseOnBeatmapChanges();
@@ -582,8 +585,11 @@ namespace osu.Game.Screens
             gameplayBackground.FadeOut().Then().Delay(250).FadeIn(500);
 
             //非背景层的动画
-            gameplayContent.ScaleTo(0f).Then().ScaleTo(1f, DURATION, Easing.OutQuint);
+            gameplayContent.MoveToX(0, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, DURATION, Easing.OutQuint);
+
+            if (sidebarToggleButton.ToggleableValue.Value)
+                sidebarContainer.Show();
         }
 
         public bool OnPressed(GlobalAction action)
