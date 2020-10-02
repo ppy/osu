@@ -366,7 +366,7 @@ namespace osu.Game
             }
         }
 
-        public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
+        public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);
 
         protected override void Dispose(bool isDisposing)
         {
