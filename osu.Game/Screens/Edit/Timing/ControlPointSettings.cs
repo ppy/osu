@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private IReadOnlyList<Drawable> createSections() => new Drawable[]
         {
+            new GroupSection(),
             new TimingSection(),
             new DifficultySection(),
             new SampleSection(),
