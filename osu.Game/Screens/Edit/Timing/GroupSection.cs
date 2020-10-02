@@ -27,6 +27,9 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private EditorClock clock { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -90,6 +93,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void changeSelectedGroupTime(in double time)
         {
+            changeHandler?.BeginChange();
+
             var currentGroupItems = SelectedGroup.Value.ControlPoints.ToArray();
 
             Beatmap.Value.Beatmap.ControlPointInfo.RemoveGroup(SelectedGroup.Value);
@@ -98,6 +103,8 @@ namespace osu.Game.Screens.Edit.Timing
                 Beatmap.Value.Beatmap.ControlPointInfo.Add(time, cp);
 
             SelectedGroup.Value = Beatmap.Value.Beatmap.ControlPointInfo.GroupAt(time);
+
+            changeHandler?.EndChange();
         }
     }
 }
