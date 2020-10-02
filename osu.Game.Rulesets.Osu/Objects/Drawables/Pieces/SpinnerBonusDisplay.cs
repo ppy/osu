@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     /// </summary>
     public class SpinnerBonusDisplay : CompositeDrawable
     {
+        private static readonly int score_per_tick = new SpinnerBonusTick().CreateJudgement().MaxNumericResult;
+
         private readonly OsuSpriteText bonusCounter;
 
         public SpinnerBonusDisplay()
@@ -36,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 return;
 
             displayedCount = count;
-            bonusCounter.Text = $"{SpinnerBonusTick.SCORE_PER_TICK * count}";
+            bonusCounter.Text = $"{score_per_tick * count}";
             bonusCounter.FadeOutFromOne(1500);
             bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
         }

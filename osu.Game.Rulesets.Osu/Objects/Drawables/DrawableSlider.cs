@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Tracking.BindValueChanged(updateSlidingSample);
         }
 
-        private SkinnableSound slidingSample;
+        private PausableSkinnableSound slidingSample;
 
         protected override void LoadSamples()
         {
@@ -103,19 +103,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
                 clone.Name = "sliderslide";
 
-                AddInternal(slidingSample = new SkinnableSound(clone)
+                AddInternal(slidingSample = new PausableSkinnableSound(clone)
                 {
                     Looping = true
                 });
             }
         }
 
+        public override void StopAllSamples()
+        {
+            base.StopAllSamples();
+            slidingSample?.Stop();
+        }
+
         private void updateSlidingSample(ValueChangedEvent<bool> tracking)
         {
-            // note that samples will not start playing if exiting a seek operation in the middle of a slider.
-            // may be something we want to address at a later point, but not so easy to make happen right now
-            // (SkinnableSound would need to expose whether the sample is already playing and this logic would need to run in Update).
-            if (tracking.NewValue && ShouldPlaySamples)
+            if (tracking.NewValue)
                 slidingSample?.Play();
             else
                 slidingSample?.Stop();

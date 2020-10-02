@@ -146,7 +146,6 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
                                             PlaceholderText = "在这里输入你要发送的消息",
-                                            OnCommit = postMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
                                         }
@@ -185,6 +184,8 @@ namespace osu.Game.Overlays
                     },
                 },
             };
+
+            textbox.OnCommit += postMessage;
 
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
             ChannelTabControl.ChannelSelectorActive.ValueChanged += active => ChannelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;

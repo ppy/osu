@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -59,7 +62,7 @@ namespace osu.Game.Rulesets.UI
         {
             if (clock != null)
             {
-                stabilityGameplayClock.ParentGameplayClock = parentGameplayClock = clock;
+                parentGameplayClock = stabilityGameplayClock.ParentGameplayClock = clock;
                 GameplayClock.IsPaused.BindTo(clock.IsPaused);
             }
         }
@@ -123,39 +126,63 @@ namespace osu.Game.Rulesets.UI
 
             try
             {
-                if (!FrameStablePlayback)
-                    return;
-
-                if (firstConsumption)
+                if (FrameStablePlayback)
                 {
-                    // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
-                    // Instead we perform an initial seek to the proposed time.
+                    if (firstConsumption)
+                    {
+                        // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
+                        // Instead we perform an initial seek to the proposed time.
 
-                    // process frame (in addition to finally clause) to clear out ElapsedTime
-                    manualClock.CurrentTime = newProposedTime;
-                    framedClock.ProcessFrame();
+                        // process frame (in addition to finally clause) to clear out ElapsedTime
+                        manualClock.CurrentTime = newProposedTime;
+                        framedClock.ProcessFrame();
 
-                    firstConsumption = false;
-                }
-                else if (manualClock.CurrentTime < gameplayStartTime)
-                    manualClock.CurrentTime = newProposedTime = Math.Min(gameplayStartTime, newProposedTime);
-                else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
-                {
-                    newProposedTime = newProposedTime > manualClock.CurrentTime
-                        ? Math.Min(newProposedTime, manualClock.CurrentTime + sixty_frame_time)
-                        : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
+                        firstConsumption = false;
+                    }
+                    else if (manualClock.CurrentTime < gameplayStartTime)
+                        manualClock.CurrentTime = newProposedTime = Math.Min(gameplayStartTime, newProposedTime);
+                    else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
+                    {
+                        newProposedTime = newProposedTime > manualClock.CurrentTime
+                            ? Math.Min(newProposedTime, manualClock.CurrentTime + sixty_frame_time)
+                            : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
+                    }
                 }
 
                 if (isAttached)
                 {
-                    double? newTime = ReplayInputHandler.SetFrameFromTime(newProposedTime);
+                    double? newTime;
 
-                    if (newTime == null)
+                    if (FrameStablePlayback)
                     {
-                        // we shouldn't execute for this time value. probably waiting on more replay data.
-                        validState = false;
-                        requireMoreUpdateLoops = true;
-                        return;
+                        // when stability is turned on, we shouldn't execute for time values the replay is unable to satisfy.
+                        if ((newTime = ReplayInputHandler.SetFrameFromTime(newProposedTime)) == null)
+                        {
+                            // setting invalid state here ensures that gameplay will not continue (ie. our child
+                            // hierarchy won't be updated).
+                            validState = false;
+
+                            // potentially loop to catch-up playback.
+                            requireMoreUpdateLoops = true;
+
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        // when stability is disabled, we don't really care about accuracy.
+                        // looping over the replay will allow it to catch up and feed out the required values
+                        // for the current time.
+                        while ((newTime = ReplayInputHandler.SetFrameFromTime(newProposedTime)) != newProposedTime)
+                        {
+                            if (newTime == null)
+                            {
+                                // special case for when the replay actually can't arrive at the required time.
+                                // protects from potential endless loop.
+                                validState = false;
+                                return;
+                            }
+                        }
                     }
 
                     newProposedTime = newTime.Value;
@@ -191,7 +218,9 @@ namespace osu.Game.Rulesets.UI
 
         private class StabilityGameplayClock : GameplayClock
         {
-            public IFrameBasedClock ParentGameplayClock;
+            public GameplayClock ParentGameplayClock;
+
+            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
 
             public StabilityGameplayClock(FramedClock underlyingClock)
                 : base(underlyingClock)

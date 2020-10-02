@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Mods
             healthProcessor.FailConditions += FailCondition;
         }
 
-        protected virtual bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => !result.IsHit && result.Judgement.AffectsCombo;
+        protected virtual bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+            => result.Type.AffectsCombo()
+               && !result.IsHit;
     }
 }

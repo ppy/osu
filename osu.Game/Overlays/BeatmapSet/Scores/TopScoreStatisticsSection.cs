@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 ppColumn.Alpha = value.Beatmap?.Status == BeatmapSetOnlineStatus.Ranked ? 1 : 0;
                 ppColumn.Text = $@"{value.PP:N0}";
 
-                statisticsColumns.ChildrenEnumerable = value.SortedStatistics.Select(kvp => createStatisticsColumn(kvp.Key, kvp.Value));
+                statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(s => createStatisticsColumn(s.result, s.count, s.maxCount));
                 modsColumn.Mods = value.Mods;
 
                 if (scoreManager != null)
@@ -125,9 +125,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private TextColumn createStatisticsColumn(HitResult hitResult, int count) => new TextColumn(hitResult.GetDescription(), smallFont, bottom_columns_min_width)
+        private TextColumn createStatisticsColumn(HitResult hitResult, int count, int? maxCount) => new TextColumn(hitResult.GetDescription(), smallFont, bottom_columns_min_width)
         {
-            Text = count.ToString()
+            Text = maxCount == null ? $"{count}" : $"{count}/{maxCount}"
         };
 
         private class InfoColumn : CompositeDrawable

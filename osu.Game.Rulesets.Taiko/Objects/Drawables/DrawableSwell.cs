@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     }
                 }
 
-                nextTick?.TriggerResult(HitResult.Great);
+                nextTick?.TriggerResult(true);
 
                 var numHits = ticks.Count(r => r.IsHit);
 
@@ -208,10 +208,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         continue;
                     }
 
-                    tick.TriggerResult(HitResult.Miss);
+                    tick.TriggerResult(false);
                 }
 
-                var hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss;
+                var hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : HitResult.Miss;
 
                 ApplyResult(r => r.Type = hitResult);
             }

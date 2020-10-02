@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -93,7 +92,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             base.LoadComplete();
 
             drawableSpinner.RotationTracker.Complete.BindValueChanged(complete => updateComplete(complete.NewValue, 200));
-            drawableSpinner.State.BindValueChanged(updateStateTransforms, true);
+            drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
+
+            updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
         }
 
         protected override void Update()
@@ -123,8 +124,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             mainContainer.Rotation = drawableSpinner.RotationTracker.Rotation;
         }
 
-        private void updateStateTransforms(ValueChangedEvent<ArmedState> state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
+            if (!(drawableHitObject is DrawableSpinner))
+                return;
+
             centre.ScaleTo(0);
             mainContainer.ScaleTo(0);
 
@@ -144,11 +148,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
 
             // transforms we have from completing the spinner will be rolled back, so reapply immediately.
-            updateComplete(state.NewValue == ArmedState.Hit, 0);
+            updateComplete(state == ArmedState.Hit, 0);
 
             using (BeginDelayedSequence(spinner.Duration, true))
             {
-                switch (state.NewValue)
+                switch (state)
                 {
                     case ArmedState.Hit:
                         this.ScaleTo(Scale * 1.2f, 320, Easing.Out);
@@ -184,6 +188,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 wholeRotationCount = rotations;
                 return true;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableSpinner != null)
+                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
