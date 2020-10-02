@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
@@ -16,7 +15,6 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Framework.Timing;
-using osu.Game.Configuration;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Graphics.ES30;
@@ -30,7 +28,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
         private int currentIndex;
         private IShader shader;
-        private Bindable<float> cursorSize;
         private double timeOffset;
         private float time;
 
@@ -51,10 +48,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, OsuConfigManager config)
+        private void load(ShaderManager shaders)
         {
             shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
-            cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -123,6 +119,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         /// </summary>
         protected virtual bool InterpolateMovements => true;
 
+        protected virtual float IntervalMultiplier => 1.0f;
+
         private Vector2? lastPosition;
         private readonly InputResampler resampler = new InputResampler();
 
@@ -151,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = partSize.X / 2.5f / Math.Max(cursorSize.Value, 1);
+                    float interval = partSize.X / 2.5f / IntervalMultiplier;
 
                     for (float d = interval; d < distance; d += interval)
                     {
