@@ -79,9 +79,6 @@ namespace osu.Game.Screens.Edit
                 SaveState();
         }
 
-        /// <summary>
-        /// Saves the current <see cref="Editor"/> state.
-        /// </summary>
         public void SaveState()
         {
             if (bulkChangesStarted > 0)
