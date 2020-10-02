@@ -341,13 +341,13 @@ namespace osu.Game
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
-        private readonly HashSet<ICanAcceptFiles> fileImporters = new HashSet<ICanAcceptFiles>();
+        private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 
         /// <summary>
-        /// Register a global handler for file imports.
+        /// Register a global handler for file imports. Most recently registered will have precedence.
         /// </summary>
         /// <param name="handler">The handler to register.</param>
-        public void RegisterImportHandler(ICanAcceptFiles handler) => fileImporters.Add(handler);
+        public void RegisterImportHandler(ICanAcceptFiles handler) => fileImporters.Insert(0, handler);
 
         /// <summary>
         /// Unregister a global handler for file imports.
