@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -23,14 +26,23 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreen : EditorScreen
+    public class SetupScreen : EditorScreen, ICanAcceptFiles
     {
+        public IEnumerable<string> HandledExtensions => ImageExtensions.Concat(AudioExtensions);
+
+        public static string[] ImageExtensions { get; } = { ".jpg", ".jpeg", ".png" };
+
+        public static string[] AudioExtensions { get; } = { ".mp3", ".ogg" };
+
         private FillFlowContainer flow;
         private LabelledTextBox artistTextBox;
         private LabelledTextBox titleTextBox;
         private LabelledTextBox creatorTextBox;
         private LabelledTextBox difficultyTextBox;
         private LabelledTextBox audioTrackTextBox;
+
+        [Resolved]
+        private OsuGameBase game { get; set; }
 
         [Resolved]
         private MusicController music { get; set; }
@@ -150,6 +162,12 @@ namespace osu.Game.Screens.Edit.Setup
                 item.OnCommit += onCommit;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            game.RegisterImportHandler(this);
+        }
+
         public bool ChangeAudioTrack(string path)
         {
             var info = new FileInfo(path);
@@ -196,6 +214,28 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Value.Metadata.AuthorString = creatorTextBox.Current.Value;
             Beatmap.Value.BeatmapInfo.Version = difficultyTextBox.Current.Value;
         }
+
+        public Task Import(params string[] paths)
+        {
+            var firstFile = new FileInfo(paths.First());
+
+            if (ImageExtensions.Contains(firstFile.Extension))
+            {
+                // todo: add image drag drop support
+            }
+            else if (AudioExtensions.Contains(firstFile.Extension))
+            {
+                audioTrackTextBox.Text = firstFile.FullName;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            game.UnregisterImportHandler(this);
+        }
     }
 
     internal class FileChooserLabelledTextBox : LabelledTextBox
@@ -230,7 +270,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         public void DisplayFileChooser()
         {
-            Target.Child = new FileSelector(validFileExtensions: new[] { ".mp3", ".ogg" })
+            Target.Child = new FileSelector(validFileExtensions: SetupScreen.AudioExtensions)
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 400,
