@@ -232,9 +232,9 @@ namespace osu.Game
             dependencies.Cache(new SessionStatics());
             dependencies.Cache(new OsuColour());
 
-            fileImporters.Add(BeatmapManager);
-            fileImporters.Add(ScoreManager);
-            fileImporters.Add(SkinManager);
+            RegisterImportHandler(BeatmapManager);
+            RegisterImportHandler(ScoreManager);
+            RegisterImportHandler(SkinManager);
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
@@ -341,7 +341,19 @@ namespace osu.Game
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
-        private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
+        private readonly HashSet<ICanAcceptFiles> fileImporters = new HashSet<ICanAcceptFiles>();
+
+        /// <summary>
+        /// Register a global handler for file imports.
+        /// </summary>
+        /// <param name="handler">The handler to register.</param>
+        public void RegisterImportHandler(ICanAcceptFiles handler) => fileImporters.Add(handler);
+
+        /// <summary>
+        /// Unregister a global handler for file imports.
+        /// </summary>
+        /// <param name="handler">The previously registered handler.</param>
+        public void UnregisterImportHandler(ICanAcceptFiles handler) => fileImporters.Remove(handler);
 
         public async Task Import(params string[] paths)
         {
