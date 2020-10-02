@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, ITrackSnaking
     {
-        private readonly Slider slider;
+        private readonly SliderTailCircle tailCircle;
 
         /// <summary>
         /// The judgement text is provided by the <see cref="DrawableSlider"/>.
@@ -29,10 +29,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Container scaleContainer;
 
-        public DrawableSliderTail(Slider slider, SliderTailCircle hitCircle)
-            : base(hitCircle)
+        public DrawableSliderTail(Slider slider, SliderTailCircle tailCircle)
+            : base(tailCircle)
         {
-            this.slider = slider;
+            this.tailCircle = tailCircle;
             Origin = Anchor.Centre;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -98,9 +98,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
-        public void UpdateSnakingPosition(Vector2 start, Vector2 end)
-        {
-            Position = end;
-        }
+        public void UpdateSnakingPosition(Vector2 start, Vector2 end) =>
+            Position = tailCircle.RepeatIndex % 2 == 0 ? end : start;
     }
 }

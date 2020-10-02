@@ -174,8 +174,10 @@ namespace osu.Game.Rulesets.Osu.Objects
                         // we need to use the LegacyLastTick here for compatibility reasons (difficulty).
                         // it is *okay* to use this because the TailCircle is not used for any meaningful purpose in gameplay.
                         // if this is to change, we should revisit this.
-                        AddNested(TailCircle = new SliderTailCircle(this)
+                        AddNested(TailCircle = new SliderTailCircle
                         {
+                            RepeatIndex = e.SpanIndex,
+                            SpanDuration = SpanDuration,
                             StartTime = e.Time,
                             Position = EndPosition,
                             StackHeight = StackHeight
