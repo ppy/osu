@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Timing
                     Origin = Anchor.Centre,
                     Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
                     Text = header,
-                    Colour = colours.Gray3
+                    Colour = colours.Gray0
                 },
             };
         }
