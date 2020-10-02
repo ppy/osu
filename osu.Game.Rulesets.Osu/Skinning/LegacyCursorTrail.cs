@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         protected override bool InterpolateMovements => !disjointTrail;
 
-        protected override float IntervalMultiplier => Math.Max(cursorSize.Value, 1);
+        protected override float IntervalMultiplier => 1 / Math.Max(cursorSize.Value, 1);
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
