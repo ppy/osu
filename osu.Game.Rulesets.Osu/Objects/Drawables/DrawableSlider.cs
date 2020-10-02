@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             InternalChildren = new Drawable[]
             {
                 Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
+                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
@@ -63,7 +64,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
-                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
             };
         }
 
