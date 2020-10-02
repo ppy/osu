@@ -61,9 +61,16 @@ namespace osu.Game.Screens.Edit.Timing
 
             textBox.OnCommit += (sender, isNew) =>
             {
+                if (!isNew)
+                    return;
+
                 if (double.TryParse(sender.Text, out var newTime))
                 {
                     changeSelectedGroupTime(newTime);
+                }
+                else
+                {
+                    SelectedGroup.TriggerChange();
                 }
             };
 
