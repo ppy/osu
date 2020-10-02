@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Drawable scaleContainer;
 
+        public readonly Drawable CirclePiece;
+
         public override bool DisplayResult => false;
 
         public DrawableSliderRepeat(SliderRepeat sliderRepeat, DrawableSlider drawableSlider)
@@ -44,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Children = new Drawable[]
                 {
                     // no default for this; only visible in legacy skins.
-                    new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty()),
+                    CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty()),
                     arrow = new ReverseArrowPiece(),
                 }
             };
