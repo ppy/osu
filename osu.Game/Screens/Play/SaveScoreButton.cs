@@ -8,7 +8,6 @@ namespace osu.Game.Screens.Play
 {
     public class SaveScoreButton : DownloadButton
     {
-
         public Action OnSave;
 
         [BackgroundDependencyLoader]
