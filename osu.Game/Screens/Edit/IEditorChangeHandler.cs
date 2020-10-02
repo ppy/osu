@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Fired whenever a state change occurs.
         /// </summary>
-        public event Action OnStateChange;
+        event Action OnStateChange;
 
         /// <summary>
         /// Begins a bulk state change event. <see cref="EndChange"/> should be invoked soon after.
