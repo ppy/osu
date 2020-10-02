@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -314,6 +315,7 @@ namespace osu.Game.Screens.Play
                 FailOverlay = new FailOverlay
                 {
                     OnRetry = Restart,
+                    OnSave = saveFailedScore,
                     OnQuit = performUserRequestedExit,
                 },
                 PauseOverlay = new PauseOverlay
@@ -498,6 +500,33 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.PopulateScore(score);
 
             return score;
+        }
+
+        private void saveFailedScore()
+        {
+            ScoreProcessor.Rank.Value = ScoreRank.F;
+
+            saveScore();
+        }
+
+        private Task<ScoreInfo> saveScore()
+        {
+            LegacyByteArrayReader replayReader = null;
+
+            var score = new Score { ScoreInfo = CreateScore() };
+
+            if (recordingReplay?.Frames.Count > 0)
+            {
+                score.Replay = recordingReplay;
+
+                using (var stream = new MemoryStream())
+                {
+                    new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
+                    replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                }
+            }
+
+            return scoreManager.Import(score.ScoreInfo, replayReader);
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
@@ -706,28 +735,12 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            LegacyByteArrayReader replayReader = null;
-
-            var score = new Score { ScoreInfo = CreateScore() };
-
-            if (recordingReplay?.Frames.Count > 0)
+            saveScore().ContinueWith(imported => Schedule(() =>
             {
-                score.Replay = recordingReplay;
-
-                using (var stream = new MemoryStream())
-                {
-                    new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
-                    replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
-                }
-            }
-
-            scoreManager.Import(score.ScoreInfo, replayReader)
-                        .ContinueWith(imported => Schedule(() =>
-                        {
-                            // screen may be in the exiting transition phase.
-                            if (this.IsCurrentScreen())
-                                this.Push(CreateResults(imported.Result));
-                        }));
+                // screen may be in the exiting transition phase.
+                if (this.IsCurrentScreen())
+                    this.Push(CreateResults(imported.Result));
+            }));
         }
 
         private void fadeOut(bool instant = false)

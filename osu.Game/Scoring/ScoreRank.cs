@@ -7,6 +7,9 @@ namespace osu.Game.Scoring
 {
     public enum ScoreRank
     {
+        [Description(@"F")]
+        F,
+
         [Description(@"D")]
         D,
 
