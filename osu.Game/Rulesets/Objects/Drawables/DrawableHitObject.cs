@@ -511,7 +511,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 case HitResult.None:
                     break;
 
-                case HitResult.Miss:
+                case { } result when !result.IsHit():
                     updateState(ArmedState.Miss);
                     break;
 
