@@ -28,8 +28,8 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public class TestSceneNotes : OsuTestScene
     {
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestVariousNotes()
         {
             Child = new FillFlowContainer
             {
