@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!(obj is DrawableDrumRollTick))
                 return;
 
-            if (result.Type > HitResult.Miss)
+            if (result.IsHit)
                 rollingHits++;
             else
                 rollingHits--;

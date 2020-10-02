@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public void Flash(JudgementResult result)
         {
-            if (result.Type == HitResult.Miss)
+            if (!result.IsHit)
                 return;
 
             Scheduler.AddOnce(flash);
