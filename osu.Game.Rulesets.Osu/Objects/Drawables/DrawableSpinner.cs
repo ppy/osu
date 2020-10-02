@@ -124,6 +124,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        public override void StopAllSamples()
+        {
+            base.StopAllSamples();
+            spinningSample?.Stop();
+        }
+
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
         {
             base.AddNestedHitObject(hitObject);
