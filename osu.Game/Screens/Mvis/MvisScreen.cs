@@ -89,7 +89,6 @@ namespace osu.Game.Screens
         private BgTrianglesContainer bgTriangles;
         private LoadingSpinner loadingSpinner;
         private BindableBool TrackRunning = new BindableBool();
-        private readonly BindableBool SBEnableProxy = new BindableBool();
         private readonly BindableBool ShowParticles = new BindableBool();
         private readonly BindableFloat BgBlur = new BindableFloat();
         private readonly BindableFloat IdleBgDim = new BindableFloat();
@@ -98,7 +97,6 @@ namespace osu.Game.Screens
         private readonly BindableBool AdjustFreq = new BindableBool();
         private readonly BindableBool NightcoreBeat = new BindableBool();
         private bool OverlaysHidden = false;
-        private Drawable SBOverlayProxy;
         private FillFlowContainer bottomFillFlow;
         private BindableBool lockChanges = new BindableBool();
         private readonly IBindable<bool> IsIdle = new BindableBool();
@@ -411,7 +409,6 @@ namespace osu.Game.Screens
             config.BindWith(MfSetting.MvisBgBlur, BgBlur);
             config.BindWith(MfSetting.MvisIdleBgDim, IdleBgDim);
             config.BindWith(MfSetting.MvisContentAlpha, ContentAlpha);
-            config.BindWith(MfSetting.MvisEnableSBOverlayProxy, SBEnableProxy);
             config.BindWith(MfSetting.MvisShowParticles, ShowParticles);
             config.BindWith(MfSetting.MvisMusicSpeed, MusicSpeed);
             config.BindWith(MfSetting.MvisAdjustMusicWithFreq, AdjustFreq);
@@ -444,7 +441,6 @@ namespace osu.Game.Screens
             NightcoreBeat.BindValueChanged(_ => ApplyTrackAdjustments());
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
-            SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue));
             ShowParticles.BindValueChanged(v =>
             {
                 switch (v.NewValue)
@@ -498,36 +494,6 @@ namespace osu.Game.Screens
 
                 case false:
                     bgTriangles.Show();
-                    break;
-            }
-        }
-
-        private void UpdateStoryboardProxy(bool AllowDisplayAboveGameplay)
-        {
-            //需要进一步优化，现在的逻辑仍然有些混乱
-            if (!sbLoader.IsReady.Value || SBOverlayProxy == null) return;
-
-            //重置proxy
-            if (SBOverlayProxy != null) //如果SBOverlayProxy不是空，则从背景和面板容器中移除
-            {
-                sbLoader.Remove(SBOverlayProxy);
-                gameplayContent.Remove(SBOverlayProxy);
-            }
-
-            switch (AllowDisplayAboveGameplay)
-            {
-                case true:
-                    sbLoader.Remove(SBOverlayProxy);
-
-                    gameplayContent.Add(SBOverlayProxy);
-                    break;
-
-                case false:
-                    if (SBOverlayProxy != null)
-                    {
-                        gameplayContent.Remove(SBOverlayProxy);
-                        sbLoader.Add(SBOverlayProxy);
-                    }
                     break;
             }
         }
@@ -821,18 +787,7 @@ namespace osu.Game.Screens
                 updateBackground(beatmap);
             });
 
-            sbLoader.UpdateStoryBoardAsync(() =>
-            {
-                if (SBOverlayProxy != null)
-                {
-                    SBOverlayProxy.Hide();
-                    SBOverlayProxy.Expire();
-                }
-
-                SBOverlayProxy = sbLoader.GetOverlayProxy();
-
-                UpdateStoryboardProxy(SBEnableProxy.Value);
-            });
+            sbLoader.UpdateStoryBoardAsync();
         }
     }
 }

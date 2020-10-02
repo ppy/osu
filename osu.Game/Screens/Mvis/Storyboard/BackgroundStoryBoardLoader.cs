@@ -55,15 +55,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
         /// </summary>
         private Action OnComplete;
 
-        private DrawableStoryboard drawableStoryboard;
         private StoryboardClock StoryboardClock = new StoryboardClock();
         private Container ClockContainer;
-
-        public Drawable GetOverlayProxy()
-        {
-            var proxy = drawableStoryboard.OverlayLayer.CreateProxy();
-            return proxy;
-        }
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
@@ -112,6 +105,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             try
             {
+                StoryboardClock.Stop();
+
                 if (!EnableSB.Value)
                 {
                     IsReady.Value = true;
@@ -122,15 +117,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
                 if (ClockContainer != null)
                 {
-                    if (drawableStoryboard != null)
-                        drawableStoryboard.Clock = StoryboardClock;
-
                     ClockContainer.FadeOut(DURATION, Easing.OutQuint);
                     ClockContainer.Expire();
-                    ClockContainer = null;
                 }
-
-                drawableStoryboard = null;
 
                 LoadSBTask = LoadComponentAsync(new Container
                 {
@@ -141,7 +130,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     {
                         RelativeSizeAxes = Axes.Both,
                         Clock = StoryboardClock = new StoryboardClock(),
-                        Child = drawableStoryboard = beatmap.Storyboard.CreateDrawable()
+                        Child = beatmap.Storyboard.CreateDrawable()
                     }
                 }, newClockContainer =>
                 {
