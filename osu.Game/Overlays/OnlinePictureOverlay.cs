@@ -6,16 +6,14 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.OnlinePicture;
 using osuTK;
-using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -37,34 +35,33 @@ namespace osu.Game.Overlays
         private TriangleButton closeButton;
         private OsuSpriteText infoText;
         private bool CanOpenInBrowser;
-        private EdgeEffectParameters edgeEffect = new EdgeEffectParameters
-        {
-            Type = EdgeEffectType.Shadow,
-            Colour = Color4.Black.Opacity(0.5f),
-            Radius = 12,
-        };
+
+        private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
 
         private BindableBool OptUI = new BindableBool();
 
         public float BottomContainerHeight => bottomContainer.Position.Y + bottomContainer.DrawHeight;
         public float TopBarHeight => topbarContainer.DrawHeight;
 
-        public OnlinePictureOverlay()
+        [BackgroundDependencyLoader]
+        private void load(MfConfigManager config)
         {
             RelativeSizeAxes = Axes.Both;
-            RelativePositionAxes = Axes.Both;
-            Width = 0.9f;
-            Height = 0.9f;
+
+            Size = new Vector2(0.9f);
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            EdgeEffect = edgeEffect;
+
             Masking = true;
+            CornerRadius = 15;
+
             Children = new Drawable[]
             {
                 new Box
                 {
+                    Colour = overlayColourProvider.Background6,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),
                 },
                 loadingSpinner = new LoadingSpinner(true)
                 {
@@ -77,6 +74,7 @@ namespace osu.Game.Overlays
                     GetBottomContainerHeight = () => BottomContainerHeight,
                     GetTopBarHeight = () => TopBarHeight,
                     RelativeSizeAxes = Axes.Both,
+
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
@@ -85,16 +83,13 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.X,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Height = 60f,
-                    Masking = true,
-                    EdgeEffect = edgeEffect,
+                    Height = 50f,
                     Children = new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#333"),
-                            Alpha = 1f,
+                            Colour = overlayColourProvider.Background5
                         },
                         new FillFlowContainer
                         {
@@ -130,34 +125,28 @@ namespace osu.Game.Overlays
                 },
                 topbarContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    EdgeEffect = edgeEffect,
-                    Masking = true,
-                    Height = 0.04f,
                     Children = new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#333"),
-                            Alpha = 1f,
+                            Colour = overlayColourProvider.Background5
                         },
                         infoText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Font = OsuFont.GetFont(size: 25),
+                            Margin = new MarginPadding { Vertical = 10 },
                         }
                     }
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
-        {
             config.BindWith(MfSetting.OptUI, OptUI);
 
             OptUI.BindValueChanged(OnOptUIChanged);
