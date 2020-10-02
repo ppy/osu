@@ -26,7 +26,6 @@ using osu.Game.Configuration;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Storyboard;
-using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Input;
 using osu.Framework.Timing;
 using osu.Framework.Audio;
@@ -249,6 +248,7 @@ namespace osu.Game.Screens
                                                                     {
                                                                         //隐藏界面，锁定更改并隐藏锁定按钮
                                                                         HideOverlays();
+                                                                        sidebarContainer.Hide();
 
                                                                         //防止手机端无法退出桌面背景模式
                                                                         if (RuntimeInfo.IsDesktop)
@@ -603,9 +603,9 @@ namespace osu.Game.Screens
             this.FadeIn(DURATION);
             Track.ResetSpeedAdjustments();
             ApplyTrackAdjustments();
+            updateBackground(Beatmap.Value);
 
             //背景层的动画
-            ApplyBackgroundBrightness();
             gameplayBackground.FadeOut().Then().Delay(250).FadeIn(500);
 
             //非背景层的动画
