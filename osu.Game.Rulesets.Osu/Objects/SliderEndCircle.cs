@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class SliderCircle : HitCircle
+    public class SliderEndCircle : HitCircle
     {
     }
 }
