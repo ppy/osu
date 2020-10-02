@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -31,22 +32,30 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Test]
         public void TestVariousNotes()
         {
-            Child = new FillFlowContainer
+            DrawableNote note1 = null;
+            DrawableNote note2 = null;
+            DrawableHoldNote holdNote1 = null;
+            DrawableHoldNote holdNote2 = null;
+
+            AddStep("create notes", () =>
             {
-                Clock = new FramedClock(new ManualClock()),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(20),
-                Children = new[]
+                Child = new FillFlowContainer
                 {
-                    createNoteDisplay(ScrollingDirection.Down, 1, out var note1),
-                    createNoteDisplay(ScrollingDirection.Up, 2, out var note2),
-                    createHoldNoteDisplay(ScrollingDirection.Down, 1, out var holdNote1),
-                    createHoldNoteDisplay(ScrollingDirection.Up, 2, out var holdNote2),
-                }
-            };
+                    Clock = new FramedClock(new ManualClock()),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(20),
+                    Children = new[]
+                    {
+                        createNoteDisplay(ScrollingDirection.Down, 1, out note1),
+                        createNoteDisplay(ScrollingDirection.Up, 2, out note2),
+                        createHoldNoteDisplay(ScrollingDirection.Down, 1, out holdNote1),
+                        createHoldNoteDisplay(ScrollingDirection.Up, 2, out holdNote2),
+                    }
+                };
+            });
 
             AddAssert("note 1 facing downwards", () => verifyAnchors(note1, Anchor.y2));
             AddAssert("note 2 facing upwards", () => verifyAnchors(note2, Anchor.y0));
