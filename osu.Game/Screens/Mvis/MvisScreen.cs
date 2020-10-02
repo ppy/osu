@@ -37,6 +37,7 @@ using osu.Game.Overlays.Settings;
 using osuTK.Input;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics;
+using osu.Framework;
 
 namespace osu.Game.Screens
 {
@@ -241,6 +242,28 @@ namespace osu.Game.Screens
                                                             Margin = new MarginPadding { Right = 5 },
                                                             Children = new Drawable[]
                                                             {
+                                                                new BottomBarButton
+                                                                {
+                                                                    ButtonIcon = FontAwesome.Solid.Desktop,
+                                                                    Action = () =>
+                                                                    {
+                                                                        //隐藏界面，锁定更改并隐藏锁定按钮
+                                                                        HideOverlays();
+
+                                                                        //防止手机端无法退出桌面背景模式
+                                                                        if (RuntimeInfo.IsDesktop)
+                                                                        {
+                                                                            lockChanges.Value = true;
+                                                                            lockButton.ToggleableValue.Value = false;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            lockChanges.Value = false;
+                                                                            lockButton.ToggleableValue.Value = true;
+                                                                        }
+                                                                    },
+                                                                    TooltipText = "桌面背景模式(切换强制锁定后移动鼠标即可恢复正常)"
+                                                                },
                                                                 loopToggleButton = new BottomBarSwitchButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Undo,
@@ -399,6 +422,19 @@ namespace osu.Game.Screens
             BgBlur.BindValueChanged(v => updateBackground(Beatmap.Value));
             ContentAlpha.BindValueChanged(_ => UpdateIdleVisuals());
             IdleBgDim.BindValueChanged(_ => UpdateIdleVisuals());
+            lockChanges.BindValueChanged(v =>
+            {
+                switch (v.NewValue)
+                {
+                    case true:
+                        lockButton.FadeColour(Color4.Gray.Opacity(0.6f), 300);
+                        break;
+
+                    case false:
+                        lockButton.FadeColour(Color4.White, 300);
+                        break;
+                }
+            });
 
             Beatmap.BindValueChanged(v => updateComponentFromBeatmap(v.NewValue), true);
 
@@ -611,10 +647,6 @@ namespace osu.Game.Screens
 
                 case GlobalAction.MvisForceLockOverlayChanges:
                     lockChanges.Toggle();
-                    if (lockChanges.Value == true)
-                        lockButton.FadeColour(Color4.Gray.Opacity(0.6f), 300);
-                    else
-                        lockButton.FadeColour(Color4.White, 300);
                     return true;
             }
 
