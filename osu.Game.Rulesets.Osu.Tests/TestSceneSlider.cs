@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
+                StartTime = Time.Current + time_offset,
                 Position = new Vector2(239, 176),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
@@ -185,22 +185,26 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable testSlowSpeed() => createSlider(speedMultiplier: 0.5);
 
-        private Drawable testShortSlowSpeed(int repeats = 0) => createSlider(distance: 100, repeats: repeats, speedMultiplier: 0.5);
+        private Drawable testShortSlowSpeed(int repeats = 0) => createSlider(distance: max_length / 4, repeats: repeats, speedMultiplier: 0.5);
 
         private Drawable testHighSpeed(int repeats = 0) => createSlider(repeats: repeats, speedMultiplier: 15);
 
-        private Drawable testShortHighSpeed(int repeats = 0) => createSlider(distance: 100, repeats: repeats, speedMultiplier: 15);
+        private Drawable testShortHighSpeed(int repeats = 0) => createSlider(distance: max_length / 4, repeats: repeats, speedMultiplier: 15);
 
-        private Drawable createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0)
+        private const double time_offset = 1500;
+
+        private const float max_length = 200;
+
+        private Drawable createSlider(float circleSize = 2, float distance = max_length, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0)
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-(distance / 2), 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(0, -(distance / 2)),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(distance, 0),
+                    new Vector2(0, distance),
                 }, distance),
                 RepeatCount = repeats,
                 StackHeight = stackHeight
@@ -213,14 +217,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-200, 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(-max_length / 2, 0),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(200, 200),
-                    new Vector2(400, 0)
-                }, 600),
+                    new Vector2(max_length / 2, max_length / 2),
+                    new Vector2(max_length, 0)
+                }, max_length * 1.5f),
                 RepeatCount = repeats,
             };
 
@@ -233,16 +237,16 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-200, 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(-max_length / 2, 0),
                 Path = new SliderPath(PathType.Linear, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(150, 75),
-                    new Vector2(200, 0),
-                    new Vector2(300, -200),
-                    new Vector2(400, 0),
-                    new Vector2(430, 0)
+                    new Vector2(max_length * 0.375f, max_length * 0.18f),
+                    new Vector2(max_length / 2, 0),
+                    new Vector2(max_length * 0.75f, -max_length / 2),
+                    new Vector2(max_length * 0.95f, 0),
+                    new Vector2(max_length, 0)
                 }),
                 RepeatCount = repeats,
             };
@@ -256,15 +260,15 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-200, 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(-max_length / 2, 0),
                 Path = new SliderPath(PathType.Bezier, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(150, 75),
-                    new Vector2(200, 100),
-                    new Vector2(300, -200),
-                    new Vector2(430, 0)
+                    new Vector2(max_length * 0.375f, max_length * 0.18f),
+                    new Vector2(max_length / 2, max_length / 4),
+                    new Vector2(max_length * 0.75f, -max_length / 2),
+                    new Vector2(max_length, 0)
                 }),
                 RepeatCount = repeats,
             };
@@ -278,16 +282,16 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
+                StartTime = Time.Current + time_offset,
                 Position = new Vector2(0, 0),
                 Path = new SliderPath(PathType.Linear, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(-200, 0),
+                    new Vector2(-max_length / 2, 0),
                     new Vector2(0, 0),
-                    new Vector2(0, -200),
-                    new Vector2(-200, -200),
-                    new Vector2(0, -200)
+                    new Vector2(0, -max_length / 2),
+                    new Vector2(-max_length / 2, -max_length / 2),
+                    new Vector2(0, -max_length / 2)
                 }),
                 RepeatCount = repeats,
             };
@@ -305,14 +309,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-100, 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(-max_length / 4, 0),
                 Path = new SliderPath(PathType.Catmull, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(50, -50),
-                    new Vector2(150, 50),
-                    new Vector2(200, 0)
+                    new Vector2(max_length * 0.125f, max_length * 0.125f),
+                    new Vector2(max_length * 0.375f, max_length * 0.125f),
+                    new Vector2(max_length / 2, 0)
                 }),
                 RepeatCount = repeats,
                 NodeSamples = repeatSamples
