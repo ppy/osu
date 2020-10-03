@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return;
 
             // Trigger a miss result for remaining ticks to avoid infinite gameplay.
-            foreach (var tick in ticks.Where(t => !t.IsHit))
+            foreach (var tick in ticks.Where(t => !t.Result.HasResult))
                 tick.TriggerResult(false);
 
             ApplyResult(r =>
