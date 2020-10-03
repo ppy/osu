@@ -158,7 +158,15 @@ namespace osu.Game.Rulesets
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
 
-        public virtual PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, DifficultyAttributes attributes, ScoreInfo score) => null;
+        public virtual PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => null;
+
+        [Obsolete("Use the DifficultyAttributes overload instead.")]
+        public PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score)
+        {
+            var difficultyCalculator = CreateDifficultyCalculator(beatmap);
+            var difficultyAttributes = difficultyCalculator.Calculate(score.Mods);
+            return CreatePerformanceCalculator(difficultyAttributes, score);
+        }
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 

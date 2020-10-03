@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new CatchLegacySkinTransformer(source);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, DifficultyAttributes attributes, ScoreInfo score) => new CatchPerformanceCalculator(this, attributes, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new CatchPerformanceCalculator(this, attributes, score);
 
         public int LegacyID => 2;
 
