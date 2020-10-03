@@ -663,6 +663,9 @@ namespace osu.Game.Screens.Select
                 music.TrackChanged -= ensureTrackLooping;
         }
 
+        private BeatmapSetInfo oldBeatmapSet;
+        protected bool BeatmapSetChanged = true;
+
         /// <summary>
         /// Allow components in SongSelect to update their loaded beatmap details.
         /// This is a debounced call (unlike directly binding to WorkingBeatmap.ValueChanged).
@@ -671,6 +674,15 @@ namespace osu.Game.Screens.Select
         /// <param name="BlurOnly">Whether to only blur the background.</param>
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap, bool BlurOnly = false)
         {
+            //我不放这oldBeatmapSet和BeatmapSetChanged就永远是null咋回事...
+            if ( oldBeatmapSet == null )
+                oldBeatmapSet = Carousel.SelectedBeatmapSet;
+
+            if ( Carousel.SelectedBeatmapSet != oldBeatmapSet )
+                BeatmapSetChanged = true;
+            else
+                BeatmapSetChanged = false;
+
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.BlurAmount.Value = OptUI.Value ? BgBlur.Value * 100 : BACKGROUND_BLUR;

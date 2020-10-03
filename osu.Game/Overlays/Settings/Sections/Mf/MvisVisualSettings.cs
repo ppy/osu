@@ -24,6 +24,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 new SettingsCheckbox
                 {
+                    LabelText = "在无故事版可用时显示背景动画",
+                    Bindable = config.GetBindable<bool>(MfSetting.MvisEnableBgTriangles),
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "显示粒子效果",
                     Bindable = config.GetBindable<bool>(MfSetting.MvisShowParticles)
                 },

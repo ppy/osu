@@ -38,9 +38,9 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisParticleAmount, 350, 0, 350);
             Set(MfSetting.MvisContentAlpha, 1f, 0f, 1f);
             Set(MfSetting.MvisBgBlur, 0.2f, 0f, 1f);
-            Set(MfSetting.MvisEnableStoryboard, false);
+            Set(MfSetting.MvisEnableStoryboard, true);
             Set(MfSetting.MvisUseOsuLogoVisualisation, false);
-            Set(MfSetting.MvisIdleBgDim, 0.3f, 0f, 1f);
+            Set(MfSetting.MvisIdleBgDim, 0.6f, 0f, 1f);
             Set(MfSetting.MvisEnableBgTriangles, true);
             Set(MfSetting.MvisEnableSBOverlayProxy, true);
             Set(MfSetting.MvisAdjustMusicWithFreq, true);

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,8 +51,11 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The final clock which is exposed to underlying components.
         /// </summary>
-        [Cached]
-        public readonly GameplayClock GameplayClock;
+        public GameplayClock GameplayClock => localGameplayClock;
+
+        [Cached(typeof(GameplayClock))]
+        [Cached(typeof(ISamplePlaybackDisabler))]
+        private readonly LocalGameplayClock localGameplayClock;
 
         private Bindable<double> userAudioOffset;
 
@@ -79,7 +83,7 @@ namespace osu.Game.Screens.Play
             userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock);
 
             // the clock to be exposed via DI to children.
-            GameplayClock = new GameplayClock(userOffsetClock);
+            localGameplayClock = new LocalGameplayClock(userOffsetClock);
 
             GameplayClock.IsPaused.BindTo(IsPaused);
         }
@@ -200,7 +204,9 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             if (!IsPaused.Value)
+            {
                 userOffsetClock.ProcessFrame();
+            }
 
             base.Update();
         }
@@ -214,6 +220,9 @@ namespace osu.Game.Screens.Play
 
             track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+
+            localGameplayClock.MutableNonGameplayAdjustments.Add(pauseFreqAdjust);
+            localGameplayClock.MutableNonGameplayAdjustments.Add(UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -231,10 +240,25 @@ namespace osu.Game.Screens.Play
             track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
+            localGameplayClock.MutableNonGameplayAdjustments.Remove(pauseFreqAdjust);
+            localGameplayClock.MutableNonGameplayAdjustments.Remove(UserPlaybackRate);
+
             speedAdjustmentsApplied = false;
         }
 
-        public class HardwareCorrectionOffsetClock : FramedOffsetClock
+        private class LocalGameplayClock : GameplayClock
+        {
+            public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
+
+            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
+
+            public LocalGameplayClock(FramedOffsetClock underlyingClock)
+                : base(underlyingClock)
+            {
+            }
+        }
+
+        private class HardwareCorrectionOffsetClock : FramedOffsetClock
         {
             // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
             // base implementation already adds offset at 1.0 rate, so we only add the difference from that here.

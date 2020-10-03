@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, MfConfigManager config)
         {
+            Alpha = 0;
             SelectedColour = new Color4(0, 86, 73, 255);
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"在Mvis中打开";
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.Select
                         this.FadeOut(750, Easing.OutQuint);
                         break;
                 }
-            });
+            }, true);
         }
     }
 }
