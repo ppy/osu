@@ -53,5 +53,105 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
         }
+
+        [TestCase(HitResult.None, false)]
+        [TestCase(HitResult.IgnoreMiss, false)]
+        [TestCase(HitResult.IgnoreHit, false)]
+        [TestCase(HitResult.Miss, true)]
+        [TestCase(HitResult.Meh, true)]
+        [TestCase(HitResult.Ok, true)]
+        [TestCase(HitResult.Good, true)]
+        [TestCase(HitResult.Great, true)]
+        [TestCase(HitResult.Perfect, true)]
+        [TestCase(HitResult.SmallTickMiss, false)]
+        [TestCase(HitResult.SmallTickHit, false)]
+        [TestCase(HitResult.LargeTickMiss, true)]
+        [TestCase(HitResult.LargeTickHit, true)]
+        [TestCase(HitResult.SmallBonus, false)]
+        [TestCase(HitResult.LargeBonus, false)]
+        public void TestAffectsCombo(HitResult hitResult, bool expectedReturnValue)
+        {
+            Assert.IsTrue(hitResult.AffectsCombo() == expectedReturnValue);
+        }
+
+        [TestCase(HitResult.None, false)]
+        [TestCase(HitResult.IgnoreMiss, false)]
+        [TestCase(HitResult.IgnoreHit, false)]
+        [TestCase(HitResult.Miss, true)]
+        [TestCase(HitResult.Meh, true)]
+        [TestCase(HitResult.Ok, true)]
+        [TestCase(HitResult.Good, true)]
+        [TestCase(HitResult.Great, true)]
+        [TestCase(HitResult.Perfect, true)]
+        [TestCase(HitResult.SmallTickMiss, true)]
+        [TestCase(HitResult.SmallTickHit, true)]
+        [TestCase(HitResult.LargeTickMiss, true)]
+        [TestCase(HitResult.LargeTickHit, true)]
+        [TestCase(HitResult.SmallBonus, false)]
+        [TestCase(HitResult.LargeBonus, false)]
+        public void TestAffectsAccuracy(HitResult hitResult, bool expectedReturnValue)
+        {
+            Assert.IsTrue(hitResult.AffectsAccuracy() == expectedReturnValue);
+        }
+
+        [TestCase(HitResult.None, false)]
+        [TestCase(HitResult.IgnoreMiss, false)]
+        [TestCase(HitResult.IgnoreHit, false)]
+        [TestCase(HitResult.Miss, false)]
+        [TestCase(HitResult.Meh, false)]
+        [TestCase(HitResult.Ok, false)]
+        [TestCase(HitResult.Good, false)]
+        [TestCase(HitResult.Great, false)]
+        [TestCase(HitResult.Perfect, false)]
+        [TestCase(HitResult.SmallTickMiss, false)]
+        [TestCase(HitResult.SmallTickHit, false)]
+        [TestCase(HitResult.LargeTickMiss, false)]
+        [TestCase(HitResult.LargeTickHit, false)]
+        [TestCase(HitResult.SmallBonus, true)]
+        [TestCase(HitResult.LargeBonus, true)]
+        public void TestIsBonus(HitResult hitResult, bool expectedReturnValue)
+        {
+            Assert.IsTrue(hitResult.IsBonus() == expectedReturnValue);
+        }
+
+        [TestCase(HitResult.None, false)]
+        [TestCase(HitResult.IgnoreMiss, false)]
+        [TestCase(HitResult.IgnoreHit, true)]
+        [TestCase(HitResult.Miss, false)]
+        [TestCase(HitResult.Meh, true)]
+        [TestCase(HitResult.Ok, true)]
+        [TestCase(HitResult.Good, true)]
+        [TestCase(HitResult.Great, true)]
+        [TestCase(HitResult.Perfect, true)]
+        [TestCase(HitResult.SmallTickMiss, false)]
+        [TestCase(HitResult.SmallTickHit, true)]
+        [TestCase(HitResult.LargeTickMiss, false)]
+        [TestCase(HitResult.LargeTickHit, true)]
+        [TestCase(HitResult.SmallBonus, true)]
+        [TestCase(HitResult.LargeBonus, true)]
+        public void TestIsHit(HitResult hitResult, bool expectedReturnValue)
+        {
+            Assert.IsTrue(hitResult.IsHit() == expectedReturnValue);
+        }
+
+        [TestCase(HitResult.None, false)]
+        [TestCase(HitResult.IgnoreMiss, false)]
+        [TestCase(HitResult.IgnoreHit, false)]
+        [TestCase(HitResult.Miss, true)]
+        [TestCase(HitResult.Meh, true)]
+        [TestCase(HitResult.Ok, true)]
+        [TestCase(HitResult.Good, true)]
+        [TestCase(HitResult.Great, true)]
+        [TestCase(HitResult.Perfect, true)]
+        [TestCase(HitResult.SmallTickMiss, true)]
+        [TestCase(HitResult.SmallTickHit, true)]
+        [TestCase(HitResult.LargeTickMiss, true)]
+        [TestCase(HitResult.LargeTickHit, true)]
+        [TestCase(HitResult.SmallBonus, true)]
+        [TestCase(HitResult.LargeBonus, true)]
+        public void TestIsScorable(HitResult hitResult, bool expectedReturnValue)
+        {
+            Assert.IsTrue(hitResult.IsScorable() == expectedReturnValue);
+        }
     }
 }
