@@ -11,6 +11,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
     ///
     /// 改变了什么:
     /// `ChangeSource()`
+    /// `Stop()`
     ///
     /// Adds the ability to keep the clock running even when the underlying source has stopped or cannot handle the current time range.
     /// This is handled by performing seeks on the underlying source and checking whether they were successful or not.
@@ -153,7 +154,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
         public void Stop()
         {
             decoupledStopwatch.Stop();
-            adjustableSource?.Stop();
         }
 
         public bool Seek(double position)

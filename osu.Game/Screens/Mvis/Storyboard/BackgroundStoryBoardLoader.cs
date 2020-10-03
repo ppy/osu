@@ -105,6 +105,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             try
             {
+                StoryboardClock.IsCoupled = false;
+                StoryboardClock.Stop();
+
                 if (!EnableSB.Value)
                 {
                     IsReady.Value = true;

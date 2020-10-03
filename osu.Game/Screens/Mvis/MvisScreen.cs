@@ -744,7 +744,7 @@ namespace osu.Game.Screens
             if (!OverlaysHidden)
                 return;
 
-            ApplyBackgroundBrightness(false, IdleBgDim.Value);
+            ApplyBackgroundBrightness(true, IdleBgDim.Value);
             gameplayContent.FadeTo(ContentAlpha.Value, DURATION, Easing.OutQuint);
         }
 
@@ -766,21 +766,33 @@ namespace osu.Game.Screens
 
         private void updateBackground(WorkingBeatmap beatmap)
         {
-            if ( Background == null ) return;
+            if ( Background == null || ! this.IsCurrentScreen() ) return;
 
-            var bg = (BackgroundScreenBeatmap)Background;
-            bg.BlurAmount.Value = BgBlur.Value * 100;
-            bg.Beatmap = beatmap;
+            if ( Background is BackgroundScreenBeatmap backgroundScreenBeatmap )
+            {
+                backgroundScreenBeatmap.BlurAmount.Value = BgBlur.Value * 100;
+                backgroundScreenBeatmap.Beatmap = beatmap;
+            }
+
             ApplyBackgroundBrightness();
         }
 
+        /// <summary>
+        /// 将屏幕暗化应用到背景层
+        /// </summary>
+        /// <param name="auto">是否根据情况自动调整.</param>
+        /// <param name="brightness">要调整的亮度.</param>
         private void ApplyBackgroundBrightness(bool auto = true, float brightness = 0)
         {
-            if ( ! sbLoader.storyboardReplacesBackground.Value )
-                Background?.FadeColour(OsuColour.Gray(auto ? (OverlaysHidden ? IdleBgDim.Value : 0.6f) : brightness), DURATION, Easing.OutQuint);
+            if ( !this.IsCurrentScreen() ) return;
+
+            if ( auto )
+                Background?.FadeColour(sbLoader.storyboardReplacesBackground.Value? Color4.Black : OsuColour.Gray( OverlaysHidden ? IdleBgDim.Value : 0.6f ),
+                                       DURATION,
+                                       Easing.OutQuint );
             else
-                Background?.FadeColour(Color4.Black, DURATION, Easing.OutQuint);
-            
+                Background?.FadeColour(OsuColour.Gray(brightness), DURATION, Easing.OutQuint);
+
             sbLoader?.FadeColour(OsuColour.Gray(auto ? (OverlaysHidden ? IdleBgDim.Value : 0.6f) : brightness), DURATION, Easing.OutQuint);
         }
 
