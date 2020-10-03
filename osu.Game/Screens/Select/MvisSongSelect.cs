@@ -11,9 +11,15 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            musicController.CurrentTrack.Looping = true;
+        }
+
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new MvisBeatmapDetailArea
         {
-            OnPressedAction = () => this.OnStart()
+            SelectCurrentAction = () => this.OnStart(),
         };
 
         public override bool AllowEditing => false;
@@ -21,7 +27,9 @@ namespace osu.Game.Screens.Select
         protected override bool OnStart()
         {
             SampleConfirm?.Play();
-            musicController.SeekTo(0);
+
+            if ( BeatmapSetChanged )
+                musicController.SeekTo(0);
 
             this.Exit();
 

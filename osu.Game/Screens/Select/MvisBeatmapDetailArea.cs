@@ -1,12 +1,11 @@
 using osu.Game.Overlays.Settings;
 using osu.Framework.Graphics;
 using System;
-
 namespace osu.Game.Screens.Select
 {
     public class MvisBeatmapDetailArea : BeatmapDetailArea
     {
-        public Action OnPressedAction;
+        public Action SelectCurrentAction;
         protected override BeatmapDetailAreaTabItem[] CreateTabItems() => new BeatmapDetailAreaTabItem[]
         {
             new VoidTabItem(),
@@ -20,7 +19,7 @@ namespace osu.Game.Screens.Select
                     Text = "选择该谱面",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Action = () => OnPressedAction?.Invoke()
+                    Action = () => SelectCurrentAction?.Invoke()
                 }
             );
         }
