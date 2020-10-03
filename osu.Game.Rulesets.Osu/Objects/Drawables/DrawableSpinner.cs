@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             while (wholeSpins != spins)
             {
-                var tick = ticks.FirstOrDefault(t => !t.IsHit);
+                var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
 
                 // tick may be null if we've hit the spin limit.
                 if (tick != null)
