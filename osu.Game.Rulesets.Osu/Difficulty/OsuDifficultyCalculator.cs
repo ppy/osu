@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo,
-                HitCirclesCount = hitCirclesCount,
+                HitCircleCount = hitCirclesCount,
                 Skills = skills
             };
         }

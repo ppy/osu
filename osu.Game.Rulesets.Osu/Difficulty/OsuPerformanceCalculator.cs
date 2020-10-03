@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window
             double betterAccuracyPercentage;
-            int amountHitObjectsWithAccuracy = Attributes.HitCirclesCount;
+            int amountHitObjectsWithAccuracy = Attributes.HitCircleCount;
 
             if (amountHitObjectsWithAccuracy > 0)
                 betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
