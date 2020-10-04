@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Edit
         public readonly Bindable<bool> CanUndo = new Bindable<bool>();
         public readonly Bindable<bool> CanRedo = new Bindable<bool>();
 
+        public event Action OnStateChange;
+
         private readonly LegacyEditorBeatmapPatcher patcher;
         private readonly List<byte[]> savedStates = new List<byte[]>();
 
@@ -109,6 +111,8 @@ namespace osu.Game.Screens.Edit
                 savedStates.Add(newState);
 
                 currentState = savedStates.Count - 1;
+
+                OnStateChange?.Invoke();
                 updateBindables();
             }
         }
@@ -136,6 +140,7 @@ namespace osu.Game.Screens.Edit
 
             isRestoring = false;
 
+            OnStateChange?.Invoke();
             updateBindables();
         }
 
