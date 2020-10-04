@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 
@@ -250,7 +249,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             // rather than doing it this way, we should probably attach the sample to the tail circle.
             // this can only be done after we stop using LegacyLastTick.
-            if (TailCircle.Result.Type != HitResult.Miss)
+            if (TailCircle.IsHit)
                 base.PlaySamples();
         }
 
