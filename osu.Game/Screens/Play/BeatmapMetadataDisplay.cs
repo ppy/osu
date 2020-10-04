@@ -23,32 +23,6 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class BeatmapMetadataDisplay : Container
     {
-        private class MetadataLine : Container
-        {
-            public MetadataLine(string left, string right)
-            {
-                AutoSizeAxes = Axes.Both;
-                Children = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopRight,
-                        Margin = new MarginPadding { Right = 5 },
-                        Colour = OsuColour.Gray(0.8f),
-                        Text = left,
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopLeft,
-                        Margin = new MarginPadding { Left = 5 },
-                        Text = string.IsNullOrEmpty(right) ? @"-" : right,
-                    }
-                };
-            }
-        }
-
         private readonly WorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable facade;
@@ -81,6 +55,7 @@ namespace osu.Game.Screens.Play
         private void load()
         {
             var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+            TextFlowContainer metadataLine;
 
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -145,15 +120,11 @@ namespace osu.Game.Screens.Play
                                 Bottom = 40
                             },
                         },
-                        new MetadataLine("Source", metadata.Source)
+                        metadataLine = new TextFlowContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                        },
-                        new MetadataLine("Mapper", metadata.AuthorString)
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre
                         },
                         new ModDisplay
                         {
@@ -166,6 +137,20 @@ namespace osu.Game.Screens.Play
                     },
                 }
             };
+
+            metadataLine.AddText("Source", t =>
+            {
+                t.Colour = OsuColour.Gray(0.8f);
+                t.Padding = new MarginPadding { Right = 10 };
+            });
+            metadataLine.AddText(string.IsNullOrEmpty(metadata.Source) ? @"-" : metadata.Source);
+
+            metadataLine.AddParagraph("Mapper", t =>
+            {
+                t.Colour = OsuColour.Gray(0.8f);
+                t.Padding = new MarginPadding { Right = 10 };
+            });
+            metadataLine.AddText(string.IsNullOrEmpty(metadata.AuthorString) ? @"-" : metadata.AuthorString);
 
             Loading = true;
         }
