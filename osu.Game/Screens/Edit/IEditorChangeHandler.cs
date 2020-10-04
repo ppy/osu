@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
@@ -10,6 +11,11 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public interface IEditorChangeHandler
     {
+        /// <summary>
+        /// Fired whenever a state change occurs.
+        /// </summary>
+        event Action OnStateChange;
+
         /// <summary>
         /// Begins a bulk state change event. <see cref="EndChange"/> should be invoked soon after.
         /// </summary>
