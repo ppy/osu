@@ -65,18 +65,19 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     if (!isNew) return;
 
-                    if (double.TryParse(Current.Value, out double doubleVal))
+                    try
                     {
-                        try
-                        {
+                        if (double.TryParse(Current.Value, out double doubleVal) && doubleVal > 0)
                             beatLengthBindable.Value = beatLengthToBpm(doubleVal);
-                        }
-                        catch
-                        {
-                            // will restore the previous text value on failure.
-                            beatLengthBindable.TriggerChange();
-                        }
                     }
+                    catch
+                    {
+                        // TriggerChange below will restore the previous text value on failure.
+                    }
+
+                    // This is run regardless of parsing success as the parsed number may not actually trigger a change
+                    // due to bindable clamping. Even in such a case we want to update the textbox to a sane visual state.
+                    beatLengthBindable.TriggerChange();
                 };
 
                 beatLengthBindable.BindValueChanged(val =>
