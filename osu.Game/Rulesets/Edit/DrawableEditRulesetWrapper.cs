@@ -40,13 +40,28 @@ namespace osu.Game.Rulesets.Edit
             Playfield.DisplayJudgements.Value = false;
         }
 
+        [Resolved(canBeNull: true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             beatmap.HitObjectAdded += addHitObject;
             beatmap.HitObjectRemoved += removeHitObject;
+
+            if (changeHandler != null)
+            {
+                // for now only regenerate replay on a finalised state change, not HitObjectUpdated.
+                changeHandler.OnStateChange += updateReplay;
+            }
+            else
+            {
+                beatmap.HitObjectUpdated += _ => updateReplay();
+            }
         }
+
+        private void updateReplay() => drawableRuleset.RegenerateAutoplay();
 
         private void addHitObject(HitObject hitObject)
         {

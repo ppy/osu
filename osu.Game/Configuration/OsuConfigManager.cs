@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Input;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
@@ -14,6 +15,7 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Configuration
 {
+    [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>
     {
         protected override void InitialiseDefaults()
@@ -23,6 +25,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Skin, 0, -1, int.MaxValue);
 
             Set(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
+            Set(OsuSetting.BeatmapDetailModsFilter, false);
 
             Set(OsuSetting.ShowConvertedBeatmaps, true);
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
@@ -201,6 +204,7 @@ namespace osu.Game.Configuration
         CursorRotation,
         MenuParallax,
         BeatmapDetailTab,
+        BeatmapDetailModsFilter,
         Username,
         ReleaseStream,
         SavePassword,
@@ -234,6 +238,6 @@ namespace osu.Game.Configuration
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource,
-        GameplayDisableWinKey
+        GameplayDisableWinKey,
     }
 }

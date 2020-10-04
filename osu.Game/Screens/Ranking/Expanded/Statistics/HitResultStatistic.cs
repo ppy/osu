@@ -12,8 +12,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     {
         private readonly HitResult result;
 
-        public HitResultStatistic(HitResult result, int count)
-            : base(result.GetDescription(), count)
+        public HitResultStatistic(HitResult result, int count, int? maxCount = null)
+            : base(result.GetDescription(), count, maxCount)
         {
             this.result = result;
         }

@@ -10,8 +10,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class VisualSettings : PlayerSettingsGroup
     {
-        protected override string Title => "Visual settings";
-
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
@@ -19,6 +17,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
         public VisualSettings()
+            : base("Visual Settings")
         {
             Children = new Drawable[]
             {

@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCirclePrefix)?.Value ?? "default";
                     var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? -2;
 
-                    return !hasFont(font)
+                    return !this.HasFont(font)
                         ? null
                         : new LegacySpriteText(Source, font)
                         {
@@ -145,7 +145,5 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             return Source.GetConfig<TLookup, TValue>(lookup);
         }
-
-        private bool hasFont(string fontName) => Source.GetTexture($"{fontName}-0") != null;
     }
 }

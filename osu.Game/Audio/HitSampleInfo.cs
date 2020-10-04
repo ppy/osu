@@ -18,6 +18,11 @@ namespace osu.Game.Audio
         public const string HIT_CLAP = @"hitclap";
 
         /// <summary>
+        /// All valid sample addition constants.
+        /// </summary>
+        public static IEnumerable<string> AllAdditions => new[] { HIT_WHISTLE, HIT_CLAP, HIT_FINISH };
+
+        /// <summary>
         /// The bank to load the sample from.
         /// </summary>
         public string Bank;

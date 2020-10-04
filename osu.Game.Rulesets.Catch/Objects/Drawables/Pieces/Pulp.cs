@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Radius = Size.X / 2,
+                Radius = DrawWidth / 2,
                 Colour = colour.NewValue.Darken(0.2f).Opacity(0.75f)
             };
         }

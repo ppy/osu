@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Play
 {
@@ -14,11 +17,16 @@ namespace osu.Game.Screens.Play
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
-    public class GameplayClock : IFrameBasedClock
+    public class GameplayClock : IFrameBasedClock, ISamplePlaybackDisabler
     {
         private readonly IFrameBasedClock underlyingClock;
 
         public readonly BindableBool IsPaused = new BindableBool();
+
+        /// <summary>
+        /// All adjustments applied to this clock which don't come from gameplay or mods.
+        /// </summary>
+        public virtual IEnumerable<Bindable<double>> NonGameplayAdjustments => Enumerable.Empty<Bindable<double>>();
 
         public GameplayClock(IFrameBasedClock underlyingClock)
         {
@@ -28,6 +36,28 @@ namespace osu.Game.Screens.Play
         public double CurrentTime => underlyingClock.CurrentTime;
 
         public double Rate => underlyingClock.Rate;
+
+        /// <summary>
+        /// The rate of gameplay when playback is at 100%.
+        /// This excludes any seeking / user adjustments.
+        /// </summary>
+        public double TrueGameplayRate
+        {
+            get
+            {
+                double baseRate = Rate;
+
+                foreach (var adjustment in NonGameplayAdjustments)
+                {
+                    if (Precision.AlmostEquals(adjustment.Value, 0))
+                        return 0;
+
+                    baseRate /= adjustment.Value;
+                }
+
+                return baseRate;
+            }
+        }
 
         public bool IsRunning => underlyingClock.IsRunning;
 
@@ -48,5 +78,7 @@ namespace osu.Game.Screens.Play
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
         public IClock Source => underlyingClock;
+
+        public IBindable<bool> SamplePlaybackDisabled => IsPaused;
     }
 }
