@@ -438,10 +438,20 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed && dialogOverlay != null && (isNewBeatmap || HasUnsavedChanges) && !(dialogOverlay.CurrentDialog is PromptForSaveDialog))
+            if (!exitConfirmed)
             {
-                dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
-                return true;
+                // if the confirm dialog is already showing (or we can't show it, ie. in tests) exit without save.
+                if (dialogOverlay == null || dialogOverlay.CurrentDialog is PromptForSaveDialog)
+                {
+                    confirmExit();
+                    return true;
+                }
+
+                if (isNewBeatmap || HasUnsavedChanges)
+                {
+                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                    return true;
+                }
             }
 
             Background.FadeColour(Color4.White, 500);
