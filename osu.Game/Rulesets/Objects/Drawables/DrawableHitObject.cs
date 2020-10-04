@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
@@ -17,7 +18,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Configuration;
-using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
-        protected SkinnableSound Samples { get; private set; }
+        protected PausableSkinnableSound Samples { get; private set; }
 
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
@@ -51,12 +51,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool PropagateNonPositionalInputSubTree => HandleUserInput;
 
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> has been applied by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
+        /// Invoked by this or a nested <see cref="DrawableHitObject"/> after a <see cref="JudgementResult"/> has been applied.
         /// </summary>
         public event Action<DrawableHitObject, JudgementResult> OnNewResult;
 
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> is being reverted by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
+        /// Invoked by this or a nested <see cref="DrawableHitObject"/> prior to a <see cref="JudgementResult"/> being reverted.
         /// </summary>
         public event Action<DrawableHitObject, JudgementResult> OnRevertResult;
 
@@ -157,6 +157,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             updateState(ArmedState.Idle, true);
         }
 
+        /// <summary>
+        /// Invoked by the base <see cref="DrawableHitObject"/> to populate samples, once on initial load and potentially again on any change to the samples collection.
+        /// </summary>
         protected virtual void LoadSamples()
         {
             if (Samples != null)
@@ -176,13 +179,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                     + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            Samples = new SkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
+            Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
             AddInternal(Samples);
         }
 
         private void onDefaultsApplied(HitObject hitObject)
         {
             apply(hitObject);
+            updateState(state.Value, true);
             DefaultsApplied?.Invoke(this);
         }
 
@@ -232,7 +236,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         #region State / Transform Management
 
         /// <summary>
-        /// Bind to apply a custom state which can override the default implementation.
+        /// Invoked by this or a nested <see cref="DrawableHitObject"/> to apply a custom state that can override the default implementation.
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
@@ -355,9 +359,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
         }
 
-        [Resolved(canBeNull: true)]
-        private GameplayClock gameplayClock { get; set; }
-
         /// <summary>
         /// Calculate the position to be used for sample playback at a specified X position (0..1).
         /// </summary>
@@ -371,22 +372,22 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Whether samples should currently be playing. Will be false during seek operations.
-        /// </summary>
-        protected bool ShouldPlaySamples => gameplayClock?.IsSeeking != true;
-
-        /// <summary>
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// This is invoked automatically when this <see cref="DrawableHitObject"/> is hit.
         /// </summary>
         public virtual void PlaySamples()
         {
-            if (Samples != null && ShouldPlaySamples)
+            if (Samples != null)
             {
                 Samples.Balance.Value = CalculateSamplePlaybackBalance(SamplePlaybackPosition);
                 Samples.Play();
             }
         }
+
+        /// <summary>
+        /// Stops playback of all samples. Automatically called when <see cref="DrawableHitObject{TObject}"/>'s lifetime has been exceeded.
+        /// </summary>
+        public virtual void StopAllSamples() => Samples?.Stop();
 
         protected override void Update()
         {
@@ -456,6 +457,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             foreach (var nested in NestedHitObjects)
                 nested.OnKilled();
 
+            StopAllSamples();
+
             UpdateResult(false);
         }
 
@@ -466,29 +469,45 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
+            if (Result.HasResult)
+                throw new InvalidOperationException("Cannot apply result on a hitobject that already has a result.");
+
             application?.Invoke(Result);
 
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
+
+            // Some (especially older) rulesets use scorable judgements instead of the newer ignorehit/ignoremiss judgements.
+            // Can be removed 20210328
+            if (Result.Judgement.MaxResult == HitResult.IgnoreHit)
+            {
+                HitResult originalType = Result.Type;
+
+                if (Result.Type == HitResult.Miss)
+                    Result.Type = HitResult.IgnoreMiss;
+                else if (Result.Type >= HitResult.Meh && Result.Type <= HitResult.Perfect)
+                    Result.Type = HitResult.IgnoreHit;
+
+                if (Result.Type != originalType)
+                {
+                    Logger.Log($"{GetType().ReadableName()} applied an invalid hit result ({originalType}) when {nameof(HitResult.IgnoreMiss)} or {nameof(HitResult.IgnoreHit)} is expected.\n"
+                               + $"This has been automatically adjusted to {Result.Type}, and support will be removed from 2020-03-28 onwards.", level: LogLevel.Important);
+                }
+            }
+
+            if (!Result.Type.IsValidHitResult(Result.Judgement.MinResult, Result.Judgement.MaxResult))
+            {
+                throw new InvalidOperationException(
+                    $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.Judgement.MinResult} ... {Result.Judgement.MaxResult}]).");
+            }
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = HitObject.GetEndTime();
 
             Result.TimeOffset = Math.Min(HitObject.HitWindows.WindowFor(HitResult.Miss), Time.Current - endTime);
 
-            switch (Result.Type)
-            {
-                case HitResult.None:
-                    break;
-
-                case HitResult.Miss:
-                    updateState(ArmedState.Miss);
-                    break;
-
-                default:
-                    updateState(ArmedState.Hit);
-                    break;
-            }
+            if (Result.HasResult)
+                updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
 
             OnNewResult?.Invoke(this, Result);
         }

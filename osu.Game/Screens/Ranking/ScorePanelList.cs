@@ -99,6 +99,8 @@ namespace osu.Game.Screens.Ranking
         {
             var panel = new ScorePanel(score)
             {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
                 PostExpandAction = () => PostExpandAction?.Invoke()
             }.With(p =>
             {

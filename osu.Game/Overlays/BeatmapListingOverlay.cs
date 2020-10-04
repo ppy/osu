@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapListingOverlay : FullscreenOverlay
+    public class BeatmapListingOverlay : FullscreenOverlay<BeatmapListingHeader>
     {
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays
         private OverlayScrollContainer resultScrollContainer;
 
         public BeatmapListingOverlay()
-            : base(OverlayColourScheme.Blue)
+            : base(OverlayColourScheme.Blue, new BeatmapListingHeader())
         {
         }
 
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new BeatmapListingHeader(),
+                            Header,
                             filterControl = new BeatmapListingFilterControl
                             {
                                 SearchStarted = onSearchStarted,

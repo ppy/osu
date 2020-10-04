@@ -21,11 +21,9 @@ using osu.Game.Overlays.Changelog;
 
 namespace osu.Game.Overlays
 {
-    public class ChangelogOverlay : FullscreenOverlay
+    public class ChangelogOverlay : FullscreenOverlay<ChangelogHeader>
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
-
-        protected ChangelogHeader Header;
 
         private Container<ChangelogContent> content;
 
@@ -36,7 +34,7 @@ namespace osu.Game.Overlays
         protected List<APIUpdateStream> Streams;
 
         public ChangelogOverlay()
-            : base(OverlayColourScheme.Purple)
+            : base(OverlayColourScheme.Purple, new ChangelogHeader())
         {
         }
 
@@ -61,10 +59,11 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            Header = new ChangelogHeader
+                            Header.With(h =>
                             {
-                                ListingSelected = ShowListing,
-                            },
+                                h.ListingSelected = ShowListing;
+                                h.Build.BindTarget = Current;
+                            }),
                             content = new Container<ChangelogContent>
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -76,8 +75,6 @@ namespace osu.Game.Overlays
             };
 
             sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
-
-            Header.Build.BindTo(Current);
 
             Current.BindValueChanged(e =>
             {

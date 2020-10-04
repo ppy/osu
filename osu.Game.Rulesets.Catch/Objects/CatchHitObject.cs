@@ -28,6 +28,11 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         /// <summary>
+        /// Whether this object can be placed on the catcher's plate.
+        /// </summary>
+        public virtual bool CanBePlated => false;
+
+        /// <summary>
         /// A random offset applied to <see cref="X"/>, set by the <see cref="CatchBeatmapProcessor"/>.
         /// </summary>
         internal float XOffset { get; set; }
@@ -98,6 +103,14 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+    }
+
+    /// <summary>
+    /// Represents a single object that can be caught by the catcher.
+    /// </summary>
+    public abstract class PalpableCatchHitObject : CatchHitObject
+    {
+        public override bool CanBePlated => true;
     }
 
     public enum FruitVisualRepresentation

@@ -9,12 +9,12 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
@@ -47,6 +47,8 @@ namespace osu.Game.Screens.Edit
 
         public readonly IBeatmap PlayableBeatmap;
 
+        public readonly ISkin BeatmapSkin;
+
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
@@ -54,49 +56,15 @@ namespace osu.Game.Screens.Edit
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap)
+        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null)
         {
             PlayableBeatmap = playableBeatmap;
+            BeatmapSkin = beatmapSkin;
 
             beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset?.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
-        }
-
-        private readonly HashSet<HitObject> pendingUpdates = new HashSet<HitObject>();
-        private ScheduledDelegate scheduledUpdate;
-
-        /// <summary>
-        /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
-        public void UpdateHitObject([NotNull] HitObject hitObject) => updateHitObject(hitObject, false);
-
-        private void updateHitObject([CanBeNull] HitObject hitObject, bool silent)
-        {
-            scheduledUpdate?.Cancel();
-
-            if (hitObject != null)
-                pendingUpdates.Add(hitObject);
-
-            scheduledUpdate = Schedule(() =>
-            {
-                beatmapProcessor?.PreProcess();
-
-                foreach (var obj in pendingUpdates)
-                    obj.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
-
-                beatmapProcessor?.PostProcess();
-
-                if (!silent)
-                {
-                    foreach (var obj in pendingUpdates)
-                        HitObjectUpdated?.Invoke(obj);
-                }
-
-                pendingUpdates.Clear();
-            });
         }
 
         public BeatmapInfo BeatmapInfo
@@ -120,6 +88,8 @@ namespace osu.Game.Screens.Edit
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
+
+        private readonly HashSet<HitObject> pendingUpdates = new HashSet<HitObject>();
 
         /// <summary>
         /// Adds a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
@@ -156,14 +126,27 @@ namespace osu.Game.Screens.Edit
 
             mutableHitObjects.Insert(index, hitObject);
 
+            // must be run after any change to hitobject ordering
+            beatmapProcessor?.PreProcess();
+            processHitObject(hitObject);
+            beatmapProcessor?.PostProcess();
+
             HitObjectAdded?.Invoke(hitObject);
-            updateHitObject(hitObject, true);
+        }
+
+        /// <summary>
+        /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
+        public void UpdateHitObject([NotNull] HitObject hitObject)
+        {
+            pendingUpdates.Add(hitObject);
         }
 
         /// <summary>
         /// Removes a <see cref="HitObject"/> from this <see cref="EditorBeatmap"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
+        /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
         /// <returns>True if the <see cref="HitObject"/> has been removed, false otherwise.</returns>
         public bool Remove(HitObject hitObject)
         {
@@ -195,11 +178,14 @@ namespace osu.Game.Screens.Edit
 
             var bindable = startTimeBindables[hitObject];
             bindable.UnbindAll();
-
             startTimeBindables.Remove(hitObject);
-            HitObjectRemoved?.Invoke(hitObject);
 
-            updateHitObject(null, true);
+            // must be run after any change to hitobject ordering
+            beatmapProcessor?.PreProcess();
+            processHitObject(hitObject);
+            beatmapProcessor?.PostProcess();
+
+            HitObjectRemoved?.Invoke(hitObject);
         }
 
         /// <summary>
@@ -207,19 +193,33 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public void Clear()
         {
-            var removed = HitObjects.ToList();
-
-            mutableHitObjects.Clear();
-
-            foreach (var b in startTimeBindables)
-                b.Value.UnbindAll();
-            startTimeBindables.Clear();
-
-            foreach (var h in removed)
-                HitObjectRemoved?.Invoke(h);
-
-            updateHitObject(null, true);
+            foreach (var h in HitObjects.ToArray())
+                Remove(h);
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // debounce updates as they are common and may come from input events, which can run needlessly many times per update frame.
+            if (pendingUpdates.Count > 0)
+            {
+                beatmapProcessor?.PreProcess();
+
+                foreach (var hitObject in pendingUpdates)
+                    processHitObject(hitObject);
+
+                beatmapProcessor?.PostProcess();
+
+                // explicitly needs to be fired after PostProcess
+                foreach (var hitObject in pendingUpdates)
+                    HitObjectUpdated?.Invoke(hitObject);
+
+                pendingUpdates.Clear();
+            }
+        }
+
+        private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
 
         private void trackStartTime(HitObject hitObject)
         {
