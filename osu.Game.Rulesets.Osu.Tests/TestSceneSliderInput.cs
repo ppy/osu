@@ -314,7 +314,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private bool assertMaxJudge() => judgementResults.Any() && judgementResults.All(t => t.Type == t.Judgement.MaxResult);
 
-        private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.SmallTickHit && judgementResults.First().Type == HitResult.Miss;
+        private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.SmallTickHit && !judgementResults.First().IsHit;
 
         private bool assertMidSliderJudgements() => judgementResults[^2].Type == HitResult.SmallTickHit;
 
