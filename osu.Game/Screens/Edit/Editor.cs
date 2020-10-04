@@ -84,6 +84,8 @@ namespace osu.Game.Screens.Edit
 
         private DependencyContainer dependencies;
 
+        private bool isNewBeatmap;
+
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -112,8 +114,6 @@ namespace osu.Game.Screens.Edit
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
-
-            bool isNewBeatmap = false;
 
             if (Beatmap.Value is DummyWorkingBeatmap)
             {
@@ -287,6 +287,9 @@ namespace osu.Game.Screens.Edit
 
         protected void Save()
         {
+            // no longer new after first user-triggered save.
+            isNewBeatmap = false;
+
             // apply any set-level metadata changes.
             beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
 
@@ -435,7 +438,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed && dialogOverlay != null && HasUnsavedChanges && !(dialogOverlay.CurrentDialog is PromptForSaveDialog))
+            if (!exitConfirmed && dialogOverlay != null && (isNewBeatmap || HasUnsavedChanges) && !(dialogOverlay.CurrentDialog is PromptForSaveDialog))
             {
                 dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
                 return true;
@@ -456,6 +459,12 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExit()
         {
+            if (isNewBeatmap)
+            {
+                // confirming exit without save means we should delete the new beatmap completely.
+                beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
+            }
+
             exitConfirmed = true;
             this.Exit();
         }
