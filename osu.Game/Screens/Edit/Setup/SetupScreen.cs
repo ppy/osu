@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Edit.Setup
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            game.UnregisterImportHandler(this);
+            game?.UnregisterImportHandler(this);
         }
     }
 
