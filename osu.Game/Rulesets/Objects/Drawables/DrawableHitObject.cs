@@ -506,19 +506,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             Result.TimeOffset = Math.Min(HitObject.HitWindows.WindowFor(HitResult.Miss), Time.Current - endTime);
 
-            switch (Result.Type)
-            {
-                case HitResult.None:
-                    break;
-
-                case HitResult.Miss:
-                    updateState(ArmedState.Miss);
-                    break;
-
-                default:
-                    updateState(ArmedState.Hit);
-                    break;
-            }
+            if (Result.HasResult)
+                updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
 
             OnNewResult?.Invoke(this, Result);
         }
