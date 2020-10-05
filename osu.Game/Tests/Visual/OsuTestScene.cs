@@ -226,16 +226,18 @@ namespace osu.Game.Tests.Visual
             public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio)
                 : base(beatmap, storyboard, audio)
             {
-                double lastObjectTime = beatmap.HitObjects.LastOrDefault()?.GetEndTime() ?? 60000;
+                var lastHitObject = beatmap.HitObjects.LastOrDefault();
+
+                double trackLength = lastHitObject?.GetEndTime() + 2000 ?? 60000;
 
                 if (referenceClock != null)
                 {
                     store = new TrackVirtualStore(referenceClock);
                     audio.AddItem(store);
-                    track = store.GetVirtual(lastObjectTime);
+                    track = store.GetVirtual(trackLength);
                 }
                 else
-                    track = audio?.Tracks.GetVirtual(lastObjectTime);
+                    track = audio?.Tracks.GetVirtual(trackLength);
             }
 
             ~ClockBackedTestWorkingBeatmap()
