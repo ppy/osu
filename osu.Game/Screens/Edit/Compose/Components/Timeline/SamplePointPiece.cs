@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -16,6 +17,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class SamplePointPiece : CompositeDrawable
     {
+        private readonly SampleControlPoint samplePoint;
+
         private readonly Bindable<string> bank;
         private readonly BindableNumber<int> volume;
 
@@ -24,6 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public SamplePointPiece(SampleControlPoint samplePoint)
         {
+            this.samplePoint = samplePoint;
             volume = samplePoint.SampleVolumeBindable.GetBoundCopy();
             bank = samplePoint.SampleBankBindable.GetBoundCopy();
         }
@@ -37,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
 
-            Color4 colour = colours.PinkDarker;
+            Color4 colour = samplePoint.GetRepresentingColour(colours);
 
             InternalChildren = new Drawable[]
             {
@@ -57,7 +61,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                         new Box
                         {
-                            Colour = colours.Pink,
+                            Colour = colour.Lighten(0.2f),
                             Width = 2,
                             RelativeSizeAxes = Axes.Y,
                         },
