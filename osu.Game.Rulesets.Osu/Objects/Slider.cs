@@ -176,6 +176,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         // if this is to change, we should revisit this.
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
+                            RepeatIndex = e.SpanIndex,
                             StartTime = e.Time,
                             Position = EndPosition,
                             StackHeight = StackHeight
@@ -183,10 +184,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new SliderRepeat
+                        AddNested(new SliderRepeat(this)
                         {
                             RepeatIndex = e.SpanIndex,
-                            SpanDuration = SpanDuration,
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,

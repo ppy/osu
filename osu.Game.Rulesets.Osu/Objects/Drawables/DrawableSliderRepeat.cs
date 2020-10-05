@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -22,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Drawable scaleContainer;
 
+        public readonly Drawable CirclePiece;
+
         public override bool DisplayResult => false;
 
         public DrawableSliderRepeat(SliderRepeat sliderRepeat, DrawableSlider drawableSlider)
@@ -34,7 +38,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new ReverseArrowPiece();
+            InternalChild = scaleContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children = new[]
+                {
+                    // no default for this; only visible in legacy skins.
+                    CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty()),
+                    arrow = new ReverseArrowPiece(),
+                }
+            };
         }
 
         private readonly IBindable<float> scaleBindable = new BindableFloat();
@@ -85,6 +100,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private bool hasRotation;
 
+        private readonly ReverseArrowPiece arrow;
+
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
             // When the repeat is hit, the arrow should fade out on spot rather than following the slider
@@ -114,18 +131,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             float aimRotation = MathUtils.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
-            while (Math.Abs(aimRotation - Rotation) > 180)
-                aimRotation += aimRotation < Rotation ? 360 : -360;
+            while (Math.Abs(aimRotation - arrow.Rotation) > 180)
+                aimRotation += aimRotation < arrow.Rotation ? 360 : -360;
 
             if (!hasRotation)
             {
-                Rotation = aimRotation;
+                arrow.Rotation = aimRotation;
                 hasRotation = true;
             }
             else
             {
                 // If we're already snaking, interpolate to smooth out sharp curves (linear sliders, mainly).
-                Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), Rotation, aimRotation, 0, 50, Easing.OutQuint);
+                arrow.Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), arrow.Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
         }
     }
