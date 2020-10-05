@@ -35,5 +35,11 @@ namespace osu.Game.Screens.Edit
         /// This should be invoked as soon as possible after <see cref="BeginChange"/> to cause a state change.
         /// </remarks>
         void EndChange();
+
+        /// <summary>
+        /// Immediately saves the current <see cref="Editor"/> state.
+        /// Note that this will be a no-op if there is a change in progress via <see cref="BeginChange"/>.
+        /// </summary>
+        void SaveState();
     }
 }

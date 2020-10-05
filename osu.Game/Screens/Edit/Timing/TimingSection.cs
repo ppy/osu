@@ -37,8 +37,13 @@ namespace osu.Game.Screens.Edit.Timing
             if (point.NewValue != null)
             {
                 bpmSlider.Bindable = point.NewValue.BeatLengthBindable;
+                bpmSlider.Bindable.BindValueChanged(_ => ChangeHandler?.SaveState());
+
                 bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
+                // no need to hook change handler here as it's the same bindable as above
+
                 timeSignature.Bindable = point.NewValue.TimeSignatureBindable;
+                timeSignature.Bindable.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 
@@ -117,6 +122,8 @@ namespace osu.Game.Screens.Edit.Timing
                 bpmBindable.BindValueChanged(bpm => beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
 
                 base.Bindable = bpmBindable;
+
+                TransferValueOnCommit = true;
             }
 
             public override Bindable<double> Bindable
