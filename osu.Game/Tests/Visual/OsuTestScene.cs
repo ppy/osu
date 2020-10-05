@@ -226,9 +226,11 @@ namespace osu.Game.Tests.Visual
             public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio)
                 : base(beatmap, storyboard, audio)
             {
-                var lastHitObject = beatmap.HitObjects.LastOrDefault();
+                double trackLength = 60000;
 
-                double trackLength = lastHitObject?.GetEndTime() + 2000 ?? 60000;
+                if (beatmap.HitObjects.Count > 0)
+                    // add buffer after last hitobject to allow for final replay frames etc.
+                    trackLength = beatmap.HitObjects.Max(h => h.GetEndTime()) + 2000;
 
                 if (referenceClock != null)
                 {
