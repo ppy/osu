@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 endHold();
             }
 
-            if (Tail.Result.Type == HitResult.Miss)
+            if (Tail.Judged && !Tail.IsHit)
                 HasBroken = true;
         }
 
