@@ -11,7 +11,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Skinning
 {
@@ -21,8 +20,6 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private ISampleStore samples { get; set; }
-
-        private bool requestedPlaying;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -37,7 +34,7 @@ namespace osu.Game.Skinning
         /// </remarks>
         protected bool PlayWhenZeroVolume => Looping;
 
-        private readonly AudioContainer<DrawableSample> samplesContainer;
+        protected readonly AudioContainer<DrawableSample> SamplesContainer;
 
         public SkinnableSound(ISampleInfo hitSamples)
             : this(new[] { hitSamples })
@@ -47,28 +44,7 @@ namespace osu.Game.Skinning
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
             this.hitSamples = hitSamples.ToArray();
-            InternalChild = samplesContainer = new AudioContainer<DrawableSample>();
-        }
-
-        private Bindable<bool> gameplayClockPaused;
-
-        [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock gameplayClock)
-        {
-            // if in a gameplay context, pause sample playback when gameplay is paused.
-            gameplayClockPaused = gameplayClock?.IsPaused.GetBoundCopy();
-            gameplayClockPaused?.BindValueChanged(paused =>
-            {
-                if (requestedPlaying)
-                {
-                    if (paused.NewValue)
-                        stop();
-                    // it's not easy to know if a sample has finished playing (to end).
-                    // to keep things simple only resume playing looping samples.
-                    else if (Looping)
-                        play();
-                }
-            });
+            InternalChild = SamplesContainer = new AudioContainer<DrawableSample>();
         }
 
         private bool looping;
@@ -82,34 +58,22 @@ namespace osu.Game.Skinning
 
                 looping = value;
 
-                samplesContainer.ForEach(c => c.Looping = looping);
+                SamplesContainer.ForEach(c => c.Looping = looping);
             }
         }
 
-        public void Play()
+        public virtual void Play()
         {
-            requestedPlaying = true;
-            play();
-        }
-
-        private void play()
-        {
-            samplesContainer.ForEach(c =>
+            SamplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
                     c.Play();
             });
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
-            requestedPlaying = false;
-            stop();
-        }
-
-        private void stop()
-        {
-            samplesContainer.ForEach(c => c.Stop());
+            SamplesContainer.ForEach(c => c.Stop());
         }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
@@ -138,33 +102,33 @@ namespace osu.Game.Skinning
                 return ch;
             }).Where(c => c != null);
 
-            samplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
+            SamplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
 
             // Start playback internally for the new samples if the previous ones were playing beforehand.
             if (wasPlaying)
-                play();
+                Play();
         }
 
         #region Re-expose AudioContainer
 
-        public BindableNumber<double> Volume => samplesContainer.Volume;
+        public BindableNumber<double> Volume => SamplesContainer.Volume;
 
-        public BindableNumber<double> Balance => samplesContainer.Balance;
+        public BindableNumber<double> Balance => SamplesContainer.Balance;
 
-        public BindableNumber<double> Frequency => samplesContainer.Frequency;
+        public BindableNumber<double> Frequency => SamplesContainer.Frequency;
 
-        public BindableNumber<double> Tempo => samplesContainer.Tempo;
+        public BindableNumber<double> Tempo => SamplesContainer.Tempo;
 
         public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => samplesContainer.AddAdjustment(type, adjustBindable);
+            => SamplesContainer.AddAdjustment(type, adjustBindable);
 
         public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => samplesContainer.RemoveAdjustment(type, adjustBindable);
+            => SamplesContainer.RemoveAdjustment(type, adjustBindable);
 
         public void RemoveAllAdjustments(AdjustableProperty type)
-            => samplesContainer.RemoveAllAdjustments(type);
+            => SamplesContainer.RemoveAllAdjustments(type);
 
-        public bool IsPlaying => samplesContainer.Any(s => s.Playing);
+        public bool IsPlaying => SamplesContainer.Any(s => s.Playing);
 
         #endregion
     }

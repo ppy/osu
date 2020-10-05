@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             DrawableDrumRollTick h;
             DrawableRuleset.Playfield.Add(h = new DrawableDrumRollTick(tick) { JudgementType = hitType });
-            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(tick, new TaikoDrumRollTickJudgement()) { Type = HitResult.Perfect });
+            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(tick, new TaikoDrumRollTickJudgement()) { Type = HitResult.Great });
         }
     }
 }

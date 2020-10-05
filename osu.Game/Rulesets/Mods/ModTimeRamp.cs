@@ -6,11 +6,11 @@ using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
-using osu.Framework.Audio.Sample;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.TriggerChange();
         }
 
-        public void ApplyToSample(SampleChannel sample)
+        public void ApplyToSample(DrawableSample sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
