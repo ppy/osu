@@ -208,11 +208,15 @@ namespace osu.Game.Rulesets.UI
 
         private void setClock()
         {
-            // in case a parent gameplay clock isn't available, just use the parent clock.
-            parentGameplayClock ??= Clock;
-
-            Clock = GameplayClock;
-            ProcessCustomClock = false;
+            if (parentGameplayClock == null)
+            {
+                // in case a parent gameplay clock isn't available, just use the parent clock.
+                parentGameplayClock ??= Clock;
+            }
+            else
+            {
+                Clock = GameplayClock;
+            }
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
