@@ -7,44 +7,37 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Configuration;
+using osu.Game.Overlays;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Input
 {
     /// <summary>
-    /// Connects <see cref="OsuSetting.ConfineMouseMode"/> with <see cref="FrameworkSetting.ConfineMouseMode"/>
-    /// while providing a property for <see cref="Player"/> to indicate whether gameplay is currently active.
+    /// Connects <see cref="OsuSetting.ConfineMouseMode"/> with <see cref="FrameworkSetting.ConfineMouseMode"/>,
+    /// while optionally binding an <see cref="OverlayActivation"/> mode, usually that of the current <see cref="Player"/>.
+    /// It is assumed that while overlay activation is <see cref="OverlayActivation.Disabled"/>, we should also confine the
+    /// mouse cursor if it has been requested with <see cref="OsuConfineMouseMode.DuringGameplay"/>.
     /// </summary>
     public class ConfineMouseTracker : Component
     {
         private Bindable<ConfineMouseMode> frameworkConfineMode;
         private Bindable<OsuConfineMouseMode> osuConfineMode;
 
-        private bool gameplayActive;
-
         /// <summary>
-        /// Indicates whether osu! is currently considered "in gameplay" for the
-        /// purposes of <see cref="OsuConfineMouseMode.DuringGameplay"/>.
+        /// The bindable used to indicate whether gameplay is active.
+        /// Should be bound to the corresponding bindable of the current <see cref="Player"/>.
+        /// Defaults to <see cref="OverlayActivation.All"/> to assume that all other screens are considered "not gameplay".
         /// </summary>
-        public bool GameplayActive
-        {
-            get => gameplayActive;
-            set
-            {
-                if (gameplayActive == value)
-                    return;
-
-                gameplayActive = value;
-                updateConfineMode();
-            }
-        }
+        public IBindable<OverlayActivation> OverlayActivationMode { get; } = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfigManager, OsuConfigManager osuConfigManager)
         {
             frameworkConfineMode = frameworkConfigManager.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode);
             osuConfineMode = osuConfigManager.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode);
-            osuConfineMode.BindValueChanged(_ => updateConfineMode(), true);
+            osuConfineMode.ValueChanged += _ => updateConfineMode();
+
+            OverlayActivationMode.BindValueChanged(_ => updateConfineMode(), true);
         }
 
         private void updateConfineMode()
@@ -60,7 +53,7 @@ namespace osu.Game.Input
                     break;
 
                 case OsuConfineMouseMode.DuringGameplay:
-                    frameworkConfineMode.Value = GameplayActive ? ConfineMouseMode.Always : ConfineMouseMode.Never;
+                    frameworkConfineMode.Value = OverlayActivationMode.Value == OverlayActivation.Disabled ? ConfineMouseMode.Always : ConfineMouseMode.Never;
                     break;
 
                 case OsuConfineMouseMode.Always:
