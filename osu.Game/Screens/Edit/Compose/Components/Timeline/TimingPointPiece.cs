@@ -11,16 +11,20 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimingPointPiece : CompositeDrawable
     {
+        private readonly TimingControlPoint point;
+
         private readonly BindableNumber<double> beatLength;
         private OsuSpriteText bpmText;
 
         public TimingPointPiece(TimingControlPoint point)
         {
+            this.point = point;
             beatLength = point.BeatLengthBindable.GetBoundCopy();
         }
 
@@ -32,12 +36,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             AutoSizeAxes = Axes.Both;
 
+            Color4 colour = point.GetRepresentingColour(colours);
+
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
                     Alpha = 0.9f,
-                    Colour = ColourInfo.GradientHorizontal(colours.YellowDark, colours.YellowDark.Opacity(0.5f)),
+                    Colour = ColourInfo.GradientHorizontal(colour, colour.Opacity(0.5f)),
                     RelativeSizeAxes = Axes.Both,
                 },
                 bpmText = new OsuSpriteText
