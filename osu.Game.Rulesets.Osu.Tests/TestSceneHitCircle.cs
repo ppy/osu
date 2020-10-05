@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private int depthIndex;
 
-        public TestSceneHitCircle()
+        [Test]
+        public void TestVariousHitCircles()
         {
             AddStep("Miss Big Single", () => SetContents(() => testSingle(2)));
             AddStep("Miss Medium Single", () => SetContents(() => testSingle(5)));

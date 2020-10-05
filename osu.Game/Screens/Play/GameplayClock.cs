@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Play
 {
@@ -47,7 +48,12 @@ namespace osu.Game.Screens.Play
                 double baseRate = Rate;
 
                 foreach (var adjustment in NonGameplayAdjustments)
+                {
+                    if (Precision.AlmostEquals(adjustment.Value, 0))
+                        return 0;
+
                     baseRate /= adjustment.Value;
+                }
 
                 return baseRate;
             }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -13,7 +14,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
     public class TestSceneHoldNote : ManiaHitObjectTestScene
     {
-        public TestSceneHoldNote()
+        [Test]
+        public void TestHoldNote()
         {
             AddToggleStep("toggle hitting", v =>
             {
