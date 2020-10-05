@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public class SliderRepeatJudgement : OsuJudgement
         {
-            protected override int NumericResultFor(HitResult result) => result == MaxResult ? 30 : 0;
+            public override HitResult MaxResult => HitResult.LargeTickHit;
         }
     }
 }
