@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private OsuSpriteText selectionDetailsText;
 
-        protected ComposeSelectionBox SelectionBox { get; private set; }
+        protected SelectionBox SelectionBox { get; private set; }
 
         [Resolved(CanBeNull = true)]
         protected EditorBeatmap EditorBeatmap { get; private set; }
@@ -94,20 +94,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        public ComposeSelectionBox CreateSelectionBox()
-            => new ComposeSelectionBox
+        public SelectionBox CreateSelectionBox()
+            => new SelectionBox
             {
-                OperationStarted = OnDragOperationBegan,
-                OperationEnded = OnDragOperationEnded,
+                OperationStarted = OnOperationBegan,
+                OperationEnded = OnOperationEnded,
 
-                OnRotation = e => HandleRotation(e.Delta.X),
-                OnScale = (e, anchor) => HandleScale(e.Delta, anchor),
+                OnRotation = angle => HandleRotation(angle),
+                OnScale = (amount, anchor) => HandleScale(amount, anchor),
+                OnFlip = direction => HandleFlip(direction),
             };
 
         /// <summary>
         /// Fired when a drag operation ends from the selection box.
         /// </summary>
-        protected virtual void OnDragOperationBegan()
+        protected virtual void OnOperationBegan()
         {
             ChangeHandler.BeginChange();
         }
@@ -115,7 +116,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Fired when a drag operation begins from the selection box.
         /// </summary>
-        protected virtual void OnDragOperationEnded()
+        protected virtual void OnOperationEnded()
         {
             ChangeHandler.EndChange();
         }
@@ -150,6 +151,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="anchor">The point of reference where the scale is originating from.</param>
         /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
         public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
+
+        /// <summary>
+        /// Handled the selected <see cref="DrawableHitObject"/>s being flipped.
+        /// </summary>
+        /// <param name="direction">The direction to flip</param>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        public virtual bool HandleFlip(Direction direction) => false;
 
         public bool OnPressed(PlatformAction action)
         {

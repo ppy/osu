@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -15,17 +14,17 @@ namespace osu.Game.Tests.Visual.Editing
 
         public TestSceneComposeSelectBox()
         {
-            ComposeSelectionBox selectionBox = null;
+            SelectionBox selectionBox = null;
 
             AddStep("create box", () =>
                 Child = selectionArea = new Container
                 {
-                    Size = new Vector2(300),
+                    Size = new Vector2(400),
                     Position = -new Vector2(150),
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        selectionBox = new ComposeSelectionBox
+                        selectionBox = new SelectionBox
                         {
                             CanRotate = true,
                             CanScaleX = true,
@@ -42,29 +41,29 @@ namespace osu.Game.Tests.Visual.Editing
             AddToggleStep("toggle y", state => selectionBox.CanScaleY = state);
         }
 
-        private void handleScale(DragEvent e, Anchor reference)
+        private void handleScale(Vector2 amount, Anchor reference)
         {
             if ((reference & Anchor.y1) == 0)
             {
                 int directionY = (reference & Anchor.y0) > 0 ? -1 : 1;
                 if (directionY < 0)
-                    selectionArea.Y += e.Delta.Y;
-                selectionArea.Height += directionY * e.Delta.Y;
+                    selectionArea.Y += amount.Y;
+                selectionArea.Height += directionY * amount.Y;
             }
 
             if ((reference & Anchor.x1) == 0)
             {
                 int directionX = (reference & Anchor.x0) > 0 ? -1 : 1;
                 if (directionX < 0)
-                    selectionArea.X += e.Delta.X;
-                selectionArea.Width += directionX * e.Delta.X;
+                    selectionArea.X += amount.X;
+                selectionArea.Width += directionX * amount.X;
             }
         }
 
-        private void handleRotation(DragEvent e)
+        private void handleRotation(float angle)
         {
             // kinda silly and wrong, but just showing that the drag handles work.
-            selectionArea.Rotation += e.Delta.X;
+            selectionArea.Rotation += angle;
         }
     }
 }
