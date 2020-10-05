@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual IEnumerable<Bindable<double>> NonGameplayAdjustments => Enumerable.Empty<Bindable<double>>();
 
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
         public GameplayClock(IFrameBasedClock underlyingClock)
         {
             this.underlyingClock = underlyingClock;
@@ -62,13 +64,15 @@ namespace osu.Game.Screens.Play
         public bool IsRunning => underlyingClock.IsRunning;
 
         /// <summary>
-        /// Whether an ongoing seek operation is active.
+        /// Whether nested samples supporting the <see cref="ISamplePlaybackDisabler"/> interface should be paused.
         /// </summary>
-        public virtual bool IsSeeking => false;
+        protected virtual bool ShouldDisableSamplePlayback => IsPaused.Value;
 
         public void ProcessFrame()
         {
-            // we do not want to process the underlying clock.
+            // intentionally not updating the underlying clock (handled externally).
+
+            samplePlaybackDisabled.Value = ShouldDisableSamplePlayback;
         }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
@@ -79,6 +83,6 @@ namespace osu.Game.Screens.Play
 
         public IClock Source => underlyingClock;
 
-        public IBindable<bool> SamplePlaybackDisabled => IsPaused;
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
     }
 }
