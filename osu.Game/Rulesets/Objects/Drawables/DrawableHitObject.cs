@@ -51,12 +51,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool PropagateNonPositionalInputSubTree => HandleUserInput;
 
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> has been applied by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
+        /// Invoked by this or a nested <see cref="DrawableHitObject"/> after a <see cref="JudgementResult"/> has been applied.
         /// </summary>
         public event Action<DrawableHitObject, JudgementResult> OnNewResult;
 
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> is being reverted by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
+        /// Invoked by this or a nested <see cref="DrawableHitObject"/> prior to a <see cref="JudgementResult"/> being reverted.
         /// </summary>
         public event Action<DrawableHitObject, JudgementResult> OnRevertResult;
 
@@ -236,7 +236,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         #region State / Transform Management
 
         /// <summary>
-        /// Bind to apply a custom state which can override the default implementation.
+        /// Invoked by this or a nested <see cref="DrawableHitObject"/> to apply a custom state that can override the default implementation.
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
@@ -384,6 +384,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
+        /// <summary>
+        /// Stops playback of all relevant samples. Generally only looping samples should be stopped by this, and the rest let to play out.
+        /// Automatically called when <see cref="DrawableHitObject{TObject}"/>'s lifetime has been exceeded.
+        /// </summary>
+        public virtual void StopAllSamples()
+        {
+            if (Samples?.Looping == true)
+                Samples.Stop();
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -452,6 +462,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             foreach (var nested in NestedHitObjects)
                 nested.OnKilled();
 
+            // failsafe to ensure looping samples don't get stuck in a playing state.
+            // this could occur in a non-frame-stable context where DrawableHitObjects get killed before a SkinnableSound has the chance to be stopped.
+            StopAllSamples();
+
             UpdateResult(false);
         }
 
@@ -462,6 +476,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
+            if (Result.HasResult)
+                throw new InvalidOperationException("Cannot apply result on a hitobject that already has a result.");
+
             application?.Invoke(Result);
 
             if (!Result.HasResult)
@@ -496,19 +513,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             Result.TimeOffset = Math.Min(HitObject.HitWindows.WindowFor(HitResult.Miss), Time.Current - endTime);
 
-            switch (Result.Type)
-            {
-                case HitResult.None:
-                    break;
-
-                case HitResult.Miss:
-                    updateState(ArmedState.Miss);
-                    break;
-
-                default:
-                    updateState(ArmedState.Hit);
-                    break;
-            }
+            if (Result.HasResult)
+                updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
 
             OnNewResult?.Invoke(this, Result);
         }

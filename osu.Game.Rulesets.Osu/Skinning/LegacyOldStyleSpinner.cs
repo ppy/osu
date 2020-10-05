@@ -24,12 +24,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private Sprite metreSprite;
         private Container metre;
 
+        private bool spinnerBlink;
+
         private const float sprite_scale = 1 / 1.6f;
         private const float final_metre_height = 692 * sprite_scale;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource source, DrawableHitObject drawableObject)
         {
+            spinnerBlink = source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value != true;
+
             drawableSpinner = (DrawableSpinner)drawableObject;
 
             RelativeSizeAxes = Axes.Both;
@@ -84,13 +88,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             base.LoadComplete();
 
-            this.FadeOut();
             drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
+            updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
+            if (!(drawableHitObject is DrawableSpinner))
+                return;
+
             var spinner = drawableSpinner.HitObject;
+
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                this.FadeOut();
 
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
                 this.FadeInFromZero(spinner.TimeFadeIn / 2);
@@ -116,12 +126,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private float getMetreHeight(float progress)
         {
-            progress = Math.Min(99, progress * 100);
+            progress *= 100;
+
+            // the spinner should still blink at 100% progress.
+            if (spinnerBlink)
+                progress = Math.Min(99, progress);
 
             int barCount = (int)progress / 10;
 
-            // todo: add SpinnerNoBlink support
-            if (RNG.NextBool(((int)progress % 10) / 10f))
+            if (spinnerBlink && RNG.NextBool(((int)progress % 10) / 10f))
                 barCount++;
 
             return (float)barCount / total_bars * final_metre_height;

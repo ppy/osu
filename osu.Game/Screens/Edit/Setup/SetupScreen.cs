@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -23,14 +26,24 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreen : EditorScreen
+    public class SetupScreen : EditorScreen, ICanAcceptFiles
     {
+        public IEnumerable<string> HandledExtensions => ImageExtensions.Concat(AudioExtensions);
+
+        public static string[] ImageExtensions { get; } = { ".jpg", ".jpeg", ".png" };
+
+        public static string[] AudioExtensions { get; } = { ".mp3", ".ogg" };
+
         private FillFlowContainer flow;
         private LabelledTextBox artistTextBox;
         private LabelledTextBox titleTextBox;
         private LabelledTextBox creatorTextBox;
         private LabelledTextBox difficultyTextBox;
         private LabelledTextBox audioTrackTextBox;
+        private Container backgroundSpriteContainer;
+
+        [Resolved]
+        private OsuGameBase game { get; set; }
 
         [Resolved]
         private MusicController music { get; set; }
@@ -83,19 +96,12 @@ namespace osu.Game.Screens.Edit.Setup
                                 Direction = FillDirection.Vertical,
                                 Children = new Drawable[]
                                 {
-                                    new Container
+                                    backgroundSpriteContainer = new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Height = 250,
                                         Masking = true,
                                         CornerRadius = 10,
-                                        Child = new BeatmapBackgroundSprite(Beatmap.Value)
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            FillMode = FillMode.Fill,
-                                        },
                                     },
                                     new OsuSpriteText
                                     {
@@ -144,10 +150,79 @@ namespace osu.Game.Screens.Edit.Setup
                 }
             };
 
+            updateBackgroundSprite();
+
             audioTrackTextBox.Current.BindValueChanged(audioTrackChanged);
 
             foreach (var item in flow.OfType<LabelledTextBox>())
                 item.OnCommit += onCommit;
+        }
+
+        Task ICanAcceptFiles.Import(params string[] paths)
+        {
+            Schedule(() =>
+            {
+                var firstFile = new FileInfo(paths.First());
+
+                if (ImageExtensions.Contains(firstFile.Extension))
+                {
+                    ChangeBackgroundImage(firstFile.FullName);
+                }
+                else if (AudioExtensions.Contains(firstFile.Extension))
+                {
+                    audioTrackTextBox.Text = firstFile.FullName;
+                }
+            });
+
+            return Task.CompletedTask;
+        }
+
+        private void updateBackgroundSprite()
+        {
+            LoadComponentAsync(new BeatmapBackgroundSprite(Beatmap.Value)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fill,
+            }, background =>
+            {
+                backgroundSpriteContainer.Child = background;
+                background.FadeInFromZero(500);
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            game.RegisterImportHandler(this);
+        }
+
+        public bool ChangeBackgroundImage(string path)
+        {
+            var info = new FileInfo(path);
+
+            if (!info.Exists)
+                return false;
+
+            var set = Beatmap.Value.BeatmapSetInfo;
+
+            // remove the previous background for now.
+            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
+            var oldFile = set.Files.FirstOrDefault(f => f.Filename == Beatmap.Value.Metadata.BackgroundFile);
+
+            using (var stream = info.OpenRead())
+            {
+                if (oldFile != null)
+                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
+                else
+                    beatmaps.AddFile(set, stream, info.Name);
+            }
+
+            Beatmap.Value.Metadata.BackgroundFile = info.Name;
+            updateBackgroundSprite();
+
+            return true;
         }
 
         public bool ChangeAudioTrack(string path)
@@ -196,6 +271,12 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Value.Metadata.AuthorString = creatorTextBox.Current.Value;
             Beatmap.Value.BeatmapInfo.Version = difficultyTextBox.Current.Value;
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            game?.UnregisterImportHandler(this);
+        }
     }
 
     internal class FileChooserLabelledTextBox : LabelledTextBox
@@ -230,7 +311,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         public void DisplayFileChooser()
         {
-            Target.Child = new FileSelector(validFileExtensions: new[] { ".mp3", ".ogg" })
+            Target.Child = new FileSelector(validFileExtensions: SetupScreen.AudioExtensions)
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 400,
