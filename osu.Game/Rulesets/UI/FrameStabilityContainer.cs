@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.UI
         public GameplayClock GameplayClock => stabilityGameplayClock;
 
         [Cached(typeof(GameplayClock))]
+        [Cached(typeof(ISamplePlaybackDisabler))]
         private readonly StabilityGameplayClock stabilityGameplayClock;
 
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
