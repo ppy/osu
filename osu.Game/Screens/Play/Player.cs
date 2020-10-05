@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
-            confineMouseTracker.OverlayActivationMode.BindTo(OverlayActivationMode);
+            confineMouseTracker?.OverlayActivationMode.BindTo(OverlayActivationMode);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
