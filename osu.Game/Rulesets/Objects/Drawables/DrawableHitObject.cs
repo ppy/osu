@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Configuration;
+using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -387,7 +388,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Stops playback of all samples. Automatically called when <see cref="DrawableHitObject{TObject}"/>'s lifetime has been exceeded.
         /// </summary>
-        public virtual void StopAllSamples() => Samples?.Stop();
+        public virtual void StopLoopingSamples()
+        {
+            if (Samples?.Looping == true)
+                Samples.Stop();
 
         protected override void Update()
         {
@@ -457,7 +461,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             foreach (var nested in NestedHitObjects)
                 nested.OnKilled();
 
-            StopAllSamples();
+            // failsafe to ensure looping samples don't get stuck in a playing state.
+            // this could occur in a non-frame-stable context where DrawableHitObjects get killed before a SkinnableSound has the chance to be stopped.
+            StopLoopingSamples();
 
             UpdateResult(false);
         }
