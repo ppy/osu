@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Configuration;
-using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -392,6 +391,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (Samples?.Looping == true)
                 Samples.Stop();
+        }
 
         protected override void Update()
         {
