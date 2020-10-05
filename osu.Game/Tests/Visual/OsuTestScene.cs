@@ -23,6 +23,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens;
 using osu.Game.Storyboards;
@@ -222,18 +223,19 @@ namespace osu.Game.Tests.Visual
             /// <param name="storyboard">The storyboard.</param>
             /// <param name="referenceClock">An optional clock which should be used instead of a stopwatch for virtual time progression.</param>
             /// <param name="audio">Audio manager. Required if a reference clock isn't provided.</param>
-            /// <param name="length">The length of the returned virtual track.</param>
-            public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio, double length = 60000)
+            public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio)
                 : base(beatmap, storyboard, audio)
             {
+                double lastObjectTime = beatmap.HitObjects.LastOrDefault()?.GetEndTime() ?? 60000;
+
                 if (referenceClock != null)
                 {
                     store = new TrackVirtualStore(referenceClock);
                     audio.AddItem(store);
-                    track = store.GetVirtual(length);
+                    track = store.GetVirtual(lastObjectTime);
                 }
                 else
-                    track = audio?.Tracks.GetVirtual(length);
+                    track = audio?.Tracks.GetVirtual(lastObjectTime);
             }
 
             ~ClockBackedTestWorkingBeatmap()
