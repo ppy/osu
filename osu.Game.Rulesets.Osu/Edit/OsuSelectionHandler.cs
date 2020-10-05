@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectionBox.CanScaleY = canOperate;
         }
 
-        protected override void OnDragOperationEnded()
+        protected override void OnOperationEnded()
         {
-            base.OnDragOperationEnded();
+            base.OnOperationEnded();
             referenceOrigin = null;
         }
 
@@ -40,6 +40,45 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
         /// </summary>
         private Vector2? referenceOrigin;
+
+        public override bool HandleFlip(Direction direction)
+        {
+            var hitObjects = selectedMovableObjects;
+
+            var selectedObjectsQuad = getSurroundingQuad(hitObjects);
+            var centre = selectedObjectsQuad.Centre;
+
+            foreach (var h in hitObjects)
+            {
+                var pos = h.Position;
+
+                switch (direction)
+                {
+                    case Direction.Horizontal:
+                        pos.X = centre.X - (pos.X - centre.X);
+                        break;
+
+                    case Direction.Vertical:
+                        pos.Y = centre.Y - (pos.Y - centre.Y);
+                        break;
+                }
+
+                h.Position = pos;
+
+                if (h is Slider slider)
+                {
+                    foreach (var point in slider.Path.ControlPoints)
+                    {
+                        point.Position.Value = new Vector2(
+                            (direction == Direction.Horizontal ? -1 : 1) * point.Position.Value.X,
+                            (direction == Direction.Vertical ? -1 : 1) * point.Position.Value.Y
+                        );
+                    }
+                }
+            }
+
+            return true;
+        }
 
         public override bool HandleScale(Vector2 scale, Anchor reference)
         {
