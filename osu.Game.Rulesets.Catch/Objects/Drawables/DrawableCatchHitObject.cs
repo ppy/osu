@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Catch.UI;
 using osuTK;
 using osuTK.Graphics;
@@ -86,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             if (CheckPosition == null) return;
 
             if (timeOffset >= 0 && Result != null)
-                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
+                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)

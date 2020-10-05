@@ -10,6 +10,7 @@ using System.Threading;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -149,23 +150,38 @@ namespace osu.Game.Scoring
                     return;
                 }
 
-                int? beatmapMaxCombo = score.Beatmap.MaxCombo;
+                int beatmapMaxCombo;
 
-                if (beatmapMaxCombo == null)
+                if (score.IsLegacyScore)
                 {
-                    if (score.Beatmap.ID == 0 || difficulties == null)
+                    // This score is guaranteed to be an osu!stable score.
+                    // The combo must be determined through either the beatmap's max combo value or the difficulty calculator, as lazer's scoring has changed and the score statistics cannot be used.
+                    if (score.Beatmap.MaxCombo == null)
                     {
-                        // We don't have enough information (max combo) to compute the score, so let's use the provided score.
-                        Value = score.TotalScore;
+                        if (score.Beatmap.ID == 0 || difficulties == null)
+                        {
+                            // We don't have enough information (max combo) to compute the score, so use the provided score.
+                            Value = score.TotalScore;
+                            return;
+                        }
+
+                        // We can compute the max combo locally after the async beatmap difficulty computation.
+                        difficultyBindable = difficulties().GetBindableDifficulty(score.Beatmap, score.Ruleset, score.Mods, (difficultyCancellationSource = new CancellationTokenSource()).Token);
+                        difficultyBindable.BindValueChanged(d => updateScore(d.NewValue.MaxCombo), true);
+
                         return;
                     }
 
-                    // We can compute the max combo locally after the async beatmap difficulty computation.
-                    difficultyBindable = difficulties().GetBindableDifficulty(score.Beatmap, score.Ruleset, score.Mods, (difficultyCancellationSource = new CancellationTokenSource()).Token);
-                    difficultyBindable.BindValueChanged(d => updateScore(d.NewValue.MaxCombo), true);
+                    beatmapMaxCombo = score.Beatmap.MaxCombo.Value;
                 }
                 else
-                    updateScore(beatmapMaxCombo.Value);
+                {
+                    // This score is guaranteed to be an osu!lazer score.
+                    // The combo must be determined through the score's statistics, as both the beatmap's max combo and the difficulty calculator will provide osu!stable combo values.
+                    beatmapMaxCombo = Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.AffectsCombo()).Select(r => score.Statistics.GetOrDefault(r)).Sum();
+                }
+
+                updateScore(beatmapMaxCombo);
             }
 
             private void updateScore(int beatmapMaxCombo)
@@ -181,7 +197,7 @@ namespace osu.Game.Scoring
 
                 scoreProcessor.Mods.Value = score.Mods;
 
-                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, beatmapMaxCombo, score.Accuracy, (double)score.MaxCombo / beatmapMaxCombo, 0));
+                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, beatmapMaxCombo, score.Accuracy, (double)score.MaxCombo / beatmapMaxCombo, score.Statistics));
             }
         }
 

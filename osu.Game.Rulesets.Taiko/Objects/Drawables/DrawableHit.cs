@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
                 return;
             }
 
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             if (!validActionPressed)
-                ApplyResult(r => r.Type = HitResult.Miss);
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
             else
                 ApplyResult(r => r.Type = result);
         }
@@ -257,19 +257,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!MainObject.Result.IsHit)
                 {
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
                     return;
                 }
 
                 if (!userTriggered)
                 {
                     if (timeOffset - MainObject.Result.TimeOffset > second_hit_window)
-                        ApplyResult(r => r.Type = HitResult.Miss);
+                        ApplyResult(r => r.Type = r.Judgement.MinResult);
                     return;
                 }
 
                 if (Math.Abs(timeOffset - MainObject.Result.TimeOffset) <= second_hit_window)
-                    ApplyResult(r => r.Type = MainObject.Result.Type);
+                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
             }
 
             public override bool OnPressed(TaikoAction action)
