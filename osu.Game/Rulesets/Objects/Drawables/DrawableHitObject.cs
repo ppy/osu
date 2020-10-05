@@ -385,9 +385,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Stops playback of all samples. Automatically called when <see cref="DrawableHitObject{TObject}"/>'s lifetime has been exceeded.
+        /// Stops playback of all relevant samples. Generally only looping samples should be stopped by this, and the rest let to play out.
+        /// Automatically called when <see cref="DrawableHitObject{TObject}"/>'s lifetime has been exceeded.
         /// </summary>
-        public virtual void StopLoopingSamples()
+        public virtual void StopAllSamples()
         {
             if (Samples?.Looping == true)
                 Samples.Stop();
@@ -463,7 +464,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             // failsafe to ensure looping samples don't get stuck in a playing state.
             // this could occur in a non-frame-stable context where DrawableHitObjects get killed before a SkinnableSound has the chance to be stopped.
-            StopLoopingSamples();
+            StopAllSamples();
 
             UpdateResult(false);
         }
