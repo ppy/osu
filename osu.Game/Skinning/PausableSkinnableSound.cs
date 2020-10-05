@@ -34,14 +34,21 @@ namespace osu.Game.Skinning
                 samplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
                 samplePlaybackDisabled.BindValueChanged(disabled =>
                 {
-                    if (RequestedPlaying)
+                    if (!RequestedPlaying) return;
+
+                    // let non-looping samples that have already been started play out to completion (sounds better than abruptly cutting off).
+                    if (!Looping) return;
+
+                    if (disabled.NewValue)
+                        base.Stop();
+                    else
                     {
-                        if (disabled.NewValue)
-                            base.Stop();
-                        // it's not easy to know if a sample has finished playing (to end).
-                        // to keep things simple only resume playing looping samples.
-                        else if (Looping)
-                            base.Play();
+                        // schedule so we don't start playing a sample which is no longer alive.
+                        Schedule(() =>
+                        {
+                            if (RequestedPlaying)
+                                base.Play();
+                        });
                     }
                 });
             }

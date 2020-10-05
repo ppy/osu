@@ -12,6 +12,14 @@ namespace osu.Game.Tests.Editing
     [TestFixture]
     public class EditorChangeHandlerTest
     {
+        private int stateChangedFired;
+
+        [SetUp]
+        public void SetUp()
+        {
+            stateChangedFired = 0;
+        }
+
         [Test]
         public void TestSaveRestoreState()
         {
@@ -23,6 +31,8 @@ namespace osu.Game.Tests.Editing
             addArbitraryChange(beatmap);
             handler.SaveState();
 
+            Assert.That(stateChangedFired, Is.EqualTo(1));
+
             Assert.That(handler.CanUndo.Value, Is.True);
             Assert.That(handler.CanRedo.Value, Is.False);
 
@@ -30,6 +40,8 @@ namespace osu.Game.Tests.Editing
 
             Assert.That(handler.CanUndo.Value, Is.False);
             Assert.That(handler.CanRedo.Value, Is.True);
+
+            Assert.That(stateChangedFired, Is.EqualTo(2));
         }
 
         [Test]
@@ -45,6 +57,7 @@ namespace osu.Game.Tests.Editing
 
             Assert.That(handler.CanUndo.Value, Is.True);
             Assert.That(handler.CanRedo.Value, Is.False);
+            Assert.That(stateChangedFired, Is.EqualTo(1));
 
             string hash = handler.CurrentStateHash;
 
@@ -52,6 +65,7 @@ namespace osu.Game.Tests.Editing
             handler.SaveState();
 
             Assert.That(hash, Is.EqualTo(handler.CurrentStateHash));
+            Assert.That(stateChangedFired, Is.EqualTo(1));
 
             handler.RestoreState(-1);
 
@@ -60,6 +74,7 @@ namespace osu.Game.Tests.Editing
             // we should only be able to restore once even though we saved twice.
             Assert.That(handler.CanUndo.Value, Is.False);
             Assert.That(handler.CanRedo.Value, Is.True);
+            Assert.That(stateChangedFired, Is.EqualTo(2));
         }
 
         [Test]
@@ -71,6 +86,8 @@ namespace osu.Game.Tests.Editing
 
             for (int i = 0; i < EditorChangeHandler.MAX_SAVED_STATES; i++)
             {
+                Assert.That(stateChangedFired, Is.EqualTo(i));
+
                 addArbitraryChange(beatmap);
                 handler.SaveState();
             }
@@ -114,7 +131,10 @@ namespace osu.Game.Tests.Editing
         {
             var beatmap = new EditorBeatmap(new Beatmap());
 
-            return (new EditorChangeHandler(beatmap), beatmap);
+            var changeHandler = new EditorChangeHandler(beatmap);
+
+            changeHandler.OnStateChange += () => stateChangedFired++;
+            return (changeHandler, beatmap);
         }
 
         private void addArbitraryChange(EditorBeatmap beatmap)
