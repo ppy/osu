@@ -17,6 +17,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public class TestSceneGameplaySamplePlayback : PlayerTestScene
     {
         [Test]
+        [Ignore("temporarily disabled pending investigation")]
         public void TestAllSamplesStopDuringSeek()
         {
             DrawableSlider slider = null;
