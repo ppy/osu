@@ -32,8 +32,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
-        public const float BORDER_RADIUS = 2;
-
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
@@ -44,6 +42,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private Drawable content;
 
         private OsuSpriteText selectionDetailsText;
+
+        protected SelectionBox SelectionBox { get; private set; }
 
         [Resolved(CanBeNull = true)]
         protected EditorBeatmap EditorBeatmap { get; private set; }
@@ -69,19 +69,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Children = new Drawable[]
                 {
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        BorderThickness = BORDER_RADIUS,
-                        BorderColour = colours.YellowDark,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            AlwaysPresent = true,
-                            Alpha = 0
-                        }
-                    },
+                    // todo: should maybe be inside the SelectionBox?
                     new Container
                     {
                         Name = "info text",
@@ -100,9 +88,37 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 Font = OsuFont.Default.With(size: 11)
                             }
                         }
-                    }
+                    },
+                    SelectionBox = CreateSelectionBox(),
                 }
             };
+        }
+
+        public SelectionBox CreateSelectionBox()
+            => new SelectionBox
+            {
+                OperationStarted = OnOperationBegan,
+                OperationEnded = OnOperationEnded,
+
+                OnRotation = angle => HandleRotation(angle),
+                OnScale = (amount, anchor) => HandleScale(amount, anchor),
+                OnFlip = direction => HandleFlip(direction),
+            };
+
+        /// <summary>
+        /// Fired when a drag operation ends from the selection box.
+        /// </summary>
+        protected virtual void OnOperationBegan()
+        {
+            ChangeHandler.BeginChange();
+        }
+
+        /// <summary>
+        /// Fired when a drag operation begins from the selection box.
+        /// </summary>
+        protected virtual void OnOperationEnded()
+        {
+            ChangeHandler.EndChange();
         }
 
         #region User Input Handling
@@ -119,7 +135,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Whether any <see cref="DrawableHitObject"/>s could be moved.
         /// Returning true will also propagate StartTime changes provided by the closest <see cref="IPositionSnapProvider.SnapScreenSpacePositionToValidTime"/>.
         /// </returns>
-        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => true;
+        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => false;
+
+        /// <summary>
+        /// Handles the selected <see cref="DrawableHitObject"/>s being rotated.
+        /// </summary>
+        /// <param name="angle">The delta angle to apply to the selection.</param>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        public virtual bool HandleRotation(float angle) => false;
+
+        /// <summary>
+        /// Handles the selected <see cref="DrawableHitObject"/>s being scaled.
+        /// </summary>
+        /// <param name="scale">The delta scale to apply, in playfield local coordinates.</param>
+        /// <param name="anchor">The point of reference where the scale is originating from.</param>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
+
+        /// <summary>
+        /// Handled the selected <see cref="DrawableHitObject"/>s being flipped.
+        /// </summary>
+        /// <param name="direction">The direction to flip</param>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        public virtual bool HandleFlip(Direction direction) => false;
 
         public bool OnPressed(PlatformAction action)
         {
@@ -222,9 +260,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
 
             if (count > 0)
+            {
                 Show();
+                OnSelectionChanged();
+            }
             else
                 Hide();
+        }
+
+        /// <summary>
+        /// Triggered whenever more than one object is selected, on each change.
+        /// Should update the selection box's state to match supported operations.
+        /// </summary>
+        protected virtual void OnSelectionChanged()
+        {
         }
 
         protected override void Update()

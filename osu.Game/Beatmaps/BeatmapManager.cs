@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public readonly WorkingBeatmap DefaultBeatmap;
 
-        public override string[] HandledExtensions => new[] { ".osz" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
