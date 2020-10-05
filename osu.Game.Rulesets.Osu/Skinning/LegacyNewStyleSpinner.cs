@@ -70,9 +70,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             base.LoadComplete();
 
-            this.FadeOut();
             drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
-
             updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
         }
 
@@ -83,12 +81,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             var spinner = (Spinner)drawableSpinner.HitObject;
 
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                this.FadeOut();
+
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
                 this.FadeInFromZero(spinner.TimeFadeIn / 2);
 
-            fixedMiddle.FadeColour(Color4.White);
-            using (BeginAbsoluteSequence(spinner.StartTime, true))
-                fixedMiddle.FadeColour(Color4.Red, spinner.Duration);
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            {
+                fixedMiddle.FadeColour(Color4.White);
+
+                using (BeginDelayedSequence(spinner.TimePreempt, true))
+                    fixedMiddle.FadeColour(Color4.Red, spinner.Duration);
+            }
         }
 
         protected override void Update()
