@@ -87,6 +87,9 @@ namespace osu.Game.Screens.Edit.Timing
             [Resolved]
             private Bindable<ControlPointGroup> selectedGroup { get; set; }
 
+            [Resolved(canBeNull: true)]
+            private IEditorChangeHandler changeHandler { get; set; }
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
@@ -146,6 +149,7 @@ namespace osu.Game.Screens.Edit.Timing
                 controlGroups.BindCollectionChanged((sender, args) =>
                 {
                     table.ControlGroups = controlGroups;
+                    changeHandler.SaveState();
                 }, true);
             }
 
