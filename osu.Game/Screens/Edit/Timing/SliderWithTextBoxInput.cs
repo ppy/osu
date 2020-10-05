@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Edit.Timing
                         },
                         slider = new SettingsSlider<T>
                         {
+                            TransferValueOnCommit = true,
                             RelativeSizeAxes = Axes.X,
                         }
                     }
