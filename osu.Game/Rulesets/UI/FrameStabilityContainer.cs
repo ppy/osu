@@ -228,7 +228,9 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            public override bool IsSeeking => ParentGameplayClock != null && Math.Abs(CurrentTime - ParentGameplayClock.CurrentTime) > 200;
+            protected override bool ShouldDisableSamplePlayback =>
+                // handle the case where playback is catching up to real-time.
+                base.ShouldDisableSamplePlayback || (ParentGameplayClock != null && Math.Abs(CurrentTime - ParentGameplayClock.CurrentTime) > 200);
         }
     }
 }
