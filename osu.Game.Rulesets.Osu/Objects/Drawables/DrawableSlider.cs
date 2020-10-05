@@ -109,9 +109,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        public override void StopAllSamples()
+        public override void StopLoopingSamples()
         {
-            base.StopAllSamples();
+            base.StopLoopingSamples();
             slidingSample?.Stop();
         }
 
