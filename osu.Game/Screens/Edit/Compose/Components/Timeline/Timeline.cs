@@ -13,7 +13,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -63,8 +62,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         private WaveformGraph waveform;
-        private ControlPointPart controlPoints;
+
         private TimelineTickDisplay ticks;
+
+        private TimelineControlPointDisplay controlPoints;
 
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
@@ -85,11 +86,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             MidColour = colours.BlueDark,
                             HighColour = colours.BlueDarker,
                         },
-                        controlPoints = new ControlPointPart
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        },
                         ticks = new TimelineTickDisplay(),
+                        controlPoints = new TimelineControlPointDisplay(),
                     }
                 },
             });
