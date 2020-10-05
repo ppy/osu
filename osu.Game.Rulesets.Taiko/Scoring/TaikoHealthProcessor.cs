@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         private double hpMultiplier;
 
         /// <summary>
-        /// HP multiplier for a <see cref="HitResult.Miss"/>.
+        /// HP multiplier for a <see cref="HitResult"/> that does not satisfy <see cref="HitResultExtensions.IsHit"/>.
         /// </summary>
         private double hpMissMultiplier;
 
@@ -45,6 +45,6 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         }
 
         protected override double GetHealthIncreaseFor(JudgementResult result)
-            => base.GetHealthIncreaseFor(result) * (result.Type == HitResult.Miss ? hpMissMultiplier : hpMultiplier);
+            => base.GetHealthIncreaseFor(result) * (result.IsHit ? hpMultiplier : hpMissMultiplier);
     }
 }
