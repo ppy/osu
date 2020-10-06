@@ -97,6 +97,11 @@ namespace osu.Game
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
+        /// <summary>
+        /// Whether gameplay is currently active.
+        /// </summary>
+        public readonly Bindable<bool> IsGameplay = new BindableBool();
+
         protected OsuScreenStack ScreenStack;
 
         protected BackButton BackButton;
