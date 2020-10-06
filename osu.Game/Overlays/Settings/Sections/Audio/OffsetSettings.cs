@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new SettingsSlider<double, OffsetSlider>
                 {
                     LabelText = "Audio offset",
-                    Bindable = config.GetBindable<double>(OsuSetting.AudioOffset),
+                    Current = config.GetBindable<double>(OsuSetting.AudioOffset),
                     KeyboardStep = 1f
                 },
                 new SettingsButton

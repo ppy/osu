@@ -35,32 +35,32 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 new SettingsCheckbox
                 {
                     LabelText = "Raw input",
-                    Bindable = rawInputToggle
+                    Current = rawInputToggle
                 },
                 new SensitivitySetting
                 {
                     LabelText = "Cursor sensitivity",
-                    Bindable = sensitivityBindable
+                    Current = sensitivityBindable
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Map absolute input to window",
-                    Bindable = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
+                    Current = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
                 },
                 new SettingsEnumDropdown<ConfineMouseMode>
                 {
                     LabelText = "Confine mouse cursor to window",
-                    Bindable = config.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode),
+                    Current = config.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Disable mouse wheel during gameplay",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Disable mouse buttons during gameplay",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
 
