@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Setup
                 AutoSizeAxes = Axes.Y,
             };
 
-            Flow.Children = new Drawable[]
+            Children = new Drawable[]
             {
                 backgroundSpriteContainer = new Container
                 {
