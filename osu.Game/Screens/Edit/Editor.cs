@@ -589,7 +589,7 @@ namespace osu.Game.Screens.Edit
 
         private void seek(UIEvent e, int direction)
         {
-            double amount = e.ShiftPressed ? 2 : 1;
+            double amount = e.ShiftPressed ? 4 : 1;
 
             if (direction < 1)
                 clock.SeekBackward(!clock.IsRunning, amount);
