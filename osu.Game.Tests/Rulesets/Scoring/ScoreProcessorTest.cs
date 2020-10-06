@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -10,7 +9,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -56,12 +54,23 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
         }
 
-        [TestCase(ScoringMode.Standardised, "osu", typeof(HitCircle), HitResult.Great, 575_000)]
-        public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, string rulesetName, Type hitObjectType, HitResult hitResult, int expectedScore)
+        [TestCase(ScoringMode.Standardised, HitResult.Miss, HitResult.Great, 0)]
+        [TestCase(ScoringMode.Standardised, HitResult.Meh, HitResult.Great, 387_500)]
+        [TestCase(ScoringMode.Standardised, HitResult.Ok, HitResult.Great, 425_000)]
+        [TestCase(ScoringMode.Standardised, HitResult.Great, HitResult.Great, 575_000)]
+        [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)]
+        [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, HitResult.SmallTickHit, 0)] // TODO: idk, this should be 225_000 from accuracy portion
+        [TestCase(ScoringMode.Standardised, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
+        [TestCase(ScoringMode.Standardised, HitResult.LargeTickHit, HitResult.LargeTickHit, 575_000)]
+        [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 30)]
+        [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 150)]
+        public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
         {
-            IBeatmap fourObjectBeatmap = new TestBeatmap(new OsuRuleset().RulesetInfo)
+            var minResult = new JudgementResult(new HitObject(), new TestJudgement(hitResult)).Judgement.MinResult;
+
+            IBeatmap fourObjectBeatmap = new TestBeatmap(new RulesetInfo())
             {
-                HitObjects = new List<HitObject>(Enumerable.Repeat((HitObject)Activator.CreateInstance(hitObjectType), 4))
+                HitObjects = new List<HitObject>(Enumerable.Repeat(new TestHitObject(maxResult), 4))
             };
             scoreProcessor.Mode.Value = scoringMode;
             scoreProcessor.ApplyBeatmap(fourObjectBeatmap);
@@ -70,7 +79,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             {
                 var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], new Judgement())
                 {
-                    Type = i == 2 ? HitResult.Miss : hitResult
+                    Type = i == 2 ? minResult : hitResult
                 };
                 scoreProcessor.ApplyResult(judgementResult);
             }
@@ -201,6 +210,21 @@ namespace osu.Game.Tests.Rulesets.Scoring
             public TestJudgement(HitResult maxResult)
             {
                 MaxResult = maxResult;
+            }
+        }
+
+        private class TestHitObject : HitObject
+        {
+            private readonly HitResult maxResult;
+
+            public override Judgement CreateJudgement()
+            {
+                return new TestJudgement(maxResult);
+            }
+
+            public TestHitObject(HitResult maxResult)
+            {
+                this.maxResult = maxResult;
             }
         }
     }
