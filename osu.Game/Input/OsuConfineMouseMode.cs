@@ -23,7 +23,7 @@ namespace osu.Game.Input
         Fullscreen,
 
         /// <summary>
-        /// The mouse cursor will be locked to the window bounds during gameplay,
+        /// The mouse cursor will be locked to the window bounds while overlays are disabled,
         /// but may otherwise move freely.
         /// </summary>
         [Description("During Gameplay")]

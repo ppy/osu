@@ -18,7 +18,6 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
-using osu.Game.Input;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -66,9 +65,6 @@ namespace osu.Game.Screens.Play
         public bool HasFailed { get; private set; }
 
         private Bindable<bool> mouseWheelDisabled;
-
-        [Resolved(CanBeNull = true)]
-        private ConfineMouseTracker confineMouseTracker { get; set; }
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
@@ -228,8 +224,6 @@ namespace osu.Game.Screens.Play
             breakTracker.IsBreakTime.BindValueChanged(_ => updateOverlayActivationMode());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
-
-            confineMouseTracker?.OverlayActivationMode.BindTo(OverlayActivationMode);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
