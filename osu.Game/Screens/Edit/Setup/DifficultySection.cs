@@ -32,7 +32,8 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 circleSizeSlider = new LabelledSliderBar<float>
                 {
-                    Label = "Circle Size",
+                    Label = "Object Size",
+                    Description = "The size of all hit objects",
                     Current = new BindableFloat(Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -43,6 +44,7 @@ namespace osu.Game.Screens.Edit.Setup
                 healthDrainSlider = new LabelledSliderBar<float>
                 {
                     Label = "Health Drain",
+                    Description = "The rate of passive health drain throughout playable time",
                     Current = new BindableFloat(Beatmap.Value.BeatmapInfo.BaseDifficulty.DrainRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -53,6 +55,7 @@ namespace osu.Game.Screens.Edit.Setup
                 approachRateSlider = new LabelledSliderBar<float>
                 {
                     Label = "Approach Rate",
+                    Description = "The speed at which objects are presented to the player",
                     Current = new BindableFloat(Beatmap.Value.BeatmapInfo.BaseDifficulty.ApproachRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
@@ -63,6 +66,7 @@ namespace osu.Game.Screens.Edit.Setup
                 overallDifficultySlider = new LabelledSliderBar<float>
                 {
                     Label = "Overall Difficulty",
+                    Description = "The harshness of hit windows and difficulty of special objects (ie. spinners)",
                     Current = new BindableFloat(Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
