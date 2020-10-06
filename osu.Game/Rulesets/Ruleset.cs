@@ -160,7 +160,6 @@ namespace osu.Game.Rulesets
 
         public virtual PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => null;
 
-        [Obsolete("Use the DifficultyAttributes overload instead.")]
         public PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score)
         {
             var difficultyCalculator = CreateDifficultyCalculator(beatmap);
