@@ -27,7 +27,7 @@ namespace osu.Game.Input
         /// but may otherwise move freely.
         /// </summary>
         [Description("During Gameplay")]
-        DuringGameplay,
+        WhenOverlaysDisabled,
 
         /// <summary>
         /// The mouse cursor will always be locked to the window bounds while the game has focus.

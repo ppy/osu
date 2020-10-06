@@ -70,7 +70,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MouseDisableButtons, false);
             Set(OsuSetting.MouseDisableWheel, false);
-            Set(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
+            Set(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.WhenOverlaysDisabled);
 
             // Graphics
             Set(OsuSetting.ShowFpsDisplay, false);
