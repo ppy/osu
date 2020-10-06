@@ -59,8 +59,11 @@ namespace osu.Game.Screens.Edit.Setup
         {
         }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Container audioTrackFileChooserContainer = new Container
             {
@@ -187,7 +190,27 @@ namespace osu.Game.Screens.Edit.Setup
                 FillMode = FillMode.Fill,
             }, background =>
             {
-                backgroundSpriteContainer.Child = background;
+                if (background.Texture != null)
+                    backgroundSpriteContainer.Child = background;
+                else
+                {
+                    backgroundSpriteContainer.Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colours.GreySeafoamDarker,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 24))
+                        {
+                            Text = "Drag image here to set beatmap background!",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.X,
+                        }
+                    };
+                }
+
                 background.FadeInFromZero(500);
             });
         }
