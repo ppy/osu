@@ -49,12 +49,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
 
-            Texture baseTexture;
-            Texture overlayTexture;
             bool allowFallback = false;
 
             // attempt lookup using priority specification
-            baseTexture = getTextureWithFallback(string.Empty);
+            Texture baseTexture = getTextureWithFallback(string.Empty);
 
             // if the base texture was not found without a fallback, switch on fallback mode and re-perform the lookup.
             if (baseTexture == null)
@@ -66,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             // at this point, any further texture fetches should be correctly using the priority source if the base texture was retrieved using it.
             // the flow above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png (potentially from the default/fall-through skin).
-            overlayTexture = getTextureWithFallback("overlay");
+            Texture overlayTexture = getTextureWithFallback("overlay");
 
             InternalChildren = new Drawable[]
             {
