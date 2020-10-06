@@ -114,7 +114,14 @@ namespace osu.Game.Screens.Edit.Timing
 
                 controlPoints = group.ControlPoints.GetBoundCopy();
                 controlPoints.CollectionChanged += (_, __) => createChildren();
+            }
 
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
                 createChildren();
             }
 
@@ -125,20 +132,22 @@ namespace osu.Game.Screens.Edit.Timing
 
             private Drawable createAttribute(ControlPoint controlPoint)
             {
+                Color4 colour = controlPoint.GetRepresentingColour(colours);
+
                 switch (controlPoint)
                 {
                     case TimingControlPoint timing:
-                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}");
+                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}", colour);
 
                     case DifficultyControlPoint difficulty:
 
-                        return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x");
+                        return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x", colour);
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("effect", () => $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}");
+                        return new RowAttribute("effect", () => $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}", colour);
 
                     case SampleControlPoint sample:
-                        return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%");
+                        return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%", colour);
                 }
 
                 return null;

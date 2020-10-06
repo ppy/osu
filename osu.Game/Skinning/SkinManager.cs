@@ -33,7 +33,7 @@ namespace osu.Game.Skinning
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
-        public override string[] HandledExtensions => new[] { ".osk" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
 
         protected override string[] HashableFileTypes => new[] { ".ini" };
 
