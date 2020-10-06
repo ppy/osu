@@ -91,6 +91,8 @@ namespace osu.Game.Screens.Edit
 
         private readonly HashSet<HitObject> pendingUpdates = new HashSet<HitObject>();
 
+        private bool isBatchApplying;
+
         /// <summary>
         /// Adds a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
         /// </summary>
@@ -126,12 +128,17 @@ namespace osu.Game.Screens.Edit
 
             mutableHitObjects.Insert(index, hitObject);
 
-            // must be run after any change to hitobject ordering
-            beatmapProcessor?.PreProcess();
-            processHitObject(hitObject);
-            beatmapProcessor?.PostProcess();
+            if (isBatchApplying)
+                batchPendingInserts.Add(hitObject);
+            else
+            {
+                // must be run after any change to hitobject ordering
+                beatmapProcessor?.PreProcess();
+                processHitObject(hitObject);
+                beatmapProcessor?.PostProcess();
 
-            HitObjectAdded?.Invoke(hitObject);
+                HitObjectAdded?.Invoke(hitObject);
+            }
         }
 
         /// <summary>
@@ -180,12 +187,58 @@ namespace osu.Game.Screens.Edit
             bindable.UnbindAll();
             startTimeBindables.Remove(hitObject);
 
-            // must be run after any change to hitobject ordering
+            if (isBatchApplying)
+                batchPendingDeletes.Add(hitObject);
+            else
+            {
+                // must be run after any change to hitobject ordering
+                beatmapProcessor?.PreProcess();
+                processHitObject(hitObject);
+                beatmapProcessor?.PostProcess();
+
+                HitObjectRemoved?.Invoke(hitObject);
+            }
+        }
+
+        private readonly List<HitObject> batchPendingInserts = new List<HitObject>();
+
+        private readonly List<HitObject> batchPendingDeletes = new List<HitObject>();
+
+        /// <summary>
+        /// Apply a batch of operations in one go, without performing Pre/Postprocessing each time.
+        /// </summary>
+        /// <param name="applyFunction">The function which will apply the batch changes.</param>
+        public void ApplyBatchChanges(Action<EditorBeatmap> applyFunction)
+        {
+            if (isBatchApplying)
+                throw new InvalidOperationException("Attempting to perform a batch application from within an existing batch");
+
+            isBatchApplying = true;
+
+            applyFunction(this);
+
             beatmapProcessor?.PreProcess();
-            processHitObject(hitObject);
             beatmapProcessor?.PostProcess();
 
-            HitObjectRemoved?.Invoke(hitObject);
+            isBatchApplying = false;
+
+            foreach (var h in batchPendingDeletes)
+            {
+                processHitObject(h);
+                HitObjectRemoved?.Invoke(h);
+            }
+
+            batchPendingDeletes.Clear();
+
+            foreach (var h in batchPendingInserts)
+            {
+                processHitObject(h);
+                HitObjectAdded?.Invoke(h);
+            }
+
+            batchPendingInserts.Clear();
+
+            isBatchApplying = false;
         }
 
         /// <summary>
