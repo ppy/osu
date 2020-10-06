@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Origin = Anchor.Centre;
 
             Masking = true;
-            BorderThickness = 10;
+            BorderThickness = 9; // roughly matches slider borders and makes stacked circles distinctly visible from each other.
             BorderColour = Color4.White;
 
             Child = new Box
