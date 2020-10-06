@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 150)]
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, double expectedScore)
         {
-            var minResult = new JudgementResult(new HitObject(), new TestJudgement(hitResult)).Judgement.MinResult;
+            var minResult = new TestJudgement(hitResult).MinResult;
 
             IBeatmap fourObjectBeatmap = new TestBeatmap(new RulesetInfo())
             {
@@ -109,8 +109,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, HitResult.IgnoreMiss)]
         public void TestMinResults(HitResult hitResult, HitResult expectedMinResult)
         {
-            var result = new JudgementResult(new HitObject(), new TestJudgement(hitResult));
-            Assert.IsTrue(result.Judgement.MinResult == expectedMinResult);
+            Assert.AreEqual(expectedMinResult, new TestJudgement(hitResult).MinResult);
         }
 
         [TestCase(HitResult.None, false)]
@@ -130,7 +129,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, false)]
         public void TestAffectsCombo(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.IsTrue(hitResult.AffectsCombo() == expectedReturnValue);
+            Assert.AreEqual(expectedReturnValue, hitResult.AffectsCombo());
         }
 
         [TestCase(HitResult.None, false)]
@@ -150,7 +149,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, false)]
         public void TestAffectsAccuracy(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.IsTrue(hitResult.AffectsAccuracy() == expectedReturnValue);
+            Assert.AreEqual(expectedReturnValue, hitResult.AffectsAccuracy());
         }
 
         [TestCase(HitResult.None, false)]
@@ -170,7 +169,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsBonus(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.IsTrue(hitResult.IsBonus() == expectedReturnValue);
+            Assert.AreEqual(expectedReturnValue, hitResult.IsBonus());
         }
 
         [TestCase(HitResult.None, false)]
@@ -190,7 +189,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsHit(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.IsTrue(hitResult.IsHit() == expectedReturnValue);
+            Assert.AreEqual(expectedReturnValue, hitResult.IsHit());
         }
 
         [TestCase(HitResult.None, false)]
@@ -210,7 +209,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsScorable(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.IsTrue(hitResult.IsScorable() == expectedReturnValue);
+            Assert.AreEqual(expectedReturnValue, hitResult.IsScorable());
         }
 
         private class TestJudgement : Judgement
