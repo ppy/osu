@@ -37,9 +37,9 @@ namespace osu.Desktop.Updater
             Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
         }
 
-        protected override async Task PerformUpdateCheck() => await checkForUpdateAsync();
+        protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync();
 
-        private async Task checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
@@ -51,7 +51,7 @@ namespace osu.Desktop.Updater
                 var info = await updateManager.CheckForUpdate(!useDeltaPatching);
                 if (info.ReleasesToApply.Count == 0)
                     // no updates available. bail and retry later.
-                    return;
+                    return false;
 
                 if (notification == null)
                 {
@@ -103,6 +103,8 @@ namespace osu.Desktop.Updater
                     Scheduler.AddDelayed(async () => await checkForUpdateAsync(), 60000 * 30);
                 }
             }
+
+            return true;
         }
 
         protected override void Dispose(bool isDisposing)

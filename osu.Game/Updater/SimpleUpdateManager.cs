@@ -30,7 +30,7 @@ namespace osu.Game.Updater
             version = game.Version;
         }
 
-        protected override async Task PerformUpdateCheck()
+        protected override async Task<bool> PerformUpdateCheck()
         {
             try
             {
@@ -53,12 +53,17 @@ namespace osu.Game.Updater
                             return true;
                         }
                     });
+
+                    return true;
                 }
             }
             catch
             {
                 // we shouldn't crash on a web failure. or any failure for the matter.
+                return true;
             }
+
+            return false;
         }
 
         private string getBestUrl(GitHubRelease release)
