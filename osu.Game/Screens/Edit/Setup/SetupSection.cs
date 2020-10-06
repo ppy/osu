@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,7 +13,7 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal class SetupSection : Container
     {
-        protected FillFlowContainer Flow;
+        private readonly FillFlowContainer flow;
 
         [Resolved]
         protected OsuColour Colours { get; private set; }
@@ -22,7 +21,7 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
 
-        public override void Add(Drawable drawable) => throw new InvalidOperationException("Use Flow.Add instead");
+        protected override Container<Drawable> Content => flow;
 
         public SetupSection()
         {
@@ -31,7 +30,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             Padding = new MarginPadding(10);
 
-            InternalChild = Flow = new FillFlowContainer
+            InternalChild = flow = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
