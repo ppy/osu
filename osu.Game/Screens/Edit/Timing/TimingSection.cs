@@ -36,14 +36,14 @@ namespace osu.Game.Screens.Edit.Timing
         {
             if (point.NewValue != null)
             {
-                bpmSlider.Bindable = point.NewValue.BeatLengthBindable;
-                bpmSlider.Bindable.BindValueChanged(_ => ChangeHandler?.SaveState());
+                bpmSlider.Current = point.NewValue.BeatLengthBindable;
+                bpmSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
 
                 bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
                 // no need to hook change handler here as it's the same bindable as above
 
-                timeSignature.Bindable = point.NewValue.TimeSignatureBindable;
-                timeSignature.Bindable.BindValueChanged(_ => ChangeHandler?.SaveState());
+                timeSignature.Current = point.NewValue.TimeSignatureBindable;
+                timeSignature.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 
@@ -121,14 +121,14 @@ namespace osu.Game.Screens.Edit.Timing
                 beatLengthBindable.BindValueChanged(beatLength => updateCurrent(beatLengthToBpm(beatLength.NewValue)), true);
                 bpmBindable.BindValueChanged(bpm => beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
 
-                base.Bindable = bpmBindable;
+                base.Current = bpmBindable;
 
                 TransferValueOnCommit = true;
             }
 
-            public override Bindable<double> Bindable
+            public override Bindable<double> Current
             {
-                get => base.Bindable;
+                get => base.Current;
                 set
                 {
                     // incoming will be beat length, not bpm

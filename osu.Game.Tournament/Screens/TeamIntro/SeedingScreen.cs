@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
                             LabelText = "Show specific team",
-                            Bindable = currentTeam,
+                            Current = currentTeam,
                         }
                     }
                 }
