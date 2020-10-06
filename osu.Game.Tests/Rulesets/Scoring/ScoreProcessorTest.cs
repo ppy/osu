@@ -97,6 +97,40 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
         }
 
+        [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, 6_850_000 / 7.0)]
+        [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, 6_400_000 / 7.0)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 1950 / 7.0)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, 1500 / 7.0)]
+        public void TestSmallTicksAccuracy(ScoringMode scoringMode, HitResult hitResult, double expectedScore)
+        {
+            IEnumerable<HitObject> hitObjects = Enumerable
+                                                .Repeat(new TestHitObject(HitResult.SmallTickHit), 4)
+                                                .Append(new TestHitObject(HitResult.Ok));
+            IBeatmap fiveObjectBeatmap = new TestBeatmap(new RulesetInfo())
+            {
+                HitObjects = hitObjects.ToList()
+            };
+            scoreProcessor.Mode.Value = scoringMode;
+            scoreProcessor.ApplyBeatmap(fiveObjectBeatmap);
+
+            for (int i = 0; i < 4; i++)
+            {
+                var judgementResult = new JudgementResult(fiveObjectBeatmap.HitObjects[i], new Judgement())
+                {
+                    Type = i == 2 ? HitResult.SmallTickMiss : hitResult
+                };
+                scoreProcessor.ApplyResult(judgementResult);
+            }
+
+            var lastJudgementResult = new JudgementResult(fiveObjectBeatmap.HitObjects.Last(), new Judgement())
+            {
+                Type = HitResult.Ok
+            };
+            scoreProcessor.ApplyResult(lastJudgementResult);
+
+            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
+        }
+
         [TestCase(HitResult.IgnoreHit, HitResult.IgnoreMiss)]
         [TestCase(HitResult.Meh, HitResult.Miss)]
         [TestCase(HitResult.Ok, HitResult.Miss)]
