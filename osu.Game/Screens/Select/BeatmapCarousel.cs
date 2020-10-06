@@ -869,7 +869,7 @@ namespace osu.Game.Screens.Select
             /// </summary>
             public bool UserScrolling { get; private set; }
 
-            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
+            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = null)
             {
                 UserScrolling = true;
                 base.OnUserScroll(value, animated, distanceDecay);

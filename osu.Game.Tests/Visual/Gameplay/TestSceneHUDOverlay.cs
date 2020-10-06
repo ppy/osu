@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             createNew(h => h.OnLoadComplete += _ => initialAlpha = hideTarget.Alpha);
             AddUntilStep("wait for load", () => hudOverlay.IsAlive);
-            AddAssert("initial alpha was less than 1", () => initialAlpha != null && initialAlpha < 1);
+            AddAssert("initial alpha was less than 1", () => initialAlpha < 1);
         }
 
         [Test]
