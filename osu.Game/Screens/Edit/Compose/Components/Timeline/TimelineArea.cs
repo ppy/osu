@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             CornerRadius = 5;
 
             OsuCheckbox waveformCheckbox;
+            OsuCheckbox controlPointsCheckbox;
+            OsuCheckbox ticksCheckbox;
 
             InternalChildren = new Drawable[]
             {
@@ -57,12 +59,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         Origin = Anchor.CentreLeft,
                                         AutoSizeAxes = Axes.Y,
                                         Width = 160,
-                                        Padding = new MarginPadding { Horizontal = 15 },
+                                        Padding = new MarginPadding { Horizontal = 10 },
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
                                         {
-                                            waveformCheckbox = new OsuCheckbox { LabelText = "波形图" }
+                                            waveformCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "波形图",
+                                                Current = { Value = true },
+                                            },
+                                            controlPointsCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "控制点",
+                                                Current = { Value = true },
+                                            },
+                                            ticksCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "音乐节拍(时间点)",
+                                                Current = { Value = true },
+                                            }
                                         }
                                     }
                                 }
@@ -119,9 +135,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             };
 
-            waveformCheckbox.Current.Value = true;
-
             Timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
+            Timeline.ControlPointsVisible.BindTo(controlPointsCheckbox.Current);
+            Timeline.TicksVisible.BindTo(ticksCheckbox.Current);
         }
 
         private void changeZoom(float change) => Timeline.Zoom += change;

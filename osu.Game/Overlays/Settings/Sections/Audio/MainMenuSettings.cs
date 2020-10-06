@@ -21,24 +21,23 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new SettingsCheckbox
                 {
                     LabelText = "开场语音",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MenuVoice)
+                    Current = config.GetBindable<bool>(OsuSetting.MenuVoice)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "osu! 主题音乐",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MenuMusic)
+                    LabelText = "osu！主题音乐",
+                    Current = config.GetBindable<bool>(OsuSetting.MenuMusic)
                 },
                 new SettingsDropdown<IntroSequence>
                 {
                     LabelText = "开场样式",
-                    Bindable = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
+                    Current = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
                     Items = Enum.GetValues(typeof(IntroSequence)).Cast<IntroSequence>()
                 },
                 new SettingsDropdown<BackgroundSource>
                 {
-                    LabelText = "背景来源",
-                    TooltipText = "需要成为osu!supporter来开启",
-                    Bindable = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
+                    LabelText = "背景来源(需要osu!supporter)",
+                    Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
                     Items = Enum.GetValues(typeof(BackgroundSource)).Cast<BackgroundSource>()
                 }
             };

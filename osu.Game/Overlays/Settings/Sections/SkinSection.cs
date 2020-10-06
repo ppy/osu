@@ -47,29 +47,29 @@ namespace osu.Game.Overlays.Settings.Sections
                 new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "菜单光标大小",
-                    Bindable = config.GetBindable<float>(OsuSetting.MenuCursorSize),
+                    Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "游戏内光标大小",
-                    Bindable = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
+                    Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "根据谱面调整光标大小",
-                    Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
+                    Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "使用谱面自带皮肤",
-                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "使用谱面自带音效",
-                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
             };
 
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
             config.BindWith(OsuSetting.Skin, configBindable);
 
-            skinDropdown.Bindable = dropdownBindable;
+            skinDropdown.Current = dropdownBindable;
             skinDropdown.Items = skins.GetAllUsableSkins().ToArray();
 
             // Todo: This should not be necessary when OsuConfigManager is databased

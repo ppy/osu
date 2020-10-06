@@ -19,21 +19,21 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 new SettingsSlider<float>
                 {
                     LabelText = "背景模糊",
-                    Bindable = config.GetBindable<float>(MfSetting.MvisBgBlur),
+                    Current = config.GetBindable<float>(MfSetting.MvisBgBlur),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsSlider<float>
                 {
                     LabelText = "空闲时的背景亮度",
-                    Bindable = config.GetBindable<float>(MfSetting.MvisIdleBgDim),
+                    Current = config.GetBindable<float>(MfSetting.MvisIdleBgDim),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsSlider<float>
                 {
                     LabelText = "空闲时的M-vis面板不透明度",
-                    Bindable = config.GetBindable<float>(MfSetting.MvisContentAlpha),
+                    Current = config.GetBindable<float>(MfSetting.MvisContentAlpha),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 }

@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
                             LabelText = "显示指定队伍",
-                            Bindable = currentTeam,
+                            Current = currentTeam,
                         }
                     }
                 }

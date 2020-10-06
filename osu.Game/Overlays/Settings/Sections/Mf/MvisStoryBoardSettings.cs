@@ -19,14 +19,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 new SettingsCheckbox
                 {
                     LabelText = "启用故事版/背景视频",
-                    Bindable = config.GetBindable<bool>(MfSetting.MvisEnableStoryboard),
+                    Current = config.GetBindable<bool>(MfSetting.MvisEnableStoryboard),
                 },
                 /*
                     new SettingsCheckbox
                     {
                         LabelText = "允许故事版的Overlay层显示在Mvis面板上方",
                         TooltipText = "这会将故事版的Overlay层放置在Mvis面板容器中，随面板的隐藏而隐藏，且不受背景暗化的影响",
-                        Bindable = config.GetBindable<bool>(MfSetting.MvisEnableSBOverlayProxy),
+                        Current = config.GetBindable<bool>(MfSetting.MvisEnableSBOverlayProxy),
                     }
                 */
             };

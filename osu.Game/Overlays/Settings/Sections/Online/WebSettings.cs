@@ -19,13 +19,13 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 new SettingsCheckbox
                 {
                     LabelText = "在打开外部链接前确认",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
+                    Current = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "下图时倾向于不带视频",
                     Keywords = new[] { "no-video" },
-                    Bindable = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
+                    Current = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
                 },
             };
         }

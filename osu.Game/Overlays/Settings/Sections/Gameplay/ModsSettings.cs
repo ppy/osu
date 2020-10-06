@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = "当视觉效果Mods启用时,增强第一个物件的可见度",
-                    Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility),
+                    Current = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility),
                 },
             };
         }

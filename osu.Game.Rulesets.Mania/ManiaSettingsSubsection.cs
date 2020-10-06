@@ -29,12 +29,12 @@ namespace osu.Game.Rulesets.Mania
                 new SettingsEnumDropdown<ManiaScrollingDirection>
                 {
                     LabelText = "下落方向",
-                    Bindable = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
+                    Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
                 },
                 new SettingsSlider<double, TimeSlider>
                 {
                     LabelText = "下落时间",
-                    Bindable = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
+                    Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
                     KeyboardStep = 5
                 },
             };
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania
 
         private class TimeSlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Value.ToString("N0") + "ms";
+            public override string TooltipText => Current.Value.ToString("N0") + "毫秒";
         }
     }
 }

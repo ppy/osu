@@ -114,7 +114,14 @@ namespace osu.Game.Screens.Edit.Timing
 
                 controlPoints = group.ControlPoints.GetBoundCopy();
                 controlPoints.CollectionChanged += (_, __) => createChildren();
+            }
 
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
                 createChildren();
             }
 
@@ -125,20 +132,22 @@ namespace osu.Game.Screens.Edit.Timing
 
             private Drawable createAttribute(ControlPoint controlPoint)
             {
+                Color4 colour = controlPoint.GetRepresentingColour(colours);
+
                 switch (controlPoint)
                 {
                     case TimingControlPoint timing:
-                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature.GetDescription() ?? timing.TimeSignature.ToString()}");
+                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}", colour);
 
                     case DifficultyControlPoint difficulty:
 
-                        return new RowAttribute("难度 / 绿线", () => $"{difficulty.SpeedMultiplier:n2}x");
+                        return new RowAttribute("难度 / 绿线", () => $"{difficulty.SpeedMultiplier:n2}x", colour);
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("效果", () => $"{(effect.KiaiMode ? "+高潮" : "")} {(effect.OmitFirstBarLine ? "+越过第一条线" : "")}");
+                        return new RowAttribute("效果", () => $"{(effect.KiaiMode ? "高潮 " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}", colour);
 
                     case SampleControlPoint sample:
-                        return new RowAttribute("音效", () => $"{sample.SampleBank} {sample.SampleVolume}%");
+                        return new RowAttribute("音效", () => $"{sample.SampleBank} {sample.SampleVolume}%", colour);
                 }
 
                 return null;

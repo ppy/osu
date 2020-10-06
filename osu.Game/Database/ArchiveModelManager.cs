@@ -70,7 +70,7 @@ namespace osu.Game.Database
 
         private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
 
-        public virtual string[] HandledExtensions => new[] { ".zip" };
+        public virtual IEnumerable<string> HandledExtensions => new[] { ".zip" };
 
         public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 

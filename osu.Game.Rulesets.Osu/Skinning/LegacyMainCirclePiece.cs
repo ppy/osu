@@ -21,10 +21,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
     public class LegacyMainCirclePiece : CompositeDrawable
     {
         private readonly string priorityLookup;
+        private readonly bool hasNumber;
 
-        public LegacyMainCirclePiece(string priorityLookup = null)
+        public LegacyMainCirclePiece(string priorityLookup = null, bool hasNumber = true)
         {
             this.priorityLookup = priorityLookup;
+            this.hasNumber = hasNumber;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
@@ -47,6 +49,23 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
 
+            bool allowFallback = false;
+
+            // attempt lookup using priority specification
+            Texture baseTexture = getTextureWithFallback(string.Empty);
+
+            // if the base texture was not found without a fallback, switch on fallback mode and re-perform the lookup.
+            if (baseTexture == null)
+            {
+                allowFallback = true;
+                baseTexture = getTextureWithFallback(string.Empty);
+            }
+
+            // at this point, any further texture fetches should be correctly using the priority source if the base texture was retrieved using it.
+            // the flow above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
+            // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png (potentially from the default/fall-through skin).
+            Texture overlayTexture = getTextureWithFallback("overlay");
+
             InternalChildren = new Drawable[]
             {
                 circleSprites = new Container<Sprite>
@@ -58,19 +77,23 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     {
                         hitCircleSprite = new Sprite
                         {
-                            Texture = getTextureWithFallback(string.Empty),
+                            Texture = baseTexture,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
                         hitCircleOverlay = new Sprite
                         {
-                            Texture = getTextureWithFallback("overlay"),
+                            Texture = overlayTexture,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         }
                     }
                 },
-                hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+            };
+
+            if (hasNumber)
+            {
+                AddInternal(hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
@@ -78,8 +101,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                },
-            };
+                });
+            }
 
             bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
@@ -95,7 +118,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 Texture tex = null;
 
                 if (!string.IsNullOrEmpty(priorityLookup))
+                {
                     tex = skin.GetTexture($"{priorityLookup}{name}");
+
+                    if (!allowFallback)
+                        return tex;
+                }
 
                 return tex ?? skin.GetTexture($"hitcircle{name}");
             }
@@ -107,7 +135,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             state.BindValueChanged(updateState, true);
             accentColour.BindValueChanged(colour => hitCircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
-            indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
+            if (hasNumber)
+                indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
         }
 
         private void updateState(ValueChangedEvent<ArmedState> state)
@@ -120,16 +149,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
                     circleSprites.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                    var legacyVersion = skin.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value;
-
-                    if (legacyVersion >= 2.0m)
-                        // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
-                        hitCircleText.FadeOut(legacy_fade_duration / 4, Easing.Out);
-                    else
+                    if (hasNumber)
                     {
-                        // old skins scale and fade it normally along other pieces.
-                        hitCircleText.FadeOut(legacy_fade_duration, Easing.Out);
-                        hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        var legacyVersion = skin.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value;
+
+                        if (legacyVersion >= 2.0m)
+                            // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
+                            hitCircleText.FadeOut(legacy_fade_duration / 4, Easing.Out);
+                        else
+                        {
+                            // old skins scale and fade it normally along other pieces.
+                            hitCircleText.FadeOut(legacy_fade_duration, Easing.Out);
+                            hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        }
                     }
 
                     break;

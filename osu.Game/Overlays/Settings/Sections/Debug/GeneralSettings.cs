@@ -18,13 +18,13 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "显示log overlay",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
+                    LabelText = "在左下角显示调试日志",
+                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "绕过 front-to-back 渲染检查",
-                    Bindable = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
+                    LabelText = "绕过front-to-back渲染检查",
+                    Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
                 }
             };
         }

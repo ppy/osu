@@ -27,7 +27,7 @@ namespace osu.Game.Scoring
 {
     public class ScoreManager : DownloadableArchiveModelManager<ScoreInfo, ScoreFileInfo>
     {
-        public override string[] HandledExtensions => new[] { ".osr" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 

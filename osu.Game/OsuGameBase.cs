@@ -233,9 +233,9 @@ namespace osu.Game
             dependencies.Cache(new SessionStatics());
             dependencies.Cache(new OsuColour());
 
-            fileImporters.Add(BeatmapManager);
-            fileImporters.Add(ScoreManager);
-            fileImporters.Add(SkinManager);
+            RegisterImportHandler(BeatmapManager);
+            RegisterImportHandler(ScoreManager);
+            RegisterImportHandler(SkinManager);
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
@@ -348,6 +348,18 @@ namespace osu.Game
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 
+        /// <summary>
+        /// Register a global handler for file imports. Most recently registered will have precedence.
+        /// </summary>
+        /// <param name="handler">The handler to register.</param>
+        public void RegisterImportHandler(ICanAcceptFiles handler) => fileImporters.Insert(0, handler);
+
+        /// <summary>
+        /// Unregister a global handler for file imports.
+        /// </summary>
+        /// <param name="handler">The previously registered handler.</param>
+        public void UnregisterImportHandler(ICanAcceptFiles handler) => fileImporters.Remove(handler);
+
         public async Task Import(params string[] paths)
         {
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
@@ -359,7 +371,7 @@ namespace osu.Game
             }
         }
 
-        public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
+        public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);
 
         protected override void Dispose(bool isDisposing)
         {
