@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load()
         {
-            Flow.Children = new Drawable[]
+            Children = new Drawable[]
             {
                 new OsuSpriteText
                 {
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
             };
 
-            foreach (var item in Flow.OfType<LabelledTextBox>())
+            foreach (var item in Children.OfType<LabelledTextBox>())
                 item.OnCommit += onCommit;
         }
 
