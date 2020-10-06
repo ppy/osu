@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load()
         {
-            Flow.Children = new Drawable[]
+            Children = new Drawable[]
             {
                 new OsuSpriteText
                 {
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
             };
 
-            foreach (var item in Flow.OfType<LabelledSliderBar<float>>())
+            foreach (var item in Children.OfType<LabelledSliderBar<float>>())
                 item.Current.ValueChanged += onValueChanged;
         }
 
