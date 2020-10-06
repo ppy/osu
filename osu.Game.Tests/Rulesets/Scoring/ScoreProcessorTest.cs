@@ -57,14 +57,16 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Miss, HitResult.Great, 0)]
         [TestCase(ScoringMode.Standardised, HitResult.Meh, HitResult.Great, 387_500)]
         [TestCase(ScoringMode.Standardised, HitResult.Ok, HitResult.Great, 425_000)]
+        [TestCase(ScoringMode.Standardised, HitResult.Good, HitResult.Perfect, 3_350_000 / 7.0)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, HitResult.Great, 575_000)]
+        [TestCase(ScoringMode.Standardised, HitResult.Perfect, HitResult.Perfect, 575_000)]
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)]
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, HitResult.SmallTickHit, 0)] // TODO: idk, this should be 225_000 from accuracy portion
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickHit, HitResult.LargeTickHit, 575_000)]
         [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 30)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 150)]
-        public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
+        public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, double expectedScore)
         {
             var minResult = new JudgementResult(new HitObject(), new TestJudgement(hitResult)).Judgement.MinResult;
 
