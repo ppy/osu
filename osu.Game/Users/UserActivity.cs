@@ -29,6 +29,11 @@ namespace osu.Game.Users
             public override string Status => "正在多人联机";
         }
 
+        public class InMvis : UserActivity
+        {
+            public override string Status => "正在听歌";
+        }
+
         public class Editing : UserActivity
         {
             public BeatmapInfo Beatmap { get; }

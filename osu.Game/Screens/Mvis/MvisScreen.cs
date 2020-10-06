@@ -37,6 +37,7 @@ using osuTK.Input;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics;
 using osu.Framework;
+using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
@@ -49,6 +50,7 @@ namespace osu.Game.Screens
     {
         private const float DURATION = 750;
 
+        protected override UserActivity InitialActivity => new UserActivity.InMvis();
         public override bool HideOverlaysOnEnter => true;
         private bool AllowCursor = false;
         public override bool AllowBackButton => false;
