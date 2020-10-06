@@ -60,8 +60,6 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Good, HitResult.Perfect, 3_350_000 / 7.0)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, HitResult.Great, 575_000)]
         [TestCase(ScoringMode.Standardised, HitResult.Perfect, HitResult.Perfect, 575_000)]
-        [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)]
-        [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, HitResult.SmallTickHit, 0)] // TODO: this should probably be 225_000 from accuracy portion
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickHit, HitResult.LargeTickHit, 575_000)]
         [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 30)]
@@ -72,8 +70,6 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 3744 / 7.0)]
         [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 936)]
         [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 936)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 0)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 936)]
         [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 30)]
