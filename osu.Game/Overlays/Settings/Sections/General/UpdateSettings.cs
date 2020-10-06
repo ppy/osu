@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         private SettingsButton checkForUpdatesButton;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
 
         [BackgroundDependencyLoader(true)]
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         {
                             if (!t.Result)
                             {
-                                notifications.Post(new SimpleNotification
+                                notifications?.Post(new SimpleNotification
                                 {
                                     Text = $"You are running the latest release ({game.Version})",
                                     Icon = FontAwesome.Solid.CheckCircle,
