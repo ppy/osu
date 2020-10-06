@@ -49,6 +49,23 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
 
+            bool allowFallback = false;
+
+            // attempt lookup using priority specification
+            Texture baseTexture = getTextureWithFallback(string.Empty);
+
+            // if the base texture was not found without a fallback, switch on fallback mode and re-perform the lookup.
+            if (baseTexture == null)
+            {
+                allowFallback = true;
+                baseTexture = getTextureWithFallback(string.Empty);
+            }
+
+            // at this point, any further texture fetches should be correctly using the priority source if the base texture was retrieved using it.
+            // the flow above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
+            // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png (potentially from the default/fall-through skin).
+            Texture overlayTexture = getTextureWithFallback("overlay");
+
             InternalChildren = new Drawable[]
             {
                 circleSprites = new Container<Sprite>
@@ -60,13 +77,13 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     {
                         hitCircleSprite = new Sprite
                         {
-                            Texture = getTextureWithFallback(string.Empty),
+                            Texture = baseTexture,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
                         hitCircleOverlay = new Sprite
                         {
-                            Texture = getTextureWithFallback("overlay"),
+                            Texture = overlayTexture,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         }
@@ -101,7 +118,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 Texture tex = null;
 
                 if (!string.IsNullOrEmpty(priorityLookup))
+                {
                     tex = skin.GetTexture($"{priorityLookup}{name}");
+
+                    if (!allowFallback)
+                        return tex;
+                }
 
                 return tex ?? skin.GetTexture($"hitcircle{name}");
             }
