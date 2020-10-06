@@ -16,7 +16,7 @@ namespace osu.Game.Input
     /// Connects <see cref="OsuSetting.ConfineMouseMode"/> with <see cref="FrameworkSetting.ConfineMouseMode"/>,
     /// while optionally binding an <see cref="OverlayActivation"/> mode, usually that of the current <see cref="Player"/>.
     /// It is assumed that while overlay activation is <see cref="OverlayActivation.Disabled"/>, we should also confine the
-    /// mouse cursor if it has been requested with <see cref="OsuConfineMouseMode.DuringGameplay"/>.
+    /// mouse cursor if it has been requested with <see cref="OsuConfineMouseMode.WhenOverlaysDisabled"/>.
     /// </summary>
     public class ConfineMouseTracker : Component
     {
@@ -52,7 +52,7 @@ namespace osu.Game.Input
                     frameworkConfineMode.Value = ConfineMouseMode.Fullscreen;
                     break;
 
-                case OsuConfineMouseMode.DuringGameplay:
+                case OsuConfineMouseMode.WhenOverlaysDisabled:
                     frameworkConfineMode.Value = OverlayActivationMode.Value == OverlayActivation.Disabled ? ConfineMouseMode.Always : ConfineMouseMode.Never;
                     break;
 
