@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -9,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -52,6 +54,44 @@ namespace osu.Game.Tests.Rulesets.Scoring
             scoreProcessor.ApplyResult(judgementResult);
 
             Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
+        }
+
+        [TestCase(ScoringMode.Standardised, "osu", typeof(HitCircle), HitResult.Great, 575_000)]
+        public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, string rulesetName, Type hitObjectType, HitResult hitResult, int expectedScore)
+        {
+            IBeatmap fourObjectBeatmap = new TestBeatmap(new OsuRuleset().RulesetInfo)
+            {
+                HitObjects = new List<HitObject>(Enumerable.Repeat((HitObject)Activator.CreateInstance(hitObjectType), 4))
+            };
+            scoreProcessor.Mode.Value = scoringMode;
+            scoreProcessor.ApplyBeatmap(fourObjectBeatmap);
+
+            for (int i = 0; i < 4; i++)
+            {
+                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], new Judgement())
+                {
+                    Type = i == 2 ? HitResult.Miss : hitResult
+                };
+                scoreProcessor.ApplyResult(judgementResult);
+            }
+
+            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
+        }
+
+        [TestCase(HitResult.IgnoreHit, HitResult.IgnoreMiss)]
+        [TestCase(HitResult.Meh, HitResult.Miss)]
+        [TestCase(HitResult.Ok, HitResult.Miss)]
+        [TestCase(HitResult.Good, HitResult.Miss)]
+        [TestCase(HitResult.Great, HitResult.Miss)]
+        [TestCase(HitResult.Perfect, HitResult.Miss)]
+        [TestCase(HitResult.SmallTickHit, HitResult.SmallTickMiss)]
+        [TestCase(HitResult.LargeTickHit, HitResult.LargeTickMiss)]
+        [TestCase(HitResult.SmallBonus, HitResult.IgnoreMiss)]
+        [TestCase(HitResult.LargeBonus, HitResult.IgnoreMiss)]
+        public void TestMinResults(HitResult hitResult, HitResult expectedMinResult)
+        {
+            var result = new JudgementResult(new HitObject(), new TestJudgement(hitResult));
+            Assert.IsTrue(result.Judgement.MinResult == expectedMinResult);
         }
 
         [TestCase(HitResult.None, false)]
@@ -152,6 +192,16 @@ namespace osu.Game.Tests.Rulesets.Scoring
         public void TestIsScorable(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.IsTrue(hitResult.IsScorable() == expectedReturnValue);
+        }
+
+        private class TestJudgement : Judgement
+        {
+            public override HitResult MaxResult { get; }
+
+            public TestJudgement(HitResult maxResult)
+            {
+                MaxResult = maxResult;
+            }
         }
     }
 }
