@@ -99,8 +99,11 @@ namespace osu.Game.Screens.Edit
         /// <param name="hitObjects">The <see cref="HitObject"/>s to add.</param>
         public void AddRange(IEnumerable<HitObject> hitObjects)
         {
-            foreach (var h in hitObjects)
-                Add(h);
+            ApplyBatchChanges(_ =>
+            {
+                foreach (var h in hitObjects)
+                    Add(h);
+            });
         }
 
         /// <summary>
@@ -164,6 +167,19 @@ namespace osu.Game.Screens.Edit
 
             RemoveAt(index);
             return true;
+        }
+
+        /// <summary>
+        /// Removes a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        /// <param name="hitObjects">The <see cref="HitObject"/>s to remove.</param>
+        public void RemoveRange(IEnumerable<HitObject> hitObjects)
+        {
+            ApplyBatchChanges(_ =>
+            {
+                foreach (var h in hitObjects)
+                    Remove(h);
+            });
         }
 
         /// <summary>
@@ -237,18 +253,12 @@ namespace osu.Game.Screens.Edit
             }
 
             batchPendingInserts.Clear();
-
-            isBatchApplying = false;
         }
 
         /// <summary>
         /// Clears all <see cref="HitObjects"/> from this <see cref="EditorBeatmap"/>.
         /// </summary>
-        public void Clear()
-        {
-            foreach (var h in HitObjects.ToArray())
-                Remove(h);
-        }
+        public void Clear() => RemoveRange(HitObjects.ToArray());
 
         protected override void Update()
         {
