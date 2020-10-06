@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="snapped">Whether to snap to the closest beat after seeking.</param>
         /// <param name="amount">The relative amount (magnitude) which should be seeked.</param>
-        public void SeekBackward(bool snapped = false, double amount = 1) => seek(-1, snapped, amount);
+        public void SeekBackward(bool snapped = false, double amount = 1) => seek(-1, snapped, amount + (IsRunning ? 1.5 : 0));
 
         /// <summary>
         /// Seeks forwards by one beat length.
