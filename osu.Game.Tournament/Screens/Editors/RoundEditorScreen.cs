@@ -63,25 +63,25 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "名称",
                                 Width = 0.33f,
-                                Bindable = Model.Name
+                                Current = Model.Name
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "描述",
                                 Width = 0.33f,
-                                Bindable = Model.Description
+                                Current = Model.Description
                             },
                             new DateTextBox
                             {
                                 LabelText = "开始时间",
                                 Width = 0.33f,
-                                Bindable = Model.StartDate
+                                Current = Model.StartDate
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "最佳(Best of)",
                                 Width = 0.33f,
-                                Bindable = Model.BestOf
+                                Current = Model.BestOf
                             },
                             new SettingsButton
                             {
@@ -186,14 +186,14 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "谱面 ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = beatmapId,
+                                        Current = beatmapId,
                                     },
                                     new SettingsTextBox
                                     {
                                         LabelText = "Mods",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = mods,
+                                        Current = mods,
                                     },
                                     drawableContainer = new Container
                                     {

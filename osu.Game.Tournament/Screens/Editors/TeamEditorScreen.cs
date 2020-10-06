@@ -102,31 +102,31 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "名称",
                                 Width = 0.2f,
-                                Bindable = Model.FullName
+                                Current = Model.FullName
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "首字母缩写",
                                 Width = 0.2f,
-                                Bindable = Model.Acronym
+                                Current = Model.Acronym
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "标志旗",
                                 Width = 0.2f,
-                                Bindable = Model.FlagName
+                                Current = Model.FlagName
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "排名",
                                 Width = 0.2f,
-                                Bindable = Model.Seed
+                                Current = Model.Seed
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "上次比赛中的排名",
                                 Width = 0.33f,
-                                Bindable = Model.LastYearPlacing
+                                Current = Model.LastYearPlacing
                             },
                             new SettingsButton
                             {
@@ -247,7 +247,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "用户ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = userId,
+                                        Current = userId,
                                     },
                                     drawableContainer = new Container
                                     {

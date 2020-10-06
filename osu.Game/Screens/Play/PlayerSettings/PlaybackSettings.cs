@@ -51,14 +51,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         }
                     },
                 },
-                rateSlider = new PlayerSliderBar<double> { Bindable = UserPlaybackRate }
+                rateSlider = new PlayerSliderBar<double> { Current = UserPlaybackRate }
             };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            rateSlider.Bindable.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.0}x", true);
+            rateSlider.Current.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.0}x", true);
         }
     }
 }

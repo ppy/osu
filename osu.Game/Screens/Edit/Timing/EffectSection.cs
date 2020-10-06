@@ -28,7 +28,10 @@ namespace osu.Game.Screens.Edit.Timing
             if (point.NewValue != null)
             {
                 kiai.Current = point.NewValue.KiaiModeBindable;
+                kiai.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+
                 omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
+                omitBarLine.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 

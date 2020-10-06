@@ -20,17 +20,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsCheckbox
                 {
                     LabelText = "在拖拽时旋转光标",
-                    Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
+                    Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "视差效果",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MenuParallax)
+                    Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
                 new SettingsSlider<float, TimeSlider>
                 {
                     LabelText = "\"按压以确认\" 激活时间",
-                    Bindable = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
+                    Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
                     KeyboardStep = 50
                 },
             };
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private class TimeSlider : OsuSliderBar<float>
         {
-            public override string TooltipText => Current.Value.ToString("N0") + "ms";
+            public override string TooltipText => Current.Value.ToString("N0") + "毫秒";
         }
     }
 }

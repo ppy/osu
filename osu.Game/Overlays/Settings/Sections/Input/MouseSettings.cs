@@ -35,32 +35,32 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 new SettingsCheckbox
                 {
                     LabelText = "绝对输入",
-                    Bindable = rawInputToggle
+                    Current = rawInputToggle
                 },
                 new SensitivitySetting
                 {
-                    LabelText = "鼠标灵敏度",
-                    Bindable =sensitivityBindable
+                    LabelText = "光标灵敏度",
+                    Current = sensitivityBindable
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "将光标绝对映射至窗口中",
-                    Bindable = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
+                    Current = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
                 },
                 new SettingsEnumDropdown<ConfineMouseMode>
                 {
                     LabelText = "光标边界",
-                    Bindable = config.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode),
+                    Current = config.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "在游玩时禁用鼠标滚轮",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "在游玩时禁用鼠标按键",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
 

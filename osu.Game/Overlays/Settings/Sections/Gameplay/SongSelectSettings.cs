@@ -31,31 +31,31 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = "右键鼠标拖拽列表",
-                    Bindable = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
+                    Current = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "显示转谱",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
                 new SettingsSlider<double, StarsSlider>
                 {
                     LabelText = "显示星级，从 ",
-                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
+                    Current = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
                 },
                 new SettingsSlider<double, MaximumStarsSlider>
                 {
-                    LabelText = "至",
-                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
+                    LabelText = "到",
+                    Current = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
                     LabelText = "随机选择算法",
-                    Bindable = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
+                    Current = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }
             };
         }

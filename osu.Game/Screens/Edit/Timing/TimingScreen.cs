@@ -12,7 +12,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
@@ -30,11 +29,6 @@ namespace osu.Game.Screens.Edit.Timing
             : base(EditorScreenMode.Timing)
         {
         }
-
-        protected override Drawable CreateTimelineContent() => new ControlPointPart
-        {
-            RelativeSizeAxes = Axes.Both,
-        };
 
         protected override Drawable CreateMainContent() => new GridContainer
         {
@@ -86,6 +80,9 @@ namespace osu.Game.Screens.Edit.Timing
 
             [Resolved]
             private Bindable<ControlPointGroup> selectedGroup { get; set; }
+
+            [Resolved(canBeNull: true)]
+            private IEditorChangeHandler changeHandler { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -146,6 +143,7 @@ namespace osu.Game.Screens.Edit.Timing
                 controlGroups.BindCollectionChanged((sender, args) =>
                 {
                     table.ControlGroups = controlGroups;
+                    changeHandler.SaveState();
                 }, true);
             }
 

@@ -113,13 +113,13 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         new SettingsSlider<int>
                         {
                             LabelText = "绿幕宽度",
-                            Bindable = LadderInfo.ChromaKeyWidth,
+                            Current = LadderInfo.ChromaKeyWidth,
                             KeyboardStep = 1,
                         },
                         new SettingsSlider<int>
                         {
                             LabelText = "每队玩家数量",
-                            Bindable = LadderInfo.PlayersPerTeam,
+                            Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
                         }
                     }

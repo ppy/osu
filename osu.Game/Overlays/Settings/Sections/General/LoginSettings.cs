@@ -240,12 +240,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     new SettingsCheckbox
                     {
                         LabelText = "记住用户名",
-                        Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
+                        Current = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
                     {
                         LabelText = "自动登录",
-                        Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
+                        Current = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
                     new Container
                     {

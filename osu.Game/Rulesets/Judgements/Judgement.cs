@@ -109,40 +109,40 @@ namespace osu.Game.Rulesets.Judgements
                     return 0;
 
                 case HitResult.SmallTickHit:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.05;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
                 case HitResult.SmallTickMiss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.05;
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
                 case HitResult.LargeTickHit:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.1;
+                    return DEFAULT_MAX_HEALTH_INCREASE;
 
                 case HitResult.LargeTickMiss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.1;
+                    return -DEFAULT_MAX_HEALTH_INCREASE;
 
                 case HitResult.Miss:
                     return -DEFAULT_MAX_HEALTH_INCREASE;
 
                 case HitResult.Meh:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.5;
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.05;
 
                 case HitResult.Ok:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.3;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
                 case HitResult.Good:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.1;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.75;
 
                 case HitResult.Great:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.8;
-
-                case HitResult.Perfect:
                     return DEFAULT_MAX_HEALTH_INCREASE;
 
+                case HitResult.Perfect:
+                    return DEFAULT_MAX_HEALTH_INCREASE * 1.05;
+
                 case HitResult.SmallBonus:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.1;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
                 case HitResult.LargeBonus:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.2;
+                    return DEFAULT_MAX_HEALTH_INCREASE;
             }
         }
 
