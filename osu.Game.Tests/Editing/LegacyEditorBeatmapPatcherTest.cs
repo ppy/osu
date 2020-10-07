@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Editing
             {
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000 }
+                    new HitCircle { StartTime = 1000, NewCombo = true }
                 }
             };
 
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new[]
             {
-                new HitCircle { StartTime = 1000 },
+                new HitCircle { StartTime = 1000, NewCombo = true },
                 new HitCircle { StartTime = 3000 },
             });
 
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new[]
             {
-                new HitCircle { StartTime = 1000 },
+                new HitCircle { StartTime = 1000, NewCombo = true },
                 new HitCircle { StartTime = 2000 },
                 new HitCircle { StartTime = 3000 },
             });
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new[]
             {
-                new HitCircle { StartTime = 1000 },
+                new HitCircle { StartTime = 1000, NewCombo = true },
                 new HitCircle { StartTime = 2000 },
                 new HitCircle { StartTime = 3000 },
             });
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Editing
             {
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 500 },
+                    new HitCircle { StartTime = 500, NewCombo = true },
                     (OsuHitObject)current.HitObjects[1],
                     (OsuHitObject)current.HitObjects[2],
                 }
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new[]
             {
-                new HitCircle { StartTime = 1000 },
+                new HitCircle { StartTime = 1000, NewCombo = true },
                 new HitCircle { StartTime = 2000 },
                 new HitCircle { StartTime = 3000 },
             });
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new OsuHitObject[]
             {
-                new HitCircle { StartTime = 1000 },
+                new HitCircle { StartTime = 1000, NewCombo = true },
                 new Slider
                 {
                     StartTime = 2000,
@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new[]
             {
-                new HitCircle { StartTime = 1000 },
+                new HitCircle { StartTime = 1000, NewCombo = true },
                 new HitCircle { StartTime = 2000 },
                 new HitCircle { StartTime = 3000 },
             });
@@ -197,7 +197,7 @@ namespace osu.Game.Tests.Editing
             {
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 500 },
+                    new HitCircle { StartTime = 500, NewCombo = true },
                     (OsuHitObject)current.HitObjects[0],
                     new HitCircle { StartTime = 1500 },
                     (OsuHitObject)current.HitObjects[1],
@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new[]
             {
-                new HitCircle { StartTime = 500 },
+                new HitCircle { StartTime = 500, NewCombo = true },
                 new HitCircle { StartTime = 1000 },
                 new HitCircle { StartTime = 1500 },
                 new HitCircle { StartTime = 2000 },
@@ -225,6 +225,9 @@ namespace osu.Game.Tests.Editing
                 new HitCircle { StartTime = 3000 },
                 new HitCircle { StartTime = 3500 },
             });
+
+            var patchedFirst = (HitCircle)current.HitObjects[1];
+            patchedFirst.NewCombo = true;
 
             var patch = new OsuBeatmap
             {
@@ -244,7 +247,7 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new[]
             {
-                new HitCircle { StartTime = 500 },
+                new HitCircle { StartTime = 500, NewCombo = true },
                 new HitCircle { StartTime = 1000 },
                 new HitCircle { StartTime = 1500 },
                 new HitCircle { StartTime = 2000 },
@@ -277,7 +280,7 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new[]
             {
-                new HitCircle { StartTime = 500 },
+                new HitCircle { StartTime = 500, NewCombo = true },
                 new HitCircle { StartTime = 1000 },
                 new HitCircle { StartTime = 1500 },
                 new HitCircle { StartTime = 2000 },
@@ -291,7 +294,7 @@ namespace osu.Game.Tests.Editing
             {
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 750 },
+                    new HitCircle { StartTime = 750, NewCombo = true },
                     (OsuHitObject)current.HitObjects[1],
                     (OsuHitObject)current.HitObjects[4],
                     (OsuHitObject)current.HitObjects[5],
@@ -309,20 +312,20 @@ namespace osu.Game.Tests.Editing
         {
             current.AddRange(new[]
             {
-                new HitCircle { StartTime = 500, Position = new Vector2(50) },
-                new HitCircle { StartTime = 500, Position = new Vector2(100) },
-                new HitCircle { StartTime = 500, Position = new Vector2(150) },
-                new HitCircle { StartTime = 500, Position = new Vector2(200) },
+                new HitCircle { StartTime = 500, Position = new Vector2(50), NewCombo = true },
+                new HitCircle { StartTime = 500, Position = new Vector2(100), NewCombo = true },
+                new HitCircle { StartTime = 500, Position = new Vector2(150), NewCombo = true },
+                new HitCircle { StartTime = 500, Position = new Vector2(200), NewCombo = true },
             });
 
             var patch = new OsuBeatmap
             {
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 500, Position = new Vector2(150) },
-                    new HitCircle { StartTime = 500, Position = new Vector2(100) },
-                    new HitCircle { StartTime = 500, Position = new Vector2(50) },
-                    new HitCircle { StartTime = 500, Position = new Vector2(200) },
+                    new HitCircle { StartTime = 500, Position = new Vector2(150), NewCombo = true },
+                    new HitCircle { StartTime = 500, Position = new Vector2(100), NewCombo = true },
+                    new HitCircle { StartTime = 500, Position = new Vector2(50), NewCombo = true },
+                    new HitCircle { StartTime = 500, Position = new Vector2(200), NewCombo = true },
                 }
             };
 
