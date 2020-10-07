@@ -38,7 +38,8 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 2,
-                        MaxValue = 7
+                        MaxValue = 7,
+                        Precision = 0.1f,
                     }
                 },
                 healthDrainSlider = new LabelledSliderBar<float>
@@ -49,7 +50,8 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
-                        MaxValue = 10
+                        MaxValue = 10,
+                        Precision = 0.1f,
                     }
                 },
                 approachRateSlider = new LabelledSliderBar<float>
@@ -60,7 +62,8 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
-                        MaxValue = 10
+                        MaxValue = 10,
+                        Precision = 0.1f,
                     }
                 },
                 overallDifficultySlider = new LabelledSliderBar<float>
@@ -71,7 +74,8 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
-                        MaxValue = 10
+                        MaxValue = 10,
+                        Precision = 0.1f,
                     }
                 },
             };
