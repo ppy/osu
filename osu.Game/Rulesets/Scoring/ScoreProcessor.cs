@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             return GetScore(mode, maxHighestCombo,
                 maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
-                maxHighestCombo > 0 ? (double)HighestCombo.Value / maxHighestCombo : 0,
+                maxHighestCombo > 0 ? (double)HighestCombo.Value / maxHighestCombo : 1,
                 scoreResultCounts);
         }
 
