@@ -549,7 +549,6 @@ namespace osu.Game
             BackButton.Receptor receptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
-            dependencies.Cache(confineMouseTracker = new ConfineMouseTracker());
 
             AddRange(new Drawable[]
             {
@@ -586,7 +585,7 @@ namespace osu.Game
                 leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker,
-                confineMouseTracker
+                confineMouseTracker = new ConfineMouseTracker()
             });
 
             ScreenStack.ScreenPushed += screenPushed;
