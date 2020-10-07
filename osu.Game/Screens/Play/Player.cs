@@ -441,6 +441,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Restart()
         {
+            // at the point of restarting the track should either already be paused or the volume should be zero.
+            // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
+            musicController.Stop();
+
             sampleRestart?.Play();
             RestartRequested?.Invoke();
 
