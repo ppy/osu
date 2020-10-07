@@ -315,5 +315,14 @@ namespace osu.Game.Screens.Edit
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
         public int BeatDivisor => beatDivisor?.Value ?? 1;
+
+        /// <summary>
+        /// Update all hit objects with potentially changed difficulty or control point data.
+        /// </summary>
+        public void UpdateBeatmap()
+        {
+            foreach (var h in HitObjects)
+                pendingUpdates.Add(h);
+        }
     }
 }
