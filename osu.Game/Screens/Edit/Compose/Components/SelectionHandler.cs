@@ -239,10 +239,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void deleteSelected()
         {
             ChangeHandler?.BeginChange();
-
-            foreach (var h in selectedBlueprints.ToList())
-                EditorBeatmap?.Remove(h.HitObject);
-
+            EditorBeatmap?.RemoveRange(selectedBlueprints.Select(b => b.HitObject));
             ChangeHandler?.EndChange();
         }
 
