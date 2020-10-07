@@ -34,6 +34,10 @@ namespace osu.Game.Input
 
         private void updateConfineMode()
         {
+            // confine mode is unavailable on some platforms
+            if (frameworkConfineMode.Disabled)
+                return;
+
             switch (osuConfineMode.Value)
             {
                 case OsuConfineMouseMode.Never:
