@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
-        private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
+        protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
 
         public int RestartCount;
 
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Play
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
             if (game != null)
-                localUserPlaying.BindTo(game.LocalUserPlaying);
+                LocalUserPlaying.BindTo(game.LocalUserPlaying);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
@@ -362,7 +362,7 @@ namespace osu.Game.Screens.Play
         {
             bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value;
             OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
-            localUserPlaying.Value = inGameplay;
+            LocalUserPlaying.Value = inGameplay;
         }
 
         private void updatePauseOnFocusLostState() =>
@@ -667,7 +667,7 @@ namespace osu.Game.Screens.Play
             screenSuspension?.Expire();
 
             // Ensure we reset the LocalUserPlaying state
-            localUserPlaying.Value = false;
+            LocalUserPlaying.Value = false;
 
             fadeOut();
             base.OnSuspending(next);
@@ -699,7 +699,7 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             // Ensure we reset the LocalUserPlaying state
-            localUserPlaying.Value = false;
+            LocalUserPlaying.Value = false;
 
             fadeOut();
             return base.OnExiting(next);
