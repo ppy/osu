@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Scoring
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
-        private int maxHighestCombo;
+        private int maxAchievableCombo;
         private double maxBaseScore;
         private double rollingMaxBaseScore;
         private double baseScore;
@@ -195,9 +195,9 @@ namespace osu.Game.Rulesets.Scoring
 
         private double getScore(ScoringMode mode)
         {
-            return GetScore(mode, maxHighestCombo,
+            return GetScore(mode, maxAchievableCombo,
                 maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
-                maxHighestCombo > 0 ? (double)HighestCombo.Value / maxHighestCombo : 1,
+                maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1,
                 scoreResultCounts);
         }
 
@@ -265,7 +265,7 @@ namespace osu.Game.Rulesets.Scoring
 
             if (storeResults)
             {
-                maxHighestCombo = HighestCombo.Value;
+                maxAchievableCombo = HighestCombo.Value;
                 maxBaseScore = baseScore;
             }
 
