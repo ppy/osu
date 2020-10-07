@@ -199,7 +199,40 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Update();
 
             // no bindable so we perform this every update
-            Width = (float)(HitObject.GetEndTime() - HitObject.StartTime);
+            float duration = (float)(HitObject.GetEndTime() - HitObject.StartTime);
+
+            if (Width != duration)
+            {
+                Width = duration;
+
+                // kind of haphazard but yeah, no bindables.
+                if (HitObject is IHasRepeats repeats)
+                    updateRepeats(repeats);
+            }
+        }
+
+        private Container repeatsContainer;
+
+        private void updateRepeats(IHasRepeats repeats)
+        {
+            repeatsContainer?.Expire();
+
+            mainComponents.Add(repeatsContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            for (int i = 0; i < repeats.RepeatCount; i++)
+            {
+                repeatsContainer.Add(new Circle
+                {
+                    Size = new Vector2(circle_size / 2),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.Centre,
+                    RelativePositionAxes = Axes.X,
+                    X = (float)(i + 1) / (repeats.RepeatCount + 1),
+                });
+            }
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
