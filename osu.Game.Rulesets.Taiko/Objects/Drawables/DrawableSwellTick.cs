@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Game.Skinning;
 
@@ -19,10 +18,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void UpdateInitialTransforms() => this.FadeOut();
 
-        public void TriggerResult(HitResult type)
+        public void TriggerResult(bool hit)
         {
             HitObject.StartTime = Time.Current;
-            ApplyResult(r => r.Type = type);
+            ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

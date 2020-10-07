@@ -3,9 +3,11 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
@@ -19,14 +21,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton importBeatmapsButton;
         private TriangleButton importScoresButton;
         private TriangleButton importSkinsButton;
+        private TriangleButton importCollectionsButton;
         private TriangleButton deleteBeatmapsButton;
         private TriangleButton deleteScoresButton;
         private TriangleButton deleteSkinsButton;
         private TriangleButton restoreButton;
         private TriangleButton undeleteButton;
 
-        [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, DialogOverlay dialogOverlay)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, DialogOverlay dialogOverlay)
         {
             if (beatmaps.SupportsImportFromStable)
             {
@@ -93,20 +96,46 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 });
             }
 
-            AddRange(new Drawable[]
+            Add(deleteSkinsButton = new DangerousSettingsButton
             {
-                deleteSkinsButton = new DangerousSettingsButton
+                Text = "Delete ALL skins",
+                Action = () =>
                 {
-                    Text = "Delete ALL skins",
+                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                    {
+                        deleteSkinsButton.Enabled.Value = false;
+                        Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
+                    }));
+                }
+            });
+
+            if (collectionManager != null)
+            {
+                if (collectionManager.SupportsImportFromStable)
+                {
+                    Add(importCollectionsButton = new SettingsButton
+                    {
+                        Text = "Import collections from stable",
+                        Action = () =>
+                        {
+                            importCollectionsButton.Enabled.Value = false;
+                            collectionManager.ImportFromStableAsync().ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
+                        }
+                    });
+                }
+
+                Add(new DangerousSettingsButton
+                {
+                    Text = "Delete ALL collections",
                     Action = () =>
                     {
-                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
-                        {
-                            deleteSkinsButton.Enabled.Value = false;
-                            Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
-                        }));
+                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(collectionManager.DeleteAll));
                     }
-                },
+                });
+            }
+
+            AddRange(new Drawable[]
+            {
                 restoreButton = new SettingsButton
                 {
                     Text = "Restore all hidden difficulties",

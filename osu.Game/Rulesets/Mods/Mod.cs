@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.UI;
@@ -17,6 +19,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// The base class for gameplay modifiers.
     /// </summary>
+    [ExcludeFromDynamicCompile]
     public abstract class Mod : IMod, IJsonSerializable
     {
         /// <summary>
@@ -126,7 +129,25 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
-        public virtual Mod CreateCopy() => (Mod)MemberwiseClone();
+        public virtual Mod CreateCopy()
+        {
+            var copy = (Mod)Activator.CreateInstance(GetType());
+
+            // Copy bindable values across
+            foreach (var (_, prop) in this.GetSettingsSourceProperties())
+            {
+                var origBindable = prop.GetValue(this);
+                var copyBindable = prop.GetValue(copy);
+
+                // The bindables themselves are readonly, so the value must be transferred through the Bindable<T>.Value property.
+                var valueProperty = origBindable.GetType().GetProperty(nameof(Bindable<object>.Value), BindingFlags.Public | BindingFlags.Instance);
+                Debug.Assert(valueProperty != null);
+
+                valueProperty.SetValue(copyBindable, valueProperty.GetValue(origBindable));
+            }
+
+            return copy;
+        }
 
         public bool Equals(IMod other) => GetType() == other?.GetType();
     }

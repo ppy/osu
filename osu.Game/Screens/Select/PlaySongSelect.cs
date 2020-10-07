@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select
             {
                 ValidForResume = false;
                 Edit();
-            }, Key.Number4);
+            });
 
             ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }

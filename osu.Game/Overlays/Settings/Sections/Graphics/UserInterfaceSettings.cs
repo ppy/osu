@@ -20,17 +20,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsCheckbox
                 {
                     LabelText = "Rotate cursor when dragging",
-                    Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
+                    Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Parallax",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MenuParallax)
+                    Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
                 new SettingsSlider<float, TimeSlider>
                 {
                     LabelText = "Hold-to-confirm activation time",
-                    Bindable = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
+                    Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
                     KeyboardStep = 50
                 },
             };

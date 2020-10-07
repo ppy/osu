@@ -68,16 +68,19 @@ namespace osu.Game.Screens.Edit
             toRemove.Sort();
             toAdd.Sort();
 
-            // Apply the changes.
-            for (int i = toRemove.Count - 1; i >= 0; i--)
-                editorBeatmap.RemoveAt(toRemove[i]);
-
-            if (toAdd.Count > 0)
+            editorBeatmap.ApplyBatchChanges(eb =>
             {
-                IBeatmap newBeatmap = readBeatmap(newState);
-                foreach (var i in toAdd)
-                    editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
-            }
+                // Apply the changes.
+                for (int i = toRemove.Count - 1; i >= 0; i--)
+                    eb.RemoveAt(toRemove[i]);
+
+                if (toAdd.Count > 0)
+                {
+                    IBeatmap newBeatmap = readBeatmap(newState);
+                    foreach (var i in toAdd)
+                        eb.Insert(i, newBeatmap.HitObjects[i]);
+                }
+            });
         }
 
         private string readString(byte[] state) => Encoding.UTF8.GetString(state);
@@ -107,7 +110,7 @@ namespace osu.Game.Screens.Edit
 
             protected override Texture GetBackground() => throw new NotImplementedException();
 
-            protected override Track GetTrack() => throw new NotImplementedException();
+            protected override Track GetBeatmapTrack() => throw new NotImplementedException();
         }
     }
 }

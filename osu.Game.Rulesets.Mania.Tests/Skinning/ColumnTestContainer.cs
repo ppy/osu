@@ -22,18 +22,22 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [Cached]
         private readonly Column column;
 
-        public ColumnTestContainer(int column, ManiaAction action)
+        public ColumnTestContainer(int column, ManiaAction action, bool showColumn = false)
         {
-            this.column = new Column(column)
+            InternalChildren = new[]
             {
-                Action = { Value = action },
-                AccentColour = Color4.Orange,
-                ColumnType = column % 2 == 0 ? ColumnType.Even : ColumnType.Odd
-            };
-
-            InternalChild = content = new ManiaInputManager(new ManiaRuleset().RulesetInfo, 4)
-            {
-                RelativeSizeAxes = Axes.Both
+                this.column = new Column(column)
+                {
+                    Action = { Value = action },
+                    AccentColour = Color4.Orange,
+                    ColumnType = column % 2 == 0 ? ColumnType.Even : ColumnType.Odd,
+                    Alpha = showColumn ? 1 : 0
+                },
+                content = new ManiaInputManager(new ManiaRuleset().RulesetInfo, 4)
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                this.column.TopLevelContainer.CreateProxy()
             };
         }
     }

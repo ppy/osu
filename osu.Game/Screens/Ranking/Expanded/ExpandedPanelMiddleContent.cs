@@ -25,15 +25,16 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// </summary>
     public class ExpandedPanelMiddleContent : CompositeDrawable
     {
-        private readonly ScoreInfo score;
+        private const float padding = 10;
 
+        private readonly ScoreInfo score;
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
 
         private FillFlowContainer starAndModDisplay;
-
         private RollingCounter<long> scoreCounter;
 
-        private const float padding = 10;
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelMiddleContent"/>.
@@ -64,8 +65,9 @@ namespace osu.Game.Screens.Ranking.Expanded
             };
 
             var bottomStatistics = new List<StatisticDisplay>();
-            foreach (var stat in score.SortedStatistics)
-                bottomStatistics.Add(new HitResultStatistic(stat.Key, stat.Value));
+
+            foreach (var (key, value, maxCount) in score.GetStatisticsForDisplay())
+                bottomStatistics.Add(new HitResultStatistic(key, value, maxCount));
 
             statisticDisplays.AddRange(topStatistics);
             statisticDisplays.AddRange(bottomStatistics);
@@ -238,7 +240,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                 using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY, true))
                 {
                     scoreCounter.FadeIn();
-                    scoreCounter.Current.Value = score.TotalScore;
+                    scoreCounter.Current = scoreManager.GetBindableTotalScore(score);
 
                     double delay = 0;
 

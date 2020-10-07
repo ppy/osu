@@ -6,6 +6,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
@@ -51,6 +53,15 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 case CatchSkinComponents.CatcherKiai:
                     return this.GetAnimation("fruit-catcher-kiai", true, true, true) ??
                            this.GetAnimation("fruit-ryuuta", true, true, true);
+
+                case CatchSkinComponents.CatchComboCounter:
+                    var comboFont = GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score";
+
+                    // For simplicity, let's use legacy combo font texture existence as a way to identify legacy skins from default.
+                    if (this.HasFont(comboFont))
+                        return new LegacyComboCounter(Source);
+
+                    break;
             }
 
             return null;
@@ -61,7 +72,12 @@ namespace osu.Game.Rulesets.Catch.Skinning
             switch (lookup)
             {
                 case CatchSkinColour colour:
-                    return Source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    var result = (Bindable<Color4>)Source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    if (result == null)
+                        return null;
+
+                    result.Value = LegacyColourCompatibility.DisallowZeroAlpha(result.Value);
+                    return (IBindable<TValue>)result;
             }
 
             return Source.GetConfig<TLookup, TValue>(lookup);

@@ -9,7 +9,7 @@ using osu.Game.Online.API;
 namespace osu.Game.Overlays
 {
     /// <summary>
-    /// A subview containing online content, to be displayed inside a <see cref="FullscreenOverlay"/>.
+    /// A subview containing online content, to be displayed inside a <see cref="FullscreenOverlay{T}"/>.
     /// </summary>
     /// <remarks>
     /// Automatically performs a data fetch on load.

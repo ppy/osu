@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem
+    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>
     {
         protected abstract Drawable CreateControl();
 
@@ -54,7 +54,14 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        public virtual Bindable<T> Bindable
+        [Obsolete("Use Current instead")] // Can be removed 20210406
+        public Bindable<T> Bindable
+        {
+            get => Current;
+            set => Current = value;
+        }
+
+        public virtual Bindable<T> Current
         {
             get => controlWithCurrent.Current;
             set => controlWithCurrent.Current = value;
