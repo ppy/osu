@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGame game)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game)
         {
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
@@ -174,7 +174,8 @@ namespace osu.Game.Screens.Play
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
-            isGameplay.BindTo(game.IsGameplay);
+            if (game is OsuGame osuGame)
+                isGameplay.BindTo(osuGame.IsGameplay);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
