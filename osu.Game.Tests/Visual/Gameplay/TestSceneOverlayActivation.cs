@@ -54,11 +54,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("local user playing", () => Player.LocalUserPlaying.Value);
             AddAssert("activation mode is disabled", () => Player.OverlayActivationMode == OverlayActivation.Disabled);
             AddStep("seek to break", () => Player.GameplayClockContainer.Seek(Beatmap.Value.Beatmap.Breaks.First().StartTime));
-            AddAssert("local user not playing", () => !Player.LocalUserPlaying.Value);
             AddUntilStep("activation mode is user triggered", () => Player.OverlayActivationMode == OverlayActivation.UserTriggered);
+            AddAssert("local user not playing", () => !Player.LocalUserPlaying.Value);
             AddStep("seek to break end", () => Player.GameplayClockContainer.Seek(Beatmap.Value.Beatmap.Breaks.First().EndTime));
-            AddAssert("local user playing", () => Player.LocalUserPlaying.Value);
             AddUntilStep("activation mode is disabled", () => Player.OverlayActivationMode == OverlayActivation.Disabled);
+            AddAssert("local user playing", () => Player.LocalUserPlaying.Value);
         }
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new OverlayTestPlayer();
