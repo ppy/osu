@@ -217,9 +217,6 @@ namespace osu.Game.Scoring
         {
             foreach (var r in Ruleset.CreateInstance().GetHitResults())
             {
-                if (r.result.IsBonus())
-                    continue;
-
                 int value = Statistics.GetOrDefault(r.result);
 
                 switch (r.result)
