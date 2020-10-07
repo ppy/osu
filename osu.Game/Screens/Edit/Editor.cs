@@ -484,8 +484,7 @@ namespace osu.Game.Screens.Edit
         protected void Cut()
         {
             Copy();
-            foreach (var h in editorBeatmap.SelectedHitObjects.ToArray())
-                editorBeatmap.Remove(h);
+            editorBeatmap.RemoveRange(editorBeatmap.SelectedHitObjects.ToArray());
         }
 
         protected void Copy()
