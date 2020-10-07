@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -22,6 +24,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override bool EditorComponentsReady => Editor.ChildrenOfType<SetupScreen>().SingleOrDefault()?.IsLoaded == true;
 
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         public override void SetUpSteps()
         {
             AddStep("set dummy", () => Beatmap.Value = new DummyWorkingBeatmap(Audio, null));
@@ -38,6 +43,15 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
+            AddAssert("new beatmap in database", () => beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID)?.DeletePending == false);
+        }
+
+        [Test]
+        public void TestExitWithoutSave()
+        {
+            AddStep("exit without save", () => Editor.Exit());
+            AddUntilStep("wait for exit", () => !Editor.IsCurrentScreen());
+            AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID)?.DeletePending == true);
         }
 
         [Test]
@@ -55,7 +69,7 @@ namespace osu.Game.Tests.Visual.Editing
                 using (var zip = ZipArchive.Open(temp))
                     zip.WriteToDirectory(extractedFolder);
 
-                bool success = setup.ChangeAudioTrack(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3"));
+                bool success = setup.ChildrenOfType<ResourcesSection>().First().ChangeAudioTrack(Path.Combine(extractedFolder, "03. Renatus - Soleily 192kbps.mp3"));
 
                 File.Delete(temp);
                 Directory.Delete(extractedFolder, true);

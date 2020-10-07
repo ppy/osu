@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
@@ -17,6 +19,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// Whether the first bar line of this control point is ignored.
         /// </summary>
         public readonly BindableBool OmitFirstBarLineBindable = new BindableBool();
+
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Purple;
 
         /// <summary>
         /// Whether the first bar line of this control point is ignored.

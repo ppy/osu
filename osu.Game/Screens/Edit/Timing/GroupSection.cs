@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Edit.Timing
     {
         private LabelledTextBox textBox;
 
+        private TriangleButton button;
+
         [Resolved]
         protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }
 
@@ -52,7 +54,7 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             Label = "Time"
                         },
-                        new TriangleButton
+                        button = new TriangleButton
                         {
                             Text = "Use current time",
                             RelativeSizeAxes = Axes.X,
@@ -82,18 +84,22 @@ namespace osu.Game.Screens.Edit.Timing
                 if (group.NewValue == null)
                 {
                     textBox.Text = string.Empty;
+
                     textBox.Current.Disabled = true;
+                    button.Enabled.Value = false;
                     return;
                 }
 
                 textBox.Current.Disabled = false;
+                button.Enabled.Value = true;
+
                 textBox.Text = $"{group.NewValue.Time:n0}";
             }, true);
         }
 
         private void changeSelectedGroupTime(in double time)
         {
-            if (time == SelectedGroup.Value.Time)
+            if (SelectedGroup.Value == null || time == SelectedGroup.Value.Time)
                 return;
 
             changeHandler?.BeginChange();
