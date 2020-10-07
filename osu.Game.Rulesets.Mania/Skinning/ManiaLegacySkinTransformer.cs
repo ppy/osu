@@ -130,6 +130,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         private Drawable getResult(HitResult result)
         {
+            if (!hitresult_mapping.ContainsKey(result))
+                return null;
+
             string filename = this.GetManiaSkinConfig<string>(hitresult_mapping[result])?.Value
                               ?? default_hitresult_skin_filenames[result];
 

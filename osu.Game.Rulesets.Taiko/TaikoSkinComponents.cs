@@ -16,10 +16,8 @@ namespace osu.Game.Rulesets.Taiko
         PlayfieldBackgroundRight,
         BarLine,
         TaikoExplosionMiss,
-        TaikoExplosionGood,
-        TaikoExplosionGoodStrong,
+        TaikoExplosionOk,
         TaikoExplosionGreat,
-        TaikoExplosionGreatStrong,
         Scroller,
         Mascot,
     }

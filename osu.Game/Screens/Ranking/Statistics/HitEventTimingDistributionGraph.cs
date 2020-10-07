@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="hitEvents">The <see cref="HitEvent"/>s to display the timing distribution of.</param>
         public HitEventTimingDistributionGraph(IReadOnlyList<HitEvent> hitEvents)
         {
-            this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result != HitResult.Miss).ToList();
+            this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit()).ToList();
         }
 
         [BackgroundDependencyLoader]

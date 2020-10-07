@@ -39,6 +39,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             base.ApplyToDrawableHitObjects(drawables);
         }
 
+        private double lastSliderHeadFadeOutStartTime;
+        private double lastSliderHeadFadeOutDuration;
+
         protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
         {
             if (!(drawable is DrawableOsuHitObject d))
@@ -54,7 +57,35 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             switch (drawable)
             {
+                case DrawableSliderTail sliderTail:
+                    // use stored values from head circle to achieve same fade sequence.
+                    fadeOutDuration = lastSliderHeadFadeOutDuration;
+                    fadeOutStartTime = lastSliderHeadFadeOutStartTime;
+
+                    using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
+                        sliderTail.FadeOut(fadeOutDuration);
+
+                    break;
+
+                case DrawableSliderRepeat sliderRepeat:
+                    // use stored values from head circle to achieve same fade sequence.
+                    fadeOutDuration = lastSliderHeadFadeOutDuration;
+                    fadeOutStartTime = lastSliderHeadFadeOutStartTime;
+
+                    using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
+                        // only apply to circle piece – reverse arrow is not affected by hidden.
+                        sliderRepeat.CirclePiece.FadeOut(fadeOutDuration);
+
+                    break;
+
                 case DrawableHitCircle circle:
+
+                    if (circle is DrawableSliderHead)
+                    {
+                        lastSliderHeadFadeOutDuration = fadeOutDuration;
+                        lastSliderHeadFadeOutStartTime = fadeOutStartTime;
+                    }
+
                     // we don't want to see the approach circle
                     using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
                         circle.ApproachCircle.Hide();

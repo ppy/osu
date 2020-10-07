@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             isSpinning.BindValueChanged(updateSpinningSample);
         }
 
-        private SkinnableSound spinningSample;
+        private PausableSkinnableSound spinningSample;
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
                 clone.Name = "spinnerspin";
 
-                AddInternal(spinningSample = new SkinnableSound(clone)
+                AddInternal(spinningSample = new PausableSkinnableSound(clone)
                 {
                     Volume = { Value = 0 },
                     Looping = true,
@@ -113,10 +113,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void updateSpinningSample(ValueChangedEvent<bool> tracking)
         {
-            // note that samples will not start playing if exiting a seek operation in the middle of a spinner.
-            // may be something we want to address at a later point, but not so easy to make happen right now
-            // (SkinnableSound would need to expose whether the sample is already playing and this logic would need to run in Update).
-            if (tracking.NewValue && ShouldPlaySamples)
+            if (tracking.NewValue)
             {
                 spinningSample?.Play();
                 spinningSample?.VolumeTo(1, 200);
@@ -125,6 +122,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 spinningSample?.VolumeTo(0, 200).Finally(_ => spinningSample.Stop());
             }
+        }
+
+        public override void StopAllSamples()
+        {
+            base.StopAllSamples();
+            spinningSample?.Stop();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -209,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return;
 
             // Trigger a miss result for remaining ticks to avoid infinite gameplay.
-            foreach (var tick in ticks.Where(t => !t.IsHit))
+            foreach (var tick in ticks.Where(t => !t.Result.HasResult))
                 tick.TriggerResult(false);
 
             ApplyResult(r =>
@@ -217,11 +220,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 if (Progress >= 1)
                     r.Type = HitResult.Great;
                 else if (Progress > .9)
-                    r.Type = HitResult.Good;
+                    r.Type = HitResult.Ok;
                 else if (Progress > .75)
                     r.Type = HitResult.Meh;
                 else if (Time.Current >= Spinner.EndTime)
-                    r.Type = HitResult.Miss;
+                    r.Type = r.Judgement.MinResult;
             });
         }
 
@@ -265,7 +268,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             while (wholeSpins != spins)
             {
-                var tick = ticks.FirstOrDefault(t => !t.IsHit);
+                var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
 
                 // tick may be null if we've hit the spin limit.
                 if (tick != null)

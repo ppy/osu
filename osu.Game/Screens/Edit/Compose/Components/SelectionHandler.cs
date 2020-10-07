@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -30,16 +32,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
-        public const float BORDER_RADIUS = 2;
-
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
+
+        public int SelectedCount => selectedBlueprints.Count;
 
         public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
 
         private Drawable content;
 
         private OsuSpriteText selectionDetailsText;
+
+        protected SelectionBox SelectionBox { get; private set; }
 
         [Resolved(CanBeNull = true)]
         protected EditorBeatmap EditorBeatmap { get; private set; }
@@ -59,23 +63,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            createStateBindables();
+
             InternalChild = content = new Container
             {
                 Children = new Drawable[]
                 {
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        BorderThickness = BORDER_RADIUS,
-                        BorderColour = colours.YellowDark,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            AlwaysPresent = true,
-                            Alpha = 0
-                        }
-                    },
+                    // todo: should maybe be inside the SelectionBox?
                     new Container
                     {
                         Name = "info text",
@@ -94,9 +88,37 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 Font = OsuFont.Default.With(size: 11)
                             }
                         }
-                    }
+                    },
+                    SelectionBox = CreateSelectionBox(),
                 }
             };
+        }
+
+        public SelectionBox CreateSelectionBox()
+            => new SelectionBox
+            {
+                OperationStarted = OnOperationBegan,
+                OperationEnded = OnOperationEnded,
+
+                OnRotation = angle => HandleRotation(angle),
+                OnScale = (amount, anchor) => HandleScale(amount, anchor),
+                OnFlip = direction => HandleFlip(direction),
+            };
+
+        /// <summary>
+        /// Fired when a drag operation ends from the selection box.
+        /// </summary>
+        protected virtual void OnOperationBegan()
+        {
+            ChangeHandler.BeginChange();
+        }
+
+        /// <summary>
+        /// Fired when a drag operation begins from the selection box.
+        /// </summary>
+        protected virtual void OnOperationEnded()
+        {
+            ChangeHandler.EndChange();
         }
 
         #region User Input Handling
@@ -113,7 +135,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Whether any <see cref="DrawableHitObject"/>s could be moved.
         /// Returning true will also propagate StartTime changes provided by the closest <see cref="IPositionSnapProvider.SnapScreenSpacePositionToValidTime"/>.
         /// </returns>
-        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => true;
+        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => false;
+
+        /// <summary>
+        /// Handles the selected <see cref="DrawableHitObject"/>s being rotated.
+        /// </summary>
+        /// <param name="angle">The delta angle to apply to the selection.</param>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        public virtual bool HandleRotation(float angle) => false;
+
+        /// <summary>
+        /// Handles the selected <see cref="DrawableHitObject"/>s being scaled.
+        /// </summary>
+        /// <param name="scale">The delta scale to apply, in playfield local coordinates.</param>
+        /// <param name="anchor">The point of reference where the scale is originating from.</param>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
+
+        /// <summary>
+        /// Handled the selected <see cref="DrawableHitObject"/>s being flipped.
+        /// </summary>
+        /// <param name="direction">The direction to flip</param>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        public virtual bool HandleFlip(Direction direction) => false;
 
         public bool OnPressed(PlatformAction action)
         {
@@ -195,10 +239,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void deleteSelected()
         {
             ChangeHandler?.BeginChange();
-
-            foreach (var h in selectedBlueprints.ToList())
-                EditorBeatmap?.Remove(h.HitObject);
-
+            EditorBeatmap?.RemoveRange(selectedBlueprints.Select(b => b.HitObject));
             ChangeHandler?.EndChange();
         }
 
@@ -216,9 +257,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
 
             if (count > 0)
+            {
                 Show();
+                OnSelectionChanged();
+            }
             else
                 Hide();
+        }
+
+        /// <summary>
+        /// Triggered whenever more than one object is selected, on each change.
+        /// Should update the selection box's state to match supported operations.
+        /// </summary>
+        protected virtual void OnSelectionChanged()
+        {
         }
 
         protected override void Update()
@@ -282,8 +334,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 var comboInfo = h as IHasComboInformation;
 
-                if (comboInfo == null)
-                    throw new InvalidOperationException($"Tried to change combo state of a {h.GetType()}, which doesn't implement {nameof(IHasComboInformation)}");
+                if (comboInfo == null || comboInfo.NewCombo == state) continue;
 
                 comboInfo.NewCombo = state;
                 EditorBeatmap?.UpdateHitObject(h);
@@ -308,6 +359,93 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #endregion
 
+        #region Selection State
+
+        /// <summary>
+        /// The state of "new combo" for all selected hitobjects.
+        /// </summary>
+        public readonly Bindable<TernaryState> SelectionNewComboState = new Bindable<TernaryState>();
+
+        /// <summary>
+        /// The state of each sample type for all selected hitobjects. Keys match with <see cref="HitSampleInfo"/> constant specifications.
+        /// </summary>
+        public readonly Dictionary<string, Bindable<TernaryState>> SelectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
+
+        /// <summary>
+        /// Set up ternary state bindables and bind them to selection/hitobject changes (in both directions)
+        /// </summary>
+        private void createStateBindables()
+        {
+            foreach (var sampleName in HitSampleInfo.AllAdditions)
+            {
+                var bindable = new Bindable<TernaryState>
+                {
+                    Description = sampleName.Replace("hit", string.Empty).Titleize()
+                };
+
+                bindable.ValueChanged += state =>
+                {
+                    switch (state.NewValue)
+                    {
+                        case TernaryState.False:
+                            RemoveHitSample(sampleName);
+                            break;
+
+                        case TernaryState.True:
+                            AddHitSample(sampleName);
+                            break;
+                    }
+                };
+
+                SelectionSampleStates[sampleName] = bindable;
+            }
+
+            // new combo
+            SelectionNewComboState.ValueChanged += state =>
+            {
+                switch (state.NewValue)
+                {
+                    case TernaryState.False:
+                        SetNewCombo(false);
+                        break;
+
+                    case TernaryState.True:
+                        SetNewCombo(true);
+                        break;
+                }
+            };
+
+            // bring in updates from selection changes
+            EditorBeatmap.HitObjectUpdated += _ => UpdateTernaryStates();
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) => UpdateTernaryStates();
+        }
+
+        /// <summary>
+        /// Called when context menu ternary states may need to be recalculated (selection changed or hitobject updated).
+        /// </summary>
+        protected virtual void UpdateTernaryStates()
+        {
+            SelectionNewComboState.Value = GetStateFromSelection(SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
+
+            foreach (var (sampleName, bindable) in SelectionSampleStates)
+            {
+                bindable.Value = GetStateFromSelection(SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
+            }
+        }
+
+        /// <summary>
+        /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
+        /// </summary>
+        protected TernaryState GetStateFromSelection<T>(IEnumerable<T> selection, Func<T, bool> func)
+        {
+            if (selection.Any(func))
+                return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;
+
+            return TernaryState.False;
+        }
+
+        #endregion
+
         #region Context Menu
 
         public MenuItem[] ContextMenuItems
@@ -322,7 +460,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 items.AddRange(GetContextMenuItemsForSelection(selectedBlueprints));
 
                 if (selectedBlueprints.All(b => b.HitObject is IHasComboInformation))
-                    items.Add(createNewComboMenuItem());
+                {
+                    items.Add(new TernaryStateMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } });
+                }
 
                 if (selectedBlueprints.Count == 1)
                     items.AddRange(selectedBlueprints[0].ContextMenuItems);
@@ -331,12 +471,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     new OsuMenuItem("Sound")
                     {
-                        Items = new[]
-                        {
-                            createHitSampleMenuItem("Whistle", HitSampleInfo.HIT_WHISTLE),
-                            createHitSampleMenuItem("Clap", HitSampleInfo.HIT_CLAP),
-                            createHitSampleMenuItem("Finish", HitSampleInfo.HIT_FINISH)
-                        }
+                        Items = SelectionSampleStates.Select(kvp =>
+                            new TernaryStateMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
                     },
                     new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),
                 });
@@ -352,76 +488,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>The relevant menu items.</returns>
         protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)
             => Enumerable.Empty<MenuItem>();
-
-        private MenuItem createNewComboMenuItem()
-        {
-            return new TernaryStateMenuItem("New combo", MenuItemType.Standard, setNewComboState)
-            {
-                State = { Value = getHitSampleState() }
-            };
-
-            void setNewComboState(TernaryState state)
-            {
-                switch (state)
-                {
-                    case TernaryState.False:
-                        SetNewCombo(false);
-                        break;
-
-                    case TernaryState.True:
-                        SetNewCombo(true);
-                        break;
-                }
-            }
-
-            TernaryState getHitSampleState()
-            {
-                int countExisting = selectedBlueprints.Select(b => (IHasComboInformation)b.HitObject).Count(h => h.NewCombo);
-
-                if (countExisting == 0)
-                    return TernaryState.False;
-
-                if (countExisting < SelectedHitObjects.Count())
-                    return TernaryState.Indeterminate;
-
-                return TernaryState.True;
-            }
-        }
-
-        private MenuItem createHitSampleMenuItem(string name, string sampleName)
-        {
-            return new TernaryStateMenuItem(name, MenuItemType.Standard, setHitSampleState)
-            {
-                State = { Value = getHitSampleState() }
-            };
-
-            void setHitSampleState(TernaryState state)
-            {
-                switch (state)
-                {
-                    case TernaryState.False:
-                        RemoveHitSample(sampleName);
-                        break;
-
-                    case TernaryState.True:
-                        AddHitSample(sampleName);
-                        break;
-                }
-            }
-
-            TernaryState getHitSampleState()
-            {
-                int countExisting = SelectedHitObjects.Count(h => h.Samples.Any(s => s.Name == sampleName));
-
-                if (countExisting == 0)
-                    return TernaryState.False;
-
-                if (countExisting < SelectedHitObjects.Count())
-                    return TernaryState.Indeterminate;
-
-                return TernaryState.True;
-            }
-        }
 
         #endregion
     }
