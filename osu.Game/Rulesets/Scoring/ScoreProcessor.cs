@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Scoring
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return getBonusScore(statistics) + (accuracyRatio * maxCombo * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
+                    return getBonusScore(statistics) + (accuracyRatio * Math.Max(1, maxCombo) * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
             }
         }
 
@@ -267,12 +267,6 @@ namespace osu.Game.Rulesets.Scoring
             {
                 maxHighestCombo = HighestCombo.Value;
                 maxBaseScore = baseScore;
-
-                if (maxBaseScore == 0 || maxHighestCombo == 0)
-                {
-                    Mode.Value = ScoringMode.Classic;
-                    Mode.Disabled = true;
-                }
             }
 
             baseScore = 0;
