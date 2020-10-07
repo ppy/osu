@@ -666,6 +666,9 @@ namespace osu.Game.Screens.Play
         {
             screenSuspension?.Expire();
 
+            // Ensure we reset the LocalUserPlaying state
+            localUserPlaying.Value = false;
+
             fadeOut();
             base.OnSuspending(next);
         }
