@@ -52,6 +52,7 @@ namespace osu.Game.Screens.Edit.Setup
                             {
                                 new ResourcesSection(),
                                 new MetadataSection(),
+                                new DifficultySection(),
                             }
                         },
                     }
