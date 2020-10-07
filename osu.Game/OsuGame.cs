@@ -90,8 +90,6 @@ namespace osu.Game
 
         private IdleTracker idleTracker;
 
-        private ConfineMouseTracker confineMouseTracker;
-
         /// <summary>
         /// Whether overlays should be able to be opened game-wide. Value is sourced from the current active screen.
         /// </summary>
@@ -585,7 +583,7 @@ namespace osu.Game
                 leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker,
-                confineMouseTracker = new ConfineMouseTracker()
+                new ConfineMouseTracker()
             });
 
             ScreenStack.ScreenPushed += screenPushed;
