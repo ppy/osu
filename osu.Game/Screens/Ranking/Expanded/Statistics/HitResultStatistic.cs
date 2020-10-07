@@ -10,18 +10,18 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
     public class HitResultStatistic : CounterStatistic
     {
-        private readonly HitResult result;
+        public readonly HitResult Result;
 
         public HitResultStatistic(HitResultDisplayStatistic result)
             : base(result.DisplayName, result.Count, result.MaxCount)
         {
-            this.result = result.Result;
+            Result = result.Result;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            HeaderText.Colour = colours.ForHitResult(result);
+            HeaderText.Colour = colours.ForHitResult(Result);
         }
     }
 }
