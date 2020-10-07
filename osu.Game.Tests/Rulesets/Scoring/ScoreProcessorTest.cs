@@ -135,6 +135,17 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
         }
 
+        [Test]
+        public void TestEmptyBeatmap(
+            [Values(ScoringMode.Standardised, ScoringMode.Classic)]
+            ScoringMode scoringMode)
+        {
+            scoreProcessor.Mode.Value = scoringMode;
+            scoreProcessor.ApplyBeatmap(new TestBeatmap(new RulesetInfo()));
+
+            Assert.IsTrue(Precision.AlmostEquals(0, scoreProcessor.TotalScore.Value));
+        }
+
         [TestCase(HitResult.IgnoreHit, HitResult.IgnoreMiss)]
         [TestCase(HitResult.Meh, HitResult.Miss)]
         [TestCase(HitResult.Ok, HitResult.Miss)]
