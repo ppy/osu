@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.Utils;
+using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -69,14 +69,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
 
-        protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
+        protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
             int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new FastRandom(seed);
 
-            return base.ConvertBeatmap(original);
+            return base.ConvertBeatmap(original, cancellationToken);
         }
 
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             return beatmap;
         }
 
-        protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
+        protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
         {
             if (original is ManiaHitObject maniaOriginal)
             {
@@ -167,8 +167,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                     var positionData = original as IHasPosition;
 
-                    for (double time = original.StartTime; !Precision.DefinitelyBigger(time, generator.EndTime); time += generator.SegmentDuration)
+                    for (int i = 0; i <= generator.SpanCount; i++)
                     {
+                        double time = original.StartTime + generator.SegmentDuration * i;
+
                         recordNote(time, positionData?.Position ?? Vector2.Zero);
                         computeDensity(time);
                     }

@@ -72,6 +72,9 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         public override Replay Generate()
         {
+            if (Beatmap.HitObjects.Count == 0)
+                return Replay;
+
             buttonIndex = 0;
 
             AddFrameToReplay(new OsuReplayFrame(-100000, new Vector2(256, 500)));
@@ -134,13 +137,13 @@ namespace osu.Game.Rulesets.Osu.Replays
                 if (!(h is Spinner))
                     AddFrameToReplay(new OsuReplayFrame(h.StartTime - hitWindows.WindowFor(HitResult.Meh), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
-            else if (h.StartTime - hitWindows.WindowFor(HitResult.Good) > endTime + hitWindows.WindowFor(HitResult.Good) + 50)
+            else if (h.StartTime - hitWindows.WindowFor(HitResult.Ok) > endTime + hitWindows.WindowFor(HitResult.Ok) + 50)
             {
                 if (!(prev is Spinner) && h.StartTime - endTime < 1000)
-                    AddFrameToReplay(new OsuReplayFrame(endTime + hitWindows.WindowFor(HitResult.Good), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
+                    AddFrameToReplay(new OsuReplayFrame(endTime + hitWindows.WindowFor(HitResult.Ok), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
 
                 if (!(h is Spinner))
-                    AddFrameToReplay(new OsuReplayFrame(h.StartTime - hitWindows.WindowFor(HitResult.Good), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
+                    AddFrameToReplay(new OsuReplayFrame(h.StartTime - hitWindows.WindowFor(HitResult.Ok), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
         }
 
@@ -154,8 +157,12 @@ namespace osu.Game.Rulesets.Osu.Replays
             // The startPosition for the slider should not be its .Position, but the point on the circle whose tangent crosses the current cursor position
             // We also modify spinnerDirection so it spins in the direction it enters the spin circle, to make a smooth transition.
             // TODO: Shouldn't the spinner always spin in the same direction?
-            if (h is Spinner)
+            if (h is Spinner spinner)
             {
+                // spinners with 0 spins required will auto-complete - don't bother
+                if (spinner.SpinsRequired == 0)
+                    return;
+
                 calcSpinnerStartPosAndDirection(((OsuReplayFrame)Frames[^1]).Position, out startPosition, out spinnerDirection);
 
                 Vector2 spinCentreOffset = SPINNER_CENTRE - ((OsuReplayFrame)Frames[^1]).Position;

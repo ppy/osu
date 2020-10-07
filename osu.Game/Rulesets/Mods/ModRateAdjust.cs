@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Audio;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -12,12 +12,12 @@ namespace osu.Game.Rulesets.Mods
     {
         public abstract BindableNumber<double> SpeedChange { get; }
 
-        public virtual void ApplyToTrack(Track track)
+        public virtual void ApplyToTrack(ITrack track)
         {
             track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
         }
 
-        public virtual void ApplyToSample(SampleChannel sample)
+        public virtual void ApplyToSample(DrawableSample sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }

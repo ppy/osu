@@ -839,7 +839,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = id * 10,
-                        Path = "normal.osu",
                         Version = "Normal",
                         StarDifficulty = 2,
                         BaseDifficulty = new BeatmapDifficulty
@@ -850,7 +849,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = id * 10 + 1,
-                        Path = "hard.osu",
                         Version = "Hard",
                         StarDifficulty = 5,
                         BaseDifficulty = new BeatmapDifficulty
@@ -861,7 +859,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = id * 10 + 2,
-                        Path = "insane.osu",
                         Version = "Insane",
                         StarDifficulty = 6,
                         BaseDifficulty = new BeatmapDifficulty

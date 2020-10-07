@@ -9,6 +9,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
@@ -205,12 +206,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                         X = result.IsHit ? judgedObject.Position.X : 0,
                     });
 
-                    if (!result.IsHit)
-                        break;
-
                     var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
-
-                    addExplosion(judgedObject, type);
+                    addExplosion(judgedObject, result.Type, type);
                     break;
             }
         }
@@ -218,9 +215,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private void addDrumRollHit(DrawableDrumRollTick drawableTick) =>
             drumRollHitContainer.Add(new DrawableFlyingHit(drawableTick));
 
-        private void addExplosion(DrawableHitObject drawableObject, HitType type)
+        private void addExplosion(DrawableHitObject drawableObject, HitResult result, HitType type)
         {
-            hitExplosionContainer.Add(new HitExplosion(drawableObject));
+            hitExplosionContainer.Add(new HitExplosion(drawableObject, result));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }

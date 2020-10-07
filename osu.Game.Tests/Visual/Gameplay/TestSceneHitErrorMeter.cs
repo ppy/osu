@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Children = new[]
                 {
                     new OsuSpriteText { Text = $@"Great: {hitWindows?.WindowFor(HitResult.Great)}" },
-                    new OsuSpriteText { Text = $@"Good: {hitWindows?.WindowFor(HitResult.Good)}" },
+                    new OsuSpriteText { Text = $@"Good: {hitWindows?.WindowFor(HitResult.Ok)}" },
                     new OsuSpriteText { Text = $@"Meh: {hitWindows?.WindowFor(HitResult.Meh)}" },
                 }
             });
