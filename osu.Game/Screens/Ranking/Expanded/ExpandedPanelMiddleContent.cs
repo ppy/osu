@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                 new CounterStatistic("pp", (int)(score.PP ?? 0)),
             };
 
-            var bottomStatistics = new List<StatisticDisplay>();
+            var bottomStatistics = new List<HitResultStatistic>();
 
             foreach (var result in score.GetStatisticsForDisplay())
                 bottomStatistics.Add(new HitResultStatistic(result));
@@ -198,7 +198,17 @@ namespace osu.Game.Screens.Ranking.Expanded
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Content = new[] { bottomStatistics.Cast<Drawable>().ToArray() },
+                                Content = new[] { bottomStatistics.Where(s => s.Result <= HitResult.Perfect).ToArray() },
+                                RowDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize),
+                                }
+                            },
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Content = new[] { bottomStatistics.Where(s => s.Result > HitResult.Perfect).ToArray() },
                                 RowDimensions = new[]
                                 {
                                     new Dimension(GridSizeMode.AutoSize),
