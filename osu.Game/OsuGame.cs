@@ -98,9 +98,9 @@ namespace osu.Game
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         /// <summary>
-        /// Whether gameplay is currently active.
+        /// Whether the local user is currently interacting with the game in a way that should not be interrupted.
         /// </summary>
-        public readonly Bindable<bool> IsGameplay = new BindableBool();
+        public readonly Bindable<bool> LocalUserPlaying = new BindableBool();
 
         protected OsuScreenStack ScreenStack;
 
