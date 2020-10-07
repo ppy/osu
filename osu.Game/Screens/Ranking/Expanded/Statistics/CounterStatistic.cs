@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
-                Child = Counter = new Counter
+                Child = Counter = new StatisticCounter
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
