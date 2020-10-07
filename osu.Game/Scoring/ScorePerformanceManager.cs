@@ -18,9 +18,6 @@ namespace osu.Game.Scoring
         private readonly ConcurrentDictionary<PerformanceCacheLookup, double> performanceCache = new ConcurrentDictionary<PerformanceCacheLookup, double>();
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
-
-        [Resolved]
         private BeatmapDifficultyManager difficultyManager { get; set; }
 
         /// <summary>
@@ -45,14 +42,13 @@ namespace osu.Game.Scoring
 
         private async Task<double> computePerformanceAsync(ScoreInfo score, PerformanceCacheLookup lookupKey, CancellationToken token = default)
         {
-            var beatmap = beatmapManager.GetWorkingBeatmap(score.Beatmap);
             var attributes = await difficultyManager.GetDifficultyAsync(score.Beatmap, score.Ruleset, score.Mods, token);
 
             if (token.IsCancellationRequested)
                 return default;
 
-            var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(beatmap, score, attributes.Attributes);
-            var total = calculator.Calculate();
+            var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(attributes.Attributes, score);
+            var total = calculator?.Calculate() ?? default;
 
             performanceCache[lookupKey] = total;
 
