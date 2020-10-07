@@ -133,13 +133,12 @@ namespace osu.Game.Graphics.Backgrounds
         private void UpdateFreq()
         {
             float[] sum = b.Value?.Track.CurrentAmplitudes.FrequencyAmplitudes.ToArray() ?? new float[256];
-            float totalSum = 1;
+            float totalSum = 0.25f;
             bool IsKiai = b.Value?.Beatmap.ControlPointInfo.EffectPointAt(b.Value?.Track?.CurrentTime ?? 0).KiaiMode ?? false;
 
             sum.ForEach(a => totalSum += a);
 
-            if (IsKiai) totalSum *= 1.2f;
-            else totalSum *= 1.5f;
+            if (IsKiai) totalSum *= 1.5f;
 
             ExtraY = totalSum;
         }

@@ -471,7 +471,8 @@ namespace osu.Game.Screens
                         loadingSpinner.Show();
                         break;
                 }
-            });
+            }, true);
+
             sbLoader.storyboardReplacesBackground.BindValueChanged(_ => ApplyBackgroundBrightness());
             inputManager = GetContainingInputManager();
 
@@ -523,8 +524,6 @@ namespace osu.Game.Screens
             //非背景层的动画
             gameplayContent.ScaleTo(0f).Then().ScaleTo(1f, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, DURATION, Easing.OutQuint);
-
-            loadingSpinner.Show();
         }
 
         public override bool OnExiting(IScreen next)
@@ -534,8 +533,7 @@ namespace osu.Game.Screens
             Track.Looping = false;
 
             //停止beatmapLogo，取消故事版家在任务以及锁定变更
-            beatmapLogo.Clock = new DecoupleableInterpolatingFramedClock();
-            ((beatmapLogo.Clock as DecoupleableInterpolatingFramedClock)).Stop();
+            beatmapLogo.StopResponseOnBeatmapChanges();
             sbLoader.CancelAllTasks();
             lockChanges.Value = true;
 
