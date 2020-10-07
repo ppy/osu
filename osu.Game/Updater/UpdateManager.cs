@@ -61,6 +61,9 @@ namespace osu.Game.Updater
 
         public async Task<bool> CheckForUpdateAsync()
         {
+            if (!CanCheckForUpdate)
+                return false;
+
             Task<bool> waitTask;
 
             lock (updateTaskLock)
