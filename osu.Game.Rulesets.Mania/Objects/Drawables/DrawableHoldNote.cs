@@ -239,11 +239,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             if (Tail.AllJudged)
             {
-                ApplyResult(r => r.Type = HitResult.Perfect);
+                ApplyResult(r => r.Type = r.Judgement.MaxResult);
                 endHold();
             }
 
-            if (Tail.Result.Type == HitResult.Miss)
+            if (Tail.Judged && !Tail.IsHit)
                 HasBroken = true;
         }
 

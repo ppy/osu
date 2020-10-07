@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap, this);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score, DifficultyAttributes attributes = null) => new ManiaPerformanceCalculator(this, beatmap, score, attributes);
+        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new ManiaPerformanceCalculator(this, attributes, score);
 
         public const string SHORT_NAME = "mania";
 

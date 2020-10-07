@@ -8,31 +8,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
 {
     public class CatchBananaJudgement : CatchJudgement
     {
-        public override bool AffectsCombo => false;
-
-        protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-
-                case HitResult.Perfect:
-                    return 1100;
-            }
-        }
-
-        protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-
-                case HitResult.Perfect:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.75;
-            }
-        }
+        public override HitResult MaxResult => HitResult.LargeBonus;
 
         public override bool ShouldExplodeFor(JudgementResult result) => true;
     }

@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -106,9 +108,14 @@ namespace osu.Game.Tests.Gameplay
                 Beatmap.Value = new TestCustomSkinWorkingBeatmap(new OsuRuleset().RulesetInfo, Audio);
                 SelectedMods.Value = new[] { testedMod };
 
-                Add(gameplayContainer = new GameplayClockContainer(Beatmap.Value, 0));
+                var beatmapSkinSourceContainer = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
 
-                gameplayContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
+                Add(gameplayContainer = new GameplayClockContainer(Beatmap.Value, 0)
+                {
+                    Child = beatmapSkinSourceContainer
+                });
+
+                beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
                     Clock = gameplayContainer.GameplayClock
                 });
@@ -116,7 +123,7 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("start", () => gameplayContainer.Start());
 
-            AddAssert("sample playback rate matches mod rates", () => sample.Channel.AggregateFrequency.Value == expectedRate);
+            AddAssert("sample playback rate matches mod rates", () => sample.ChildrenOfType<DrawableSample>().First().AggregateFrequency.Value == expectedRate);
         }
 
         private class TestSkin : LegacySkin
@@ -168,8 +175,6 @@ namespace osu.Game.Tests.Gameplay
                 : base(sampleInfo)
             {
             }
-
-            public new SampleChannel Channel => base.Channel;
         }
     }
 }

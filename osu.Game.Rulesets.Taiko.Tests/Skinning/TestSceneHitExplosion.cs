@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning
@@ -18,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public void TestNormalHit()
         {
             AddStep("Great", () => SetContents(() => getContentFor(createHit(HitResult.Great))));
-            AddStep("Good", () => SetContents(() => getContentFor(createHit(HitResult.Good))));
+            AddStep("Ok", () => SetContents(() => getContentFor(createHit(HitResult.Ok))));
             AddStep("Miss", () => SetContents(() => getContentFor(createHit(HitResult.Miss))));
         }
 
@@ -26,18 +25,20 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public void TestStrongHit([Values(false, true)] bool hitBoth)
         {
             AddStep("Great", () => SetContents(() => getContentFor(createStrongHit(HitResult.Great, hitBoth))));
-            AddStep("Good", () => SetContents(() => getContentFor(createStrongHit(HitResult.Good, hitBoth))));
+            AddStep("Good", () => SetContents(() => getContentFor(createStrongHit(HitResult.Ok, hitBoth))));
         }
 
-        private Drawable getContentFor(DrawableTaikoHitObject hit)
+        private Drawable getContentFor(DrawableTestHit hit)
         {
             return new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    hit,
-                    new HitExplosion(hit)
+                    // the hit needs to be added to hierarchy in order for nested objects to be created correctly.
+                    // setting zero alpha is supposed to prevent the test from looking broken.
+                    hit.With(h => h.Alpha = 0),
+                    new HitExplosion(hit, hit.Type)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -46,9 +47,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             };
         }
 
-        private DrawableTaikoHitObject createHit(HitResult type) => new DrawableTestHit(new Hit { StartTime = Time.Current }, type);
+        private DrawableTestHit createHit(HitResult type) => new DrawableTestHit(new Hit { StartTime = Time.Current }, type);
 
-        private DrawableTaikoHitObject createStrongHit(HitResult type, bool hitBoth)
-            => new DrawableTestStrongHit(Time.Current, type, hitBoth);
+        private DrawableTestHit createStrongHit(HitResult type, bool hitBoth) => new DrawableTestStrongHit(Time.Current, type, hitBoth);
     }
 }

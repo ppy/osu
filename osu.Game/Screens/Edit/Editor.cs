@@ -43,6 +43,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
+    [Cached]
     public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider
     {
         public override float BackgroundParallaxAmount => 0.1f;
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.Edit
         private string lastSavedHash;
 
         private Box bottomBackground;
-        private Container screenContainer;
+        private Container<EditorScreen> screenContainer;
 
         private EditorScreen currentScreen;
 
@@ -83,6 +84,8 @@ namespace osu.Game.Screens.Edit
 
         private DependencyContainer dependencies;
 
+        private bool isNewBeatmap;
+
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -91,6 +94,9 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private MusicController music { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host)
         {
@@ -98,17 +104,16 @@ namespace osu.Game.Screens.Edit
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
-            var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
-            clock.ChangeSource(sourceClock);
+
+            UpdateClockSource();
 
             dependencies.CacheAs(clock);
+            dependencies.CacheAs<ISamplePlaybackDisabler>(clock);
             AddInternal(clock);
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
-
-            bool isNewBeatmap = false;
 
             if (Beatmap.Value is DummyWorkingBeatmap)
             {
@@ -163,7 +168,7 @@ namespace osu.Game.Screens.Edit
                         Name = "Screen container",
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = 40, Bottom = 60 },
-                        Child = screenContainer = new Container
+                        Child = screenContainer = new Container<EditorScreen>
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true
@@ -271,8 +276,20 @@ namespace osu.Game.Screens.Edit
             bottomBackground.Colour = colours.Gray2;
         }
 
+        /// <summary>
+        /// If the beatmap's track has changed, this method must be called to keep the editor in a valid state.
+        /// </summary>
+        public void UpdateClockSource()
+        {
+            var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
+            clock.ChangeSource(sourceClock);
+        }
+
         protected void Save()
         {
+            // no longer new after first user-triggered save.
+            isNewBeatmap = false;
+
             // apply any set-level metadata changes.
             beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
 
@@ -421,10 +438,20 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed && dialogOverlay != null && HasUnsavedChanges && !(dialogOverlay.CurrentDialog is PromptForSaveDialog))
+            if (!exitConfirmed)
             {
-                dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
-                return true;
+                // if the confirm dialog is already showing (or we can't show it, ie. in tests) exit without save.
+                if (dialogOverlay == null || dialogOverlay.CurrentDialog is PromptForSaveDialog)
+                {
+                    confirmExit();
+                    return true;
+                }
+
+                if (isNewBeatmap || HasUnsavedChanges)
+                {
+                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                    return true;
+                }
             }
 
             Background.FadeColour(Color4.White, 500);
@@ -442,6 +469,12 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExit()
         {
+            if (isNewBeatmap)
+            {
+                // confirming exit without save means we should delete the new beatmap completely.
+                beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
+            }
+
             exitConfirmed = true;
             this.Exit();
         }
@@ -451,8 +484,7 @@ namespace osu.Game.Screens.Edit
         protected void Cut()
         {
             Copy();
-            foreach (var h in editorBeatmap.SelectedHitObjects.ToArray())
-                editorBeatmap.Remove(h);
+            editorBeatmap.RemoveRange(editorBeatmap.SelectedHitObjects.ToArray());
         }
 
         protected void Copy()
@@ -512,7 +544,21 @@ namespace osu.Game.Screens.Edit
 
         private void onModeChanged(ValueChangedEvent<EditorScreenMode> e)
         {
-            currentScreen?.Exit();
+            var lastScreen = currentScreen;
+
+            lastScreen?
+                .ScaleTo(0.98f, 200, Easing.OutQuint)
+                .FadeOut(200, Easing.OutQuint);
+
+            if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
+            {
+                screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
+
+                currentScreen
+                    .ScaleTo(1, 200, Easing.OutQuint)
+                    .FadeIn(200, Easing.OutQuint);
+                return;
+            }
 
             switch (e.NewValue)
             {
@@ -542,7 +588,7 @@ namespace osu.Game.Screens.Edit
 
         private void seek(UIEvent e, int direction)
         {
-            double amount = e.ShiftPressed ? 2 : 1;
+            double amount = e.ShiftPressed ? 4 : 1;
 
             if (direction < 1)
                 clock.SeekBackward(!clock.IsRunning, amount);

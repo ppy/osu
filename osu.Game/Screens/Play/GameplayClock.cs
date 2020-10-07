@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Play
 {
@@ -14,11 +17,18 @@ namespace osu.Game.Screens.Play
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
-    public class GameplayClock : IFrameBasedClock
+    public class GameplayClock : IFrameBasedClock, ISamplePlaybackDisabler
     {
         private readonly IFrameBasedClock underlyingClock;
 
         public readonly BindableBool IsPaused = new BindableBool();
+
+        /// <summary>
+        /// All adjustments applied to this clock which don't come from gameplay or mods.
+        /// </summary>
+        public virtual IEnumerable<Bindable<double>> NonGameplayAdjustments => Enumerable.Empty<Bindable<double>>();
+
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         public GameplayClock(IFrameBasedClock underlyingClock)
         {
@@ -29,16 +39,40 @@ namespace osu.Game.Screens.Play
 
         public double Rate => underlyingClock.Rate;
 
+        /// <summary>
+        /// The rate of gameplay when playback is at 100%.
+        /// This excludes any seeking / user adjustments.
+        /// </summary>
+        public double TrueGameplayRate
+        {
+            get
+            {
+                double baseRate = Rate;
+
+                foreach (var adjustment in NonGameplayAdjustments)
+                {
+                    if (Precision.AlmostEquals(adjustment.Value, 0))
+                        return 0;
+
+                    baseRate /= adjustment.Value;
+                }
+
+                return baseRate;
+            }
+        }
+
         public bool IsRunning => underlyingClock.IsRunning;
 
         /// <summary>
-        /// Whether an ongoing seek operation is active.
+        /// Whether nested samples supporting the <see cref="ISamplePlaybackDisabler"/> interface should be paused.
         /// </summary>
-        public virtual bool IsSeeking => false;
+        protected virtual bool ShouldDisableSamplePlayback => IsPaused.Value;
 
         public void ProcessFrame()
         {
-            // we do not want to process the underlying clock.
+            // intentionally not updating the underlying clock (handled externally).
+
+            samplePlaybackDisabled.Value = ShouldDisableSamplePlayback;
         }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
@@ -48,5 +82,7 @@ namespace osu.Game.Screens.Play
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
         public IClock Source => underlyingClock;
+
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
     }
 }
