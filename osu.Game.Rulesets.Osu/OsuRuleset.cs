@@ -191,6 +191,41 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
+        protected override IEnumerable<HitResult> GetValidHitResults()
+        {
+            return new[]
+            {
+                HitResult.Great,
+                HitResult.Ok,
+                HitResult.Meh,
+
+                HitResult.LargeTickHit,
+                HitResult.SmallTickHit,
+                HitResult.SmallBonus,
+                HitResult.LargeBonus,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LargeTickHit:
+                    return "slider tick";
+
+                case HitResult.SmallTickHit:
+                    return "slider end";
+
+                case HitResult.SmallBonus:
+                    return "spinner spin";
+
+                case HitResult.LargeBonus:
+                    return "spinner bonus";
+            }
+
+            return base.GetDisplayNameForHitResult(result);
+        }
+
         public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
         {
             var timedHitEvents = score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
