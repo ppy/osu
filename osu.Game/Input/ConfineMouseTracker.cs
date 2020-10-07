@@ -12,24 +12,24 @@ namespace osu.Game.Input
 {
     /// <summary>
     /// Connects <see cref="OsuSetting.ConfineMouseMode"/> with <see cref="FrameworkSetting.ConfineMouseMode"/>.
-    /// If <see cref="OsuGame.IsGameplay"/> is true, we should also confine the mouse cursor if it has been
+    /// If <see cref="OsuGame.LocalUserPlaying"/> is true, we should also confine the mouse cursor if it has been
     /// requested with <see cref="OsuConfineMouseMode.DuringGameplay"/>.
     /// </summary>
     public class ConfineMouseTracker : Component
     {
         private Bindable<ConfineMouseMode> frameworkConfineMode;
         private Bindable<OsuConfineMouseMode> osuConfineMode;
-        private IBindable<bool> isGameplay;
+        private IBindable<bool> localUserPlaying;
 
         [BackgroundDependencyLoader]
         private void load(OsuGame game, FrameworkConfigManager frameworkConfigManager, OsuConfigManager osuConfigManager)
         {
             frameworkConfineMode = frameworkConfigManager.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode);
             osuConfineMode = osuConfigManager.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode);
-            isGameplay = game.IsGameplay.GetBoundCopy();
+            localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
 
             osuConfineMode.ValueChanged += _ => updateConfineMode();
-            isGameplay.BindValueChanged(_ => updateConfineMode(), true);
+            localUserPlaying.BindValueChanged(_ => updateConfineMode(), true);
         }
 
         private void updateConfineMode()
@@ -49,7 +49,7 @@ namespace osu.Game.Input
                     break;
 
                 case OsuConfineMouseMode.DuringGameplay:
-                    frameworkConfineMode.Value = isGameplay.Value ? ConfineMouseMode.Always : ConfineMouseMode.Never;
+                    frameworkConfineMode.Value = localUserPlaying.Value ? ConfineMouseMode.Always : ConfineMouseMode.Never;
                     break;
 
                 case OsuConfineMouseMode.Always:
