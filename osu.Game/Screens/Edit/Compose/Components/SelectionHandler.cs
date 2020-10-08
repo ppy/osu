@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handles the selected <see cref="DrawableHitObject"/>s being rotated.
         /// </summary>
         /// <param name="angle">The delta angle to apply to the selection.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be rotated.</returns>
         public virtual bool HandleRotation(float angle) => false;
 
         /// <summary>
@@ -149,14 +149,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="scale">The delta scale to apply, in playfield local coordinates.</param>
         /// <param name="anchor">The point of reference where the scale is originating from.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be scaled.</returns>
         public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
 
         /// <summary>
-        /// Handled the selected <see cref="DrawableHitObject"/>s being flipped.
+        /// Handles the selected <see cref="DrawableHitObject"/>s being flipped.
         /// </summary>
         /// <param name="direction">The direction to flip</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be flipped.</returns>
         public virtual bool HandleFlip(Direction direction) => false;
 
         public bool OnPressed(PlatformAction action)
