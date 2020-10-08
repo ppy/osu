@@ -141,6 +141,7 @@ namespace osu.Game.Screens.Edit
                 beatmapProcessor?.PostProcess();
 
                 HitObjectAdded?.Invoke(hitObject);
+                SaveState();
             }
         }
 
@@ -222,6 +223,7 @@ namespace osu.Game.Screens.Edit
                 beatmapProcessor?.PostProcess();
 
                 HitObjectRemoved?.Invoke(hitObject);
+                SaveState();
             }
         }
 
