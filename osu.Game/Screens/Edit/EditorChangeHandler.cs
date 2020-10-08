@@ -53,21 +53,15 @@ namespace osu.Game.Screens.Edit
         {
             this.editorBeatmap = editorBeatmap;
 
-            editorBeatmap.HitObjectAdded += hitObjectAdded;
-            editorBeatmap.HitObjectRemoved += hitObjectRemoved;
-            editorBeatmap.HitObjectUpdated += hitObjectUpdated;
+            editorBeatmap.TransactionBegan += BeginChange;
+            editorBeatmap.TransactionEnded += EndChange;
+            editorBeatmap.SaveStateTriggered += SaveState;
 
             patcher = new LegacyEditorBeatmapPatcher(editorBeatmap);
 
             // Initial state.
             SaveState();
         }
-
-        private void hitObjectAdded(HitObject obj) => SaveState();
-
-        private void hitObjectRemoved(HitObject obj) => SaveState();
-
-        private void hitObjectUpdated(HitObject obj) => SaveState();
 
         protected override void UpdateState()
         {
