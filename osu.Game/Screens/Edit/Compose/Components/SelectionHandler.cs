@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public int SelectedCount => selectedBlueprints.Count;
 
-        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
+        public IEnumerable<HitObject> SelectedHitObjects => EditorBeatmap.SelectedHitObjects;
 
         private Drawable content;
 
