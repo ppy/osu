@@ -237,13 +237,19 @@ namespace osu.Game.Screens.Edit
 
             beatmapProcessor?.PostProcess();
 
-            foreach (var h in batchPendingDeletes) HitObjectRemoved?.Invoke(h);
-            foreach (var h in batchPendingInserts) HitObjectAdded?.Invoke(h);
-            foreach (var h in batchPendingUpdates) HitObjectUpdated?.Invoke(h);
-
+            // callbacks may modify the lists so let's be safe about it
+            var deletes = batchPendingDeletes.ToArray();
             batchPendingDeletes.Clear();
+
+            var inserts = batchPendingInserts.ToArray();
             batchPendingInserts.Clear();
+
+            var updates = batchPendingUpdates.ToArray();
             batchPendingUpdates.Clear();
+
+            foreach (var h in deletes) HitObjectRemoved?.Invoke(h);
+            foreach (var h in inserts) HitObjectAdded?.Invoke(h);
+            foreach (var h in updates) HitObjectUpdated?.Invoke(h);
         }
 
         /// <summary>
