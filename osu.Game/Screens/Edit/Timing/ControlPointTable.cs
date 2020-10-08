@@ -113,7 +113,6 @@ namespace osu.Game.Screens.Edit.Timing
                 };
 
                 controlPoints = group.ControlPoints.GetBoundCopy();
-                controlPoints.CollectionChanged += (_, __) => createChildren();
             }
 
             [Resolved]
@@ -123,6 +122,12 @@ namespace osu.Game.Screens.Edit.Timing
             private void load()
             {
                 createChildren();
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                controlPoints.CollectionChanged += (_, __) => createChildren();
             }
 
             private void createChildren()

@@ -11,5 +11,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SpeedStrain;
         public double ApproachRate;
         public double OverallDifficulty;
+        public int HitCircleCount;
     }
 }

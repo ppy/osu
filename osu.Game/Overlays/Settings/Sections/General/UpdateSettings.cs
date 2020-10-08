@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
                 LabelText = "Release stream",
-                Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
+                Current = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
             });
 
             if (updateManager?.CanCheckForUpdate == true)
