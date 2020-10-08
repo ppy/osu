@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Scoring
 {
@@ -57,34 +56,21 @@ namespace osu.Game.Scoring
 
         public readonly struct PerformanceCacheLookup
         {
-            public readonly double Accuracy;
-            public readonly int BeatmapId;
-            public readonly long TotalScore;
-            public readonly int Combo;
-            public readonly Mod[] Mods;
-            public readonly int RulesetId;
+            public readonly string ScoreHash;
+            public readonly int LocalId;
 
             public PerformanceCacheLookup(ScoreInfo info)
             {
-                Accuracy = info.Accuracy;
-                BeatmapId = info.Beatmap.ID;
-                TotalScore = info.TotalScore;
-                Combo = info.Combo;
-                Mods = info.Mods;
-                RulesetId = info.Ruleset.ID ?? 0;
+                ScoreHash = info.Hash;
+                LocalId = info.ID;
             }
 
             public override int GetHashCode()
             {
                 var hash = new HashCode();
 
-                hash.Add(Accuracy);
-                hash.Add(BeatmapId);
-                hash.Add(TotalScore);
-                hash.Add(Combo);
-                hash.Add(RulesetId);
-                foreach (var mod in Mods)
-                    hash.Add(mod);
+                hash.Add(ScoreHash);
+                hash.Add(LocalId);
 
                 return hash.ToHashCode();
             }
