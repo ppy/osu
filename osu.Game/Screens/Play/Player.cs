@@ -666,8 +666,6 @@ namespace osu.Game.Screens.Play
         {
             screenSuspension?.Expire();
 
-            LocalUserPlaying.Value = false;
-
             fadeOut();
             base.OnSuspending(next);
         }
@@ -696,8 +694,6 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer?.StopUsingBeatmapClock();
 
             musicController.ResetTrackAdjustments();
-
-            LocalUserPlaying.Value = false;
 
             fadeOut();
             return base.OnExiting(next);

@@ -957,6 +957,9 @@ namespace osu.Game
                     break;
             }
 
+            // reset on screen change for sanity.
+            LocalUserPlaying.Value = false;
+
             if (current is IOsuScreen currentOsuScreen)
                 OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
 
