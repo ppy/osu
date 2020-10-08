@@ -103,6 +103,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OnRotation = angle => HandleRotation(angle),
                 OnScale = (amount, anchor) => HandleScale(amount, anchor),
                 OnFlip = direction => HandleFlip(direction),
+                OnReverse = () => HandleReverse(),
             };
 
         /// <summary>
