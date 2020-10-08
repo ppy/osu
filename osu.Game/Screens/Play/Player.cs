@@ -666,7 +666,6 @@ namespace osu.Game.Screens.Play
         {
             screenSuspension?.Expire();
 
-            // Ensure we reset the LocalUserPlaying state
             LocalUserPlaying.Value = false;
 
             fadeOut();
@@ -698,7 +697,6 @@ namespace osu.Game.Screens.Play
 
             musicController.ResetTrackAdjustments();
 
-            // Ensure we reset the LocalUserPlaying state
             LocalUserPlaying.Value = false;
 
             fadeOut();
