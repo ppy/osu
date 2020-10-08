@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Catch
                     return "small droplet";
 
                 case HitResult.LargeBonus:
-                    return "bananas";
+                    return "banana";
             }
 
             return base.GetDisplayNameForHitResult(result);
