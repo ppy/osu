@@ -15,14 +15,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class DifficultyPointPiece : CompositeDrawable
     {
-        private readonly DifficultyControlPoint difficultyPoint;
+        public readonly DifficultyControlPoint DifficultyPoint;
 
         private OsuSpriteText speedMultiplierText;
         private readonly BindableNumber<double> speedMultiplier;
 
         public DifficultyPointPiece(DifficultyControlPoint difficultyPoint)
         {
-            this.difficultyPoint = difficultyPoint;
+            DifficultyPoint = difficultyPoint;
             speedMultiplier = difficultyPoint.SpeedMultiplierBindable.GetBoundCopy();
         }
 
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
-            Color4 colour = difficultyPoint.GetRepresentingColour(colours);
+            Color4 colour = DifficultyPoint.GetRepresentingColour(colours);
 
             InternalChildren = new Drawable[]
             {

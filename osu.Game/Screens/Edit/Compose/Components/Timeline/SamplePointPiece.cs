@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class SamplePointPiece : CompositeDrawable
     {
-        private readonly SampleControlPoint samplePoint;
+        public readonly SampleControlPoint SamplePoint;
 
         private readonly Bindable<string> bank;
         private readonly BindableNumber<int> volume;
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public SamplePointPiece(SampleControlPoint samplePoint)
         {
-            this.samplePoint = samplePoint;
+            SamplePoint = samplePoint;
             volume = samplePoint.SampleVolumeBindable.GetBoundCopy();
             bank = samplePoint.SampleBankBindable.GetBoundCopy();
         }
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
 
-            Color4 colour = samplePoint.GetRepresentingColour(colours);
+            Color4 colour = SamplePoint.GetRepresentingColour(colours);
 
             InternalChildren = new Drawable[]
             {

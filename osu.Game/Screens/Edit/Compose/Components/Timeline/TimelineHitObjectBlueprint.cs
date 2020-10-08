@@ -195,6 +195,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
+        private DifficultyPointPiece difficultyOverrideDisplay;
+        private SamplePointPiece sampleOverrideDisplay;
+
         protected override void Update()
         {
             base.Update();
@@ -209,6 +212,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // kind of haphazard but yeah, no bindables.
                 if (HitObject is IHasRepeats repeats)
                     updateRepeats(repeats);
+            }
+
+            if (HitObject.LocalDifficultyControlPoint != difficultyOverrideDisplay?.DifficultyPoint)
+            {
+                difficultyOverrideDisplay?.Expire();
+                if (HitObject.LocalDifficultyControlPoint != null)
+                    AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(HitObject.LocalDifficultyControlPoint));
+            }
+
+            if (HitObject.LocalSampleControlPoint != sampleOverrideDisplay?.SamplePoint)
+            {
+                sampleOverrideDisplay?.Expire();
+                if (HitObject.LocalSampleControlPoint != null)
+                    AddInternal(sampleOverrideDisplay = new SamplePointPiece(HitObject.LocalSampleControlPoint));
             }
         }
 
