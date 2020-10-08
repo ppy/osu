@@ -42,7 +42,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         private double lastSliderHeadFadeOutStartTime;
         private double lastSliderHeadFadeOutDuration;
 
-        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
+        protected override void ApplyFirstObjectIncreaseVisibilityState(DrawableHitObject drawable, ArmedState state) => applyState(drawable, true);
+
+        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state) => applyState(drawable, false);
+
+        private void applyState(DrawableHitObject drawable, bool increaseVisibility)
         {
             if (!(drawable is DrawableOsuHitObject d))
                 return;
@@ -86,9 +90,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                         lastSliderHeadFadeOutStartTime = fadeOutStartTime;
                     }
 
-                    // we don't want to see the approach circle
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
-                        circle.ApproachCircle.Hide();
+                    if (!increaseVisibility)
+                    {
+                        // we don't want to see the approach circle
+                        using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                            circle.ApproachCircle.Hide();
+                    }
 
                     // fade out immediately after fade in.
                     using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
