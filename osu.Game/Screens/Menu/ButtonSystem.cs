@@ -46,6 +46,7 @@ namespace osu.Game.Screens.Menu
         public Action OnChart;
         public Action OnBeatmapListing;
         public Action OnMvisButton;
+        public Action OnImportButton;
         public Action OnMfMenuButton;
 
         public const float BUTTON_WIDTH = 140f;
@@ -137,6 +138,7 @@ namespace osu.Game.Screens.Menu
         {
             buttonsCustom.Add(new Button(@"关于Mf-osu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnMfMenuButton?.Invoke(), WEDGE_WIDTH));
             buttonsCustom.Add(new Button(@"Mvis播放器", @"button-generic-select", FontAwesome.Solid.QuoteLeft, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
+            buttonsCustom.Add(new Button(@"文件导入", @"button-generic-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
 
             buttonsPlay.Add(new Button(@"单人游戏", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));

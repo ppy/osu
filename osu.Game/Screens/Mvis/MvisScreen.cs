@@ -27,7 +27,6 @@ using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Storyboard;
 using osu.Game.Input;
-using osu.Framework.Timing;
 using osu.Framework.Audio;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics.Audio;
