@@ -335,7 +335,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (comboInfo == null || comboInfo.NewCombo == state) continue;
 
                 comboInfo.NewCombo = state;
-                EditorBeatmap?.UpdateHitObject(h);
+                EditorBeatmap?.Update(h);
             }
 
             EditorBeatmap?.EndChange();

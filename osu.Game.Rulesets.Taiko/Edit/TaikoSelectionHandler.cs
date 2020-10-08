@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
                 if (h.IsStrong != state)
                 {
                     h.IsStrong = state;
-                    EditorBeatmap.UpdateHitObject(h);
+                    EditorBeatmap.Update(h);
                 }
             }
 

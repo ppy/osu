@@ -88,6 +88,12 @@ namespace osu.Game.Screens.Edit
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
 
+        private readonly List<HitObject> batchPendingInserts = new List<HitObject>();
+
+        private readonly List<HitObject> batchPendingDeletes = new List<HitObject>();
+
+        private readonly HashSet<HitObject> batchPendingUpdates = new HashSet<HitObject>();
+
         /// <summary>
         /// Adds a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
         /// </summary>
@@ -142,10 +148,19 @@ namespace osu.Game.Screens.Edit
         /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
-        public void UpdateHitObject([NotNull] HitObject hitObject)
+        public void Update([NotNull] HitObject hitObject)
         {
             // updates are debounced regardless of whether a batch is active.
             batchPendingUpdates.Add(hitObject);
+        }
+
+        /// <summary>
+        /// Update all hit objects with potentially changed difficulty or control point data.
+        /// </summary>
+        public void UpdateAllHitObjects()
+        {
+            foreach (var h in HitObjects)
+                batchPendingUpdates.Add(h);
         }
 
         /// <summary>
@@ -210,12 +225,6 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        private readonly List<HitObject> batchPendingInserts = new List<HitObject>();
-
-        private readonly List<HitObject> batchPendingDeletes = new List<HitObject>();
-
-        private readonly HashSet<HitObject> batchPendingUpdates = new HashSet<HitObject>();
-
         protected override void Update()
         {
             base.Update();
@@ -270,7 +279,7 @@ namespace osu.Game.Screens.Edit
                 var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
                 mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
-                UpdateHitObject(hitObject);
+                Update(hitObject);
             };
         }
 
@@ -296,14 +305,5 @@ namespace osu.Game.Screens.Edit
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
         public int BeatDivisor => beatDivisor?.Value ?? 1;
-
-        /// <summary>
-        /// Update all hit objects with potentially changed difficulty or control point data.
-        /// </summary>
-        public void UpdateAllHitObjects()
-        {
-            foreach (var h in HitObjects)
-                batchPendingUpdates.Add(h);
-        }
     }
 }
