@@ -131,18 +131,9 @@ namespace osu.Game.Screens.Edit
 
             mutableHitObjects.Insert(index, hitObject);
 
-            if (TransactionActive)
-                batchPendingInserts.Add(hitObject);
-            else
-            {
-                // must be run after any change to hitobject ordering
-                beatmapProcessor?.PreProcess();
-                processHitObject(hitObject);
-                beatmapProcessor?.PostProcess();
-
-                HitObjectAdded?.Invoke(hitObject);
-                SaveState();
-            }
+            BeginChange();
+            batchPendingInserts.Add(hitObject);
+            EndChange();
         }
 
         /// <summary>
@@ -213,18 +204,9 @@ namespace osu.Game.Screens.Edit
             bindable.UnbindAll();
             startTimeBindables.Remove(hitObject);
 
-            if (TransactionActive)
-                batchPendingDeletes.Add(hitObject);
-            else
-            {
-                // must be run after any change to hitobject ordering
-                beatmapProcessor?.PreProcess();
-                processHitObject(hitObject);
-                beatmapProcessor?.PostProcess();
-
-                HitObjectRemoved?.Invoke(hitObject);
-                SaveState();
-            }
+            BeginChange();
+            batchPendingDeletes.Add(hitObject);
+            EndChange();
         }
 
         protected override void Update()
