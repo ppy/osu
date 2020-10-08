@@ -159,6 +159,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether any <see cref="DrawableHitObject"/>s could be flipped.</returns>
         public virtual bool HandleFlip(Direction direction) => false;
 
+        /// <summary>
+        /// Handles the selected <see cref="DrawableHitObject"/>s being reversed pattern-wise.
+        /// </summary>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be reversed.</returns>
+        public virtual bool HandleReverse() => false;
+
         public bool OnPressed(PlatformAction action)
         {
             switch (action.ActionMethod)
