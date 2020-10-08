@@ -39,11 +39,13 @@ namespace osu.Game.Rulesets.Mods
         {
             if (IncreaseFirstObjectVisibility.Value)
             {
+                drawables = drawables.SkipWhile(h => !IsFirstHideableObject(h));
+
                 var firstObject = drawables.FirstOrDefault();
                 if (firstObject != null)
                     firstObject.ApplyCustomUpdateState += ApplyFirstObjectIncreaseVisibilityState;
 
-                drawables = drawables.SkipWhile(h => !IsFirstHideableObject(h)).Skip(1);
+                drawables = drawables.Skip(1);
             }
 
             foreach (var dho in drawables)
