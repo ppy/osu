@@ -167,6 +167,8 @@ namespace osu.Game.Rulesets.Taiko
                 HitResult.Ok,
 
                 HitResult.SmallTickHit,
+
+                HitResult.SmallBonus,
             };
         }
 
@@ -176,6 +178,9 @@ namespace osu.Game.Rulesets.Taiko
             {
                 case HitResult.SmallTickHit:
                     return "drum tick";
+
+                case HitResult.SmallBonus:
+                    return "strong bonus";
             }
 
             return base.GetDisplayNameForHitResult(result);
