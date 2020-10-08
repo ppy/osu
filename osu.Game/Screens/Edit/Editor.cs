@@ -509,14 +509,14 @@ namespace osu.Game.Screens.Edit
             foreach (var h in objects)
                 h.StartTime += timeOffset;
 
-            changeHandler.BeginChange();
+            editorBeatmap.BeginChange();
 
             editorBeatmap.SelectedHitObjects.Clear();
 
             editorBeatmap.AddRange(objects);
             editorBeatmap.SelectedHitObjects.AddRange(objects);
 
-            changeHandler.EndChange();
+            editorBeatmap.EndChange();
         }
 
         protected void Undo() => changeHandler.RestoreState(-1);
