@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -194,6 +195,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
+        private DifficultyPointPiece difficultyOverrideDisplay;
+        private SamplePointPiece sampleOverrideDisplay;
+
         protected override void Update()
         {
             base.Update();
@@ -208,6 +212,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // kind of haphazard but yeah, no bindables.
                 if (HitObject is IHasRepeats repeats)
                     updateRepeats(repeats);
+            }
+
+            if (HitObject.LocalDifficultyControlPoint != difficultyOverrideDisplay?.DifficultyPoint)
+            {
+                difficultyOverrideDisplay?.Expire();
+                if (HitObject.LocalDifficultyControlPoint != null)
+                    AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(HitObject.LocalDifficultyControlPoint));
+            }
+
+            if (HitObject.LocalSampleControlPoint != sampleOverrideDisplay?.SamplePoint)
+            {
+                sampleOverrideDisplay?.Expire();
+                if (HitObject.LocalSampleControlPoint != null)
+                    AddInternal(sampleOverrideDisplay = new SamplePointPiece(HitObject.LocalSampleControlPoint));
             }
         }
 
@@ -373,6 +391,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 return true;
             }
 
+            [Resolved]
+            private EditorBeatmap editorBeatmap { get; set; }
+
             protected override void OnDrag(DragEvent e)
             {
                 base.OnDrag(e);
@@ -384,14 +405,35 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     switch (hitObject)
                     {
                         case IHasRepeats repeatHitObject:
-                            // find the number of repeats which can fit in the requested time.
-                            var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
-                            var proposedCount = Math.Max(0, (int)Math.Round((time - hitObject.StartTime) / lengthOfOneRepeat) - 1);
+                            double proposedDuration = time - hitObject.StartTime;
 
-                            if (proposedCount == repeatHitObject.RepeatCount)
-                                return;
+                            if (e.CurrentState.Keyboard.ShiftPressed)
+                            {
+                                var closestGlobalDifficulty = editorBeatmap.ControlPointInfo.DifficultyPointAt(hitObject.StartTime);
 
-                            repeatHitObject.RepeatCount = proposedCount;
+                                // if we don't have a local difficulty point yet, create one from the closest entry in the global list.
+                                var localDifficulty = hitObject.LocalDifficultyControlPoint ??= new DifficultyControlPoint
+                                {
+                                    SpeedMultiplier = closestGlobalDifficulty.SpeedMultiplier
+                                };
+
+                                localDifficulty.SpeedMultiplier *= (repeatHitObject.Duration / proposedDuration);
+
+                                if (closestGlobalDifficulty.IsRedundant(localDifficulty))
+                                    hitObject.LocalDifficultyControlPoint = null;
+                            }
+                            else
+                            {
+                                // find the number of repeats which can fit in the requested time.
+                                var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
+                                var proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
+
+                                if (proposedCount == repeatHitObject.RepeatCount)
+                                    return;
+
+                                repeatHitObject.RepeatCount = proposedCount;
+                            }
+
                             break;
 
                         case IHasDuration endTimeHitObject:
