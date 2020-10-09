@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             int minColumn = int.MaxValue;
             int maxColumn = int.MinValue;
 
-            foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
+            foreach (var obj in EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>())
             {
                 if (obj.Column < minColumn)
                     minColumn = obj.Column;
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             columnDelta = Math.Clamp(columnDelta, -minColumn, maniaPlayfield.TotalColumns - 1 - maxColumn);
 
-            foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
+            foreach (var obj in EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>())
                 obj.Column += columnDelta;
         }
     }
