@@ -12,6 +12,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
     /// </summary>
     public class PointVisualisation : Box
     {
+        public const float WIDTH = 1;
+
         public PointVisualisation(double startTime)
             : this()
         {
@@ -25,8 +27,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
             RelativePositionAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
 
-            Width = 1;
-            EdgeSmoothness = new Vector2(1, 0);
+            Width = WIDTH;
+            EdgeSmoothness = new Vector2(WIDTH, 0);
         }
     }
 }
