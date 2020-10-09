@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
         public void SetStrongState(bool state)
         {
-            var hits = SelectedHitObjects.OfType<Hit>();
+            var hits = EditorBeatmap.SelectedHitObjects.OfType<Hit>();
 
             ChangeHandler.BeginChange();
 
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
         public void SetRimState(bool state)
         {
-            var hits = SelectedHitObjects.OfType<Hit>();
+            var hits = EditorBeatmap.SelectedHitObjects.OfType<Hit>();
 
             ChangeHandler.BeginChange();
 
@@ -93,8 +93,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
         {
             base.UpdateTernaryStates();
 
-            selectionRimState.Value = GetStateFromSelection(SelectedHitObjects.OfType<Hit>(), h => h.Type == HitType.Rim);
-            selectionStrongState.Value = GetStateFromSelection(SelectedHitObjects.OfType<TaikoHitObject>(), h => h.IsStrong);
+            selectionRimState.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects.OfType<Hit>(), h => h.Type == HitType.Rim);
+            selectionStrongState.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects.OfType<TaikoHitObject>(), h => h.IsStrong);
         }
     }
 }
