@@ -41,7 +41,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             beatDivisor.BindValueChanged(_ => tickCache.Invalidate());
         }
 
+        /// <summary>
+        /// The visible time/position range of the timeline.
+        /// </summary>
         private (float min, float max) visibleRange = (float.MinValue, float.MaxValue);
+
+        /// <summary>
+        /// The next time/position value to the left of the display when tick regeneration needs to be run.
+        /// </summary>
+        private float? nextMinTick;
+
+        /// <summary>
+        /// The next time/position value to the right of the display when tick regeneration needs to be run.
+        /// </summary>
+        private float? nextMaxTick;
 
         [Resolved(canBeNull: true)]
         private Timeline timeline { get; set; }
@@ -57,9 +70,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X / DrawWidth * Content.RelativeChildSize.X);
 
                 if (visibleRange != newRange)
-                    tickCache.Invalidate();
+                {
+                    visibleRange = newRange;
 
-                visibleRange = newRange;
+                    // actual regeneration only needs to occur if we've passed one of the known next min/max tick boundaries.
+                    if (nextMinTick == null || nextMaxTick == null || (visibleRange.min < nextMinTick || visibleRange.max > nextMaxTick))
+                        tickCache.Invalidate();
+                }
             }
 
             if (!tickCache.IsValid)
@@ -69,6 +86,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void createTicks()
         {
             int drawableIndex = 0;
+            int highestDivisor = BindableBeatDivisor.VALID_DIVISORS.Last();
+
+            nextMinTick = null;
+            nextMaxTick = null;
 
             for (var i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
             {
@@ -79,40 +100,39 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 for (double t = point.Time; t < until; t += point.BeatLength / beatDivisor.Value)
                 {
-                    if (t >= visibleRange.min && t <= visibleRange.max)
+                    float xPos = (float)t;
+
+                    if (t < visibleRange.min)
+                        nextMinTick = xPos;
+                    else if (t > visibleRange.max)
+                        nextMaxTick ??= xPos;
+                    else
                     {
+                        // if this is the first beat in the beatmap, there is no next min tick
+                        if (beat == 0 && i == 0)
+                            nextMinTick = float.MinValue;
+
                         var indexInBeat = beat % beatDivisor.Value;
 
-                        if (indexInBeat == 0)
-                        {
-                            var downbeatPoint = getNextUsablePoint();
-                            downbeatPoint.X = (float)t;
+                        var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
+                        var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
 
-                            downbeatPoint.Colour = BindableBeatDivisor.GetColourFor(1, colours);
-                            downbeatPoint.Anchor = Anchor.TopLeft;
-                            downbeatPoint.Origin = Anchor.TopCentre;
-                            downbeatPoint.Height = 1;
-                        }
-                        else
-                        {
-                            var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
-                            var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
-                            var height = 0.1f - (float)divisor / BindableBeatDivisor.VALID_DIVISORS.Last() * 0.08f;
+                        // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.
+                        var height = indexInBeat == 0 ? 0.5f : 0.1f - (float)divisor / highestDivisor * 0.08f;
 
-                            var topPoint = getNextUsablePoint();
-                            topPoint.X = (float)t;
-                            topPoint.Colour = colour;
-                            topPoint.Height = height;
-                            topPoint.Anchor = Anchor.TopLeft;
-                            topPoint.Origin = Anchor.TopCentre;
+                        var topPoint = getNextUsablePoint();
+                        topPoint.X = xPos;
+                        topPoint.Colour = colour;
+                        topPoint.Height = height;
+                        topPoint.Anchor = Anchor.TopLeft;
+                        topPoint.Origin = Anchor.TopCentre;
 
-                            var bottomPoint = getNextUsablePoint();
-                            bottomPoint.X = (float)t;
-                            bottomPoint.Colour = colour;
-                            bottomPoint.Anchor = Anchor.BottomLeft;
-                            bottomPoint.Origin = Anchor.BottomCentre;
-                            bottomPoint.Height = height;
-                        }
+                        var bottomPoint = getNextUsablePoint();
+                        bottomPoint.X = xPos;
+                        bottomPoint.Colour = colour;
+                        bottomPoint.Anchor = Anchor.BottomLeft;
+                        bottomPoint.Origin = Anchor.BottomCentre;
+                        bottomPoint.Height = height;
                     }
 
                     beat++;
@@ -137,8 +157,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (drawableIndex >= Count)
                     Add(point = new PointVisualisation());
                 else
-                    point = Children[drawableIndex++];
+                    point = Children[drawableIndex];
 
+                drawableIndex++;
                 point.Show();
 
                 return point;
