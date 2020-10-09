@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the panel when contracted.
         /// </summary>
-        private const float contracted_height = 355;
+        private const float contracted_height = 385;
 
         /// <summary>
         /// Width of the panel when expanded.
