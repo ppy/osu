@@ -89,6 +89,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
                 yield return new TernaryStateMenuItem("Strong") { State = { BindTarget = selectionStrongState } };
         }
 
+        public override bool HandleMovement(MoveSelectionEvent moveEvent) => true;
+
         protected override void UpdateTernaryStates()
         {
             base.UpdateTernaryStates();
