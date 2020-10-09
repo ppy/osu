@@ -43,6 +43,10 @@ namespace osu.Game.Scoring
         {
             var attributes = await difficultyManager.GetDifficultyAsync(score.Beatmap, score.Ruleset, score.Mods, token);
 
+            // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
+            if (attributes.Attributes == null)
+                return default;
+
             if (token.IsCancellationRequested)
                 return default;
 
