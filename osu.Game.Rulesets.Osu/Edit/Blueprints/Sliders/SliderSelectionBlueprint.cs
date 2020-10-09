@@ -24,10 +24,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
     public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
-        protected SliderBodyPiece BodyPiece;
-        protected SliderCircleSelectionBlueprint HeadBlueprint;
-        protected SliderCircleSelectionBlueprint TailBlueprint;
-        protected PathControlPointVisualiser ControlPointVisualiser;
+        protected SliderBodyPiece BodyPiece { get; private set; }
+        protected SliderCircleSelectionBlueprint HeadBlueprint { get; private set; }
+        protected SliderCircleSelectionBlueprint TailBlueprint { get; private set; }
+        protected PathControlPointVisualiser ControlPointVisualiser { get; private set; }
 
         private readonly DrawableSlider slider;
 
