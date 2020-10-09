@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -32,6 +33,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.Both;
         }
 
+        private readonly Cached tickCache = new Cached();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            beatDivisor.BindValueChanged(_ => tickCache.Invalidate());
+        }
+
+        private (float min, float max) visibleRange = (float.MinValue, float.MaxValue);
+
         [Resolved(canBeNull: true)]
         private Timeline timeline { get; set; }
 
@@ -39,16 +50,25 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.Update();
 
-            int drawableIndex = 0;
-
-            double minVisibleTime = double.MinValue;
-            double maxVisibleTime = double.MaxValue;
-
             if (timeline != null)
             {
-                minVisibleTime = ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X / DrawWidth * Content.RelativeChildSize.X;
-                maxVisibleTime = ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X / DrawWidth * Content.RelativeChildSize.X;
+                var newRange = (
+                    ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X / DrawWidth * Content.RelativeChildSize.X,
+                    ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X / DrawWidth * Content.RelativeChildSize.X);
+
+                if (visibleRange != newRange)
+                    tickCache.Invalidate();
+
+                visibleRange = newRange;
             }
+
+            if (!tickCache.IsValid)
+                createTicks();
+        }
+
+        private void createTicks()
+        {
+            int drawableIndex = 0;
 
             for (var i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
             {
@@ -59,7 +79,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 for (double t = point.Time; t < until; t += point.BeatLength / beatDivisor.Value)
                 {
-                    if (t >= minVisibleTime && t <= maxVisibleTime)
+                    if (t >= visibleRange.min && t <= visibleRange.max)
                     {
                         var indexInBeat = beat % beatDivisor.Value;
 
@@ -108,6 +128,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // expire any excess
             while (drawableIndex < Count)
                 Children[drawableIndex++].Expire();
+
+            tickCache.Validate();
 
             Drawable getNextUsablePoint()
             {
