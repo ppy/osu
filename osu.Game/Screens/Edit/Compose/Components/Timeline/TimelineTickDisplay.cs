@@ -112,13 +112,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         if (beat == 0 && i == 0)
                             nextMinTick = float.MinValue;
 
-                        var indexInBeat = beat % beatDivisor.Value;
+                        var indexInBar = beat % ((int)point.TimeSignature * beatDivisor.Value);
 
                         var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
                         var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
 
                         // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.
-                        var height = indexInBeat == 0 ? 0.5f : 0.1f - (float)divisor / highestDivisor * 0.08f;
+                        var height = indexInBar == 0 ? 0.5f : 0.1f - (float)divisor / highestDivisor * 0.08f;
 
                         var topPoint = getNextUsablePoint();
                         topPoint.X = xPos;
