@@ -37,15 +37,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public int SelectedCount => selectedBlueprints.Count;
 
-        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
-
         private Drawable content;
 
         private OsuSpriteText selectionDetailsText;
 
         protected SelectionBox SelectionBox { get; private set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
 
         [Resolved(CanBeNull = true)]
@@ -103,6 +101,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OnRotation = angle => HandleRotation(angle),
                 OnScale = (amount, anchor) => HandleScale(amount, anchor),
                 OnFlip = direction => HandleFlip(direction),
+                OnReverse = () => HandleReverse(),
             };
 
         /// <summary>
@@ -141,7 +140,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handles the selected <see cref="DrawableHitObject"/>s being rotated.
         /// </summary>
         /// <param name="angle">The delta angle to apply to the selection.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be rotated.</returns>
         public virtual bool HandleRotation(float angle) => false;
 
         /// <summary>
@@ -149,15 +148,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="scale">The delta scale to apply, in playfield local coordinates.</param>
         /// <param name="anchor">The point of reference where the scale is originating from.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be scaled.</returns>
         public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
 
         /// <summary>
-        /// Handled the selected <see cref="DrawableHitObject"/>s being flipped.
+        /// Handles the selected <see cref="DrawableHitObject"/>s being flipped.
         /// </summary>
         /// <param name="direction">The direction to flip</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be moved.</returns>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be flipped.</returns>
         public virtual bool HandleFlip(Direction direction) => false;
+
+        /// <summary>
+        /// Handles the selected <see cref="DrawableHitObject"/>s being reversed pattern-wise.
+        /// </summary>
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be reversed.</returns>
+        public virtual bool HandleReverse() => false;
 
         public bool OnPressed(PlatformAction action)
         {
@@ -238,12 +243,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void deleteSelected()
         {
-            ChangeHandler?.BeginChange();
-
-            foreach (var h in selectedBlueprints.ToList())
-                EditorBeatmap?.Remove(h.HitObject);
-
-            ChangeHandler?.EndChange();
+            EditorBeatmap.RemoveRange(selectedBlueprints.Select(b => b.HitObject));
         }
 
         #endregion
@@ -310,9 +310,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
-            ChangeHandler?.BeginChange();
+            EditorBeatmap.BeginChange();
 
-            foreach (var h in SelectedHitObjects)
+            foreach (var h in EditorBeatmap.SelectedHitObjects)
             {
                 // Make sure there isn't already an existing sample
                 if (h.Samples.Any(s => s.Name == sampleName))
@@ -321,7 +321,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 h.Samples.Add(new HitSampleInfo { Name = sampleName });
             }
 
-            ChangeHandler?.EndChange();
+            EditorBeatmap.EndChange();
         }
 
         /// <summary>
@@ -331,19 +331,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <exception cref="InvalidOperationException">Throws if any selected object doesn't implement <see cref="IHasComboInformation"/></exception>
         public void SetNewCombo(bool state)
         {
-            ChangeHandler?.BeginChange();
+            EditorBeatmap.BeginChange();
 
-            foreach (var h in SelectedHitObjects)
+            foreach (var h in EditorBeatmap.SelectedHitObjects)
             {
                 var comboInfo = h as IHasComboInformation;
 
                 if (comboInfo == null || comboInfo.NewCombo == state) continue;
 
                 comboInfo.NewCombo = state;
-                EditorBeatmap?.UpdateHitObject(h);
+                EditorBeatmap.Update(h);
             }
 
-            ChangeHandler?.EndChange();
+            EditorBeatmap.EndChange();
         }
 
         /// <summary>
@@ -352,12 +352,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
-            ChangeHandler?.BeginChange();
+            EditorBeatmap.BeginChange();
 
-            foreach (var h in SelectedHitObjects)
+            foreach (var h in EditorBeatmap.SelectedHitObjects)
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
 
-            ChangeHandler?.EndChange();
+            EditorBeatmap.EndChange();
         }
 
         #endregion
@@ -428,11 +428,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void UpdateTernaryStates()
         {
-            SelectionNewComboState.Value = GetStateFromSelection(SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
+            SelectionNewComboState.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
 
             foreach (var (sampleName, bindable) in SelectionSampleStates)
             {
-                bindable.Value = GetStateFromSelection(SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
+                bindable.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
             }
         }
 

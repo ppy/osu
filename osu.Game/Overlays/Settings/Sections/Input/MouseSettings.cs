@@ -6,9 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -47,10 +47,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = "将光标绝对映射至窗口中",
                     Current = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
                 },
-                new SettingsEnumDropdown<ConfineMouseMode>
+                new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
-                    LabelText = "光标边界",
-                    Current = config.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode),
+                    LabelText = "光标边界( 将光标限制在窗口中 )",
+                    Current = osuConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode)
                 },
                 new SettingsCheckbox
                 {

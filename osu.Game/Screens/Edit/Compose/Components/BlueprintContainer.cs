@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // handle positional change etc.
                 foreach (var obj in selectedHitObjects)
-                    Beatmap.UpdateHitObject(obj);
+                    Beatmap.Update(obj);
 
                 changeHandler?.EndChange();
                 isDraggingBlueprint = false;
@@ -436,8 +436,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // Apply the start time at the newly snapped-to position
                 double offset = result.Time.Value - draggedObject.StartTime;
-                foreach (HitObject obj in SelectionHandler.SelectedHitObjects)
+
+                foreach (HitObject obj in Beatmap.SelectedHitObjects)
+                {
                     obj.StartTime += offset;
+                    Beatmap.Update(obj);
+                }
             }
 
             return true;
