@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -238,6 +239,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private readonly string displayName;
 
             protected FillFlowContainer Flow;
+            private Box flashBox;
 
             protected DisplayPiece(string displayName = null)
             {
@@ -266,6 +268,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Margin = new MarginPadding { Vertical = 2, Horizontal = 5 },
                         Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(5),
+                    },
+                    flashBox = new Box
+                    {
+                        Colour = Color4.White.Opacity(0.1f),
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
                     }
                 };
 
@@ -292,6 +300,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected abstract string FallbackName { get; }
 
             protected abstract IconUsage? Icon { get; }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                flashBox.FadeIn(300, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                flashBox.FadeOut(300, Easing.OutQuint);
+                base.OnHoverLost(e);
+            }
         }
     }
 }
