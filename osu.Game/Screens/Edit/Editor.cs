@@ -469,10 +469,17 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExit()
         {
+            // stop the track if playing to allow the parent screen to choose a suitable playback mode.
+            Beatmap.Value.Track.Stop();
+
             if (isNewBeatmap)
             {
                 // confirming exit without save means we should delete the new beatmap completely.
                 beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
+
+                // in theory this shouldn't be required but due to EF core not sharing instance states 100%
+                // MusicController is unaware of the changed DeletePending state.
+                Beatmap.SetDefault();
             }
 
             exitConfirmed = true;
@@ -484,8 +491,7 @@ namespace osu.Game.Screens.Edit
         protected void Cut()
         {
             Copy();
-            foreach (var h in editorBeatmap.SelectedHitObjects.ToArray())
-                editorBeatmap.Remove(h);
+            editorBeatmap.RemoveRange(editorBeatmap.SelectedHitObjects.ToArray());
         }
 
         protected void Copy()
@@ -510,14 +516,14 @@ namespace osu.Game.Screens.Edit
             foreach (var h in objects)
                 h.StartTime += timeOffset;
 
-            changeHandler.BeginChange();
+            editorBeatmap.BeginChange();
 
             editorBeatmap.SelectedHitObjects.Clear();
 
             editorBeatmap.AddRange(objects);
             editorBeatmap.SelectedHitObjects.AddRange(objects);
 
-            changeHandler.EndChange();
+            editorBeatmap.EndChange();
         }
 
         protected void Undo() => changeHandler.RestoreState(-1);

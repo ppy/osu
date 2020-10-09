@@ -19,6 +19,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Import;
 
 namespace osu.Game.Screens.Menu
 {
@@ -107,6 +108,7 @@ namespace osu.Game.Screens.Menu
                             },
                             OnSolo = onSolo,
                             OnMvisButton = onMvis,
+                            OnImportButton = onImport,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = confirmAndExit,
                         }
@@ -172,6 +174,8 @@ namespace osu.Game.Screens.Menu
         private void onSolo() => this.Push(consumeSongSelect());
 
         private void onMvis() => this.Push(consumeMvis());
+
+        private void onImport() => this.Push(new FileImportScreen());
 
         private Screen consumeSongSelect()
         {

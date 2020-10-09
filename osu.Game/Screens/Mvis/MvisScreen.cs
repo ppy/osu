@@ -27,7 +27,6 @@ using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Storyboard;
 using osu.Game.Input;
-using osu.Framework.Timing;
 using osu.Framework.Audio;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics.Audio;
@@ -249,7 +248,7 @@ namespace osu.Game.Screens
                                                                         //隐藏界面，锁定更改并隐藏锁定按钮
                                                                         lockChanges.Value = false;
                                                                         HideOverlays();
-                                                                        if ( sidebarContainer.Alpha != 0 )
+                                                                        if ( sidebarToggleButton.ToggleableValue.Value )
                                                                             sidebarToggleButton.Click();
 
                                                                         //防止手机端无法退出桌面背景模式
@@ -471,7 +470,8 @@ namespace osu.Game.Screens
                         loadingSpinner.Show();
                         break;
                 }
-            });
+            }, true);
+
             sbLoader.storyboardReplacesBackground.BindValueChanged(_ => ApplyBackgroundBrightness());
             inputManager = GetContainingInputManager();
 
@@ -523,8 +523,6 @@ namespace osu.Game.Screens
             //非背景层的动画
             gameplayContent.ScaleTo(0f).Then().ScaleTo(1f, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, DURATION, Easing.OutQuint);
-
-            loadingSpinner.Show();
         }
 
         public override bool OnExiting(IScreen next)
@@ -534,8 +532,7 @@ namespace osu.Game.Screens
             Track.Looping = false;
 
             //停止beatmapLogo，取消故事版家在任务以及锁定变更
-            beatmapLogo.Clock = new DecoupleableInterpolatingFramedClock();
-            ((beatmapLogo.Clock as DecoupleableInterpolatingFramedClock)).Stop();
+            beatmapLogo.StopResponseOnBeatmapChanges();
             sbLoader.CancelAllTasks();
             lockChanges.Value = true;
 

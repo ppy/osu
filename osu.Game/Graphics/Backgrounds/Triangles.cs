@@ -18,6 +18,7 @@ using osu.Framework.Lists;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Beatmaps;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -129,23 +130,17 @@ namespace osu.Game.Graphics.Backgrounds
             TrianglesEnabled.ValueChanged += _ => UpdateIcons();
         }
 
-        private void UpdateFreq(bool IsKiai)
+        private void UpdateFreq()
         {
-            float sum = b.Value?.Track.CurrentAmplitudes.Maximum ?? 0;
+            float[] sum = b.Value?.Track.CurrentAmplitudes.FrequencyAmplitudes.ToArray() ?? new float[256];
+            float totalSum = 0.25f;
+            bool IsKiai = b.Value?.Beatmap.ControlPointInfo.EffectPointAt(b.Value?.Track?.CurrentTime ?? 0).KiaiMode ?? false;
 
-            if (IsKiai)
-            {
-                sum /= 1500;
-            }
-            else
-            {
-                sum /= 3000;
-            }
+            sum.ForEach(a => totalSum += a);
 
-            if (sum > 0.01f)
-                sum = 0.01f;
+            if (IsKiai) totalSum *= 1.5f;
 
-            ExtraY = sum;
+            ExtraY = totalSum;
         }
 
         private void UpdateIcons()
@@ -192,11 +187,13 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
-            if ( EnableBeatSync )
+            if (EnableBeatSync)
             {
-                var track = b.Value?.Track;
-                var IsKiai= b.Value?.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? 0).KiaiMode ?? false;
-                UpdateFreq(IsKiai);
+                UpdateFreq();
+            }
+            else
+            {
+                ExtraY = 1;
             }
 
             Invalidate(Invalidation.DrawNode);
@@ -213,7 +210,7 @@ namespace osu.Game.Graphics.Backgrounds
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
             // Since we will later multiply by the scale of individual triangles we normalize by
             // dividing by triangleScale.
-            float movedDistance = ( -elapsedSeconds * Velocity * base_velocity / (DrawHeight * triangleScale) ) - ExtraY;
+            float movedDistance = (-elapsedSeconds * Velocity * base_velocity * ExtraY) / (DrawHeight * triangleScale);
 
             for (int i = 0; i < parts.Count; i++)
             {
