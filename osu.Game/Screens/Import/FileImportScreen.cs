@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Import
         private DialogOverlay dialogOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(Storage storage, OsuColour colours, MfConfigManager config)
+        private void load(Storage storage, MfConfigManager config)
         {
             var originalPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
             defaultPath = originalPath;
@@ -69,12 +69,6 @@ namespace osu.Game.Screens.Import
                         Width = 0.65f,
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
-                        Child = fileSelector = new FileSelector(originalPath, validFileExtensions: FileExtensions)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            CurrentFile = { BindTarget = currentFile },
-                            CurrentPath = { BindTarget = currentDirectory }
-                        }
                     },
                     new Container
                     {
@@ -220,14 +214,16 @@ namespace osu.Game.Screens.Import
             currentDirectory.UnbindBindings();
 
             fileSelector?.Expire();
-            var directory = currentDirectory.Value?.FullName ?? defaultPath;
 
-            fileSelector = new FileSelector(directory, validFileExtensions: FileExtensions)
+            var directory = currentDirectory.Value?.FullName;
+
+            fileSelector = new FileSelector(initialPath: directory, validFileExtensions: FileExtensions)
             {
-                RelativeSizeAxes = Axes.Both,
-                CurrentFile = { BindTarget = currentFile },
-                CurrentPath = { BindTarget = currentDirectory }
+                RelativeSizeAxes = Axes.Both
             };
+
+            currentDirectory.BindTo(fileSelector.CurrentPath);
+            currentFile.BindTo(fileSelector.CurrentFile);
 
             fileSelectContainer.Add(fileSelector);
         }
