@@ -24,10 +24,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
     public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
-        protected readonly SliderBodyPiece BodyPiece;
-        protected readonly SliderCircleSelectionBlueprint HeadBlueprint;
-        protected readonly SliderCircleSelectionBlueprint TailBlueprint;
-        protected readonly PathControlPointVisualiser ControlPointVisualiser;
+        protected SliderBodyPiece BodyPiece;
+        protected SliderCircleSelectionBlueprint HeadBlueprint;
+        protected SliderCircleSelectionBlueprint TailBlueprint;
+        protected PathControlPointVisualiser ControlPointVisualiser;
+
+        private readonly DrawableSlider slider;
 
         [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; }
@@ -44,17 +46,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         public SliderSelectionBlueprint(DrawableSlider slider)
             : base(slider)
         {
-            var sliderObject = (Slider)slider.HitObject;
+            this.slider = slider;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             InternalChildren = new Drawable[]
             {
                 BodyPiece = new SliderBodyPiece(),
                 HeadBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.Start),
                 TailBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.End),
-                ControlPointVisualiser = new PathControlPointVisualiser(sliderObject, true)
-                {
-                    RemoveControlPointsRequested = removeControlPoints
-                }
             };
         }
 
@@ -76,6 +78,25 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             if (IsSelected)
                 BodyPiece.UpdateFrom(HitObject);
+        }
+
+        protected override void OnSelected()
+        {
+            AddInternal(ControlPointVisualiser = new PathControlPointVisualiser((Slider)slider.HitObject, true)
+            {
+                RemoveControlPointsRequested = removeControlPoints
+            });
+
+            base.OnSelected();
+        }
+
+        protected override void OnDeselected()
+        {
+            base.OnDeselected();
+
+            // throw away frame buffers on deselection.
+            ControlPointVisualiser?.Expire();
+            BodyPiece.RecyclePath();
         }
 
         private Vector2 rightClickPosition;
