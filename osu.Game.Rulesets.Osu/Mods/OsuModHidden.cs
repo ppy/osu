@@ -90,7 +90,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                         lastSliderHeadFadeOutStartTime = fadeOutStartTime;
                     }
 
-                    if (!increaseVisibility)
+                    Drawable fadeTarget = circle;
+
+                    if (increaseVisibility)
+                    {
+                        // only fade the circle piece (not the approach circle) for the increased visibility object.
+                        fadeTarget = circle.CirclePiece;
+                    }
+                    else
                     {
                         // we don't want to see the approach circle
                         using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
@@ -99,8 +106,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     // fade out immediately after fade in.
                     using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
-                        circle.FadeOut(fadeOutDuration);
-
+                        fadeTarget.FadeOut(fadeOutDuration);
                     break;
 
                 case DrawableSlider slider:
