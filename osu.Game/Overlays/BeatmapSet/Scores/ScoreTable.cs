@@ -110,6 +110,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (!allScoreStatistics.Contains(result))
                     continue;
 
+                // for the time being ignore bonus result types.
+                // this is not being sent from the API and will be empty in all cases.
+                if (result.IsBonus())
+                    continue;
+
                 string displayName = ruleset.GetDisplayNameForHitResult(result);
 
                 columns.Add(new TableColumn(displayName, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
