@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,7 +13,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineTickDisplay : TimelinePart
+    public class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -31,15 +32,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            beatDivisor.BindValueChanged(_ => createLines(), true);
-        }
+        [Resolved(canBeNull: true)]
+        private Timeline timeline { get; set; }
 
-        private void createLines()
+        protected override void Update()
         {
-            Clear();
+            base.Update();
+
+            int drawableIndex = 0;
+
+            double minVisibleTime = double.MinValue;
+            double maxVisibleTime = double.MaxValue;
+
+            if (timeline != null)
+            {
+                minVisibleTime = ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X / DrawWidth * Content.RelativeChildSize.X;
+                maxVisibleTime = ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X / DrawWidth * Content.RelativeChildSize.X;
+            }
 
             for (var i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
             {
@@ -50,40 +59,67 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 for (double t = point.Time; t < until; t += point.BeatLength / beatDivisor.Value)
                 {
-                    var indexInBeat = beat % beatDivisor.Value;
-
-                    if (indexInBeat == 0)
+                    if (t >= minVisibleTime && t <= maxVisibleTime)
                     {
-                        Add(new PointVisualisation(t)
-                        {
-                            Colour = BindableBeatDivisor.GetColourFor(1, colours),
-                            Origin = Anchor.TopCentre,
-                        });
-                    }
-                    else
-                    {
-                        var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
-                        var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
-                        var height = 0.1f - (float)divisor / BindableBeatDivisor.VALID_DIVISORS.Last() * 0.08f;
+                        var indexInBeat = beat % beatDivisor.Value;
 
-                        Add(new PointVisualisation(t)
+                        if (indexInBeat == 0)
                         {
-                            Colour = colour,
-                            Height = height,
-                            Origin = Anchor.TopCentre,
-                        });
+                            var downbeatPoint = getNextUsablePoint();
+                            downbeatPoint.X = (float)t;
 
-                        Add(new PointVisualisation(t)
+                            downbeatPoint.Colour = BindableBeatDivisor.GetColourFor(1, colours);
+                            downbeatPoint.Anchor = Anchor.TopLeft;
+                            downbeatPoint.Origin = Anchor.TopCentre;
+                            downbeatPoint.Height = 1;
+                        }
+                        else
                         {
-                            Colour = colour,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomCentre,
-                            Height = height,
-                        });
+                            var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
+                            var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
+                            var height = 0.1f - (float)divisor / BindableBeatDivisor.VALID_DIVISORS.Last() * 0.08f;
+
+                            var topPoint = getNextUsablePoint();
+                            topPoint.X = (float)t;
+                            topPoint.Colour = colour;
+                            topPoint.Height = height;
+                            topPoint.Anchor = Anchor.TopLeft;
+                            topPoint.Origin = Anchor.TopCentre;
+
+                            var bottomPoint = getNextUsablePoint();
+                            bottomPoint.X = (float)t;
+                            bottomPoint.Colour = colour;
+                            bottomPoint.Anchor = Anchor.BottomLeft;
+                            bottomPoint.Origin = Anchor.BottomCentre;
+                            bottomPoint.Height = height;
+                        }
                     }
 
                     beat++;
                 }
+            }
+
+            int usedDrawables = drawableIndex;
+
+            // save a few drawables beyond the currently used for edge cases.
+            while (drawableIndex < Math.Min(usedDrawables + 16, Count))
+                Children[drawableIndex++].Hide();
+
+            // expire any excess
+            while (drawableIndex < Count)
+                Children[drawableIndex++].Expire();
+
+            Drawable getNextUsablePoint()
+            {
+                PointVisualisation point;
+                if (drawableIndex >= Count)
+                    Add(point = new PointVisualisation());
+                else
+                    point = Children[drawableIndex++];
+
+                point.Show();
+
+                return point;
             }
         }
     }
