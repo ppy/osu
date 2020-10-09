@@ -71,8 +71,12 @@ namespace osu.Game.Rulesets.Judgements
 
         protected virtual void ApplyHitAnimations()
         {
-            JudgementBody.ScaleTo(0.9f);
-            JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
+            if (bodyDrawable.Drawable is LegacySkinExtensions.SkinnableTextureAnimation) { }
+            else
+            {
+                JudgementBody.ScaleTo(0.9f);
+                JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
+            }
 
             this.Delay(FadeOutDelay).FadeOut(400);
         }
