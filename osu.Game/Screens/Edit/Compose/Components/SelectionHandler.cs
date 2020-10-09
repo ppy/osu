@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public int SelectedCount => selectedBlueprints.Count;
 
-        public IEnumerable<HitObject> SelectedHitObjects => EditorBeatmap.SelectedHitObjects;
-
         private Drawable content;
 
         private OsuSpriteText selectionDetailsText;
@@ -309,7 +307,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             ChangeHandler?.BeginChange();
 
-            foreach (var h in SelectedHitObjects)
+            foreach (var h in EditorBeatmap.SelectedHitObjects)
             {
                 // Make sure there isn't already an existing sample
                 if (h.Samples.Any(s => s.Name == sampleName))
@@ -330,7 +328,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             ChangeHandler?.BeginChange();
 
-            foreach (var h in SelectedHitObjects)
+            foreach (var h in EditorBeatmap.SelectedHitObjects)
             {
                 var comboInfo = h as IHasComboInformation;
 
@@ -351,7 +349,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             ChangeHandler?.BeginChange();
 
-            foreach (var h in SelectedHitObjects)
+            foreach (var h in EditorBeatmap.SelectedHitObjects)
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
 
             ChangeHandler?.EndChange();
@@ -425,11 +423,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void UpdateTernaryStates()
         {
-            SelectionNewComboState.Value = GetStateFromSelection(SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
+            SelectionNewComboState.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
 
             foreach (var (sampleName, bindable) in SelectionSampleStates)
             {
-                bindable.Value = GetStateFromSelection(SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
+                bindable.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
             }
         }
 
