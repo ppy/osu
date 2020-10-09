@@ -15,6 +15,7 @@ using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Import
 {
@@ -42,10 +43,16 @@ namespace osu.Game.Screens.Import
         [Resolved]
         private DialogOverlay dialogOverlay { get; set; }
 
+        private Storage storage { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, MfConfigManager config)
         {
-            var originalPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
+            this.storage = storage;
+
+            storage.GetStorageForDirectory("imports");
+            var originalPath = storage.GetFullPath("imports", true);
+
             defaultPath = originalPath;
 
             InternalChild = contentContainer = new Container
@@ -148,20 +155,52 @@ namespace osu.Game.Screens.Import
                                                             Current = config.GetBindable<FileFilterType>(MfSetting.FileFilter),
                                                             Margin = new MarginPadding{ Bottom = 15 }
                                                         },
-                                                        new TriangleButton()
+                                                        new GridContainer
                                                         {
-                                                            Text = "选中该文件",
                                                             Anchor = Anchor.BottomCentre,
                                                             Origin = Anchor.BottomCentre,
+                                                            AutoSizeAxes = Axes.Y,
                                                             RelativeSizeAxes = Axes.X,
-                                                            Height = 50,
-                                                            Action = () => dialogOverlay.Push(new ImportConfirmDialog(currentFile.Value?.Name)
-                                                            {
-                                                                OnConfirmedAction = StartImport
-                                                            }),
                                                             Margin = new MarginPadding{Top = 15},
-                                                            Padding = new MarginPadding{Horizontal = 15}
-                                                        }
+                                                            RowDimensions = new Dimension[]
+                                                            {
+                                                                new Dimension(GridSizeMode.AutoSize)
+                                                            },
+                                                            Content = new []
+                                                            {
+                                                                new Drawable[]
+                                                                {
+                                                                    new TriangleButton
+                                                                    {
+                                                                        Anchor = Anchor.BottomCentre,
+                                                                        Origin = Anchor.BottomCentre,
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        Height = 50,
+                                                                        Width = 0.9f,
+                                                                        Text = "刷新文件列表",
+                                                                        Action = Refresh
+                                                                    },
+                                                                    new TriangleButton()
+                                                                    {
+                                                                        Text = "导入该文件",
+                                                                        Anchor = Anchor.BottomCentre,
+                                                                        Origin = Anchor.BottomCentre,
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        Height = 50,
+                                                                        Width = 0.9f,
+                                                                        Action = () =>
+                                                                        {
+                                                                            var d = currentFile.Value?.FullName;
+                                                                            var n = currentFile.Value?.Name;
+                                                                            if ( d != null )
+                                                                                StartImport(d);
+                                                                            else
+                                                                                currentFileText.FlashColour(Color4.Red, 500);
+                                                                        },
+                                                                    }
+                                                                },
+                                                            }
+                                                        },
                                                     }
                                                 },
                                             }
@@ -210,27 +249,38 @@ namespace osu.Game.Screens.Import
                     break;
             }
 
+            Refresh();
+        }
+
+        private void Refresh()
+        {
+            //解绑
             currentFile.UnbindBindings();
             currentDirectory.UnbindBindings();
 
+            //清理文件选择器fileSelector
             fileSelector?.Expire();
 
-            var directory = currentDirectory.Value?.FullName;
+            //创建字符串directory，赋值为当前目录或默认目录
+            var directory = currentDirectory.Value?.FullName ?? defaultPath;
 
+            //设置文件选择器
             fileSelector = new FileSelector(initialPath: directory, validFileExtensions: FileExtensions)
             {
                 RelativeSizeAxes = Axes.Both
             };
 
+            //绑定
             currentDirectory.BindTo(fileSelector.CurrentPath);
             currentFile.BindTo(fileSelector.CurrentFile);
 
+            //添加
             fileSelectContainer.Add(fileSelector);
         }
 
         private void updateFileSelectionText(ValueChangedEvent<FileInfo> v)
         {
-            currentFileText.Text = v.NewValue?.FullName ?? "请选择一个文件";
+            currentFileText.Text = v.NewValue?.Name ?? "请选择一个文件";
         }
 
         public override void OnEntering(IScreen last)
@@ -253,10 +303,20 @@ namespace osu.Game.Screens.Import
             return base.OnExiting(next);
         }
 
-        private void StartImport()
+        private void StartImport(string path)
         {
-            var path = currentFile.Value?.FullName ?? null;
-            if (path == null) return;
+            //在某些特殊情况下会这样...
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            //如果文件被移动或删除
+            if (!storage.Exists(path))
+            {
+                Refresh();
+                currentFileText.Text = "文件不存在";
+                currentFileText.FlashColour(Color4.Red, 500);
+                return;
+            }
 
             string[] paths = { path };
 
