@@ -54,30 +54,30 @@ namespace osu.Game.Rulesets.Taiko.Edit
         {
             var hits = EditorBeatmap.SelectedHitObjects.OfType<Hit>();
 
-            ChangeHandler.BeginChange();
+            EditorBeatmap.BeginChange();
 
             foreach (var h in hits)
             {
                 if (h.IsStrong != state)
                 {
                     h.IsStrong = state;
-                    EditorBeatmap.UpdateHitObject(h);
+                    EditorBeatmap.Update(h);
                 }
             }
 
-            ChangeHandler.EndChange();
+            EditorBeatmap.EndChange();
         }
 
         public void SetRimState(bool state)
         {
             var hits = EditorBeatmap.SelectedHitObjects.OfType<Hit>();
 
-            ChangeHandler.BeginChange();
+            EditorBeatmap.BeginChange();
 
             foreach (var h in hits)
                 h.Type = state ? HitType.Rim : HitType.Centre;
 
-            ChangeHandler.EndChange();
+            EditorBeatmap.EndChange();
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)
@@ -88,6 +88,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
             if (selection.All(s => s.HitObject is TaikoHitObject))
                 yield return new TernaryStateMenuItem("Strong") { State = { BindTarget = selectionStrongState } };
         }
+
+        public override bool HandleMovement(MoveSelectionEvent moveEvent) => true;
 
         protected override void UpdateTernaryStates()
         {
