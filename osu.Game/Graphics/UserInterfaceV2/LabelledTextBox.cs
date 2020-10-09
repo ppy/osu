@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
@@ -32,18 +33,29 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => Component.Text = value;
         }
 
+        public Container TabbableContentContainer
+        {
+            set => Component.TabbableContentContainer = value;
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Component.BorderColour = colours.Blue;
         }
 
-        protected override OsuTextBox CreateComponent() => new OsuTextBox
+        protected virtual OsuTextBox CreateTextBox() => new OsuTextBox
         {
+            CommitOnFocusLost = true,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             RelativeSizeAxes = Axes.X,
             CornerRadius = CORNER_RADIUS,
-        }.With(t => t.OnCommit += (sender, newText) => OnCommit?.Invoke(sender, newText));
+        };
+
+        protected override OsuTextBox CreateComponent() => CreateTextBox().With(t =>
+        {
+            t.OnCommit += (sender, newText) => OnCommit?.Invoke(sender, newText);
+        });
     }
 }

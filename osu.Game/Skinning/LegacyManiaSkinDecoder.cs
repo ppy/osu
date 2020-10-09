@@ -97,8 +97,16 @@ namespace osu.Game.Skinning
                         currentConfig.ShowJudgementLine = pair.Value == "1";
                         break;
 
+                    case "KeysUnderNotes":
+                        currentConfig.KeysUnderNotes = pair.Value == "1";
+                        break;
+
                     case "LightingNWidth":
                         parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
+                        break;
+
+                    case "LightingLWidth":
+                        parseArrayValue(pair.Value, currentConfig.HoldNoteLightWidth);
                         break;
 
                     case "WidthForNoteHeightScale":
@@ -116,6 +124,7 @@ namespace osu.Game.Skinning
                     case string _ when pair.Key.StartsWith("KeyImage"):
                     case string _ when pair.Key.StartsWith("Hit"):
                     case string _ when pair.Key.StartsWith("Stage"):
+                    case string _ when pair.Key.StartsWith("Lighting"):
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }

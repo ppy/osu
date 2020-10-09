@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
@@ -31,17 +33,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public readonly BindableBool Complete = new BindableBool();
 
         /// <summary>
-        /// The total rotation performed on the spinner disc, disregarding the spin direction.
+        /// The total rotation performed on the spinner disc, disregarding the spin direction,
+        /// adjusted for the track's playback rate.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// This value is always non-negative and is monotonically increasing with time
         /// (i.e. will only increase if time is passing forward, but can decrease during rewind).
+        /// </para>
+        /// <para>
+        /// The rotation from each frame is multiplied by the clock's current playback rate.
+        /// The reason this is done is to ensure that spinners give the same score and require the same number of spins
+        /// regardless of whether speed-modifying mods are applied.
+        /// </para>
         /// </remarks>
         /// <example>
-        /// If the spinner is spun 360 degrees clockwise and then 360 degrees counter-clockwise,
+        /// Assuming no speed-modifying mods are active,
+        /// if the spinner is spun 360 degrees clockwise and then 360 degrees counter-clockwise,
         /// this property will return the value of 720 (as opposed to 0 for <see cref="Drawable.Rotation"/>).
+        /// If Double Time is active instead (with a speed multiplier of 1.5x),
+        /// in the same scenario the property will return 720 * 1.5 = 1080.
         /// </example>
-        public float CumulativeRotation { get; private set; }
+        public float RateAdjustedRotation { get; private set; }
 
         /// <summary>
         /// Whether the spinning is spinning at a reasonable speed to be considered visually spinning.
@@ -65,6 +78,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private float currentRotation;
 
         private bool rotationTransferred;
+
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
 
         protected override void Update()
         {
@@ -113,7 +129,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
 
             currentRotation += angle;
-            CumulativeRotation += Math.Abs(angle) * Math.Sign(Clock.ElapsedFrameTime);
+            // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
+            // (see: ModTimeRamp)
+            RateAdjustedRotation += (float)(Math.Abs(angle) * (gameplayClock?.TrueGameplayRate ?? Clock.Rate));
         }
     }
 }

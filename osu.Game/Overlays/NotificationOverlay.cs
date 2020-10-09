@@ -16,8 +16,12 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationOverlay : OsuFocusedOverlayContainer
+    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/notification";
+        public string Title => "notifications";
+        public string Description => "waiting for 'ya";
+
         private const float width = 320;
 
         public const float TRANSITION_LENGTH = 600;
