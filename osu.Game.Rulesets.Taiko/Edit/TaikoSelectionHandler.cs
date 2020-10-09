@@ -54,30 +54,30 @@ namespace osu.Game.Rulesets.Taiko.Edit
         {
             var hits = SelectedHitObjects.OfType<Hit>();
 
-            ChangeHandler.BeginChange();
+            EditorBeatmap.BeginChange();
 
             foreach (var h in hits)
             {
                 if (h.IsStrong != state)
                 {
                     h.IsStrong = state;
-                    EditorBeatmap.UpdateHitObject(h);
+                    EditorBeatmap.Update(h);
                 }
             }
 
-            ChangeHandler.EndChange();
+            EditorBeatmap.EndChange();
         }
 
         public void SetRimState(bool state)
         {
             var hits = SelectedHitObjects.OfType<Hit>();
 
-            ChangeHandler.BeginChange();
+            EditorBeatmap.BeginChange();
 
             foreach (var h in hits)
                 h.Type = state ? HitType.Rim : HitType.Centre;
 
-            ChangeHandler.EndChange();
+            EditorBeatmap.EndChange();
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)
