@@ -10,8 +10,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class VisualSettings : PlayerSettingsGroup
     {
-        protected override string Title => "Visual settings";
-
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
@@ -19,6 +17,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
         public VisualSettings()
+            : base("Visual Settings")
         {
             Children = new Drawable[]
             {
@@ -51,8 +50,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
-            blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
+            dimSliderBar.Current = config.GetBindable<double>(OsuSetting.DimLevel);
+            blurSliderBar.Current = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);

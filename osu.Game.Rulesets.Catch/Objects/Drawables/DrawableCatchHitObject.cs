@@ -8,21 +8,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Catch.UI;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public abstract class PalpableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
-        where TObject : CatchHitObject
+    public abstract class PalpableDrawableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
+        where TObject : PalpableCatchHitObject
     {
-        public override bool CanBePlated => true;
-
         protected Container ScaleContainer { get; private set; }
 
-        protected PalpableCatchHitObject(TObject hitObject)
+        protected PalpableDrawableCatchHitObject(TObject hitObject)
             : base(hitObject)
         {
             Origin = Anchor.Centre;
@@ -65,9 +62,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
-        public virtual bool CanBePlated => false;
-
-        public virtual bool StaysOnPlate => CanBePlated;
+        public virtual bool StaysOnPlate => HitObject.CanBePlated;
 
         public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
 
@@ -90,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             if (CheckPosition == null) return;
 
             if (timeOffset >= 0 && Result != null)
-                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
+                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)

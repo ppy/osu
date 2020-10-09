@@ -15,8 +15,10 @@ namespace osu.Game.Skinning
         public enum LegacySetting
         {
             Version,
+            ComboPrefix,
+            ComboOverlap,
             AnimationFramerate,
-            LayeredHitSounds,
+            LayeredHitSounds
         }
     }
 }

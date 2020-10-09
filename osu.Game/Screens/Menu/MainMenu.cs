@@ -5,7 +5,6 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
@@ -46,8 +45,8 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private MusicController music { get; set; }
+        [Resolved]
+        private MusicController musicController { get; set; }
 
         [Resolved(canBeNull: true)]
         private LoginOverlay login { get; set; }
@@ -61,8 +60,6 @@ namespace osu.Game.Screens.Menu
         private BackgroundScreenDefault background;
 
         protected override BackgroundScreen CreateBackground() => background;
-
-        internal Track Track { get; private set; }
 
         private Bindable<float> holdDelay;
         private Bindable<bool> loginDisplayed;
@@ -101,7 +98,11 @@ namespace osu.Game.Screens.Menu
                     {
                         buttons = new ButtonSystem
                         {
-                            OnEdit = delegate { this.Push(new Editor()); },
+                            OnEdit = delegate
+                            {
+                                Beatmap.SetDefault();
+                                this.Push(new Editor());
+                            },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = confirmAndExit,
@@ -177,15 +178,14 @@ namespace osu.Game.Screens.Menu
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
 
-            Track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is IntroScreen && Track != null)
+            if (last is IntroScreen && musicController.TrackLoaded)
             {
-                if (!Track.IsRunning)
+                if (!musicController.CurrentTrack.IsRunning)
                 {
-                    Track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * Track.Length);
-                    Track.Start();
+                    musicController.CurrentTrack.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * musicController.CurrentTrack.Length);
+                    musicController.CurrentTrack.Start();
                 }
             }
 
@@ -260,7 +260,7 @@ namespace osu.Game.Screens.Menu
             // we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 
-            music.EnsurePlayingSomething();
+            musicController.EnsurePlayingSomething();
         }
 
         public override bool OnExiting(IScreen next)
@@ -280,6 +280,7 @@ namespace osu.Game.Screens.Menu
             }
 
             buttons.State = ButtonSystemState.Exit;
+            OverlayActivationMode.Value = OverlayActivation.Disabled;
 
             songTicker.Hide();
 

@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 windowModeDropdown = new SettingsDropdown<WindowMode>
                 {
                     LabelText = "Screen mode",
-                    Bindable = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
+                    Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                     ItemSource = windowModes,
                 },
                 resolutionSettingsContainer = new Container
@@ -74,14 +74,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "UI Scaling",
                     TransferValueOnCommit = true,
-                    Bindable = osuConfig.GetBindable<float>(OsuSetting.UIScale),
+                    Current = osuConfig.GetBindable<float>(OsuSetting.UIScale),
                     KeyboardStep = 0.01f,
                     Keywords = new[] { "scale", "letterbox" },
                 },
                 new SettingsEnumDropdown<ScalingMode>
                 {
                     LabelText = "Screen Scaling",
-                    Bindable = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
+                    Current = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                     Keywords = new[] { "scale", "letterbox" },
                 },
                 scalingSettings = new FillFlowContainer<SettingsSlider<float>>
@@ -97,28 +97,28 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = "Horizontal position",
-                            Bindable = scalingPositionX,
+                            Current = scalingPositionX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical position",
-                            Bindable = scalingPositionY,
+                            Current = scalingPositionY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Horizontal scale",
-                            Bindable = scalingSizeX,
+                            Current = scalingSizeX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical scale",
-                            Bindable = scalingSizeY,
+                            Current = scalingSizeY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
             };
 
-            scalingSettings.ForEach(s => bindPreviewEvent(s.Bindable));
+            scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
             var resolutions = getResolutions();
 
@@ -137,10 +137,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Resolution",
                     ShowsDefaultIndicator = false,
                     Items = resolutions,
-                    Bindable = sizeFullscreen
+                    Current = sizeFullscreen
                 };
 
-                windowModeDropdown.Bindable.BindValueChanged(mode =>
+                windowModeDropdown.Current.BindValueChanged(mode =>
                 {
                     if (mode.NewValue == WindowMode.Fullscreen)
                     {
@@ -163,8 +163,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 scalingSettings.ForEach(s => s.TransferValueOnCommit = mode.NewValue == ScalingMode.Everything);
             }, true);
 
-            windowModes.ItemsAdded += _ => windowModesChanged();
-            windowModes.ItemsRemoved += _ => windowModesChanged();
+            windowModes.CollectionChanged += (sender, args) => windowModesChanged();
 
             windowModesChanged();
         }

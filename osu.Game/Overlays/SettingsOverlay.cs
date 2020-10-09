@@ -13,8 +13,12 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsOverlay : SettingsPanel
+    public class SettingsOverlay : SettingsPanel, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/settings";
+        public string Title => "settings";
+        public string Description => "change the way osu! behaves";
+
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {
             new GeneralSection(),
@@ -30,7 +34,7 @@ namespace osu.Game.Overlays
 
         private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();
 
-        protected override Drawable CreateHeader() => new SettingsHeader("settings", "Change the way osu! behaves");
+        protected override Drawable CreateHeader() => new SettingsHeader(Title, Description);
         protected override Drawable CreateFooter() => new SettingsFooter();
 
         public SettingsOverlay()

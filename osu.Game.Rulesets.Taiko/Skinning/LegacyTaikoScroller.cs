@@ -42,10 +42,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 var r = result.NewValue;
 
                 // always ignore hitobjects that don't affect combo (drumroll ticks etc.)
-                if (r?.Judgement.AffectsCombo == false)
+                if (r?.Type.AffectsCombo() == false)
                     return;
 
-                passing = r == null || r.Type > HitResult.Miss;
+                passing = r == null || r.IsHit;
 
                 foreach (var sprite in InternalChildren.OfType<ScrollerSprite>())
                     sprite.Passing = passing;

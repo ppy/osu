@@ -236,17 +236,16 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         PlaceholderText = "password",
                         RelativeSizeAxes = Axes.X,
                         TabbableContentContainer = this,
-                        OnCommit = (sender, newText) => performLogin()
                     },
                     new SettingsCheckbox
                     {
                         LabelText = "Remember username",
-                        Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
+                        Current = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
                     {
                         LabelText = "Stay signed in",
-                        Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
+                        Current = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
                     new Container
                     {
@@ -276,6 +275,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         }
                     }
                 };
+
+                password.OnCommit += (sender, newText) => performLogin();
             }
 
             public override bool AcceptsFocus => true;
