@@ -6,9 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -47,10 +47,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = "Map absolute input to window",
                     Current = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
                 },
-                new SettingsEnumDropdown<ConfineMouseMode>
+                new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
                     LabelText = "Confine mouse cursor to window",
-                    Current = config.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode),
+                    Current = osuConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode)
                 },
                 new SettingsCheckbox
                 {

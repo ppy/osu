@@ -111,7 +111,8 @@ namespace osu.Game.Screens.Edit.Timing
             foreach (var cp in currentGroupItems)
                 Beatmap.Value.Beatmap.ControlPointInfo.Add(time, cp);
 
-            SelectedGroup.Value = Beatmap.Value.Beatmap.ControlPointInfo.GroupAt(time);
+            // the control point might not necessarily exist yet, if currentGroupItems was empty.
+            SelectedGroup.Value = Beatmap.Value.Beatmap.ControlPointInfo.GroupAt(time, true);
 
             changeHandler?.EndChange();
         }
