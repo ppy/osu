@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -138,7 +139,8 @@ namespace osu.Game.Storyboards.Drawables
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             base.SkinChanged(skin, allowFallback);
-            var newTexture = skin?.GetTexture(Sprite.Path) ?? storyboardTextureStore?.Get(texturePath);
+
+            var newTexture = skin?.GetTexture(Path.GetFileNameWithoutExtension(Sprite.Path)) ?? storyboardTextureStore?.Get(texturePath);
 
             if (drawableSprite.Texture == newTexture) return;
 
