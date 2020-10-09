@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Import
         private string[] FileExtensions = { ".foo" };
         private string defaultPath;
 
-        private readonly IBindable<FileInfo> currentFile = new Bindable<FileInfo>();
+        private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
         private readonly IBindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
         private Bindable<FileFilterType> FilterType = new Bindable<FileFilterType>();
         private TextFlowContainer currentFileText;
@@ -186,6 +186,10 @@ namespace osu.Game.Screens.Import
             config.BindWith(MfSetting.FileFilter, FilterType);
 
             currentFile.BindValueChanged(updateFileSelectionText, true);
+            currentDirectory.BindValueChanged(_ =>
+            {
+                currentFile.Value = null;
+            });
 
             FilterType.BindValueChanged(OnFilterTypeChanged, true);
         }
