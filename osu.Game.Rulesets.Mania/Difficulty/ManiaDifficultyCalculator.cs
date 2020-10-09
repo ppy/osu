@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             return new ManiaDifficultyAttributes
             {
-                StarRating = difficultyValue(skills) * star_scaling_factor,
+                StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                 GreatHitWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate,
@@ -49,55 +49,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             };
         }
 
-        private double difficultyValue(Skill[] skills)
-        {
-            // Preprocess the strains to find the maximum overall + individual (aggregate) strain from each section
-            var overall = skills.OfType<Overall>().Single();
-            var aggregatePeaks = new List<double>(Enumerable.Repeat(0.0, overall.StrainPeaks.Count));
-
-            foreach (var individual in skills.OfType<Individual>())
-            {
-                for (int i = 0; i < individual.StrainPeaks.Count; i++)
-                {
-                    double aggregate = individual.StrainPeaks[i] + overall.StrainPeaks[i];
-
-                    if (aggregate > aggregatePeaks[i])
-                        aggregatePeaks[i] = aggregate;
-                }
-            }
-
-            aggregatePeaks.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
-            double difficulty = 0;
-            double weight = 1;
-
-            // Difficulty is the weighted sum of the highest strains from every section.
-            foreach (double strain in aggregatePeaks)
-            {
-                difficulty += strain * weight;
-                weight *= 0.9;
-            }
-
-            return difficulty;
-        }
-
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             for (int i = 1; i < beatmap.HitObjects.Count; i++)
                 yield return new ManiaDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], clockRate);
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap)
+        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
         {
-            int columnCount = ((ManiaBeatmap)beatmap).TotalColumns;
-
-            var skills = new List<Skill> { new Overall(columnCount) };
-
-            for (int i = 0; i < columnCount; i++)
-                skills.Add(new Individual(i, columnCount));
-
-            return skills.ToArray();
-        }
+            new Strain(((ManiaBeatmap)beatmap).TotalColumns)
+        };
 
         protected override Mod[] DifficultyAdjustmentMods
         {
