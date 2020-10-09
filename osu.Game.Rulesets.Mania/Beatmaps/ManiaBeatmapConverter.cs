@@ -116,7 +116,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 prevNoteTimes.RemoveAt(0);
             prevNoteTimes.Add(newNoteTime);
 
-            density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
+            if (prevNoteTimes.Count >= 2)
+                density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
         }
 
         private double lastTime;
