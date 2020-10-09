@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         /// <param name="scoringMode">Scoring mode to test</param>
         /// <param name="hitResult">HitResult that will be applied to HitObjects</param>
         /// <param name="maxResult">HitResult used for accuracy calcualtion</param>
-        /// <param name="expectedScore">Expected score after 3/4 hitobjects have been hit</param>
+        /// <param name="expectedScore">Expected score after 3/4 hitobjects have been hit rounded to nearest integer</param>
         /// <remarks>
         /// This test intentionally misses the 3rd hitobject to achieve lower than 75% accuracy and 50% max combo
         /// expectedScore is calcualted using this algorithm for standardised scoring: 1_000_000 * ((75% * score_per_hitobject / max_per_hitobject * 30%) + (50% * 70%))
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Miss, HitResult.Great, 0)]
         [TestCase(ScoringMode.Standardised, HitResult.Meh, HitResult.Great, 387_500)]
         [TestCase(ScoringMode.Standardised, HitResult.Ok, HitResult.Great, 425_000)]
-        [TestCase(ScoringMode.Standardised, HitResult.Good, HitResult.Perfect, 3_350_000 / 7.0)]
+        [TestCase(ScoringMode.Standardised, HitResult.Good, HitResult.Perfect, 478_571)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, HitResult.Great, 575_000)]
         [TestCase(ScoringMode.Standardised, HitResult.Perfect, HitResult.Perfect, 575_000)]
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, HitResult.SmallTickHit, 700_000)]
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)]
         [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 156)]
         [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 312)]
-        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 3744 / 7.0)]
+        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 535)]
         [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 936)]
         [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 936)]
         [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)]
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 936)]
         [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 30)]
         [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 150)]
-        public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, double expectedScore)
+        public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
         {
             var minResult = new TestJudgement(hitResult).MinResult;
 
@@ -113,14 +113,14 @@ namespace osu.Game.Tests.Rulesets.Scoring
                 scoreProcessor.ApplyResult(judgementResult);
             }
 
-            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
+            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value, 0.5));
         }
 
-        [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, 6_850_000 / 7.0)]
-        [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, 6_400_000 / 7.0)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 1950 / 7.0)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, 1500 / 7.0)]
-        public void TestSmallTicksAccuracy(ScoringMode scoringMode, HitResult hitResult, double expectedScore)
+        [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, 978_571)]
+        [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, 914_286)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 279)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, 214)]
+        public void TestSmallTicksAccuracy(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {
             IEnumerable<HitObject> hitObjects = Enumerable
                                                 .Repeat(new TestHitObject(HitResult.SmallTickHit), 4)
@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             };
             scoreProcessor.ApplyResult(lastJudgementResult);
 
-            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
+            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value, 0.5));
         }
 
         [TestCase(HitResult.IgnoreHit, HitResult.IgnoreMiss)]
