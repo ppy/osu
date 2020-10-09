@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.OnSelectionChanged();
 
-            bool canOperate = SelectedHitObjects.Count() > 1 || SelectedHitObjects.Any(s => s is Slider);
+            bool canOperate = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
 
             SelectionBox.CanRotate = canOperate;
             SelectionBox.CanScaleX = canOperate;
@@ -232,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <param name="points">The points to calculate a quad for.</param>
         private Quad getSurroundingQuad(IEnumerable<Vector2> points)
         {
-            if (!SelectedHitObjects.Any())
+            if (!EditorBeatmap.SelectedHitObjects.Any())
                 return new Quad();
 
             Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
@@ -253,10 +253,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// All osu! hitobjects which can be moved/rotated/scaled.
         /// </summary>
-        private OsuHitObject[] selectedMovableObjects => SelectedHitObjects
-                                                         .OfType<OsuHitObject>()
-                                                         .Where(h => !(h is Spinner))
-                                                         .ToArray();
+        private OsuHitObject[] selectedMovableObjects => EditorBeatmap.SelectedHitObjects
+                                                                      .OfType<OsuHitObject>()
+                                                                      .Where(h => !(h is Spinner))
+                                                                      .ToArray();
 
         /// <summary>
         /// Rotate a point around an arbitrary origin.
