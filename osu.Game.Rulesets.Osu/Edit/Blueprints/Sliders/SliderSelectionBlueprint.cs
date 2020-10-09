@@ -66,13 +66,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             pathVersion = HitObject.Path.Version.GetBoundCopy();
             pathVersion.BindValueChanged(_ => updatePath());
+
+            BodyPiece.UpdateFrom(HitObject);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            BodyPiece.UpdateFrom(HitObject);
+            if (IsSelected)
+                BodyPiece.UpdateFrom(HitObject);
         }
 
         private Vector2 rightClickPosition;
