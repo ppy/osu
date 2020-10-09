@@ -158,7 +158,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.LoadSamples();
 
-            isStrong.Value = getStrongSamples().Any();
+            if (HitObject.CanBeStrong)
+                isStrong.Value = getStrongSamples().Any();
         }
 
         private void updateSamplesFromStrong()
