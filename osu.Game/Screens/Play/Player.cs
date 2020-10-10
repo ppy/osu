@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Play
 
         public BreakOverlay BreakOverlay;
 
+        public IBindable<bool> IsBreakTime => breakTracker?.IsBreakTime;
+
         private BreakTracker breakTracker;
 
         private SkipOverlay skipOverlay;
