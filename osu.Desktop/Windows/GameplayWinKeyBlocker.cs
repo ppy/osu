@@ -18,7 +18,7 @@ namespace osu.Desktop.Windows
         [Resolved]
         private GameHost host { get; set; }
 
-        [BackgroundDependencyLoader(true)]
+        [BackgroundDependencyLoader]
         private void load(OsuGame game, OsuConfigManager config)
         {
             localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
