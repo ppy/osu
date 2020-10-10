@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         {
             if (score.PP.HasValue)
             {
-                performance.Value = (int)score.PP.Value;
+                performance.Value = (int)Math.Round(score.PP.Value, MidpointRounding.AwayFromZero);
             }
             else
             {
@@ -35,7 +36,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                                   .ContinueWith(t => Schedule(() =>
                                   {
                                       if (t.Result.HasValue)
-                                          performance.Value = (int)t.Result.Value;
+                                          performance.Value = (int)Math.Round(t.Result.Value, MidpointRounding.AwayFromZero);
                                   }), cancellationTokenSource.Token);
             }
         }
