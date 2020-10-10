@@ -184,9 +184,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
                 result = CreateSlider(pos, combo, comboOffset, convertControlPoints(points, pathType), length, repeatCount, nodeSamples);
-
-                // The samples are played when the slider ends, which is the last node
-                result.Samples = nodeSamples[^1];
             }
             else if (type.HasFlag(LegacyHitObjectType.Spinner))
             {
