@@ -89,7 +89,10 @@ namespace osu.Game.Screens.Play
 
         public BreakOverlay BreakOverlay;
 
-        public IBindable<bool> IsBreakTime => breakTracker?.IsBreakTime;
+        /// <summary>
+        /// Whether the gameplay is currently in a break.
+        /// </summary>
+        public readonly BindableBool IsBreakTime = new BindableBool();
 
         private BreakTracker breakTracker;
 
@@ -259,6 +262,7 @@ namespace osu.Game.Screens.Play
                 mod.ApplyToHealthProcessor(HealthProcessor);
 
             breakTracker.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
+            IsBreakTime.BindTo((BindableBool)breakTracker.IsBreakTime);
         }
 
         private Drawable createUnderlayComponents() =>
