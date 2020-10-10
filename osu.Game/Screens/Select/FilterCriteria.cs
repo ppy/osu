@@ -43,6 +43,11 @@ namespace osu.Game.Screens.Select
 
         private string searchText;
 
+        /// <summary>
+        /// <see cref="SearchText"/> as a number (if it can be parsed as one).
+        /// </summary>
+        public int? SearchNumber { get; private set; }
+
         public string SearchText
         {
             get => searchText;
@@ -50,6 +55,11 @@ namespace osu.Game.Screens.Select
             {
                 searchText = value;
                 SearchTerms = searchText.Split(new[] { ',', ' ', '!' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
+
+                SearchNumber = null;
+
+                if (SearchTerms.Length == 1 && int.TryParse(SearchTerms[0], out int parsed))
+                    SearchNumber = parsed;
             }
         }
 
