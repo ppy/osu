@@ -28,5 +28,28 @@ namespace osu.Game.Tests.Beatmaps
 
             Assert.That(key1, Is.EqualTo(key2));
         }
+
+        [TestCase(1.3, DifficultyRating.Easy)]
+        [TestCase(1.993, DifficultyRating.Easy)]
+        [TestCase(1.998, DifficultyRating.Normal)]
+        [TestCase(2.4, DifficultyRating.Normal)]
+        [TestCase(2.693, DifficultyRating.Normal)]
+        [TestCase(2.698, DifficultyRating.Hard)]
+        [TestCase(3.5, DifficultyRating.Hard)]
+        [TestCase(3.993, DifficultyRating.Hard)]
+        [TestCase(3.997, DifficultyRating.Insane)]
+        [TestCase(5.0, DifficultyRating.Insane)]
+        [TestCase(5.292, DifficultyRating.Insane)]
+        [TestCase(5.297, DifficultyRating.Expert)]
+        [TestCase(6.2, DifficultyRating.Expert)]
+        [TestCase(6.493, DifficultyRating.Expert)]
+        [TestCase(6.498, DifficultyRating.ExpertPlus)]
+        [TestCase(8.3, DifficultyRating.ExpertPlus)]
+        public void TestDifficultyRatingMapping(double starRating, DifficultyRating expectedBracket)
+        {
+            var actualBracket = BeatmapDifficultyManager.GetDifficultyRating(starRating);
+
+            Assert.AreEqual(expectedBracket, actualBracket);
+        }
     }
 }
