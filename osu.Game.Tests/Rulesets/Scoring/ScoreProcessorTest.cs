@@ -55,19 +55,24 @@ namespace osu.Game.Tests.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Test to see that all <see cref="HitResult"/> contribute to score portions in correct amounts.
+        /// Test to see that all <see cref="HitResult"/>s contribute to score portions in correct amounts.
         /// </summary>
-        /// <param name="scoringMode">Scoring mode to test</param>
-        /// <param name="hitResult">HitResult that will be applied to HitObjects</param>
-        /// <param name="maxResult">HitResult used for accuracy calcualtion</param>
-        /// <param name="expectedScore">Expected score after 3/4 hitobjects have been hit rounded to nearest integer</param>
+        /// <param name="scoringMode">Scoring mode to test.</param>
+        /// <param name="hitResult">The <see cref="HitResult"/> that will be applied to selected hit objects.</param>
+        /// <param name="maxResult">The maximum <see cref="HitResult"/> achievable.</param>
+        /// <param name="expectedScore">Expected score after all objects have been judged, rounded to the nearest integer.</param>
         /// <remarks>
-        /// This test intentionally misses the 3rd hitobject to achieve lower than 75% accuracy and 50% max combo
-        /// expectedScore is calcualted using this algorithm for standardised scoring: 1_000_000 * ((75% * score_per_hitobject / max_per_hitobject * 30%) + (50% * 70%))
-        /// "75% * score_per_hitobject / max_per_hitobject" is the accuracy we would get for hitting 3/4 hitobjects that award "score_per_hitobject / max_per_hitobject" accuracy each hit
-        ///
-        /// expectedScore is calculated using this algorithm for classic scoring: score_per_hitobject / max_per_hitobject * 936
-        /// "936" is simplified from "75% * 4 * 300 * (1 + 1/25)"
+        /// This test intentionally misses the 3rd hitobject to achieve lower than 75% accuracy and exactly 50% max combo.
+        /// <para>
+        /// For standardised scoring, <paramref name="expectedScore"/> is calculated using the following formula:
+        /// 1_000_000 * ((3 * <paramref name="hitResult"/> / 4 * <paramref name="maxResult"/>) * 30% + 50% * 70%)
+        /// </para>
+        /// <para>
+        /// For classic scoring, <paramref name="expectedScore"/> is calculated using the following formula:
+        /// <paramref name="hitResult"/> / <paramref name="maxResult"/> * 936
+        /// where 936 is simplified from:
+        /// 75% * 4 * 300 * (1 + 1/25)
+        /// </para>
         /// </remarks>
         [TestCase(ScoringMode.Standardised, HitResult.Miss, HitResult.Great, 0)]
         [TestCase(ScoringMode.Standardised, HitResult.Meh, HitResult.Great, 387_500)]
