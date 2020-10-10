@@ -61,12 +61,12 @@ namespace osu.Game.Scoring
         public readonly struct PerformanceCacheLookup
         {
             public readonly string ScoreHash;
-            public readonly int LocalId;
+            public readonly int LocalScoreID;
 
             public PerformanceCacheLookup(ScoreInfo info)
             {
                 ScoreHash = info.Hash;
-                LocalId = info.ID;
+                LocalScoreID = info.ID;
             }
 
             public override int GetHashCode()
@@ -74,7 +74,7 @@ namespace osu.Game.Scoring
                 var hash = new HashCode();
 
                 hash.Add(ScoreHash);
-                hash.Add(LocalId);
+                hash.Add(LocalScoreID);
 
                 return hash.ToHashCode();
             }
