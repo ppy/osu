@@ -24,7 +24,7 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <param name="score">The score to do the calculation on. </param>
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
-        public async Task<double> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default)
+        public async Task<double?> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default)
         {
             if (tryGetExisting(score, out var perf, out var lookupKey))
                 return perf;
@@ -39,21 +39,21 @@ namespace osu.Game.Scoring
             return performanceCache.TryGetValue(lookupKey, out performance);
         }
 
-        private async Task<double> computePerformanceAsync(ScoreInfo score, PerformanceCacheLookup lookupKey, CancellationToken token = default)
+        private async Task<double?> computePerformanceAsync(ScoreInfo score, PerformanceCacheLookup lookupKey, CancellationToken token = default)
         {
             var attributes = await difficultyManager.GetDifficultyAsync(score.Beatmap, score.Ruleset, score.Mods, token);
 
             // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
             if (attributes.Attributes == null)
-                return default;
+                return null;
 
-            if (token.IsCancellationRequested)
-                return default;
+            token.ThrowIfCancellationRequested();
 
             var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(attributes.Attributes, score);
-            var total = calculator?.Calculate() ?? default;
+            var total = calculator?.Calculate();
 
-            performanceCache[lookupKey] = total;
+            if (total.HasValue)
+                performanceCache[lookupKey] = total.Value;
 
             return total;
         }

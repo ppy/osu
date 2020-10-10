@@ -32,7 +32,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             else
             {
                 performanceManager.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                                  .ContinueWith(t => Schedule(() => performance.Value = (int)t.Result), cancellationTokenSource.Token);
+                                  .ContinueWith(t => Schedule(() =>
+                                  {
+                                      if (t.Result.HasValue)
+                                          performance.Value = (int)t.Result.Value;
+                                  }), cancellationTokenSource.Token);
             }
         }
 
