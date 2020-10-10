@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void updatePath()
         {
             HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
-            editorBeatmap?.UpdateHitObject(HitObject);
+            editorBeatmap?.Update(HitObject);
         }
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]
