@@ -45,6 +45,9 @@ namespace osu.Game.Rulesets.UI
             stabilityGameplayClock = new StabilityGameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
 
             this.gameplayStartTime = gameplayStartTime;
+
+            // UpdateSubTree() does not necessarily always run, but we want to manually process the clock regardless of that.
+            ProcessCustomClock = false;
         }
 
         private readonly ManualClock manualClock;
@@ -103,6 +106,10 @@ namespace osu.Game.Rulesets.UI
             validState = !GameplayClock.IsPaused.Value;
 
             int loops = 0;
+
+            // gameplay clock does not update its underlying clocks, but we need to run its frames
+            // to propagate the state of the clocks it wraps to whichever component needs to read it
+            stabilityGameplayClock.ProcessFrame();
 
             while (validState && requireMoreUpdateLoops && loops++ < MaxCatchUpFrames)
             {
