@@ -284,7 +284,7 @@ namespace osu.Game.Overlays.Mods
                         },
                     },
                 },
-                ModSettingsContainer = new Container
+                ModSettingsContainer = new CModSettingsContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
@@ -495,5 +495,19 @@ namespace osu.Game.Overlays.Mods
         }
 
         #endregion
+
+        protected class CModSettingsContainer : Container
+        {
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                return true;
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                return true;
+            }
+        }
+
     }
 }
