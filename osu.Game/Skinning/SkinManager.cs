@@ -88,6 +88,7 @@ namespace osu.Game.Skinning
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 
         private const string unknown_creator_string = "Unknown";
+        protected override string HumanisedModelName => "皮肤";
 
         protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
         {

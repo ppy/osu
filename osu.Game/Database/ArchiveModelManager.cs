@@ -120,7 +120,7 @@ namespace osu.Game.Database
         protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
-            notification.Text = $"对 {HumanisedModelName.Humanize(LetterCasing.Title)} 的导入正在进行中";
+            notification.Text = $"对{HumanisedModelName.Humanize(LetterCasing.Title)}的导入正在进行中";
 
             int current = 0;
 
@@ -140,7 +140,7 @@ namespace osu.Game.Database
                             imported.Add(model);
                         current++;
 
-                        notification.Text = $"已导入 {current} / {paths.Length} {HumanisedModelName}";
+                        notification.Text = $"已导入{current}(共{paths.Length}个){HumanisedModelName}";
                         notification.Progress = (float)current / paths.Length;
                     }
                 }
@@ -150,20 +150,20 @@ namespace osu.Game.Database
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $@"无法导入 ({Path.GetFileName(path)})", LoggingTarget.Database);
+                    Logger.Error(e, $@"无法导入({Path.GetFileName(path)})", LoggingTarget.Database);
                 }
             }));
 
             if (imported.Count == 0)
             {
-                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} 导入失败!";
+                notification.Text = $"对{HumanisedModelName.Humanize(LetterCasing.Title)}的导入失败!";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"已导入 {imported.First()}!"
-                    : $"已导入 {imported.Count} {HumanisedModelName}!";
+                    ? $"已导入{HumanisedModelName} {imported.First()}!"
+                    : $"已导入{imported.Count}个{HumanisedModelName}!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {

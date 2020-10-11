@@ -384,7 +384,7 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
-        protected override string HumanisedModelName => "beatmap";
+        protected override string HumanisedModelName => "谱面";
 
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
