@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
@@ -52,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnNewResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
-            if (result.Judgement is IgnoreJudgement)
+            if (!result.Type.IsScorable())
                 return;
 
             void runAfterLoaded(Action action)

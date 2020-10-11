@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             switch (Result.Type)
             {
-                case HitResult.Good:
+                case HitResult.Ok:
                     JudgementBody.Colour = colours.GreenLight;
                     break;
 

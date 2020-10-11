@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
+        protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
+
         public int RestartCount;
 
         [Resolved]
@@ -155,8 +157,8 @@ namespace osu.Game.Screens.Play
             DrawableRuleset.SetRecordTarget(recordingReplay = new Replay());
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config)
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, OsuConfigManager config, OsuGame game)
         {
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
@@ -171,6 +173,9 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+
+            if (game != null)
+                LocalUserPlaying.BindTo(game.LocalUserPlaying);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
@@ -191,9 +196,25 @@ namespace osu.Game.Screens.Play
 
             dependencies.CacheAs(gameplayBeatmap);
 
-            addUnderlayComponents(GameplayClockContainer);
-            addGameplayComponents(GameplayClockContainer, Beatmap.Value, playableBeatmap);
-            addOverlayComponents(GameplayClockContainer, Beatmap.Value);
+            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
+
+            // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
+            // full access to all skin sources.
+            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
+
+            // load the skinning hierarchy first.
+            // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
+            GameplayClockContainer.Add(beatmapSkinProvider.WithChild(rulesetSkinProvider));
+
+            rulesetSkinProvider.AddRange(new[]
+            {
+                // underlay and gameplay should have access the to skinning sources.
+                createUnderlayComponents(),
+                createGameplayComponents(Beatmap.Value, playableBeatmap)
+            });
+
+            // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
+            GameplayClockContainer.Add(createOverlayComponents(Beatmap.Value));
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -203,9 +224,9 @@ namespace osu.Game.Screens.Play
                 skipOverlay.Hide();
             }
 
-            DrawableRuleset.IsPaused.BindValueChanged(_ => updateOverlayActivationMode());
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateOverlayActivationMode());
-            breakTracker.IsBreakTime.BindValueChanged(_ => updateOverlayActivationMode());
+            DrawableRuleset.IsPaused.BindValueChanged(_ => updateGameplayState());
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
+            breakTracker.IsBreakTime.BindValueChanged(_ => updateGameplayState());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
@@ -238,45 +259,31 @@ namespace osu.Game.Screens.Play
             breakTracker.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
 
-        private void addUnderlayComponents(Container target)
+        private Drawable createUnderlayComponents() =>
+            DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
+
+        private Drawable createGameplayComponents(WorkingBeatmap working, IBeatmap playableBeatmap) => new ScalingContainer(ScalingMode.Gameplay)
         {
-            target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
-        }
-
-        private void addGameplayComponents(Container target, WorkingBeatmap working, IBeatmap playableBeatmap)
-        {
-            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(working.Skin);
-
-            // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
-            // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
-
-            // load the skinning hierarchy first.
-            // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
-            target.Add(new ScalingContainer(ScalingMode.Gameplay)
-                .WithChild(beatmapSkinProvider
-                    .WithChild(target = rulesetSkinProvider)));
-
-            target.AddRange(new Drawable[]
+            Children = new Drawable[]
             {
-                DrawableRuleset,
+                DrawableRuleset.With(r =>
+                    r.FrameStableComponents.Children = new Drawable[]
+                    {
+                        ScoreProcessor,
+                        HealthProcessor,
+                        breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
+                        {
+                            Breaks = working.Beatmap.Breaks
+                        }
+                    }),
                 new ComboEffects(ScoreProcessor)
-            });
+            }
+        };
 
-            DrawableRuleset.FrameStableComponents.AddRange(new Drawable[]
-            {
-                ScoreProcessor,
-                HealthProcessor,
-                breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
-                {
-                    Breaks = working.Beatmap.Breaks
-                }
-            });
-        }
-
-        private void addOverlayComponents(Container target, WorkingBeatmap working)
+        private Drawable createOverlayComponents(WorkingBeatmap working) => new Container
         {
-            target.AddRange(new[]
+            RelativeSizeAxes = Axes.Both,
+            Children = new[]
             {
                 DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
                 BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
@@ -342,8 +349,8 @@ namespace osu.Game.Screens.Play
                     },
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
-            });
-        }
+            }
+        };
 
         private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
         {
@@ -351,14 +358,11 @@ namespace osu.Game.Screens.Play
             HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
         }
 
-        private void updateOverlayActivationMode()
+        private void updateGameplayState()
         {
-            bool canTriggerOverlays = DrawableRuleset.IsPaused.Value || breakTracker.IsBreakTime.Value;
-
-            if (DrawableRuleset.HasReplayLoaded.Value || canTriggerOverlays)
-                OverlayActivationMode.Value = OverlayActivation.UserTriggered;
-            else
-                OverlayActivationMode.Value = OverlayActivation.Disabled;
+            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value;
+            OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
+            LocalUserPlaying.Value = inGameplay;
         }
 
         private void updatePauseOnFocusLostState() =>
@@ -439,6 +443,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Restart()
         {
+            // at the point of restarting the track should either already be paused or the volume should be zero.
+            // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
+            musicController.Stop();
+
             sampleRestart?.Play();
             RestartRequested?.Invoke();
 
@@ -655,7 +663,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(musicController.CurrentTrack);
 
-            updateOverlayActivationMode();
+            updateGameplayState();
         }
 
         public override void OnSuspending(IScreen next)
