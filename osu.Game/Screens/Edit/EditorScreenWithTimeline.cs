@@ -112,11 +112,18 @@ namespace osu.Game.Screens.Edit
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        new TimelineTickDisplay(),
                         CreateTimelineContent(),
                     }
-                }, timelineContainer.Add);
+                }, t =>
+                {
+                    timelineContainer.Add(t);
+                    OnTimelineLoaded(t);
+                });
             });
+        }
+
+        protected virtual void OnTimelineLoaded(TimelineArea timelineArea)
+        {
         }
 
         protected abstract Drawable CreateMainContent();

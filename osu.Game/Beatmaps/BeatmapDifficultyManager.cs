@@ -14,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
@@ -112,6 +113,34 @@ namespace osu.Game.Beatmaps
                 return existing;
 
             return computeDifficulty(key, beatmapInfo, rulesetInfo);
+        }
+
+        /// <summary>
+        /// Retrieves the <see cref="DifficultyRating"/> that describes a star rating.
+        /// </summary>
+        /// <remarks>
+        /// For more information, see: https://osu.ppy.sh/help/wiki/Difficulties
+        /// </remarks>
+        /// <param name="starRating">The star rating.</param>
+        /// <returns>The <see cref="DifficultyRating"/> that best describes <paramref name="starRating"/>.</returns>
+        public static DifficultyRating GetDifficultyRating(double starRating)
+        {
+            if (Precision.AlmostBigger(starRating, 6.5, 0.005))
+                return DifficultyRating.ExpertPlus;
+
+            if (Precision.AlmostBigger(starRating, 5.3, 0.005))
+                return DifficultyRating.Expert;
+
+            if (Precision.AlmostBigger(starRating, 4.0, 0.005))
+                return DifficultyRating.Insane;
+
+            if (Precision.AlmostBigger(starRating, 2.7, 0.005))
+                return DifficultyRating.Hard;
+
+            if (Precision.AlmostBigger(starRating, 2.0, 0.005))
+                return DifficultyRating.Normal;
+
+            return DifficultyRating.Easy;
         }
 
         private CancellationTokenSource trackedUpdateCancellationSource;
@@ -307,5 +336,7 @@ namespace osu.Game.Beatmaps
 
             // Todo: Add more members (BeatmapInfo.DifficultyRating? Attributes? Etc...)
         }
+
+        public DifficultyRating DifficultyRating => BeatmapDifficultyManager.GetDifficultyRating(Stars);
     }
 }

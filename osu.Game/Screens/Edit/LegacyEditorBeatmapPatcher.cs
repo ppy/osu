@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Edit
             toRemove.Sort();
             toAdd.Sort();
 
+            editorBeatmap.BeginChange();
+
             // Apply the changes.
             for (int i = toRemove.Count - 1; i >= 0; i--)
                 editorBeatmap.RemoveAt(toRemove[i]);
@@ -78,6 +80,8 @@ namespace osu.Game.Screens.Edit
                 foreach (var i in toAdd)
                     editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
             }
+
+            editorBeatmap.EndChange();
         }
 
         private string readString(byte[] state) => Encoding.UTF8.GetString(state);

@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             OriginPosition = body.PathOffset;
         }
 
+        public void RecyclePath() => body.RecyclePath();
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => body.ReceivePositionalInputAt(screenSpacePos);
     }
 }

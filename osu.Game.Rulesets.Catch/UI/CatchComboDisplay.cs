@@ -33,10 +33,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnNewResult(DrawableCatchHitObject judgedObject, JudgementResult result)
         {
-            if (!result.Judgement.AffectsCombo || !result.HasResult)
+            if (!result.Type.AffectsCombo() || !result.HasResult)
                 return;
 
-            if (result.Type == HitResult.Miss)
+            if (!result.IsHit)
             {
                 updateCombo(0, null);
                 return;
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnRevertResult(DrawableCatchHitObject judgedObject, JudgementResult result)
         {
-            if (!result.Judgement.AffectsCombo || !result.HasResult)
+            if (!result.Type.AffectsCombo() || !result.HasResult)
                 return;
 
             updateCombo(result.ComboAtJudgement, judgedObject.AccentColour.Value);

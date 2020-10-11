@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -32,6 +35,7 @@ namespace osu.Game.Rulesets.UI
         public GameplayClock GameplayClock => stabilityGameplayClock;
 
         [Cached(typeof(GameplayClock))]
+        [Cached(typeof(ISamplePlaybackDisabler))]
         private readonly StabilityGameplayClock stabilityGameplayClock;
 
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
@@ -55,13 +59,16 @@ namespace osu.Game.Rulesets.UI
         private int direction;
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock)
+        private void load(GameplayClock clock, ISamplePlaybackDisabler sampleDisabler)
         {
             if (clock != null)
             {
-                stabilityGameplayClock.ParentGameplayClock = parentGameplayClock = clock;
+                parentGameplayClock = stabilityGameplayClock.ParentGameplayClock = clock;
                 GameplayClock.IsPaused.BindTo(clock.IsPaused);
             }
+
+            // this is a bit temporary. should really be done inside of GameplayClock (but requires large structural changes).
+            stabilityGameplayClock.ParentSampleDisabler = sampleDisabler;
         }
 
         protected override void LoadComplete()
@@ -204,25 +211,37 @@ namespace osu.Game.Rulesets.UI
 
         private void setClock()
         {
-            // in case a parent gameplay clock isn't available, just use the parent clock.
-            parentGameplayClock ??= Clock;
-
-            Clock = GameplayClock;
-            ProcessCustomClock = false;
+            if (parentGameplayClock == null)
+            {
+                // in case a parent gameplay clock isn't available, just use the parent clock.
+                parentGameplayClock ??= Clock;
+            }
+            else
+            {
+                Clock = GameplayClock;
+            }
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
 
         private class StabilityGameplayClock : GameplayClock
         {
-            public IFrameBasedClock ParentGameplayClock;
+            public GameplayClock ParentGameplayClock;
+
+            public ISamplePlaybackDisabler ParentSampleDisabler;
+
+            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
 
             public StabilityGameplayClock(FramedClock underlyingClock)
                 : base(underlyingClock)
             {
             }
 
-            public override bool IsSeeking => ParentGameplayClock != null && Math.Abs(CurrentTime - ParentGameplayClock.CurrentTime) > 200;
+            protected override bool ShouldDisableSamplePlayback =>
+                // handle the case where playback is catching up to real-time.
+                base.ShouldDisableSamplePlayback
+                || ParentSampleDisabler?.SamplePlaybackDisabled.Value == true
+                || (ParentGameplayClock != null && Math.Abs(CurrentTime - ParentGameplayClock.CurrentTime) > 200);
         }
     }
 }

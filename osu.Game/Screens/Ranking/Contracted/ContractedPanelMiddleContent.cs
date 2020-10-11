@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -13,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
                                             Spacing = new Vector2(0, 5),
-                                            ChildrenEnumerable = score.SortedStatistics.Select(s => createStatistic(s.Key.GetDescription(), s.Value.ToString()))
+                                            ChildrenEnumerable = score.GetStatisticsForDisplay().Where(s => !s.Result.IsBonus()).Select(createStatistic)
                                         },
                                         new FillFlowContainer
                                         {
@@ -197,6 +197,9 @@ namespace osu.Game.Screens.Ranking.Contracted
                 }
             };
         }
+
+        private Drawable createStatistic(HitResultDisplayStatistic result)
+            => createStatistic(result.DisplayName, result.MaxCount == null ? $"{result.Count}" : $"{result.Count}/{result.MaxCount}");
 
         private Drawable createStatistic(string key, string value) => new Container
         {

@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 
@@ -52,6 +51,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             InternalChildren = new Drawable[]
             {
                 Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
+                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
@@ -63,7 +63,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
-                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
             };
         }
 
@@ -87,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Tracking.BindValueChanged(updateSlidingSample);
         }
 
-        private SkinnableSound slidingSample;
+        private PausableSkinnableSound slidingSample;
 
         protected override void LoadSamples()
         {
@@ -103,19 +102,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
                 clone.Name = "sliderslide";
 
-                AddInternal(slidingSample = new SkinnableSound(clone)
+                AddInternal(slidingSample = new PausableSkinnableSound(clone)
                 {
                     Looping = true
                 });
             }
         }
 
+        public override void StopAllSamples()
+        {
+            base.StopAllSamples();
+            slidingSample?.Stop();
+        }
+
         private void updateSlidingSample(ValueChangedEvent<bool> tracking)
         {
-            // note that samples will not start playing if exiting a seek operation in the middle of a slider.
-            // may be something we want to address at a later point, but not so easy to make happen right now
-            // (SkinnableSound would need to expose whether the sample is already playing and this logic would need to run in Update).
-            if (tracking.NewValue && ShouldPlaySamples)
+            if (tracking.NewValue)
                 slidingSample?.Play();
             else
                 slidingSample?.Stop();
@@ -247,7 +249,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             // rather than doing it this way, we should probably attach the sample to the tail circle.
             // this can only be done after we stop using LegacyLastTick.
-            if (TailCircle.Result.Type != HitResult.Miss)
+            if (TailCircle.IsHit)
                 base.PlaySamples();
         }
 
