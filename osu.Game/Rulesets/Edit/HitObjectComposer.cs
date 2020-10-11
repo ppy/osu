@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Edit
                         {
                             Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X }
                         },
-                        new ToolboxGroup("开关选项 (Q~P)")
+                        new ToolboxGroup("编辑/音效选项 (Q~P)")
                         {
                             Child = togglesCollection = new FillFlowContainer
                             {

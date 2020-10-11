@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             yield return new TernaryButton(NewCombo, "新连击", () => new SpriteIcon { Icon = FontAwesome.Regular.DotCircle });
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
-                yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => getIconForSample(kvp.Key));
+                yield return new TernaryButton(kvp.Value, getNameForSample(kvp.Key).Replace("hit", string.Empty).Titleize(), () => getIconForSample(kvp.Key));
         }
 
         private Drawable getIconForSample(string sampleName)
@@ -149,6 +149,28 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             return null;
+        }
+
+        //临时方案
+        public static string getNameForSample(string sampleName)
+        {
+            switch( sampleName )
+            {
+                case "Clap":
+                case HitSampleInfo.HIT_CLAP:
+                    return "击掌";
+                
+                case "Finish":
+                case HitSampleInfo.HIT_FINISH:
+                    return "重音";
+                
+                case "Whistle":
+                case HitSampleInfo.HIT_WHISTLE:
+                    return "口哨";
+                
+                default:
+                    return sampleName;
+            }
         }
 
         #region Placement

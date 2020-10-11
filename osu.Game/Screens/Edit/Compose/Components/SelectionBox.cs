@@ -143,15 +143,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (CanScaleX && CanScaleY) addFullScaleComponents();
             if (CanScaleY) addYScaleComponents();
             if (CanRotate) addRotationComponents();
-            if (CanReverse) addButton(FontAwesome.Solid.Backward, "Reverse pattern", () => OnReverse?.Invoke());
+            if (CanReverse) addButton(FontAwesome.Solid.Backward, "反转", () => OnReverse?.Invoke());
         }
 
         private void addRotationComponents()
         {
             const float separation = 40;
 
-            addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise", () => OnRotation?.Invoke(-90));
-            addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise", () => OnRotation?.Invoke(90));
+            addButton(FontAwesome.Solid.Undo, "逆时针旋转90°", () => OnRotation?.Invoke(-90));
+            addButton(FontAwesome.Solid.Redo, "顺时针旋转90°", () => OnRotation?.Invoke(90));
 
             AddRangeInternal(new Drawable[]
             {
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
                 },
-                new SelectionBoxDragHandleButton(FontAwesome.Solid.Redo, "Free rotate")
+                new SelectionBoxDragHandleButton(FontAwesome.Solid.Redo, "自由旋转")
                 {
                     Anchor = Anchor.TopCentre,
                     Y = -separation,
@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addYScaleComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical));
+            addButton(FontAwesome.Solid.ArrowsAltV, "垂直翻转", () => OnFlip?.Invoke(Direction.Vertical));
 
             addDragHandle(Anchor.TopCentre);
             addDragHandle(Anchor.BottomCentre);
@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addXScaleComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally", () => OnFlip?.Invoke(Direction.Horizontal));
+            addButton(FontAwesome.Solid.ArrowsAltH, "水平翻转", () => OnFlip?.Invoke(Direction.Horizontal));
 
             addDragHandle(Anchor.CentreLeft);
             addDragHandle(Anchor.CentreRight);
