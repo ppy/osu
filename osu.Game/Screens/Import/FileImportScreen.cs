@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Import
                 return;
 
             //如果文件被移动或删除
-            if (!storage.Exists(path))
+            if (!File.Exists(path))
             {
                 Refresh();
                 currentFileText.Text = "文件不存在";
