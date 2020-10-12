@@ -12,6 +12,8 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
+        public float TotalHeight => DrawableCarouselBeatmapSet.HEIGHT + BeatmapSet.Beatmaps.Count * DrawableCarouselBeatmap.HEIGHT;
+
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
