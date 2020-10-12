@@ -707,7 +707,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(third.ControlPoints[5].Type.Value, Is.EqualTo(null));
                 Assert.That(third.ControlPoints[6].Position.Value, Is.EqualTo(new Vector2(480, 0)));
                 Assert.That(third.ControlPoints[6].Type.Value, Is.EqualTo(null));
-
             }
         }
     }
