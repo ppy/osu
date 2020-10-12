@@ -508,6 +508,5 @@ namespace osu.Game.Overlays.Mods
                 return true;
             }
         }
-
     }
 }
