@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -78,6 +79,9 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.UpdateItem();
 
+            beatmapContainer.Clear();
+            beatmapSetState?.UnbindAll();
+
             Content.Children = new Drawable[]
             {
                 new DelayedLoadUnloadWrapper(() =>
@@ -145,8 +149,6 @@ namespace osu.Game.Screens.Select.Carousel
                 }, 100, 5000)
             };
 
-            beatmapContainer.Clear();
-
             beatmapSetState = Item.State.GetBoundCopy();
             beatmapSetState.BindValueChanged(setSelected, true);
         }
@@ -156,14 +158,16 @@ namespace osu.Game.Screens.Select.Carousel
             switch (obj.NewValue)
             {
                 default:
-                    beatmapContainer.Clear();
+                    foreach (var beatmap in beatmapContainer)
+                        beatmap.FadeOut(50).Expire();
                     break;
 
                 case CarouselItemState.Selected:
 
                     var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
-                    LoadComponentsAsync(carouselBeatmapSet.Children.Select(c => c.CreateDrawableRepresentation()), loaded =>
+                    // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
+                    LoadComponentsAsync(carouselBeatmapSet.Children.Select(c => c.CreateDrawableRepresentation()).ToArray(), loaded =>
                     {
                         // make sure the pooled target hasn't changed.
                         if (carouselBeatmapSet != Item)
@@ -175,9 +179,9 @@ namespace osu.Game.Screens.Select.Carousel
                         {
                             item.Y = yPos;
                             yPos += item.Item.TotalHeight;
-
-                            beatmapContainer.Add(item);
                         }
+
+                        beatmapContainer.ChildrenEnumerable = loaded;
                     });
 
                     break;
