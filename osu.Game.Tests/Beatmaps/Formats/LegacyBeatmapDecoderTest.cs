@@ -688,6 +688,26 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(second.ControlPoints[1].Type.Value, Is.EqualTo(null));
                 Assert.That(second.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(376, -3)));
                 Assert.That(second.ControlPoints[2].Type.Value, Is.EqualTo(null));
+
+                // Implicit multi-segment
+                var third = ((IHasPath)decoded.HitObjects[2]).Path;
+
+                Assert.That(third.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
+                Assert.That(third.ControlPoints[0].Type.Value, Is.EqualTo(PathType.Bezier));
+                Assert.That(third.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(0, 192)));
+                Assert.That(third.ControlPoints[1].Type.Value, Is.EqualTo(null));
+                Assert.That(third.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(224, 192)));
+                Assert.That(third.ControlPoints[2].Type.Value, Is.EqualTo(null));
+
+                Assert.That(third.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(224, 0)));
+                Assert.That(third.ControlPoints[3].Type.Value, Is.EqualTo(PathType.Bezier));
+                Assert.That(third.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(224, -192)));
+                Assert.That(third.ControlPoints[4].Type.Value, Is.EqualTo(null));
+                Assert.That(third.ControlPoints[5].Position.Value, Is.EqualTo(new Vector2(480, -192)));
+                Assert.That(third.ControlPoints[5].Type.Value, Is.EqualTo(null));
+                Assert.That(third.ControlPoints[6].Position.Value, Is.EqualTo(new Vector2(480, 0)));
+                Assert.That(third.ControlPoints[6].Type.Value, Is.EqualTo(null));
+
             }
         }
     }
