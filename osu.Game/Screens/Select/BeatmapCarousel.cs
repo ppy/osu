@@ -96,9 +96,6 @@ namespace osu.Game.Screens.Select
 
             beatmapSets.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
 
-            // preload drawables as the ctor overhead is quite high currently.
-            _ = newRoot.Drawables;
-
             root = newRoot;
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
@@ -119,6 +116,8 @@ namespace osu.Game.Screens.Select
         }
 
         private readonly List<float> yPositions = new List<float>();
+        private readonly List<CarouselItem> visibleItems = new List<CarouselItem>();
+
         private readonly Cached itemsCache = new Cached();
         private readonly Cached scrollPositionCache = new Cached();
 
@@ -129,8 +128,6 @@ namespace osu.Game.Screens.Select
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
-
-        protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
 
         private CarouselRoot root;
 
@@ -178,7 +175,8 @@ namespace osu.Game.Screens.Select
             itemRestored = beatmaps.BeatmapRestored.GetBoundCopy();
             itemRestored.BindValueChanged(beatmapRestored);
 
-            loadBeatmapSets(GetLoadableBeatmaps());
+            if (!beatmapSets.Any())
+                loadBeatmapSets(GetLoadableBeatmaps());
         }
 
         protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.AllButFiles);
@@ -558,71 +556,78 @@ namespace osu.Game.Screens.Select
         {
             base.Update();
 
+            //todo: this should only refresh items, not everything here
             if (!itemsCache.IsValid)
+            {
                 updateItems();
 
-            // Remove all items that should no longer be on-screen
-            scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
+                // Remove all items that should no longer be on-screen
+                scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
-            // Find index range of all items that should be on-screen
-            Trace.Assert(Items.Count == yPositions.Count);
+                // Find index range of all items that should be on-screen
+                int firstIndex = yPositions.BinarySearch(visibleUpperBound - DrawableCarouselItem.MAX_HEIGHT);
+                if (firstIndex < 0) firstIndex = ~firstIndex;
+                int lastIndex = yPositions.BinarySearch(visibleBottomBound);
+                if (lastIndex < 0) lastIndex = ~lastIndex;
 
-            int firstIndex = yPositions.BinarySearch(visibleUpperBound - DrawableCarouselItem.MAX_HEIGHT);
-            if (firstIndex < 0) firstIndex = ~firstIndex;
-            int lastIndex = yPositions.BinarySearch(visibleBottomBound);
-            if (lastIndex < 0) lastIndex = ~lastIndex;
+                scrollableContent.Clear();
 
-            int notVisibleCount = 0;
-
-            // Add those items within the previously found index range that should be displayed.
-            for (int i = firstIndex; i < lastIndex; ++i)
-            {
-                DrawableCarouselItem item = Items[i];
-
-                if (!item.Item.Visible)
+                // Add those items within the previously found index range that should be displayed.
+                for (int i = firstIndex; i < lastIndex; ++i)
                 {
-                    if (!item.IsPresent)
-                        notVisibleCount++;
-                    continue;
-                }
+                    DrawableCarouselItem item = visibleItems[i].CreateDrawableRepresentation();
 
-                float depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
+                    item.Y = yPositions[i];
+                    item.Depth = i;
 
-                // Only add if we're not already part of the content.
-                if (!scrollableContent.Contains(item))
-                {
-                    // Makes sure headers are always _below_ items,
-                    // and depth flows downward.
-                    item.Depth = depth;
+                    scrollableContent.Add(item);
 
-                    switch (item.LoadState)
+                    // if (!item.Item.Visible)
+                    // {
+                    //     if (!item.IsPresent)
+                    //         notVisibleCount++;
+                    //     continue;
+                    // }
+
+                    // Only add if we're not already part of the content.
+                    /*
+                    if (!scrollableContent.Contains(item))
                     {
-                        case LoadState.NotLoaded:
-                            LoadComponentAsync(item);
-                            break;
+                        // Makes sure headers are always _below_ items,
+                        // and depth flows downward.
+                        item.Depth = depth;
 
-                        case LoadState.Loading:
-                            break;
+                        switch (item.LoadState)
+                        {
+                            case LoadState.NotLoaded:
+                                LoadComponentAsync(item);
+                                break;
 
-                        default:
-                            scrollableContent.Add(item);
-                            break;
+                            case LoadState.Loading:
+                                break;
+
+                            default:
+                                scrollableContent.Add(item);
+                                break;
+                        }
                     }
-                }
-                else
-                {
-                    scrollableContent.ChangeChildDepth(item, depth);
+                    else
+                    {
+                        scrollableContent.ChangeChildDepth(item, depth);
+                    }
+                    */
                 }
             }
-
-            // this is not actually useful right now, but once we have groups may well be.
-            if (notVisibleCount > 50)
-                itemsCache.Invalidate();
 
             // Update externally controlled state of currently visible items
             // (e.g. x-offset and opacity).
             foreach (DrawableCarouselItem p in scrollableContent.Children)
+            {
                 updateItem(p);
+
+                // foreach (var pChild in p.ChildItems)
+                //     updateItem(pChild, p);
+            }
         }
 
         protected override void UpdateAfterChildren()
@@ -631,15 +636,6 @@ namespace osu.Game.Screens.Select
 
             if (!scrollPositionCache.IsValid)
                 updateScrollPosition();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            // aggressively dispose "off-screen" items to reduce GC pressure.
-            foreach (var i in Items)
-                i.Dispose();
         }
 
         private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
@@ -704,69 +700,39 @@ namespace osu.Game.Screens.Select
         /// <returns>The Y position of the currently selected item.</returns>
         private void updateItems()
         {
-            Items = root.Drawables.ToList();
-
             yPositions.Clear();
+            visibleItems.Clear();
 
             float currentY = visibleHalfHeight;
-            DrawableCarouselBeatmapSet lastSet = null;
 
             scrollTarget = null;
 
-            foreach (DrawableCarouselItem d in Items)
+            foreach (CarouselItem item in root.Children)
             {
-                if (d.IsPresent)
+                if (item.Filtered.Value)
+                    continue;
+
+                switch (item)
                 {
-                    switch (d)
+                    case CarouselBeatmapSet set:
                     {
-                        case DrawableCarouselBeatmapSet set:
-                        {
-                            lastSet = set;
+                        visibleItems.Add(set);
+                        yPositions.Add(currentY);
+                        //lastSet = set;
 
-                            set.MoveToX(set.Item.State.Value == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
-                            set.MoveToY(currentY, 750, Easing.OutExpo);
-                            break;
-                        }
-
-                        case DrawableCarouselBeatmap beatmap:
-                        {
-                            if (beatmap.Item.State.Value == CarouselItemState.Selected)
-                                // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
-                                // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
-                                // then reapply the top semi-transparent area (because carousel's screen space starts below it)
-                                // and finally add half of the panel's own height to achieve vertical centering of the panel itself
-                                scrollTarget = currentY - visibleHalfHeight + BleedTop + beatmap.DrawHeight / 2;
-
-                            void performMove(float y, float? startY = null)
-                            {
-                                if (startY != null) beatmap.MoveTo(new Vector2(0, startY.Value));
-                                beatmap.MoveToX(beatmap.Item.State.Value == CarouselItemState.Selected ? -50 : 0, 500, Easing.OutExpo);
-                                beatmap.MoveToY(y, 750, Easing.OutExpo);
-                            }
-
-                            Debug.Assert(lastSet != null);
-
-                            float? setY = null;
-                            if (!d.IsLoaded || beatmap.Alpha == 0) // can't use IsPresent due to DrawableCarouselItem override.
-                                setY = lastSet.Y + lastSet.DrawHeight + 5;
-
-                            if (d.IsLoaded)
-                                performMove(currentY, setY);
-                            else
-                            {
-                                float y = currentY;
-                                d.OnLoadComplete += _ => performMove(y, setY);
-                            }
-
-                            break;
-                        }
+                        // TODO: move this logic to DCBS too.
+                        // set.MoveToX(set.Item.State.Value == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
+                        // set.MoveToY(currentY, 750, Easing.OutExpo);
+                        currentY += set.TotalHeight;
+                        break;
                     }
+
+                    default:
+                        continue;
+                    //
+                    //     break;
+                    // }
                 }
-
-                yPositions.Add(currentY);
-
-                if (d.Item.Visible)
-                    currentY += d.DrawHeight + 5;
             }
 
             currentY += visibleHalfHeight;
@@ -869,6 +835,7 @@ namespace osu.Game.Screens.Select
             /// </summary>
             public bool UserScrolling { get; private set; }
 
+            // ReSharper disable once OptionalParameterHierarchyMismatch fuck off rider
             protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
             {
                 UserScrolling = true;

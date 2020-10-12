@@ -10,6 +10,8 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmap : CarouselItem
     {
+        public override float TotalHeight => DrawableCarouselBeatmap.HEIGHT;
+
         public readonly BeatmapInfo Beatmap;
 
         public CarouselBeatmap(BeatmapInfo beatmap)

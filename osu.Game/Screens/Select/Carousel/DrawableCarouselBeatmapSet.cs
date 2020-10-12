@@ -43,7 +43,12 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
+        public override IEnumerable<DrawableCarouselItem> ChildItems => beatmapContainer?.Children ?? base.ChildItems;
+
         private readonly BeatmapSetInfo beatmapSet;
+
+        private Container<DrawableCarouselBeatmap> beatmapContainer;
+        private Bindable<CarouselItemState> beatmapSetState;
 
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
             : base(set)
@@ -119,6 +124,44 @@ namespace osu.Game.Screens.Select.Carousel
                     }
                 }
             };
+
+            // TODO: temporary. we probably want to *not* inherit DrawableCarouselItem for this class, but only the above header portion.
+            AddRangeInternal(new Drawable[]
+            {
+                beatmapContainer = new Container<DrawableCarouselBeatmap>
+                {
+                    X = 50,
+                    Y = MAX_HEIGHT,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
+            });
+
+            beatmapSetState = Item.State.GetBoundCopy();
+            beatmapSetState.BindValueChanged(setSelected, true);
+        }
+
+        private void setSelected(ValueChangedEvent<CarouselItemState> obj)
+        {
+            switch (obj.NewValue)
+            {
+                default:
+                    beatmapContainer.Clear();
+                    break;
+
+                case CarouselItemState.Selected:
+
+                    float yPos = 0;
+
+                    foreach (var item in ((CarouselBeatmapSet)Item).Beatmaps.Select(b => b.CreateDrawableRepresentation()).OfType<DrawableCarouselBeatmap>())
+                    {
+                        item.Y = yPos;
+                        beatmapContainer.Add(item);
+                        yPos += item.Item.TotalHeight;
+                    }
+
+                    break;
+            }
         }
 
         private const int maximum_difficulty_icons = 18;
