@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -835,40 +836,27 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Title = $"test set #{id}!",
                     AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
                 },
-                Beatmaps = new List<BeatmapInfo>(new[]
-                {
-                    new BeatmapInfo
-                    {
-                        OnlineBeatmapID = id * 10,
-                        Version = "Normal",
-                        StarDifficulty = 2,
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            OverallDifficulty = 3.5f,
-                        }
-                    },
-                    new BeatmapInfo
-                    {
-                        OnlineBeatmapID = id * 10 + 1,
-                        Version = "Hard",
-                        StarDifficulty = 5,
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            OverallDifficulty = 5,
-                        }
-                    },
-                    new BeatmapInfo
-                    {
-                        OnlineBeatmapID = id * 10 + 2,
-                        Version = "Insane",
-                        StarDifficulty = 6,
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            OverallDifficulty = 7,
-                        }
-                    },
-                }),
+                Beatmaps = getBeatmaps(RNG.Next(1, 20)).ToList()
             };
+        }
+
+        private IEnumerable<BeatmapInfo> getBeatmaps(int count)
+        {
+            int id = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                yield return new BeatmapInfo
+                {
+                    OnlineBeatmapID = id++ * 10,
+                    Version = "Normal",
+                    StarDifficulty = RNG.NextSingle() * 10,
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        OverallDifficulty = RNG.NextSingle() * 10,
+                    }
+                };
+            }
         }
 
         private BeatmapSetInfo createTestBeatmapSetWithManyDifficulties(int id)
