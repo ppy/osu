@@ -45,26 +45,40 @@ namespace osu.Game.Screens.Select.Carousel
 
         public override IEnumerable<DrawableCarouselItem> ChildItems => beatmapContainer?.Children ?? base.ChildItems;
 
-        private readonly BeatmapSetInfo beatmapSet;
+        private BeatmapSetInfo beatmapSet => (Item as CarouselBeatmapSet)?.BeatmapSet;
 
         private Container<DrawableCarouselBeatmap> beatmapContainer;
         private Bindable<CarouselItemState> beatmapSetState;
 
-        public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
-            : base(set)
-        {
-            beatmapSet = set.BeatmapSet;
-        }
+        [Resolved]
+        private BeatmapManager manager { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay)
+        private void load(BeatmapSetOverlay beatmapOverlay)
         {
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
 
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
 
-            Children = new Drawable[]
+            // TODO: temporary. we probably want to *not* inherit DrawableCarouselItem for this class, but only the above header portion.
+            AddRangeInternal(new Drawable[]
+            {
+                beatmapContainer = new Container<DrawableCarouselBeatmap>
+                {
+                    X = 50,
+                    Y = MAX_HEIGHT,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
+            });
+        }
+
+        protected override void UpdateItem()
+        {
+            base.UpdateItem();
+
+            Content.Children = new Drawable[]
             {
                 new DelayedLoadUnloadWrapper(() =>
                     {
@@ -125,17 +139,7 @@ namespace osu.Game.Screens.Select.Carousel
                 }
             };
 
-            // TODO: temporary. we probably want to *not* inherit DrawableCarouselItem for this class, but only the above header portion.
-            AddRangeInternal(new Drawable[]
-            {
-                beatmapContainer = new Container<DrawableCarouselBeatmap>
-                {
-                    X = 50,
-                    Y = MAX_HEIGHT,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                },
-            });
+            beatmapContainer.Clear();
 
             beatmapSetState = Item.State.GetBoundCopy();
             beatmapSetState.BindValueChanged(setSelected, true);
@@ -153,11 +157,16 @@ namespace osu.Game.Screens.Select.Carousel
 
                     float yPos = 0;
 
-                    foreach (var item in ((CarouselBeatmapSet)Item).Beatmaps.Select(b => b.CreateDrawableRepresentation()).OfType<DrawableCarouselBeatmap>())
+                    var carouselBeatmapSet = (CarouselBeatmapSet)Item;
+
+                    foreach (var item in carouselBeatmapSet.Children)
                     {
-                        item.Y = yPos;
-                        beatmapContainer.Add(item);
-                        yPos += item.Item.TotalHeight;
+                        var beatmapPanel = item.CreateDrawableRepresentation();
+
+                        beatmapPanel.Y = yPos;
+                        yPos += item.TotalHeight;
+
+                        beatmapContainer.Add((DrawableCarouselBeatmap)beatmapPanel);
                     }
 
                     break;
