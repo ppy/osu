@@ -676,6 +676,8 @@ namespace osu.Game.Screens.Select
             return set;
         }
 
+        private const float panel_padding = 5;
+
         /// <summary>
         /// Computes the target Y positions for every item in the carousel.
         /// </summary>
@@ -705,7 +707,7 @@ namespace osu.Game.Screens.Select
                         // TODO: move this logic to DCBS too.
                         // set.MoveToX(set.Item.State.Value == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
                         // set.MoveToY(currentY, 750, Easing.OutExpo);
-                        currentY += set.TotalHeight;
+                        currentY += set.TotalHeight + panel_padding;
                         break;
                     }
 
