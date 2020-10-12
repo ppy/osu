@@ -62,10 +62,10 @@ namespace osu.Game.Tests.Rulesets.Scoring
         /// <param name="maxResult">The maximum <see cref="HitResult"/> achievable.</param>
         /// <param name="expectedScore">Expected score after all objects have been judged, rounded to the nearest integer.</param>
         /// <remarks>
-        /// This test intentionally misses the 3rd hitobject to achieve lower than 75% accuracy and exactly 50% max combo.
+        /// This test intentionally misses the 3rd hitobject to achieve lower than 75% accuracy and 50% max combo.
         /// <para>
         /// For standardised scoring, <paramref name="expectedScore"/> is calculated using the following formula:
-        /// 1_000_000 * (((3 * <paramref name="hitResult"/>) / (4 * <paramref name="maxResult"/>)) * 30% + 50% * 70%)
+        /// 1_000_000 * (((3 * <paramref name="hitResult"/>) / (4 * <paramref name="maxResult"/>)) * 30% + (bestCombo / maxCombo) * 70%)
         /// </para>
         /// <para>
         /// For classic scoring, <paramref name="expectedScore"/> is calculated using the following formula:
