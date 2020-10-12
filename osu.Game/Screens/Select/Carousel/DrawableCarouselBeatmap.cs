@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class DrawableCarouselBeatmap : DrawableCarouselItem, IHasContextMenu
     {
-        public const float HEIGHT = MAX_HEIGHT;
+        public const float HEIGHT = MAX_HEIGHT * 0.6f;
 
         private readonly BeatmapInfo beatmap;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Select.Carousel
             : base(panel)
         {
             beatmap = panel.Beatmap;
-            Height *= 0.60f;
+            Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -169,6 +169,8 @@ namespace osu.Game.Screens.Select.Carousel
         protected override void Selected()
         {
             base.Selected();
+
+            BorderContainer.MoveToX(Item.State.Value == CarouselItemState.Selected ? -50 : 0, 500, Easing.OutExpo);
 
             background.Colour = ColourInfo.GradientVertical(
                 new Color4(20, 43, 51, 255),

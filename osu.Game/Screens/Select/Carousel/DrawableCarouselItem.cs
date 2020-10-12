@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -27,10 +29,13 @@ namespace osu.Game.Screens.Select.Carousel
 
         public readonly CarouselItem Item;
 
-        private Container nestedContainer;
-        private Container borderContainer;
+        public virtual IEnumerable<DrawableCarouselItem> ChildItems => Enumerable.Empty<DrawableCarouselItem>();
 
-        private Box hoverLayer;
+        private readonly Container nestedContainer;
+
+        protected readonly Container BorderContainer;
+
+        private readonly Box hoverLayer;
 
         protected override Container<Drawable> Content => nestedContainer;
 
@@ -41,14 +46,8 @@ namespace osu.Game.Screens.Select.Carousel
             Height = MAX_HEIGHT;
             RelativeSizeAxes = Axes.X;
             Alpha = 0;
-        }
 
-        private SampleChannel sampleHover;
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
-        {
-            InternalChild = borderContainer = new Container
+            InternalChild = BorderContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
@@ -68,7 +67,13 @@ namespace osu.Game.Screens.Select.Carousel
                     },
                 }
             };
+        }
 
+        private SampleChannel sampleHover;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuColour colours)
+        {
             sampleHover = audio.Samples.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
@@ -87,7 +92,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.OnHoverLost(e);
         }
 
-        public void SetMultiplicativeAlpha(float alpha) => borderContainer.Alpha = alpha;
+        public void SetMultiplicativeAlpha(float alpha) => BorderContainer.Alpha = alpha;
 
         protected override void LoadComplete()
         {
@@ -123,8 +128,8 @@ namespace osu.Game.Screens.Select.Carousel
         {
             Item.State.Value = CarouselItemState.Selected;
 
-            borderContainer.BorderThickness = 2.5f;
-            borderContainer.EdgeEffect = new EdgeEffectParameters
+            BorderContainer.BorderThickness = 2.5f;
+            BorderContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = new Color4(130, 204, 255, 150),
@@ -137,8 +142,8 @@ namespace osu.Game.Screens.Select.Carousel
         {
             Item.State.Value = CarouselItemState.NotSelected;
 
-            borderContainer.BorderThickness = 0;
-            borderContainer.EdgeEffect = new EdgeEffectParameters
+            BorderContainer.BorderThickness = 0;
+            BorderContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(1),

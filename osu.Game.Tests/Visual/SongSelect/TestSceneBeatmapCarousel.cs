@@ -709,19 +709,20 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null)
         {
-            createCarousel(carouselAdjust);
-
-            if (beatmapSets == null)
-            {
-                beatmapSets = new List<BeatmapSetInfo>();
-
-                for (int i = 1; i <= set_count; i++)
-                    beatmapSets.Add(createTestBeatmapSet(i));
-            }
-
             bool changed = false;
-            AddStep($"Load {(beatmapSets.Count > 0 ? beatmapSets.Count.ToString() : "some")} beatmaps", () =>
+
+            createCarousel(c =>
             {
+                carouselAdjust?.Invoke(c);
+
+                if (beatmapSets == null)
+                {
+                    beatmapSets = new List<BeatmapSetInfo>();
+
+                    for (int i = 1; i <= set_count; i++)
+                        beatmapSets.Add(createTestBeatmapSet(i));
+                }
+
                 carousel.Filter(initialCriteria?.Invoke() ?? new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
                 carousel.BeatmapSets = beatmapSets;
@@ -807,7 +808,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private bool selectedBeatmapVisible()
         {
-            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
+            var currentlySelected = carousel.Items.FirstOrDefault(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
             if (currentlySelected == null)
                 return true;
 
@@ -908,9 +909,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestBeatmapCarousel : BeatmapCarousel
         {
-            public new List<DrawableCarouselItem> Items => base.Items;
-
             public bool PendingFilterTask => PendingFilter != null;
+
+            public IEnumerable<DrawableCarouselItem> Items => InternalChildren.OfType<DrawableCarouselItem>();
 
             protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();
         }
