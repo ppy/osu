@@ -566,12 +566,8 @@ namespace osu.Game.Screens.Select
 
             bool revalidateItems = !itemsCache.IsValid;
 
-            //todo: this should only refresh items, not everything here
             if (revalidateItems)
-                updateItems();
-
-            // Remove all items that should no longer be on-screen
-            //scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
+                updateYPositions();
 
             // Find index range of all items that should be on-screen
             int firstIndex = yPositions.BinarySearch(visibleUpperBound);
@@ -586,6 +582,9 @@ namespace osu.Game.Screens.Select
 
             if (revalidateItems || firstIndex != displayedRange.first || lastIndex != displayedRange.last)
             {
+                // Remove all items that should no longer be on-screen
+                scrollableContent.RemoveAll(p => p.Y + p.Item.TotalHeight < visibleUpperBound || p.Y > visibleBottomBound);
+
                 displayedRange = (firstIndex, lastIndex);
 
                 // Add those items within the previously found index range that should be displayed.
@@ -598,11 +597,22 @@ namespace osu.Game.Screens.Select
                     if (panel == null)
                     {
                         panel = setPool.Get(p => p.Item = item);
+                        panel.Y = yPositions[i];
+                        panel.Depth = i;
+
+                        panel.ClearTransforms();
+
                         scrollableContent.Add(panel);
                     }
+                    else
+                    {
+                        if (panel.IsPresent)
+                            panel.MoveToY(yPositions[i], 800, Easing.OutQuint);
+                        else
+                            panel.Y = yPositions[i];
 
-                    panel.Y = yPositions[i];
-                    scrollableContent.ChangeChildDepth(panel, i);
+                        scrollableContent.ChangeChildDepth(panel, i);
+                    }
                 }
             }
 
@@ -682,7 +692,7 @@ namespace osu.Game.Screens.Select
         /// Computes the target Y positions for every item in the carousel.
         /// </summary>
         /// <returns>The Y position of the currently selected item.</returns>
-        private void updateItems()
+        private void updateYPositions()
         {
             yPositions.Clear();
             visibleItems.Clear();
