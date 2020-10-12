@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Select.Carousel
             State.Value = CarouselItemState.Collapsed;
         }
 
-        protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
+        public override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
 
         public override void Filter(FilterCriteria criteria)
         {
