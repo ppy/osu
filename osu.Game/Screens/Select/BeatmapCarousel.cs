@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select
         {
             CarouselRoot newRoot = new CarouselRoot(this);
 
-            beatmapSets.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
+            newRoot.AddChildren(beatmapSets.Select(createCarouselSet).Where(g => g != null));
 
             root = newRoot;
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
