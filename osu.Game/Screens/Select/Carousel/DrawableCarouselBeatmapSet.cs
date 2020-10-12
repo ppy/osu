@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -153,9 +152,11 @@ namespace osu.Game.Screens.Select.Carousel
             beatmapSetState.BindValueChanged(setSelected, true);
         }
 
-        private void setSelected(ValueChangedEvent<CarouselItemState> obj)
+        private void setSelected(ValueChangedEvent<CarouselItemState> selected)
         {
-            switch (obj.NewValue)
+            BorderContainer.MoveToX(selected.NewValue == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
+
+            switch (selected.NewValue)
             {
                 default:
                     foreach (var beatmap in beatmapContainer)
