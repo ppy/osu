@@ -574,10 +574,15 @@ namespace osu.Game.Screens.Select
             //scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
             // Find index range of all items that should be on-screen
-            int firstIndex = yPositions.BinarySearch(visibleUpperBound - DrawableCarouselItem.MAX_HEIGHT);
+            int firstIndex = yPositions.BinarySearch(visibleUpperBound);
             if (firstIndex < 0) firstIndex = ~firstIndex;
             int lastIndex = yPositions.BinarySearch(visibleBottomBound);
             if (lastIndex < 0) lastIndex = ~lastIndex;
+
+            // as we can't be 100% sure on the size of individual carousel drawables,
+            // always play it safe and extend bounds by one.
+            firstIndex = Math.Max(0, firstIndex - 1);
+            lastIndex = Math.Min(yPositions.Count - 1, lastIndex + 1);
 
             if (revalidateItems || firstIndex != displayedRange.first || lastIndex != displayedRange.last)
             {
