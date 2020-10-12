@@ -52,7 +52,6 @@ namespace osu.Game.Screens.Select.Carousel
         private BeatmapSetInfo beatmapSet => (Item as CarouselBeatmapSet)?.BeatmapSet;
 
         private Container<DrawableCarouselItem> beatmapContainer;
-        private Bindable<CarouselItemState> beatmapSetState;
 
         [Resolved]
         private BeatmapManager manager { get; set; }
@@ -89,7 +88,6 @@ namespace osu.Game.Screens.Select.Carousel
             base.UpdateItem();
 
             beatmapContainer.Clear();
-            beatmapSetState?.UnbindAll();
 
             if (Item == null)
                 return;
@@ -160,46 +158,48 @@ namespace osu.Game.Screens.Select.Carousel
                     return mainFlow;
                 }, 100, 5000)
             };
-
-            beatmapSetState = Item.State.GetBoundCopy();
-            beatmapSetState.BindValueChanged(setSelected, true);
         }
 
-        private void setSelected(ValueChangedEvent<CarouselItemState> selected)
+        protected override void Deselected()
         {
-            BorderContainer.MoveToX(selected.NewValue == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
+            base.Deselected();
 
-            switch (selected.NewValue)
+            BorderContainer.MoveToX(0, 500, Easing.OutExpo);
+
+            foreach (var beatmap in beatmapContainer)
+                beatmap.FadeOut(50).Expire();
+        }
+
+        protected override void Selected()
+        {
+            base.Selected();
+
+            BorderContainer.MoveToX(-100, 500, Easing.OutExpo);
+
+            var carouselBeatmapSet = (CarouselBeatmapSet)Item;
+
+            // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
+            var visibleBeatmaps = carouselBeatmapSet.Children
+                                                    .Where(c => c.Visible)
+                                                    .Select(c => c.CreateDrawableRepresentation())
+                                                    .ToArray();
+
+            LoadComponentsAsync(visibleBeatmaps, loaded =>
             {
-                default:
-                    foreach (var beatmap in beatmapContainer)
-                        beatmap.FadeOut(50).Expire();
-                    break;
+                // make sure the pooled target hasn't changed.
+                if (carouselBeatmapSet != Item)
+                    return;
 
-                case CarouselItemState.Selected:
+                float yPos = 0;
 
-                    var carouselBeatmapSet = (CarouselBeatmapSet)Item;
+                foreach (var item in loaded)
+                {
+                    item.Y = yPos;
+                    yPos += item.Item.TotalHeight;
+                }
 
-                    // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
-                    LoadComponentsAsync(carouselBeatmapSet.Children.Select(c => c.CreateDrawableRepresentation()).ToArray(), loaded =>
-                    {
-                        // make sure the pooled target hasn't changed.
-                        if (carouselBeatmapSet != Item)
-                            return;
-
-                        float yPos = 0;
-
-                        foreach (var item in loaded)
-                        {
-                            item.Y = yPos;
-                            yPos += item.Item.TotalHeight;
-                        }
-
-                        beatmapContainer.ChildrenEnumerable = loaded;
-                    });
-
-                    break;
-            }
+                beatmapContainer.ChildrenEnumerable = loaded;
+            });
         }
 
         private const int maximum_difficulty_icons = 18;
