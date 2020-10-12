@@ -72,31 +72,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 double? length = null;
 
-                string[] pointSplit = split[5].Split('|');
-
-                var controlPoints = new List<Memory<PathControlPoint>>();
-                int startIndex = 0;
-                int endIndex = 0;
-                bool first = true;
-
-                while (++endIndex < pointSplit.Length)
-                {
-                    // Keep incrementing endIndex while it's not the start of a new segment (indicated by having a type descriptor of length 1).
-                    if (pointSplit[endIndex].Length > 1)
-                        continue;
-
-                    // Multi-segmented sliders DON'T contain the end point as part of the current segment as it's assumed to be the start of the next segment.
-                    // The start of the next segment is the index after the type descriptor.
-                    string endPoint = endIndex < pointSplit.Length - 1 ? pointSplit[endIndex + 1] : null;
-
-                    controlPoints.Add(convertControlPoints(pointSplit.AsSpan().Slice(startIndex, endIndex - startIndex), endPoint, first, pos));
-                    startIndex = endIndex;
-                    first = false;
-                }
-
-                if (endIndex > startIndex)
-                    controlPoints.Add(convertControlPoints(pointSplit.AsSpan().Slice(startIndex, endIndex - startIndex), null, first, pos));
-
                 int repeatCount = Parsing.ParseInt(split[6]);
 
                 if (repeatCount > 9000)
@@ -163,7 +138,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                result = CreateSlider(pos, combo, comboOffset, mergeControlPoints(controlPoints), length, repeatCount, nodeSamples);
+                result = CreateSlider(pos, combo, comboOffset, convertPathString(split[5], pos), length, repeatCount, nodeSamples);
             }
             else if (type.HasFlag(LegacyHitObjectType.Spinner))
             {
@@ -252,19 +227,71 @@ namespace osu.Game.Rulesets.Objects.Legacy
         }
 
         /// <summary>
-        /// Converts a given point list into a set of <see cref="PathControlPoint"/>s.
+        /// Converts a given point string into a set of path control points.
         /// </summary>
-        /// <param name="pointSpan">The point list.</param>
-        /// <param name="endPoint">Any extra endpoint to consider as part of the points. This will NOT be returned.</param>
-        /// <param name="first">Whether this is the first point list in the set. If <c>true</c> the returned set will contain a zero point.</param>
+        /// <remarks>
+        /// A point string takes the form: X|1:1|2:2|2:2|3:3|Y|1:1|2:2.
+        /// This has three segments:
+        /// <list type="number">
+        ///     <item>
+        ///         <description>X: { (1,1), (2,2) } (implicit segment)</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>X: { (2,2), (3,3) } (implicit segment)</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Y: { (3,3), (1,1), (2, 2) } (explicit segment)</description>
+        ///     </item>
+        /// </list>
+        /// </remarks>
+        /// <param name="pointString">The point string.</param>
         /// <param name="offset">The positional offset to apply to the control points.</param>
-        /// <returns>The set of points contained by <paramref name="pointSpan"/>, prepended by an extra zero point if <paramref name="first"/> is <c>true</c>.</returns>
-        private Memory<PathControlPoint> convertControlPoints(ReadOnlySpan<string> pointSpan, string endPoint, bool first, Vector2 offset)
+        /// <returns>All control points in the resultant path.</returns>
+        private PathControlPoint[] convertPathString(string pointString, Vector2 offset)
         {
-            PathType type = convertPathType(pointSpan[0]);
+            // This code takes on the responsibility of handling explicit segments of the path ("X" & "Y" from above). Implicit segments are handled by calls to convertPoints().
+            string[] pointSplit = pointString.Split('|');
+
+            var controlPoints = new List<Memory<PathControlPoint>>();
+            int startIndex = 0;
+            int endIndex = 0;
+            bool first = true;
+
+            while (++endIndex < pointSplit.Length)
+            {
+                // Keep incrementing endIndex while it's not the start of a new segment (indicated by having a type descriptor of length 1).
+                if (pointSplit[endIndex].Length > 1)
+                    continue;
+
+                // Multi-segmented sliders DON'T contain the end point as part of the current segment as it's assumed to be the start of the next segment.
+                // The start of the next segment is the index after the type descriptor.
+                string endPoint = endIndex < pointSplit.Length - 1 ? pointSplit[endIndex + 1] : null;
+
+                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), endPoint, first, offset));
+                startIndex = endIndex;
+                first = false;
+            }
+
+            if (endIndex > startIndex)
+                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), null, first, offset));
+
+            return mergePointsLists(controlPoints);
+        }
+
+        /// <summary>
+        /// Converts a given point list into a set of path segments.
+        /// </summary>
+        /// <param name="points">The point list.</param>
+        /// <param name="endPoint">Any extra endpoint to consider as part of the points. This will NOT be returned.</param>
+        /// <param name="first">Whether this is the first segment in the set. If <c>true</c> the first of the returned segments will contain a zero point.</param>
+        /// <param name="offset">The positional offset to apply to the control points.</param>
+        /// <returns>The set of points contained by <paramref name="points"/> as one or more segments of the path, prepended by an extra zero point if <paramref name="first"/> is <c>true</c>.</returns>
+        private IEnumerable<Memory<PathControlPoint>> convertPoints(ReadOnlyMemory<string> points, string endPoint, bool first, Vector2 offset)
+        {
+            PathType type = convertPathType(points.Span[0]);
 
             int readOffset = first ? 1 : 0; // First control point is zero for the first segment.
-            int readablePoints = pointSpan.Length - 1; // Total points readable from the base point span.
+            int readablePoints = points.Length - 1; // Total points readable from the base point span.
             int endPointLength = endPoint != null ? 1 : 0; // Extra length if an endpoint is given that lies outside the base point span.
 
             var vertices = new PathControlPoint[readOffset + readablePoints + endPointLength];
@@ -274,8 +301,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 vertices[i] = new PathControlPoint();
 
             // Parse into control points.
-            for (int i = 1; i < pointSpan.Length; i++)
-                readPoint(pointSpan[i], offset, out vertices[readOffset + i - 1]);
+            for (int i = 1; i < points.Length; i++)
+                readPoint(points.Span[i], offset, out vertices[readOffset + i - 1]);
 
             // If an endpoint is given, add it now.
             if (endPoint != null)
@@ -297,13 +324,25 @@ namespace osu.Game.Rulesets.Objects.Legacy
             vertices[0].Type.Value = type;
 
             // A path can have multiple segments of the same type if there are two sequential control points with the same position.
-            for (int i = 1; i < vertices.Length; i++)
+            // To handle such cases, this code may return multiple path segments with the final control point in each segment having a non-null type.
+            int startIndex = 0;
+            int endIndex = 0;
+
+            while (++endIndex < vertices.Length - endPointLength)
             {
-                if (vertices[i] == vertices[i - 1])
-                    vertices[i].Type.Value = type;
+                if (vertices[endIndex].Position.Value != vertices[endIndex - 1].Position.Value)
+                    continue;
+
+                // Force a type on the last point, and return the current control point set as a segment.
+                vertices[endIndex - 1].Type.Value = type;
+                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+
+                // Skip the current control point - as it's the same as the one that's just been returned.
+                startIndex = endIndex + 1;
             }
 
-            return vertices.AsMemory().Slice(0, vertices.Length - endPointLength);
+            if (endIndex > startIndex)
+                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
 
             static void readPoint(string value, Vector2 startPos, out PathControlPoint point)
             {
@@ -317,7 +356,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                                                                                     - (p[1].Position.Value.X - p[0].Position.Value.X) * (p[2].Position.Value.Y - p[0].Position.Value.Y));
         }
 
-        private PathControlPoint[] mergeControlPoints(List<Memory<PathControlPoint>> controlPointList)
+        private PathControlPoint[] mergePointsLists(List<Memory<PathControlPoint>> controlPointList)
         {
             int totalCount = 0;
 
