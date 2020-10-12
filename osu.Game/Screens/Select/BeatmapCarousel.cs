@@ -16,6 +16,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Threading;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -136,6 +137,8 @@ namespace osu.Game.Screens.Select
         private IBindable<WeakReference<BeatmapInfo>> itemHidden;
         private IBindable<WeakReference<BeatmapInfo>> itemRestored;
 
+        private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
+
         public BeatmapCarousel()
         {
             root = new CarouselRoot(this);
@@ -146,9 +149,13 @@ namespace osu.Game.Screens.Select
                 {
                     Masking = false,
                     RelativeSizeAxes = Axes.Both,
-                    Child = scrollableContent = new Container<DrawableCarouselItem>
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
+                        setPool,
+                        scrollableContent = new Container<DrawableCarouselItem>
+                        {
+                            RelativeSizeAxes = Axes.X,
+                        }
                     }
                 }
             };
@@ -580,11 +587,13 @@ namespace osu.Game.Screens.Select
                 // Add those items within the previously found index range that should be displayed.
                 for (int i = firstIndex; i < lastIndex; ++i)
                 {
-                    var panel = scrollableContent.FirstOrDefault(c => c.Item == visibleItems[i]);
+                    var item = visibleItems[i];
+
+                    var panel = scrollableContent.FirstOrDefault(c => c.Item == item);
 
                     if (panel == null)
                     {
-                        panel = visibleItems[i].CreateDrawableRepresentation();
+                        panel = setPool.Get(p => p.Item = item);
                         scrollableContent.Add(panel);
                     }
 

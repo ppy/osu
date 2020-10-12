@@ -60,10 +60,12 @@ namespace osu.Game.Screens.Select.Carousel
         private CancellationTokenSource starDifficultyCancellationSource;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
-            : base(panel)
         {
             beatmap = panel.Beatmap;
             Height = HEIGHT;
+
+            // todo: temporary
+            Item = panel;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -79,7 +81,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (manager != null)
                 hideRequested = manager.Hide;
 
-            Children = new Drawable[]
+            Content.Children = new Drawable[]
             {
                 background = new Box
                 {

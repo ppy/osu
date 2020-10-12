@@ -2,14 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -19,15 +22,32 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public abstract class DrawableCarouselItem : Container
+    public abstract class DrawableCarouselItem : PoolableDrawable
     {
         public const float MAX_HEIGHT = 80;
 
-        public override bool RemoveWhenNotAlive => false;
+        public override bool IsPresent => base.IsPresent || Item?.Visible == true;
 
-        public override bool IsPresent => base.IsPresent || Item.Visible;
+        public CarouselItem Item
+        {
+            get => item;
+            set
+            {
+                if (item == value)
+                    return;
 
-        public readonly CarouselItem Item;
+                if (item != null)
+                {
+                    Item.Filtered.ValueChanged -= onStateChange;
+                    Item.State.ValueChanged -= onStateChange;
+                }
+
+                item = value;
+
+                if (IsLoaded)
+                    UpdateItem();
+            }
+        }
 
         public virtual IEnumerable<DrawableCarouselItem> ChildItems => Enumerable.Empty<DrawableCarouselItem>();
 
@@ -37,12 +57,10 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly Box hoverLayer;
 
-        protected override Container<Drawable> Content => nestedContainer;
+        protected Container<Drawable> Content => nestedContainer;
 
-        protected DrawableCarouselItem(CarouselItem item)
+        protected DrawableCarouselItem()
         {
-            Item = item;
-
             Height = MAX_HEIGHT;
             RelativeSizeAxes = Axes.X;
             Alpha = 0;
@@ -70,6 +88,7 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         private SampleChannel sampleHover;
+        private CarouselItem item;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
@@ -98,14 +117,27 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.LoadComplete();
 
-            ApplyState();
-            Item.Filtered.ValueChanged += _ => Schedule(ApplyState);
-            Item.State.ValueChanged += _ => Schedule(ApplyState);
+            UpdateItem();
         }
+
+        protected virtual void UpdateItem()
+        {
+            if (item == null)
+                return;
+
+            ApplyState();
+
+            Item.Filtered.ValueChanged += onStateChange;
+            Item.State.ValueChanged += onStateChange;
+        }
+
+        private void onStateChange(ValueChangedEvent<CarouselItemState> obj) => Schedule(ApplyState);
+
+        private void onStateChange(ValueChangedEvent<bool> _) => Schedule(ApplyState);
 
         protected virtual void ApplyState()
         {
-            if (!IsLoaded) return;
+            Debug.Assert(Item != null);
 
             switch (Item.State.Value)
             {
@@ -126,6 +158,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void Selected()
         {
+            Debug.Assert(Item != null);
+
             Item.State.Value = CarouselItemState.Selected;
 
             BorderContainer.BorderThickness = 2.5f;

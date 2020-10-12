@@ -43,8 +43,6 @@ namespace osu.Game.Screens.Select.Carousel
                       .ForEach(AddChild);
         }
 
-        public override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
-
         protected override CarouselItem GetNextToSelect()
         {
             if (LastSelected == null)
