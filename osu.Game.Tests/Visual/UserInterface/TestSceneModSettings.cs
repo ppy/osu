@@ -101,7 +101,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestCustomisationMenuNoClickthrough()
         {
-
             createModSelect();
             openModSelect();
 
@@ -116,12 +115,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("only cm2 is active", () => SelectedMods.Value.Count == 1);
         }
 
-
-
-        private void clickPosition(int x, int y) {
-            //Move cursor to coordinates
-            //Click coordinates
-        }
         private void createModSelect()
         {
             AddStep("create mod select", () =>
@@ -148,20 +141,19 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public bool ButtonsLoaded => ModSectionsContainer.Children.All(c => c.ModIconsLoaded);
 
-            public void SelectMod(Mod mod) =>
-                ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
-                                    .ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType())).SelectNext(1);
-            
             public ModButton GetModButton(Mod mod)
             {
-                return ModSectionsContainer.Children.Single(s => s.ModType == mod.Type).
-                                            ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType()));
+                return ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
+                                           .ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType()));
             }
 
-            public float SetModSettingsWidth(float NewWidth)
+            public void SelectMod(Mod mod) =>
+                GetModButton(mod).SelectNext(1);
+
+            public float SetModSettingsWidth(float newWidth)
             {
                 float oldWidth = ModSettingsContainer.Width;
-                ModSettingsContainer.Width = NewWidth;
+                ModSettingsContainer.Width = newWidth;
                 return oldWidth;
             }
         }
