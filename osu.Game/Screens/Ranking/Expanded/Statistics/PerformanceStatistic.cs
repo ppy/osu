@@ -28,17 +28,19 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         {
             if (score.PP.HasValue)
             {
-                performance.Value = (int)Math.Round(score.PP.Value, MidpointRounding.AwayFromZero);
+                setPerformanceValue(score.PP.Value);
             }
             else
             {
                 performanceManager.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                                  .ContinueWith(t => Schedule(() =>
-                                  {
-                                      if (t.Result.HasValue)
-                                          performance.Value = (int)Math.Round(t.Result.Value, MidpointRounding.AwayFromZero);
-                                  }), cancellationTokenSource.Token);
+                                  .ContinueWith(t => Schedule(() => setPerformanceValue(t.Result)), cancellationTokenSource.Token);
             }
+        }
+
+        private void setPerformanceValue(double? pp)
+        {
+            if (pp.HasValue)
+                performance.Value = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
         }
 
         public override void Appear()
