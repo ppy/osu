@@ -40,6 +40,12 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     Item.Filtered.ValueChanged -= onStateChange;
                     Item.State.ValueChanged -= onStateChange;
+
+                    if (item is CarouselGroup group)
+                    {
+                        foreach (var c in group.Children)
+                            c.Filtered.ValueChanged -= onStateChange;
+                    }
                 }
 
                 item = value;
@@ -129,6 +135,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             Item.Filtered.ValueChanged += onStateChange;
             Item.State.ValueChanged += onStateChange;
+
+            if (Item is CarouselGroup group)
+            {
+                foreach (var c in group.Children)
+                    c.Filtered.ValueChanged += onStateChange;
+            }
         }
 
         private void onStateChange(ValueChangedEvent<CarouselItemState> obj) => Scheduler.AddOnce(ApplyState);
