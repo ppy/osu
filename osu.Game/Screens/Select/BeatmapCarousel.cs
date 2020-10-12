@@ -723,6 +723,9 @@ namespace osu.Game.Screens.Select
 
                             foreach (var b in set.Beatmaps)
                             {
+                                if (!b.Visible)
+                                    continue;
+
                                 if (b.State.Value == CarouselItemState.Selected)
                                 {
                                     scrollTarget += b.TotalHeight / 2;
