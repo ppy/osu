@@ -19,7 +19,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -194,8 +193,8 @@ namespace osu.Game.Tests.Visual.Background
             AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(new ScoreInfo
             {
                 User = new User { Username = "osu!" },
-                Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
-                Ruleset = new OsuRuleset().RulesetInfo,
+                Beatmap = new TestBeatmap(Ruleset.Value).BeatmapInfo,
+                Ruleset = Ruleset.Value,
             })));
 
             AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
