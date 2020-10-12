@@ -304,11 +304,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
             for (int i = 1; i < points.Length; i++)
                 readPoint(points.Span[i], offset, out vertices[readOffset + i - 1]);
 
-            // If an endpoint is given, add it now.
+            // If an endpoint is given, add it to the end.
             if (endPoint != null)
                 readPoint(endPoint, offset, out vertices[^1]);
 
-            // Edge-case rules.
+            // Edge-case rules (to match stable).
             if (type == PathType.PerfectCurve)
             {
                 if (vertices.Length != 3)
@@ -320,11 +320,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
             }
 
-            // Set a definite type for the first control point.
+            // The first control point must have a definite type.
             vertices[0].Type.Value = type;
 
-            // A path can have multiple segments of the same type if there are two sequential control points with the same position.
+            // A path can have multiple implicit segments of the same type if there are two sequential control points with the same position.
             // To handle such cases, this code may return multiple path segments with the final control point in each segment having a non-null type.
+            // For the point string X|1:1|2:2|2:2|3:3, this code returns the segments:
+            // X: { (1,1), (2, 2) }
+            // X: { (3, 3) }
+            // Note: (2, 2) is not returned in the second segments, as it is implicit in the path.
             int startIndex = 0;
             int endIndex = 0;
 
