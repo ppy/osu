@@ -121,6 +121,12 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value, 0.5));
         }
 
+        /// <remarks>
+        /// This test uses a beatmap with four small ticks and one object with the <see cref="Judgement.MaxResult"/> of <see cref="HitResult.Ok"/>.
+        /// Its goal is to ensure that with the <see cref="ScoringMode"/> of <see cref="ScoringMode.Standardised"/>,
+        /// small ticks contribute to the accuracy portion, but not the combo portion.
+        /// In contrast, <see cref="ScoringMode.Classic"/> does not have separate combo and accuracy portion (they are multiplied by each other).
+        /// </remarks>
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, 978_571)] // (3 * 10 + 100) / (4 * 10 + 100) * 300_000 + (1 / 1) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, 914_286)] // (3 * 0 + 100) / (4 * 10 + 100) * 300_000 + (1 / 1) * 700_000
         [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 279)] // (((3 * 10 + 100) / (4 * 10 + 100)) * 1 * 300) * (1 + 0 / 25)
