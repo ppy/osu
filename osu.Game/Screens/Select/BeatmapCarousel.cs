@@ -571,7 +571,7 @@ namespace osu.Game.Screens.Select
                 updateItems();
 
             // Remove all items that should no longer be on-screen
-            scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
+            //scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
             // Find index range of all items that should be on-screen
             int firstIndex = yPositions.BinarySearch(visibleUpperBound - DrawableCarouselItem.MAX_HEIGHT);
