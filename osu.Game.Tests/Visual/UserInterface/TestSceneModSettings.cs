@@ -18,16 +18,19 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneModSettings : OsuTestScene
+    public class TestSceneModSettings : OsuManualInputManagerTestScene
     {
         private TestModSelectOverlay modSelect;
 
         private readonly Mod testCustomisableMod = new TestModCustomisable1();
 
         private readonly Mod testCustomisableAutoOpenMod = new TestModCustomisable2();
+
+        private readonly Mod testCustomisableMenuCoveredMod = new TestModCustomisable1();
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -95,6 +98,30 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("copy has original value", () => Precision.AlmostEquals(1.5, copy.SpeedChange.Value));
         }
 
+        [Test]
+        public void TestCustomisationMenuNoClickthrough()
+        {
+
+            createModSelect();
+            openModSelect();
+
+            AddStep("change mod settings menu width to full screen", () => modSelect.SetModSettingsWidth(1.0f));
+            AddStep("select cm2", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
+            AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
+            AddStep("hover over mod behind settings menu", () => InputManager.MoveMouseTo(modSelect.GetModButton(testCustomisableMenuCoveredMod)));
+            AddAssert("Mod is not considered hovered over", () => !modSelect.GetModButton(testCustomisableMenuCoveredMod).IsHovered);
+            AddStep("left click mod", () => InputManager.Click(MouseButton.Left));
+            AddAssert("only cm2 is active", () => SelectedMods.Value.Count == 1);
+            AddStep("right click mod", () => InputManager.Click(MouseButton.Right));
+            AddAssert("only cm2 is active", () => SelectedMods.Value.Count == 1);
+        }
+
+
+
+        private void clickPosition(int x, int y) {
+            //Move cursor to coordinates
+            //Click coordinates
+        }
         private void createModSelect()
         {
             AddStep("create mod select", () =>
@@ -124,6 +151,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             public void SelectMod(Mod mod) =>
                 ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
                                     .ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType())).SelectNext(1);
+            
+            public ModButton GetModButton(Mod mod)
+            {
+                return ModSectionsContainer.Children.Single(s => s.ModType == mod.Type).
+                                            ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType()));
+            }
+
+            public float SetModSettingsWidth(float NewWidth)
+            {
+                float oldWidth = ModSettingsContainer.Width;
+                ModSettingsContainer.Width = NewWidth;
+                return oldWidth;
+            }
         }
 
         public class TestRulesetInfo : RulesetInfo
