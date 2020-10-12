@@ -26,17 +26,12 @@ namespace osu.Game.Scoring
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
         public async Task<double?> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default)
         {
-            if (tryGetExisting(score, out var perf, out var lookupKey))
-                return perf;
+            var lookupKey = new PerformanceCacheLookup(score);
+
+            if (performanceCache.TryGetValue(lookupKey, out double performance))
+                return performance;
 
             return await computePerformanceAsync(score, lookupKey, token);
-        }
-
-        private bool tryGetExisting(ScoreInfo score, out double performance, out PerformanceCacheLookup lookupKey)
-        {
-            lookupKey = new PerformanceCacheLookup(score);
-
-            return performanceCache.TryGetValue(lookupKey, out performance);
         }
 
         private async Task<double?> computePerformanceAsync(ScoreInfo score, PerformanceCacheLookup lookupKey, CancellationToken token = default)
