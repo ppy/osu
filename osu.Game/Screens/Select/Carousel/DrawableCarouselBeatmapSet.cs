@@ -190,12 +190,12 @@ namespace osu.Game.Screens.Select.Carousel
                 if (carouselBeatmapSet != Item)
                     return;
 
-                float yPos = 0;
+                float yPos = DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
 
                 foreach (var item in loaded)
                 {
                     item.Y = yPos;
-                    yPos += item.Item.TotalHeight;
+                    yPos += item.Item.TotalHeight + DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
                 }
 
                 beatmapContainer.ChildrenEnumerable = loaded;

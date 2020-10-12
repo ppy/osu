@@ -732,7 +732,7 @@ namespace osu.Game.Screens.Select
                                     break;
                                 }
 
-                                scrollTarget += b.TotalHeight;
+                                scrollTarget += b.TotalHeight + DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
                             }
                         }
 

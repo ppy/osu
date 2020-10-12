@@ -31,7 +31,9 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class DrawableCarouselBeatmap : DrawableCarouselItem, IHasContextMenu
     {
-        public const float HEIGHT = MAX_HEIGHT * 0.6f;
+        public const float CAROUSEL_BEATMAP_SPACING = 5;
+
+        public const float HEIGHT = MAX_HEIGHT * 0.6f; // TODO: add once base class is fixed + CAROUSEL_BEATMAP_SPACING;
 
         private readonly BeatmapInfo beatmap;
 
