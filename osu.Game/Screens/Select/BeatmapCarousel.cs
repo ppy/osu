@@ -578,7 +578,7 @@ namespace osu.Game.Screens.Select
             // as we can't be 100% sure on the size of individual carousel drawables,
             // always play it safe and extend bounds by one.
             firstIndex = Math.Max(0, firstIndex - 1);
-            lastIndex = Math.Min(yPositions.Count - 1, lastIndex + 1);
+            lastIndex = Math.Min(yPositions.Count, lastIndex + 1);
 
             if (revalidateItems || firstIndex != displayedRange.first || lastIndex != displayedRange.last)
             {
