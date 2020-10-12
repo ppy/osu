@@ -604,12 +604,7 @@ namespace osu.Game.Screens.Select
             // Update externally controlled state of currently visible items
             // (e.g. x-offset and opacity).
             foreach (DrawableCarouselItem p in scrollableContent.Children)
-            {
                 updateItem(p);
-
-                // foreach (var pChild in p.ChildItems)
-                //     updateItem(pChild, p);
-            }
         }
 
         protected override void UpdateAfterChildren()
@@ -702,6 +697,26 @@ namespace osu.Game.Screens.Select
                     {
                         visibleItems.Add(set);
                         yPositions.Add(currentY);
+
+                        if (item.State.Value == CarouselItemState.Selected)
+                        {
+                            // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
+                            // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
+                            // then reapply the top semi-transparent area (because carousel's screen space starts below it)
+                            // and finally add half of the panel's own height to achieve vertical centering of the panel itself
+                            scrollTarget = currentY + DrawableCarouselBeatmapSet.HEIGHT - visibleHalfHeight + BleedTop;
+
+                            foreach (var b in set.Beatmaps)
+                            {
+                                if (b.State.Value == CarouselItemState.Selected)
+                                {
+                                    scrollTarget += b.TotalHeight / 2;
+                                    break;
+                                }
+
+                                scrollTarget += b.TotalHeight;
+                            }
+                        }
 
                         currentY += set.TotalHeight + panel_padding;
                         break;
