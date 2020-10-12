@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private BeatmapSetInfo beatmapSet => (Item as CarouselBeatmapSet)?.BeatmapSet;
 
-        private Container<DrawableCarouselBeatmap> beatmapContainer;
+        private Container<DrawableCarouselItem> beatmapContainer;
         private Bindable<CarouselItemState> beatmapSetState;
 
         [Resolved]
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select.Carousel
             // TODO: temporary. we probably want to *not* inherit DrawableCarouselItem for this class, but only the above header portion.
             AddRangeInternal(new Drawable[]
             {
-                beatmapContainer = new Container<DrawableCarouselBeatmap>
+                beatmapContainer = new Container<DrawableCarouselItem>
                 {
                     X = 50,
                     Y = MAX_HEIGHT,
@@ -81,62 +81,68 @@ namespace osu.Game.Screens.Select.Carousel
             Content.Children = new Drawable[]
             {
                 new DelayedLoadUnloadWrapper(() =>
-                    {
-                        var background = new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        };
-
-                        background.OnLoadComplete += d => d.FadeInFromZero(1000, Easing.OutQuint);
-
-                        return background;
-                    }, 300, 5000
-                ),
-                new FillFlowContainer
                 {
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    var background = new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                     {
-                        new OsuSpriteText
+                        RelativeSizeAxes = Axes.Both,
+                    };
+
+                    background.OnLoadComplete += d => d.FadeInFromZero(1000, Easing.OutQuint);
+
+                    return background;
+                }, 300, 5000),
+                new DelayedLoadUnloadWrapper(() =>
+                {
+                    var mainFlow = new FillFlowContainer
+                    {
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
-                            Shadow = true,
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
-                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
-                            Shadow = true,
-                        },
-                        new FillFlowContainer
-                        {
-                            Direction = FillDirection.Horizontal,
-                            AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Top = 5 },
-                            Children = new Drawable[]
+                            new OsuSpriteText
                             {
-                                new BeatmapSetOnlineStatusPill
+                                Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
+                                Shadow = true,
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
+                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
+                                Shadow = true,
+                            },
+                            new FillFlowContainer
+                            {
+                                Direction = FillDirection.Horizontal,
+                                AutoSizeAxes = Axes.Both,
+                                Margin = new MarginPadding { Top = 5 },
+                                Children = new Drawable[]
                                 {
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Right = 5 },
-                                    TextSize = 11,
-                                    TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                                    Status = beatmapSet.Status
-                                },
-                                new FillFlowContainer<DifficultyIcon>
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Spacing = new Vector2(3),
-                                    ChildrenEnumerable = getDifficultyIcons(),
-                                },
+                                    new BeatmapSetOnlineStatusPill
+                                    {
+                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.CentreLeft,
+                                        Margin = new MarginPadding { Right = 5 },
+                                        TextSize = 11,
+                                        TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                                        Status = beatmapSet.Status
+                                    },
+                                    new FillFlowContainer<DifficultyIcon>
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Spacing = new Vector2(3),
+                                        ChildrenEnumerable = getDifficultyIcons(),
+                                    },
+                                }
                             }
                         }
-                    }
-                }
+                    };
+
+                    mainFlow.OnLoadComplete += d => d.FadeInFromZero(1000, Easing.OutQuint);
+
+                    return mainFlow;
+                }, 100, 5000)
             };
 
             beatmapContainer.Clear();
@@ -155,19 +161,24 @@ namespace osu.Game.Screens.Select.Carousel
 
                 case CarouselItemState.Selected:
 
-                    float yPos = 0;
-
                     var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
-                    foreach (var item in carouselBeatmapSet.Children)
+                    LoadComponentsAsync(carouselBeatmapSet.Children.Select(c => c.CreateDrawableRepresentation()), loaded =>
                     {
-                        var beatmapPanel = item.CreateDrawableRepresentation();
+                        // make sure the pooled target hasn't changed.
+                        if (carouselBeatmapSet != Item)
+                            return;
 
-                        beatmapPanel.Y = yPos;
-                        yPos += item.TotalHeight;
+                        float yPos = 0;
 
-                        beatmapContainer.Add((DrawableCarouselBeatmap)beatmapPanel);
-                    }
+                        foreach (var item in loaded)
+                        {
+                            item.Y = yPos;
+                            yPos += item.Item.TotalHeight;
+
+                            beatmapContainer.Add(item);
+                        }
+                    });
 
                     break;
             }
