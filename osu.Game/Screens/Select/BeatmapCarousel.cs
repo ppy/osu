@@ -552,70 +552,44 @@ namespace osu.Game.Screens.Select
 
         #endregion
 
+        private (int first, int last) displayedRange;
+
         protected override void Update()
         {
             base.Update();
 
+            bool revalidateItems = !itemsCache.IsValid;
+
             //todo: this should only refresh items, not everything here
-            if (!itemsCache.IsValid)
-            {
+            if (revalidateItems)
                 updateItems();
 
-                // Remove all items that should no longer be on-screen
-                scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
+            // Remove all items that should no longer be on-screen
+            scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
-                // Find index range of all items that should be on-screen
-                int firstIndex = yPositions.BinarySearch(visibleUpperBound - DrawableCarouselItem.MAX_HEIGHT);
-                if (firstIndex < 0) firstIndex = ~firstIndex;
-                int lastIndex = yPositions.BinarySearch(visibleBottomBound);
-                if (lastIndex < 0) lastIndex = ~lastIndex;
+            // Find index range of all items that should be on-screen
+            int firstIndex = yPositions.BinarySearch(visibleUpperBound - DrawableCarouselItem.MAX_HEIGHT);
+            if (firstIndex < 0) firstIndex = ~firstIndex;
+            int lastIndex = yPositions.BinarySearch(visibleBottomBound);
+            if (lastIndex < 0) lastIndex = ~lastIndex;
 
-                scrollableContent.Clear();
+            if (revalidateItems || firstIndex != displayedRange.first || lastIndex != displayedRange.last)
+            {
+                displayedRange = (firstIndex, lastIndex);
 
                 // Add those items within the previously found index range that should be displayed.
                 for (int i = firstIndex; i < lastIndex; ++i)
                 {
-                    DrawableCarouselItem item = visibleItems[i].CreateDrawableRepresentation();
+                    var panel = scrollableContent.FirstOrDefault(c => c.Item == visibleItems[i]);
 
-                    item.Y = yPositions[i];
-                    item.Depth = i;
-
-                    scrollableContent.Add(item);
-
-                    // if (!item.Item.Visible)
-                    // {
-                    //     if (!item.IsPresent)
-                    //         notVisibleCount++;
-                    //     continue;
-                    // }
-
-                    // Only add if we're not already part of the content.
-                    /*
-                    if (!scrollableContent.Contains(item))
+                    if (panel == null)
                     {
-                        // Makes sure headers are always _below_ items,
-                        // and depth flows downward.
-                        item.Depth = depth;
-
-                        switch (item.LoadState)
-                        {
-                            case LoadState.NotLoaded:
-                                LoadComponentAsync(item);
-                                break;
-
-                            case LoadState.Loading:
-                                break;
-
-                            default:
-                                scrollableContent.Add(item);
-                                break;
-                        }
+                        panel = visibleItems[i].CreateDrawableRepresentation();
+                        scrollableContent.Add(panel);
                     }
-                    else
-                    {
-                        scrollableContent.ChangeChildDepth(item, depth);
-                    }
-                    */
+
+                    panel.Y = yPositions[i];
+                    scrollableContent.ChangeChildDepth(panel, i);
                 }
             }
 
