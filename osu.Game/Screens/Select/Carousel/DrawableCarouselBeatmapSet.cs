@@ -53,6 +53,12 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private BeatmapManager manager { get; set; }
 
+        protected override void FreeAfterUse()
+        {
+            base.FreeAfterUse();
+            Item = null;
+        }
+
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapSetOverlay beatmapOverlay)
         {
@@ -80,6 +86,9 @@ namespace osu.Game.Screens.Select.Carousel
 
             beatmapContainer.Clear();
             beatmapSetState?.UnbindAll();
+
+            if (Item == null)
+                return;
 
             Content.Children = new Drawable[]
             {
