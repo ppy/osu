@@ -125,15 +125,15 @@ namespace osu.Game.Screens.Select.Carousel
             if (item == null)
                 return;
 
-            ApplyState();
+            Scheduler.AddOnce(ApplyState);
 
             Item.Filtered.ValueChanged += onStateChange;
             Item.State.ValueChanged += onStateChange;
         }
 
-        private void onStateChange(ValueChangedEvent<CarouselItemState> obj) => Schedule(ApplyState);
+        private void onStateChange(ValueChangedEvent<CarouselItemState> obj) => Scheduler.AddOnce(ApplyState);
 
-        private void onStateChange(ValueChangedEvent<bool> _) => Schedule(ApplyState);
+        private void onStateChange(ValueChangedEvent<bool> _) => Scheduler.AddOnce(ApplyState);
 
         protected virtual void ApplyState()
         {
