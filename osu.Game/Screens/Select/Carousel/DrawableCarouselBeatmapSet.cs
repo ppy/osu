@@ -103,10 +103,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (beatmapContainer != null)
             {
                 foreach (var beatmap in beatmapContainer)
-                {
                     beatmap.MoveToY(0, 800, Easing.OutQuint);
-                    beatmap.FadeOut(80);
-                }
             }
         }
 
