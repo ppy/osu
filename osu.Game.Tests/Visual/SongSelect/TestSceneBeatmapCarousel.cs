@@ -42,6 +42,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestManyPanels()
+        {
+            loadBeatmaps(count: 5000, randomDifficulties: true);
+        }
+
+        [Test]
         public void TestKeyRepeat()
         {
             loadBeatmaps();
@@ -708,7 +714,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null)
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null, int? count = null, bool randomDifficulties = false)
         {
             bool changed = false;
 
@@ -720,8 +726,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     beatmapSets = new List<BeatmapSetInfo>();
 
-                    for (int i = 1; i <= set_count; i++)
-                        beatmapSets.Add(createTestBeatmapSet(i));
+                    for (int i = 1; i <= (count ?? set_count); i++)
+                        beatmapSets.Add(createTestBeatmapSet(i, randomDifficulties));
                 }
 
                 carousel.Filter(initialCriteria?.Invoke() ?? new FilterCriteria());
