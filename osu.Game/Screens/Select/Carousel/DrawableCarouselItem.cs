@@ -20,6 +20,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         public readonly CarouselHeader Header;
 
+        /// <summary>
+        /// Optional content which sits below the header.
+        /// </summary>
         protected readonly Container<Drawable> Content;
 
         protected readonly Container MovementContainer;
@@ -88,6 +91,9 @@ namespace osu.Game.Screens.Select.Carousel
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            // avoid using fill flow for performance reasons. header size doesn't change after load.
+            Content.Y = Header.Height;
 
             UpdateItem();
         }
