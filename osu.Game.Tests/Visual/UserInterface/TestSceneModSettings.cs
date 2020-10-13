@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -29,8 +30,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         private readonly Mod testCustomisableMod = new TestModCustomisable1();
 
         private readonly Mod testCustomisableAutoOpenMod = new TestModCustomisable2();
-
-        private readonly Mod testCustomisableMenuCoveredMod = new TestModCustomisable1();
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -107,8 +106,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("change mod settings menu width to full screen", () => modSelect.SetModSettingsWidth(1.0f));
             AddStep("select cm2", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
             AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
-            AddStep("hover over mod behind settings menu", () => InputManager.MoveMouseTo(modSelect.GetModButton(testCustomisableMenuCoveredMod)));
-            AddAssert("Mod is not considered hovered over", () => !modSelect.GetModButton(testCustomisableMenuCoveredMod).IsHovered);
+            AddStep("hover over mod behind settings menu", () => InputManager.MoveMouseTo(modSelect.GetModButton(testCustomisableMod)));
+            AddAssert("Mod is not considered hovered over", () => !modSelect.GetModButton(testCustomisableMod).IsHovered);
             AddStep("left click mod", () => InputManager.Click(MouseButton.Left));
             AddAssert("only cm2 is active", () => SelectedMods.Value.Count == 1);
             AddStep("right click mod", () => InputManager.Click(MouseButton.Right));
@@ -143,19 +142,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public ModButton GetModButton(Mod mod)
             {
-                return ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
-                                           .ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType()));
+                return ModSectionsContainer.ChildrenOfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType()));
             }
 
             public void SelectMod(Mod mod) =>
                 GetModButton(mod).SelectNext(1);
 
-            public float SetModSettingsWidth(float newWidth)
-            {
-                float oldWidth = ModSettingsContainer.Width;
+            public void SetModSettingsWidth(float newWidth) =>
                 ModSettingsContainer.Width = newWidth;
-                return oldWidth;
-            }
         }
 
         public class TestRulesetInfo : RulesetInfo
