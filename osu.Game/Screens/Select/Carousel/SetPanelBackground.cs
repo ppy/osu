@@ -9,9 +9,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public class PanelBackground : BufferedContainer
+    public class SetPanelBackground : BufferedContainer
     {
-        public PanelBackground(WorkingBeatmap working)
+        public SetPanelBackground(WorkingBeatmap working)
         {
             CacheDrawnFrameBuffer = true;
             RedrawOnScale = false;

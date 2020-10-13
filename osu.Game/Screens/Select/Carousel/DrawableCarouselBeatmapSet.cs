@@ -10,16 +10,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osuTK;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -85,7 +80,7 @@ namespace osu.Game.Screens.Select.Carousel
                 new DelayedLoadUnloadWrapper(() =>
                 {
                     Logger.Log($"loaded background item {beatmapSet}");
-                    var background = new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
+                    var background = new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                     {
                         RelativeSizeAxes = Axes.Both,
                     };
@@ -96,52 +91,8 @@ namespace osu.Game.Screens.Select.Carousel
                 }, 300, 5000),
                 new DelayedLoadUnloadWrapper(() =>
                 {
-                    var mainFlow = new FillFlowContainer
-                    {
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
-                        // required to ensure we load as soon as any part of the panel comes on screen
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
-                                Shadow = true,
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
-                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
-                                Shadow = true,
-                            },
-                            new FillFlowContainer
-                            {
-                                Direction = FillDirection.Horizontal,
-                                AutoSizeAxes = Axes.Both,
-                                Margin = new MarginPadding { Top = 5 },
-                                Children = new Drawable[]
-                                {
-                                    new BeatmapSetOnlineStatusPill
-                                    {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Margin = new MarginPadding { Right = 5 },
-                                        TextSize = 11,
-                                        TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                                        Status = beatmapSet.Status
-                                    },
-                                    new FillFlowContainer<DifficultyIcon>
-                                    {
-                                        AutoSizeAxes = Axes.Both,
-                                        Spacing = new Vector2(3),
-                                        ChildrenEnumerable = getDifficultyIcons(),
-                                    },
-                                }
-                            }
-                        }
-                    };
+                    // main content split into own class to reduce allocation before load operation triggers.
+                    var mainFlow = new SetPanelContent((CarouselBeatmapSet)Item);
 
                     mainFlow.OnLoadComplete += d => d.FadeInFromZero(1000, Easing.OutQuint);
 
@@ -227,17 +178,6 @@ namespace osu.Game.Screens.Select.Carousel
                     yPos += panel.Item.TotalHeight + DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
                 }
             }
-        }
-
-        private const int maximum_difficulty_icons = 18;
-
-        private IEnumerable<DifficultyIcon> getDifficultyIcons()
-        {
-            var beatmaps = ((CarouselBeatmapSet)Item).Beatmaps.ToList();
-
-            return beatmaps.Count > maximum_difficulty_icons
-                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.Beatmap.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
-                : beatmaps.Select(b => new FilterableDifficultyIcon(b));
         }
 
         public MenuItem[] ContextMenuItems
