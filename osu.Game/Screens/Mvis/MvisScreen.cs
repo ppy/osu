@@ -501,8 +501,11 @@ namespace osu.Game.Screens
             }
         }
 
-        private void SeekTo(double position) =>
+        private void SeekTo(double position)
+        {
             musicController.SeekTo(position);
+            sbLoader.Seek(position);
+        }
 
         protected override void Update()
         {
