@@ -604,7 +604,7 @@ namespace osu.Game.Screens.Select
                     // remove but only if too far off-screen
                     if (panel.Y < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
                     {
-                        // todo: may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
+                        // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
                         panel.ClearTransforms();
                         panel.Expire();
                     }
