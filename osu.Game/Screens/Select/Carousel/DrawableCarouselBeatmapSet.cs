@@ -192,8 +192,7 @@ namespace osu.Game.Screens.Select.Carousel
                 beatmapContainer = new Container<DrawableCarouselItem>
                 {
                     X = 100,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                     ChildrenEnumerable = visibleBeatmaps
                 };
 

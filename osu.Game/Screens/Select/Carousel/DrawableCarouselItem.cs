@@ -63,7 +63,6 @@ namespace osu.Game.Screens.Select.Carousel
         protected DrawableCarouselItem()
         {
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
 
             Alpha = 0;
 
@@ -71,15 +70,13 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 MovementContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         Header = new CarouselHeader(),
                         Content = new Container
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.Both,
                         }
                     }
                 },
@@ -123,6 +120,10 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void ApplyState()
         {
+            // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
+            // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
+            Height = Item.TotalHeight;
+
             Debug.Assert(Item != null);
 
             switch (Item.State.Value)
