@@ -13,9 +13,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Beatmaps
 {
@@ -124,13 +127,22 @@ namespace osu.Game.Beatmaps
         /// <returns>The <see cref="DifficultyRating"/> that best describes <paramref name="starRating"/>.</returns>
         public static DifficultyRating GetDifficultyRating(double starRating)
         {
-            if (starRating < 2.0) return DifficultyRating.Easy;
-            if (starRating < 2.7) return DifficultyRating.Normal;
-            if (starRating < 4.0) return DifficultyRating.Hard;
-            if (starRating < 5.3) return DifficultyRating.Insane;
-            if (starRating < 6.5) return DifficultyRating.Expert;
+            if (Precision.AlmostBigger(starRating, 6.5, 0.005))
+                return DifficultyRating.ExpertPlus;
 
-            return DifficultyRating.ExpertPlus;
+            if (Precision.AlmostBigger(starRating, 5.3, 0.005))
+                return DifficultyRating.Expert;
+
+            if (Precision.AlmostBigger(starRating, 4.0, 0.005))
+                return DifficultyRating.Insane;
+
+            if (Precision.AlmostBigger(starRating, 2.7, 0.005))
+                return DifficultyRating.Hard;
+
+            if (Precision.AlmostBigger(starRating, 2.0, 0.005))
+                return DifficultyRating.Normal;
+
+            return DifficultyRating.Easy;
         }
 
         private CancellationTokenSource trackedUpdateCancellationSource;
@@ -227,6 +239,24 @@ namespace osu.Game.Beatmaps
                 var attributes = calculator.Calculate(key.Mods);
 
                 return difficultyCache[key] = new StarDifficulty(attributes.StarRating, attributes.MaxCombo);
+            }
+            catch (BeatmapInvalidForRulesetException e)
+            {
+                // Conversion has failed for the given ruleset, so return the difficulty in the beatmap's default ruleset.
+
+                // Ensure the beatmap's default ruleset isn't the one already being converted to.
+                // This shouldn't happen as it means something went seriously wrong, but if it does an endless loop should be avoided.
+                if (rulesetInfo.Equals(beatmapInfo.Ruleset))
+                {
+                    Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineBeatmapID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
+                    return difficultyCache[key] = new StarDifficulty();
+                }
+
+                // Check the cache first because this is now a different ruleset than the one previously guarded against.
+                if (tryGetExisting(beatmapInfo, beatmapInfo.Ruleset, Array.Empty<Mod>(), out var existingDefault, out var existingDefaultKey))
+                    return existingDefault;
+
+                return computeDifficulty(existingDefaultKey, beatmapInfo, beatmapInfo.Ruleset);
             }
             catch
             {
