@@ -845,7 +845,9 @@ namespace osu.Game.Screens.Select
             float itemDrawY = posInScroll.Y - visibleUpperBound;
             float dist = Math.Abs(1f - itemDrawY / visibleHalfHeight);
 
-            item.X = offsetX(dist, visibleHalfHeight) - (parent?.X ?? 0);
+            // adjusting the item's overall X position can cause it to become masked away when
+            // child items (difficulties) are still visible.
+            item.Header.X = offsetX(dist, visibleHalfHeight) - (parent?.X ?? 0);
 
             // We are applying a multiplicative alpha (which is internally done by nesting an
             // additional container and setting that container's alpha) such that we can
