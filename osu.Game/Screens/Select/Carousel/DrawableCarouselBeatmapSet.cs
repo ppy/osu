@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -21,9 +20,6 @@ namespace osu.Game.Screens.Select.Carousel
     public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
         public const float HEIGHT = MAX_HEIGHT;
-
-        // TODO: don't do this. need to split out the base class' style so our height isn't fixed to the panel display height (and autosize?).
-        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         private Action<BeatmapSetInfo> restoreHiddenRequested;
         private Action<int> viewDetails;
