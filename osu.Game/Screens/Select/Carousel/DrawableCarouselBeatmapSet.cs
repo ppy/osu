@@ -5,15 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -22,9 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Rulesets;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -284,117 +278,6 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 State = { Value = state }
             };
-        }
-
-        private class PanelBackground : BufferedContainer
-        {
-            public PanelBackground(WorkingBeatmap working)
-            {
-                CacheDrawnFrameBuffer = true;
-                RedrawOnScale = false;
-
-                Children = new Drawable[]
-                {
-                    new BeatmapBackgroundSprite(working)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        FillMode = FillMode.Fill,
-                    },
-                    new FillFlowContainer
-                    {
-                        Depth = -1,
-                        RelativeSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
-                        Shear = new Vector2(0.8f, 0),
-                        Alpha = 0.5f,
-                        Children = new[]
-                        {
-                            // The left half with no gradient applied
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black,
-                                Width = 0.4f,
-                            },
-                            // Piecewise-linear gradient with 3 segments to make it appear smoother
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
-                                Width = 0.05f,
-                            },
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
-                                Width = 0.2f,
-                            },
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
-                                Width = 0.05f,
-                            },
-                        }
-                    },
-                };
-            }
-        }
-
-        public class FilterableDifficultyIcon : DifficultyIcon
-        {
-            private readonly BindableBool filtered = new BindableBool();
-
-            public bool IsFiltered => filtered.Value;
-
-            public readonly CarouselBeatmap Item;
-
-            public FilterableDifficultyIcon(CarouselBeatmap item)
-                : base(item.Beatmap)
-            {
-                filtered.BindTo(item.Filtered);
-                filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
-                filtered.TriggerChange();
-
-                Item = item;
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                Item.State.Value = CarouselItemState.Selected;
-                return true;
-            }
-        }
-
-        public class FilterableGroupedDifficultyIcon : GroupedDifficultyIcon
-        {
-            public readonly List<CarouselBeatmap> Items;
-
-            public FilterableGroupedDifficultyIcon(List<CarouselBeatmap> items, RulesetInfo ruleset)
-                : base(items.Select(i => i.Beatmap).ToList(), ruleset, Color4.White)
-            {
-                Items = items;
-
-                foreach (var item in items)
-                    item.Filtered.BindValueChanged(_ => Scheduler.AddOnce(updateFilteredDisplay));
-
-                updateFilteredDisplay();
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                Items.First().State.Value = CarouselItemState.Selected;
-                return true;
-            }
-
-            private void updateFilteredDisplay()
-            {
-                // for now, fade the whole group based on the ratio of hidden items.
-                this.FadeTo(1 - 0.9f * ((float)Items.Count(i => i.Filtered.Value) / Items.Count), 100);
-            }
         }
     }
 }
