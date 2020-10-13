@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Selected();
 
-            Header.MoveToX(-50, 500, Easing.OutExpo);
+            MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
 
             background.Colour = ColourInfo.GradientVertical(
                 new Color4(20, 43, 51, 255),
@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Deselected();
 
-            Header.MoveToX(0, 500, Easing.OutExpo);
+            MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
             background.Colour = new Color4(20, 43, 51, 255);
             triangles.Colour = OsuColour.Gray(0.5f);
