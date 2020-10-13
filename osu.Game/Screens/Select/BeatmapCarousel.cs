@@ -640,7 +640,7 @@ namespace osu.Game.Screens.Select
 
                 if (item is DrawableCarouselBeatmapSet set)
                 {
-                    foreach (var diff in set.ChildItems)
+                    foreach (var diff in set.DrawableBeatmaps)
                         updateItem(diff, item);
                 }
             }

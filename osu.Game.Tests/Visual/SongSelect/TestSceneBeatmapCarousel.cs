@@ -923,7 +923,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                         if (item is DrawableCarouselBeatmapSet set)
                         {
-                            foreach (var difficulty in set.ChildItems)
+                            foreach (var difficulty in set.DrawableBeatmaps)
                                 yield return difficulty;
                         }
                     }
