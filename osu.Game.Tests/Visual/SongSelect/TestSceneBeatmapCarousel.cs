@@ -427,7 +427,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 0; i < 3; i++)
             {
-                var set = createTestBeatmapSet(i);
+                var set = createTestBeatmapSet(i, 3);
                 set.Beatmaps[0].StarDifficulty = 3 - i;
                 set.Beatmaps[2].StarDifficulty = 6 + i;
                 sets.Add(set);
@@ -822,7 +822,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selection is visible", selectedBeatmapVisible);
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int id)
+        private BeatmapSetInfo createTestBeatmapSet(int id, int minimumDifficulties = 1)
         {
             return new BeatmapSetInfo
             {
@@ -836,7 +836,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Title = $"test set #{id}!",
                     AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
                 },
-                Beatmaps = getBeatmaps(RNG.Next(1, 20)).ToList()
+                Beatmaps = getBeatmaps(RNG.Next(minimumDifficulties, 20)).ToList()
             };
         }
 
