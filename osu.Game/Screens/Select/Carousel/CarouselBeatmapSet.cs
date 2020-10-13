@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Select.Carousel
                 switch (State.Value)
                 {
                     case CarouselItemState.Selected:
-                        return DrawableCarouselBeatmapSet.HEIGHT + Children.Count(c => c.Visible) * (DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING + DrawableCarouselBeatmap.HEIGHT);
+                        return DrawableCarouselBeatmapSet.HEIGHT + Children.Count(c => c.Visible) * DrawableCarouselBeatmap.HEIGHT;
 
                     default:
                         return DrawableCarouselBeatmapSet.HEIGHT;
