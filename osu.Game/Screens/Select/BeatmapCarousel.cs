@@ -583,21 +583,31 @@ namespace osu.Game.Screens.Select
 
                 displayedRange = newDisplayRange;
 
-                // Add those items within the previously found index range that should be displayed.
-                for (int i = displayedRange.first; i < displayedRange.last; ++i)
+                var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first);
+
+                foreach (var panel in scrollableContent.Children)
                 {
-                    var item = visibleItems[i];
+                    if (toDisplay.Remove(panel.Item))
+                    {
+                        // panel already displayed.
+                        continue;
+                    }
 
-                    if (scrollableContent.Any(c => c.Item == item)) continue;
-
-                    Logger.Log($"getting panel for {item} from pool");
-                    var panel = setPool.Get(p => p.Item = item);
-                    panel.Depth = i;
-                    panel.Y = item.CarouselYPosition;
-                    scrollableContent.Add(panel);
+                    // panel displayed but not required
+                    scrollableContent.Remove(panel);
                 }
 
-                // Remove any items which are far out of the visible range.
+                // Add those items within the previously found index range that should be displayed.
+                foreach (var item in toDisplay)
+                {
+                    Logger.Log($"getting panel for {item} from pool");
+                    var panel = setPool.Get(p => p.Item = item);
+
+                    panel.Depth = item.CarouselYPosition; // todo: i think this is correct
+                    panel.Y = item.CarouselYPosition;
+
+                    scrollableContent.Add(panel);
+                }
             }
 
             // Finally, if the filtered items have changed, animate drawables to their new locations.
