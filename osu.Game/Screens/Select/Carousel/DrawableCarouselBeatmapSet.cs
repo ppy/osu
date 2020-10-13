@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.FreeAfterUse();
 
             Item = null;
+
             ClearTransforms();
         }
 
@@ -66,20 +67,14 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
-
-            Content.Add(beatmapContainer = new Container<DrawableCarouselItem>
-            {
-                X = 100,
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-            });
         }
 
         protected override void UpdateItem()
         {
             base.UpdateItem();
 
-            beatmapContainer.Clear();
+            Content.Clear();
+            beatmapContainer = null;
 
             if (Item == null)
                 return;
@@ -160,10 +155,13 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
-            foreach (var beatmap in beatmapContainer)
+            if (beatmapContainer != null)
             {
-                beatmap.MoveToY(0, 800, Easing.OutQuint);
-                beatmap.FadeOut(80).Expire();
+                foreach (var beatmap in beatmapContainer)
+                {
+                    beatmap.MoveToY(0, 800, Easing.OutQuint);
+                    beatmap.FadeOut(80);
+                }
             }
         }
 
@@ -173,33 +171,55 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(-100, 500, Easing.OutExpo);
 
-            // on selection we show our child beatmaps.
-            // for now this is a simple drawable construction each selection.
-            // can be improved in the future.
-            var carouselBeatmapSet = (CarouselBeatmapSet)Item;
-
-            // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
-            var visibleBeatmaps = carouselBeatmapSet.Children
-                                                    .Where(c => c.Visible)
-                                                    .Select(c => c.CreateDrawableRepresentation())
-                                                    .ToArray();
-
-            LoadComponentsAsync(visibleBeatmaps, loaded =>
+            if (beatmapContainer != null)
             {
-                // make sure the pooled target hasn't changed.
-                if (carouselBeatmapSet != Item)
-                    return;
+                // if already loaded, we only need to re-animate.
+                animateBeatmaps();
+            }
+            else
+            {
+                // on selection we show our child beatmaps.
+                // for now this is a simple drawable construction each selection.
+                // can be improved in the future.
+                var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
-                beatmapContainer.ChildrenEnumerable = loaded;
+                // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
+                var visibleBeatmaps = carouselBeatmapSet.Children
+                                                        .Where(c => c.Visible)
+                                                        .Select(c => c.CreateDrawableRepresentation())
+                                                        .ToArray();
 
+                beatmapContainer = new Container<DrawableCarouselItem>
+                {
+                    X = 100,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    ChildrenEnumerable = visibleBeatmaps
+                };
+
+                Logger.Log($"loading {visibleBeatmaps.Length} beatmaps for {Item}");
+
+                LoadComponentAsync(beatmapContainer, loaded =>
+                {
+                    // make sure the pooled target hasn't changed.
+                    if (carouselBeatmapSet != Item)
+                        return;
+
+                    Content.Child = loaded;
+                    animateBeatmaps();
+                });
+            }
+
+            void animateBeatmaps()
+            {
                 float yPos = DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
 
-                foreach (var item in loaded)
+                foreach (var item in beatmapContainer.Children)
                 {
                     item.MoveToY(yPos, 800, Easing.OutQuint);
                     yPos += item.Item.TotalHeight + DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
                 }
-            });
+            }
         }
 
         private const int maximum_difficulty_icons = 18;
