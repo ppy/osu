@@ -64,15 +64,14 @@ namespace osu.Game.Screens.Select.Carousel
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
         {
             beatmap = panel.Beatmap;
-            Height = HEIGHT;
-
-            // todo: temporary
             Item = panel;
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager manager, SongSelect songSelect)
         {
+            Header.Height = HEIGHT;
+
             if (songSelect != null)
             {
                 startRequested = b => songSelect.FinaliseSelection(b);
@@ -83,7 +82,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (manager != null)
                 hideRequested = manager.Hide;
 
-            Content.Children = new Drawable[]
+            Header.Children = new Drawable[]
             {
                 background = new Box
                 {
@@ -174,7 +173,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Selected();
 
-            BorderContainer.MoveToX(-50, 500, Easing.OutExpo);
+            Header.MoveToX(-50, 500, Easing.OutExpo);
 
             background.Colour = ColourInfo.GradientVertical(
                 new Color4(20, 43, 51, 255),
@@ -187,7 +186,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Deselected();
 
-            BorderContainer.MoveToX(0, 500, Easing.OutExpo);
+            Header.MoveToX(0, 500, Easing.OutExpo);
 
             background.Colour = new Color4(20, 43, 51, 255);
             triangles.Colour = OsuColour.Gray(0.5f);
