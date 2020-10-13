@@ -427,7 +427,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 0; i < 3; i++)
             {
-                var set = createTestBeatmapSet(i, 3);
+                var set = createTestBeatmapSet(i);
                 set.Beatmaps[0].StarDifficulty = 3 - i;
                 set.Beatmaps[2].StarDifficulty = 6 + i;
                 sets.Add(set);
@@ -822,7 +822,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selection is visible", selectedBeatmapVisible);
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int id, int minimumDifficulties = 1)
+        private BeatmapSetInfo createTestBeatmapSet(int id, bool randomDifficultyCount = false)
         {
             return new BeatmapSetInfo
             {
@@ -836,7 +836,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Title = $"test set #{id}!",
                     AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
                 },
-                Beatmaps = getBeatmaps(RNG.Next(minimumDifficulties, 20)).ToList()
+                Beatmaps = getBeatmaps(randomDifficultyCount ? RNG.Next(1, 20) : 3).ToList()
             };
         }
 
@@ -846,14 +846,22 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 0; i < count; i++)
             {
+                float diff = (float)i / count * 10;
+
+                string version = "Normal";
+                if (diff > 6.6)
+                    version = "Insane";
+                else if (diff > 3.3)
+                    version = "Hard";
+
                 yield return new BeatmapInfo
                 {
                     OnlineBeatmapID = id++ * 10,
-                    Version = "Normal",
-                    StarDifficulty = RNG.NextSingle() * 10,
+                    Version = version,
+                    StarDifficulty = diff,
                     BaseDifficulty = new BeatmapDifficulty
                     {
-                        OverallDifficulty = RNG.NextSingle() * 10,
+                        OverallDifficulty = diff,
                     }
                 };
             }
@@ -899,7 +907,22 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             public bool PendingFilterTask => PendingFilter != null;
 
-            public IEnumerable<DrawableCarouselItem> Items => InternalChildren.OfType<DrawableCarouselItem>();
+            public IEnumerable<DrawableCarouselItem> Items
+            {
+                get
+                {
+                    foreach (var item in ScrollableContent)
+                    {
+                        yield return item;
+
+                        if (item is DrawableCarouselBeatmapSet set)
+                        {
+                            foreach (var difficulty in set.ChildItems)
+                                yield return difficulty;
+                        }
+                    }
+                }
+            }
 
             protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();
         }

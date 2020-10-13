@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Select
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
 
-            scrollableContent.Clear(false);
+            ScrollableContent.Clear(false);
             itemsCache.Invalidate();
             scrollPositionCache.Invalidate();
 
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Select
         private readonly Cached itemsCache = new Cached();
         private readonly Cached scrollPositionCache = new Cached();
 
-        private readonly Container<DrawableCarouselItem> scrollableContent;
+        protected readonly Container<DrawableCarouselItem> ScrollableContent;
 
         public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
 
@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Select
                     Children = new Drawable[]
                     {
                         setPool,
-                        scrollableContent = new Container<DrawableCarouselItem>
+                        ScrollableContent = new Container<DrawableCarouselItem>
                         {
                             RelativeSizeAxes = Axes.X,
                         }
@@ -595,7 +595,7 @@ namespace osu.Game.Screens.Select
 
                 var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first);
 
-                foreach (var panel in scrollableContent.Children)
+                foreach (var panel in ScrollableContent.Children)
                 {
                     if (toDisplay.Remove(panel.Item))
                     {
@@ -622,7 +622,7 @@ namespace osu.Game.Screens.Select
                     panel.Depth = item.CarouselYPosition;
                     panel.Y = item.CarouselYPosition;
 
-                    scrollableContent.Add(panel);
+                    ScrollableContent.Add(panel);
                 }
             }
 
@@ -630,7 +630,7 @@ namespace osu.Game.Screens.Select
             // This is common if a selected/collapsed state has changed.
             if (revalidateItems)
             {
-                foreach (DrawableCarouselItem panel in scrollableContent.Children)
+                foreach (DrawableCarouselItem panel in ScrollableContent.Children)
                 {
                     panel.MoveToY(panel.Item.CarouselYPosition, 800, Easing.OutQuint);
                 }
@@ -638,7 +638,7 @@ namespace osu.Game.Screens.Select
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
-            foreach (DrawableCarouselItem item in scrollableContent.Children)
+            foreach (DrawableCarouselItem item in ScrollableContent.Children)
             {
                 updateItem(item);
 
@@ -786,7 +786,7 @@ namespace osu.Game.Screens.Select
             }
 
             currentY += visibleHalfHeight;
-            scrollableContent.Height = currentY;
+            ScrollableContent.Height = currentY;
 
             if (BeatmapSetsLoaded && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
             {
@@ -841,7 +841,7 @@ namespace osu.Game.Screens.Select
         /// <param name="parent">For nested items, the parent of the item to be updated.</param>
         private void updateItem(DrawableCarouselItem item, DrawableCarouselItem parent = null)
         {
-            Vector2 posInScroll = scrollableContent.ToLocalSpace(item.Header.ScreenSpaceDrawQuad.Centre);
+            Vector2 posInScroll = ScrollableContent.ToLocalSpace(item.Header.ScreenSpaceDrawQuad.Centre);
             float itemDrawY = posInScroll.Y - visibleUpperBound;
             float dist = Math.Abs(1f - itemDrawY / visibleHalfHeight);
 
