@@ -54,7 +54,9 @@ namespace osu.Game.Screens.Select.Carousel
         protected override void FreeAfterUse()
         {
             base.FreeAfterUse();
+
             Item = null;
+            ClearTransforms();
         }
 
         [BackgroundDependencyLoader(true)]
