@@ -171,29 +171,36 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(-100, 500, Easing.OutExpo);
 
-            if (beatmapContainer != null)
+            updateBeatmapDifficulties();
+        }
+
+        private void updateBeatmapDifficulties()
+        {
+            var carouselBeatmapSet = (CarouselBeatmapSet)Item;
+
+            var visibleBeatmaps = carouselBeatmapSet.Children
+                                                    .Where(c => c.Visible)
+                                                    .ToArray();
+
+            // if we are already displaying all the correct beatmaps, only run animation updates.
+            // note that the displayed beatmaps may change due to the applied filter.
+            // a future optimisation could add/remove only changed difficulties rather than reinitialise.
+            if (beatmapContainer != null && visibleBeatmaps.Length == beatmapContainer.Count && visibleBeatmaps.All(b => beatmapContainer.Any(c => c.Item == b)))
             {
-                // if already loaded, we only need to re-animate.
-                animateBeatmaps();
+                updateBeatmapYPositions();
             }
             else
             {
                 // on selection we show our child beatmaps.
                 // for now this is a simple drawable construction each selection.
                 // can be improved in the future.
-                var carouselBeatmapSet = (CarouselBeatmapSet)Item;
-
-                // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
-                var visibleBeatmaps = carouselBeatmapSet.Children
-                                                        .Where(c => c.Visible)
-                                                        .Select(c => c.CreateDrawableRepresentation())
-                                                        .ToArray();
 
                 beatmapContainer = new Container<DrawableCarouselItem>
                 {
                     X = 100,
                     RelativeSizeAxes = Axes.Both,
-                    ChildrenEnumerable = visibleBeatmaps
+                    // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
+                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()).ToArray()
                 };
 
                 Logger.Log($"loading {visibleBeatmaps.Length} beatmaps for {Item}");
@@ -205,18 +212,18 @@ namespace osu.Game.Screens.Select.Carousel
                         return;
 
                     Content.Child = loaded;
-                    animateBeatmaps();
+                    updateBeatmapYPositions();
                 });
             }
 
-            void animateBeatmaps()
+            void updateBeatmapYPositions()
             {
                 float yPos = DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
 
-                foreach (var item in beatmapContainer.Children)
+                foreach (var panel in beatmapContainer.Children)
                 {
-                    item.MoveToY(yPos, 800, Easing.OutQuint);
-                    yPos += item.Item.TotalHeight + DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
+                    panel.MoveToY(yPos, 800, Easing.OutQuint);
+                    yPos += panel.Item.TotalHeight + DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
                 }
             }
         }
