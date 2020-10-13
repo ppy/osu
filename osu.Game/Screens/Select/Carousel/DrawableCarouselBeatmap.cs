@@ -33,7 +33,12 @@ namespace osu.Game.Screens.Select.Carousel
     {
         public const float CAROUSEL_BEATMAP_SPACING = 5;
 
-        public const float HEIGHT = MAX_HEIGHT * 0.6f; // TODO: add once base class is fixed + CAROUSEL_BEATMAP_SPACING;
+        /// <summary>
+        /// The height of a carousel beatmap, including vertical spacing.
+        /// </summary>
+        public const float HEIGHT = height + CAROUSEL_BEATMAP_SPACING;
+
+        private const float height = MAX_HEIGHT * 0.6f;
 
         private readonly BeatmapInfo beatmap;
 
@@ -70,7 +75,7 @@ namespace osu.Game.Screens.Select.Carousel
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager manager, SongSelect songSelect)
         {
-            Header.Height = HEIGHT;
+            Header.Height = height;
 
             if (songSelect != null)
             {

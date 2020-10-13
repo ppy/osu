@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Select.Carousel
                 foreach (var panel in beatmapContainer.Children)
                 {
                     panel.MoveToY(yPos, 800, Easing.OutQuint);
-                    yPos += panel.Item.TotalHeight + DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
+                    yPos += panel.Item.TotalHeight;
                 }
             }
         }
