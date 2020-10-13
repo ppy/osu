@@ -116,7 +116,6 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        private readonly List<float> yPositions = new List<float>();
         private readonly List<CarouselItem> visibleItems = new List<CarouselItem>();
 
         private readonly Cached itemsCache = new Cached();
@@ -570,23 +569,15 @@ namespace osu.Game.Screens.Select
             if (revalidateItems)
                 updateYPositions();
 
-            // Find index range of all items that should be on-screen
-            int firstIndex = yPositions.BinarySearch(visibleUpperBound);
-            if (firstIndex < 0) firstIndex = ~firstIndex;
-            int lastIndex = yPositions.BinarySearch(visibleBottomBound);
-            if (lastIndex < 0) lastIndex = ~lastIndex;
-
-            // as we can't be 100% sure on the size of individual carousel drawables,
-            // always play it safe and extend bounds by one.
-            firstIndex = Math.Max(0, firstIndex - 1);
-            lastIndex = Math.Min(yPositions.Count, lastIndex + 1);
+            var (firstIndex, lastIndex) = getDisplayRange();
 
             if (revalidateItems || firstIndex != displayedRange.first || lastIndex != displayedRange.last)
             {
                 Logger.Log("revalidation requested");
 
                 // Remove all items that should no longer be on-screen
-                scrollableContent.RemoveAll(p => p.Y + p.Item.TotalHeight < visibleUpperBound || p.Y > visibleBottomBound);
+                // TODO: figure out a more resilient way of doing this removal.
+                // scrollableContent.RemoveAll(p => p.Y + p.Item.TotalHeight < visibleUpperBound || p.Y > visibleBottomBound);
 
                 displayedRange = (firstIndex, lastIndex);
 
@@ -601,7 +592,7 @@ namespace osu.Game.Screens.Select
                     {
                         Logger.Log($"getting panel for {item} from pool");
                         panel = setPool.Get(p => p.Item = item);
-                        panel.Y = yPositions[i];
+                        panel.Y = item.CarouselYPosition;
                         panel.Depth = i;
 
                         panel.ClearTransforms();
@@ -611,9 +602,9 @@ namespace osu.Game.Screens.Select
                     else
                     {
                         if (panel.IsPresent)
-                            panel.MoveToY(yPositions[i], 800, Easing.OutQuint);
+                            panel.MoveToY(item.CarouselYPosition, 800, Easing.OutQuint);
                         else
-                            panel.Y = yPositions[i];
+                            panel.Y = item.CarouselYPosition;
 
                         scrollableContent.ChangeChildDepth(panel, i);
                     }
@@ -624,6 +615,22 @@ namespace osu.Game.Screens.Select
             // (e.g. x-offset and opacity).
             foreach (DrawableCarouselItem p in scrollableContent.Children)
                 updateItem(p);
+        }
+
+        private (int firstIndex, int lastIndex) getDisplayRange()
+        {
+            // Find index range of all items that should be on-screen
+            // TODO: reduce allocs of CarouselBoundsItem.
+            int firstIndex = visibleItems.BinarySearch(new CarouselBoundsItem(visibleUpperBound));
+            if (firstIndex < 0) firstIndex = ~firstIndex;
+            int lastIndex = visibleItems.BinarySearch(new CarouselBoundsItem(visibleBottomBound));
+            if (lastIndex < 0) lastIndex = ~lastIndex;
+
+            // as we can't be 100% sure on the size of individual carousel drawables,
+            // always play it safe and extend bounds by one.
+            firstIndex = Math.Max(0, firstIndex - 1);
+            lastIndex = Math.Min(visibleItems.Count, lastIndex + 1);
+            return (firstIndex, lastIndex);
         }
 
         protected override void UpdateAfterChildren()
@@ -698,7 +705,6 @@ namespace osu.Game.Screens.Select
         /// <returns>The Y position of the currently selected item.</returns>
         private void updateYPositions()
         {
-            yPositions.Clear();
             visibleItems.Clear();
 
             float currentY = visibleHalfHeight;
@@ -715,7 +721,7 @@ namespace osu.Game.Screens.Select
                     case CarouselBeatmapSet set:
                     {
                         visibleItems.Add(set);
-                        yPositions.Add(currentY);
+                        set.CarouselYPosition = currentY;
 
                         if (item.State.Value == CarouselItemState.Selected)
                         {
@@ -813,6 +819,20 @@ namespace osu.Game.Screens.Select
             // additional container and setting that container's alpha) such that we can
             // layer transformations on top, with a similar reasoning to the previous comment.
             p.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
+        }
+
+        /// <summary>
+        /// A carousel item strictly used for binary search purposes.
+        /// </summary>
+        private class CarouselBoundsItem : CarouselItem
+        {
+            public CarouselBoundsItem(in float pos)
+            {
+                CarouselYPosition = pos;
+            }
+
+            public override DrawableCarouselItem CreateDrawableRepresentation() =>
+                throw new NotImplementedException();
         }
 
         private class CarouselRoot : CarouselGroupEagerSelect

@@ -1,13 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public abstract class CarouselItem
+    public abstract class CarouselItem : IComparable<CarouselItem>
     {
         public virtual float TotalHeight => 0;
+
+        /// <summary>
+        /// An externally defined value used to determine this item's vertical display offset relative to the carousel.
+        /// </summary>
+        public float CarouselYPosition;
 
         public readonly BindableBool Filtered = new BindableBool();
 
@@ -42,6 +48,8 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => ChildID.CompareTo(other.ChildID);
+
+        public int CompareTo(CarouselItem other) => CarouselYPosition.CompareTo(other.CarouselYPosition);
     }
 
     public enum CarouselItemState
