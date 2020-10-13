@@ -560,6 +560,16 @@ namespace osu.Game.Screens.Select
 
         private (int first, int last) displayedRange;
 
+        /// <summary>
+        /// Extend the range to retain already loaded pooled drawables.
+        /// </summary>
+        private const float distance_offscreen_before_unload = 1024;
+
+        /// <summary>
+        /// Extend the range to update positions / retrieve pooled drawables outside of visible range.
+        /// </summary>
+        private const float distance_offscreen_to_preload = 256;
+
         protected override void Update()
         {
             base.Update();
@@ -585,7 +595,7 @@ namespace osu.Game.Screens.Select
 
                 var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first);
 
-                foreach (var panel in scrollableContent.Children)
+                foreach (var panel in scrollableContent.Children.ToArray())
                 {
                     if (toDisplay.Remove(panel.Item))
                     {
@@ -593,8 +603,10 @@ namespace osu.Game.Screens.Select
                         continue;
                     }
 
-                    // panel displayed but not required
-                    scrollableContent.Remove(panel);
+                    // panel loaded as drawable but not required by visible range.
+                    // remove but only if too far off-screen
+                    if (panel.Y < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
+                        scrollableContent.Remove(panel);
                 }
 
                 // Add those items within the previously found index range that should be displayed.
@@ -603,7 +615,7 @@ namespace osu.Game.Screens.Select
                     Logger.Log($"getting panel for {item} from pool");
                     var panel = setPool.Get(p => p.Item = item);
 
-                    panel.Depth = item.CarouselYPosition; // todo: i think this is correct
+                    panel.Depth = item.CarouselYPosition;
                     panel.Y = item.CarouselYPosition;
 
                     scrollableContent.Add(panel);
@@ -632,9 +644,9 @@ namespace osu.Game.Screens.Select
         {
             // Find index range of all items that should be on-screen
             // TODO: reduce allocs of CarouselBoundsItem.
-            int firstIndex = visibleItems.BinarySearch(new CarouselBoundsItem(visibleUpperBound));
+            int firstIndex = visibleItems.BinarySearch(new CarouselBoundsItem(visibleUpperBound - distance_offscreen_to_preload));
             if (firstIndex < 0) firstIndex = ~firstIndex;
-            int lastIndex = visibleItems.BinarySearch(new CarouselBoundsItem(visibleBottomBound));
+            int lastIndex = visibleItems.BinarySearch(new CarouselBoundsItem(visibleBottomBound + distance_offscreen_to_preload));
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
             // as we can't be 100% sure on the size of individual carousel drawables,
