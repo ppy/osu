@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -34,9 +35,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.Children ?? Enumerable.Empty<DrawableCarouselItem>();
 
-        private BeatmapSetInfo beatmapSet => (Item as CarouselBeatmapSet)?.BeatmapSet;
-
         private Container<DrawableCarouselItem> beatmapContainer;
+
+        private BeatmapSetInfo beatmapSet;
 
         [Resolved]
         private BeatmapManager manager { get; set; }
@@ -68,6 +69,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (Item == null)
                 return;
+
+            beatmapSet = ((CarouselBeatmapSet)Item).BeatmapSet;
 
             DelayedLoadWrapper background;
             DelayedLoadWrapper mainFlow;
@@ -161,6 +164,8 @@ namespace osu.Game.Screens.Select.Carousel
         {
             get
             {
+                Debug.Assert(beatmapSet != null);
+
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (Item.State.Value == CarouselItemState.NotSelected)
@@ -189,6 +194,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private MenuItem createCollectionMenuItem(BeatmapCollection collection)
         {
+            Debug.Assert(beatmapSet != null);
+
             TernaryState state;
 
             var countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
