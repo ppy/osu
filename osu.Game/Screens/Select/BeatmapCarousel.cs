@@ -595,8 +595,6 @@ namespace osu.Game.Screens.Select
                         panel.Y = item.CarouselYPosition;
                         panel.Depth = i;
 
-                        panel.ClearTransforms();
-
                         scrollableContent.Add(panel);
                     }
                     else
