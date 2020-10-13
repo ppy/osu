@@ -595,7 +595,7 @@ namespace osu.Game.Screens.Select
 
                 var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first);
 
-                foreach (var panel in scrollableContent.Children.ToArray())
+                foreach (var panel in scrollableContent.Children)
                 {
                     if (toDisplay.Remove(panel.Item))
                     {
@@ -606,7 +606,11 @@ namespace osu.Game.Screens.Select
                     // panel loaded as drawable but not required by visible range.
                     // remove but only if too far off-screen
                     if (panel.Y < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
-                        scrollableContent.Remove(panel);
+                    {
+                        // todo: may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
+                        panel.ClearTransforms();
+                        panel.Expire();
+                    }
                 }
 
                 // Add those items within the previously found index range that should be displayed.
