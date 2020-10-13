@@ -69,29 +69,25 @@ namespace osu.Game.Screens.Select.Carousel
             if (Item == null)
                 return;
 
+            DelayedLoadWrapper background;
+            DelayedLoadWrapper mainFlow;
+
             Header.Children = new Drawable[]
             {
-                new DelayedLoadUnloadWrapper(() =>
+                background = new DelayedLoadWrapper(new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                 {
-                    var background = new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    };
-
-                    background.OnLoadComplete += d => d.FadeInFromZero(1000, Easing.OutQuint);
-
-                    return background;
-                }, 300, 5000),
-                new DelayedLoadUnloadWrapper(() =>
-                {
-                    // main content split into own class to reduce allocation before load operation triggers.
-                    var mainFlow = new SetPanelContent((CarouselBeatmapSet)Item);
-
-                    mainFlow.OnLoadComplete += d => d.FadeInFromZero(1000, Easing.OutQuint);
-
-                    return mainFlow;
-                }, 100, 5000)
+                    RelativeSizeAxes = Axes.Both,
+                }, 300),
+                mainFlow = new DelayedLoadWrapper(new SetPanelContent((CarouselBeatmapSet)Item), 100),
             };
+
+            background.DelayedLoadComplete += fadeContentIn;
+            mainFlow.DelayedLoadComplete += fadeContentIn;
+        }
+
+        private void fadeContentIn(Drawable d)
+        {
+            d.FadeInFromZero(1000, Easing.OutQuint);
         }
 
         protected override void Deselected()
