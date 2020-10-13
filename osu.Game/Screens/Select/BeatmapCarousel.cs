@@ -841,7 +841,7 @@ namespace osu.Game.Screens.Select
         /// <param name="parent">For nested items, the parent of the item to be updated.</param>
         private void updateItem(DrawableCarouselItem item, DrawableCarouselItem parent = null)
         {
-            Vector2 posInScroll = scrollableContent.ToLocalSpace(item.ScreenSpaceDrawQuad.Centre);
+            Vector2 posInScroll = scrollableContent.ToLocalSpace(item.Header.ScreenSpaceDrawQuad.Centre);
             float itemDrawY = posInScroll.Y - visibleUpperBound;
             float dist = Math.Abs(1f - itemDrawY / visibleHalfHeight);
 

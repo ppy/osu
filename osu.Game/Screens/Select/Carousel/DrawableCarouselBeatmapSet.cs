@@ -67,16 +67,12 @@ namespace osu.Game.Screens.Select.Carousel
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
 
-            // TODO: temporary. we probably want to *not* inherit DrawableCarouselItem for this class, but only the above header portion.
-            AddRangeInternal(new Drawable[]
+            Content.Add(beatmapContainer = new Container<DrawableCarouselItem>
             {
-                beatmapContainer = new Container<DrawableCarouselItem>
-                {
-                    X = 50,
-                    Y = MAX_HEIGHT,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                },
+                X = 50,
+                Y = MAX_HEIGHT,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
             });
         }
 
@@ -90,7 +86,7 @@ namespace osu.Game.Screens.Select.Carousel
                 return;
 
             Logger.Log($"updating item {beatmapSet}");
-            Content.Children = new Drawable[]
+            Header.Children = new Drawable[]
             {
                 new DelayedLoadUnloadWrapper(() =>
                 {
@@ -163,7 +159,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Deselected();
 
-            BorderContainer.MoveToX(0, 500, Easing.OutExpo);
+            MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
             foreach (var beatmap in beatmapContainer)
             {
@@ -176,7 +172,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Selected();
 
-            BorderContainer.MoveToX(-100, 500, Easing.OutExpo);
+            MovementContainer.MoveToX(-100, 500, Easing.OutExpo);
 
             // on selection we show our child beatmaps.
             // for now this is a simple drawable construction each selection.
