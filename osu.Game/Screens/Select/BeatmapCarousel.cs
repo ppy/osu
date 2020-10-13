@@ -638,9 +638,15 @@ namespace osu.Game.Screens.Select
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
-            foreach (DrawableCarouselItem p in scrollableContent.Children)
+            foreach (DrawableCarouselItem item in scrollableContent.Children)
             {
-                updateItem(p);
+                updateItem(item);
+
+                if (item is DrawableCarouselBeatmapSet set)
+                {
+                    foreach (var diff in set.ChildItems)
+                        updateItem(diff, item);
+                }
             }
         }
 
@@ -831,21 +837,20 @@ namespace osu.Game.Screens.Select
         /// Update a item's x position and multiplicative alpha based on its y position and
         /// the current scroll position.
         /// </summary>
-        /// <param name="p">The item to be updated.</param>
-        private void updateItem(DrawableCarouselItem p)
+        /// <param name="item">The item to be updated.</param>
+        /// <param name="parent">For nested items, the parent of the item to be updated.</param>
+        private void updateItem(DrawableCarouselItem item, DrawableCarouselItem parent = null)
         {
-            float itemDrawY = p.Position.Y - visibleUpperBound + p.DrawHeight / 2;
+            Vector2 posInScroll = scrollableContent.ToLocalSpace(item.ScreenSpaceDrawQuad.Centre);
+            float itemDrawY = posInScroll.Y - visibleUpperBound;
             float dist = Math.Abs(1f - itemDrawY / visibleHalfHeight);
 
-            // Setting the origin position serves as an additive position on top of potential
-            // local transformation we may want to apply (e.g. when a item gets selected, we
-            // may want to smoothly transform it leftwards.)
-            p.OriginPosition = new Vector2(-offsetX(dist, visibleHalfHeight), 0);
+            item.X = offsetX(dist, visibleHalfHeight) - (parent?.X ?? 0);
 
             // We are applying a multiplicative alpha (which is internally done by nesting an
             // additional container and setting that container's alpha) such that we can
-            // layer transformations on top, with a similar reasoning to the previous comment.
-            p.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
+            // layer alpha transformations on top.
+            item.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
 
         /// <summary>
