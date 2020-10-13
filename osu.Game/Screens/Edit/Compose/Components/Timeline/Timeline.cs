@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         waveform = new WaveformGraph
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colours.Blue.Opacity(0.2f),
+                            BaseColour = colours.Blue.Opacity(0.2f),
                             LowColour = colours.BlueLighter,
                             MidColour = colours.BlueDark,
                             HighColour = colours.BlueDarker,
