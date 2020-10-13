@@ -167,7 +167,10 @@ namespace osu.Game.Screens.Select.Carousel
             BorderContainer.MoveToX(0, 500, Easing.OutExpo);
 
             foreach (var beatmap in beatmapContainer)
-                beatmap.FadeOut(50).Expire();
+            {
+                beatmap.MoveToY(0, 800, Easing.OutQuint);
+                beatmap.FadeOut(80).Expire();
+            }
         }
 
         protected override void Selected()
@@ -176,6 +179,9 @@ namespace osu.Game.Screens.Select.Carousel
 
             BorderContainer.MoveToX(-100, 500, Easing.OutExpo);
 
+            // on selection we show our child beatmaps.
+            // for now this is a simple drawable construction each selection.
+            // can be improved in the future.
             var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
             // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
@@ -190,15 +196,15 @@ namespace osu.Game.Screens.Select.Carousel
                 if (carouselBeatmapSet != Item)
                     return;
 
+                beatmapContainer.ChildrenEnumerable = loaded;
+
                 float yPos = DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
 
                 foreach (var item in loaded)
                 {
-                    item.Y = yPos;
+                    item.MoveToY(yPos, 800, Easing.OutQuint);
                     yPos += item.Item.TotalHeight + DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
                 }
-
-                beatmapContainer.ChildrenEnumerable = loaded;
             });
         }
 
