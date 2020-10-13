@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Events;
+using osuTK;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -26,6 +27,9 @@ namespace osu.Game.Screens.Select.Carousel
         protected readonly Container<Drawable> Content;
 
         protected readonly Container MovementContainer;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            Header.ReceivePositionalInputAt(screenSpacePos);
 
         private CarouselItem item;
 
