@@ -74,6 +74,18 @@ namespace osu.Game.Screens.Select
         public override bool PropagatePositionalInputSubTree => AllowSelection;
         public override bool PropagateNonPositionalInputSubTree => AllowSelection;
 
+        private (int first, int last) displayedRange;
+
+        /// <summary>
+        /// Extend the range to retain already loaded pooled drawables.
+        /// </summary>
+        private const float distance_offscreen_before_unload = 1024;
+
+        /// <summary>
+        /// Extend the range to update positions / retrieve pooled drawables outside of visible range.
+        /// </summary>
+        private const float distance_offscreen_to_preload = 512; // todo: adjust this appropriately once we can make set panel contents load while off-screen.
+
         /// <summary>
         /// Whether carousel items have completed asynchronously loaded.
         /// </summary>
@@ -556,18 +568,6 @@ namespace osu.Game.Screens.Select
         }
 
         #endregion
-
-        private (int first, int last) displayedRange;
-
-        /// <summary>
-        /// Extend the range to retain already loaded pooled drawables.
-        /// </summary>
-        private const float distance_offscreen_before_unload = 1024;
-
-        /// <summary>
-        /// Extend the range to update positions / retrieve pooled drawables outside of visible range.
-        /// </summary>
-        private const float distance_offscreen_to_preload = 256;
 
         protected override void Update()
         {
