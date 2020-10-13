@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
-        public override IEnumerable<DrawableCarouselItem> ChildItems => beatmapContainer?.Children ?? base.ChildItems;
+        public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.Children ?? Enumerable.Empty<DrawableCarouselItem>();
 
         private BeatmapSetInfo beatmapSet => (Item as CarouselBeatmapSet)?.BeatmapSet;
 
