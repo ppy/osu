@@ -566,53 +566,56 @@ namespace osu.Game.Screens.Select
 
             bool revalidateItems = !itemsCache.IsValid;
 
+            // First we iterate over all non-filtered carousel items and populate their
+            // vertical position data.
             if (revalidateItems)
                 updateYPositions();
 
-            var (firstIndex, lastIndex) = getDisplayRange();
+            // This data is consumed to find the currently displayable range.
+            // This is the range we want to keep drawables for, and should exceed the visible range slightly to avoid drawable churn.
+            var newDisplayRange = getDisplayRange();
 
-            if (revalidateItems || firstIndex != displayedRange.first || lastIndex != displayedRange.last)
+            // If the filtered items or visible range has changed, pooling requirements need to be checked.
+            // This involves fetching new items from the pool, returning no-longer required items.
+            if (revalidateItems || newDisplayRange != displayedRange)
             {
                 Logger.Log("revalidation requested");
 
-                // Remove all items that should no longer be on-screen
-                // TODO: figure out a more resilient way of doing this removal.
-                // scrollableContent.RemoveAll(p => p.Y + p.Item.TotalHeight < visibleUpperBound || p.Y > visibleBottomBound);
-
-                displayedRange = (firstIndex, lastIndex);
+                displayedRange = newDisplayRange;
 
                 // Add those items within the previously found index range that should be displayed.
-                for (int i = firstIndex; i < lastIndex; ++i)
+                for (int i = displayedRange.first; i < displayedRange.last; ++i)
                 {
                     var item = visibleItems[i];
 
-                    var panel = scrollableContent.FirstOrDefault(c => c.Item == item);
+                    if (scrollableContent.Any(c => c.Item == item)) continue;
 
-                    if (panel == null)
-                    {
-                        Logger.Log($"getting panel for {item} from pool");
-                        panel = setPool.Get(p => p.Item = item);
-                        panel.Y = item.CarouselYPosition;
-                        panel.Depth = i;
+                    Logger.Log($"getting panel for {item} from pool");
+                    var panel = setPool.Get(p => p.Item = item);
+                    panel.Depth = i;
+                    panel.Y = item.CarouselYPosition;
+                    scrollableContent.Add(panel);
+                }
 
-                        scrollableContent.Add(panel);
-                    }
-                    else
-                    {
-                        if (panel.IsPresent)
-                            panel.MoveToY(item.CarouselYPosition, 800, Easing.OutQuint);
-                        else
-                            panel.Y = item.CarouselYPosition;
+                // Remove any items which are far out of the visible range.
+            }
 
-                        scrollableContent.ChangeChildDepth(panel, i);
-                    }
+            // Finally, if the filtered items have changed, animate drawables to their new locations.
+            // This is common if a selected/collapsed state has changed.
+            if (revalidateItems)
+            {
+                foreach (DrawableCarouselItem panel in scrollableContent.Children)
+                {
+                    panel.MoveToY(panel.Item.CarouselYPosition, 800, Easing.OutQuint);
                 }
             }
 
-            // Update externally controlled state of currently visible items
-            // (e.g. x-offset and opacity).
+            // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
+            // This is a per-frame update on all drawable panels.
             foreach (DrawableCarouselItem p in scrollableContent.Children)
+            {
                 updateItem(p);
+            }
         }
 
         private (int firstIndex, int lastIndex) getDisplayRange()
