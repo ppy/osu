@@ -100,7 +100,8 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         Direction = FillDirection.Vertical,
                         Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
-                        AutoSizeAxes = Axes.Both,
+                        // required to ensure we load as soon as any part of the panel comes on screen
+                        RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
                             new OsuSpriteText
