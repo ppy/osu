@@ -70,7 +70,6 @@ namespace osu.Game.Screens.Select.Carousel
             Content.Add(beatmapContainer = new Container<DrawableCarouselItem>
             {
                 X = 100,
-                Y = MAX_HEIGHT,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
             });
