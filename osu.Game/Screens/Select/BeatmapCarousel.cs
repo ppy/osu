@@ -646,19 +646,24 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        private readonly CarouselBoundsItem carouselBoundsItem = new CarouselBoundsItem();
+
         private (int firstIndex, int lastIndex) getDisplayRange()
         {
             // Find index range of all items that should be on-screen
-            // TODO: reduce allocs of CarouselBoundsItem.
-            int firstIndex = visibleItems.BinarySearch(new CarouselBoundsItem(visibleUpperBound - distance_offscreen_to_preload));
+            carouselBoundsItem.CarouselYPosition = visibleUpperBound - distance_offscreen_to_preload;
+            int firstIndex = visibleItems.BinarySearch(carouselBoundsItem);
             if (firstIndex < 0) firstIndex = ~firstIndex;
-            int lastIndex = visibleItems.BinarySearch(new CarouselBoundsItem(visibleBottomBound + distance_offscreen_to_preload));
+
+            carouselBoundsItem.CarouselYPosition = visibleBottomBound + distance_offscreen_to_preload;
+            int lastIndex = visibleItems.BinarySearch(carouselBoundsItem);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
             // as we can't be 100% sure on the size of individual carousel drawables,
             // always play it safe and extend bounds by one.
             firstIndex = Math.Max(0, firstIndex - 1);
             lastIndex = Math.Min(visibleItems.Count, lastIndex + 1);
+
             return (firstIndex, lastIndex);
         }
 
@@ -856,11 +861,6 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private class CarouselBoundsItem : CarouselItem
         {
-            public CarouselBoundsItem(in float pos)
-            {
-                CarouselYPosition = pos;
-            }
-
             public override DrawableCarouselItem CreateDrawableRepresentation() =>
                 throw new NotImplementedException();
         }
