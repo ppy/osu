@@ -18,6 +18,7 @@ using osu.Framework.Threading;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
@@ -582,6 +583,8 @@ namespace osu.Game.Screens.Select
 
             if (revalidateItems || firstIndex != displayedRange.first || lastIndex != displayedRange.last)
             {
+                Logger.Log("revalidation requested");
+
                 // Remove all items that should no longer be on-screen
                 scrollableContent.RemoveAll(p => p.Y + p.Item.TotalHeight < visibleUpperBound || p.Y > visibleBottomBound);
 
@@ -596,6 +599,7 @@ namespace osu.Game.Screens.Select
 
                     if (panel == null)
                     {
+                        Logger.Log($"getting panel for {item} from pool");
                         panel = setPool.Get(p => p.Item = item);
                         panel.Y = yPositions[i];
                         panel.Depth = i;

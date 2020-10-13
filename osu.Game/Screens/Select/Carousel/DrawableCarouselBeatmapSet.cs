@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
@@ -86,10 +87,12 @@ namespace osu.Game.Screens.Select.Carousel
             if (Item == null)
                 return;
 
+            Logger.Log($"updating item {beatmapSet}");
             Content.Children = new Drawable[]
             {
                 new DelayedLoadUnloadWrapper(() =>
                 {
+                    Logger.Log($"loaded background item {beatmapSet}");
                     var background = new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                     {
                         RelativeSizeAxes = Axes.Both,
