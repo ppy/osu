@@ -85,10 +85,7 @@ namespace osu.Game.Screens.Select.Carousel
             mainFlow.DelayedLoadComplete += fadeContentIn;
         }
 
-        private void fadeContentIn(Drawable d)
-        {
-            d.FadeInFromZero(1000, Easing.OutQuint);
-        }
+        private void fadeContentIn(Drawable d) => d.FadeInFromZero(750, Easing.OutQuint);
 
         protected override void Deselected()
         {
