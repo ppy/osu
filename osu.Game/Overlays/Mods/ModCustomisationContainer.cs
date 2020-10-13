@@ -16,11 +16,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class CModSettingsContainer : Container
+    public class ModCustomisationContainer : Container
     {
         private readonly FillFlowContainer<ModControlSection> modSettingsContent;
 
-        public CModSettingsContainer()
+        public ModCustomisationContainer()
         {
             Children = new Drawable[]
             {
