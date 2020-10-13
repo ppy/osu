@@ -392,6 +392,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 return;
 
                             repeatHitObject.RepeatCount = proposedCount;
+                            beatmap.Update(hitObject);
                             break;
 
                         case IHasDuration endTimeHitObject:
@@ -401,10 +402,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 return;
 
                             endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
+                            beatmap.Update(hitObject);
                             break;
                     }
-
-                    beatmap.UpdateHitObject(hitObject);
                 }
             }
 
