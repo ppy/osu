@@ -113,9 +113,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             var carouselBeatmapSet = (CarouselBeatmapSet)Item;
 
-            var visibleBeatmaps = carouselBeatmapSet.Children
-                                                    .Where(c => c.Visible)
-                                                    .ToArray();
+            var visibleBeatmaps = carouselBeatmapSet.Children.Where(c => c.Visible).ToArray();
 
             // if we are already displaying all the correct beatmaps, only run animation updates.
             // note that the displayed beatmaps may change due to the applied filter.
@@ -129,13 +127,11 @@ namespace osu.Game.Screens.Select.Carousel
                 // on selection we show our child beatmaps.
                 // for now this is a simple drawable construction each selection.
                 // can be improved in the future.
-
                 beatmapContainer = new Container<DrawableCarouselItem>
                 {
                     X = 100,
                     RelativeSizeAxes = Axes.Both,
-                    // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
-                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()).ToArray()
+                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation())
                 };
 
                 LoadComponentAsync(beatmapContainer, loaded =>
