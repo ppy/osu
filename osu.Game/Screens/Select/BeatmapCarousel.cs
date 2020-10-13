@@ -1,30 +1,29 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using osu.Game.Configuration;
-using osuTK.Input;
-using osu.Framework.Utils;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Threading;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -589,8 +588,6 @@ namespace osu.Game.Screens.Select
             // This involves fetching new items from the pool, returning no-longer required items.
             if (revalidateItems || newDisplayRange != displayedRange)
             {
-                Logger.Log("revalidation requested");
-
                 displayedRange = newDisplayRange;
 
                 var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first);
@@ -616,7 +613,6 @@ namespace osu.Game.Screens.Select
                 // Add those items within the previously found index range that should be displayed.
                 foreach (var item in toDisplay)
                 {
-                    Logger.Log($"getting panel for {item} from pool");
                     var panel = setPool.Get(p => p.Item = item);
 
                     panel.Depth = item.CarouselYPosition;

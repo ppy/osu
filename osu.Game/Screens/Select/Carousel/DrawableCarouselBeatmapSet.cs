@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
@@ -70,12 +69,10 @@ namespace osu.Game.Screens.Select.Carousel
             if (Item == null)
                 return;
 
-            Logger.Log($"updating item {beatmapSet}");
             Header.Children = new Drawable[]
             {
                 new DelayedLoadUnloadWrapper(() =>
                 {
-                    Logger.Log($"loaded background item {beatmapSet}");
                     var background = new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -150,8 +147,6 @@ namespace osu.Game.Screens.Select.Carousel
                     // ToArray() in this line is required due to framework oversight: https://github.com/ppy/osu-framework/pull/3929
                     ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()).ToArray()
                 };
-
-                Logger.Log($"loading {visibleBeatmaps.Length} beatmaps for {Item}");
 
                 LoadComponentAsync(beatmapContainer, loaded =>
                 {
