@@ -89,10 +89,15 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.LoadComplete();
 
+            UpdateItem();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
             // avoid using fill flow for performance reasons. header size doesn't change after load.
             Content.Y = Header.Height;
-
-            UpdateItem();
         }
 
         protected virtual void UpdateItem()
