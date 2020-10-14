@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
-        [TestCase(2.3683365342338796d, "diffcalc-test")]
+        [TestCase(2.3449735700206298d, "diffcalc-test")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
