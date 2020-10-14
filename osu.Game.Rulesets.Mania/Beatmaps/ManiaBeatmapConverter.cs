@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public bool Dual;
         public readonly bool IsForCurrentRuleset;
 
-        private int originalTargetColumns;
+        private readonly int originalTargetColumns;
 
         // Internal for testing purposes
         internal FastRandom Random { get; private set; }
