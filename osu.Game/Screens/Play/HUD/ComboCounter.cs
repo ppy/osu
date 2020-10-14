@@ -9,9 +9,9 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public abstract class ComboCounter : Container
+    public abstract class ComboCounter : Container, IComboCounter
     {
-        public BindableInt Current = new BindableInt
+        public Bindable<int> Current { get; } = new BindableInt
         {
             MinValue = 0,
         };

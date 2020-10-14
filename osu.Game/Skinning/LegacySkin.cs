@@ -18,6 +18,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -327,6 +328,17 @@ namespace osu.Game.Skinning
         {
             switch (component)
             {
+                case HUDSkinComponent hudComponent:
+                {
+                    switch (hudComponent.Component)
+                    {
+                        case HUDSkinComponents.ComboCounter:
+                            return new LegacyComboCounter();
+                    }
+
+                    return null;
+                }
+
                 case GameplaySkinComponent<HitResult> resultComponent:
                     switch (resultComponent.Component)
                     {

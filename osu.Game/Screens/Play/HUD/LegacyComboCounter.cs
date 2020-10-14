@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over.
     /// </summary>
-    public class StandardComboCounter : ComboCounter
+    public class LegacyComboCounter : ComboCounter
     {
         protected uint ScheduledPopOutCurrentId;
 
@@ -17,6 +17,14 @@ namespace osu.Game.Screens.Play.HUD
         protected virtual bool CanPopOutWhileRolling => false;
 
         public new Vector2 PopOutScale = new Vector2(1.6f);
+
+        public LegacyComboCounter()
+        {
+            Anchor = Anchor.BottomLeft;
+            Origin = Anchor.BottomLeft;
+
+            Margin = new MarginPadding { Top = 5, Left = 20 };
+        }
 
         protected override void LoadComplete()
         {

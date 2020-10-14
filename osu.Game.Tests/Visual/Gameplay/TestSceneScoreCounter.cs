@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
             Add(score);
 
-            ComboCounter comboCounter = new StandardComboCounter
+            ComboCounter comboCounter = new LegacyComboCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
