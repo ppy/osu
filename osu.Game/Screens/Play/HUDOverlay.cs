@@ -80,26 +80,49 @@ namespace osu.Game.Screens.Play
                 visibilityContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Child = new GridContainer
                     {
-                        HealthDisplay = CreateHealthDisplay(),
-                        topScoreContainer = new Container
+                        RelativeSizeAxes = Axes.Both,
+                        Content = new[]
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
+                            new Drawable[]
                             {
-                                AccuracyCounter = CreateAccuracyCounter(),
-                                ScoreCounter = CreateScoreCounter(),
-                                ComboCounter = CreateComboCounter(),
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        HealthDisplay = CreateHealthDisplay(),
+                                        topScoreContainer = new Container
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            AutoSizeAxes = Axes.Both,
+                                            Children = new Drawable[]
+                                            {
+                                                AccuracyCounter = CreateAccuracyCounter(),
+                                                ScoreCounter = CreateScoreCounter(),
+                                                ComboCounter = CreateComboCounter(),
+                                            },
+                                        },
+                                        ComboCounter = CreateComboCounter(),
+                                        ModDisplay = CreateModsContainer(),
+                                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
+                                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                                    }
+                                },
                             },
+                            new Drawable[]
+                            {
+                                Progress = CreateProgress(),
+                            }
                         },
-                        Progress = CreateProgress(),
-                        ModDisplay = CreateModsContainer(),
-                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
-                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
-                    }
+                        RowDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.Distributed),
+                            new Dimension(GridSizeMode.AutoSize)
+                        }
+                    },
                 },
                 new FillFlowContainer
                 {
