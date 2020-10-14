@@ -57,10 +57,8 @@ namespace osu.Game.IO
                 TryChangeToCustomStorage(out Error);
         }
 
-        public Storage GetStorageFromPath(string path)
-        {
-            return IGNORE_DIRECTORIES.Any(x => path.StartsWith(x)) ? defaultStorage : UnderlyingStorage;
-        }
+        public Storage GetStorageFromPath(string path) =>
+            IGNORE_DIRECTORIES.Any(x => path.StartsWith(x)) ? defaultStorage : UnderlyingStorage;
 
         public override string GetFullPath(string path, bool createIfNotExisting = false) =>
             GetStorageFromPath(path).GetFullPath(MutatePath(path), createIfNotExisting);
