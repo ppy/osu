@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -334,6 +335,14 @@ namespace osu.Game.Skinning
                     {
                         case HUDSkinComponents.ComboCounter:
                             return new LegacyComboCounter();
+
+                        case HUDSkinComponents.ScoreText:
+                            const string font = "score";
+
+                            if (!this.HasFont(font))
+                                return null;
+
+                            return new LegacySpriteText(this, font);
                     }
 
                     return null;

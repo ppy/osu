@@ -1,8 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osuTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -26,6 +31,22 @@ namespace osu.Game.Screens.Play.HUD
             Margin = new MarginPadding { Top = 5, Left = 20 };
         }
 
+        [Resolved]
+        private ISkinSource skin { get; set; }
+
+        protected override Drawable CreateSpriteText()
+        {
+            return skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) ?? new OsuSpriteText();
+
+            /*
+            new OsuSpriteText
+            {
+                Font = OsuFont.Numeric.With(size: 40),
+                UseFullGlyphHeight = false,
+            });
+    */
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -41,7 +62,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual void TransformPopOut(int newValue)
         {
-            PopOutCount.Text = FormatCount(newValue);
+            ((IHasText)PopOutCount).Text = FormatCount(newValue);
 
             PopOutCount.ScaleTo(PopOutScale);
             PopOutCount.FadeTo(PopOutInitialAlpha);
@@ -60,13 +81,13 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual void TransformNoPopOut(int newValue)
         {
-            DisplayedCountSpriteText.Text = FormatCount(newValue);
+            ((IHasText)DisplayedCountSpriteText).Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(1);
         }
 
         protected virtual void TransformPopOutSmall(int newValue)
         {
-            DisplayedCountSpriteText.Text = FormatCount(newValue);
+            ((IHasText)DisplayedCountSpriteText).Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(PopOutSmallScale);
             DisplayedCountSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
         }
