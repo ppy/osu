@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -56,6 +57,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 Volume = s.Volume
             }).ToList();
 
+            int nodeIndex = 0;
             SliderEventDescriptor? lastEvent = null;
 
             foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
@@ -105,7 +107,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     case SliderEventType.Repeat:
                         AddNested(new Fruit
                         {
-                            Samples = Samples,
+                            Samples = this.GetNodeSamples(nodeIndex++),
                             StartTime = e.Time,
                             X = X + Path.PositionAt(e.PathProgress).X,
                         });
@@ -119,7 +121,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         public double Duration
         {
             get => this.SpanCount() * Path.Distance / Velocity;
-            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+            set => throw new NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
         public double EndTime => StartTime + Duration;

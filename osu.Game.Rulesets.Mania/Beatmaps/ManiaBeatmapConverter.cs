@@ -116,7 +116,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 prevNoteTimes.RemoveAt(0);
             prevNoteTimes.Add(newNoteTime);
 
-            density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
+            if (prevNoteTimes.Count >= 2)
+                density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
         }
 
         private double lastTime;
@@ -180,7 +181,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 case IHasDuration endTimeData:
                 {
-                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
+                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
 
                     recordNote(endTimeData.EndTime, new Vector2(256, 192));
                     computeDensity(endTimeData.EndTime);
