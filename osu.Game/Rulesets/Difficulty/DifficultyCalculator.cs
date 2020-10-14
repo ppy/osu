@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
@@ -11,6 +12,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using Sentry;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -132,18 +134,18 @@ namespace osu.Game.Rulesets.Difficulty
                 // Apply the rest of the remaining mods recursively.
                 for (int i = 0; i < remainingMods.Length; i++)
                 {
-                    var adjustmentMod = remainingMods.Span[i];
+                    var (nextSet, nextCount) = flatten(remainingMods.Span[i]);
 
-                    if (currentSet.Any(c => c.IncompatibleMods.Any(m => m.IsInstanceOfType(adjustmentMod))
-                                            || adjustmentMod.IncompatibleMods.Any(m => m.IsInstanceOfType(c))))
-                    {
+                    // Check if any mods in the next set are incompatible with any of the current set.
+                    if (currentSet.SelectMany(m => m.IncompatibleMods).Any(c => nextSet.Any(c.IsInstanceOfType)))
                         continue;
-                    }
 
-                    // Append the new mod.
-                    var (newSet, newSetCount) = flatten(adjustmentMod);
+                    // Check if any mods in the next set are the same type as the current set. Mods of the exact same type are not incompatible with themselves.
+                    if (currentSet.Any(c => nextSet.Any(n => c.GetType() == n.GetType())))
+                        continue;
 
-                    foreach (var combo in createDifficultyAdjustmentModCombinations(remainingMods.Slice(i + 1), currentSet.Concat(newSet), currentSetCount + newSetCount))
+                    // If all's good, attach the next set to the current set and recurse further.
+                    foreach (var combo in createDifficultyAdjustmentModCombinations(remainingMods.Slice(i + 1), currentSet.Concat(nextSet), currentSetCount + nextCount))
                         yield return combo;
                 }
             }
