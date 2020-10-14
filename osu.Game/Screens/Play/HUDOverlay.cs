@@ -22,6 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
+    [Cached]
     public class HUDOverlay : Container
     {
         private const float fade_duration = 400;
@@ -104,7 +105,6 @@ namespace osu.Game.Screens.Play
                                             {
                                                 AccuracyCounter = CreateAccuracyCounter(),
                                                 ScoreCounter = CreateScoreCounter(),
-                                                ComboCounter = CreateComboCounter(),
                                             },
                                         },
                                         ComboCounter = CreateComboCounter(),
