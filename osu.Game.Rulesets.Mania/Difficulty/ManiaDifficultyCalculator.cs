@@ -47,6 +47,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                 GreatHitWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate,
+                ScoreMultiplier = getScoreMultiplier(beatmap, mods),
                 MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
                 Skills = skills
             };
@@ -93,12 +94,44 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                     new ManiaModKey3(),
                     new ManiaModKey4(),
                     new ManiaModKey5(),
+                    new MultiMod(new ManiaModKey5(), new ManiaModDualStages()),
                     new ManiaModKey6(),
+                    new MultiMod(new ManiaModKey6(), new ManiaModDualStages()),
                     new ManiaModKey7(),
+                    new MultiMod(new ManiaModKey7(), new ManiaModDualStages()),
                     new ManiaModKey8(),
+                    new MultiMod(new ManiaModKey8(), new ManiaModDualStages()),
                     new ManiaModKey9(),
+                    new MultiMod(new ManiaModKey9(), new ManiaModDualStages()),
                 }).ToArray();
             }
+        }
+
+        private double getScoreMultiplier(IBeatmap beatmap, Mod[] mods)
+        {
+            double scoreMultiplier = 1;
+
+            foreach (var m in mods)
+            {
+                switch (m)
+                {
+                    case ManiaModNoFail _:
+                    case ManiaModEasy _:
+                    case ManiaModHalfTime _:
+                        scoreMultiplier *= 0.5;
+                        break;
+                }
+            }
+
+            var maniaBeatmap = (ManiaBeatmap)beatmap;
+            int diff = maniaBeatmap.TotalColumns - maniaBeatmap.OriginalTotalColumns;
+
+            if (diff > 0)
+                scoreMultiplier *= 0.9;
+            else if (diff < 0)
+                scoreMultiplier *= 0.9 + 0.04 * diff;
+
+            return scoreMultiplier;
         }
     }
 }
