@@ -137,6 +137,10 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
+
+            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
+            // For now, the samples are attached to and played by the slider itself at the correct end time.
+            Samples = this.GetNodeSamples(repeatCount + 1);
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
@@ -230,14 +234,11 @@ namespace osu.Game.Rulesets.Osu.Objects
                 tick.Samples = sampleList;
 
             foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                repeat.Samples = getNodeSamples(repeat.RepeatIndex + 1);
+                repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
 
             if (HeadCircle != null)
-                HeadCircle.Samples = getNodeSamples(0);
+                HeadCircle.Samples = this.GetNodeSamples(0);
         }
-
-        private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
-            nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
         public override Judgement CreateJudgement() => new OsuIgnoreJudgement();
 
