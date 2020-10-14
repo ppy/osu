@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
         private const Easing fade_easing = Easing.Out;
 
         public readonly KeyCounterDisplay KeyCounter;
-        public readonly RollingCounter<int> ComboCounter;
+        public readonly SkinnableComboCounter ComboCounter;
         public readonly ScoreCounter ScoreCounter;
         public readonly RollingCounter<double> AccuracyCounter;
         public readonly HealthDisplay HealthDisplay;
@@ -275,13 +275,7 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.TopCentre,
         };
 
-        protected virtual RollingCounter<int> CreateComboCounter() => new SimpleComboCounter
-        {
-            BypassAutoSizeAxes = Axes.X,
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopLeft,
-            Margin = new MarginPadding { Top = 5, Left = 20 },
-        };
+        protected virtual SkinnableComboCounter CreateComboCounter() => new SkinnableComboCounter();
 
         protected virtual HealthDisplay CreateHealthDisplay() => new StandardHealthDisplay
         {
