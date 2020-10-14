@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -54,6 +55,61 @@ namespace osu.Game.IO
 
             if (!string.IsNullOrEmpty(CustomStoragePath))
                 TryChangeToCustomStorage(out Error);
+        }
+
+        public Storage GetStorageFromPath(string path)
+        {
+            return IGNORE_DIRECTORIES.Any(x => path.StartsWith(x)) ? defaultStorage : UnderlyingStorage;
+        }
+
+        public override string GetFullPath(string path, bool createIfNotExisting = false) =>
+            GetStorageFromPath(path).GetFullPath(MutatePath(path), createIfNotExisting);
+
+        public override bool Exists(string path) =>
+            GetStorageFromPath(path).Exists(MutatePath(path));
+
+        public override bool ExistsDirectory(string path) =>
+            GetStorageFromPath(path).ExistsDirectory(MutatePath(path));
+
+        public override void DeleteDirectory(string path) =>
+            GetStorageFromPath(path).DeleteDirectory(MutatePath(path));
+
+        public override void Delete(string path) =>
+            GetStorageFromPath(path).Delete(MutatePath(path));
+
+        public override IEnumerable<string> GetDirectories(string path) =>
+            ToLocalRelative(GetStorageFromPath(path).GetDirectories(MutatePath(path)));
+
+        public override IEnumerable<string> ToLocalRelative(IEnumerable<string> paths)
+        {
+            foreach (var path in paths)
+            {
+                Storage storage = GetStorageFromPath(path);
+                string localRoot = storage.GetFullPath(string.Empty);
+                yield return Path.GetRelativePath(localRoot, storage.GetFullPath(path));
+            }
+        }
+
+        public override IEnumerable<string> GetFiles(string path, string pattern = "*") =>
+            ToLocalRelative(GetStorageFromPath(path).GetFiles(MutatePath(path), pattern));
+
+        public override Stream GetStream(string path, FileAccess access = FileAccess.Read, FileMode mode = FileMode.OpenOrCreate) =>
+            GetStorageFromPath(path).GetStream(MutatePath(path), access, mode);
+
+        public override void OpenPathInNativeExplorer(string path) => GetStorageFromPath(path).OpenPathInNativeExplorer(MutatePath(path));
+
+        public override Storage GetStorageForDirectory(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentException("Must be non-null and not empty string", nameof(path));
+
+            if (!path.EndsWith(Path.DirectorySeparatorChar))
+                path += Path.DirectorySeparatorChar;
+
+            // create non-existing path.
+            GetStorageFromPath(path).GetFullPath(path, true);
+
+            return new WrappedStorage(this, path);
         }
 
         /// <summary>

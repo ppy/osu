@@ -56,7 +56,7 @@ namespace osu.Game.IO
         public override IEnumerable<string> GetDirectories(string path) =>
             ToLocalRelative(UnderlyingStorage.GetDirectories(MutatePath(path)));
 
-        public IEnumerable<string> ToLocalRelative(IEnumerable<string> paths)
+        public virtual IEnumerable<string> ToLocalRelative(IEnumerable<string> paths)
         {
             string localRoot = GetFullPath(string.Empty);
 
