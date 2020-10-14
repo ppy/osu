@@ -55,6 +55,12 @@ namespace osu.Android
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            LoadComponentAsync(new GameplayScreenRotationLocker(), Add);
+        }
+
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
     }
 }
