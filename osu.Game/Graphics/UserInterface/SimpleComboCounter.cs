@@ -5,13 +5,14 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
     /// Used as an accuracy counter. Represented visually as a percentage.
     /// </summary>
-    public class SimpleComboCounter : RollingCounter<int>
+    public class SimpleComboCounter : RollingCounter<int>, IComboCounter
     {
         protected override double RollingDuration => 750;
 
