@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
     /// </summary>
     /// <remarks>
     /// Source: https://referencesource.microsoft.com/#mscorlib/system/collections/generic/arraysorthelper.cs
+    /// Copyright (c) Microsoft Corporation.  All rights reserved.
     /// </remarks>
     internal static class LegacySortHelper<T>
     {
