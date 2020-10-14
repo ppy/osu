@@ -95,7 +95,7 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
-        public void TestMultiMod1()
+        public void TestMultiModFlattening()
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModA(), new MultiMod(new ModB(), new ModC())).CreateDifficultyAdjustmentModCombinations();
 
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
-        public void TestMultiMod2()
+        public void TestIncompatibleThroughMultiMod()
         {
             var combinations = new TestLegacyDifficultyCalculator(new ModA(), new MultiMod(new ModB(), new ModIncompatibleWithA())).CreateDifficultyAdjustmentModCombinations();
 
