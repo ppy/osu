@@ -19,7 +19,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
