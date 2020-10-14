@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,7 +19,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool IsRolling { get; protected set; }
 
-        protected SpriteText PopOutCount;
+        protected Drawable PopOutCount;
 
         protected virtual double PopOutDuration => 150;
         protected virtual float PopOutScale => 2.0f;
@@ -37,7 +38,7 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         protected Easing RollingEasing => Easing.None;
 
-        protected SpriteText DisplayedCountSpriteText;
+        protected Drawable DisplayedCountSpriteText;
 
         private int previousValue;
 
@@ -47,30 +48,34 @@ namespace osu.Game.Screens.Play.HUD
         protected ComboCounter()
         {
             AutoSizeAxes = Axes.Both;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new OsuSpriteText
+                DisplayedCountSpriteText = CreateSpriteText().With(s =>
                 {
-                    Alpha = 0,
-                },
-                PopOutCount = new OsuSpriteText
+                    s.Alpha = 0;
+                }),
+                PopOutCount = CreateSpriteText().With(s =>
                 {
-                    Alpha = 0,
-                    Margin = new MarginPadding(0.05f),
-                }
+                    s.Alpha = 0;
+                    s.Margin = new MarginPadding(0.05f);
+                })
             };
-
-            TextSize = 80;
 
             Current.ValueChanged += combo => updateCount(combo.NewValue == 0);
         }
+
+        protected virtual Drawable CreateSpriteText() => new OsuSpriteText();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Current.Value);
+            ((IHasText)DisplayedCountSpriteText).Text = FormatCount(Current.Value);
             DisplayedCountSpriteText.Anchor = Anchor;
             DisplayedCountSpriteText.Origin = Origin;
 
@@ -91,20 +96,6 @@ namespace osu.Game.Screens.Play.HUD
                     return;
 
                 updateDisplayedCount(displayedCount, value, IsRolling);
-            }
-        }
-
-        private float textSize;
-
-        public float TextSize
-        {
-            get => textSize;
-            set
-            {
-                textSize = value;
-
-                DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(size: TextSize);
-                PopOutCount.Font = PopOutCount.Font.With(size: TextSize);
             }
         }
 
