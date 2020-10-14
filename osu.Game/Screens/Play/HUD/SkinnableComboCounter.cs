@@ -14,6 +14,7 @@ namespace osu.Game.Screens.Play.HUD
         public SkinnableComboCounter()
             : base(new HUDSkinComponent(HUDSkinComponents.ComboCounter), createDefault)
         {
+            CentreComponent = false;
         }
 
         private IComboCounter skinnedCounter;
