@@ -289,8 +289,11 @@ namespace osu.Game.Overlays.Mods
                     Width = 0.25f,
                     Alpha = 0,
                     X = -100,
+                    SelectedMods = { BindTarget = SelectedMods },
                 }
             };
+
+            ((IBindable<bool>)CustomiseButton.Enabled).BindTo(ModSettingsContainer.HasSettingsForSelection);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -399,8 +402,6 @@ namespace osu.Game.Overlays.Mods
                 section.SelectTypes(mods.NewValue.Select(m => m.GetType()).ToList());
 
             updateMods();
-
-            CustomiseButton.Enabled.Value = ModSettingsContainer.UpdateModSettings(mods);
         }
 
         private void updateMods()
