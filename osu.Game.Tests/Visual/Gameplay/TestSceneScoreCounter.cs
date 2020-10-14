@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep(@"Hit! :D", delegate
             {
                 score.Current.Value += 300 + (ulong)(300.0 * (comboCounter.Current.Value > 0 ? comboCounter.Current.Value - 1 : 0) / 25.0);
-                comboCounter.Increment();
+                comboCounter.Current.Value++;
                 numerator++;
                 denominator++;
                 accuracyCounter.SetFraction(numerator, denominator);

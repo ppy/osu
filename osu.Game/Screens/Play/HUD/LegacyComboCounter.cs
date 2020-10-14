@@ -18,15 +18,33 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public class LegacyComboCounter : CompositeDrawable, IComboCounter
     {
-        protected uint ScheduledPopOutCurrentId;
+        public Bindable<int> Current { get; } = new BindableInt { MinValue = 0, };
 
-        protected virtual float PopOutSmallScale => 1.1f;
-        protected virtual bool CanPopOutWhileRolling => false;
+        private uint scheduledPopOutCurrentId;
 
-        protected Drawable PopOutCount;
-        protected Drawable DisplayedCountSpriteText;
+        private const double pop_out_duration = 150;
+
+        private const Easing pop_out_easing = Easing.None;
+
+        private const double fade_out_duration = 100;
+
+        /// <summary>
+        /// Duration in milliseconds for the counter roll-up animation for each element.
+        /// </summary>
+        private const double rolling_duration = 20;
+
+        private Drawable popOutCount;
+
+        private Drawable displayedCountSpriteText;
+
         private int previousValue;
+
         private int displayedCount;
+
+        private bool isRolling;
+
+        [Resolved]
+        private ISkinSource skin { get; set; }
 
         public LegacyComboCounter()
         {
@@ -40,65 +58,38 @@ namespace osu.Game.Screens.Play.HUD
             Scale = new Vector2(1.6f);
         }
 
-        [Resolved]
-        private ISkinSource skin { get; set; }
-
-        public Bindable<int> Current { get; } = new BindableInt
-        {
-            MinValue = 0,
-        };
-
-        public bool IsRolling { get; protected set; }
-        protected virtual double PopOutDuration => 150;
-        protected virtual float PopOutScale => 1.6f;
-        protected virtual Easing PopOutEasing => Easing.None;
-        protected virtual float PopOutInitialAlpha => 0.75f;
-        protected virtual double FadeOutDuration => 100;
-
-        /// <summary>
-        /// Duration in milliseconds for the counter roll-up animation for each element.
-        /// </summary>
-        protected virtual double RollingDuration => 20;
-
-        /// <summary>
-        /// Easing for the counter rollover animation.
-        /// </summary>
-        protected Easing RollingEasing => Easing.None;
-
         /// <summary>
         /// Value shown at the current moment.
         /// </summary>
         public virtual int DisplayedCount
         {
             get => displayedCount;
-            protected set
+            private set
             {
                 if (displayedCount.Equals(value))
                     return;
 
-                updateDisplayedCount(displayedCount, value, IsRolling);
-            }
-        }
+                if (isRolling)
+                    onDisplayedCountRolling(displayedCount, value);
+                else if (displayedCount + 1 == value)
+                    onDisplayedCountIncrement(value);
+                else
+                    onDisplayedCountChange(value);
 
-        protected Drawable CreateSpriteText()
-        {
-            return skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) ?? new OsuSpriteText
-            {
-                Font = OsuFont.Numeric.With(size: 40),
-                UseFullGlyphHeight = false,
-            };
+                displayedCount = value;
+            }
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                DisplayedCountSpriteText = CreateSpriteText().With(s =>
+                displayedCountSpriteText = createSpriteText().With(s =>
                 {
                     s.Alpha = 0;
                 }),
-                PopOutCount = CreateSpriteText().With(s =>
+                popOutCount = createSpriteText().With(s =>
                 {
                     s.Alpha = 0;
                     s.Margin = new MarginPadding(0.05f);
@@ -112,160 +103,14 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            ((IHasText)DisplayedCountSpriteText).Text = FormatCount(Current.Value);
+            ((IHasText)displayedCountSpriteText).Text = formatCount(Current.Value);
 
-            DisplayedCountSpriteText.Anchor = Anchor;
-            DisplayedCountSpriteText.Origin = Origin;
-            PopOutCount.Origin = Origin;
-            PopOutCount.Anchor = Anchor;
+            displayedCountSpriteText.Anchor = Anchor;
+            displayedCountSpriteText.Origin = Origin;
+            popOutCount.Origin = Origin;
+            popOutCount.Anchor = Anchor;
 
-            StopRolling();
-        }
-
-        protected virtual void TransformPopOut(int newValue)
-        {
-            ((IHasText)PopOutCount).Text = FormatCount(newValue);
-
-            PopOutCount.ScaleTo(PopOutScale);
-            PopOutCount.FadeTo(PopOutInitialAlpha);
-            PopOutCount.MoveTo(Vector2.Zero);
-
-            PopOutCount.ScaleTo(1, PopOutDuration, PopOutEasing);
-            PopOutCount.FadeOut(PopOutDuration, PopOutEasing);
-            PopOutCount.MoveTo(DisplayedCountSpriteText.Position, PopOutDuration, PopOutEasing);
-        }
-
-        protected virtual void TransformPopOutRolling(int newValue)
-        {
-            TransformPopOut(newValue);
-            TransformPopOutSmall(newValue);
-        }
-
-        protected virtual void TransformNoPopOut(int newValue)
-        {
-            ((IHasText)DisplayedCountSpriteText).Text = FormatCount(newValue);
-            DisplayedCountSpriteText.ScaleTo(1);
-        }
-
-        protected virtual void TransformPopOutSmall(int newValue)
-        {
-            ((IHasText)DisplayedCountSpriteText).Text = FormatCount(newValue);
-            DisplayedCountSpriteText.ScaleTo(PopOutSmallScale);
-            DisplayedCountSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
-        }
-
-        protected virtual void ScheduledPopOutSmall(uint id)
-        {
-            // Too late; scheduled task invalidated
-            if (id != ScheduledPopOutCurrentId)
-                return;
-
-            DisplayedCount++;
-        }
-
-        protected void OnCountRolling(int currentValue, int newValue)
-        {
-            ScheduledPopOutCurrentId++;
-
-            // Hides displayed count if was increasing from 0 to 1 but didn't finish
-            if (currentValue == 0 && newValue == 0)
-                DisplayedCountSpriteText.FadeOut(FadeOutDuration);
-
-            transformRoll(currentValue, newValue);
-        }
-
-        protected void OnCountIncrement(int currentValue, int newValue)
-        {
-            ScheduledPopOutCurrentId++;
-
-            if (DisplayedCount < currentValue)
-                DisplayedCount++;
-
-            DisplayedCountSpriteText.Show();
-
-            TransformPopOut(newValue);
-
-            uint newTaskId = ScheduledPopOutCurrentId;
-            Scheduler.AddDelayed(delegate
-            {
-                ScheduledPopOutSmall(newTaskId);
-            }, PopOutDuration);
-        }
-
-        protected void OnCountChange(int currentValue, int newValue)
-        {
-            ScheduledPopOutCurrentId++;
-
-            if (newValue == 0)
-                DisplayedCountSpriteText.FadeOut();
-
-            DisplayedCount = newValue;
-        }
-
-        protected void OnDisplayedCountRolling(int currentValue, int newValue)
-        {
-            if (newValue == 0)
-                DisplayedCountSpriteText.FadeOut(FadeOutDuration);
-            else
-                DisplayedCountSpriteText.Show();
-
-            if (CanPopOutWhileRolling)
-                TransformPopOutRolling(newValue);
-            else
-                TransformNoPopOut(newValue);
-        }
-
-        protected void OnDisplayedCountChange(int newValue)
-        {
-            DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
-
-            TransformNoPopOut(newValue);
-        }
-
-        protected void OnDisplayedCountIncrement(int newValue)
-        {
-            DisplayedCountSpriteText.Show();
-
-            TransformPopOutSmall(newValue);
-        }
-
-        /// <summary>
-        /// Increments the combo by an amount.
-        /// </summary>
-        /// <param name="amount"></param>
-        public void Increment(int amount = 1)
-        {
-            Current.Value += amount;
-        }
-
-        /// <summary>
-        /// Stops rollover animation, forcing the displayed count to be the actual count.
-        /// </summary>
-        public void StopRolling()
-        {
             updateCount(false);
-        }
-
-        protected string FormatCount(int count)
-        {
-            return $@"{count}x";
-        }
-
-        private double getProportionalDuration(int currentValue, int newValue)
-        {
-            double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
-            return difference * RollingDuration;
-        }
-
-        private void updateDisplayedCount(int currentValue, int newValue, bool rolling)
-        {
-            displayedCount = newValue;
-            if (rolling)
-                OnDisplayedCountRolling(currentValue, newValue);
-            else if (currentValue + 1 == newValue)
-                OnDisplayedCountIncrement(newValue);
-            else
-                OnDisplayedCountChange(newValue);
         }
 
         private void updateCount(bool rolling)
@@ -279,24 +124,134 @@ namespace osu.Game.Screens.Play.HUD
             if (!rolling)
             {
                 FinishTransforms(false, nameof(DisplayedCount));
-                IsRolling = false;
+                isRolling = false;
                 DisplayedCount = prev;
 
                 if (prev + 1 == Current.Value)
-                    OnCountIncrement(prev, Current.Value);
+                    onCountIncrement(prev, Current.Value);
                 else
-                    OnCountChange(prev, Current.Value);
+                    onCountChange(prev, Current.Value);
             }
             else
             {
-                OnCountRolling(displayedCount, Current.Value);
-                IsRolling = true;
+                onCountRolling(displayedCount, Current.Value);
+                isRolling = true;
             }
         }
 
-        private void transformRoll(int currentValue, int newValue)
+        private void transformPopOut(int newValue)
         {
-            this.TransformTo<LegacyComboCounter, int>(nameof(DisplayedCount), newValue, getProportionalDuration(currentValue, newValue), RollingEasing);
+            ((IHasText)popOutCount).Text = formatCount(newValue);
+
+            popOutCount.ScaleTo(1.6f);
+            popOutCount.FadeTo(0.75f);
+            popOutCount.MoveTo(Vector2.Zero);
+
+            popOutCount.ScaleTo(1, pop_out_duration, pop_out_easing);
+            popOutCount.FadeOut(pop_out_duration, pop_out_easing);
+            popOutCount.MoveTo(displayedCountSpriteText.Position, pop_out_duration, pop_out_easing);
         }
+
+        private void transformNoPopOut(int newValue)
+        {
+            ((IHasText)displayedCountSpriteText).Text = formatCount(newValue);
+
+            displayedCountSpriteText.ScaleTo(1);
+        }
+
+        private void transformPopOutSmall(int newValue)
+        {
+            ((IHasText)displayedCountSpriteText).Text = formatCount(newValue);
+            displayedCountSpriteText.ScaleTo(1.1f);
+            displayedCountSpriteText.ScaleTo(1, pop_out_duration, pop_out_easing);
+        }
+
+        private void scheduledPopOutSmall(uint id)
+        {
+            // Too late; scheduled task invalidated
+            if (id != scheduledPopOutCurrentId)
+                return;
+
+            DisplayedCount++;
+        }
+
+        private void onCountIncrement(int currentValue, int newValue)
+        {
+            scheduledPopOutCurrentId++;
+
+            if (DisplayedCount < currentValue)
+                DisplayedCount++;
+
+            displayedCountSpriteText.Show();
+
+            transformPopOut(newValue);
+
+            uint newTaskId = scheduledPopOutCurrentId;
+
+            Scheduler.AddDelayed(delegate
+            {
+                scheduledPopOutSmall(newTaskId);
+            }, pop_out_duration);
+        }
+
+        private void onCountRolling(int currentValue, int newValue)
+        {
+            scheduledPopOutCurrentId++;
+
+            // Hides displayed count if was increasing from 0 to 1 but didn't finish
+            if (currentValue == 0 && newValue == 0)
+                displayedCountSpriteText.FadeOut(fade_out_duration);
+
+            transformRoll(currentValue, newValue);
+        }
+
+        private void onCountChange(int currentValue, int newValue)
+        {
+            scheduledPopOutCurrentId++;
+
+            if (newValue == 0)
+                displayedCountSpriteText.FadeOut();
+
+            DisplayedCount = newValue;
+        }
+
+        private void onDisplayedCountRolling(int currentValue, int newValue)
+        {
+            if (newValue == 0)
+                displayedCountSpriteText.FadeOut(fade_out_duration);
+            else
+                displayedCountSpriteText.Show();
+
+            transformNoPopOut(newValue);
+        }
+
+        private void onDisplayedCountChange(int newValue)
+        {
+            displayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
+            transformNoPopOut(newValue);
+        }
+
+        private void onDisplayedCountIncrement(int newValue)
+        {
+            displayedCountSpriteText.Show();
+            transformPopOutSmall(newValue);
+        }
+
+        private void transformRoll(int currentValue, int newValue) =>
+            this.TransformTo(nameof(DisplayedCount), newValue, getProportionalDuration(currentValue, newValue), Easing.None);
+
+        private string formatCount(int count) => $@"{count}x";
+
+        private double getProportionalDuration(int currentValue, int newValue)
+        {
+            double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
+            return difference * rolling_duration;
+        }
+
+        private Drawable createSpriteText() => skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) ?? new OsuSpriteText
+        {
+            Font = OsuFont.Numeric.With(size: 40),
+            UseFullGlyphHeight = false,
+        };
     }
 }
