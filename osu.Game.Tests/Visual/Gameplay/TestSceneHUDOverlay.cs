@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -21,12 +23,32 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private HUDOverlay hudOverlay;
 
+        private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
+
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
         private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
 
         [Resolved]
         private OsuConfigManager config { get; set; }
+
+        [Test]
+        public void TestComboCounterIncrementing()
+        {
+            createNew();
+
+            AddRepeatStep("increase combo", () =>
+            {
+                foreach (var hud in hudOverlays)
+                    hud.ComboCounter.Current.Value++;
+            }, 10);
+
+            AddStep("reset combo", () =>
+            {
+                foreach (var hud in hudOverlays)
+                    hud.ComboCounter.Current.Value = 0;
+            });
+        }
 
         [Test]
         public void TestShownByDefault()
@@ -55,7 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             createNew();
 
-            AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
+            AddStep("set showhud false", () => hudOverlays.ForEach(h => h.ShowHud.Value = false));
 
             AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
             AddAssert("pause button is still visible", () => hudOverlay.HoldToQuit.IsPresent);
@@ -91,14 +113,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set keycounter visible false", () =>
             {
                 config.Set<bool>(OsuSetting.KeyOverlay, false);
-                hudOverlay.KeyCounter.AlwaysVisible.Value = false;
+                hudOverlays.ForEach(h => h.KeyCounter.AlwaysVisible.Value = false);
             });
 
-            AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
+            AddStep("set showhud false", () => hudOverlays.ForEach(h => h.ShowHud.Value = false));
             AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
             AddAssert("key counters hidden", () => !keyCounterFlow.IsPresent);
 
-            AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
+            AddStep("set showhud true", () => hudOverlays.ForEach(h => h.ShowHud.Value = true));
             AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
             AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
 
@@ -115,6 +137,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     // Add any key just to display the key counter visually.
                     hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
+
+                    hudOverlay.ComboCounter.Current.Value = 1;
 
                     action?.Invoke(hudOverlay);
 
