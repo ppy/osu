@@ -2,62 +2,124 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osuTK;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over.
     /// </summary>
-    public class LegacyComboCounter : ComboCounter
+    public class LegacyComboCounter : CompositeDrawable, IComboCounter
     {
         protected uint ScheduledPopOutCurrentId;
 
         protected virtual float PopOutSmallScale => 1.1f;
         protected virtual bool CanPopOutWhileRolling => false;
 
-        public new Vector2 PopOutScale = new Vector2(1.6f);
+        protected Drawable PopOutCount;
+        protected Drawable DisplayedCountSpriteText;
+        private int previousValue;
+        private int displayedCount;
 
         public LegacyComboCounter()
         {
+            AutoSizeAxes = Axes.Both;
+
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
-            Margin = new MarginPadding { Top = 5, Left = 20 };
+            Margin = new MarginPadding { Bottom = 20, Left = 20 };
+
+            Scale = new Vector2(1.6f);
         }
 
         [Resolved]
         private ISkinSource skin { get; set; }
 
-        protected override Drawable CreateSpriteText()
+        public Bindable<int> Current { get; } = new BindableInt
         {
-            return skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) ?? new OsuSpriteText();
+            MinValue = 0,
+        };
 
-            /*
-            new OsuSpriteText
+        public bool IsRolling { get; protected set; }
+        protected virtual double PopOutDuration => 150;
+        protected virtual float PopOutScale => 1.6f;
+        protected virtual Easing PopOutEasing => Easing.None;
+        protected virtual float PopOutInitialAlpha => 0.75f;
+        protected virtual double FadeOutDuration => 100;
+
+        /// <summary>
+        /// Duration in milliseconds for the counter roll-up animation for each element.
+        /// </summary>
+        protected virtual double RollingDuration => 20;
+
+        /// <summary>
+        /// Easing for the counter rollover animation.
+        /// </summary>
+        protected Easing RollingEasing => Easing.None;
+
+        /// <summary>
+        /// Value shown at the current moment.
+        /// </summary>
+        public virtual int DisplayedCount
+        {
+            get => displayedCount;
+            protected set
+            {
+                if (displayedCount.Equals(value))
+                    return;
+
+                updateDisplayedCount(displayedCount, value, IsRolling);
+            }
+        }
+
+        protected Drawable CreateSpriteText()
+        {
+            return skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) ?? new OsuSpriteText
             {
                 Font = OsuFont.Numeric.With(size: 40),
                 UseFullGlyphHeight = false,
-            });
-    */
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InternalChildren = new Drawable[]
+            {
+                DisplayedCountSpriteText = CreateSpriteText().With(s =>
+                {
+                    s.Alpha = 0;
+                }),
+                PopOutCount = CreateSpriteText().With(s =>
+                {
+                    s.Alpha = 0;
+                    s.Margin = new MarginPadding(0.05f);
+                })
+            };
+
+            Current.ValueChanged += combo => updateCount(combo.NewValue == 0);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            ((IHasText)DisplayedCountSpriteText).Text = FormatCount(Current.Value);
+
+            DisplayedCountSpriteText.Anchor = Anchor;
+            DisplayedCountSpriteText.Origin = Origin;
             PopOutCount.Origin = Origin;
             PopOutCount.Anchor = Anchor;
-        }
 
-        protected override string FormatCount(int count)
-        {
-            return $@"{count}x";
+            StopRolling();
         }
 
         protected virtual void TransformPopOut(int newValue)
@@ -101,7 +163,7 @@ namespace osu.Game.Screens.Play.HUD
             DisplayedCount++;
         }
 
-        protected override void OnCountRolling(int currentValue, int newValue)
+        protected void OnCountRolling(int currentValue, int newValue)
         {
             ScheduledPopOutCurrentId++;
 
@@ -109,10 +171,10 @@ namespace osu.Game.Screens.Play.HUD
             if (currentValue == 0 && newValue == 0)
                 DisplayedCountSpriteText.FadeOut(FadeOutDuration);
 
-            base.OnCountRolling(currentValue, newValue);
+            transformRoll(currentValue, newValue);
         }
 
-        protected override void OnCountIncrement(int currentValue, int newValue)
+        protected void OnCountIncrement(int currentValue, int newValue)
         {
             ScheduledPopOutCurrentId++;
 
@@ -130,17 +192,17 @@ namespace osu.Game.Screens.Play.HUD
             }, PopOutDuration);
         }
 
-        protected override void OnCountChange(int currentValue, int newValue)
+        protected void OnCountChange(int currentValue, int newValue)
         {
             ScheduledPopOutCurrentId++;
 
             if (newValue == 0)
                 DisplayedCountSpriteText.FadeOut();
 
-            base.OnCountChange(currentValue, newValue);
+            DisplayedCount = newValue;
         }
 
-        protected override void OnDisplayedCountRolling(int currentValue, int newValue)
+        protected void OnDisplayedCountRolling(int currentValue, int newValue)
         {
             if (newValue == 0)
                 DisplayedCountSpriteText.FadeOut(FadeOutDuration);
@@ -153,18 +215,88 @@ namespace osu.Game.Screens.Play.HUD
                 TransformNoPopOut(newValue);
         }
 
-        protected override void OnDisplayedCountChange(int newValue)
+        protected void OnDisplayedCountChange(int newValue)
         {
             DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
             TransformNoPopOut(newValue);
         }
 
-        protected override void OnDisplayedCountIncrement(int newValue)
+        protected void OnDisplayedCountIncrement(int newValue)
         {
             DisplayedCountSpriteText.Show();
 
             TransformPopOutSmall(newValue);
+        }
+
+        /// <summary>
+        /// Increments the combo by an amount.
+        /// </summary>
+        /// <param name="amount"></param>
+        public void Increment(int amount = 1)
+        {
+            Current.Value += amount;
+        }
+
+        /// <summary>
+        /// Stops rollover animation, forcing the displayed count to be the actual count.
+        /// </summary>
+        public void StopRolling()
+        {
+            updateCount(false);
+        }
+
+        protected string FormatCount(int count)
+        {
+            return $@"{count}x";
+        }
+
+        private double getProportionalDuration(int currentValue, int newValue)
+        {
+            double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
+            return difference * RollingDuration;
+        }
+
+        private void updateDisplayedCount(int currentValue, int newValue, bool rolling)
+        {
+            displayedCount = newValue;
+            if (rolling)
+                OnDisplayedCountRolling(currentValue, newValue);
+            else if (currentValue + 1 == newValue)
+                OnDisplayedCountIncrement(newValue);
+            else
+                OnDisplayedCountChange(newValue);
+        }
+
+        private void updateCount(bool rolling)
+        {
+            int prev = previousValue;
+            previousValue = Current.Value;
+
+            if (!IsLoaded)
+                return;
+
+            if (!rolling)
+            {
+                FinishTransforms(false, nameof(DisplayedCount));
+                IsRolling = false;
+                DisplayedCount = prev;
+
+                if (prev + 1 == Current.Value)
+                    OnCountIncrement(prev, Current.Value);
+                else
+                    OnCountChange(prev, Current.Value);
+            }
+            else
+            {
+                OnCountRolling(displayedCount, Current.Value);
+                IsRolling = true;
+            }
+        }
+
+        private void transformRoll(int currentValue, int newValue)
+        {
+            this.TransformTo<LegacyComboCounter, int>(nameof(DisplayedCount), newValue, getProportionalDuration(currentValue, newValue), RollingEasing);
         }
     }
 }
