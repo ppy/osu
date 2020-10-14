@@ -437,7 +437,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // Apply the start time at the newly snapped-to position
                 double offset = result.Time.Value - draggedObject.StartTime;
 
-                foreach (HitObject obj in SelectionHandler.SelectedHitObjects)
+                foreach (HitObject obj in Beatmap.SelectedHitObjects)
                 {
                     obj.StartTime += offset;
                     Beatmap.Update(obj);
