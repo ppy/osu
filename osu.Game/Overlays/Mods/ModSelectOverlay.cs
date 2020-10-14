@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
-        protected readonly ModCustomisationContainer ModSettingsContainer;
+        protected readonly ModSettingsContainer ModSettingsContainer;
 
         public readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -281,7 +281,7 @@ namespace osu.Game.Overlays.Mods
                         },
                     },
                 },
-                ModSettingsContainer = new ModCustomisationContainer
+                ModSettingsContainer = new ModSettingsContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
