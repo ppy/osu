@@ -126,6 +126,20 @@ namespace osu.Game.Tests.NonVisual
             Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModIncompatibleWithA);
         }
 
+        [Test]
+        public void TestIncompatibleWithSameInstanceViaMultiMod()
+        {
+            var combinations = new TestLegacyDifficultyCalculator(new ModA(), new MultiMod(new ModA(), new ModB())).CreateDifficultyAdjustmentModCombinations();
+
+            Assert.AreEqual(3, combinations.Length);
+            Assert.IsTrue(combinations[0] is ModNoMod);
+            Assert.IsTrue(combinations[1] is ModA);
+            Assert.IsTrue(combinations[2] is MultiMod);
+
+            Assert.IsTrue(((MultiMod)combinations[2]).Mods[0] is ModA);
+            Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModB);
+        }
+
         private class ModA : Mod
         {
             public override string Name => nameof(ModA);
