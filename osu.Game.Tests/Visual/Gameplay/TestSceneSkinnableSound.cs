@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUp]
         public void SetUpSteps()
         {
-            AddStep("setup heirarchy", () =>
+            AddStep("setup hierarchy", () =>
             {
                 Children = new Drawable[]
                 {
@@ -58,9 +58,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
 
-            AddStep("pause gameplay clock", () => skinSource.SamplePlaybackDisabled.Value = true);
+            AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
 
-            AddStep("resume gameplay clock", () => skinSource.SamplePlaybackDisabled.Value = false);
+            AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
 
             AddWaitStep("wait a bit", 5);
             AddAssert("sample not playing", () => !sample.Playing);
@@ -79,10 +79,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for sample to start playing", () => sample.Playing);
 
-            AddStep("pause gameplay clock", () => skinSource.SamplePlaybackDisabled.Value = true);
+            AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
             AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
 
-            AddStep("resume gameplay clock", () => skinSource.SamplePlaybackDisabled.Value = false);
+            AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
             AddUntilStep("wait for sample to start playing", () => sample.Playing);
         }
 
@@ -98,11 +98,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("sample playing", () => sample.Playing);
 
-            AddStep("pause gameplay clock", () => skinSource.SamplePlaybackDisabled.Value = true);
+            AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
 
             AddUntilStep("sample not playing", () => !sample.Playing);
 
-            AddStep("resume gameplay clock", () => skinSource.SamplePlaybackDisabled.Value = false);
+            AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
 
             AddAssert("sample not playing", () => !sample.Playing);
             AddAssert("sample not playing", () => !sample.Playing);
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("sample playing", () => sample.Playing);
 
-            AddStep("pause gameplay clock", () => skinSource.SamplePlaybackDisabled.Value = true);
+            AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
             AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
 
             AddStep("trigger skin change", () => skinSource.TriggerSourceChanged());
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("new sample stopped", () => !sample.Playing);
-            AddStep("resume gameplay clock", () => skinSource.SamplePlaybackDisabled.Value = false);
+            AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
 
             AddWaitStep("wait a bit", 5);
             AddAssert("new sample not played", () => !sample.Playing);
