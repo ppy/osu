@@ -105,10 +105,11 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         public Mod[] CreateDifficultyAdjustmentModCombinations()
         {
-            return createDifficultyAdjustmentModCombinations(Array.Empty<Mod>(), DifficultyAdjustmentMods).ToArray();
+            return createDifficultyAdjustmentModCombinations(DifficultyAdjustmentMods, Array.Empty<Mod>()).ToArray();
 
-            static IEnumerable<Mod> createDifficultyAdjustmentModCombinations(IEnumerable<Mod> currentSet, Mod[] adjustmentSet, int currentSetCount = 0, int adjustmentSetStart = 0)
+            static IEnumerable<Mod> createDifficultyAdjustmentModCombinations(ReadOnlyMemory<Mod> remainingMods, IEnumerable<Mod> currentSet, int currentSetCount = 0)
             {
+                // Return the current set.
                 switch (currentSetCount)
                 {
                     case 0:
@@ -128,11 +129,10 @@ namespace osu.Game.Rulesets.Difficulty
                         break;
                 }
 
-                // Apply mods in the adjustment set recursively. Using the entire adjustment set would result in duplicate multi-mod mod
-                // combinations in further recursions, so a moving subset is used to eliminate this effect
-                for (int i = adjustmentSetStart; i < adjustmentSet.Length; i++)
+                // Apply the rest of the remaining mods recursively.
+                for (int i = 0; i < remainingMods.Length; i++)
                 {
-                    var adjustmentMod = adjustmentSet[i];
+                    var adjustmentMod = remainingMods.Span[i];
 
                     if (currentSet.Any(c => c.IncompatibleMods.Any(m => m.IsInstanceOfType(adjustmentMod))
                                             || adjustmentMod.IncompatibleMods.Any(m => m.IsInstanceOfType(c))))
@@ -141,27 +141,30 @@ namespace osu.Game.Rulesets.Difficulty
                     }
 
                     // Append the new mod.
-                    int newSetCount = currentSetCount;
-                    var newSet = append(currentSet, adjustmentMod, ref newSetCount);
+                    var (newSet, newSetCount) = flatten(adjustmentMod);
 
-                    foreach (var combo in createDifficultyAdjustmentModCombinations(newSet, adjustmentSet, newSetCount, i + 1))
+                    foreach (var combo in createDifficultyAdjustmentModCombinations(remainingMods.Slice(i + 1), currentSet.Concat(newSet), currentSetCount + newSetCount))
                         yield return combo;
                 }
             }
 
-            // Appends a mod to an existing enumerable, returning the result. Recurses for MultiMod.
-            static IEnumerable<Mod> append(IEnumerable<Mod> existing, Mod mod, ref int count)
+            // Flattens a mod hierarchy (through MultiMod) as an IEnumerable<Mod>
+            static (IEnumerable<Mod> set, int count) flatten(Mod mod)
             {
-                if (mod is MultiMod multi)
-                {
-                    foreach (var nested in multi.Mods)
-                        existing = append(existing, nested, ref count);
+                if (!(mod is MultiMod multi))
+                    return (mod.Yield(), 1);
 
-                    return existing;
+                IEnumerable<Mod> set = Enumerable.Empty<Mod>();
+                int count = 0;
+
+                foreach (var nested in multi.Mods)
+                {
+                    var (nestedSet, nestedCount) = flatten(nested);
+                    set = set.Concat(nestedSet);
+                    count += nestedCount;
                 }
 
-                count++;
-                return existing.Append(mod);
+                return (set, count);
             }
         }
 
