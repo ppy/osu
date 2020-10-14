@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Difficulty
         {
             return createDifficultyAdjustmentModCombinations(Array.Empty<Mod>(), DifficultyAdjustmentMods).ToArray();
 
-            IEnumerable<Mod> createDifficultyAdjustmentModCombinations(IEnumerable<Mod> currentSet, Mod[] adjustmentSet, int currentSetCount = 0, int adjustmentSetStart = 0)
+            static IEnumerable<Mod> createDifficultyAdjustmentModCombinations(IEnumerable<Mod> currentSet, Mod[] adjustmentSet, int currentSetCount = 0, int adjustmentSetStart = 0)
             {
                 switch (currentSetCount)
                 {
@@ -133,12 +133,35 @@ namespace osu.Game.Rulesets.Difficulty
                 for (int i = adjustmentSetStart; i < adjustmentSet.Length; i++)
                 {
                     var adjustmentMod = adjustmentSet[i];
-                    if (currentSet.Any(c => c.IncompatibleMods.Any(m => m.IsInstanceOfType(adjustmentMod))))
-                        continue;
 
-                    foreach (var combo in createDifficultyAdjustmentModCombinations(currentSet.Append(adjustmentMod), adjustmentSet, currentSetCount + 1, i + 1))
+                    if (currentSet.Any(c => c.IncompatibleMods.Any(m => m.IsInstanceOfType(adjustmentMod))
+                                            || adjustmentMod.IncompatibleMods.Any(m => m.IsInstanceOfType(c))))
+                    {
+                        continue;
+                    }
+
+                    // Append the new mod.
+                    int newSetCount = currentSetCount;
+                    var newSet = append(currentSet, adjustmentMod, ref newSetCount);
+
+                    foreach (var combo in createDifficultyAdjustmentModCombinations(newSet, adjustmentSet, newSetCount, i + 1))
                         yield return combo;
                 }
+            }
+
+            // Appends a mod to an existing enumerable, returning the result. Recurses for MultiMod.
+            static IEnumerable<Mod> append(IEnumerable<Mod> existing, Mod mod, ref int count)
+            {
+                if (mod is MultiMod multi)
+                {
+                    foreach (var nested in multi.Mods)
+                        existing = append(existing, nested, ref count);
+
+                    return existing;
+                }
+
+                count++;
+                return existing.Append(mod);
             }
         }
 
