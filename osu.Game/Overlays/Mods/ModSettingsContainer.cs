@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -18,6 +19,12 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSettingsContainer : Container
     {
+        public readonly IBindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        public IBindable<bool> HasSettingsForSelection => hasSettingsForSelection;
+
+        private readonly Bindable<bool> hasSettingsForSelection = new Bindable<bool>();
+
         private readonly FillFlowContainer<ModControlSection> modSettingsContent;
 
         public ModSettingsContainer()
@@ -45,8 +52,14 @@ namespace osu.Game.Overlays.Mods
             };
         }
 
-        ///<returns>Bool indicating whether any settings are listed</returns>
-        public bool UpdateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            SelectedMods.BindValueChanged(modsChanged, true);
+        }
+
+        private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             modSettingsContent.Clear();
 
@@ -62,7 +75,7 @@ namespace osu.Game.Overlays.Mods
             if (!hasSettings)
                 Hide();
 
-            return hasSettings;
+            hasSettingsForSelection.Value = hasSettings;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
