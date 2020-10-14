@@ -47,7 +47,10 @@ namespace osu.Game.Beatmaps.Drawables
         private readonly IReadOnlyList<Mod> mods;
 
         private readonly bool shouldShowTooltip;
-        private readonly IBindable<StarDifficulty> difficultyBindable = new Bindable<StarDifficulty>();
+
+        private readonly bool performBackgroundDifficultyLookup;
+
+        private readonly Bindable<StarDifficulty> difficultyBindable = new Bindable<StarDifficulty>();
 
         private Drawable background;
 
@@ -70,10 +73,12 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         /// <param name="beatmap">The beatmap to show the difficulty of.</param>
         /// <param name="shouldShowTooltip">Whether to display a tooltip when hovered.</param>
-        public DifficultyIcon([NotNull] BeatmapInfo beatmap, bool shouldShowTooltip = true)
+        /// <param name="performBackgroundDifficultyLookup">Whether to perform difficulty lookup (including calculation if necessary).</param>
+        public DifficultyIcon([NotNull] BeatmapInfo beatmap, bool shouldShowTooltip = true, bool performBackgroundDifficultyLookup = true)
         {
             this.beatmap = beatmap ?? throw new ArgumentNullException(nameof(beatmap));
             this.shouldShowTooltip = shouldShowTooltip;
+            this.performBackgroundDifficultyLookup = performBackgroundDifficultyLookup;
 
             AutoSizeAxes = Axes.Both;
 
@@ -112,8 +117,12 @@ namespace osu.Game.Beatmaps.Drawables
                     // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
                     Icon = (ruleset ?? beatmap.Ruleset)?.CreateInstance()?.CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle }
                 },
-                new DelayedLoadUnloadWrapper(() => new DifficultyRetriever(beatmap, ruleset, mods) { StarDifficulty = { BindTarget = difficultyBindable } }, 0),
             };
+
+            if (performBackgroundDifficultyLookup)
+                iconContainer.Add(new DelayedLoadUnloadWrapper(() => new DifficultyRetriever(beatmap, ruleset, mods) { StarDifficulty = { BindTarget = difficultyBindable } }, 0));
+            else
+                difficultyBindable.Value = new StarDifficulty(beatmap.StarDifficulty, 0);
 
             difficultyBindable.BindValueChanged(difficulty => background.Colour = colours.ForDifficultyRating(difficulty.NewValue.DifficultyRating));
         }

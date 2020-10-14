@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select.Carousel
         public readonly CarouselBeatmap Item;
 
         public FilterableDifficultyIcon(CarouselBeatmap item)
-            : base(item.Beatmap)
+            : base(item.Beatmap, performBackgroundDifficultyLookup: false)
         {
             filtered.BindTo(item.Filtered);
             filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
