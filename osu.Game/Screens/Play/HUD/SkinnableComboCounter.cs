@@ -21,8 +21,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.SkinChanged(skin, allowFallback);
 
-            skinnedCounter = (IComboCounter)Drawable;
-            skinnedCounter.Current.BindTo(Current);
+            skinnedCounter = Drawable as IComboCounter;
+            skinnedCounter?.Current.BindTo(Current);
         }
 
         private static Drawable createDefault(ISkinComponent skinComponent) => new DefaultComboCounter();
