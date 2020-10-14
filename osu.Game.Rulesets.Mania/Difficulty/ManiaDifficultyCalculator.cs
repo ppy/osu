@@ -26,11 +26,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private const double star_scaling_factor = 0.018;
 
         private readonly bool isForCurrentRuleset;
+        private readonly double originalOverallDifficulty;
 
         public ManiaDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
+            originalOverallDifficulty = beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
@@ -46,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate,
+                GreatHitWindow = (int)Math.Ceiling(getHitWindow300(mods) / clockRate),
                 ScoreMultiplier = getScoreMultiplier(beatmap, mods),
                 MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
                 Skills = skills
@@ -104,6 +106,35 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                     new ManiaModKey9(),
                     new MultiMod(new ManiaModKey9(), new ManiaModDualStages()),
                 }).ToArray();
+            }
+        }
+
+        private int getHitWindow300(Mod[] mods)
+        {
+            if (isForCurrentRuleset)
+            {
+                double od = Math.Min(10.0, Math.Max(0, 10.0 - originalOverallDifficulty));
+                return applyModAdjustments(34 + 3 * od, mods);
+            }
+
+            if (Math.Round(originalOverallDifficulty) > 4)
+                return applyModAdjustments(34, mods);
+
+            return applyModAdjustments(47, mods);
+
+            static int applyModAdjustments(double value, Mod[] mods)
+            {
+                if (mods.Any(m => m is ManiaModHardRock))
+                    value /= 1.4;
+                else if (mods.Any(m => m is ManiaModEasy))
+                    value *= 1.4;
+
+                if (mods.Any(m => m is ManiaModDoubleTime))
+                    value *= 1.5;
+                else if (mods.Any(m => m is ManiaModHalfTime))
+                    value *= 0.75;
+
+                return (int)value;
             }
         }
 
