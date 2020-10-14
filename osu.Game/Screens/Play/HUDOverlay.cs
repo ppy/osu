@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Container topScoreContainer;
 
-        private FillFlowContainer bottomRightElements;
+        private readonly FillFlowContainer bottomRightElements;
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
