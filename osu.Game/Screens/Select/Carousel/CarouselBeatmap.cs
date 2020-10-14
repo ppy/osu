@@ -58,6 +58,14 @@ namespace osu.Game.Screens.Select.Carousel
 
                 foreach (var criteriaTerm in criteria.SearchTerms)
                     match &= terms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0);
+
+                // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
+                // this should be done after text matching so we can prioritise matching numbers in metadata.
+                if (!match && criteria.SearchNumber.HasValue)
+                {
+                    match = (Beatmap.OnlineBeatmapID == criteria.SearchNumber.Value) ||
+                            (Beatmap.BeatmapSet?.OnlineBeatmapSetID == criteria.SearchNumber.Value);
+                }
             }
 
             if (match)

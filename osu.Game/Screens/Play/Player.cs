@@ -89,6 +89,11 @@ namespace osu.Game.Screens.Play
 
         public BreakOverlay BreakOverlay;
 
+        /// <summary>
+        /// Whether the gameplay is currently in a break.
+        /// </summary>
+        public readonly IBindable<bool> IsBreakTime = new BindableBool();
+
         private BreakTracker breakTracker;
 
         private SkipOverlay skipOverlay;
@@ -226,7 +231,6 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset.IsPaused.BindValueChanged(_ => updateGameplayState());
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
-            breakTracker.IsBreakTime.BindValueChanged(_ => updateGameplayState());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
@@ -256,7 +260,8 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToHealthProcessor>())
                 mod.ApplyToHealthProcessor(HealthProcessor);
 
-            breakTracker.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
+            IsBreakTime.BindTo(breakTracker.IsBreakTime);
+            IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
 
         private Drawable createUnderlayComponents() =>
@@ -354,6 +359,7 @@ namespace osu.Game.Screens.Play
 
         private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
         {
+            updateGameplayState();
             updatePauseOnFocusLostState();
             HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
         }

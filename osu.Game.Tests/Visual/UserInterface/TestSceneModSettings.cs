@@ -98,6 +98,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestMultiModSettingsUnboundWhenCopied()
+        {
+            MultiMod original = null;
+            MultiMod copy = null;
+
+            AddStep("create mods", () =>
+            {
+                original = new MultiMod(new OsuModDoubleTime());
+                copy = (MultiMod)original.CreateCopy();
+            });
+
+            AddStep("change property", () => ((OsuModDoubleTime)original.Mods[0]).SpeedChange.Value = 2);
+
+            AddAssert("original has new value", () => Precision.AlmostEquals(2.0, ((OsuModDoubleTime)original.Mods[0]).SpeedChange.Value));
+            AddAssert("copy has original value", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)copy.Mods[0]).SpeedChange.Value));
+        }
+
+        [Test]
         public void TestCustomisationMenuNoClickthrough()
         {
             createModSelect();
