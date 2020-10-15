@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public bool Dual;
         public readonly bool IsForCurrentRuleset;
 
+        private readonly int originalTargetColumns;
+
         // Internal for testing purposes
         internal FastRandom Random { get; private set; }
 
@@ -65,6 +67,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 else
                     TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
             }
+
+            originalTargetColumns = TargetColumns;
         }
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
@@ -81,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
         {
-            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns }, originalTargetColumns);
 
             if (Dual)
                 beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
