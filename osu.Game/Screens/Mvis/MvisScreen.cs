@@ -37,6 +37,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics;
 using osu.Framework;
 using osu.Game.Users;
+using osu.Game.Screens.Mvis.Modules;
 
 namespace osu.Game.Screens
 {
@@ -105,6 +106,7 @@ namespace osu.Game.Screens
         private Container particles;
         private NightcoreBeatContainer nightcoreBeatContainer;
         private Container buttonsContainer;
+        private CollectionHelper collectionHelper;
 
         public MvisScreen()
         {
@@ -393,7 +395,13 @@ namespace osu.Game.Screens
                                             {
                                                 Text = "歌曲选择",
                                                 Action = () => this.Push(new MvisSongSelect())
-                                            }
+                                            },
+                                            collectionHelper = new CollectionHelper(),
+                                            new SettingsButton()
+                                            {
+                                                Text = "Random",
+                                                Action = collectionHelper.RandomSelectBeatmap
+                                            },
                                         }
                                     },
                                 },
