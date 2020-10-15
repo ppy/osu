@@ -16,6 +16,7 @@ namespace osu.Game.Screens.Play.HUD
         public DefaultAccuracyCounter()
         {
             Origin = Anchor.TopRight;
+            Anchor = Anchor.TopRight;
         }
 
         [Resolved(canBeNull: true)]
@@ -34,6 +35,7 @@ namespace osu.Game.Screens.Play.HUD
             if (hud?.ScoreCounter.Drawable is DefaultScoreCounter score)
             {
                 // for now align with the score counter. eventually this will be user customisable.
+                Anchor = Anchor.TopLeft;
                 Position = Parent.ToLocalSpace(score.ScreenSpaceDrawQuad.TopLeft) + offset;
             }
         }
