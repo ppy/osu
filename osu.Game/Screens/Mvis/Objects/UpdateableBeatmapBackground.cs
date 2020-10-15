@@ -10,6 +10,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Screens.Mvis.UI.Objects.Helpers;
+using osu.Framework.Localisation;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Mvis.UI.Objects
 {
@@ -115,6 +117,24 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
         private class BeatmapName : CompositeDrawable
         {
+            private OsuSpriteText titleText;
+            private ILocalisedBindableString title;
+            private WorkingBeatmap beatmap;
+
+            [Resolved]
+            private LocalisationManager localisation {get; set;}
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                title = localisation.GetLocalisedString(new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)));
+                title.BindValueChanged(v =>
+                {
+                    titleText.Text = getShortTitle(v.NewValue);
+                }, true);
+            }
+
             public BeatmapName(WorkingBeatmap beatmap = null)
             {
                 RelativeSizeAxes = Axes.Both;
@@ -122,6 +142,8 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
                 if (beatmap == null)
                     return;
+                
+                this.beatmap = beatmap;
 
                 AddInternal(new FillFlowContainer
                 {
@@ -137,15 +159,14 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 26, weight: FontWeight.SemiBold),
-                            Text = beatmap.Metadata.Artist,
+                            Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
                             Shadow = false,
                         },
-                        new OsuSpriteText
+                        titleText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold),
-                            Text = getShortTitle(beatmap.Metadata.Title),
                             Shadow = false,
                         }
                     }
