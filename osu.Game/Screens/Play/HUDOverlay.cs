@@ -10,13 +10,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play
         public readonly KeyCounterDisplay KeyCounter;
         public readonly SkinnableComboCounter ComboCounter;
         public readonly SkinnableScoreCounter ScoreCounter;
-        public readonly RollingCounter<double> AccuracyCounter;
+        public readonly SkinnableAccuracyCounter AccuracyCounter;
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
@@ -66,6 +66,8 @@ namespace osu.Game.Screens.Play
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
 
+        private readonly Container mainUIElements;
+
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
         public HUDOverlay(ScoreProcessor scoreProcessor, HealthProcessor healthProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
@@ -90,7 +92,7 @@ namespace osu.Game.Screens.Play
                         {
                             new Drawable[]
                             {
-                                new Container
+                                mainUIElements = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
@@ -206,7 +208,17 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            topRightElements.Y = ToLocalSpace(ScoreCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
+            float topRightOffset = 0;
+
+            // fetch the bottom-most position of any main ui element that is anchored to the top of the screen.
+            // consider this kind of temporary.
+            foreach (var d in mainUIElements)
+            {
+                if (d is SkinnableDrawable sd && (sd.Drawable.Anchor & Anchor.y0) > 0)
+                    topRightOffset = Math.Max(sd.Drawable.ScreenSpaceDrawQuad.BottomRight.Y, topRightOffset);
+            }
+
+            topRightElements.Y = ToLocalSpace(new Vector2(0, topRightOffset)).Y;
             bottomRightElements.Y = -Progress.Height;
         }
 
@@ -254,13 +266,7 @@ namespace osu.Game.Screens.Play
             return base.OnKeyDown(e);
         }
 
-        protected virtual RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter
-        {
-            BypassAutoSizeAxes = Axes.X,
-            Anchor = Anchor.TopLeft,
-            Origin = Anchor.TopRight,
-            Margin = new MarginPadding { Top = 5, Right = 20 },
-        };
+        protected virtual SkinnableAccuracyCounter CreateAccuracyCounter() => new SkinnableAccuracyCounter();
 
         protected virtual SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
 
