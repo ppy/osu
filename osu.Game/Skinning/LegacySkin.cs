@@ -341,6 +341,9 @@ namespace osu.Game.Skinning
                     {
                         case HUDSkinComponents.ComboCounter:
                             return new LegacyComboCounter();
+
+                        case HUDSkinComponents.ScoreCounter:
+                            return new LegacyScoreCounter(this);
                     }
 
                     return null;

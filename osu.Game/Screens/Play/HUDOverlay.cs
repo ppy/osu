@@ -25,12 +25,13 @@ namespace osu.Game.Screens.Play
     [Cached]
     public class HUDOverlay : Container
     {
-        private const float fade_duration = 400;
-        private const Easing fade_easing = Easing.Out;
+        public const float FADE_DURATION = 400;
+
+        public const Easing FADE_EASING = Easing.Out;
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly SkinnableComboCounter ComboCounter;
-        public readonly ScoreCounter ScoreCounter;
+        public readonly SkinnableScoreCounter ScoreCounter;
         public readonly RollingCounter<double> AccuracyCounter;
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
@@ -62,9 +63,8 @@ namespace osu.Game.Screens.Play
 
         public Action<double> RequestSeek;
 
-        private readonly Container topScoreContainer;
-
         private readonly FillFlowContainer bottomRightElements;
+        private readonly FillFlowContainer topRightElements;
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
@@ -96,21 +96,10 @@ namespace osu.Game.Screens.Play
                                     Children = new Drawable[]
                                     {
                                         HealthDisplay = CreateHealthDisplay(),
-                                        topScoreContainer = new Container
-                                        {
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
-                                            AutoSizeAxes = Axes.Both,
-                                            Children = new Drawable[]
-                                            {
-                                                AccuracyCounter = CreateAccuracyCounter(),
-                                                ScoreCounter = CreateScoreCounter(),
-                                            },
-                                        },
+                                        AccuracyCounter = CreateAccuracyCounter(),
+                                        ScoreCounter = CreateScoreCounter(),
                                         ComboCounter = CreateComboCounter(),
-                                        ModDisplay = CreateModsContainer(),
                                         HitErrorDisplay = CreateHitErrorDisplayOverlay(),
-                                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                                     }
                                 },
                             },
@@ -126,14 +115,29 @@ namespace osu.Game.Screens.Play
                         }
                     },
                 },
+                topRightElements = new FillFlowContainer
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Margin = new MarginPadding(10),
+                    Spacing = new Vector2(10),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        ModDisplay = CreateModsContainer(),
+                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                    }
+                },
                 bottomRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    X = -5,
+                    Margin = new MarginPadding(10),
+                    Spacing = new Vector2(10),
                     AutoSizeAxes = Axes.Both,
-                    LayoutDuration = fade_duration / 2,
-                    LayoutEasing = fade_easing,
+                    LayoutDuration = FADE_DURATION / 2,
+                    LayoutEasing = FADE_EASING,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -186,21 +190,8 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, fade_duration, fade_easing)));
-
-            ShowHealthbar.BindValueChanged(healthBar =>
-            {
-                if (healthBar.NewValue)
-                {
-                    HealthDisplay.FadeIn(fade_duration, fade_easing);
-                    topScoreContainer.MoveToY(30, fade_duration, fade_easing);
-                }
-                else
-                {
-                    HealthDisplay.FadeOut(fade_duration, fade_easing);
-                    topScoreContainer.MoveToY(0, fade_duration, fade_easing);
-                }
-            }, true);
+            ShowHealthbar.BindValueChanged(healthBar => HealthDisplay.FadeTo(healthBar.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING), true);
+            ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
             configShowHud.BindValueChanged(visible =>
             {
@@ -214,6 +205,8 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
+
+            topRightElements.Y = ToLocalSpace(ScoreCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
             bottomRightElements.Y = -Progress.Height;
         }
 
@@ -269,11 +262,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 5, Right = 20 },
         };
 
-        protected virtual ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
-        {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre,
-        };
+        protected virtual SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
 
         protected virtual SkinnableComboCounter CreateComboCounter() => new SkinnableComboCounter();
 
@@ -293,7 +282,6 @@ namespace osu.Game.Screens.Play
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
-            Margin = new MarginPadding(10),
         };
 
         protected virtual SongProgress CreateProgress() => new SongProgress
@@ -314,7 +302,6 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             AutoSizeAxes = Axes.Both,
-            Margin = new MarginPadding { Top = 20, Right = 20 },
         };
 
         protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);
