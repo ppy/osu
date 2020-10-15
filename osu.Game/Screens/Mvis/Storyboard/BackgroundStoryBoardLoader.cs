@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Mvis.Storyboard
@@ -56,7 +57,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         private Action OnComplete;
 
         private StoryboardClock StoryboardClock = new StoryboardClock();
-        private Container ClockContainer;
+        private BeatmapSkinProvidingContainer ClockContainer;
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
@@ -122,7 +123,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     ClockContainer.Expire();
                 }
 
-                LoadSBTask = LoadComponentAsync(new Container
+                LoadSBTask = LoadComponentAsync(new BeatmapSkinProvidingContainer(b.Value.Skin)
                 {
                     Name = "Storyboard Container",
                     RelativeSizeAxes = Axes.Both,
@@ -202,7 +203,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
         private DrawableStoryboard CreateDrawableStoryboard(WorkingBeatmap beatmap)
         {
             var sb = new DrawableStoryboard(beatmap.Storyboard);
-            //sb.RelativeSizeAxes = Axes.X;
             sb.Width = sb.Height * (beatmap.Storyboard.BeatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f);
             return sb;
         }
