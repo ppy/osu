@@ -3,7 +3,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
@@ -70,23 +69,18 @@ namespace osu.Game.Screens.Mvis.Modules
             }
             maxCount = list.Count;
 
-            void NextBeatmap()
+            //当前位置往指定位置移动
+            currentPosition+=displace;
+            //如果当前位置超过了最大位置或者不在范围内，那么回到第一个
+            if (currentPosition >= maxCount || currentPosition < 0)
             {
-                //当前位置往指定位置移动
-                currentPosition+=displace;
-                //如果当前位置超过了最大位置或者不在范围内，那么回到第一个
-                if (currentPosition >= maxCount || currentPosition < 0)
-                {
-                    if ( displace > 0 ) currentPosition = 0;
-                    else currentPosition = maxCount - 1;
-                }
-
-                //从list获取当前位置所在的BeatmapSetInfo, 然后选择该BeatmapSetInfo下的第一个WorkingBeatmap
-                //最终赋值给NewBeatmap
-                NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First());
+                if ( displace > 0 ) currentPosition = 0;
+                else currentPosition = maxCount - 1;
             }
 
-            NextBeatmap();
+            //从list获取当前位置所在的BeatmapSetInfo, 然后选择该BeatmapSetInfo下的第一个WorkingBeatmap
+            //最终赋值给NewBeatmap
+            NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First());
             return NewBeatmap;
         }
 
@@ -109,6 +103,12 @@ namespace osu.Game.Screens.Mvis.Modules
             }
         }
 
-        public void RefreshBeatmapList() => updateBeatmaps(collectionManager.Collections.First());
+        public void RefreshBeatmapList(BeatmapCollection collection = null)
+        {
+            if ( collection == null )
+                collection = collectionManager.Collections.First();
+
+            updateBeatmaps(collection);
+        }
     }
 }

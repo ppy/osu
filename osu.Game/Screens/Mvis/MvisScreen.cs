@@ -38,6 +38,7 @@ using osu.Game.Graphics;
 using osu.Framework;
 using osu.Game.Users;
 using osu.Game.Screens.Mvis.Modules;
+using osu.Game.Collections;
 
 namespace osu.Game.Screens
 {
@@ -108,6 +109,7 @@ namespace osu.Game.Screens
         private NightcoreBeatContainer nightcoreBeatContainer;
         private Container buttonsContainer;
         private CollectionHelper collectionHelper;
+        private Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
 
         public MvisScreen()
         {
@@ -396,6 +398,11 @@ namespace osu.Game.Screens
                                             {
                                                 Text = "歌曲选择",
                                                 Action = () => this.Push(new MvisSongSelect())
+                                            },
+                                            new SettingsButton()
+                                            {
+                                                Text = "收藏夹选择",
+                                                Action = PushCollectionSelect
                                             }
                                         }
                                     },
@@ -462,6 +469,14 @@ namespace osu.Game.Screens
                         break;
                 }
             }, true);
+
+            CurrentCollection.BindValueChanged(v =>
+            {
+                collectionHelper.RefreshBeatmapList(v.NewValue);
+
+                if (PlayFromCollection.Value)
+                    collectionHelper.PlayNextBeatmap();
+            });
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
             ShowParticles.BindValueChanged(v =>
@@ -602,7 +617,6 @@ namespace osu.Game.Screens
             base.OnResuming(last);
 
             musicController.TrackAdjustTakenOver = true;
-            collectionHelper.RefreshBeatmapList();
 
             this.FadeIn(DURATION);
             Track.ResetSpeedAdjustments();
@@ -783,6 +797,14 @@ namespace osu.Game.Screens
                 collectionHelper.NextTrack();
             else
                 musicController.NextTrack();
+        }
+
+        private void PushCollectionSelect()
+        {
+            this.Push(new CollectionSelectScreen
+            {
+                CurrentCollection = { BindTarget = CurrentCollection }
+            });
         }
 
         private void UpdateIdleVisuals()
