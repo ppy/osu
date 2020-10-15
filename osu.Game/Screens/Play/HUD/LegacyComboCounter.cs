@@ -6,8 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -248,10 +246,6 @@ namespace osu.Game.Screens.Play.HUD
             return difference * rolling_duration;
         }
 
-        private Drawable createSpriteText() => skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) ?? new OsuSpriteText
-        {
-            Font = OsuFont.Numeric.With(size: 40),
-            UseFullGlyphHeight = false,
-        };
+        private Drawable createSpriteText() => new LegacySpriteText(skin);
     }
 }

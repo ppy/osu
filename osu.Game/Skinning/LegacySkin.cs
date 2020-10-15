@@ -324,24 +324,23 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        private const string score_font = "score";
+
+        private bool hasScoreFont => this.HasFont(score_font);
+
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
                 case HUDSkinComponent hudComponent:
                 {
+                    if (!hasScoreFont)
+                        return null;
+
                     switch (hudComponent.Component)
                     {
                         case HUDSkinComponents.ComboCounter:
                             return new LegacyComboCounter();
-
-                        case HUDSkinComponents.ScoreText:
-                            const string font = "score";
-
-                            if (!this.HasFont(font))
-                                return null;
-
-                            return new LegacySpriteText(this, font);
                     }
 
                     return null;
