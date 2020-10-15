@@ -2,15 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class SkinnableComboCounter : SkinnableDrawable, IComboCounter
     {
+        public Bindable<int> Current { get; } = new Bindable<int>();
+
         public SkinnableComboCounter()
-            : base(new HUDSkinComponent(HUDSkinComponents.ComboCounter), createDefault)
+            : base(new HUDSkinComponent(HUDSkinComponents.ComboCounter), skinComponent => new DefaultComboCounter())
         {
             CentreComponent = false;
         }
@@ -24,9 +25,5 @@ namespace osu.Game.Screens.Play.HUD
             skinnedCounter = Drawable as IComboCounter;
             skinnedCounter?.Current.BindTo(Current);
         }
-
-        private static Drawable createDefault(ISkinComponent skinComponent) => new DefaultComboCounter();
-
-        public Bindable<int> Current { get; } = new Bindable<int>();
     }
 }
