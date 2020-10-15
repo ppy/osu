@@ -63,6 +63,8 @@ namespace osu.Game.Screens.Play
 
         private readonly Container topScoreContainer;
 
+        private readonly FillFlowContainer bottomRightElements;
+
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
         public HUDOverlay(ScoreProcessor scoreProcessor, HealthProcessor healthProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
@@ -80,32 +82,55 @@ namespace osu.Game.Screens.Play
                 visibilityContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Child = new GridContainer
                     {
-                        HealthDisplay = CreateHealthDisplay(),
-                        topScoreContainer = new Container
+                        RelativeSizeAxes = Axes.Both,
+                        Content = new[]
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
+                            new Drawable[]
                             {
-                                AccuracyCounter = CreateAccuracyCounter(),
-                                ScoreCounter = CreateScoreCounter(),
-                                ComboCounter = CreateComboCounter(),
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        HealthDisplay = CreateHealthDisplay(),
+                                        topScoreContainer = new Container
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            AutoSizeAxes = Axes.Both,
+                                            Children = new Drawable[]
+                                            {
+                                                AccuracyCounter = CreateAccuracyCounter(),
+                                                ScoreCounter = CreateScoreCounter(),
+                                                ComboCounter = CreateComboCounter(),
+                                            },
+                                        },
+                                        ComboCounter = CreateComboCounter(),
+                                        ModDisplay = CreateModsContainer(),
+                                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
+                                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                                    }
+                                },
                             },
+                            new Drawable[]
+                            {
+                                Progress = CreateProgress(),
+                            }
                         },
-                        Progress = CreateProgress(),
-                        ModDisplay = CreateModsContainer(),
-                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
-                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
-                    }
+                        RowDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize)
+                        }
+                    },
                 },
-                new FillFlowContainer
+                bottomRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
+                    X = -5,
                     AutoSizeAxes = Axes.Both,
                     LayoutDuration = fade_duration / 2,
                     LayoutEasing = fade_easing,
@@ -184,6 +209,12 @@ namespace osu.Game.Screens.Play
             }, true);
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            bottomRightElements.Y = -Progress.Height;
         }
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
