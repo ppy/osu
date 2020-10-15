@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -32,7 +31,7 @@ namespace osu.Game.Screens.Play
         public readonly KeyCounterDisplay KeyCounter;
         public readonly SkinnableComboCounter ComboCounter;
         public readonly SkinnableScoreCounter ScoreCounter;
-        public readonly RollingCounter<double> AccuracyCounter;
+        public readonly SkinnableAccuracyCounter AccuracyCounter;
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
@@ -254,13 +253,7 @@ namespace osu.Game.Screens.Play
             return base.OnKeyDown(e);
         }
 
-        protected virtual RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter
-        {
-            BypassAutoSizeAxes = Axes.X,
-            Anchor = Anchor.TopLeft,
-            Origin = Anchor.TopRight,
-            Margin = new MarginPadding { Top = 5, Right = 20 },
-        };
+        protected virtual SkinnableAccuracyCounter CreateAccuracyCounter() => new SkinnableAccuracyCounter();
 
         protected virtual SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
 

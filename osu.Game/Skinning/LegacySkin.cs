@@ -344,6 +344,9 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.ScoreCounter:
                             return new LegacyScoreCounter(this);
+
+                        case HUDSkinComponents.AccuracyCounter:
+                            return new LegacyAccuracyCounter(this);
                     }
 
                     return null;
