@@ -21,6 +21,7 @@ namespace osu.Game.Skinning
             Origin = Anchor.TopRight;
 
             Scale = new Vector2(0.75f);
+            Margin = new MarginPadding(10);
 
             this.skin = skin;
         }
