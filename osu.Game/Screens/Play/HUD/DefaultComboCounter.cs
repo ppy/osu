@@ -37,10 +37,10 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
-            if (hud != null)
+            if (hud?.ScoreCounter.Drawable is DefaultScoreCounter score)
             {
                 // for now align with the score counter. eventually this will be user customisable.
-                Position += ToLocalSpace(hud.ScoreCounter.ScreenSpaceDrawQuad.TopRight) + offset;
+                Position += ToLocalSpace(score.ScreenSpaceDrawQuad.TopRight) + offset;
             }
         }
 
