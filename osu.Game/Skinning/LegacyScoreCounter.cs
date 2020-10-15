@@ -28,8 +28,7 @@ namespace osu.Game.Skinning
             // base class uses int for display, but externally we bind to ScoreProcesssor as a double for now.
             Current.BindValueChanged(v => base.Current.Value = (int)v.NewValue);
 
-            Margin = new MarginPadding { Bottom = 10, Left = 10 };
-            Scale = new Vector2(1.2f);
+            Margin = new MarginPadding(10);
         }
 
         protected sealed override OsuSpriteText CreateSpriteText() =>

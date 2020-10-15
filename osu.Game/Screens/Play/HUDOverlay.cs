@@ -25,8 +25,9 @@ namespace osu.Game.Screens.Play
     [Cached]
     public class HUDOverlay : Container
     {
-        private const float fade_duration = 400;
-        private const Easing fade_easing = Easing.Out;
+        public const float FADE_DURATION = 400;
+
+        public const Easing FADE_EASING = Easing.Out;
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly SkinnableComboCounter ComboCounter;
@@ -62,8 +63,6 @@ namespace osu.Game.Screens.Play
 
         public Action<double> RequestSeek;
 
-        private readonly Container topScoreContainer;
-
         private readonly FillFlowContainer bottomRightElements;
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
@@ -96,17 +95,8 @@ namespace osu.Game.Screens.Play
                                     Children = new Drawable[]
                                     {
                                         HealthDisplay = CreateHealthDisplay(),
-                                        topScoreContainer = new Container
-                                        {
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
-                                            AutoSizeAxes = Axes.Both,
-                                            Children = new Drawable[]
-                                            {
-                                                AccuracyCounter = CreateAccuracyCounter(),
-                                                ScoreCounter = CreateScoreCounter(),
-                                            },
-                                        },
+                                        AccuracyCounter = CreateAccuracyCounter(),
+                                        ScoreCounter = CreateScoreCounter(),
                                         ComboCounter = CreateComboCounter(),
                                         ModDisplay = CreateModsContainer(),
                                         HitErrorDisplay = CreateHitErrorDisplayOverlay(),
@@ -132,8 +122,8 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomRight,
                     X = -5,
                     AutoSizeAxes = Axes.Both,
-                    LayoutDuration = fade_duration / 2,
-                    LayoutEasing = fade_easing,
+                    LayoutDuration = FADE_DURATION / 2,
+                    LayoutEasing = FADE_EASING,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -186,21 +176,8 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, fade_duration, fade_easing)));
-
-            ShowHealthbar.BindValueChanged(healthBar =>
-            {
-                if (healthBar.NewValue)
-                {
-                    HealthDisplay.FadeIn(fade_duration, fade_easing);
-                    topScoreContainer.MoveToY(30, fade_duration, fade_easing);
-                }
-                else
-                {
-                    HealthDisplay.FadeOut(fade_duration, fade_easing);
-                    topScoreContainer.MoveToY(0, fade_duration, fade_easing);
-                }
-            }, true);
+            ShowHealthbar.BindValueChanged(healthBar => HealthDisplay.FadeTo(healthBar.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING), true);
+            ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
             configShowHud.BindValueChanged(visible =>
             {
