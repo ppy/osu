@@ -17,7 +17,9 @@ namespace osu.Game.Skinning
 
         public LegacyAccuracyCounter(ISkin skin)
         {
+            Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
+
             Scale = new Vector2(0.75f);
 
             this.skin = skin;
@@ -40,7 +42,7 @@ namespace osu.Game.Skinning
             if (hud?.ScoreCounter.Drawable is LegacyScoreCounter score)
             {
                 // for now align with the score counter. eventually this will be user customisable.
-                Position = Parent.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight);
+                Y = Parent.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
             }
         }
     }
