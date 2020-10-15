@@ -5,10 +5,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
@@ -17,11 +16,9 @@ namespace osu.Game.Overlays.MfMenu
 {
     public class MfMenuTextBoxContainer : Container
     {
-        private static void Titlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold);
-
         public Drawable d;
         public float HoverScale = 1.025f;
-        public string Title { get; set; }
+        public string Title;
 
         private FillFlowContainer contentFillFlow;
 
@@ -45,6 +42,7 @@ namespace osu.Game.Overlays.MfMenu
             Offset = new Vector2(0, 3.5f),
             Colour = Color4.Black.Opacity(0.35f),
         };
+        private OsuSpriteText titleText;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -59,14 +57,6 @@ namespace osu.Game.Overlays.MfMenu
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                new Container
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -87,10 +77,23 @@ namespace osu.Game.Overlays.MfMenu
                             Masking = true,
                             LayoutEasing = EASING,
                             LayoutDuration = DURATION + 250,
+                            Children = new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Child = titleText = new OsuSpriteText
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = Title,
+                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold)
+                                    }
+                                }
+                                
+                            }
                         },
                         SelectSounds()
-                    }
-                },
             };
 
             AllowTransformBasicEffects.Value = true;
@@ -100,28 +103,10 @@ namespace osu.Game.Overlays.MfMenu
         {
             borderThickness.BindValueChanged(OnborderThicknessChanged);
 
-            if ( Title != null )
-            {
-                var titleTextFlow = new LinkFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    TextAnchor = Anchor.TopLeft,
-                };
-
-                //将传入的标题转化为charArray以避免ui缩放导致文字伸出容器
-                var title = Title.ToCharArray();
-
-                foreach(var c in title)
-                {
-                    titleTextFlow.AddText(c.ToString(), Titlefont);
-                }
-
-                contentFillFlow.Add(titleTextFlow);
-            }
-
             if ( d != null )
                 contentFillFlow.Add(d);
+
+                contentFillFlow.UpdateSubTree();
 
             base.LoadComplete();
         }
