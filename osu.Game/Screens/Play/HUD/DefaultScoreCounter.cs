@@ -5,14 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class DefaultScoreCounter : ScoreCounter
     {
-        private readonly Vector2 offset = new Vector2(20, 5);
-
         public DefaultScoreCounter()
             : base(6)
         {
