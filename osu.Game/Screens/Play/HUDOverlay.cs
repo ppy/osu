@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly SkinnableComboCounter ComboCounter;
-        public readonly ScoreCounter ScoreCounter;
+        public readonly SkinnableScoreCounter ScoreCounter;
         public readonly RollingCounter<double> AccuracyCounter;
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
@@ -269,11 +269,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 5, Right = 20 },
         };
 
-        protected virtual ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
-        {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre,
-        };
+        protected virtual SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
 
         protected virtual SkinnableComboCounter CreateComboCounter() => new SkinnableComboCounter();
 
