@@ -4,16 +4,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.Modules
 {
     public class CollectionHelper : Component
     {
-        private BindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
-
         [Resolved]
         private CollectionManager collectionManager { get; set; }
 
@@ -23,6 +21,9 @@ namespace osu.Game.Screens.Mvis.Modules
         [Resolved]
         private Bindable<WorkingBeatmap> b { get; set; }
 
+        [Resolved]
+        private MusicController controller { get; set; }
+
         private List<BeatmapSetInfo> beatmapList = new List<BeatmapSetInfo>();
 
         private int currentPosition = 0;
@@ -31,56 +32,58 @@ namespace osu.Game.Screens.Mvis.Modules
         [BackgroundDependencyLoader]
         private void load()
         {
-            collections.BindTo(collectionManager.Collections);
-
-            foreach (var c in collections)
-            {
-                Logger.Log($"+++收藏夹{c.Name}中的内容");
-                foreach (var item in c.Beatmaps)
-                {
-                    Logger.Log($"+++++{item}");
-                    Logger.Log($"++++++++++{item.BeatmapSet}");
-                }
-            }
-        }
-
-        public void RandomSelectBeatmap()
-        {
-            var currentCollection = collectionManager.Collections.First();
-
-            var beatmap = NextBeatmap(currentCollection, b.Value);
-
-            b.Value = beatmap;
-        }
-
-        protected override void LoadComplete()
-        {
             updateBeatmaps(collectionManager.Collections.First());
-            base.LoadComplete();
         }
 
-        private WorkingBeatmap NextBeatmap(BeatmapCollection collection, WorkingBeatmap prevBeatmap)
+        public void PlayNextBeatmap() => Schedule(NextTrack);
+
+        public void NextTrack()
+        {
+            b.Value = GetBeatmap(beatmapList, b.Value, true);
+            controller.Play();
+        }
+
+        public void PrevTrack()
+        {
+            b.Value = GetBeatmap(beatmapList, b.Value, true, -1);
+            controller.Play();
+        }
+
+        /// <summary>
+        /// 用于从列表中获取指定的<see cref="WorkingBeatmap"/>。
+        /// </summary>
+        /// <returns>根据给定位移得到的<see cref="WorkingBeatmap"/></returns>
+        /// <param name="list">要给予的<see cref="BeatmapSetInfo"/>列表</param>
+        /// <param name="prevBeatmap">上一张图</param>
+        /// <param name="updateCurrentPosition">是否更新当前位置</param>
+        /// <param name="displace">位移数值，默认为1.</param>
+        private WorkingBeatmap GetBeatmap(List<BeatmapSetInfo> list, WorkingBeatmap prevBeatmap, bool updateCurrentPosition = false, int displace = 1)
         {
             var info = prevBeatmap.BeatmapInfo;
+            var prevSet = prevBeatmap.BeatmapSetInfo;
             WorkingBeatmap NewBeatmap = null;
 
             //更新当前位置和最大位置
-            currentPosition = collection.Beatmaps.IndexOf(info);
-            maxCount = collection.Beatmaps.Count;
+            if ( updateCurrentPosition )
+            {
+                currentPosition = list.IndexOf(prevSet);
+            }
+            maxCount = list.Count;
 
             void NextBeatmap()
             {
-                //当前位置往后移一个
-                currentPosition++;
+                //当前位置往指定位置移动
+                currentPosition+=displace;
                 //如果当前位置超过了最大位置或者不在范围内，那么回到第一个
-                if (currentPosition >= maxCount || currentPosition < 0) currentPosition = 0;
+                if (currentPosition >= maxCount || currentPosition < 0)
+                {
+                    if ( displace > 0 ) currentPosition = 0;
+                    else currentPosition = maxCount - 1;
+                }
 
-                //获取下一张图
-                NewBeatmap = beatmaps.GetWorkingBeatmap(collection.Beatmaps.ElementAt(currentPosition));
-
-                //如果下一张图和之前的图是一个曲子，继续寻找下一个
-                if ( NewBeatmap.BeatmapSetInfo.Hash == prevBeatmap.BeatmapSetInfo.Hash )
-                    NextBeatmap();
+                //从list获取当前位置所在的BeatmapSetInfo, 然后选择该BeatmapSetInfo下的第一个WorkingBeatmap
+                //最终赋值给NewBeatmap
+                NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First());
             }
 
             NextBeatmap();
@@ -88,7 +91,7 @@ namespace osu.Game.Screens.Mvis.Modules
         }
 
         ///<summary>
-        ///用来更新`beatmapList`(谱面列表)
+        ///用来更新<see cref="beatmapList"/>
         ///</summary>
         private void updateBeatmaps(BeatmapCollection collection)
         {
@@ -105,5 +108,7 @@ namespace osu.Game.Screens.Mvis.Modules
                     beatmapList.Add(currentSet);
             }
         }
+
+        public void RefreshBeatmapList() => updateBeatmaps(collectionManager.Collections.First());
     }
 }

@@ -375,13 +375,15 @@ namespace osu.Game.Overlays
             });
         }
 
+        public bool TrackAdjustTakenOver = false;
+
         private void onTrackCompleted(WorkingBeatmap workingBeatmap)
         {
             // the source of track completion is the audio thread, so the beatmap may have changed before firing.
             if (current != workingBeatmap)
                 return;
 
-            if (!CurrentTrack.Looping && !beatmap.Disabled)
+            if (!CurrentTrack.Looping && !beatmap.Disabled && !TrackAdjustTakenOver)
                 NextTrack();
         }
 
