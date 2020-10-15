@@ -18,6 +18,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -323,10 +324,28 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        private const string score_font = "score";
+
+        private bool hasScoreFont => this.HasFont(score_font);
+
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
+                case HUDSkinComponent hudComponent:
+                {
+                    if (!hasScoreFont)
+                        return null;
+
+                    switch (hudComponent.Component)
+                    {
+                        case HUDSkinComponents.ComboCounter:
+                            return new LegacyComboCounter();
+                    }
+
+                    return null;
+                }
+
                 case GameplaySkinComponent<HitResult> resultComponent:
                     switch (resultComponent.Component)
                     {
