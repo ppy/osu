@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             int numerator = 0, denominator = 0;
 
-            ScoreCounter score = new ScoreCounter(7)
+            ScoreCounter score = new DefaultScoreCounter()
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
