@@ -64,6 +64,7 @@ namespace osu.Game.Screens.Play
         public Action<double> RequestSeek;
 
         private readonly FillFlowContainer bottomRightElements;
+        private readonly FillFlowContainer topRightElements;
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
@@ -98,9 +99,7 @@ namespace osu.Game.Screens.Play
                                         AccuracyCounter = CreateAccuracyCounter(),
                                         ScoreCounter = CreateScoreCounter(),
                                         ComboCounter = CreateComboCounter(),
-                                        ModDisplay = CreateModsContainer(),
                                         HitErrorDisplay = CreateHitErrorDisplayOverlay(),
-                                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                                     }
                                 },
                             },
@@ -116,11 +115,26 @@ namespace osu.Game.Screens.Play
                         }
                     },
                 },
+                topRightElements = new FillFlowContainer
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Margin = new MarginPadding(10),
+                    Spacing = new Vector2(10),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        ModDisplay = CreateModsContainer(),
+                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                    }
+                },
                 bottomRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    X = -5,
+                    Margin = new MarginPadding(10),
+                    Spacing = new Vector2(10),
                     AutoSizeAxes = Axes.Both,
                     LayoutDuration = FADE_DURATION / 2,
                     LayoutEasing = FADE_EASING,
@@ -191,6 +205,8 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
+
+            topRightElements.Y = ToLocalSpace(ScoreCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
             bottomRightElements.Y = -Progress.Height;
         }
 
@@ -266,7 +282,6 @@ namespace osu.Game.Screens.Play
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
-            Margin = new MarginPadding(10),
         };
 
         protected virtual SongProgress CreateProgress() => new SongProgress
@@ -287,7 +302,6 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             AutoSizeAxes = Axes.Both,
-            Margin = new MarginPadding { Top = 20, Right = 20 },
         };
 
         protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);
