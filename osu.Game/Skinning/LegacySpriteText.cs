@@ -12,7 +12,7 @@ namespace osu.Game.Skinning
     {
         private readonly LegacyGlyphStore glyphStore;
 
-        public LegacySpriteText(ISkin skin, string font)
+        public LegacySpriteText(ISkin skin, string font = "score")
         {
             Shadow = false;
             UseFullGlyphHeight = false;
