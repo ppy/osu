@@ -23,11 +23,6 @@ namespace osu.Game.Screens.Play.HUD
         public DefaultComboCounter()
         {
             Current.Value = DisplayedCount = 0;
-
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopLeft;
-
-            Position = offset;
         }
 
         [BackgroundDependencyLoader]
@@ -40,7 +35,7 @@ namespace osu.Game.Screens.Play.HUD
             if (hud != null)
             {
                 // for now align with the score counter. eventually this will be user customisable.
-                Position += ToLocalSpace(hud.ScoreCounter.ScreenSpaceDrawQuad.TopRight) + offset;
+                Position = Parent.ToLocalSpace(hud.ScoreCounter.ScreenSpaceDrawQuad.TopRight) + offset;
             }
         }
 
