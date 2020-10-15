@@ -6,7 +6,6 @@ namespace osu.Game.Skinning
     public enum HUDSkinComponents
     {
         ComboCounter,
-        ScoreText,
         ScoreCounter
     }
 }
