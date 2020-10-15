@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play.HUD
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
-            Margin = new MarginPadding { Bottom = 10, Left = 10 };
+            Margin = new MarginPadding(10);
 
             Scale = new Vector2(1.2f);
         }
