@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
         public readonly SkinnableComboCounter ComboCounter;
         public readonly SkinnableScoreCounter ScoreCounter;
         public readonly SkinnableAccuracyCounter AccuracyCounter;
-        public readonly HealthDisplay HealthDisplay;
+        public readonly SkinnableHealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
         public readonly HitErrorDisplay HitErrorDisplay;
@@ -272,12 +272,7 @@ namespace osu.Game.Screens.Play
 
         protected virtual SkinnableComboCounter CreateComboCounter() => new SkinnableComboCounter();
 
-        protected virtual HealthDisplay CreateHealthDisplay() => new StandardHealthDisplay
-        {
-            Size = new Vector2(1, 5),
-            RelativeSizeAxes = Axes.X,
-            Margin = new MarginPadding { Top = 20 }
-        };
+        protected virtual SkinnableHealthDisplay CreateHealthDisplay() => new SkinnableHealthDisplay();
 
         protected virtual FailingLayer CreateFailingLayer() => new FailingLayer
         {
@@ -320,8 +315,14 @@ namespace osu.Game.Screens.Play
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
 
-            if (HealthDisplay is StandardHealthDisplay shd)
-                processor.NewJudgement += shd.Flash;
+            if (HealthDisplay is IHealthDisplay shd)
+            {
+                processor.NewJudgement += judgement =>
+                {
+                    if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
+                        shd.Flash(judgement);
+                };
+            }
         }
 
         protected virtual void BindHealthProcessor(HealthProcessor processor)
