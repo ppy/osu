@@ -25,13 +25,15 @@ namespace osu.Game.Screens.Mvis.Modules
 
         private List<BeatmapSetInfo> beatmapList = new List<BeatmapSetInfo>();
 
+        private BeatmapCollection currentCollection;
+
         private int currentPosition = 0;
         private int maxCount = 0;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            updateBeatmaps(collectionManager.Collections.First());
+            RefreshBeatmapList();
         }
 
         public void PlayNextBeatmap() => Schedule(NextTrack);
@@ -116,7 +118,9 @@ namespace osu.Game.Screens.Mvis.Modules
             if ( collection == null )
                 collection = collectionManager.Collections.First();
 
-            updateBeatmaps(collection);
+            currentCollection = collection;
+
+            updateBeatmaps(currentCollection);
         }
     }
 }

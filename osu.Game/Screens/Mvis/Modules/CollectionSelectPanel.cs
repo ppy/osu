@@ -141,6 +141,8 @@ namespace osu.Game.Screens.Mvis.Modules
 
             CurrentCollection.BindValueChanged(OnCurrentCollectionChanged);
             SelectedCollection.BindValueChanged(UpdateSelection);
+
+            collectionManager.Collections.CollectionChanged += (_, __) => AddCollections();
         }
 
         private void OnCurrentCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
