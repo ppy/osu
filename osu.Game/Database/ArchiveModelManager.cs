@@ -593,7 +593,7 @@ namespace osu.Game.Database
             var fileInfos = new List<TFileModel>();
 
             string prefix = reader.Filenames.GetCommonPrefix();
-            if (!(prefix.EndsWith("/", StringComparison.Ordinal) || prefix.EndsWith("\\", StringComparison.Ordinal)))
+            if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
                 prefix = string.Empty;
 
             // import files to manager
