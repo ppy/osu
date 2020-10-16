@@ -71,7 +71,7 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="ppy.osu.Framework.iOS" Version="2020.1009.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2020.904.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2020.1016.0" />
   </ItemGroup>
   <!-- Xamarin.iOS does not automatically handle transitive dependencies from NuGet packages. -->
   <ItemGroup Label="Transitive Dependencies">
