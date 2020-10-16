@@ -12,7 +12,11 @@ namespace osu.Game.Screens.Play
 {
     public class SkinnableHealthDisplay : SkinnableDrawable, IHealthDisplay
     {
-        public Bindable<double> Current { get; } = new Bindable<double>();
+        public Bindable<double> Current { get; } = new BindableDouble(1)
+        {
+            MinValue = 0,
+            MaxValue = 1
+        };
 
         public void Flash(JudgementResult result) => skinnedCounter?.Flash(result);
 
