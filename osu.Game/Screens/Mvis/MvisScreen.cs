@@ -110,6 +110,7 @@ namespace osu.Game.Screens
         private Container buttonsContainer;
         private CollectionHelper collectionHelper;
         private Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
+        private CollectionSelectPanel collectionPanel;
 
         public MvisScreen()
         {
@@ -399,19 +400,21 @@ namespace osu.Game.Screens
                                                 Text = "歌曲选择",
                                                 Action = () => this.Push(new MvisSongSelect())
                                             },
-                                            new SettingsButton()
+                                            collectionPanel = new CollectionSelectPanel
                                             {
-                                                Text = "收藏夹选择",
-                                                Action = PushCollectionSelect
-                                            }
+                                                CurrentCollection = { BindTarget = CurrentCollection },
+                                                Padding = new MarginPadding{Horizontal = 15}
+                                            },
                                         }
                                     },
                                 },
                             }
-                        }
+                        },
                     }
                 },
             };
+
+            collectionPanel.Show();
         }
 
         [BackgroundDependencyLoader]
@@ -457,7 +460,7 @@ namespace osu.Game.Screens
                 //确保Beatmap.Value.Track.Completed中collectionHelper.PlayNextBeatmap只会触发一次
                 Beatmap.Value.Track.Completed -= collectionHelper.PlayNextBeatmap;
 
-                switch(v.NewValue)
+                switch (v.NewValue)
                 {
                     case true:
                         Beatmap.Value.Track.Completed += collectionHelper.PlayNextBeatmap;
@@ -475,7 +478,9 @@ namespace osu.Game.Screens
                 collectionHelper.RefreshBeatmapList(v.NewValue);
 
                 if (PlayFromCollection.Value)
-                    collectionHelper.PlayNextBeatmap();
+                {
+                    collectionHelper.PlayFirstBeatmap();
+                }
             });
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
@@ -602,7 +607,7 @@ namespace osu.Game.Screens
             gameplayContent.MoveToX(-DrawWidth, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30, DURATION, Easing.OutQuint);
 
-            if ( sidebarContainer.Alpha != 0 )
+            if (sidebarContainer.Alpha != 0)
                 sidebarContainer.Hide();
 
             this.FadeOut(DURATION, Easing.OutQuint);
@@ -785,7 +790,7 @@ namespace osu.Game.Screens
 
         private void PrevTrack()
         {
-            if ( PlayFromCollection.Value )
+            if (PlayFromCollection.Value)
                 collectionHelper.PrevTrack();
             else
                 musicController.PreviousTrack();
@@ -793,18 +798,10 @@ namespace osu.Game.Screens
 
         private void NextTrack()
         {
-            if ( PlayFromCollection.Value )
+            if (PlayFromCollection.Value)
                 collectionHelper.NextTrack();
             else
                 musicController.NextTrack();
-        }
-
-        private void PushCollectionSelect()
-        {
-            this.Push(new CollectionSelectScreen
-            {
-                CurrentCollection = { BindTarget = CurrentCollection }
-            });
         }
 
         private void UpdateIdleVisuals()
@@ -834,9 +831,9 @@ namespace osu.Game.Screens
 
         private void updateBackground(WorkingBeatmap beatmap)
         {
-            if ( Background == null || ! this.IsCurrentScreen() ) return;
+            if (Background == null || !this.IsCurrentScreen()) return;
 
-            if ( Background is BackgroundScreenBeatmap backgroundScreenBeatmap )
+            if (Background is BackgroundScreenBeatmap backgroundScreenBeatmap)
             {
                 backgroundScreenBeatmap.BlurAmount.Value = BgBlur.Value * 100;
                 backgroundScreenBeatmap.Beatmap = beatmap;
@@ -852,12 +849,12 @@ namespace osu.Game.Screens
         /// <param name="brightness">要调整的亮度.</param>
         private void ApplyBackgroundBrightness(bool auto = true, float brightness = 0)
         {
-            if ( !this.IsCurrentScreen() ) return;
+            if (!this.IsCurrentScreen()) return;
 
-            if ( auto )
-                Background?.FadeColour(sbLoader.storyboardReplacesBackground.Value? Color4.Black : OsuColour.Gray( OverlaysHidden ? IdleBgDim.Value : 0.6f ),
+            if (auto)
+                Background?.FadeColour(sbLoader.storyboardReplacesBackground.Value ? Color4.Black : OsuColour.Gray(OverlaysHidden ? IdleBgDim.Value : 0.6f),
                                        DURATION,
-                                       Easing.OutQuint );
+                                       Easing.OutQuint);
             else
                 Background?.FadeColour(OsuColour.Gray(brightness), DURATION, Easing.OutQuint);
 
