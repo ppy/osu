@@ -319,7 +319,7 @@ namespace osu.Game.Screens.Play
             {
                 processor.NewJudgement += judgement =>
                 {
-                    if (judgement.IsHit)
+                    if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
                         shd.Flash(judgement);
                 };
             }
