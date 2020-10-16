@@ -350,7 +350,6 @@ namespace osu.Game.Skinning
                             return new LegacyAccuracyCounter(this);
 
                         case HUDSkinComponents.ScoreText:
-                        case HUDSkinComponents.AccuracyText:
                             return new LegacySpriteText(this, scorePrefix)
                             {
                                 Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2), 0)
