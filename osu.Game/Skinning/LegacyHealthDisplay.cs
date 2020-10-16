@@ -12,14 +12,15 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
     public class LegacyHealthDisplay : CompositeDrawable, IHealthDisplay
     {
         private readonly Skin skin;
-        private Drawable fill;
-        private LegacyMarker marker;
+        private LegacyHealthPiece fill;
+        private LegacyHealthPiece marker;
 
         private float maxFillWidth;
 
@@ -63,7 +64,9 @@ namespace osu.Game.Skinning
                 });
             }
 
+            fill.Current.BindTo(Current);
             marker.Current.BindTo(Current);
+
             maxFillWidth = fill.Width;
         }
 
@@ -82,7 +85,18 @@ namespace osu.Game.Skinning
 
         private static Texture getTexture(Skin skin, string name) => skin.GetTexture($"scorebar-{name}");
 
-        public class LegacyOldStyleMarker : LegacyMarker
+        private static Color4 getFillColour(double hp)
+        {
+            if (hp < 0.2)
+                return Interpolation.ValueAt(0.2 - hp, Color4.Black, Color4.Red, 0, 0.2);
+
+            if (hp < 0.5)
+                return Interpolation.ValueAt(0.5 - hp, Color4.White, Color4.Black, 0, 0.5);
+
+            return Color4.White;
+        }
+
+        public class LegacyOldStyleMarker : LegacyHealthPiece
         {
             private readonly Sprite sprite;
 
@@ -92,6 +106,8 @@ namespace osu.Game.Skinning
 
             public LegacyOldStyleMarker(Skin skin)
             {
+                Origin = Anchor.Centre;
+
                 normalTexture = getTexture(skin, "ki");
                 dangerTexture = getTexture(skin, "kidanger");
                 superDangerTexture = getTexture(skin, "kidanger2");
@@ -120,39 +136,46 @@ namespace osu.Game.Skinning
                         sprite.Texture = normalTexture;
                 });
             }
+
+            public override void Flash(JudgementResult result)
+            {
+                this.ScaleTo(1.4f).Then().ScaleTo(1, 200, Easing.Out);
+            }
         }
 
-        public class LegacyNewStyleMarker : LegacyMarker
+        public class LegacyNewStyleMarker : LegacyHealthPiece
         {
+            private readonly Sprite sprite;
+
             public LegacyNewStyleMarker(Skin skin)
             {
+                Origin = Anchor.Centre;
+
                 InternalChildren = new Drawable[]
                 {
-                    new Sprite
+                    sprite = new Sprite
                     {
                         Texture = getTexture(skin, "marker"),
                         Origin = Anchor.Centre,
                     }
                 };
             }
-        }
 
-        public class LegacyMarker : CompositeDrawable, IHealthDisplay
-        {
-            public Bindable<double> Current { get; } = new Bindable<double>();
-
-            public LegacyMarker()
+            protected override void Update()
             {
-                Origin = Anchor.Centre;
+                base.Update();
+
+                sprite.Colour = getFillColour(Current.Value);
+                sprite.Blending = Current.Value < 0.5f ? BlendingParameters.Inherit : BlendingParameters.Additive;
             }
 
-            public void Flash(JudgementResult result)
+            public override void Flash(JudgementResult result)
             {
                 this.ScaleTo(1.4f).Then().ScaleTo(1, 200, Easing.Out);
             }
         }
 
-        internal class LegacyOldStyleFill : CompositeDrawable
+        internal class LegacyOldStyleFill : LegacyHealthPiece
         {
             public LegacyOldStyleFill(Skin skin)
             {
@@ -175,12 +198,33 @@ namespace osu.Game.Skinning
             }
         }
 
-        internal class LegacyNewStyleFill : Sprite
+        internal class LegacyNewStyleFill : LegacyHealthPiece
         {
             public LegacyNewStyleFill(Skin skin)
             {
-                Texture = getTexture(skin, "colour");
+                InternalChild = new Sprite
+                {
+                    Texture = getTexture(skin, "colour"),
+                };
+
+                Size = InternalChild.Size;
                 Position = new Vector2(7.5f, 7.8f) * 1.6f;
+                Masking = true;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                this.Colour = getFillColour(Current.Value);
+            }
+        }
+
+        public class LegacyHealthPiece : CompositeDrawable, IHealthDisplay
+        {
+            public Bindable<double> Current { get; } = new Bindable<double>();
+
+            public virtual void Flash(JudgementResult result)
+            {
             }
         }
     }
