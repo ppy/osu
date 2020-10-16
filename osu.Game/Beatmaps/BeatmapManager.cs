@@ -389,7 +389,7 @@ namespace osu.Game.Beatmaps
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
-            string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
+            string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
 
             if (string.IsNullOrEmpty(mapName))
             {
@@ -417,7 +417,7 @@ namespace osu.Game.Beatmaps
         {
             var beatmapInfos = new List<BeatmapInfo>();
 
-            foreach (var file in files.Where(f => f.Filename.EndsWith(".osu")))
+            foreach (var file in files.Where(f => f.Filename.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)))
             {
                 using (var raw = Files.Store.GetStream(file.FileInfo.StoragePath))
                 using (var ms = new MemoryStream()) // we need a memory stream so we can seek
