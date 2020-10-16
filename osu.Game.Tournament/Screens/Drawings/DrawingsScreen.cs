@@ -234,7 +234,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
-                            if (line.ToUpperInvariant().StartsWith("GROUP"))
+                            if (line.ToUpperInvariant().StartsWith("GROUP", StringComparison.Ordinal))
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure

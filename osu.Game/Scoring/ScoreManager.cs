@@ -33,6 +33,8 @@ namespace osu.Game.Scoring
 
         protected override string ImportFromStablePath => Path.Combine("Data", "r");
 
+        protected override string HumanisedModelName => "分数";
+
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
@@ -57,7 +59,7 @@ namespace osu.Game.Scoring
             if (archive == null)
                 return null;
 
-            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr"))))
+            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase))))
             {
                 try
                 {

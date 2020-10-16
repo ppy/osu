@@ -15,23 +15,26 @@ namespace osu.Game.Input
         /// <summary>
         /// The mouse cursor will be free to move outside the game window.
         /// </summary>
+        [Description("禁用")]
         Never,
 
         /// <summary>
         /// The mouse cursor will be locked to the window bounds while in fullscreen mode.
         /// </summary>
+        [Description("全屏模式时启用")]
         Fullscreen,
 
         /// <summary>
         /// The mouse cursor will be locked to the window bounds during gameplay,
         /// but may otherwise move freely.
         /// </summary>
-        [Description("During Gameplay")]
+        [Description("游戏时启用")]
         DuringGameplay,
 
         /// <summary>
         /// The mouse cursor will always be locked to the window bounds while the game has focus.
         /// </summary>
+        [Description("启用")]
         Always
     }
 }

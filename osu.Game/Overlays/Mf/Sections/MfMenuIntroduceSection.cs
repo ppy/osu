@@ -102,9 +102,7 @@ namespace osu.Game.Overlays.MfMenu
             var t = new MfText();
 
             t.AddLink("Mf-osu","https://github.com/MATRIX-feather/osu");
-            t.AddText("是一个基于");
-            t.AddLink("官方osu!lazer","https://github.com/ppy/osu");
-            t.AddText("的分支版本。");
+            t.AddText("是一个基于osu!lazer(ppy/osu)的分支版本");
 
             return t;
         }
@@ -156,17 +154,14 @@ namespace osu.Game.Overlays.MfMenu
         {
             var t = new MfText();
 
-            t.AddText("虽然osu!lazer和他的框架osu!");
-            t.AddText("framework");
-            t.AddLink("是基于MIT协议","https://opensource.org/licenses/MIT");
-            t.AddText("开源的, 但这并不覆盖有关\"osu\"和\"ppy\"在软件、 资源、 广告和促销中的的任何用法, 因为这些都是注册商标并受商标法的保护, ");
+            t.AddText("“osu!”是ppy的商标，本软件与ppy无关。");
+            t.NewParagraph();
 
-            t.AddText("详细信息可以通过");
-            t.AddLink("官方README","https://github.com/ppy/osu#licence");
-            t.AddText("查询。");
-            t.AddParagraph("如果仍有疑惑, 您可以发送邮件至");
-            t.AddLink("contact@ppy.sh","mailto:contact@ppy.sh");
-            t.AddText(";");
+            t.AddParagraph("您可以在");
+            t.AddLink("这里", "https://github.com/ppy/osu");
+            t.AddText("找到原版osu!lazer的源码");
+            t.NewParagraph();
+
             t.AddParagraph("与本项目有关的问题, 请发送邮件至");
             t.AddLink("midnightcarnival@outlook.com","mailto:midnightcarnival@outlook.com");
             t.AddText(", 一般情况下, 本人将会在一周内给予回应");

@@ -12,8 +12,8 @@ namespace osu.Game.Overlays.MfMenu
             public MfTitle()
             {
                 Title = "关于Mf-osu";
-                Description = "这是一个官方lazer的分支,祝游玩愉快(｡･ω･)ﾉﾞ";
-                IconTexture = "Icons/Hexacons/contests";
+                Description = "这是基于osu!lazer的一个分支版本,祝游玩愉快(｡･ω･)ﾉﾞ";
+                IconTexture = "Icons/Hexacons/aboutMF";
             }
         }
     }

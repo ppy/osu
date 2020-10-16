@@ -46,6 +46,7 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisAdjustMusicWithFreq, true);
             Set(MfSetting.MvisMusicSpeed, 1.0, 0.1, 2.0);
             Set(MfSetting.MvisEnableNightcoreBeat, false);
+            Set(MfSetting.MvisPlayFromCollection, false);
 
             //Mvis Settings(Upstream)
             Set(MfSetting.MvisShowParticles, true);
@@ -90,6 +91,7 @@ namespace osu.Game.Configuration
         MvisMusicSpeed,
         MvisAdjustMusicWithFreq,
         MvisEnableNightcoreBeat,
+        MvisPlayFromCollection,
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect,

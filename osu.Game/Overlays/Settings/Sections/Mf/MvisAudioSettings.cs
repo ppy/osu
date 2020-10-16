@@ -36,6 +36,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     LabelText = "夜核节拍器",
                     Current = config.GetBindable<bool>(MfSetting.MvisEnableNightcoreBeat),
                     TooltipText = "动次打次动次打次"
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "从收藏夹播放音乐",
+                    Current = config.GetBindable<bool>(MfSetting.MvisPlayFromCollection),
+                    TooltipText = "早期实现"
                 }
             };
         }

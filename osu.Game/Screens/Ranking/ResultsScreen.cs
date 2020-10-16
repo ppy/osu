@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -17,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
@@ -26,7 +28,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public abstract class ResultsScreen : OsuScreen
+    public abstract class ResultsScreen : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         protected const float BACKGROUND_BLUR = 20;
         private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
@@ -317,84 +319,6 @@ namespace osu.Game.Screens.Ranking
             return false;
         }
 
-        private void OnSelectedScoreChanged(ValueChangedEvent<ScoreInfo> s)
-            => UpdateRankTexts(s.NewValue);
-
-        private void UpdateRankTexts(ScoreInfo s)
-        {
-            if ( s == null )
-            {
-                texts.Text = "";
-                return;
-            };
-
-            switch ( s.Rank )
-            {
-                case ScoreRank.X:
-                case ScoreRank.XH:
-                    texts.Text = RandomTextXH();
-                    break;
-                case ScoreRank.S:
-                case ScoreRank.SH:
-                    texts.Text = RandomTextS();
-                    break;
-
-                case ScoreRank.A:
-                    texts.Text = "快要到了, 继续努力!";
-                    break;
-                case ScoreRank.B:
-                case ScoreRank.C:
-                case ScoreRank.D:
-                    texts.Text = "加油, 你一定能行!";
-                    break;
-
-                default:
-                    texts.Text = "???";
-                    break;
-            }
-        }
-        private string RandomTextXH() //基于Disclaimer
-        {
-            string[] texts =
-            {
-                "恭喜达成SS!",
-                "去挑战top榜吧!",
-                "OHHHHHHHHHHHHH",
-            };
-
-            return texts[RNG.Next(0, texts.Length)];
-        }
-
-        private void UpdateVisualEffects()
-        {
-            if (OptUIEnabled.Value)
-            switch(bottomPanel.panel_IsHovered.Value)
-            {
-                case true:
-                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y + 30, DURATION, Easing.OutQuint);
-                    colorBox.FadeColour( Color4Extensions.FromHex("#2d2d2d"), DURATION);
-                    texts.FadeIn(DURATION).MoveToY(-23, DURATION, Easing.OutQuint);
-                    break;
-
-                case false:
-                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint);
-                    colorBox.FadeColour( Color4Extensions.FromHex("#333"), DURATION );
-                    texts.FadeOut(DURATION, Easing.OutExpo).MoveToY(-10, DURATION, Easing.OutQuint);
-                    break;
-            }
-        }
-
-        private string RandomTextS()
-        {
-            string[] texts =
-            {
-                "虽然有点难, 但你克服了几乎所有的挑战!",
-                "离SS只有咫尺之遥!",
-            };
-
-            return texts[RNG.Next(0, texts.Length)];
-        }
-
         private void addScore(ScoreInfo score)
         {
             var panel = ScorePanelList.AddScore(score);
@@ -457,6 +381,22 @@ namespace osu.Game.Screens.Ranking
 
                 detachedPanel = null;
             }
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    statisticsPanel.ToggleVisibility();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         private class VerticalScrollContainer : OsuScrollContainer

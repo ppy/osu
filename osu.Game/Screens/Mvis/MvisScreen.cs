@@ -37,6 +37,8 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics;
 using osu.Framework;
 using osu.Game.Users;
+using osu.Game.Screens.Mvis.Modules;
+using osu.Game.Collections;
 
 namespace osu.Game.Screens
 {
@@ -97,6 +99,7 @@ namespace osu.Game.Screens
         private readonly BindableDouble MusicSpeed = new BindableDouble();
         private readonly BindableBool AdjustFreq = new BindableBool();
         private readonly BindableBool NightcoreBeat = new BindableBool();
+        private readonly BindableBool PlayFromCollection = new BindableBool();
         private bool OverlaysHidden = false;
         private FillFlowContainer bottomFillFlow;
         private BindableBool lockChanges = new BindableBool();
@@ -105,6 +108,9 @@ namespace osu.Game.Screens
         private Container particles;
         private NightcoreBeatContainer nightcoreBeatContainer;
         private Container buttonsContainer;
+        private CollectionHelper collectionHelper;
+        private Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
+        private CollectionSelectPanel collectionPanel;
 
         public MvisScreen()
         {
@@ -122,7 +128,7 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-
+                        collectionHelper = new CollectionHelper(),
                         loadingSpinner = new LoadingSpinner(true, true)
                         {
                             Anchor = Anchor.BottomCentre,
@@ -201,7 +207,7 @@ namespace osu.Game.Screens
                                                                     Anchor = Anchor.Centre,
                                                                     Origin = Anchor.Centre,
                                                                     ButtonIcon = FontAwesome.Solid.StepBackward,
-                                                                    Action = () => musicController.PreviousTrack(),
+                                                                    Action = PrevTrack,
                                                                     TooltipText = "上一首/从头开始",
                                                                 },
                                                                 songProgressButton = new BottomBarSwitchButton()
@@ -225,7 +231,7 @@ namespace osu.Game.Screens
                                                                     Anchor = Anchor.Centre,
                                                                     Origin = Anchor.Centre,
                                                                     ButtonIcon = FontAwesome.Solid.StepForward,
-                                                                    Action = () => musicController.NextTrack(),
+                                                                    Action = NextTrack,
                                                                     TooltipText = "下一首",
                                                                 },
                                                             }
@@ -393,15 +399,22 @@ namespace osu.Game.Screens
                                             {
                                                 Text = "歌曲选择",
                                                 Action = () => this.Push(new MvisSongSelect())
-                                            }
+                                            },
+                                            collectionPanel = new CollectionSelectPanel
+                                            {
+                                                CurrentCollection = { BindTarget = CurrentCollection },
+                                                Padding = new MarginPadding{Horizontal = 15}
+                                            },
                                         }
                                     },
                                 },
                             }
-                        }
+                        },
                     }
                 },
             };
+
+            collectionPanel.Show();
         }
 
         [BackgroundDependencyLoader]
@@ -415,6 +428,7 @@ namespace osu.Game.Screens
             config.BindWith(MfSetting.MvisMusicSpeed, MusicSpeed);
             config.BindWith(MfSetting.MvisAdjustMusicWithFreq, AdjustFreq);
             config.BindWith(MfSetting.MvisEnableNightcoreBeat, NightcoreBeat);
+            config.BindWith(MfSetting.MvisPlayFromCollection, PlayFromCollection);
         }
 
         protected override void LoadComplete()
@@ -441,6 +455,33 @@ namespace osu.Game.Screens
             MusicSpeed.BindValueChanged(_ => ApplyTrackAdjustments());
             AdjustFreq.BindValueChanged(_ => ApplyTrackAdjustments());
             NightcoreBeat.BindValueChanged(_ => ApplyTrackAdjustments());
+            PlayFromCollection.BindValueChanged(v =>
+            {
+                //确保Beatmap.Value.Track.Completed中collectionHelper.PlayNextBeatmap只会触发一次
+                Beatmap.Value.Track.Completed -= collectionHelper.PlayNextBeatmap;
+
+                switch (v.NewValue)
+                {
+                    case true:
+                        Beatmap.Value.Track.Completed += collectionHelper.PlayNextBeatmap;
+                        musicController.TrackAdjustTakenOver = true;
+                        break;
+
+                    case false:
+                        musicController.TrackAdjustTakenOver = false;
+                        break;
+                }
+            }, true);
+
+            CurrentCollection.BindValueChanged(v =>
+            {
+                collectionHelper.RefreshBeatmapList(v.NewValue);
+
+                if (PlayFromCollection.Value)
+                {
+                    collectionHelper.PlayFirstBeatmap();
+                }
+            });
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
             ShowParticles.BindValueChanged(v =>
@@ -501,8 +542,11 @@ namespace osu.Game.Screens
             }
         }
 
-        private void SeekTo(double position) =>
+        private void SeekTo(double position)
+        {
             musicController.SeekTo(position);
+            sbLoader.Seek(position);
+        }
 
         protected override void Update()
         {
@@ -523,6 +567,8 @@ namespace osu.Game.Screens
             //非背景层的动画
             gameplayContent.ScaleTo(0f).Then().ScaleTo(1f, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, DURATION, Easing.OutQuint);
+
+            PlayFromCollection.TriggerChange();
         }
 
         public override bool OnExiting(IScreen next)
@@ -530,6 +576,7 @@ namespace osu.Game.Screens
             //重置Track
             Track.ResetSpeedAdjustments();
             Track.Looping = false;
+            musicController.TrackAdjustTakenOver = false;
 
             //停止beatmapLogo，取消故事版家在任务以及锁定变更
             beatmapLogo.StopResponseOnBeatmapChanges();
@@ -550,6 +597,7 @@ namespace osu.Game.Screens
         public override void OnSuspending(IScreen next)
         {
             Track.ResetSpeedAdjustments();
+            PlayFromCollection.TriggerChange();
 
             //背景层的动画
             ApplyBackgroundBrightness(false, 1);
@@ -559,7 +607,7 @@ namespace osu.Game.Screens
             gameplayContent.MoveToX(-DrawWidth, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30, DURATION, Easing.OutQuint);
 
-            if ( sidebarContainer.Alpha != 0 )
+            if (sidebarContainer.Alpha != 0)
                 sidebarContainer.Hide();
 
             this.FadeOut(DURATION, Easing.OutQuint);
@@ -572,6 +620,9 @@ namespace osu.Game.Screens
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+
+            musicController.TrackAdjustTakenOver = true;
+            collectionHelper.RefreshBeatmapList(CurrentCollection.Value);
 
             this.FadeIn(DURATION);
             Track.ResetSpeedAdjustments();
@@ -738,6 +789,22 @@ namespace osu.Game.Screens
                 musicController.Play();
         }
 
+        private void PrevTrack()
+        {
+            if (PlayFromCollection.Value)
+                collectionHelper.PrevTrack();
+            else
+                musicController.PreviousTrack();
+        }
+
+        private void NextTrack()
+        {
+            if (PlayFromCollection.Value)
+                collectionHelper.NextTrack();
+            else
+                musicController.NextTrack();
+        }
+
         private void UpdateIdleVisuals()
         {
             if (!OverlaysHidden)
@@ -765,9 +832,9 @@ namespace osu.Game.Screens
 
         private void updateBackground(WorkingBeatmap beatmap)
         {
-            if ( Background == null || ! this.IsCurrentScreen() ) return;
+            if (Background == null || !this.IsCurrentScreen()) return;
 
-            if ( Background is BackgroundScreenBeatmap backgroundScreenBeatmap )
+            if (Background is BackgroundScreenBeatmap backgroundScreenBeatmap)
             {
                 backgroundScreenBeatmap.BlurAmount.Value = BgBlur.Value * 100;
                 backgroundScreenBeatmap.Beatmap = beatmap;
@@ -783,12 +850,12 @@ namespace osu.Game.Screens
         /// <param name="brightness">要调整的亮度.</param>
         private void ApplyBackgroundBrightness(bool auto = true, float brightness = 0)
         {
-            if ( !this.IsCurrentScreen() ) return;
+            if (!this.IsCurrentScreen()) return;
 
-            if ( auto )
-                Background?.FadeColour(sbLoader.storyboardReplacesBackground.Value? Color4.Black : OsuColour.Gray( OverlaysHidden ? IdleBgDim.Value : 0.6f ),
+            if (auto)
+                Background?.FadeColour(sbLoader.storyboardReplacesBackground.Value ? Color4.Black : OsuColour.Gray(OverlaysHidden ? IdleBgDim.Value : 0.6f),
                                        DURATION,
-                                       Easing.OutQuint );
+                                       Easing.OutQuint);
             else
                 Background?.FadeColour(OsuColour.Gray(brightness), DURATION, Easing.OutQuint);
 
@@ -798,6 +865,7 @@ namespace osu.Game.Screens
         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
             var beatmap = v.NewValue;
+            PlayFromCollection.TriggerChange();
 
             this.Schedule(() =>
             {

@@ -38,6 +38,7 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
+using M.Resources;
 
 namespace osu.Game
 {
@@ -153,6 +154,7 @@ namespace osu.Game
                 VersionHash = $"{Version}-{RuntimeInfo.OS}".ComputeMD5Hash();
             }
 
+            Resources.AddStore(new DllResourceStore(typeof(MResources).Assembly));
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));

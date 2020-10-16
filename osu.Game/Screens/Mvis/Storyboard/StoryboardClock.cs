@@ -122,9 +122,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             if (source == null) return;
 
-            // transfer our value to the source clock.
-            //(source as IAdjustableClock)?.Seek(CurrentTime);
-
             Seek( (source as IAdjustableClock).CurrentTime );
 
             base.ChangeSource(source);
@@ -160,15 +157,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             try
             {
-                bool success = adjustableSource?.Seek(position) != false;
-
-                if (IsCoupled)
-                    return success;
-
-                if (!success)
-                    //if we failed to seek then stop the source and use decoupled mode.
-                    adjustableSource?.Stop();
-
                 return decoupledStopwatch.Seek(position);
             }
             finally

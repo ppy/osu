@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("get variables", () =>
             {
-                gameplayClock = Player.ChildrenOfType<FrameStabilityContainer>().First().GameplayClock;
+                gameplayClock = Player.ChildrenOfType<FrameStabilityContainer>().First();
                 slider = Player.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).First();
                 samples = slider.ChildrenOfType<DrawableSample>().ToArray();
             });

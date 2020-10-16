@@ -4,24 +4,40 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osuTK;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Screens.Play.HUD
 {
-    /// <summary>
-    /// Used as an accuracy counter. Represented visually as a percentage.
-    /// </summary>
-    public class SimpleComboCounter : RollingCounter<int>
+    public class DefaultComboCounter : RollingCounter<int>, IComboCounter
     {
+        private readonly Vector2 offset = new Vector2(20, 5);
+
         protected override double RollingDuration => 750;
 
-        public SimpleComboCounter()
+        [Resolved(canBeNull: true)]
+        private HUDOverlay hud { get; set; }
+
+        public DefaultComboCounter()
         {
             Current.Value = DisplayedCount = 0;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours) => Colour = colours.BlueLighter;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (hud?.ScoreCounter.Drawable is DefaultScoreCounter score)
+            {
+                // for now align with the score counter. eventually this will be user customisable.
+                Position = Parent.ToLocalSpace(score.ScreenSpaceDrawQuad.TopRight) + offset;
+            }
+        }
 
         protected override string FormatCount(int count)
         {

@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -167,10 +168,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 items.Add(createMenuItemForPathType(PathType.Bezier));
                 items.Add(createMenuItemForPathType(PathType.Catmull));
 
+                string controlPointDeleteText = count > 1 ? $"{count}个滑条点" : "滑条点";
                 return new MenuItem[]
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => deleteSelected()),
-                    new OsuMenuItem("Curve type")
+                    new OsuMenuItem($"删除{controlPointDeleteText}", MenuItemType.Destructive, () => deleteSelected()),
+                    new OsuMenuItem("曲线类型")
                     {
                         Items = items
                     }
@@ -202,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private class PathTypeMenuItem : TernaryStateMenuItem
         {
             public PathTypeMenuItem(PathType? type, Action action)
-                : base(type == null ? "Inherit" : type.ToString().Humanize(), changeState, MenuItemType.Standard, _ => action?.Invoke())
+                : base(type == null ? "继承" : type.GetDescription() ?? type.ToString().Humanize(), changeState, MenuItemType.Standard, _ => action?.Invoke())
             {
             }
 

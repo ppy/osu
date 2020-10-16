@@ -18,12 +18,14 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
+    [ExcludeFromDynamicCompile]
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource
     {
         private readonly AudioManager audio;
@@ -88,6 +90,7 @@ namespace osu.Game.Skinning
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 
         private const string unknown_creator_string = "Unknown";
+        protected override string HumanisedModelName => "皮肤";
 
         protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
         {

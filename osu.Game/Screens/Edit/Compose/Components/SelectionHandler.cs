@@ -376,6 +376,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         /// <summary>
         /// Set up ternary state bindables and bind them to selection/hitobject changes (in both directions)
+        /// Sample名称在这里指定
         /// </summary>
         private void createStateBindables()
         {
@@ -475,7 +476,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     new OsuMenuItem("音效")
                     {
                         Items = SelectionSampleStates.Select(kvp =>
-                            new TernaryStateMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
+                            new TernaryStateMenuItem(ComposeBlueprintContainer.getNameForSample(kvp.Value.Description)) { State = { BindTarget = kvp.Value } }).ToArray()
                     },
                     new OsuMenuItem("删除", MenuItemType.Destructive, deleteSelected),
                 });
