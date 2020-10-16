@@ -96,31 +96,24 @@ namespace osu.Game.Skinning
             return Color4.White;
         }
 
-        public class LegacyOldStyleMarker : LegacyHealthPiece
+        public class LegacyOldStyleMarker : LegacyMarker
         {
-            private readonly Sprite sprite;
-
             private readonly Texture normalTexture;
             private readonly Texture dangerTexture;
             private readonly Texture superDangerTexture;
 
             public LegacyOldStyleMarker(Skin skin)
             {
-                Origin = Anchor.Centre;
-
                 normalTexture = getTexture(skin, "ki");
                 dangerTexture = getTexture(skin, "kidanger");
                 superDangerTexture = getTexture(skin, "kidanger2");
-
-                InternalChildren = new Drawable[]
-                {
-                    sprite = new Sprite
-                    {
-                        Texture = getTexture(skin, "ki"),
-                        Origin = Anchor.Centre,
-                    }
-                };
             }
+
+            public override Sprite CreateSprite() => new Sprite
+            {
+                Texture = normalTexture,
+                Origin = Anchor.Centre,
+            };
 
             protected override void LoadComplete()
             {
@@ -129,49 +122,36 @@ namespace osu.Game.Skinning
                 Current.BindValueChanged(hp =>
                 {
                     if (hp.NewValue < 0.2f)
-                        sprite.Texture = superDangerTexture;
+                        Main.Texture = superDangerTexture;
                     else if (hp.NewValue < 0.5f)
-                        sprite.Texture = dangerTexture;
+                        Main.Texture = dangerTexture;
                     else
-                        sprite.Texture = normalTexture;
+                        Main.Texture = normalTexture;
                 });
-            }
-
-            public override void Flash(JudgementResult result)
-            {
-                this.ScaleTo(1.4f).Then().ScaleTo(1, 200, Easing.Out);
             }
         }
 
-        public class LegacyNewStyleMarker : LegacyHealthPiece
+        public class LegacyNewStyleMarker : LegacyMarker
         {
-            private readonly Sprite sprite;
+            private readonly Skin skin;
 
             public LegacyNewStyleMarker(Skin skin)
             {
-                Origin = Anchor.Centre;
-
-                InternalChildren = new Drawable[]
-                {
-                    sprite = new Sprite
-                    {
-                        Texture = getTexture(skin, "marker"),
-                        Origin = Anchor.Centre,
-                    }
-                };
+                this.skin = skin;
             }
+
+            public override Sprite CreateSprite() => new Sprite
+            {
+                Texture = getTexture(skin, "marker"),
+                Origin = Anchor.Centre,
+            };
 
             protected override void Update()
             {
                 base.Update();
 
-                sprite.Colour = getFillColour(Current.Value);
-                sprite.Blending = Current.Value < 0.5f ? BlendingParameters.Inherit : BlendingParameters.Additive;
-            }
-
-            public override void Flash(JudgementResult result)
-            {
-                this.ScaleTo(1.4f).Then().ScaleTo(1, 200, Easing.Out);
+                Main.Colour = getFillColour(Current.Value);
+                Main.Blending = Current.Value < 0.5f ? BlendingParameters.Inherit : BlendingParameters.Additive;
             }
         }
 
@@ -215,8 +195,58 @@ namespace osu.Game.Skinning
             protected override void Update()
             {
                 base.Update();
-                this.Colour = getFillColour(Current.Value);
+                Colour = getFillColour(Current.Value);
             }
+        }
+
+        public abstract class LegacyMarker : LegacyHealthPiece
+        {
+            protected Sprite Main;
+
+            private Sprite explode;
+
+            protected LegacyMarker()
+            {
+                Origin = Anchor.Centre;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    Main = CreateSprite(),
+                    explode = CreateSprite().With(s =>
+                    {
+                        s.Alpha = 0;
+                        s.Blending = BlendingParameters.Additive;
+                    }),
+                };
+            }
+
+            public abstract Sprite CreateSprite();
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Current.BindValueChanged(val =>
+                {
+                    if (val.NewValue > val.OldValue)
+                        bulgeMain();
+                });
+            }
+
+            public override void Flash(JudgementResult result)
+            {
+                bulgeMain();
+
+                explode.FadeOutFromOne(120);
+                explode.ScaleTo(1).Then().ScaleTo(Current.Value > 0.5f ? 2 : 1.6f, 120);
+            }
+
+            private void bulgeMain() =>
+                Main.ScaleTo(1.4f).Then().ScaleTo(1, 200, Easing.Out);
         }
 
         public class LegacyHealthPiece : CompositeDrawable, IHealthDisplay
