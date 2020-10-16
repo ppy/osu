@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -17,6 +19,9 @@ namespace osu.Game.Skinning
         private readonly Skin skin;
         private Sprite fill;
         private Marker marker;
+
+        private float maxFillWidth;
+
         public Bindable<double> Current { get; } = new BindableDouble { MinValue = 0, MaxValue = 1 };
 
         public LegacyHealthDisplay(Skin skin)
@@ -45,24 +50,17 @@ namespace osu.Game.Skinning
                     Current = { BindTarget = Current },
                 }
             };
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Current.BindValueChanged(updateHp, true);
-        }
-
-        private void updateHp(ValueChangedEvent<double> hp)
-        {
-            if (fill.Texture != null)
-                fill.ResizeWidthTo((float)(fill.Texture.DisplayWidth * hp.NewValue), 500, Easing.OutQuint);
+            maxFillWidth = fill.Width;
         }
 
         protected override void Update()
         {
             base.Update();
+
+            fill.Width = Interpolation.ValueAt(
+                Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
+                fill.Width, (float)Current.Value * maxFillWidth, 0, 200, Easing.OutQuint);
 
             marker.Position = fill.Position + new Vector2(fill.DrawWidth, fill.DrawHeight / 2);
         }
