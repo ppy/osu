@@ -230,7 +230,7 @@ namespace osu.Game.Collections
         public void DeleteAll()
         {
             Collections.Clear();
-            PostNotification?.Invoke(new ProgressCompletionNotification { Text = "Deleted all collections!" });
+            PostNotification?.Invoke(new ProgressCompletionNotification { Text = "已删除所有收藏夹!" });
         }
 
         private readonly object saveLock = new object();
