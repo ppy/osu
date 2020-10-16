@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
 
-            Scale = new Vector2(0.75f);
+            Scale = new Vector2(0.6f);
             Margin = new MarginPadding(10);
 
             this.skin = skin;
