@@ -315,8 +315,14 @@ namespace osu.Game.Screens.Play
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
 
-            if (HealthDisplay.Drawable is IHealthDisplay shd)
-                processor.NewJudgement += shd.Flash;
+            if (HealthDisplay is IHealthDisplay shd)
+            {
+                processor.NewJudgement += judgement =>
+                {
+                    if (judgement.IsHit)
+                        shd.Flash(judgement);
+                };
+            }
         }
 
         protected virtual void BindHealthProcessor(HealthProcessor processor)
