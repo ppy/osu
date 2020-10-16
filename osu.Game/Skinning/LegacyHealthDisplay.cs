@@ -84,16 +84,41 @@ namespace osu.Game.Skinning
 
         public class LegacyOldStyleMarker : LegacyMarker
         {
+            private readonly Sprite sprite;
+
+            private readonly Texture normalTexture;
+            private readonly Texture dangerTexture;
+            private readonly Texture superDangerTexture;
+
             public LegacyOldStyleMarker(Skin skin)
             {
+                normalTexture = getTexture(skin, "ki");
+                dangerTexture = getTexture(skin, "kidanger");
+                superDangerTexture = getTexture(skin, "kidanger2");
+
                 InternalChildren = new Drawable[]
                 {
-                    new Sprite
+                    sprite = new Sprite
                     {
                         Texture = getTexture(skin, "ki"),
                         Origin = Anchor.Centre,
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Current.BindValueChanged(hp =>
+                {
+                    if (hp.NewValue < 0.2f)
+                        sprite.Texture = superDangerTexture;
+                    else if (hp.NewValue < 0.5f)
+                        sprite.Texture = dangerTexture;
+                    else
+                        sprite.Texture = normalTexture;
+                });
             }
         }
 
