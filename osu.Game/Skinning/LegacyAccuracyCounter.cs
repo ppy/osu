@@ -29,7 +29,7 @@ namespace osu.Game.Skinning
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
 
-        protected sealed override OsuSpriteText CreateSpriteText() => skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) as OsuSpriteText ?? new OsuSpriteText();
+        protected sealed override OsuSpriteText CreateSpriteText() => (OsuSpriteText)skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText));
 
         protected override void Update()
         {
