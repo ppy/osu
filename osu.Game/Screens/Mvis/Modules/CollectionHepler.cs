@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
@@ -82,13 +84,22 @@ namespace osu.Game.Screens.Mvis.Modules
 
             //从list获取当前位置所在的BeatmapSetInfo, 然后选择该BeatmapSetInfo下的第一个WorkingBeatmap
             //最终赋值给NewBeatmap
-            NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First());
+            if ( list.Count > 0 )
+                NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First());
+            else
+                NewBeatmap = b.Value;
             return NewBeatmap;
         }
 
         private void playFirstBeatmap(List<BeatmapSetInfo> list)
         {
-            b.Value = beatmaps.GetWorkingBeatmap(list.ElementAt(0).Beatmaps.First());
+            WorkingBeatmap NewBeatmap;
+
+            if ( list.Count == 0 ) return;
+
+            NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First());
+
+            b.Value = NewBeatmap;
             controller.Play();
         }
 
@@ -101,6 +112,8 @@ namespace osu.Game.Screens.Mvis.Modules
         {
             //清理现有的谱面列表
             beatmapList.Clear();
+
+            if ( collection == null ) return;
 
             foreach( var item in collection.Beatmaps )
             {
@@ -116,7 +129,7 @@ namespace osu.Game.Screens.Mvis.Modules
         public void RefreshBeatmapList(BeatmapCollection collection = null)
         {
             if ( collection == null )
-                collection = collectionManager.Collections.First();
+                collection = collectionManager.Collections.FirstOrDefault();
 
             currentCollection = collection;
 

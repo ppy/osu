@@ -4,6 +4,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Collections;
 using osu.Game.Graphics;
@@ -30,6 +31,8 @@ namespace osu.Game.Screens.Mvis.Modules
         private OsuSpriteText titleText;
         private Container contentContainer;
         private CollectionPill selectedPill;
+        private OsuScrollContainer collectionScroll;
+        private Container placeholder;
 
         public CollectionSelectPanel()
         {
@@ -87,17 +90,48 @@ namespace osu.Game.Screens.Mvis.Modules
                             },
                             new Drawable[]
                             {
-                                new OsuScrollContainer
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Child = collectionsFillFlow = new FillFlowContainer
+                                    Children = new Drawable[]
                                     {
-                                        AutoSizeAxes = Axes.Y,
-                                        RelativeSizeAxes = Axes.X,
-                                        Spacing = new Vector2(10),
-                                        Padding = new MarginPadding(10)
+                                        placeholder = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = new FillFlowContainer
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Spacing = new Vector2(30),
+                                                Colour = Colour4.White.Opacity(0.5f),
+                                                Direction = FillDirection.Vertical,
+                                                Children = new Drawable[]
+                                                {
+                                                    new OsuSpriteText
+                                                    {
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        Text = "空空如也呢(´・ω・`)",
+                                                        Font = OsuFont.GetFont(size: 30)
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        collectionScroll = new OsuScrollContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = collectionsFillFlow = new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Y,
+                                                RelativeSizeAxes = Axes.X,
+                                                Spacing = new Vector2(10),
+                                                Padding = new MarginPadding(10)
+                                            }
+                                        }
                                     }
-                                }
+                                },
                             },
                             new[]
                             {
@@ -149,9 +183,9 @@ namespace osu.Game.Screens.Mvis.Modules
         {
             titleText.Text = string.IsNullOrEmpty(v.NewValue?.Name.Value) ? "选择收藏夹" : v.NewValue.Name.Value;
 
-            foreach(var d in collectionsFillFlow)
+            foreach (var d in collectionsFillFlow)
             {
-                if ( d is CollectionPill pill )
+                if (d is CollectionPill pill)
                 {
                     pill.InActive();
                     pill.IsCurrent = false;
@@ -163,11 +197,11 @@ namespace osu.Game.Screens.Mvis.Modules
 
         private void UpdateSelection(ValueChangedEvent<BeatmapCollection> v)
         {
-            foreach(var d in collectionsFillFlow)
+            foreach (var d in collectionsFillFlow)
             {
-                if ( d is CollectionPill pill )
+                if (d is CollectionPill pill)
                 {
-                    if (v.NewValue == pill.collection )
+                    if (v.NewValue == pill.collection)
                     {
                         //如果pill是被选中的，则调用Selected并将selectedPill设置为这个
                         pill.OnSelect();
@@ -175,7 +209,7 @@ namespace osu.Game.Screens.Mvis.Modules
                     }
                     else
                     {
-                        if ( !pill.IsCurrent )
+                        if (!pill.IsCurrent)
                             pill.InActive();
                     }
                 }
@@ -186,12 +220,23 @@ namespace osu.Game.Screens.Mvis.Modules
         {
             collectionsFillFlow.Clear();
 
-            foreach (var collection in collectionManager.Collections)
+            if (collectionManager.Collections.Count == 0)
             {
-                collectionsFillFlow.Add(new CollectionPill(collection)
+                placeholder.FadeIn(300);
+                collectionScroll.FadeOut(300);
+            }
+            else
+            {
+                foreach (var collection in collectionManager.Collections)
                 {
-                    SelectedCollection = {BindTarget = this.SelectedCollection}
-                });
+                    collectionsFillFlow.Add(new CollectionPill(collection)
+                    {
+                        SelectedCollection = { BindTarget = this.SelectedCollection }
+                    });
+                }
+
+                placeholder.FadeOut(300);
+                collectionScroll.FadeIn(300);
             }
         }
 
@@ -254,7 +299,7 @@ namespace osu.Game.Screens.Mvis.Modules
 
             protected override bool OnHover(HoverEvent e)
             {
-                if ( !selected )
+                if (!selected)
                     this.BorderThickness = 1.5f;
 
                 return base.OnHover(e);
@@ -262,7 +307,7 @@ namespace osu.Game.Screens.Mvis.Modules
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if ( !selected )
+                if (!selected)
                     this.BorderThickness = 0;
 
                 base.OnHoverLost(e);
