@@ -25,17 +25,12 @@ namespace osu.Game.Skinning
 
             this.skin = skin;
 
-            // base class uses int for display, but externally we bind to ScoreProcesssor as a double for now.
+            // base class uses int for display, but externally we bind to ScoreProcessor as a double for now.
             Current.BindValueChanged(v => base.Current.Value = (int)v.NewValue);
 
             Margin = new MarginPadding(10);
         }
 
-        protected sealed override OsuSpriteText CreateSpriteText() =>
-            new LegacySpriteText(skin, "score" /*, true*/)
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            };
+        protected sealed override OsuSpriteText CreateSpriteText() => (OsuSpriteText)skin.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText));
     }
 }
