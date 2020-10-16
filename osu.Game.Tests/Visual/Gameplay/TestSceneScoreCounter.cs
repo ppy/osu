@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             int numerator = 0, denominator = 0;
 
-            ScoreCounter score = new ScoreCounter(7)
+            ScoreCounter score = new DefaultScoreCounter
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
             Add(score);
 
-            ComboCounter comboCounter = new StandardComboCounter
+            LegacyComboCounter comboCounter = new LegacyComboCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep(@"Hit! :D", delegate
             {
                 score.Current.Value += 300 + (ulong)(300.0 * (comboCounter.Current.Value > 0 ? comboCounter.Current.Value - 1 : 0) / 25.0);
-                comboCounter.Increment();
+                comboCounter.Current.Value++;
                 numerator++;
                 denominator++;
                 accuracyCounter.SetFraction(numerator, denominator);
