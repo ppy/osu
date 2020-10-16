@@ -1,3 +1,4 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -146,19 +147,45 @@ namespace osu.Game.Screens.Mvis.Modules
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = colourProvider.Background4,
                                         },
-                                        new TriangleButton()
+                                        new GridContainer
                                         {
+                                            Anchor = Anchor.BottomCentre,
+                                            Origin = Anchor.BottomCentre,
+                                            AutoSizeAxes = Axes.Y,
                                             RelativeSizeAxes = Axes.X,
-                                            Width = 0.5f,
-                                            Margin = new MarginPadding(15),
-                                            Text = "选中该收藏夹",
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Action = () =>
+                                            Margin = new MarginPadding{Vertical = 15},
+                                            RowDimensions = new Dimension[]
                                             {
-                                                CurrentCollection.Value = SelectedCollection.Value;
+                                                new Dimension(GridSizeMode.AutoSize)
+                                            },
+                                            Content = new []
+                                            {
+                                                new Drawable[]
+                                                {
+                                                    new TriangleButton
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        Width = 0.9f,
+                                                        Text = "刷新收藏夹",
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        Action = RefreshCollections
+                                                    },
+                                                    new TriangleButton()
+                                                    {
+                                                        Text = "选中该收藏夹",
+                                                        RelativeSizeAxes = Axes.X,
+                                                        Width = 0.9f,
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        Action = () =>
+                                                        {
+                                                            CurrentCollection.Value = SelectedCollection.Value;
+                                                        }
+                                                    }
+                                                },
                                             }
-                                        }
+                                        },
                                     }
                                 }
                             }
@@ -171,14 +198,12 @@ namespace osu.Game.Screens.Mvis.Modules
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            AddCollections();
 
             CurrentCollection.BindValueChanged(OnCurrentCollectionChanged);
             SelectedCollection.BindValueChanged(UpdateSelection);
 
-            collectionManager.Collections.CollectionChanged += (_, __) => AddCollections();
+            RefreshCollections();
         }
-
         private void OnCurrentCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
             titleText.Text = string.IsNullOrEmpty(v.NewValue?.Name.Value) ? "选择收藏夹" : v.NewValue.Name.Value;
@@ -216,7 +241,7 @@ namespace osu.Game.Screens.Mvis.Modules
             }
         }
 
-        private void AddCollections()
+        private void RefreshCollections()
         {
             collectionsFillFlow.Clear();
 
@@ -229,12 +254,11 @@ namespace osu.Game.Screens.Mvis.Modules
             {
                 foreach (var collection in collectionManager.Collections)
                 {
-                    collectionsFillFlow.Add(new CollectionPill(collection)
+                    collectionsFillFlow.Add(new CollectionPill(collection, () => CurrentCollection.Value = SelectedCollection.Value)
                     {
                         SelectedCollection = { BindTarget = this.SelectedCollection }
                     });
                 }
-
                 placeholder.FadeOut(300);
                 collectionScroll.FadeIn(300);
             }
@@ -253,13 +277,14 @@ namespace osu.Game.Screens.Mvis.Modules
         protected class CollectionPill : CircularContainer
         {
             private Box flashBox;
+            private Action onDoubleClick;
             public readonly BeatmapCollection collection;
             public bool selected = false;
             public bool IsCurrent = false;
 
             public Bindable<BeatmapCollection> SelectedCollection = new Bindable<BeatmapCollection>();
 
-            public CollectionPill(BeatmapCollection collection)
+            public CollectionPill(BeatmapCollection collection, Action onDoubleClick)
             {
                 RelativeSizeAxes = Axes.X;
                 Height = 35;
@@ -267,6 +292,7 @@ namespace osu.Game.Screens.Mvis.Modules
                 BorderColour = Colour4.White;
 
                 this.collection = collection;
+                this.onDoubleClick = onDoubleClick;
 
                 Children = new Drawable[]
                 {
@@ -292,8 +318,12 @@ namespace osu.Game.Screens.Mvis.Modules
             }
 
             protected override bool OnClick(ClickEvent e)
-            {
+            {                
+                if ( selected )
+                    onDoubleClick?.Invoke();
+
                 SelectedCollection.Value = collection;
+
                 return base.OnClick(e);
             }
 
