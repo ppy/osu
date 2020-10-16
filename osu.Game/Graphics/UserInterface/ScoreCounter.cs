@@ -1,18 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ScoreCounter : RollingCounter<double>
+    public abstract class ScoreCounter : RollingCounter<double>, IScoreCounter
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
 
-        public bool UseCommaSeparator;
+        /// <summary>
+        /// Whether comma separators should be displayed.
+        /// </summary>
+        public bool UseCommaSeparator { get; }
 
         /// <summary>
         /// How many leading zeroes the counter has.
@@ -23,13 +26,12 @@ namespace osu.Game.Graphics.UserInterface
         /// Displays score.
         /// </summary>
         /// <param name="leading">How many leading zeroes the counter will have.</param>
-        public ScoreCounter(uint leading = 0)
+        /// <param name="useCommaSeparator">Whether comma separators should be displayed.</param>
+        protected ScoreCounter(uint leading = 0, bool useCommaSeparator = false)
         {
+            UseCommaSeparator = useCommaSeparator;
             LeadingZeroes = leading;
         }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => Colour = colours.BlueLighter;
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {

@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
                     // For simplicity, let's use legacy combo font texture existence as a way to identify legacy skins from default.
                     if (this.HasFont(comboFont))
-                        return new LegacyComboCounter(Source);
+                        return new LegacyCatchComboCounter(Source);
 
                     break;
             }
