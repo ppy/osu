@@ -17,14 +17,14 @@ namespace osu.Android
         private void load(OsuGame game)
         {
             localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
-            localUserPlaying.BindValueChanged(_ => updateLock());
+            localUserPlaying.BindValueChanged(userPlaying => updateLock(userPlaying));
         }
 
-        private void updateLock()
+        private void updateLock(ValueChangedEvent<bool> userPlaying)
         {
             OsuGameActivity.Activity.RunOnUiThread(() =>
             {
-                OsuGameActivity.Activity.RequestedOrientation = localUserPlaying.Value ? ScreenOrientation.Locked : ScreenOrientation.FullUser;
+                OsuGameActivity.Activity.RequestedOrientation = userPlaying.NewValue ? ScreenOrientation.Locked : ScreenOrientation.FullUser;
             });
         }
     }
