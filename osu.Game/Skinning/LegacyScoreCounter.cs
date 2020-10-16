@@ -33,6 +33,6 @@ namespace osu.Game.Skinning
             Margin = new MarginPadding(10);
         }
 
-        protected sealed override OsuSpriteText CreateSpriteText() => (OsuSpriteText)skin.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText));
+        protected sealed override OsuSpriteText CreateSpriteText() => ((OsuSpriteText)skin.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText))).With(s => s.Anchor = s.Origin = Anchor.TopRight);
     }
 }
