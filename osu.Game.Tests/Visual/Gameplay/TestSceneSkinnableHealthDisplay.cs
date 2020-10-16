@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Screens.Play;
-using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
