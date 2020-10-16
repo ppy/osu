@@ -351,6 +351,9 @@ namespace osu.Game.Skinning
                         case HUDSkinComponents.AccuracyCounter:
                             return new LegacyAccuracyCounter(this);
 
+                        case HUDSkinComponents.HealthDisplay:
+                            return new LegacyHealthDisplay(this);
+
                         case HUDSkinComponents.ComboText:
                             return new LegacySpriteText(this, comboPrefix)
                             {
