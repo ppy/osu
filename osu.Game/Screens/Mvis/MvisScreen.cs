@@ -622,6 +622,7 @@ namespace osu.Game.Screens
             base.OnResuming(last);
 
             musicController.TrackAdjustTakenOver = true;
+            collectionHelper.RefreshBeatmapList(CurrentCollection.Value);
 
             this.FadeIn(DURATION);
             Track.ResetSpeedAdjustments();
