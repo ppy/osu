@@ -5,6 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -28,6 +29,7 @@ namespace osu.Game.Skinning
             // base class uses int for display, but externally we bind to ScoreProcesssor as a double for now.
             Current.BindValueChanged(v => base.Current.Value = (int)v.NewValue);
 
+            Scale = new Vector2(0.96f);
             Margin = new MarginPadding(10);
         }
 
