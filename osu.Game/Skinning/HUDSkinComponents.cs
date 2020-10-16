@@ -9,6 +9,5 @@ namespace osu.Game.Skinning
         ScoreCounter,
         ScoreText,
         AccuracyCounter,
-        AccuracyText
     }
 }
