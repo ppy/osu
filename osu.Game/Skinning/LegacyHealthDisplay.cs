@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play.HUD;
@@ -22,6 +23,8 @@ namespace osu.Game.Skinning
 
         private float maxFillWidth;
 
+        private Texture isNewStyle;
+
         public Bindable<double> Current { get; } = new BindableDouble { MinValue = 0, MaxValue = 1 };
 
         public LegacyHealthDisplay(Skin skin)
@@ -34,15 +37,17 @@ namespace osu.Game.Skinning
         {
             AutoSizeAxes = Axes.Both;
 
+            isNewStyle = getTexture(skin, "marker");
+
             InternalChildren = new Drawable[]
             {
                 new Sprite
                 {
-                    Texture = skin.GetTexture("scorebar-bg")
+                    Texture = getTexture(skin, "bg")
                 },
                 fill = new Sprite
                 {
-                    Texture = skin.GetTexture("scorebar-colour"),
+                    Texture = getTexture(skin, "colour"),
                     Position = new Vector2(7.5f, 7.8f) * 1.6f
                 },
                 marker = new Marker(skin)
@@ -78,7 +83,7 @@ namespace osu.Game.Skinning
             {
                 Origin = Anchor.Centre;
 
-                if (skin.GetTexture("scorebar-ki") != null)
+                if (getTexture(skin, "ki") != null)
                 {
                     // TODO: old style (marker changes as health decreases)
                 }
@@ -88,12 +93,14 @@ namespace osu.Game.Skinning
                     {
                         new Sprite
                         {
-                            Texture = skin.GetTexture("scorebar-marker"),
+                            Texture = getTexture(skin, "marker"),
                             Origin = Anchor.Centre,
                         }
                     };
                 }
             }
         }
+
+        private static Texture getTexture(Skin skin, string name) => skin.GetTexture($"scorebar-{name}");
     }
 }
