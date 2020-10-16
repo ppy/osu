@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -347,6 +348,15 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.AccuracyCounter:
                             return new LegacyAccuracyCounter(this);
+
+                        case HUDSkinComponents.ScoreText:
+                        case HUDSkinComponents.AccuracyText:
+                            string scorePrefix = GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
+                            int scoreOverlap = GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2;
+                            return new LegacySpriteText(this, scorePrefix)
+                            {
+                                Spacing = new Vector2(-scoreOverlap, 0)
+                            };
                     }
 
                     return null;

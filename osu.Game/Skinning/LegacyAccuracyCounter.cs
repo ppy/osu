@@ -15,9 +15,6 @@ namespace osu.Game.Skinning
     {
         private readonly ISkin skin;
 
-        private readonly string scorePrefix;
-        private readonly int scoreOverlap;
-
         public LegacyAccuracyCounter(ISkin skin)
         {
             Anchor = Anchor.TopRight;
@@ -27,20 +24,12 @@ namespace osu.Game.Skinning
             Margin = new MarginPadding(10);
 
             this.skin = skin;
-            scorePrefix = skin.GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
-            scoreOverlap = skin.GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2;
         }
 
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
 
-        protected sealed override OsuSpriteText CreateSpriteText() =>
-            new LegacySpriteText(skin, scorePrefix)
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Spacing = new Vector2(-scoreOverlap, 0)
-            };
+        protected sealed override OsuSpriteText CreateSpriteText() => skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyText)) as OsuSpriteText ?? new OsuSpriteText();
 
         protected override void Update()
         {
