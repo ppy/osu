@@ -19,6 +19,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -36,6 +37,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
+    [ExcludeFromDynamicCompile]
     public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IDisposable
     {
         /// <summary>
