@@ -18,6 +18,8 @@ namespace osu.Game.Skinning
 {
     public class LegacyHealthDisplay : CompositeDrawable, IHealthDisplay
     {
+        private const double epic_cutoff = 0.5;
+
         private readonly Skin skin;
         private LegacyHealthPiece fill;
         private LegacyHealthPiece marker;
@@ -90,7 +92,7 @@ namespace osu.Game.Skinning
             if (hp < 0.2)
                 return Interpolation.ValueAt(0.2 - hp, Color4.Black, Color4.Red, 0, 0.2);
 
-            if (hp < 0.5)
+            if (hp < epic_cutoff)
                 return Interpolation.ValueAt(0.5 - hp, Color4.White, Color4.Black, 0, 0.5);
 
             return Color4.White;
@@ -123,7 +125,7 @@ namespace osu.Game.Skinning
                 {
                     if (hp.NewValue < 0.2f)
                         Main.Texture = superDangerTexture;
-                    else if (hp.NewValue < 0.5f)
+                    else if (hp.NewValue < epic_cutoff)
                         Main.Texture = dangerTexture;
                     else
                         Main.Texture = normalTexture;
@@ -151,7 +153,7 @@ namespace osu.Game.Skinning
                 base.Update();
 
                 Main.Colour = getFillColour(Current.Value);
-                Main.Blending = Current.Value < 0.5f ? BlendingParameters.Inherit : BlendingParameters.Additive;
+                Main.Blending = Current.Value < epic_cutoff ? BlendingParameters.Inherit : BlendingParameters.Additive;
             }
         }
 
@@ -241,8 +243,11 @@ namespace osu.Game.Skinning
             {
                 bulgeMain();
 
+                bool isEpic = Current.Value >= epic_cutoff;
+
+                explode.Blending = isEpic ? BlendingParameters.Additive : BlendingParameters.Inherit;
+                explode.ScaleTo(1).Then().ScaleTo(isEpic ? 2 : 1.6f, 120);
                 explode.FadeOutFromOne(120);
-                explode.ScaleTo(1).Then().ScaleTo(Current.Value > 0.5f ? 2 : 1.6f, 120);
             }
 
             private void bulgeMain() =>
