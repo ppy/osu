@@ -17,6 +17,6 @@ namespace osu.Game.Skinning
         protected virtual string ComponentName => Component.ToString();
 
         public string LookupName =>
-            string.Join("/", new[] { "HUD", ComponentName }.Where(s => !string.IsNullOrEmpty(s)));
+            string.Join('/', new[] { "HUD", ComponentName }.Where(s => !string.IsNullOrEmpty(s)));
     }
 }

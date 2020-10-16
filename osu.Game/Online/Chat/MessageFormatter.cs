@@ -111,7 +111,7 @@ namespace osu.Game.Online.Chat
 
         public static LinkDetails GetLinkDetails(string url)
         {
-            var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var args = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
 
             switch (args[0])
