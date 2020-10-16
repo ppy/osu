@@ -5,16 +5,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Skinning
 {
     public class LegacyScoreCounter : ScoreCounter
     {
         private readonly ISkin skin;
-
-        private readonly string scorePrefix;
-        private readonly int scoreOverlap;
 
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
@@ -28,8 +24,6 @@ namespace osu.Game.Skinning
             Origin = Anchor.TopRight;
 
             this.skin = skin;
-            scorePrefix = skin.GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
-            scoreOverlap = skin.GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2;
 
             // base class uses int for display, but externally we bind to ScoreProcessor as a double for now.
             Current.BindValueChanged(v => base.Current.Value = (int)v.NewValue);
@@ -37,12 +31,6 @@ namespace osu.Game.Skinning
             Margin = new MarginPadding(10);
         }
 
-        protected sealed override OsuSpriteText CreateSpriteText() =>
-            new LegacySpriteText(skin, scorePrefix)
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Spacing = new Vector2(-scoreOverlap, 0)
-            };
+        protected sealed override OsuSpriteText CreateSpriteText() => skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) as OsuSpriteText ?? new OsuSpriteText();
     }
 }
