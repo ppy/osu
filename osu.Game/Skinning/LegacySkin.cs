@@ -327,6 +327,8 @@ namespace osu.Game.Skinning
 
         private string scorePrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
 
+        private string comboPrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ComboPrefix)?.Value ?? "score";
+
         private bool hasScoreFont => this.HasFont(scorePrefix);
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -348,6 +350,12 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.AccuracyCounter:
                             return new LegacyAccuracyCounter(this);
+
+                        case HUDSkinComponents.ComboText:
+                            return new LegacySpriteText(this, comboPrefix)
+                            {
+                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ComboOverlap)?.Value ?? -2), 0)
+                            };
 
                         case HUDSkinComponents.ScoreText:
                             return new LegacySpriteText(this, scorePrefix)
