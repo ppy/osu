@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -324,9 +325,11 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private const string score_font = "score";
+        private string scorePrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
 
-        private bool hasScoreFont => this.HasFont(score_font);
+        private string comboPrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ComboPrefix)?.Value ?? "score";
+
+        private bool hasScoreFont => this.HasFont(scorePrefix);
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
@@ -347,6 +350,18 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.AccuracyCounter:
                             return new LegacyAccuracyCounter(this);
+
+                        case HUDSkinComponents.ComboText:
+                            return new LegacySpriteText(this, comboPrefix)
+                            {
+                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ComboOverlap)?.Value ?? -2), 0)
+                            };
+
+                        case HUDSkinComponents.ScoreText:
+                            return new LegacySpriteText(this, scorePrefix)
+                            {
+                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2), 0)
+                            };
                     }
 
                     return null;
