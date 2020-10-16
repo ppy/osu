@@ -325,9 +325,9 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private const string score_font = "score";
+        private string scorePrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
 
-        private bool hasScoreFont => this.HasFont(score_font);
+        private bool hasScoreFont => this.HasFont(scorePrefix);
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
@@ -351,7 +351,6 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.ScoreText:
                         case HUDSkinComponents.AccuracyText:
-                            string scorePrefix = GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
                             int scoreOverlap = GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2;
                             return new LegacySpriteText(this, scorePrefix)
                             {
