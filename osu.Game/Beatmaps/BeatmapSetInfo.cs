@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; }
 
-        public string StoryboardFile => Files?.Find(f => f.Filename.EndsWith(".osb"))?.Filename;
+        public string StoryboardFile => Files?.Find(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
 
         public List<BeatmapSetFileInfo> Files { get; set; }
 
