@@ -7,6 +7,9 @@ namespace osu.Game.Skinning
     {
         ComboCounter,
         ScoreCounter,
-        AccuracyCounter
+        AccuracyCounter,
+        HealthDisplay,
+        ScoreText,
+        ComboText,
     }
 }

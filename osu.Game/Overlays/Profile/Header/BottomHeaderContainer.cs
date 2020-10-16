@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Profile.Header
             if (string.IsNullOrEmpty(content)) return false;
 
             // newlines could be contained in API returned user content.
-            content = content.Replace("\n", " ");
+            content = content.Replace('\n', ' ');
 
             bottomLinkContainer.AddIcon(icon, text =>
             {

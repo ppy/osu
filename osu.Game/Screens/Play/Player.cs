@@ -221,8 +221,12 @@ namespace osu.Game.Screens.Play
                 createGameplayComponents(Beatmap.Value, playableBeatmap)
             });
 
+            // also give the HUD a ruleset container to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
+            // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
+            var hudRulesetContainer = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
+
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
-            GameplayClockContainer.Add(createOverlayComponents(Beatmap.Value));
+            GameplayClockContainer.Add(hudRulesetContainer.WithChild(createOverlayComponents(Beatmap.Value)));
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {

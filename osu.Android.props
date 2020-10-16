@@ -51,7 +51,7 @@
     <Reference Include="Java.Interop" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2020.904.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2020.1016.0" />
     <PackageReference Include="ppy.osu.Framework.Android" Version="2020.1009.0" />
   </ItemGroup>
 </Project>

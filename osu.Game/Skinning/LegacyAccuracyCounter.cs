@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
 
-            Scale = new Vector2(0.75f);
+            Scale = new Vector2(0.6f);
             Margin = new MarginPadding(10);
 
             this.skin = skin;
@@ -29,12 +29,7 @@ namespace osu.Game.Skinning
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
 
-        protected sealed override OsuSpriteText CreateSpriteText() =>
-            new LegacySpriteText(skin, "score" /*, true*/)
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            };
+        protected sealed override OsuSpriteText CreateSpriteText() => (OsuSpriteText)skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText));
 
         protected override void Update()
         {
