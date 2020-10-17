@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestVeryLargeScore()
         {
-            AddStep("set large score", () => scoreCounters.ForEach(counter => counter.Current.Value = 1_00_000_000));
+            AddStep("set large score", () => scoreCounters.ForEach(counter => counter.Current.Value = 1_000_000_000));
         }
     }
 }
