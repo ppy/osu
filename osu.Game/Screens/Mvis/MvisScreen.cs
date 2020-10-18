@@ -324,7 +324,7 @@ namespace osu.Game.Screens
                                     }
                                 }
                             }
-                        },
+                        }
                     }
                 },
                 new Container
@@ -415,7 +415,7 @@ namespace osu.Game.Screens
                         collectionPanel = new CollectionSelectPanel()
                         {
                             CurrentCollection = { BindTarget = CurrentCollection },
-                        }
+                        },
                     }
                 },
             };

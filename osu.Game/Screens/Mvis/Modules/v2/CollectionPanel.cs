@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                 }
                             }
                         },
-                        thumbnailScroll = new OsuScrollContainer(Direction.Horizontal)
+                        thumbnailScroll = new ThumbnailScrollContainer(Direction.Horizontal)
                         {
                             Name = "谱面图标容器",
                             RelativeSizeAxes = Axes.X,
@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             Child = new BeatmapThumbnailFlow(beatmapSets)
                         }
                     }
-                },
+                }
             };
 
             thumbnailScroll.ScrollContent.RelativeSizeAxes = Axes.None;
@@ -295,16 +295,32 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 foreach (var c in beatmapSetList)
                 {
                     var b = beatmaps.GetWorkingBeatmap(c.Beatmaps.First());
+                    string tooltip = $"{b.Metadata.ArtistUnicode ?? b.Metadata.Artist}"
+                                   + " - "
+                                   + $"{b.Metadata.TitleUnicode ?? b.Metadata.Title}";
 
                     Add(new TooltipContainer
                     {
                         Size = new Vector2(40),
                         Masking = true,
                         CornerRadius = 7.25f,
-                        TooltipText = b.BeatmapInfo.Metadata.TitleUnicode ?? b.BeatmapInfo.Metadata.Title ?? "亲, 您这歌没有标题",
+                        TooltipText = tooltip,
                         Child = new BeatmapCover(b)
                     });
                 };
+            }
+        }
+    
+        private class ThumbnailScrollContainer : OsuScrollContainer
+        {
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                return false;
+            }
+
+            public ThumbnailScrollContainer(Direction scrollDirection)
+                :base(scrollDirection)
+            {
             }
         }
     }

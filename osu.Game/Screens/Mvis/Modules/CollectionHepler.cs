@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
@@ -67,24 +65,24 @@ namespace osu.Game.Screens.Mvis.Modules
             WorkingBeatmap NewBeatmap = null;
 
             //更新当前位置和最大位置
-            if ( updateCurrentPosition )
+            if (updateCurrentPosition)
             {
                 currentPosition = list.IndexOf(prevSet);
             }
             maxCount = list.Count;
 
             //当前位置往指定位置移动
-            currentPosition+=displace;
+            currentPosition += displace;
             //如果当前位置超过了最大位置或者不在范围内，那么回到第一个
             if (currentPosition >= maxCount || currentPosition < 0)
             {
-                if ( displace > 0 ) currentPosition = 0;
+                if (displace > 0) currentPosition = 0;
                 else currentPosition = maxCount - 1;
             }
 
             //从list获取当前位置所在的BeatmapSetInfo, 然后选择该BeatmapSetInfo下的第一个WorkingBeatmap
             //最终赋值给NewBeatmap
-            if ( list.Count > 0 )
+            if (list.Count > 0)
                 NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First());
             else
                 NewBeatmap = b.Value;
@@ -95,9 +93,9 @@ namespace osu.Game.Screens.Mvis.Modules
         {
             WorkingBeatmap NewBeatmap;
 
-            if ( list.Count == 0 ) return;
+            if (list.Count == 0) return;
 
-            NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First());
+            NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(0).Beatmaps.First());
 
             b.Value = NewBeatmap;
             controller.Play();
@@ -113,22 +111,22 @@ namespace osu.Game.Screens.Mvis.Modules
             //清理现有的谱面列表
             beatmapList.Clear();
 
-            if ( collection == null ) return;
+            if (collection == null) return;
 
-            foreach( var item in collection.Beatmaps )
+            foreach (var item in collection.Beatmaps)
             {
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
-            
+
                 //进行比对，如果beatmapList中不存在，则添加。
-                if ( ! beatmapList.Contains(currentSet) )
+                if (!beatmapList.Contains(currentSet))
                     beatmapList.Add(currentSet);
             }
         }
 
         public void RefreshBeatmapList(BeatmapCollection collection = null)
         {
-            if ( collection == null )
+            if (collection == null)
                 collection = collectionManager.Collections.FirstOrDefault();
 
             currentCollection = collection;

@@ -4,7 +4,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
@@ -22,16 +21,22 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved]
+        private Bindable<WorkingBeatmap> working { get; set; }
+
         private Box flashBox;
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;
         private Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
         private List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
         private BeatmapCover cover;
+        private BeatmapPiece currentPiece;
 
         [Cached]
         public readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
         private FillFlowContainer beatmapFillFlow;
+        private OsuScrollContainer beatmapScroll;
+        private BindableBool isCurrentCollection = new BindableBool();
 
         public CollectionInfo()
         {
@@ -120,12 +125,14 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding{Horizontal = 35, Vertical = 20},
-                                Child = new OsuScrollContainer
+                                Padding = new MarginPadding{Left = 35, Right = 20, Vertical = 20},
+                                Child = beatmapScroll = new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    RightMouseScrollbar = true,
                                     Child = beatmapFillFlow = new FillFlowContainer
                                     {
+                                        Padding = new MarginPadding{Right = 15},
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Spacing = new Vector2(5)
@@ -138,6 +145,16 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             };
 
             collection.BindValueChanged(OnCollectionChanged);
+            working.BindValueChanged(OnBeatmapChanged);
+            isCurrentCollection.BindValueChanged(v =>
+            {
+                if (v.NewValue)
+                {
+                    foreach (var d in beatmapFillFlow)
+                        if (d is BeatmapPiece p)
+                            p.isCurrent = v.NewValue;
+                }
+            });
         }
 
         private void AddBeatmapToFillFlow()
@@ -146,7 +163,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             foreach (var b in beatmapSets)
             {
-                beatmapFillFlow.Add(new BeatmapPiece( beatmaps.GetWorkingBeatmap(b.Beatmaps.First()) ));
+                beatmapFillFlow.Add(new BeatmapPiece(beatmaps.GetWorkingBeatmap(b.Beatmaps.First()), isCurrentCollection.Value));
             }
         }
 
@@ -154,12 +171,13 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             var c = v.NewValue;
 
-            if ( c == null )
+            if (c == null)
             {
                 ClearInfo();
                 return;
             }
 
+            beatmapScroll.ScrollToStart();
             beatmapSets.Clear();
             //From CollectionHelper.cs
             foreach (var item in c.Beatmaps)
@@ -179,13 +197,61 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             flashBox.FlashColour(Colour4.White, 1000, Easing.OutQuint);
 
             AddBeatmapToFillFlow();
+            this.Delay(5).Schedule(() => working.TriggerChange());
+        }
+
+        private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
+        {
+            currentPiece?.InActive();
+
+            foreach (var d in beatmapFillFlow)
+            {
+                if (d is BeatmapPiece piece)
+                    if (piece.beatmap.BeatmapSetInfo.Hash == v.NewValue.BeatmapSetInfo.Hash)
+                    {
+                        currentPiece = piece;
+                        piece.MakeActive();
+                        ScrollToCurrentBeatmap();
+                        break;
+                    }
+            }
+        }
+
+        private void ScrollToCurrentBeatmap()
+        {
+            if ( !isCurrentCollection.Value ) return;
+
+            float distance = 0;
+            var index = beatmapFillFlow.IndexOf(currentPiece);
+
+            //如果是第一个，那么滚动到头
+            if (index == 0)
+            {
+                beatmapScroll.ScrollToStart();
+                return;
+            }
+            else
+            {
+                distance = (index - 1) * 85;
+
+                //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
+                //n个piece, n-1个间隔
+                if (distance + beatmapScroll.DrawHeight > (beatmapFillFlow.Count * 85 - 5) )
+                {
+                    beatmapScroll.ScrollToEnd();
+                    return;
+                }
+            }
+
+            beatmapScroll.ScrollTo(distance);
         }
 
         public void UpdateCollection(BeatmapCollection collection, bool isCurrent)
         {
-            if ( ! isCurrent )  flashBox.FadeColour( Colour4.Gold, 300, Easing.OutQuint );
-            else    flashBox.FadeColour( Color4Extensions.FromHex("#88b300"), 300, Easing.OutQuint );
+            if (!isCurrent) flashBox.FadeColour(Colour4.Gold, 300, Easing.OutQuint);
+            else flashBox.FadeColour(Color4Extensions.FromHex("#88b300"), 300, Easing.OutQuint);
 
+            isCurrentCollection.Value = isCurrent;
             this.collection.Value = collection;
         }
 
@@ -199,72 +265,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             collectionBeatmapCount.Text = "请先选择一个收藏夹!";
 
             flashBox.FadeColour(Colour4.Gold);
-        }
-
-        private class BeatmapPiece : Container
-        {
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
-
-            private WorkingBeatmap beatmap;
-
-            public BeatmapPiece(WorkingBeatmap b)
-            {
-                Masking = true;
-                CornerRadius = 12.5f;
-                BorderThickness = 3f;
-                RelativeSizeAxes = Axes.X;
-                Height = 80;
-                
-                beatmap = b;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                BorderColour = colourProvider.Highlight1;
-
-                InternalChildren = new Drawable[]
-                {
-                    new BeatmapCover(beatmap),
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background3.Opacity(0.5f)
-                    },
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.5f,
-                        Colour = ColourInfo.GradientHorizontal(
-                            colourProvider.Background3,
-                            colourProvider.Background3.Opacity(0)
-                        )
-                    },
-                    new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding{Left = 15},
-                        Children = new Drawable[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Text = beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title,
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold)
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = beatmap.Metadata.ArtistUnicode ?? beatmap.Metadata.Artist,
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold)
-                            }
-                        }
-                    }
-                };
-            }
         }
     }
 }

@@ -12,7 +12,6 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    //TODO: 当做Overlay从Mvis调用
     public class CollectionSelectPanel : VisibilityContainer
     {
         [Resolved]
@@ -111,6 +110,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         private void OnCurrentCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
+            if ( v.NewValue == null ) return;
+
             info.UpdateCollection(v.NewValue, true);
 
             foreach (var d in collectionsFillFlow)
@@ -126,7 +127,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         /// </summary>
         private void UpdateSelection(ValueChangedEvent<BeatmapCollection> v)
         {
-            if (CurrentCollection.Value != null && v.NewValue == CurrentCollection.Value)
+            if ( v.NewValue == null ) return;
+
+            if (v.NewValue == CurrentCollection.Value)
                 info.UpdateCollection(v.NewValue, true);
             else
                 info.UpdateCollection(v.NewValue, false);
@@ -134,22 +137,24 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         private void UpdateSelectedPanel(ValueChangedEvent<CollectionPanel> v)
         {
+            if ( v.NewValue == null ) return;
             selectedpanel?.Reset();
             selectedpanel = v.NewValue;
         }
-        
+
         private void SearchForCurrentSelection()
         {
             foreach (var d in collectionsFillFlow)
             {
-                if ( d is CollectionPanel panel )
-                    if ( panel.collection == CurrentCollection.Value )
+                if (d is CollectionPanel panel)
+                    if (panel.collection == CurrentCollection.Value)
                         selectedpanel = panel;
             }
         }
 
         private void RefreshCollections()
         {
+            var oldCollection = CurrentCollection.Value;
             collectionsFillFlow.Clear();
             info.UpdateCollection(null, false);
             selectedpanel = null;
@@ -171,7 +176,20 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 collectionScroll.FadeIn(300);
             }
 
+            //清空选择
+            SelectedCollection.Value = null;
+
+            //如果收藏夹被删除，则留null
+            if ( !collectionManager.Collections.Contains(oldCollection) )
+                oldCollection = null;
+
+            //重新赋值
+            CurrentCollection.Value = SelectedCollection.Value = oldCollection;
+
+            //根据选中的收藏夹寻找
             SearchForCurrentSelection();
+
+            //CurrentCollection需要手动触发因为它和MvisScreen中的CurrentCollection绑在一起
             CurrentCollection.TriggerChange();
         }
 
