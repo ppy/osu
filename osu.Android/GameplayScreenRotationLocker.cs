@@ -17,7 +17,7 @@ namespace osu.Android
         private void load(OsuGame game)
         {
             localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
-            localUserPlaying.BindValueChanged(userPlaying => updateLock(userPlaying));
+            localUserPlaying.ValueChanged += updateLock;
         }
 
         private void updateLock(ValueChangedEvent<bool> userPlaying)
