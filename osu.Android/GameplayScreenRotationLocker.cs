@@ -13,6 +13,9 @@ namespace osu.Android
     {
         private Bindable<bool> localUserPlaying;
 
+        [Resolved]
+        private OsuGameActivity gameActivity { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuGame game)
         {
@@ -22,9 +25,9 @@ namespace osu.Android
 
         private void updateLock(ValueChangedEvent<bool> userPlaying)
         {
-            OsuGameActivity.Activity.RunOnUiThread(() =>
+            gameActivity.RunOnUiThread(() =>
             {
-                OsuGameActivity.Activity.RequestedOrientation = userPlaying.NewValue ? ScreenOrientation.Locked : ScreenOrientation.FullUser;
+                gameActivity.RequestedOrientation = userPlaying.NewValue ? ScreenOrientation.Locked : ScreenOrientation.FullUser;
             });
         }
     }
