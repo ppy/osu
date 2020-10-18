@@ -4,6 +4,7 @@
 using System;
 using Android.App;
 using Android.OS;
+using osu.Framework.Allocation;
 using osu.Game;
 using osu.Game.Updater;
 
@@ -11,6 +12,15 @@ namespace osu.Android
 {
     public class OsuGameAndroid : OsuGame
     {
+        [Cached]
+        private readonly OsuGameActivity gameActivity;
+
+        public OsuGameAndroid(OsuGameActivity activity)
+            : base(null)
+        {
+            gameActivity = activity;
+        }
+
         public override Version AssemblyVersion
         {
             get
