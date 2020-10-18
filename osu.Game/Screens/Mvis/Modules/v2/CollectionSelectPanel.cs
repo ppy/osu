@@ -134,13 +134,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 if (d is CollectionPanel panel)
                 {
                     if (v.NewValue == panel.collection)
-                    {
                         selectedpanel = panel;
-                    }
                     else
-                    {
                         panel.Reset();
-                    }
                 }
             }
         }

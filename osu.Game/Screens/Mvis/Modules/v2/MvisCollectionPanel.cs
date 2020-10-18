@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             BorderColour = Colour4.White;
             RelativeSizeAxes = Axes.X;
-            Height = 150;
+            AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 12.5f;
 
@@ -78,60 +78,73 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#111").Opacity(0.6f),
                 },
-                new Container
+                new FillFlowContainer
                 {
-                    Name = "标题容器",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding(15),
+                    Spacing = new Vector2(15),
                     Children = new Drawable[]
                     {
-                        new CircularContainer
+                        new Container
                         {
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 5,
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Masking = true,
-                            Child = stateBox = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both
-                            }
-                        },
-                        new FillFlowContainer
-                        {
+                            Name = "标题容器",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(4),
-                            Padding = new MarginPadding{Left = 15},
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
-                                collectionName = new OsuSpriteText
+                                new CircularContainer
                                 {
-                                    Font = OsuFont.GetFont(size: 30),
-                                    Text = "???"
+                                    RelativeSizeAxes = Axes.Y,
+                                    Width = 5,
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Masking = true,
+                                    Child = stateBox = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both
+                                    }
                                 },
-                                collectionBeatmapCount = new OsuSpriteText
+                                new FillFlowContainer
                                 {
-                                    Text = "???"
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(4),
+                                    Padding = new MarginPadding{Left = 15},
+                                    Children = new Drawable[]
+                                    {
+                                        collectionName = new OsuSpriteText
+                                        {
+                                            Font = OsuFont.GetFont(size: 30),
+                                            RelativeSizeAxes = Axes.X,
+                                            Text = "???"
+                                        },
+                                        collectionBeatmapCount = new OsuSpriteText
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Text = "???"
+                                        }
+                                    }
                                 }
                             }
+                        },
+                        thumbnailScroll = new OsuScrollContainer(Direction.Horizontal)
+                        {
+                            Name = "谱面图标容器",
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Width = 0.98f,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            ScrollbarVisible = false,
+                            Child = new BeatmapThumbnailFlow(beatmapSets)
                         }
                     }
                 },
-                thumbnailScroll = new OsuScrollContainer(Direction.Horizontal)
-                {
-                    Name = "谱面图标容器",
-                    Padding = new MarginPadding(15),
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Width = 0.98f,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    ScrollbarVisible = false,
-                    Child = new BeatmapThumbnailFlow(beatmapSets)
-                }
             };
 
             thumbnailScroll.ScrollContent.RelativeSizeAxes = Axes.None;
@@ -167,8 +180,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     break;
 
                 case ActiveState.Disabled:
-                    Height = 1;
-                    AutoSizeAxes = Axes.Y;
                     BorderThickness = 0f;
                     Colour = Color4Extensions.FromHex("#555");
                     stateBox.FadeColour(Colour4.Gray, 300, Easing.OutQuint);
