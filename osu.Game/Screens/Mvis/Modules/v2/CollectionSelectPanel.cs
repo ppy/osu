@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public readonly Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
 
         private Bindable<BeatmapCollection> SelectedCollection = new Bindable<BeatmapCollection>();
+        private Bindable<CollectionPanel> SelectedPanel = new Bindable<CollectionPanel>();
 
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
         private FillFlowContainer collectionsFillFlow;
@@ -103,6 +104,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             CurrentCollection.BindValueChanged(OnCurrentCollectionChanged);
             SelectedCollection.BindValueChanged(UpdateSelection);
+            SelectedPanel.BindValueChanged(UpdateSelectedPanel);
 
             RefreshCollections();
         }
@@ -115,7 +117,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 if (d is CollectionPanel panel)
                     panel.Reset(true);
 
-            if ( selectedpanel != null )
+            if (selectedpanel != null)
                 selectedpanel.state.Value = ActiveState.Active;
         }
 
@@ -124,20 +126,25 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         /// </summary>
         private void UpdateSelection(ValueChangedEvent<BeatmapCollection> v)
         {
-            if ( CurrentCollection.Value != null && v.NewValue == CurrentCollection.Value )
+            if (CurrentCollection.Value != null && v.NewValue == CurrentCollection.Value)
                 info.UpdateCollection(v.NewValue, true);
             else
                 info.UpdateCollection(v.NewValue, false);
+        }
 
+        private void UpdateSelectedPanel(ValueChangedEvent<CollectionPanel> v)
+        {
+            selectedpanel?.Reset();
+            selectedpanel = v.NewValue;
+        }
+        
+        private void SearchForCurrentSelection()
+        {
             foreach (var d in collectionsFillFlow)
             {
-                if (d is CollectionPanel panel)
-                {
-                    if (v.NewValue == panel.collection)
+                if ( d is CollectionPanel panel )
+                    if ( panel.collection == CurrentCollection.Value )
                         selectedpanel = panel;
-                    else
-                        panel.Reset();
-                }
             }
         }
 
@@ -145,6 +152,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             collectionsFillFlow.Clear();
             info.UpdateCollection(null, false);
+            selectedpanel = null;
 
             if (collectionManager.Collections.Count == 0)
             {
@@ -156,18 +164,20 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 {
                     collectionsFillFlow.Add(new CollectionPanel(collection, MakeCurrentSelected)
                     {
-                        SelectedCollection = { BindTarget = this.SelectedCollection }
+                        SelectedCollection = { BindTarget = this.SelectedCollection },
+                        SelectedPanel = { BindTarget = this.SelectedPanel }
                     });
                 };
                 collectionScroll.FadeIn(300);
             }
 
+            SearchForCurrentSelection();
             CurrentCollection.TriggerChange();
         }
 
         private void MakeCurrentSelected()
         {
-            if ( CurrentCollection.Value == SelectedCollection.Value )
+            if (CurrentCollection.Value == SelectedCollection.Value)
                 CurrentCollection.TriggerChange();
             else
                 CurrentCollection.Value = SelectedCollection.Value;

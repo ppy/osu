@@ -29,6 +29,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         ///用于触发<see cref="CollectionSelectPanel"/>的SelectedCollection变更
         ///</summary>
         public Bindable<BeatmapCollection> SelectedCollection = new Bindable<BeatmapCollection>();
+        public Bindable<CollectionPanel> SelectedPanel = new Bindable<CollectionPanel>();
 
         private List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
 
@@ -171,7 +172,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         private void OnStateChanged(ValueChangedEvent<ActiveState> v)
         {
-            switch( v.NewValue )
+            switch (v.NewValue)
             {
                 case ActiveState.Active:
                     BorderThickness = 3f;
@@ -185,10 +186,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     stateBox.FadeColour(Colour4.Gray, 300, Easing.OutQuint);
                     thumbnailScroll.Hide();
                     break;
-                
+
                 case ActiveState.Selected:
                     BorderThickness = 3f;
-                    BorderColour = Colour4.White;
+                    BorderColour = Colour4.Gold;
+                    stateBox.FadeColour(Colour4.Gold, 300, Easing.OutQuint);
                     break;
 
                 default:
@@ -216,7 +218,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override bool OnHover(HoverEvent e)
         {
-            if ( state.Value == ActiveState.Idle )
+            if (state.Value == ActiveState.Idle)
                 BorderThickness = 1.5f;
 
             return base.OnHover(e);
@@ -224,7 +226,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if ( state.Value == ActiveState.Idle )
+            if (state.Value == ActiveState.Idle)
                 BorderThickness = 0f;
 
             base.OnHoverLost(e);
@@ -232,22 +234,23 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override bool OnClick(ClickEvent e)
         {
-            if ( state.Value == ActiveState.Disabled )
+            if (state.Value == ActiveState.Disabled)
                 return base.OnClick(e);
 
             //如果已经被选中了，则触发双击
-            if ( state.Value == ActiveState.Selected )
+            if (state.Value == ActiveState.Selected)
             {
                 doubleClick?.Invoke();
                 state.Value = ActiveState.Active;
 
                 return base.OnClick(e);
             }
-            
+
             //使SelectedCollection的值变为collection, 从而出触发CollectionSelectPanel的UpdateSelection
             SelectedCollection.Value = collection;
+            SelectedPanel.Value = this;
 
-            if ( state.Value != ActiveState.Active )
+            if (state.Value != ActiveState.Active)
                 state.Value = ActiveState.Selected;
 
             return base.OnClick(e);
@@ -258,8 +261,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         /// </summary>
         public void Reset(bool makeInactive = false)
         {
-            if ( state.Value != ActiveState.Disabled && state.Value != ActiveState.Active ||
-                 state.Value != ActiveState.Disabled && makeInactive )
+            if (state.Value != ActiveState.Disabled && state.Value != ActiveState.Active ||
+                 state.Value != ActiveState.Disabled && makeInactive)
             {
                 state.Value = ActiveState.Idle;
             }
