@@ -116,15 +116,12 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore, Storyboard storyboard)
         {
             var storyboardPath = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
-            var sprite = storyboardPath != null
-                ? (Drawable)new Sprite
-                {
-                    Texture = textureStore.Get(storyboardPath)
-                }
-                : new SkinnableSprite(Sprite.Path); // fall back to skin textures if not found in storyboard files.
+            var sprite = storyboard.UseSkinSprites && storyboardPath == null
+                ? (Drawable)new SkinnableSprite(Sprite.Path)
+                : new Sprite { Texture = textureStore.Get(storyboardPath) };
 
             InternalChild = sprite.With(s => s.Anchor = s.Origin = Anchor.Centre);
 
