@@ -3,7 +3,6 @@
 
 using System;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -30,8 +29,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private readonly Random rng = new Random(1337);
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestVariousHits()
         {
             AddStep("Hit", () => addHitJudgement(false));
             AddStep("Strong hit", () => addStrongHitJudgement(false));

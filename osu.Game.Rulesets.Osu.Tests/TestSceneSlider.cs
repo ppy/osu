@@ -27,7 +27,8 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private int depthIndex;
 
-        public TestSceneSlider()
+        [Test]
+        public void TestVariousSliders()
         {
             AddStep("Big Single", () => SetContents(() => testSimpleBig()));
             AddStep("Medium Single", () => SetContents(() => testSimpleMedium()));

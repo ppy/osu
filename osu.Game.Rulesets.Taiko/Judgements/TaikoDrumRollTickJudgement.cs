@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
         {
             switch (result)
             {
-                case HitResult.Great:
+                case HitResult.SmallTickHit:
                     return 0.15;
 
                 default:

@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets.Objects
                             c.Changed += invalidate;
                         break;
 
+                    case NotifyCollectionChangedAction.Reset:
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var c in args.OldItems.Cast<PathControlPoint>())
                             c.Changed -= invalidate;

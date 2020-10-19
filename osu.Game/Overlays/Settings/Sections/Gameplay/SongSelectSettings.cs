@@ -31,31 +31,31 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = "Right mouse drag to absolute scroll",
-                    Bindable = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
+                    Current = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show converted beatmaps",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
                 new SettingsSlider<double, StarsSlider>
                 {
                     LabelText = "Display beatmaps from",
-                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
+                    Current = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
                 },
                 new SettingsSlider<double, MaximumStarsSlider>
                 {
                     LabelText = "up to",
-                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
+                    Current = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
                     LabelText = "Random selection algorithm",
-                    Bindable = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
+                    Current = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }
             };
         }

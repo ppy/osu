@@ -27,7 +27,7 @@ namespace osu.Game.Scoring
 {
     public class ScoreManager : DownloadableArchiveModelManager<ScoreInfo, ScoreFileInfo>
     {
-        public override string[] HandledExtensions => new[] { ".osr" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
@@ -57,7 +57,7 @@ namespace osu.Game.Scoring
             if (archive == null)
                 return null;
 
-            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr"))))
+            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase))))
             {
                 try
                 {

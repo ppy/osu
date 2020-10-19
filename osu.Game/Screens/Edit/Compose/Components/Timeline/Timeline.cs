@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -21,6 +22,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
+
+        public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
+
+        public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
+
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         [Resolved]
@@ -57,23 +63,41 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private WaveformGraph waveform;
 
+        private TimelineTickDisplay ticks;
+
+        private TimelineControlPointDisplay controlPoints;
+
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
         {
-            Add(waveform = new WaveformGraph
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Colour = colours.Blue.Opacity(0.2f),
-                LowColour = colours.BlueLighter,
-                MidColour = colours.BlueDark,
-                HighColour = colours.BlueDarker,
-                Depth = float.MaxValue
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                    Children = new Drawable[]
+                    {
+                        waveform = new WaveformGraph
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.Blue.Opacity(0.2f),
+                            LowColour = colours.BlueLighter,
+                            MidColour = colours.BlueDark,
+                            HighColour = colours.BlueDarker,
+                        },
+                        ticks = new TimelineTickDisplay(),
+                        controlPoints = new TimelineControlPointDisplay(),
+                    }
+                },
             });
 
             // We don't want the centre marker to scroll
             AddInternal(new CentreMarker { Depth = float.MaxValue });
 
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            ControlPointsVisible.ValueChanged += visible => controlPoints.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
             Beatmap.BindValueChanged(b =>

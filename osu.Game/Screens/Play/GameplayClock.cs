@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Play
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Screens.Play
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
-    public class GameplayClock : IFrameBasedClock, ISamplePlaybackDisabler
+    public class GameplayClock : IFrameBasedClock
     {
         private readonly IFrameBasedClock underlyingClock;
 
@@ -47,7 +48,12 @@ namespace osu.Game.Screens.Play
                 double baseRate = Rate;
 
                 foreach (var adjustment in NonGameplayAdjustments)
+                {
+                    if (Precision.AlmostEquals(adjustment.Value, 0))
+                        return 0;
+
                     baseRate /= adjustment.Value;
+                }
 
                 return baseRate;
             }
@@ -56,13 +62,13 @@ namespace osu.Game.Screens.Play
         public bool IsRunning => underlyingClock.IsRunning;
 
         /// <summary>
-        /// Whether an ongoing seek operation is active.
+        /// Whether nested samples supporting the <see cref="ISamplePlaybackDisabler"/> interface should be paused.
         /// </summary>
-        public virtual bool IsSeeking => false;
+        public virtual bool ShouldDisableSamplePlayback => IsPaused.Value;
 
         public void ProcessFrame()
         {
-            // we do not want to process the underlying clock.
+            // intentionally not updating the underlying clock (handled externally).
         }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
@@ -72,7 +78,5 @@ namespace osu.Game.Screens.Play
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
         public IClock Source => underlyingClock;
-
-        public IBindable<bool> SamplePlaybackDisabled => IsPaused;
     }
 }

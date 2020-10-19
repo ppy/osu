@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!result.Type.AffectsCombo() || !result.HasResult)
                 return;
 
-            if (result.Type == HitResult.Miss)
+            if (!result.IsHit)
             {
                 updateCombo(0, null);
                 return;

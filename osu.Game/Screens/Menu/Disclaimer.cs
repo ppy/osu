@@ -42,8 +42,11 @@ namespace osu.Game.Screens.Menu
             ValidForResume = false;
         }
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load(OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
@@ -104,7 +107,9 @@ namespace osu.Game.Screens.Menu
 
             iconColour = colours.Yellow;
 
-            currentUser.BindTo(api.LocalUser);
+            // manually transfer the user once, but only do the final bind in LoadComplete to avoid thread woes (API scheduler could run while this screen is still loading).
+            // the manual transfer is here to ensure all text content is loaded ahead of time as this is very early in the game load process and we want to avoid stutters.
+            currentUser.Value = api.LocalUser.Value;
             currentUser.BindValueChanged(e =>
             {
                 supportFlow.Children.ForEach(d => d.FadeOut().Expire());
@@ -141,6 +146,8 @@ namespace osu.Game.Screens.Menu
             base.LoadComplete();
             if (nextScreen != null)
                 LoadComponentAsync(nextScreen);
+
+            currentUser.BindTo(api.LocalUser);
         }
 
         public override void OnEntering(IScreen last)

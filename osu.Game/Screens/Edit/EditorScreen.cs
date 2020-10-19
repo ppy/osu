@@ -44,10 +44,5 @@ namespace osu.Game.Screens.Edit
                 .Then()
                 .FadeTo(1f, 250, Easing.OutQuint);
         }
-
-        public void Exit()
-        {
-            Expire();
-        }
     }
 }

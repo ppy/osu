@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return;
 
             // Trigger a miss result for remaining ticks to avoid infinite gameplay.
-            foreach (var tick in ticks.Where(t => !t.IsHit))
+            foreach (var tick in ticks.Where(t => !t.Result.HasResult))
                 tick.TriggerResult(false);
 
             ApplyResult(r =>
@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 else if (Progress > .75)
                     r.Type = HitResult.Meh;
                 else if (Time.Current >= Spinner.EndTime)
-                    r.Type = HitResult.Miss;
+                    r.Type = r.Judgement.MinResult;
             });
         }
 
@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             while (wholeSpins != spins)
             {
-                var tick = ticks.FirstOrDefault(t => !t.IsHit);
+                var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
 
                 // tick may be null if we've hit the spin limit.
                 if (tick != null)

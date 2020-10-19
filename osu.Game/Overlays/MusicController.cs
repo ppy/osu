@@ -150,7 +150,7 @@ namespace osu.Game.Overlays
         {
             if (IsUserPaused) return;
 
-            if (CurrentTrack.IsDummyDevice)
+            if (CurrentTrack.IsDummyDevice || beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 if (beatmap.Disabled)
                     return;

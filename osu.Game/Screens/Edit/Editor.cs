@@ -84,6 +84,8 @@ namespace osu.Game.Screens.Edit
 
         private DependencyContainer dependencies;
 
+        private bool isNewBeatmap;
+
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -112,8 +114,6 @@ namespace osu.Game.Screens.Edit
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
-
-            bool isNewBeatmap = false;
 
             if (Beatmap.Value is DummyWorkingBeatmap)
             {
@@ -287,6 +287,9 @@ namespace osu.Game.Screens.Edit
 
         protected void Save()
         {
+            // no longer new after first user-triggered save.
+            isNewBeatmap = false;
+
             // apply any set-level metadata changes.
             beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
 
@@ -435,10 +438,20 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed && dialogOverlay != null && HasUnsavedChanges && !(dialogOverlay.CurrentDialog is PromptForSaveDialog))
+            if (!exitConfirmed)
             {
-                dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
-                return true;
+                // if the confirm dialog is already showing (or we can't show it, ie. in tests) exit without save.
+                if (dialogOverlay == null || dialogOverlay.CurrentDialog is PromptForSaveDialog)
+                {
+                    confirmExit();
+                    return true;
+                }
+
+                if (isNewBeatmap || HasUnsavedChanges)
+                {
+                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                    return true;
+                }
             }
 
             Background.FadeColour(Color4.White, 500);
@@ -456,6 +469,19 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExit()
         {
+            // stop the track if playing to allow the parent screen to choose a suitable playback mode.
+            Beatmap.Value.Track.Stop();
+
+            if (isNewBeatmap)
+            {
+                // confirming exit without save means we should delete the new beatmap completely.
+                beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
+
+                // in theory this shouldn't be required but due to EF core not sharing instance states 100%
+                // MusicController is unaware of the changed DeletePending state.
+                Beatmap.SetDefault();
+            }
+
             exitConfirmed = true;
             this.Exit();
         }
@@ -465,8 +491,7 @@ namespace osu.Game.Screens.Edit
         protected void Cut()
         {
             Copy();
-            foreach (var h in editorBeatmap.SelectedHitObjects.ToArray())
-                editorBeatmap.Remove(h);
+            editorBeatmap.RemoveRange(editorBeatmap.SelectedHitObjects.ToArray());
         }
 
         protected void Copy()
@@ -491,14 +516,14 @@ namespace osu.Game.Screens.Edit
             foreach (var h in objects)
                 h.StartTime += timeOffset;
 
-            changeHandler.BeginChange();
+            editorBeatmap.BeginChange();
 
             editorBeatmap.SelectedHitObjects.Clear();
 
             editorBeatmap.AddRange(objects);
             editorBeatmap.SelectedHitObjects.AddRange(objects);
 
-            changeHandler.EndChange();
+            editorBeatmap.EndChange();
         }
 
         protected void Undo() => changeHandler.RestoreState(-1);
@@ -570,12 +595,22 @@ namespace osu.Game.Screens.Edit
 
         private void seek(UIEvent e, int direction)
         {
-            double amount = e.ShiftPressed ? 2 : 1;
+            double amount = e.ShiftPressed ? 4 : 1;
+
+            bool trackPlaying = clock.IsRunning;
+
+            if (trackPlaying)
+            {
+                // generally users are not looking to perform tiny seeks when the track is playing,
+                // so seeks should always be by one full beat, bypassing the beatDivisor.
+                // this multiplication undoes the division that will be applied in the underlying seek operation.
+                amount *= beatDivisor.Value;
+            }
 
             if (direction < 1)
-                clock.SeekBackward(!clock.IsRunning, amount);
+                clock.SeekBackward(!trackPlaying, amount);
             else
-                clock.SeekForward(!clock.IsRunning, amount);
+                clock.SeekForward(!trackPlaying, amount);
         }
 
         private void exportBeatmap()

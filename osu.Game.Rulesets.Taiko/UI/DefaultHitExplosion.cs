@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             Alpha = 0.15f;
             Masking = true;
 
-            if (result == HitResult.Miss)
+            if (!result.IsHit())
                 return;
 
             bool isRim = (judgedObject.HitObject as Hit)?.Type == HitType.Rim;

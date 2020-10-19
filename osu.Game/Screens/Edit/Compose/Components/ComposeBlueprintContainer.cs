@@ -79,9 +79,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementNewCombo()
         {
-            if (currentPlacement == null) return;
-
-            if (currentPlacement.HitObject is IHasComboInformation c)
+            if (currentPlacement?.HitObject is IHasComboInformation c)
                 c.NewCombo = NewCombo.Value == TernaryState.True;
         }
 
@@ -201,7 +199,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void AddBlueprintFor(HitObject hitObject)
         {
             refreshTool();
+
             base.AddBlueprintFor(hitObject);
+
+            // on successful placement, the new combo button should be reset as this is the most common user interaction.
+            if (Beatmap.SelectedHitObjects.Count == 0)
+                NewCombo.Value = TernaryState.False;
         }
 
         private void createPlacement()

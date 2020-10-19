@@ -7,6 +7,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 
@@ -14,13 +15,29 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 {
     public class TaikoLegacySkinTransformer : LegacySkinTransformer
     {
+        private Lazy<bool> hasExplosion;
+
         public TaikoLegacySkinTransformer(ISkinSource source)
             : base(source)
         {
+            Source.SourceChanged += sourceChanged;
+            sourceChanged();
+        }
+
+        private void sourceChanged()
+        {
+            hasExplosion = new Lazy<bool>(() => Source.GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
+            if (component is GameplaySkinComponent<HitResult>)
+            {
+                // if a taiko skin is providing explosion sprites, hide the judgements completely
+                if (hasExplosion.Value)
+                    return Drawable.Empty();
+            }
+
             if (!(component is TaikoSkinComponent taikoComponent))
                 return null;
 
@@ -87,10 +104,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     var hitName = getHitName(taikoComponent.Component);
                     var hitSprite = this.GetAnimation(hitName, true, false);
-                    var strongHitSprite = this.GetAnimation($"{hitName}k", true, false);
 
                     if (hitSprite != null)
+                    {
+                        var strongHitSprite = this.GetAnimation($"{hitName}k", true, false);
+
                         return new LegacyHitExplosion(hitSprite, strongHitSprite);
+                    }
 
                     return null;
 
