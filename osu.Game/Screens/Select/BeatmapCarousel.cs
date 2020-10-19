@@ -602,7 +602,7 @@ namespace osu.Game.Screens.Select
 
                     // panel loaded as drawable but not required by visible range.
                     // remove but only if too far off-screen
-                    if (panel.Y < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
+                    if (panel.Y + panel.DrawHeight < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
                     {
                         // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
                         panel.ClearTransforms();
