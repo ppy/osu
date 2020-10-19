@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Dashboard
             public DashboardTitle()
             {
                 Title = "dashboard";
-                Description = "View your friends and other information";
+                Description = "view your friends and other information";
                 IconTexture = "Icons/Hexacons/social";
             }
         }

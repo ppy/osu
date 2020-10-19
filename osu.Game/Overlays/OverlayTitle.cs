@@ -14,6 +14,8 @@ namespace osu.Game.Overlays
 {
     public abstract class OverlayTitle : CompositeDrawable, INamedOverlayComponent
     {
+        public const float ICON_SIZE = 30;
+
         private readonly OsuSpriteText titleText;
         private readonly Container icon;
 
@@ -51,7 +53,7 @@ namespace osu.Game.Overlays
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Margin = new MarginPadding { Horizontal = 5 }, // compensates for osu-web sprites having around 5px of whitespace on each side
-                        Size = new Vector2(30)
+                        Size = new Vector2(ICON_SIZE)
                     },
                     titleText = new OsuSpriteText
                     {

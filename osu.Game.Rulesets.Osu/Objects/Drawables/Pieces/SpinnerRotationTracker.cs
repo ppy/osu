@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
@@ -77,6 +79,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private bool rotationTransferred;
 
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
+
         protected override void Update()
         {
             base.Update();
@@ -126,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             currentRotation += angle;
             // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
             // (see: ModTimeRamp)
-            RateAdjustedRotation += (float)(Math.Abs(angle) * Clock.Rate);
+            RateAdjustedRotation += (float)(Math.Abs(angle) * (gameplayClock?.TrueGameplayRate ?? Clock.Rate));
         }
     }
 }

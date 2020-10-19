@@ -7,11 +7,17 @@ using osu.Framework.Graphics;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
     public class CatchLegacySkinTransformer : LegacySkinTransformer
     {
+        /// <summary>
+        /// For simplicity, let's use legacy combo font texture existence as a way to identify legacy skins from default.
+        /// </summary>
+        private bool providesComboCounter => this.HasFont(GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score");
+
         public CatchLegacySkinTransformer(ISkinSource source)
             : base(source)
         {
@@ -19,6 +25,16 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
+            if (component is HUDSkinComponent hudComponent)
+            {
+                switch (hudComponent.Component)
+                {
+                    case HUDSkinComponents.ComboCounter:
+                        // catch may provide its own combo counter; hide the default.
+                        return providesComboCounter ? Drawable.Empty() : null;
+                }
+            }
+
             if (!(component is CatchSkinComponent catchSkinComponent))
                 return null;
 
@@ -52,6 +68,13 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 case CatchSkinComponents.CatcherKiai:
                     return this.GetAnimation("fruit-catcher-kiai", true, true, true) ??
                            this.GetAnimation("fruit-ryuuta", true, true, true);
+
+                case CatchSkinComponents.CatchComboCounter:
+
+                    if (providesComboCounter)
+                        return new LegacyCatchComboCounter(Source);
+
+                    break;
             }
 
             return null;

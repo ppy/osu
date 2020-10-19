@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }
 
+        [Resolved(canBeNull: true)]
+        protected IEditorChangeHandler ChangeHandler { get; private set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {

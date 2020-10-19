@@ -15,18 +15,21 @@ namespace osu.Game.Tests.Beatmaps
 {
     public class TestBeatmap : Beatmap
     {
-        public TestBeatmap(RulesetInfo ruleset)
+        public TestBeatmap(RulesetInfo ruleset, bool withHitObjects = true)
         {
             var baseBeatmap = CreateBeatmap();
 
             BeatmapInfo = baseBeatmap.BeatmapInfo;
             ControlPointInfo = baseBeatmap.ControlPointInfo;
             Breaks = baseBeatmap.Breaks;
-            HitObjects = baseBeatmap.HitObjects;
+
+            if (withHitObjects)
+                HitObjects = baseBeatmap.HitObjects;
 
             BeatmapInfo.Ruleset = ruleset;
             BeatmapInfo.RulesetID = ruleset.ID ?? 0;
             BeatmapInfo.BeatmapSet.Metadata = BeatmapInfo.Metadata;
+            BeatmapInfo.BeatmapSet.Files = new List<BeatmapSetFileInfo>();
             BeatmapInfo.BeatmapSet.Beatmaps = new List<BeatmapInfo> { BeatmapInfo };
             BeatmapInfo.BeatmapSet.OnlineInfo = new BeatmapSetOnlineInfo
             {

@@ -17,8 +17,8 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load()
         {
-            TooltipMain = "Home";
-            TooltipSub = "Return to the main menu";
+            TooltipMain = "home";
+            TooltipSub = "return to the main menu";
             SetIcon("Icons/Hexacons/home");
         }
     }

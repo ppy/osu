@@ -31,6 +31,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -38,6 +39,7 @@ using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.Music;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
@@ -92,6 +94,15 @@ namespace osu.Game
         /// Whether overlays should be able to be opened game-wide. Value is sourced from the current active screen.
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
+
+        /// <summary>
+        /// Whether the local user is currently interacting with the game in a way that should not be interrupted.
+        /// </summary>
+        /// <remarks>
+        /// This is exclusively managed by <see cref="Player"/>. If other components are mutating this state, a more
+        /// resilient method should be used to ensure correct state.
+        /// </remarks>
+        public Bindable<bool> LocalUserPlaying = new BindableBool();
 
         protected OsuScreenStack ScreenStack;
 
@@ -170,7 +181,7 @@ namespace osu.Game
 
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith(@"-")).ToArray();
+                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
                 if (paths.Length > 0)
                     Task.Run(() => Import(paths));
             }
@@ -278,7 +289,7 @@ namespace osu.Game
 
         public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
         {
-            if (url.StartsWith("/"))
+            if (url.StartsWith('/'))
                 url = $"{API.Endpoint}{url}";
 
             externalLinkOpener.OpenUrlExternally(url);
@@ -575,7 +586,8 @@ namespace osu.Game
                 rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                idleTracker
+                idleTracker,
+                new ConfineMouseTracker()
             });
 
             ScreenStack.ScreenPushed += screenPushed;
@@ -609,12 +621,19 @@ namespace osu.Game
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
 
+            loadComponentSingleFile(new CollectionManager(Storage)
+            {
+                PostNotification = n => notifications.Post(n),
+                GetStableStorage = GetStorageForStableInstall
+            }, Add, true);
+
             loadComponentSingleFile(screenshotManager, Add);
 
             // dependency on notification overlay, dependent by settings overlay
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
 
             // overlay elements
+            loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
@@ -647,6 +666,7 @@ namespace osu.Game
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());
+            Add(new MusicKeyBindingHandler());
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, notifications };
@@ -716,24 +736,6 @@ namespace osu.Game
             // show above others if not visible at all, else leave at current depth.
             if (!overlay.IsPresent)
                 overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
-        }
-
-        public class GameIdleTracker : IdleTracker
-        {
-            private InputManager inputManager;
-
-            public GameIdleTracker(int time)
-                : base(time)
-            {
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                inputManager = GetContainingInputManager();
-            }
-
-            protected override bool AllowIdle => inputManager.FocusedDrawable == null;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -955,6 +957,9 @@ namespace osu.Game
                     break;
             }
 
+            // reset on screen change for sanity.
+            LocalUserPlaying.Value = false;
+
             if (current is IOsuScreen currentOsuScreen)
                 OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
 
@@ -990,11 +995,5 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
-    }
-
-    public enum ScorePresentType
-    {
-        Results,
-        Gameplay
     }
 }

@@ -13,9 +13,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Beatmaps
 {
@@ -114,6 +117,34 @@ namespace osu.Game.Beatmaps
             return computeDifficulty(key, beatmapInfo, rulesetInfo);
         }
 
+        /// <summary>
+        /// Retrieves the <see cref="DifficultyRating"/> that describes a star rating.
+        /// </summary>
+        /// <remarks>
+        /// For more information, see: https://osu.ppy.sh/help/wiki/Difficulties
+        /// </remarks>
+        /// <param name="starRating">The star rating.</param>
+        /// <returns>The <see cref="DifficultyRating"/> that best describes <paramref name="starRating"/>.</returns>
+        public static DifficultyRating GetDifficultyRating(double starRating)
+        {
+            if (Precision.AlmostBigger(starRating, 6.5, 0.005))
+                return DifficultyRating.ExpertPlus;
+
+            if (Precision.AlmostBigger(starRating, 5.3, 0.005))
+                return DifficultyRating.Expert;
+
+            if (Precision.AlmostBigger(starRating, 4.0, 0.005))
+                return DifficultyRating.Insane;
+
+            if (Precision.AlmostBigger(starRating, 2.7, 0.005))
+                return DifficultyRating.Hard;
+
+            if (Precision.AlmostBigger(starRating, 2.0, 0.005))
+                return DifficultyRating.Normal;
+
+            return DifficultyRating.Easy;
+        }
+
         private CancellationTokenSource trackedUpdateCancellationSource;
         private readonly List<CancellationTokenSource> linkedCancellationSources = new List<CancellationTokenSource>();
 
@@ -207,11 +238,29 @@ namespace osu.Game.Beatmaps
                 var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(beatmapInfo));
                 var attributes = calculator.Calculate(key.Mods);
 
-                return difficultyCache[key] = new StarDifficulty(attributes.StarRating);
+                return difficultyCache[key] = new StarDifficulty(attributes.StarRating, attributes.MaxCombo);
+            }
+            catch (BeatmapInvalidForRulesetException e)
+            {
+                // Conversion has failed for the given ruleset, so return the difficulty in the beatmap's default ruleset.
+
+                // Ensure the beatmap's default ruleset isn't the one already being converted to.
+                // This shouldn't happen as it means something went seriously wrong, but if it does an endless loop should be avoided.
+                if (rulesetInfo.Equals(beatmapInfo.Ruleset))
+                {
+                    Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineBeatmapID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
+                    return difficultyCache[key] = new StarDifficulty();
+                }
+
+                // Check the cache first because this is now a different ruleset than the one previously guarded against.
+                if (tryGetExisting(beatmapInfo, beatmapInfo.Ruleset, Array.Empty<Mod>(), out var existingDefault, out var existingDefaultKey))
+                    return existingDefault;
+
+                return computeDifficulty(existingDefaultKey, beatmapInfo, beatmapInfo.Ruleset);
             }
             catch
             {
-                return difficultyCache[key] = new StarDifficulty(0);
+                return difficultyCache[key] = new StarDifficulty();
             }
         }
 
@@ -233,7 +282,7 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo.ID == 0 || rulesetInfo.ID == null)
             {
                 // If not, fall back to the existing star difficulty (e.g. from an online source).
-                existingDifficulty = new StarDifficulty(beatmapInfo.StarDifficulty);
+                existingDifficulty = new StarDifficulty(beatmapInfo.StarDifficulty, beatmapInfo.MaxCombo ?? 0);
                 key = default;
 
                 return true;
@@ -298,12 +347,16 @@ namespace osu.Game.Beatmaps
     public readonly struct StarDifficulty
     {
         public readonly double Stars;
+        public readonly int MaxCombo;
 
-        public StarDifficulty(double stars)
+        public StarDifficulty(double stars, int maxCombo)
         {
             Stars = stars;
+            MaxCombo = maxCombo;
 
             // Todo: Add more members (BeatmapInfo.DifficultyRating? Attributes? Etc...)
         }
+
+        public DifficultyRating DifficultyRating => BeatmapDifficultyManager.GetDifficultyRating(Stars);
     }
 }

@@ -17,7 +17,7 @@ namespace osu.Game.Overlays
     {
         public string IconTexture => "Icons/Hexacons/settings";
         public string Title => "settings";
-        public string Description => "Change the way osu! behaves";
+        public string Description => "change the way osu! behaves";
 
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {

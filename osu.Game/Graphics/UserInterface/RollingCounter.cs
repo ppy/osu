@@ -9,16 +9,20 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class RollingCounter<T> : Container
+    public abstract class RollingCounter<T> : Container, IHasCurrentValue<T>
         where T : struct, IEquatable<T>
     {
-        /// <summary>
-        /// The current value.
-        /// </summary>
-        public Bindable<T> Current = new Bindable<T>();
+        private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
+
+        public Bindable<T> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
 
         private SpriteText displayedCountSpriteText;
 
@@ -52,8 +56,7 @@ namespace osu.Game.Graphics.UserInterface
                     return;
 
                 displayedCount = value;
-                if (displayedCountSpriteText != null)
-                    displayedCountSpriteText.Text = FormatCount(value);
+                UpdateDisplay();
             }
         }
 
@@ -69,8 +72,15 @@ namespace osu.Game.Graphics.UserInterface
         private void load()
         {
             displayedCountSpriteText = CreateSpriteText();
-            displayedCountSpriteText.Text = FormatCount(DisplayedCount);
+
+            UpdateDisplay();
             Child = displayedCountSpriteText;
+        }
+
+        protected void UpdateDisplay()
+        {
+            if (displayedCountSpriteText != null)
+                displayedCountSpriteText.Text = FormatCount(DisplayedCount);
         }
 
         protected override void LoadComplete()
