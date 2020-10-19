@@ -76,14 +76,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsEnumDropdown<ScoringMode>
                 {
                     LabelText = "Score display mode",
-                    Bindable = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
+                    Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
                     Keywords = new[] { "scoring" }
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show playfield border",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowPlayfieldBorder)
-                    Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
+                    Current = config.GetBindable<bool>(OsuSetting.ShowPlayfieldBorder),
                 },
             };
 
