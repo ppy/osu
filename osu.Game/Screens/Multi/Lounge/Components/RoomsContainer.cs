@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Multiplayer;
 using osuTK;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
@@ -38,17 +39,25 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [Resolved]
         private IRoomManager roomManager { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private LoungeSubScreen loungeSubScreen { get; set; }
+
         public RoomsContainer()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = roomFlow = new FillFlowContainer<DrawableRoom>
+            InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(2),
+                Child = roomFlow = new FillFlowContainer<DrawableRoom>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2),
+                }
             };
         }
 
