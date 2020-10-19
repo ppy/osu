@@ -21,6 +21,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
             InternalChild = circlePiece = new HitCirclePiece();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            BeginPlacement();
+        }
+
         protected override void Update()
         {
             base.Update();

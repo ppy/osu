@@ -18,12 +18,14 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
+    [ExcludeFromDynamicCompile]
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource
     {
         private readonly AudioManager audio;

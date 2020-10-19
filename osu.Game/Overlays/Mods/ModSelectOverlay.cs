@@ -13,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -45,9 +44,7 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
-        protected readonly FillFlowContainer<ModControlSection> ModSettingsContent;
-
-        protected readonly Container ModSettingsContainer;
+        protected readonly ModSettingsContainer ModSettingsContainer;
 
         public readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -284,7 +281,7 @@ namespace osu.Game.Overlays.Mods
                         },
                     },
                 },
-                ModSettingsContainer = new Container
+                ModSettingsContainer = new ModSettingsContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
@@ -292,29 +289,11 @@ namespace osu.Game.Overlays.Mods
                     Width = 0.25f,
                     Alpha = 0,
                     X = -100,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(0, 0, 0, 192)
-                        },
-                        new OsuScrollContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = ModSettingsContent = new FillFlowContainer<ModControlSection>
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(0f, 10f),
-                                Padding = new MarginPadding(20),
-                            }
-                        }
-                    }
+                    SelectedMods = { BindTarget = SelectedMods },
                 }
             };
+
+            ((IBindable<bool>)CustomiseButton.Enabled).BindTo(ModSettingsContainer.HasSettingsForSelection);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -423,8 +402,6 @@ namespace osu.Game.Overlays.Mods
                 section.SelectTypes(mods.NewValue.Select(m => m.GetType()).ToList());
 
             updateMods();
-
-            updateModSettings(mods);
         }
 
         private void updateMods()
@@ -443,25 +420,6 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(LowMultiplierColour, 200);
             else
                 MultiplierLabel.FadeColour(Color4.White, 200);
-        }
-
-        private void updateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> selectedMods)
-        {
-            ModSettingsContent.Clear();
-
-            foreach (var mod in selectedMods.NewValue)
-            {
-                var settings = mod.CreateSettingsControls().ToList();
-                if (settings.Count > 0)
-                    ModSettingsContent.Add(new ModControlSection(mod, settings));
-            }
-
-            bool hasSettings = ModSettingsContent.Count > 0;
-
-            CustomiseButton.Enabled.Value = hasSettings;
-
-            if (!hasSettings)
-                ModSettingsContainer.Hide();
         }
 
         private void modButtonPressed(Mod selectedMod)

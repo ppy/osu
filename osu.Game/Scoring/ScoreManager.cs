@@ -57,7 +57,7 @@ namespace osu.Game.Scoring
             if (archive == null)
                 return null;
 
-            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr"))))
+            using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase))))
             {
                 try
                 {
