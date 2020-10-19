@@ -208,17 +208,9 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            float topRightOffset = 0;
+            // for now align with the accuracy counter. eventually this will be user customisable.
+            topRightElements.Y = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
 
-            // fetch the bottom-most position of any main ui element that is anchored to the top of the screen.
-            // consider this kind of temporary.
-            foreach (var d in mainUIElements)
-            {
-                if (d is SkinnableDrawable sd && (sd.Drawable.Anchor & Anchor.y0) > 0)
-                    topRightOffset = Math.Max(sd.Drawable.ScreenSpaceDrawQuad.BottomRight.Y, topRightOffset);
-            }
-
-            topRightElements.Y = ToLocalSpace(new Vector2(0, topRightOffset)).Y;
             bottomRightElements.Y = -Progress.Height;
         }
 
