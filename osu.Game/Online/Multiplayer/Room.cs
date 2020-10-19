@@ -104,21 +104,17 @@ namespace osu.Game.Online.Multiplayer
         public readonly Bindable<int> Position = new Bindable<int>(-1);
 
         /// <summary>
-        /// Create a copy of this room, without information specific to it, such as Room ID or host
+        /// Create a copy of this room without online information.
+        /// Should be used to create a local copy of a room for submitting in the future.
         /// </summary>
         public Room CreateCopy()
         {
-            Room newRoom = new Room
-            {
-                Name = { Value = Name.Value },
-                Availability = { Value = Availability.Value },
-                Type = { Value = Type.Value },
-                MaxParticipants = { Value = MaxParticipants.Value }
-            };
+            var copy = new Room();
 
-            newRoom.Playlist.AddRange(Playlist);
+            copy.CopyFrom(this);
+            copy.RoomID.Value = null;
 
-            return newRoom;
+            return copy;
         }
 
         public void CopyFrom(Room other)
