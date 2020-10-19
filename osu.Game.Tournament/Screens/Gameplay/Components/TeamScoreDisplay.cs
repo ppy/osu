@@ -21,7 +21,10 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private TeamDisplay teamDisplay;
 
-        public bool ShowScore { set => teamDisplay.ShowScore = value; }
+        public bool ShowScore
+        {
+            set => teamDisplay.ShowScore = value;
+        }
 
         public TeamScoreDisplay(TeamColour teamColour)
         {

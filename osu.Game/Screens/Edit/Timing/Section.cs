@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }
 
+        [Resolved(canBeNull: true)]
+        protected IEditorChangeHandler ChangeHandler { get; private set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -57,7 +60,7 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         checkbox = new OsuCheckbox
                         {
-                            LabelText = typeof(T).Name.Replace(typeof(ControlPoint).Name, string.Empty)
+                            LabelText = typeof(T).Name.Replace(nameof(Beatmaps.ControlPoints.ControlPoint), string.Empty)
                         }
                     }
                 },

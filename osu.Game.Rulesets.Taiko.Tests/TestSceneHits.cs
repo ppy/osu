@@ -2,11 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -18,25 +15,22 @@ using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
-using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    public class TestSceneHits : OsuTestScene
+    public class TestSceneHits : DrawableTaikoRulesetTestScene
     {
-        private const double default_duration = 1000;
+        private const double default_duration = 3000;
         private const float scroll_time = 1000;
 
         protected override double TimePerAction => default_duration * 2;
 
         private readonly Random rng = new Random(1337);
-        private DrawableTaikoRuleset drawableRuleset;
-        private Container playfieldContainer;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestVariousHits()
         {
             AddStep("Hit", () => addHitJudgement(false));
             AddStep("Strong hit", () => addStrongHitJudgement(false));
@@ -45,6 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Miss :(", addMissJudgement);
             AddStep("DrumRoll", () => addDrumRoll(false));
             AddStep("Strong DrumRoll", () => addDrumRoll(true));
+            AddStep("Kiai DrumRoll", () => addDrumRoll(true, kiai: true));
             AddStep("Swell", () => addSwell());
             AddStep("Centre", () => addCentreHit(false));
             AddStep("Strong Centre", () => addCentreHit(true));
@@ -63,35 +58,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Height test 4", () => changePlayfieldSize(4));
             AddStep("Height test 5", () => changePlayfieldSize(5));
             AddStep("Reset height", () => changePlayfieldSize(6));
-
-            var controlPointInfo = new ControlPointInfo();
-            controlPointInfo.Add(0, new TimingControlPoint());
-
-            WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
-            {
-                HitObjects = new List<HitObject> { new Hit { Type = HitType.Centre } },
-                BeatmapInfo = new BeatmapInfo
-                {
-                    BaseDifficulty = new BeatmapDifficulty(),
-                    Metadata = new BeatmapMetadata
-                    {
-                        Artist = @"Unknown",
-                        Title = @"Sample Beatmap",
-                        AuthorString = @"peppy",
-                    },
-                    Ruleset = new TaikoRuleset().RulesetInfo
-                },
-                ControlPointInfo = controlPointInfo
-            });
-
-            Add(playfieldContainer = new Container
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.X,
-                Height = 768,
-                Children = new[] { drawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap.GetPlayableBeatmap(new TaikoRuleset().RulesetInfo)) }
-            });
         }
 
         private void changePlayfieldSize(int step)
@@ -127,18 +93,18 @@ namespace osu.Game.Rulesets.Taiko.Tests
             switch (step)
             {
                 default:
-                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
+                    PlayfieldContainer.Delay(delay).ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
                     break;
 
                 case 6:
-                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_HEIGHT), 500);
+                    PlayfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_HEIGHT), 500);
                     break;
             }
         }
 
         private void addHitJudgement(bool kiai)
         {
-            HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
+            HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Ok : HitResult.Great;
 
             var cpi = new ControlPointInfo();
             cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
@@ -146,14 +112,16 @@ namespace osu.Game.Rulesets.Taiko.Tests
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
+            var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
 
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
+            DrawableRuleset.Playfield.Add(h);
+
+            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
         }
 
         private void addStrongHitJudgement(bool kiai)
         {
-            HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
+            HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Ok : HitResult.Great;
 
             var cpi = new ControlPointInfo();
             cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
@@ -161,78 +129,86 @@ namespace osu.Game.Rulesets.Taiko.Tests
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
+            var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
 
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new HitObject(), new TaikoStrongJudgement()) { Type = HitResult.Great });
+            DrawableRuleset.Playfield.Add(h);
+
+            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
+            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new HitObject(), new TaikoStrongJudgement()) { Type = HitResult.Great });
         }
 
         private void addMissJudgement()
         {
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new DrawableTestHit(new Hit()), new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = HitResult.Miss });
+            DrawableTestHit h;
+            DrawableRuleset.Playfield.Add(h = new DrawableTestHit(new Hit(), HitResult.Miss));
+            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = HitResult.Miss });
         }
 
         private void addBarLine(bool major, double delay = scroll_time)
         {
-            BarLine bl = new BarLine { StartTime = drawableRuleset.Playfield.Time.Current + delay };
+            BarLine bl = new BarLine { StartTime = DrawableRuleset.Playfield.Time.Current + delay };
 
-            drawableRuleset.Playfield.Add(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
+            DrawableRuleset.Playfield.Add(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
         }
 
         private void addSwell(double duration = default_duration)
         {
             var swell = new Swell
             {
-                StartTime = drawableRuleset.Playfield.Time.Current + scroll_time,
+                StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
                 Duration = duration,
             };
 
             swell.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            drawableRuleset.Playfield.Add(new DrawableSwell(swell));
+            DrawableRuleset.Playfield.Add(new DrawableSwell(swell));
         }
 
-        private void addDrumRoll(bool strong, double duration = default_duration)
+        private void addDrumRoll(bool strong, double duration = default_duration, bool kiai = false)
         {
             addBarLine(true);
             addBarLine(true, scroll_time + duration);
 
             var d = new DrumRoll
             {
-                StartTime = drawableRuleset.Playfield.Time.Current + scroll_time,
+                StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
                 IsStrong = strong,
                 Duration = duration,
+                TickRate = 8,
             };
 
-            d.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            var cpi = new ControlPointInfo();
+            cpi.Add(-10000, new EffectControlPoint { KiaiMode = kiai });
 
-            drawableRuleset.Playfield.Add(new DrawableDrumRoll(d));
+            d.ApplyDefaults(cpi, new BeatmapDifficulty());
+
+            DrawableRuleset.Playfield.Add(new DrawableDrumRoll(d));
         }
 
         private void addCentreHit(bool strong)
         {
             Hit h = new Hit
             {
-                StartTime = drawableRuleset.Playfield.Time.Current + scroll_time,
+                StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
                 IsStrong = strong
             };
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            drawableRuleset.Playfield.Add(new DrawableCentreHit(h));
+            DrawableRuleset.Playfield.Add(new DrawableHit(h));
         }
 
         private void addRimHit(bool strong)
         {
             Hit h = new Hit
             {
-                StartTime = drawableRuleset.Playfield.Time.Current + scroll_time,
+                StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
                 IsStrong = strong
             };
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            drawableRuleset.Playfield.Add(new DrawableRimHit(h));
+            DrawableRuleset.Playfield.Add(new DrawableHit(h));
         }
 
         private class TestStrongNestedHit : DrawableStrongNestedHit
@@ -243,14 +219,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             }
 
             public override bool OnPressed(TaikoAction action) => false;
-        }
-
-        private class DrawableTestHit : DrawableHitObject<TaikoHitObject>
-        {
-            public DrawableTestHit(TaikoHitObject hitObject)
-                : base(hitObject)
-            {
-            }
         }
     }
 }

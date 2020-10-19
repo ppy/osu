@@ -2,16 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
-using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -25,15 +21,6 @@ namespace osu.Game.Tests.Visual.Online
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ProfileHeader),
-            typeof(RankGraph),
-            typeof(LineGraph),
-            typeof(SectionsContainer<>),
-            typeof(SupporterIcon)
-        };
 
         public static readonly User TEST_USER = new User
         {

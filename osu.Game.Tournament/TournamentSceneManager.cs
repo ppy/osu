@@ -37,7 +37,7 @@ namespace osu.Game.Tournament
 
         public const float STREAM_AREA_WIDTH = 1366;
 
-        public const double REQUIRED_WIDTH = TournamentSceneManager.CONTROL_AREA_WIDTH * 2 + TournamentSceneManager.STREAM_AREA_WIDTH;
+        public const double REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
 
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();

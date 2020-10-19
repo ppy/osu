@@ -4,13 +4,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
-    public class LegacyStageForeground : LegacyManiaElement
+    public class LegacyStageForeground : CompositeDrawable
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string bottomImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.BottomStageImage)?.Value
+            string bottomImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.BottomStageImage)?.Value
                                  ?? "mania-stage-bottom";
 
             sprite = skin.GetAnimation(bottomImage, true, true)?.With(d =>

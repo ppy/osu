@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        protected virtual float StartScale => 1;
+        public abstract BindableNumber<float> StartScale { get; }
 
         protected virtual float EndScale => 1;
 
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableHitCircle _:
                 {
                     using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-                        drawable.ScaleTo(StartScale).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);
+                        drawable.ScaleTo(StartScale.Value).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);
                     break;
                 }
             }

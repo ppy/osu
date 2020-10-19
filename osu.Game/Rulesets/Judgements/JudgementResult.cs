@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// Whether a successful hit occurred.
         /// </summary>
-        public bool IsHit => Type > HitResult.Miss;
+        public bool IsHit => Type.IsHit();
 
         /// <summary>
         /// Creates a new <see cref="JudgementResult"/>.

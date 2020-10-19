@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     case BananaShower bananaShower:
                         foreach (var banana in bananaShower.NestedHitObjects.OfType<Banana>())
                         {
-                            banana.XOffset = (float)rng.NextDouble();
+                            banana.XOffset = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
                             rng.Next(); // osu!stable retrieved a random banana type
                             rng.Next(); // osu!stable retrieved a random banana rotation
                             rng.Next(); // osu!stable retrieved a random banana colour
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
                     case JuiceStream juiceStream:
                         // Todo: BUG!! Stable used the last control point as the final position of the path, but it should use the computed path instead.
-                        lastPosition = juiceStream.X + juiceStream.Path.ControlPoints[^1].Position.Value.X / CatchPlayfield.BASE_WIDTH;
+                        lastPosition = juiceStream.X + juiceStream.Path.ControlPoints[^1].Position.Value.X;
 
                         // Todo: BUG!! Stable attempted to use the end time of the stream, but referenced it too early in execution and used the start time instead.
                         lastStartTime = juiceStream.StartTime;
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             catchObject.XOffset = 0;
 
                             if (catchObject is TinyDroplet)
-                                catchObject.XOffset = Math.Clamp(rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH, -catchObject.X, 1 - catchObject.X);
+                                catchObject.XOffset = Math.Clamp(rng.Next(-20, 20), -catchObject.X, CatchPlayfield.WIDTH - catchObject.X);
                             else if (catchObject is Droplet)
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                         }
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             }
 
             // ReSharper disable once PossibleLossOfFraction
-            if (Math.Abs(positionDiff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3)
+            if (Math.Abs(positionDiff) < timeDiff / 3)
                 applyOffset(ref offsetPosition, positionDiff);
 
             hitObject.XOffset = offsetPosition - hitObject.X;
@@ -149,12 +149,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
         private static void applyRandomOffset(ref float position, double maxOffset, FastRandom rng)
         {
             bool right = rng.NextBool();
-            float rand = Math.Min(20, (float)rng.Next(0, Math.Max(0, maxOffset))) / CatchPlayfield.BASE_WIDTH;
+            float rand = Math.Min(20, (float)rng.Next(0, Math.Max(0, maxOffset)));
 
             if (right)
             {
                 // Clamp to the right bound
-                if (position + rand <= 1)
+                if (position + rand <= CatchPlayfield.WIDTH)
                     position += rand;
                 else
                     position -= rand;
@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             if (amount > 0)
             {
                 // Clamp to the right bound
-                if (position + amount < 1)
+                if (position + amount < CatchPlayfield.WIDTH)
                     position += amount;
             }
             else
@@ -211,7 +211,13 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             objectWithDroplets.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
-            double halfCatcherWidth = CatcherArea.GetCatcherSize(beatmap.BeatmapInfo.BaseDifficulty) / 2;
+            double halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) / 2;
+
+            // Todo: This is wrong. osu!stable calculated hyperdashes using the full catcher size, excluding the margins.
+            // This should theoretically cause impossible scenarios, but practically, likely due to the size of the playfield, it doesn't seem possible.
+            // For now, to bring gameplay (and diffcalc!) completely in-line with stable, this code also uses the full catcher size.
+            halfCatcherWidth /= Catcher.ALLOWED_CATCH_RANGE;
+
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
 

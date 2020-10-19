@@ -8,8 +8,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     public class FilterCriteria
     {
         public string SearchString;
-        public PrimaryFilter PrimaryFilter;
-        public SecondaryFilter SecondaryFilter;
+        public RoomStatusFilter StatusFilter;
+        public RoomCategoryFilter RoomCategoryFilter;
         public RulesetInfo Ruleset;
     }
 }

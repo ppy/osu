@@ -35,7 +35,7 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(cpi.TimingPoints.Count, Is.EqualTo(2));
             Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(2));
 
-            cpi.Add(1000, new TimingControlPoint()); //is redundant
+            cpi.Add(1000, new TimingControlPoint()); // is redundant
 
             Assert.That(cpi.Groups.Count, Is.EqualTo(2));
             Assert.That(cpi.TimingPoints.Count, Is.EqualTo(2));
@@ -137,6 +137,22 @@ namespace osu.Game.Tests.NonVisual
             cpi.RemoveGroup(group);
 
             Assert.That(cpi.Groups.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestRemoveGroupAlsoRemovedControlPoints()
+        {
+            var cpi = new ControlPointInfo();
+
+            var group = cpi.GroupAt(1000, true);
+
+            group.Add(new SampleControlPoint());
+
+            Assert.That(cpi.SamplePoints.Count, Is.EqualTo(1));
+
+            cpi.RemoveGroup(group);
+
+            Assert.That(cpi.SamplePoints.Count, Is.EqualTo(0));
         }
 
         [Test]

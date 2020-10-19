@@ -4,16 +4,22 @@
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Audio;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModRateAdjust : Mod, IApplicableToTrack
+    public abstract class ModRateAdjust : Mod, IApplicableToAudio
     {
         public abstract BindableNumber<double> SpeedChange { get; }
 
-        public virtual void ApplyToTrack(Track track)
+        public virtual void ApplyToTrack(ITrack track)
         {
             track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
+        }
+
+        public virtual void ApplyToSample(DrawableSample sample)
+        {
+            sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
 
         public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N2}x";

@@ -1,20 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using osu.Game.Rulesets.Osu.Skinning;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     public abstract class OsuSkinnableTestScene : SkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        private Container content;
+
+        protected override Container<Drawable> Content
         {
-            typeof(OsuRuleset),
-            typeof(OsuLegacySkinTransformer),
-        };
+            get
+            {
+                if (content == null)
+                    base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
+
+                return content;
+            }
+        }
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
     }

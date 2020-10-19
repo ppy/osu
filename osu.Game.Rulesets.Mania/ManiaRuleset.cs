@@ -30,6 +30,7 @@ using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Mania
 {
@@ -44,9 +45,11 @@ namespace osu.Game.Rulesets.Mania
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
 
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new DrainingHealthProcessor(drainStartTime, 0.2);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap, this);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new ManiaPerformanceCalculator(this, attributes, score);
 
         public const string SHORT_NAME = "mania";
 
@@ -121,6 +124,9 @@ namespace osu.Game.Rulesets.Mania
 
             if (mods.HasFlag(LegacyMods.Random))
                 yield return new ManiaModRandom();
+
+            if (mods.HasFlag(LegacyMods.Mirror))
+                yield return new ManiaModMirror();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -170,6 +176,10 @@ namespace osu.Game.Rulesets.Mania
                     case ManiaModFadeIn _:
                         value |= LegacyMods.FadeIn;
                         break;
+
+                    case ManiaModMirror _:
+                        value |= LegacyMods.Mirror;
+                        break;
                 }
             }
 
@@ -215,6 +225,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
                         new ManiaModDifficultyAdjust(),
+                        new ManiaModInvert(),
                     };
 
                 case ModType.Automation:
@@ -307,6 +318,56 @@ namespace osu.Game.Rulesets.Mania
         {
             return (PlayfieldType)Enum.GetValues(typeof(PlayfieldType)).Cast<int>().OrderByDescending(i => i).First(v => variant >= v);
         }
+
+        protected override IEnumerable<HitResult> GetValidHitResults()
+        {
+            return new[]
+            {
+                HitResult.Perfect,
+                HitResult.Great,
+                HitResult.Good,
+                HitResult.Ok,
+                HitResult.Meh,
+
+                HitResult.LargeTickHit,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LargeTickHit:
+                    return "hold tick";
+            }
+
+            return base.GetDisplayNameForHitResult(result);
+        }
+
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
+        {
+            new StatisticRow
+            {
+                Columns = new[]
+                {
+                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 250
+                    }),
+                }
+            },
+            new StatisticRow
+            {
+                Columns = new[]
+                {
+                    new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                    {
+                        new UnstableRate(score.HitEvents)
+                    }))
+                }
+            }
+        };
     }
 
     public enum PlayfieldType

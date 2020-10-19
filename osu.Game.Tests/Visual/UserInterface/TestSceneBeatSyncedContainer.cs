@@ -26,14 +26,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private readonly NowPlayingOverlay np;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(BeatSyncedContainer)
-        };
-
-        [Cached]
-        private MusicController musicController = new MusicController();
-
         public TestSceneBeatSyncedContainer()
         {
             Clock = new FramedClock();
@@ -41,7 +33,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddRange(new Drawable[]
             {
-                musicController,
                 new BeatContainer
                 {
                     Anchor = Anchor.BottomCentre,
@@ -75,6 +66,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             private readonly InfoString timeSinceLastBeat;
 
             private readonly Box flashLayer;
+
+            [Resolved]
+            private MusicController musicController { get; set; }
 
             public BeatContainer()
             {
@@ -170,7 +164,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (timingPoints.Count == 0) return 0;
 
                 if (timingPoints[^1] == current)
-                    return (int)Math.Ceiling((Beatmap.Value.Track.Length - current.Time) / current.BeatLength);
+                    return (int)Math.Ceiling((musicController.CurrentTrack.Length - current.Time) / current.BeatLength);
 
                 return (int)Math.Ceiling((getNextTimingPoint(current).Time - current.Time) / current.BeatLength);
             }
@@ -182,7 +176,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 timeSinceLastBeat.Value = TimeSinceLastBeat;
             }
 
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 

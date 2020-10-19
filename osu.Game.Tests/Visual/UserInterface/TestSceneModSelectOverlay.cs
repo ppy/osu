@@ -12,14 +12,12 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
-using osu.Game.Overlays.Mods.Sections;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Graphics;
@@ -29,20 +27,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     [Description("mod select and icon display")]
     public class TestSceneModSelectOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ModDisplay),
-            typeof(ModSection),
-            typeof(ModIcon),
-            typeof(ModButton),
-            typeof(ModButtonEmpty),
-            typeof(DifficultyReductionSection),
-            typeof(DifficultyIncreaseSection),
-            typeof(AutomationSection),
-            typeof(ConversionSection),
-            typeof(FunSection),
-        };
-
         private RulesetStore rulesets;
         private ModDisplay modDisplay;
         private TestModSelectOverlay modSelect;
@@ -118,7 +102,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             changeRuleset(3);
 
-            testRankedText(new ManiaRuleset().GetModsFor(ModType.Conversion).First(m => m is ManiaModRandom));
+            var mania = new ManiaRuleset();
+
+            testModsWithSameBaseType(
+                mania.GetAllMods().Single(m => m.GetType() == typeof(ManiaModFadeIn)),
+                mania.GetAllMods().Single(m => m.GetType() == typeof(ManiaModHidden)));
         }
 
         [Test]
@@ -217,13 +205,16 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkLabelColor(() => Color4.White);
         }
 
-        private void testRankedText(Mod mod)
+        private void testModsWithSameBaseType(Mod modA, Mod modB)
         {
-            AddUntilStep("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
-            selectNext(mod);
-            AddUntilStep("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
-            selectPrevious(mod);
-            AddUntilStep("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
+            selectNext(modA);
+            checkSelected(modA);
+            selectNext(modB);
+            checkSelected(modB);
+
+            // Backwards
+            selectPrevious(modA);
+            checkSelected(modA);
         }
 
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
@@ -272,7 +263,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             public new OsuSpriteText MultiplierLabel => base.MultiplierLabel;
-            public new OsuSpriteText UnrankedLabel => base.UnrankedLabel;
             public new TriangleButton DeselectAllButton => base.DeselectAllButton;
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;

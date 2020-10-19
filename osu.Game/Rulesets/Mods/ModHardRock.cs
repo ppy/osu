@@ -17,7 +17,9 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Everything just got a bit harder...";
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust) };
 
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty) { }
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        {
+        }
 
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {

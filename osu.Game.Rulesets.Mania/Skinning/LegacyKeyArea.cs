@@ -33,10 +33,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string upImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.KeyImage)?.Value
+            string upImage = GetColumnSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.KeyImage)?.Value
                              ?? $"mania-key{FallbackColumnIndex}";
 
-            string downImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.KeyImageDown)?.Value
+            string downImage = GetColumnSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.KeyImageDown)?.Value
                                ?? $"mania-key{FallbackColumnIndex}D";
 
             InternalChild = directionContainer = new Container
@@ -65,6 +65,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
+
+            if (GetColumnSkinConfig<bool>(skin, LegacyManiaSkinConfigurationLookups.KeysUnderNotes)?.Value ?? false)
+                Column.UnderlayElements.Add(CreateProxy());
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)

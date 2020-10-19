@@ -3,65 +3,126 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
-using osu.Game.Online.API.Requests;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Game.Overlays.Comments;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Game.Users;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
     public class TestSceneCommentsContainer : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CommentsContainer),
-            typeof(CommentsHeader),
-            typeof(DrawableComment),
-            typeof(HeaderButton),
-            typeof(OverlaySortTabControl<>),
-            typeof(ShowChildrenButton),
-            typeof(DeletedCommentsCounter),
-            typeof(VotePill),
-            typeof(CommentsPage),
-        };
-
-        protected override bool UseOnlineAPI => true;
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        public TestSceneCommentsContainer()
-        {
-            BasicScrollContainer scroll;
-            TestCommentsContainer comments;
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-            Add(scroll = new BasicScrollContainer
+        private CommentsContainer commentsContainer;
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+            Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = comments = new TestCommentsContainer()
+                Child = commentsContainer = new CommentsContainer()
             });
 
-            AddStep("Big Black comments", () => comments.ShowComments(CommentableType.Beatmapset, 41823));
-            AddStep("Airman comments", () => comments.ShowComments(CommentableType.Beatmapset, 24313));
-            AddStep("Lazer build comments", () => comments.ShowComments(CommentableType.Build, 4772));
-            AddStep("News comments", () => comments.ShowComments(CommentableType.NewsPost, 715));
-            AddStep("Trigger user change", comments.User.TriggerChange);
-            AddStep("Idle state", () =>
-            {
-                scroll.Clear();
-                scroll.Add(comments = new TestCommentsContainer());
-            });
-        }
-
-        private class TestCommentsContainer : CommentsContainer
+        [Test]
+        public void TestIdleState()
         {
-            public new Bindable<User> User => base.User;
+            AddUntilStep("loading spinner shown",
+                () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().IsLoading);
         }
+
+        [Test]
+        public void TestSingleCommentsPage()
+        {
+            setUpCommentsResponse(exampleComments);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("show more button hidden",
+                () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().Alpha == 0);
+        }
+
+        [Test]
+        public void TestMultipleCommentPages()
+        {
+            var comments = exampleComments;
+            comments.HasMore = true;
+            comments.TopLevelCount = 10;
+
+            setUpCommentsResponse(comments);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("show more button visible",
+                () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().Alpha == 1);
+        }
+
+        [Test]
+        public void TestMultipleLoads()
+        {
+            var comments = exampleComments;
+            int topLevelCommentCount = exampleComments.Comments.Count;
+
+            AddStep("hide container", () => commentsContainer.Hide());
+            setUpCommentsResponse(comments);
+            AddRepeatStep("show comments multiple times",
+                () => commentsContainer.ShowComments(CommentableType.Beatmapset, 456), 2);
+            AddStep("show container", () => commentsContainer.Show());
+            AddUntilStep("comment count is correct",
+                () => commentsContainer.ChildrenOfType<DrawableComment>().Count() == topLevelCommentCount);
+        }
+
+        private void setUpCommentsResponse(CommentBundle commentBundle)
+            => AddStep("set up response", () =>
+            {
+                dummyAPI.HandleRequest = request =>
+                {
+                    if (!(request is GetCommentsRequest getCommentsRequest))
+                        return;
+
+                    getCommentsRequest.TriggerSuccess(commentBundle);
+                };
+            });
+
+        private CommentBundle exampleComments => new CommentBundle
+        {
+            Comments = new List<Comment>
+            {
+                new Comment
+                {
+                    Id = 1,
+                    Message = "This is a comment",
+                    LegacyName = "FirstUser",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 19,
+                    RepliesCount = 1
+                },
+                new Comment
+                {
+                    Id = 5,
+                    ParentId = 1,
+                    Message = "This is a child comment",
+                    LegacyName = "SecondUser",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 4,
+                },
+                new Comment
+                {
+                    Id = 10,
+                    Message = "This is another comment",
+                    LegacyName = "ThirdUser",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 0
+                },
+            },
+            IncludedComments = new List<Comment>(),
+        };
     }
 }

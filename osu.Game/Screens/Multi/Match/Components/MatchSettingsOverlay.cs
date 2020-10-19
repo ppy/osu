@@ -14,7 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.SearchableList;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             {
                                                 new Container
                                                 {
-                                                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                                                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.WIDTH_PADDING },
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
                                                     Children = new Drawable[]
@@ -133,7 +133,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
-                                                                        OnCommit = (sender, text) => apply(),
                                                                     },
                                                                 },
                                                                 new Section("Duration")
@@ -196,7 +195,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
                                                                         ReadOnly = true,
-                                                                        OnCommit = (sender, text) => apply()
                                                                     },
                                                                 },
                                                                 new Section("Password (optional)")
@@ -207,7 +205,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
                                                                         ReadOnly = true,
-                                                                        OnCommit = (sender, text) => apply()
                                                                     },
                                                                 },
                                                             },
@@ -331,6 +328,9 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             private void apply()
             {
+                if (!ApplyButton.Enabled.Value)
+                    return;
+
                 hideError();
 
                 RoomName.Value = NameField.Text;
@@ -433,7 +433,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             }
         }
 
-        private class CreateRoomButton : TriangleButton
+        public class CreateRoomButton : TriangleButton
         {
             public CreateRoomButton()
             {

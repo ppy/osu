@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -24,14 +23,14 @@ namespace osu.Game.Screens
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
-        /// This allows for the game content to be pushed byt he options/notification overlays without causing black areas to appear.
+        /// This allows for the game content to be pushed by the options/notification overlays without causing black areas to appear.
         /// </summary>
         public const float HORIZONTAL_OVERFLOW_PADDING = 50;
 
         /// <summary>
         /// A user-facing title for this screen.
         /// </summary>
-        public virtual string Title => GetType().ShortDisplayName();
+        public virtual string Title => GetType().Name;
 
         public string Description => Title;
 
@@ -45,9 +44,13 @@ namespace osu.Game.Screens
         public virtual bool HideOverlaysOnEnter => false;
 
         /// <summary>
-        /// Whether overlays should be able to be opened once this screen is entered or resumed.
+        /// The initial overlay activation mode to use when this screen is entered for the first time.
         /// </summary>
-        public virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
+        protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
+
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode;
+
+        IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
 
         public virtual bool CursorVisible => true;
 
@@ -139,6 +142,8 @@ namespace osu.Game.Screens
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+
+            OverlayActivationMode = new Bindable<OverlayActivation>(InitialOverlayActivationMode);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -259,5 +264,7 @@ namespace osu.Game.Screens
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
+
+        public virtual bool OnBackButton() => false;
     }
 }

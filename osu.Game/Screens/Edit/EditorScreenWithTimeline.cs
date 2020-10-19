@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK.Graphics;
@@ -24,6 +25,11 @@ namespace osu.Game.Screens.Edit
 
         private Container timelineContainer;
 
+        protected EditorScreenWithTimeline(EditorScreenMode type)
+            : base(type)
+        {
+        }
+
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] BindableBeatDivisor beatDivisor)
         {
@@ -31,6 +37,8 @@ namespace osu.Game.Screens.Edit
                 this.beatDivisor.BindTo(beatDivisor);
 
             Container mainContent;
+
+            LoadingSpinner spinner;
 
             Children = new Drawable[]
             {
@@ -43,6 +51,10 @@ namespace osu.Game.Screens.Edit
                         Horizontal = horizontal_margins,
                         Top = vertical_margins + timeline_height,
                         Bottom = vertical_margins
+                    },
+                    Child = spinner = new LoadingSpinner(true)
+                    {
+                        State = { Value = Visibility.Visible },
                     },
                 },
                 new Container
@@ -90,6 +102,8 @@ namespace osu.Game.Screens.Edit
 
             LoadComponentAsync(CreateMainContent(), content =>
             {
+                spinner.State.Value = Visibility.Hidden;
+
                 mainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
 
@@ -98,11 +112,18 @@ namespace osu.Game.Screens.Edit
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        new TimelineTickDisplay(),
                         CreateTimelineContent(),
                     }
-                }, timelineContainer.Add);
+                }, t =>
+                {
+                    timelineContainer.Add(t);
+                    OnTimelineLoaded(t);
+                });
             });
+        }
+
+        protected virtual void OnTimelineLoaded(TimelineArea timelineArea)
+        {
         }
 
         protected abstract Drawable CreateMainContent();

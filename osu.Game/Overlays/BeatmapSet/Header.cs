@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     {
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
-                                                        Margin = new MarginPadding { Left = 3, Bottom = 4 }, //To better lineup with the font
+                                                        Margin = new MarginPadding { Left = 3, Bottom = 4 }, // To better lineup with the font
                                                     },
                                                 }
                                             },
@@ -264,7 +264,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             if (BeatmapSet.Value == null) return;
 
-            if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
+            if ((BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false) && State.Value != DownloadState.LocallyAvailable)
             {
                 downloadButtonsContainer.Clear();
                 return;

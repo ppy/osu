@@ -2,11 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
     public class DifficultyControlPoint : ControlPoint
     {
+        public static readonly DifficultyControlPoint DEFAULT = new DifficultyControlPoint
+        {
+            SpeedMultiplierBindable = { Disabled = true },
+        };
+
         /// <summary>
         /// The speed multiplier at this control point.
         /// </summary>
@@ -17,6 +24,8 @@ namespace osu.Game.Beatmaps.ControlPoints
             MinValue = 0.1,
             MaxValue = 10
         };
+
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.GreenDark;
 
         /// <summary>
         /// The speed multiplier at this control point.

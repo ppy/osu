@@ -3,8 +3,6 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
-using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
@@ -17,11 +15,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneOverlayScrollContainer : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(OverlayScrollContainer)
-        };
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 

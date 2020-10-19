@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Rankings
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private readonly Bindable<APISpotlight> selectedSpotlight = new Bindable<APISpotlight>();
+        private readonly Bindable<RankingsSortCriteria> sort = new Bindable<RankingsSortCriteria>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -72,15 +73,16 @@ namespace osu.Game.Overlays.Rankings
                     }
                 }
             };
+
+            sort.BindTo(selector.Sort);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            selector.Show();
-
-            selectedSpotlight.BindValueChanged(onSpotlightChanged);
+            selectedSpotlight.BindValueChanged(_ => onSpotlightChanged());
+            sort.BindValueChanged(_ => onSpotlightChanged());
             Ruleset.BindValueChanged(onRulesetChanged);
 
             getSpotlights();
@@ -101,14 +103,14 @@ namespace osu.Game.Overlays.Rankings
             selectedSpotlight.TriggerChange();
         }
 
-        private void onSpotlightChanged(ValueChangedEvent<APISpotlight> spotlight)
+        private void onSpotlightChanged()
         {
             loading.Show();
 
             cancellationToken?.Cancel();
             getRankingsRequest?.Cancel();
 
-            getRankingsRequest = new GetSpotlightRankingsRequest(Ruleset.Value, spotlight.NewValue.Id);
+            getRankingsRequest = new GetSpotlightRankingsRequest(Ruleset.Value, selectedSpotlight.Value.Id, sort.Value);
             getRankingsRequest.Success += onSuccess;
             api.Queue(getRankingsRequest);
         }

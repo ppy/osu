@@ -17,6 +17,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly SpriteIcon spinner;
 
+        protected override bool StartHidden => true;
+
         protected Container MainContents;
 
         public const float TRANSITION_DURATION = 500;

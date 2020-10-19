@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 RelativeSizeAxes = Axes.Both;
             }
 
-            //disable keyboard controls
+            // disable keyboard controls
             public bool OnPressed(CatchAction action) => true;
 
             public void OnReleased(CatchAction action)
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                catcher.UpdatePosition(e.MousePosition.X / DrawSize.X);
+                catcher.UpdatePosition(e.MousePosition.X / DrawSize.X * CatchPlayfield.WIDTH);
                 return base.OnMouseMove(e);
             }
         }

@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -15,22 +15,21 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
     public class TestSceneDrawableJudgement : ManiaSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableJudgement),
-            typeof(DrawableManiaJudgement)
-        };
-
         public TestSceneDrawableJudgement()
         {
+            var hitWindows = new ManiaHitWindows();
+
             foreach (HitResult result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Skip(1))
             {
-                AddStep("Show " + result.GetDescription(), () => SetContents(() =>
-                    new DrawableManiaJudgement(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }));
+                if (hitWindows.IsHitResultAllowed(result))
+                {
+                    AddStep("Show " + result.GetDescription(), () => SetContents(() =>
+                        new DrawableManiaJudgement(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }));
+                }
             }
         }
     }

@@ -2,13 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
-using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -16,22 +13,6 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class TestSceneFruitObjects : CatchSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
-        {
-            typeof(CatchHitObject),
-            typeof(Fruit),
-            typeof(FruitPiece),
-            typeof(Droplet),
-            typeof(Banana),
-            typeof(BananaShower),
-            typeof(DrawableCatchHitObject),
-            typeof(DrawableFruit),
-            typeof(DrawableDroplet),
-            typeof(DrawableBanana),
-            typeof(DrawableBananaShower),
-            typeof(Pulp),
-        }).ToList();
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -39,19 +20,19 @@ namespace osu.Game.Rulesets.Catch.Tests
             foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
                 AddStep($"show {rep}", () => SetContents(() => createDrawable(rep)));
 
-            AddStep("show droplet", () => SetContents(createDrawableDroplet));
-
+            AddStep("show droplet", () => SetContents(() => createDrawableDroplet()));
             AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
 
             foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
                 AddStep($"show hyperdash {rep}", () => SetContents(() => createDrawable(rep, true)));
+
+            AddStep("show hyperdash droplet", () => SetContents(() => createDrawableDroplet(true)));
         }
 
         private Drawable createDrawableTinyDroplet()
         {
-            var droplet = new TinyDroplet
+            var droplet = new TestCatchTinyDroplet
             {
-                StartTime = Clock.CurrentTime,
                 Scale = 1.5f,
             };
 
@@ -66,12 +47,12 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
         }
 
-        private Drawable createDrawableDroplet()
+        private Drawable createDrawableDroplet(bool hyperdash = false)
         {
-            var droplet = new Droplet
+            var droplet = new TestCatchDroplet
             {
-                StartTime = Clock.CurrentTime,
                 Scale = 1.5f,
+                HyperDashTarget = hyperdash ? new Banana() : null
             };
 
             return new DrawableDroplet(droplet)
@@ -113,6 +94,22 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
 
             public override FruitVisualRepresentation VisualRepresentation { get; }
+        }
+
+        public class TestCatchDroplet : Droplet
+        {
+            public TestCatchDroplet()
+            {
+                StartTime = 1000000000000;
+            }
+        }
+
+        public class TestCatchTinyDroplet : TinyDroplet
+        {
+            public TestCatchTinyDroplet()
+            {
+                StartTime = 1000000000000;
+            }
         }
     }
 }

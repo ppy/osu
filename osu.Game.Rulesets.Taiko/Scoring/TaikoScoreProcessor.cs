@@ -7,6 +7,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 {
     internal class TaikoScoreProcessor : ScoreProcessor
     {
-        public override HitWindows CreateHitWindows() => new TaikoHitWindows();
+        protected override double DefaultAccuracyPortion => 0.75;
+
+        protected override double DefaultComboPortion => 0.25;
     }
 }
