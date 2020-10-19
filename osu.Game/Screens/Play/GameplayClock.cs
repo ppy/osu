@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
-    public class GameplayClock : IFrameBasedClock, ISamplePlaybackDisabler
+    public class GameplayClock : IFrameBasedClock
     {
         private readonly IFrameBasedClock underlyingClock;
 
@@ -27,8 +27,6 @@ namespace osu.Game.Screens.Play
         /// All adjustments applied to this clock which don't come from gameplay or mods.
         /// </summary>
         public virtual IEnumerable<Bindable<double>> NonGameplayAdjustments => Enumerable.Empty<Bindable<double>>();
-
-        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         public GameplayClock(IFrameBasedClock underlyingClock)
         {
@@ -66,13 +64,11 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Whether nested samples supporting the <see cref="ISamplePlaybackDisabler"/> interface should be paused.
         /// </summary>
-        protected virtual bool ShouldDisableSamplePlayback => IsPaused.Value;
+        public virtual bool ShouldDisableSamplePlayback => IsPaused.Value;
 
         public void ProcessFrame()
         {
             // intentionally not updating the underlying clock (handled externally).
-
-            samplePlaybackDisabled.Value = ShouldDisableSamplePlayback;
         }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
@@ -82,7 +78,5 @@ namespace osu.Game.Screens.Play
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
         public IClock Source => underlyingClock;
-
-        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
     }
 }
