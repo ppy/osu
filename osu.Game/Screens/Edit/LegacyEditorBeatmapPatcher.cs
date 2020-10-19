@@ -68,19 +68,20 @@ namespace osu.Game.Screens.Edit
             toRemove.Sort();
             toAdd.Sort();
 
-            editorBeatmap.ApplyBatchChanges(eb =>
-            {
-                // Apply the changes.
-                for (int i = toRemove.Count - 1; i >= 0; i--)
-                    eb.RemoveAt(toRemove[i]);
+            editorBeatmap.BeginChange();
 
-                if (toAdd.Count > 0)
-                {
-                    IBeatmap newBeatmap = readBeatmap(newState);
-                    foreach (var i in toAdd)
-                        eb.Insert(i, newBeatmap.HitObjects[i]);
-                }
-            });
+            // Apply the changes.
+            for (int i = toRemove.Count - 1; i >= 0; i--)
+                editorBeatmap.RemoveAt(toRemove[i]);
+
+            if (toAdd.Count > 0)
+            {
+                IBeatmap newBeatmap = readBeatmap(newState);
+                foreach (var i in toAdd)
+                    editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
+            }
+
+            editorBeatmap.EndChange();
         }
 
         private string readString(byte[] state) => Encoding.UTF8.GetString(state);
