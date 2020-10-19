@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -30,7 +31,7 @@ namespace osu.Game.Updater
             version = game.Version;
         }
 
-        protected override async Task PerformUpdateCheck()
+        protected override async Task<bool> PerformUpdateCheck()
         {
             try
             {
@@ -53,12 +54,17 @@ namespace osu.Game.Updater
                             return true;
                         }
                     });
+
+                    return true;
                 }
             }
             catch
             {
                 // we shouldn't crash on a web failure. or any failure for the matter.
+                return true;
             }
+
+            return false;
         }
 
         private string getBestUrl(GitHubRelease release)
@@ -68,16 +74,21 @@ namespace osu.Game.Updater
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe", StringComparison.Ordinal));
                     break;
 
                 case RuntimeInfo.Platform.MacOsx:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip", StringComparison.Ordinal));
                     break;
 
                 case RuntimeInfo.Platform.Linux:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage", StringComparison.Ordinal));
                     break;
+
+                case RuntimeInfo.Platform.iOS:
+                    // iOS releases are available via testflight. this link seems to work well enough for now.
+                    // see https://stackoverflow.com/a/32960501
+                    return "itms-beta://beta.itunes.apple.com/v1/app/1447765923";
 
                 case RuntimeInfo.Platform.Android:
                     // on our testing device this causes the download to magically disappear.

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
@@ -18,9 +19,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            AccentColour = component == TaikoSkinComponents.CentreHit
-                ? new Color4(235, 69, 44, 255)
-                : new Color4(67, 142, 172, 255);
+            AccentColour = LegacyColourCompatibility.DisallowZeroAlpha(
+                component == TaikoSkinComponents.CentreHit
+                    ? new Color4(235, 69, 44, 255)
+                    : new Color4(67, 142, 172, 255));
         }
     }
 }

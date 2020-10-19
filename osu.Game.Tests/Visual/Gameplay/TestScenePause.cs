@@ -11,6 +11,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
@@ -157,7 +158,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestQuickRetryFromFailedGameplay()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddStep("quick retry", () => Player.GameplayClockContainer.OfType<HotkeyRetryOverlay>().First().Action?.Invoke());
+            AddStep("quick retry", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyRetryOverlay>().First().Action?.Invoke());
 
             confirmExited();
         }
@@ -166,7 +167,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestQuickExitFromFailedGameplay()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddStep("quick exit", () => Player.GameplayClockContainer.OfType<HotkeyExitOverlay>().First().Action?.Invoke());
+            AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
 
             confirmExited();
         }
@@ -182,7 +183,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickExitFromGameplay()
         {
-            AddStep("quick exit", () => Player.GameplayClockContainer.OfType<HotkeyExitOverlay>().First().Action?.Invoke());
+            AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
 
             confirmExited();
         }
@@ -219,6 +220,31 @@ namespace osu.Game.Tests.Visual.Gameplay
             resumeAndConfirm();
             restart();
             confirmExited();
+        }
+
+        [Test]
+        public void TestPauseSoundLoop()
+        {
+            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
+
+            SkinnableSound getLoop() => Player.ChildrenOfType<PauseOverlay>().FirstOrDefault()?.ChildrenOfType<SkinnableSound>().FirstOrDefault();
+
+            pauseAndConfirm();
+            AddAssert("loop is playing", () => getLoop().IsPlaying);
+
+            resumeAndConfirm();
+            AddUntilStep("loop is stopped", () => !getLoop().IsPlaying);
+
+            AddUntilStep("pause again", () =>
+            {
+                Player.Pause();
+                return !Player.GameplayClockContainer.GameplayClock.IsRunning;
+            });
+
+            AddAssert("loop is playing", () => getLoop().IsPlaying);
+
+            resumeAndConfirm();
+            AddUntilStep("loop is stopped", () => !getLoop().IsPlaying);
         }
 
         private void pauseAndConfirm()

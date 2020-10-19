@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -29,12 +30,14 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Overlays;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK.Input;
+using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
 {
@@ -55,6 +58,8 @@ namespace osu.Game
 
         protected ScoreManager ScoreManager;
 
+        protected BeatmapDifficultyManager DifficultyManager;
+
         protected SkinManager SkinManager;
 
         protected RulesetStore RulesetStore;
@@ -70,6 +75,8 @@ namespace osu.Game
         protected IAPIProvider API;
 
         protected MenuCursorContainer MenuCursorContainer;
+
+        protected MusicController MusicController;
 
         private Container content;
 
@@ -96,6 +103,11 @@ namespace osu.Game
         private Bindable<bool> fpsDisplayVisible;
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
+
+        /// <summary>
+        /// MD5 representation of the game executable.
+        /// </summary>
+        public string VersionHash { get; private set; }
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
@@ -128,6 +140,18 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
+            try
+            {
+                using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
+                    VersionHash = str.ComputeMD5Hash();
+            }
+            catch
+            {
+                // special case for android builds, which can't read DLLs from a packed apk.
+                // should eventually be handled in a better way.
+                VersionHash = $"{Version}-{RuntimeInfo.OS}".ComputeMD5Hash();
+            }
+
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
@@ -175,8 +199,8 @@ namespace osu.Game
             dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => DifficultyManager, LocalConfig));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap, true));
 
             // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
@@ -199,31 +223,24 @@ namespace osu.Game
                     ScoreManager.Undelete(getBeatmapScores(item), true);
             });
 
+            dependencies.Cache(DifficultyManager = new BeatmapDifficultyManager());
+            AddInternal(DifficultyManager);
+
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
             dependencies.Cache(new SessionStatics());
             dependencies.Cache(new OsuColour());
 
-            fileImporters.Add(BeatmapManager);
-            fileImporters.Add(ScoreManager);
-            fileImporters.Add(SkinManager);
+            RegisterImportHandler(BeatmapManager);
+            RegisterImportHandler(ScoreManager);
+            RegisterImportHandler(SkinManager);
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
-
-            // ScheduleAfterChildren is safety against something in the current frame accessing the previous beatmap's track
-            // and potentially causing a reload of it after just unloading.
-            // Note that the reason for this being added *has* been resolved, so it may be feasible to removed this if required.
-            Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
-            {
-                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
-                if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
-                    b.OldValue.RecycleTrack();
-            }));
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
@@ -234,10 +251,11 @@ namespace osu.Game
                 AddInternal(apiAccess);
             AddInternal(RulesetConfigCache);
 
-            GlobalActionContainer globalBinding;
-
             MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
-            MenuCursorContainer.Child = globalBinding = new GlobalActionContainer(this)
+
+            GlobalActionContainer globalBindings;
+
+            MenuCursorContainer.Child = globalBindings = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
@@ -245,12 +263,15 @@ namespace osu.Game
 
             base.Content.Add(CreateScalingContainer().WithChild(MenuCursorContainer));
 
-            KeyBindingStore.Register(globalBinding);
-            dependencies.Cache(globalBinding);
+            KeyBindingStore.Register(globalBindings);
+            dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
+
+            AddInternal(MusicController = new MusicController());
+            dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }
@@ -322,6 +343,18 @@ namespace osu.Game
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 
+        /// <summary>
+        /// Register a global handler for file imports. Most recently registered will have precedence.
+        /// </summary>
+        /// <param name="handler">The handler to register.</param>
+        public void RegisterImportHandler(ICanAcceptFiles handler) => fileImporters.Insert(0, handler);
+
+        /// <summary>
+        /// Unregister a global handler for file imports.
+        /// </summary>
+        /// <param name="handler">The previously registered handler.</param>
+        public void UnregisterImportHandler(ICanAcceptFiles handler) => fileImporters.Remove(handler);
+
         public async Task Import(params string[] paths)
         {
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
@@ -333,13 +366,15 @@ namespace osu.Game
             }
         }
 
-        public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
+        public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             RulesetStore?.Dispose();
             BeatmapManager?.Dispose();
+            LocalConfig?.Dispose();
 
             contextFactory.FlushConnections();
         }
@@ -373,7 +408,7 @@ namespace osu.Game
         public void Migrate(string path)
         {
             contextFactory.FlushConnections();
-            (Storage as OsuStorage)?.Migrate(path);
+            (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
         }
     }
 }

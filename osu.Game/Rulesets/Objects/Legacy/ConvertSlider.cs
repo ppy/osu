@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -29,6 +30,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         public List<IList<HitSampleInfo>> NodeSamples { get; set; }
         public int RepeatCount { get; set; }
 
+        [JsonIgnore]
         public double Duration
         {
             get => this.SpanCount() * Distance / Velocity;

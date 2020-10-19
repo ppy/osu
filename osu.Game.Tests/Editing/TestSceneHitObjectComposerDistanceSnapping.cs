@@ -169,17 +169,17 @@ namespace osu.Game.Tests.Editing
         [Test]
         public void GetSnappedDistanceFromDistance()
         {
-            assertSnappedDistance(50, 100);
+            assertSnappedDistance(50, 0);
             assertSnappedDistance(100, 100);
-            assertSnappedDistance(150, 200);
+            assertSnappedDistance(150, 100);
             assertSnappedDistance(200, 200);
-            assertSnappedDistance(250, 300);
+            assertSnappedDistance(250, 200);
 
             AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2);
 
             assertSnappedDistance(50, 0);
-            assertSnappedDistance(100, 200);
-            assertSnappedDistance(150, 200);
+            assertSnappedDistance(100, 0);
+            assertSnappedDistance(150, 0);
             assertSnappedDistance(200, 200);
             assertSnappedDistance(250, 200);
 
@@ -190,8 +190,8 @@ namespace osu.Game.Tests.Editing
             });
 
             assertSnappedDistance(50, 0);
-            assertSnappedDistance(100, 200);
-            assertSnappedDistance(150, 200);
+            assertSnappedDistance(100, 0);
+            assertSnappedDistance(150, 0);
             assertSnappedDistance(200, 200);
             assertSnappedDistance(250, 200);
             assertSnappedDistance(400, 400);

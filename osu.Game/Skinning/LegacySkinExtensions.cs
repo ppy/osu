@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Skinning
 {
@@ -61,6 +62,9 @@ namespace osu.Game.Skinning
             }
         }
 
+        public static bool HasFont(this ISkin source, string fontPrefix)
+            => source.GetTexture($"{fontPrefix}-0") != null;
+
         public class SkinnableTextureAnimation : TextureAnimation
         {
             [Resolved(canBeNull: true)]
@@ -89,7 +93,7 @@ namespace osu.Game.Skinning
         {
             if (applyConfigFrameRate)
             {
-                var iniRate = source.GetConfig<GlobalSkinConfiguration, int>(GlobalSkinConfiguration.AnimationFramerate);
+                var iniRate = source.GetConfig<LegacySetting, int>(LegacySetting.AnimationFramerate);
 
                 if (iniRate?.Value > 0)
                     return 1000f / iniRate.Value;

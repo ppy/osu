@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (MenuVoice.Value && !UsingThemedIntro)
+            if (MenuVoice.Value)
                 welcome = audio.Samples.Get(@"Intro/welcome");
         }
 
@@ -64,7 +64,8 @@ namespace osu.Game.Screens.Menu
                 }, t =>
                 {
                     AddInternal(t);
-                    welcome?.Play();
+                    if (!UsingThemedIntro)
+                        welcome?.Play();
 
                     StartTrack();
                 });
@@ -260,7 +261,7 @@ namespace osu.Game.Screens.Menu
 
             private class LazerLogo : CompositeDrawable
             {
-                private HueAnimation highlight, background;
+                private LogoAnimation highlight, background;
 
                 public float Progress
                 {
@@ -282,13 +283,13 @@ namespace osu.Game.Screens.Menu
                 {
                     InternalChildren = new Drawable[]
                     {
-                        highlight = new HueAnimation
+                        highlight = new LogoAnimation
                         {
                             RelativeSizeAxes = Axes.Both,
                             Texture = textures.Get(@"Intro/Triangles/logo-highlight"),
                             Colour = Color4.White,
                         },
-                        background = new HueAnimation
+                        background = new LogoAnimation
                         {
                             RelativeSizeAxes = Axes.Both,
                             Texture = textures.Get(@"Intro/Triangles/logo-background"),

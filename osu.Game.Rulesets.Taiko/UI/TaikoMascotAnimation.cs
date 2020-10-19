@@ -128,6 +128,13 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         private static Texture getAnimationFrame(ISkin skin, TaikoMascotAnimationState state, int frameIndex)
-            => skin.GetTexture($"pippidon{state.ToString().ToLower()}{frameIndex}");
+        {
+            var texture = skin.GetTexture($"pippidon{state.ToString().ToLower()}{frameIndex}");
+
+            if (frameIndex == 0 && texture == null)
+                texture = skin.GetTexture($"pippidon{state.ToString().ToLower()}");
+
+            return texture;
+        }
     }
 }

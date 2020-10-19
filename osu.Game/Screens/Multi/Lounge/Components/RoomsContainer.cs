@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Multiplayer;
 using osuTK;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
@@ -37,24 +39,31 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [Resolved]
         private IRoomManager roomManager { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private LoungeSubScreen loungeSubScreen { get; set; }
+
         public RoomsContainer()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = roomFlow = new FillFlowContainer<DrawableRoom>
+            InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(2),
+                Child = roomFlow = new FillFlowContainer<DrawableRoom>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2),
+                }
             };
         }
 
         protected override void LoadComplete()
         {
-            rooms.ItemsAdded += addRooms;
-            rooms.ItemsRemoved += removeRooms;
+            rooms.CollectionChanged += roomsChanged;
             roomManager.RoomsUpdated += updateSorting;
 
             rooms.BindTo(roomManager.Rooms);
@@ -80,6 +89,20 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     r.MatchingFilter = matchingFilter;
                 }
             });
+        }
+
+        private void roomsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    addRooms(args.NewItems.Cast<Room>());
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    removeRooms(args.OldItems.Cast<Room>());
+                    break;
+            }
         }
 
         private void addRooms(IEnumerable<Room> rooms)

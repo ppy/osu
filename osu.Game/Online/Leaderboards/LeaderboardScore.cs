@@ -72,7 +72,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour)
+        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager)
         {
             var user = score.User;
 
@@ -82,20 +82,10 @@ namespace osu.Game.Online.Leaderboards
 
             Children = new Drawable[]
             {
-                new Container
+                new RankLabel(rank)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = rank_width,
-                    Children = new[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
-                        },
-                    },
                 },
                 content = new Container
                 {
@@ -204,7 +194,7 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             TextColour = Color4.White,
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
-                                            Text = score.TotalScore.ToString(@"N0"),
+                                            Current = scoreManager.GetBindableTotalScoreString(score),
                                             Font = OsuFont.Numeric.With(size: 23),
                                         },
                                         RankContainer = new Container
@@ -354,6 +344,25 @@ namespace osu.Game.Online.Leaderboards
                     },
                 };
             }
+        }
+
+        private class RankLabel : Container, IHasTooltip
+        {
+            public RankLabel(int? rank)
+            {
+                if (rank >= 1000)
+                    TooltipText = $"#{rank:N0}";
+
+                Child = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.GetFont(size: 20, italics: true),
+                    Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                };
+            }
+
+            public string TooltipText { get; }
         }
 
         public class LeaderboardScoreStatistic
