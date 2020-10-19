@@ -4,12 +4,12 @@
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 
-namespace osu.Game.Tournament
+namespace osu.Game.Tournament.IO
 {
-    internal class TournamentStorage : NamespacedResourceStore<byte[]>
+    public class TournamentVideoResourceStore : NamespacedResourceStore<byte[]>
     {
-        public TournamentStorage(Storage storage)
-            : base(new StorageBackedResourceStore(storage), "tournament")
+        public TournamentVideoResourceStore(Storage storage)
+            : base(new StorageBackedResourceStore(storage), "videos")
         {
             AddExtension("m4v");
             AddExtension("avi");

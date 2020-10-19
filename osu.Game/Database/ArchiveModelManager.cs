@@ -279,7 +279,7 @@ namespace osu.Game.Database
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
-            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(f.Filename.EndsWith)).OrderBy(f => f.Filename))
+            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
             {
                 using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
                     s.CopyTo(hashable);
@@ -593,7 +593,7 @@ namespace osu.Game.Database
             var fileInfos = new List<TFileModel>();
 
             string prefix = reader.Filenames.GetCommonPrefix();
-            if (!(prefix.EndsWith("/") || prefix.EndsWith("\\")))
+            if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
                 prefix = string.Empty;
 
             // import files to manager

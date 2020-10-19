@@ -1,35 +1,37 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ScoreCounter : RollingCounter<double>
+    public abstract class ScoreCounter : RollingCounter<double>, IScoreCounter
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
 
-        public bool UseCommaSeparator;
-
         /// <summary>
-        /// How many leading zeroes the counter has.
+        /// Whether comma separators should be displayed.
         /// </summary>
-        public uint LeadingZeroes { get; }
+        public bool UseCommaSeparator { get; }
+
+        public Bindable<int> RequiredDisplayDigits { get; } = new Bindable<int>();
 
         /// <summary>
         /// Displays score.
         /// </summary>
         /// <param name="leading">How many leading zeroes the counter will have.</param>
-        public ScoreCounter(uint leading = 0)
+        /// <param name="useCommaSeparator">Whether comma separators should be displayed.</param>
+        protected ScoreCounter(int leading = 0, bool useCommaSeparator = false)
         {
-            LeadingZeroes = leading;
-        }
+            UseCommaSeparator = useCommaSeparator;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => Colour = colours.BlueLighter;
+            RequiredDisplayDigits.Value = leading;
+            RequiredDisplayDigits.BindValueChanged(_ => UpdateDisplay());
+        }
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {
@@ -38,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override string FormatCount(double count)
         {
-            string format = new string('0', (int)LeadingZeroes);
+            string format = new string('0', RequiredDisplayDigits.Value);
 
             if (UseCommaSeparator)
             {
