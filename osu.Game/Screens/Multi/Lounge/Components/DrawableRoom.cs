@@ -38,10 +38,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public event Action<SelectionState> StateChanged;
 
-        public Action DuplicateRoom;
-
         private readonly Box selectionBox;
         private CachedModelDependencyContainer<Room> dependencies;
+
+        [Resolved(canBeNull: true)]
+        private Multiplayer multiplayer { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -239,7 +240,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Create copy", MenuItemType.Standard, DuplicateRoom)
+            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+            {
+                multiplayer?.CreateRoom(Room.CreateCopy());
+            })
         };
     }
 }

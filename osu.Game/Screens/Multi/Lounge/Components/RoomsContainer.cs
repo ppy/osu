@@ -111,14 +111,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             {
                 roomFlow.Add(new DrawableRoom(room)
                 {
-                    DuplicateRoom = () =>
-                    {
-                        Room newRoom = room.CreateCopy();
-                        if (!newRoom.Name.Value.StartsWith("Copy of "))
-                            newRoom.Name.Value = $"Copy of {room.Name.Value}";
-
-                        loungeSubScreen?.Open(newRoom);
-                    },
                     Action = () =>
                     {
                         if (room == selectedRoom.Value)
