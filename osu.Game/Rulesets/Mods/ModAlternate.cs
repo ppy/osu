@@ -8,7 +8,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
@@ -24,22 +26,27 @@ namespace osu.Game.Rulesets.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
     }
 
-    public abstract class ModAlternate<THitObject, TAction> : ModAlternate, IApplicableToPlayer, IApplicableToDrawableRuleset<THitObject>
+    public abstract class ModAlternate<THitObject, TAction> : ModAlternate, IApplicableToPlayer, IApplicableToDrawableRuleset<THitObject>, IApplicableToScoreProcessor
         where THitObject : HitObject
         where TAction : struct
     {
         protected readonly BindableBool IsBreakTime = new BindableBool();
+        protected readonly BindableInt HighestCombo = new BindableInt();
         protected List<THitObject> HitObjects;
         protected InputInterceptor Interceptor;
-        protected bool ShouldCheckForInput => !IsBreakTime.Value || Interceptor?.Time.Current > drawableRuleset?.GameplayStartTime;
-        private DrawableRuleset<THitObject> drawableRuleset;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<THitObject> drawableRuleset)
         {
-            this.drawableRuleset = drawableRuleset;
             HitObjects = drawableRuleset.Beatmap.HitObjects;
             drawableRuleset.KeyBindingInputManager.Add(Interceptor = new InputInterceptor(this));
         }
+
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            HighestCombo.BindTo(scoreProcessor.HighestCombo);
+        }
+
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
         public void ApplyToPlayer(Player player)
         {
@@ -55,8 +62,6 @@ namespace osu.Game.Rulesets.Mods
 
         protected abstract bool OnPressed(TAction action);
 
-        protected abstract bool OnReleased(TAction action);
-
         protected abstract void ResetActionStates();
 
         public class InputInterceptor : Drawable, IKeyBindingHandler<TAction>
@@ -70,7 +75,9 @@ namespace osu.Game.Rulesets.Mods
 
             public bool OnPressed(TAction action) => mod.OnPressed(action);
 
-            public void OnReleased(TAction action) => mod.OnReleased(action);
+            public void OnReleased(TAction action)
+            {
+            }
         }
     }
 }

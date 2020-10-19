@@ -9,34 +9,28 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModAlternate : ModAlternate<OsuHitObject, OsuAction>
     {
         private OsuAction? lastActionPressed;
-        private OsuAction? lastActionReleased;
 
         protected override void ResetActionStates()
         {
-            lastActionPressed = lastActionReleased = null;
+            lastActionPressed = null;
         }
 
         protected override bool OnPressed(OsuAction action)
         {
-            if (!ShouldCheckForInput)
+            if (IsBreakTime.Value)
                 return false;
+
+            if (HighestCombo.Value == 0)
+            {
+                lastActionPressed = action;
+                return false;
+            }
 
             if (lastActionPressed == action)
                 return true;
 
             lastActionPressed = action;
-            return false;
-        }
 
-        protected override bool OnReleased(OsuAction action)
-        {
-            if (!ShouldCheckForInput)
-                return false;
-
-            if (lastActionReleased == action)
-                return true;
-
-            lastActionReleased = action;
             return false;
         }
     }

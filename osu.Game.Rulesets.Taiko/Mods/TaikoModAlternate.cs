@@ -32,10 +32,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected override bool OnPressed(TaikoAction action)
         {
-            if (!ShouldCheckForInput)
+            if (IsBreakTime.Value)
                 return false;
-
-            bool blockInput;
 
             var hitObject = HitObjects.FirstOrDefault(h =>
             {
@@ -44,6 +42,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 var endTime = (h as IHasDuration)?.EndTime ?? h.StartTime;
                 return (time > h.StartTime - window) && (time < endTime + window);
             });
+
+            if (HighestCombo.Value == 0)
+            {
+                prevPressedAction = action;
+                prevActionTime = Interceptor.Time.Current;
+                prevHitObject = hitObject;
+
+                return false;
+            }
+
+            bool blockInput;
 
             var previous = HitObjects.ElementAtOrDefault(HitObjects.IndexOf(hitObject) - 1);
             if ((ResetAfterDrumRoll.Value && previous is DrumRoll) || previous is Swell)
@@ -69,8 +78,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             return blockInput;
         }
-
-        protected override bool OnReleased(TaikoAction action) => false;
 
         private bool shouldBlock(TaikoAction action)
         {
