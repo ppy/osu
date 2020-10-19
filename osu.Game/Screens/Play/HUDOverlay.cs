@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
@@ -66,8 +65,6 @@ namespace osu.Game.Screens.Play
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
 
-        private readonly Container mainUIElements;
-
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
         public HUDOverlay(ScoreProcessor scoreProcessor, HealthProcessor healthProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
@@ -92,7 +89,7 @@ namespace osu.Game.Screens.Play
                         {
                             new Drawable[]
                             {
-                                mainUIElements = new Container
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
