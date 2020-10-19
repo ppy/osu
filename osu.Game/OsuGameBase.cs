@@ -406,7 +406,7 @@ namespace osu.Game
         public void Migrate(string path)
         {
             contextFactory.FlushConnections();
-            (Storage as OsuStorage)?.Migrate(path);
+            (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
         }
     }
 }

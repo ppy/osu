@@ -15,5 +15,11 @@ namespace osu.Game.Screens.Play.HUD
         /// The current score to be displayed.
         /// </summary>
         Bindable<double> Current { get; }
+
+        /// <summary>
+        /// The number of digits required to display most sane scores.
+        /// This may be exceeded in very rare cases, but is useful to pad or space the display to avoid it jumping around.
+        /// </summary>
+        Bindable<int> RequiredDisplayDigits { get; }
     }
 }
