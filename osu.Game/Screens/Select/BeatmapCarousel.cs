@@ -590,7 +590,7 @@ namespace osu.Game.Screens.Select
             {
                 displayedRange = newDisplayRange;
 
-                var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first);
+                var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
 
                 foreach (var panel in ScrollableContent.Children)
                 {
