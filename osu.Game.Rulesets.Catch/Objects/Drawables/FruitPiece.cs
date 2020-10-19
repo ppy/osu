@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -21,10 +20,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public const float RADIUS_ADJUST = 1.1f;
 
         private Circle border;
-
         private CatchHitObject hitObject;
-
-        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
         public FruitPiece()
         {
@@ -36,8 +32,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
             hitObject = drawableCatchObject.HitObject;
-
-            accentColour.BindTo(drawableCatchObject.AccentColour);
 
             AddRangeInternal(new[]
             {

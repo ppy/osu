@@ -20,11 +20,6 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         private Container directionContainer;
 
-        public LegacyHitTarget()
-        {
-            RelativeSizeAxes = Axes.Both;
-        }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
@@ -56,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                         Anchor = Anchor.CentreLeft,
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
-                        Colour = lineColour,
+                        Colour = LegacyColourCompatibility.DisallowZeroAlpha(lineColour),
                         Alpha = showJudgementLine ? 0.9f : 0
                     }
                 }

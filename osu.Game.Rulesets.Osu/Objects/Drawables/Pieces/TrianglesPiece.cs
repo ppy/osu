@@ -11,7 +11,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected override bool CreateNewTriangles => false;
         protected override float SpawnRatio => 0.5f;
 
-        public TrianglesPiece()
+        public TrianglesPiece(int? seed = null)
+            : base(seed)
         {
             TriangleScale = 1.2f;
             HideAlphaDiscrepancies = false;

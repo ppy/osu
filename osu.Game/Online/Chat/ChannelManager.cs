@@ -196,7 +196,7 @@ namespace osu.Game.Online.Chat
             if (target == null)
                 return;
 
-            var parameters = text.Split(new[] { ' ' }, 2);
+            var parameters = text.Split(' ', 2);
             string command = parameters[0];
             string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 

@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Select
     internal static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status|creator|artist)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
+            @"\b(?<key>stars|ar|dr|hp|cs|divisor|length|objects|bpm|status|creator|artist)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -43,6 +43,7 @@ namespace osu.Game.Screens.Select
                     break;
 
                 case "dr" when parseFloatWithPoint(value, out var dr):
+                case "hp" when parseFloatWithPoint(value, out dr):
                     updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
                     break;
 
@@ -78,10 +79,10 @@ namespace osu.Game.Screens.Select
         }
 
         private static int getLengthScale(string value) =>
-            value.EndsWith("ms") ? 1 :
-            value.EndsWith("s") ? 1000 :
-            value.EndsWith("m") ? 60000 :
-            value.EndsWith("h") ? 3600000 : 1000;
+            value.EndsWith("ms", StringComparison.Ordinal) ? 1 :
+            value.EndsWith('s') ? 1000 :
+            value.EndsWith('m') ? 60000 :
+            value.EndsWith('h') ? 3600000 : 1000;
 
         private static bool parseFloatWithPoint(string value, out float result) =>
             float.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);

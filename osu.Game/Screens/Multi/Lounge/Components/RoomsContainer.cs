@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -62,8 +63,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         protected override void LoadComplete()
         {
-            rooms.ItemsAdded += addRooms;
-            rooms.ItemsRemoved += removeRooms;
+            rooms.CollectionChanged += roomsChanged;
             roomManager.RoomsUpdated += updateSorting;
 
             rooms.BindTo(roomManager.Rooms);
@@ -89,6 +89,20 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     r.MatchingFilter = matchingFilter;
                 }
             });
+        }
+
+        private void roomsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    addRooms(args.NewItems.Cast<Room>());
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    removeRooms(args.OldItems.Cast<Room>());
+                    break;
+            }
         }
 
         private void addRooms(IEnumerable<Room> rooms)
