@@ -36,9 +36,14 @@ namespace osu.Game.Screens.Edit.Timing
         {
             if (point.NewValue != null)
             {
-                bpmSlider.Bindable = point.NewValue.BeatLengthBindable;
+                bpmSlider.Current = point.NewValue.BeatLengthBindable;
+                bpmSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+
                 bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
-                timeSignature.Bindable = point.NewValue.TimeSignatureBindable;
+                // no need to hook change handler here as it's the same bindable as above
+
+                timeSignature.Current = point.NewValue.TimeSignatureBindable;
+                timeSignature.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 
@@ -65,18 +70,19 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     if (!isNew) return;
 
-                    if (double.TryParse(Current.Value, out double doubleVal))
+                    try
                     {
-                        try
-                        {
+                        if (double.TryParse(Current.Value, out double doubleVal) && doubleVal > 0)
                             beatLengthBindable.Value = beatLengthToBpm(doubleVal);
-                        }
-                        catch
-                        {
-                            // will restore the previous text value on failure.
-                            beatLengthBindable.TriggerChange();
-                        }
                     }
+                    catch
+                    {
+                        // TriggerChange below will restore the previous text value on failure.
+                    }
+
+                    // This is run regardless of parsing success as the parsed number may not actually trigger a change
+                    // due to bindable clamping. Even in such a case we want to update the textbox to a sane visual state.
+                    beatLengthBindable.TriggerChange();
                 };
 
                 beatLengthBindable.BindValueChanged(val =>
@@ -103,19 +109,26 @@ namespace osu.Game.Screens.Edit.Timing
             private const double sane_maximum = 240;
 
             private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
-            private readonly BindableDouble bpmBindable = new BindableDouble();
+
+            private readonly BindableDouble bpmBindable = new BindableDouble(60000 / TimingControlPoint.DEFAULT_BEAT_LENGTH)
+            {
+                MinValue = sane_minimum,
+                MaxValue = sane_maximum,
+            };
 
             public BPMSlider()
             {
                 beatLengthBindable.BindValueChanged(beatLength => updateCurrent(beatLengthToBpm(beatLength.NewValue)), true);
-                bpmBindable.BindValueChanged(bpm => bpmBindable.Default = beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
+                bpmBindable.BindValueChanged(bpm => beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
 
-                base.Bindable = bpmBindable;
+                base.Current = bpmBindable;
+
+                TransferValueOnCommit = true;
             }
 
-            public override Bindable<double> Bindable
+            public override Bindable<double> Current
             {
-                get => base.Bindable;
+                get => base.Current;
                 set
                 {
                     // incoming will be beat length, not bpm

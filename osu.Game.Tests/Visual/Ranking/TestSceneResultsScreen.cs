@@ -220,7 +220,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
 
-            AddAssert("download button is disabled", () => !screen.ChildrenOfType<DownloadButton>().Single().Enabled.Value);
+            AddAssert("download button is disabled", () => !screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
 
             AddStep("click contracted panel", () =>
             {
@@ -229,7 +229,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("download button is enabled", () => screen.ChildrenOfType<DownloadButton>().Single().Enabled.Value);
+            AddAssert("download button is enabled", () => screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
         }
 
         private class TestResultsContainer : Container

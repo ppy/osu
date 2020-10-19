@@ -28,17 +28,17 @@ using FileInfo = System.IO.FileInfo;
 namespace osu.Game.Tests.Beatmaps.IO
 {
     [TestFixture]
-    public class ImportBeatmapTest
+    public class ImportBeatmapTest : ImportTest
     {
         [Test]
         public async Task TestImportWhenClosed()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    await LoadOszIntoOsu(loadOsu(host));
+                    await LoadOszIntoOsu(LoadOsuIntoHost(host));
                 }
                 finally
                 {
@@ -51,11 +51,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenDelete()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var imported = await LoadOszIntoOsu(osu);
 
@@ -72,11 +72,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var imported = await LoadOszIntoOsu(osu);
                     var importedSecondTime = await LoadOszIntoOsu(osu);
@@ -98,11 +98,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithReZip()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
 
@@ -156,11 +156,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithChangedFile()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
 
@@ -207,11 +207,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithDifferentFilename()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
 
@@ -259,11 +259,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportCorruptThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var imported = await LoadOszIntoOsu(osu);
 
@@ -301,7 +301,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestRollbackOnFailure()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
@@ -314,7 +314,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             Interlocked.Increment(ref loggedExceptionCount);
                     };
 
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
                     // ReSharper disable once AccessToModifiedClosure
@@ -378,11 +378,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenDeleteThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var imported = await LoadOszIntoOsu(osu);
 
@@ -406,11 +406,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportThenDeleteThenImportWithOnlineIDMismatch(bool set)
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(set.ToString()))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-{set}"))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var imported = await LoadOszIntoOsu(osu);
 
@@ -440,11 +440,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         public async Task TestImportWithDuplicateBeatmapIDs()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var metadata = new BeatmapMetadata
                     {
@@ -496,15 +496,15 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Ignore("Binding IPC on Appveyor isn't working (port in use). Need to figure out why")]
         public void TestImportOverIPC()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("host", true))
-            using (HeadlessGameHost client = new CleanRunHeadlessGameHost("client", true))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-host", true))
+            using (HeadlessGameHost client = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-client", true))
             {
                 try
                 {
                     Assert.IsTrue(host.IsPrimaryInstance);
                     Assert.IsFalse(client.IsPrimaryInstance);
 
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
 
@@ -526,11 +526,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWhenFileOpen()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
                     var temp = TestResources.GetTestBeatmapForImport();
                     using (File.OpenRead(temp))
                         await osu.Dependencies.Get<BeatmapManager>().Import(temp);
@@ -548,11 +548,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWithDuplicateHashes()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
 
@@ -590,11 +590,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportNestedStructure()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
 
@@ -635,11 +635,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWithIgnoredDirectoryInArchive()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
 
                     var temp = TestResources.GetTestBeatmapForImport();
 
@@ -689,11 +689,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestUpdateBeatmapInfo()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
                     var temp = TestResources.GetTestBeatmapForImport();
@@ -719,11 +719,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestUpdateBeatmapFile()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
                     var temp = TestResources.GetTestBeatmapForImport();
@@ -761,11 +761,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestCreateNewEmptyBeatmap()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
                     var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
@@ -788,11 +788,11 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestCreateNewBeatmapWithObject()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
                     var working = manager.CreateNew(new OsuRuleset().RulesetInfo, User.SYSTEM_USER);
@@ -861,14 +861,6 @@ namespace osu.Game.Tests.Beatmaps.IO
         private void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
         {
             Assert.AreEqual(expected, osu.Dependencies.Get<FileStore>().QueryFiles(f => f.ReferenceCount == 1).Count());
-        }
-
-        private OsuGameBase loadOsu(GameHost host)
-        {
-            var osu = new OsuGameBase();
-            Task.Run(() => host.Run(osu));
-            waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
-            return osu;
         }
 
         private static void ensureLoaded(OsuGameBase osu, int timeout = 60000)

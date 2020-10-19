@@ -163,16 +163,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                     target = centreHit;
                     back = centre;
 
-                    if (gameplayClock?.IsSeeking != true)
-                        drumSample.Centre?.Play();
+                    drumSample.Centre?.Play();
                 }
                 else if (action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
 
-                    if (gameplayClock?.IsSeeking != true)
-                        drumSample.Rim?.Play();
+                    drumSample.Rim?.Play();
                 }
 
                 if (target != null)

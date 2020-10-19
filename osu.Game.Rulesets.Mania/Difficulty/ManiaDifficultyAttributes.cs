@@ -8,5 +8,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
     public class ManiaDifficultyAttributes : DifficultyAttributes
     {
         public double GreatHitWindow;
+        public double ScoreMultiplier;
     }
 }

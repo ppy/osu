@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private Spinner spinner;
 
+        private const float initial_scale = 1.3f;
         private const float idle_alpha = 0.2f;
         private const float tracking_alpha = 0.4f;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             // we are slightly bigger than our parent, to clip the top and bottom of the circle
             // this should probably be revisited when scaled spinners are a thing.
-            Scale = new Vector2(1.3f);
+            Scale = new Vector2(initial_scale);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -93,7 +93,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             base.LoadComplete();
 
             drawableSpinner.RotationTracker.Complete.BindValueChanged(complete => updateComplete(complete.NewValue, 200));
-            drawableSpinner.State.BindValueChanged(updateStateTransforms, true);
+            drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
+
+            updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
         }
 
         protected override void Update()
@@ -116,50 +118,66 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 fill.Alpha = (float)Interpolation.Damp(fill.Alpha, drawableSpinner.RotationTracker.Tracking ? tracking_alpha : idle_alpha, 0.98f, (float)Math.Abs(Clock.ElapsedFrameTime));
             }
 
-            const float initial_scale = 0.2f;
-            float targetScale = initial_scale + (1 - initial_scale) * drawableSpinner.Progress;
+            const float initial_fill_scale = 0.2f;
+            float targetScale = initial_fill_scale + (1 - initial_fill_scale) * drawableSpinner.Progress;
 
             fill.Scale = new Vector2((float)Interpolation.Lerp(fill.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
             mainContainer.Rotation = drawableSpinner.RotationTracker.Rotation;
         }
 
-        private void updateStateTransforms(ValueChangedEvent<ArmedState> state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            centre.ScaleTo(0);
-            mainContainer.ScaleTo(0);
+            if (!(drawableHitObject is DrawableSpinner))
+                return;
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt / 2, true))
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
             {
-                // constant ambient rotation to give the spinner "spinning" character.
-                this.RotateTo((float)(25 * spinner.Duration / 2000), spinner.TimePreempt + spinner.Duration);
-
-                centre.ScaleTo(0.3f, spinner.TimePreempt / 4, Easing.OutQuint);
-                mainContainer.ScaleTo(0.2f, spinner.TimePreempt / 4, Easing.OutQuint);
+                this.ScaleTo(initial_scale);
+                this.RotateTo(0);
 
                 using (BeginDelayedSequence(spinner.TimePreempt / 2, true))
                 {
-                    centre.ScaleTo(0.5f, spinner.TimePreempt / 2, Easing.OutQuint);
-                    mainContainer.ScaleTo(1, spinner.TimePreempt / 2, Easing.OutQuint);
+                    // constant ambient rotation to give the spinner "spinning" character.
+                    this.RotateTo((float)(25 * spinner.Duration / 2000), spinner.TimePreempt + spinner.Duration);
+                }
+
+                using (BeginDelayedSequence(spinner.TimePreempt + spinner.Duration + drawableHitObject.Result.TimeOffset, true))
+                {
+                    switch (state)
+                    {
+                        case ArmedState.Hit:
+                            this.ScaleTo(initial_scale * 1.2f, 320, Easing.Out);
+                            this.RotateTo(mainContainer.Rotation + 180, 320);
+                            break;
+
+                        case ArmedState.Miss:
+                            this.ScaleTo(initial_scale * 0.8f, 320, Easing.In);
+                            break;
+                    }
+                }
+            }
+
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            {
+                centre.ScaleTo(0);
+                mainContainer.ScaleTo(0);
+
+                using (BeginDelayedSequence(spinner.TimePreempt / 2, true))
+                {
+                    centre.ScaleTo(0.3f, spinner.TimePreempt / 4, Easing.OutQuint);
+                    mainContainer.ScaleTo(0.2f, spinner.TimePreempt / 4, Easing.OutQuint);
+
+                    using (BeginDelayedSequence(spinner.TimePreempt / 2, true))
+                    {
+                        centre.ScaleTo(0.5f, spinner.TimePreempt / 2, Easing.OutQuint);
+                        mainContainer.ScaleTo(1, spinner.TimePreempt / 2, Easing.OutQuint);
+                    }
                 }
             }
 
             // transforms we have from completing the spinner will be rolled back, so reapply immediately.
-            updateComplete(state.NewValue == ArmedState.Hit, 0);
-
-            using (BeginDelayedSequence(spinner.Duration, true))
-            {
-                switch (state.NewValue)
-                {
-                    case ArmedState.Hit:
-                        this.ScaleTo(Scale * 1.2f, 320, Easing.Out);
-                        this.RotateTo(mainContainer.Rotation + 180, 320);
-                        break;
-
-                    case ArmedState.Miss:
-                        this.ScaleTo(Scale * 0.8f, 320, Easing.In);
-                        break;
-                }
-            }
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                updateComplete(state == ArmedState.Hit, 0);
         }
 
         private void updateComplete(bool complete, double duration)
@@ -184,6 +202,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 wholeRotationCount = rotations;
                 return true;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableSpinner != null)
+                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

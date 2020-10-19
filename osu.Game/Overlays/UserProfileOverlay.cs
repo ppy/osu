@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
@@ -175,6 +176,10 @@ namespace osu.Game.Overlays
             {
                 AccentColour = colourProvider.Highlight1;
             }
+
+            protected override bool OnClick(ClickEvent e) => true;
+
+            protected override bool OnHover(HoverEvent e) => true;
 
             private class ProfileSectionTabItem : OverlayTabItem
             {

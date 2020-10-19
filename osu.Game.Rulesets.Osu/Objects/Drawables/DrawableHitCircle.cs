@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
 
                 return;
             }
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var circleResult = (OsuHitCircleJudgementResult)r;
 
                 // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
-                if (result != HitResult.Miss)
+                if (result.IsHit())
                 {
                     var localMousePosition = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
                     circleResult.CursorPositionAtHit = HitObject.StackedPosition + (localMousePosition - DrawSize / 2);
