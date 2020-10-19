@@ -17,6 +17,7 @@ using osu.Game.Screens.Multi.Match;
 
 namespace osu.Game.Screens.Multi.Lounge
 {
+    [Cached]
     public class LoungeSubScreen : MultiplayerSubScreen
     {
         public override string Title => "Lounge";
@@ -125,7 +126,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (selectedRoom.Value?.RoomID.Value == null)
                 selectedRoom.Value = new Room();
 
-            music.EnsurePlayingSomething();
+            music?.EnsurePlayingSomething();
 
             onReturning();
         }
