@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
         private FillFlowContainer beatmapFillFlow;
         private OsuScrollContainer beatmapScroll;
-        private BindableBool isCurrentCollection = new BindableBool();
+        private bool isCurrentCollection;
 
         public CollectionInfo()
         {
@@ -146,15 +146,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             collection.BindValueChanged(OnCollectionChanged);
             working.BindValueChanged(OnBeatmapChanged);
-            isCurrentCollection.BindValueChanged(v =>
-            {
-                if (v.NewValue)
-                {
-                    foreach (var d in beatmapFillFlow)
-                        if (d is BeatmapPiece p)
-                            p.isCurrent = v.NewValue;
-                }
-            });
         }
 
         private void AddBeatmapToFillFlow()
@@ -163,7 +154,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             foreach (var b in beatmapSets)
             {
-                beatmapFillFlow.Add(new BeatmapPiece(beatmaps.GetWorkingBeatmap(b.Beatmaps.First()), isCurrentCollection.Value));
+                beatmapFillFlow.Add(new BeatmapPiece(beatmaps.GetWorkingBeatmap(b.Beatmaps.First())));
             }
         }
 
@@ -171,6 +162,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             var c = v.NewValue;
 
+            currentPiece = null;
             if (c == null)
             {
                 ClearInfo();
@@ -219,7 +211,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         private void ScrollToCurrentBeatmap()
         {
-            if ( !isCurrentCollection.Value ) return;
+            if ( !isCurrentCollection ) return;
 
             float distance = 0;
             var index = beatmapFillFlow.IndexOf(currentPiece);
@@ -251,8 +243,19 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             if (!isCurrent) flashBox.FadeColour(Colour4.Gold, 300, Easing.OutQuint);
             else flashBox.FadeColour(Color4Extensions.FromHex("#88b300"), 300, Easing.OutQuint);
 
-            isCurrentCollection.Value = isCurrent;
+            //设置当前选择是否为正在播放的收藏夹
+            isCurrentCollection = isCurrent;
+
+            //将当前收藏夹设为collection
             this.collection.Value = collection;
+
+            //更新BeatmapPiece
+            foreach (var d in beatmapFillFlow)
+                if (d is BeatmapPiece p)
+                    p.isCurrent = isCurrent;
+
+            currentPiece?.Active.TriggerChange();
+
         }
 
         private void ClearInfo()

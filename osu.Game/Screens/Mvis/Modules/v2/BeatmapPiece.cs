@@ -27,14 +27,14 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [Resolved]
         private MusicController controller { get; set; }
 
-        private BindableBool Active = new BindableBool();
+        public readonly BindableBool Active = new BindableBool();
 
         public readonly WorkingBeatmap beatmap;
         private Flash flash;
         private Box maskBox;
-        public bool isCurrent = false;
+        public bool isCurrent;
 
-        public BeatmapPiece(WorkingBeatmap b, bool isCurrent)
+        public BeatmapPiece(WorkingBeatmap b)
         {
             Masking = true;
             CornerRadius = 12.5f;
@@ -43,7 +43,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             Height = 80;
 
             beatmap = b;
-            this.isCurrent = isCurrent;
         }
 
         [BackgroundDependencyLoader]
@@ -55,12 +54,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 maskBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3.Opacity(0.5f)
+                    Colour = colourProvider.Background3.Opacity(0.65f)
                 },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.6f,
+                    Alpha = 0.75f,
                     Children = new Drawable[]
                     {
                         new Box
@@ -155,7 +154,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             switch (v.NewValue)
             {
                 case true:
-                    BorderColour = colourProvider.Highlight1;
+                    if ( isCurrent )
+                            BorderColour = colourProvider.Highlight1;
+                    else
+                            BorderColour = Colour4.Gold;
                     maskBox.FadeOut(500);
                     flash.Show();
                     break;
@@ -173,7 +175,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (isCurrent)
+            if (isCurrent && b.Value != beatmap )
             {
                 b.Value = beatmap;
                 controller.Play();

@@ -129,6 +129,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             if ( v.NewValue == null ) return;
 
+            //如果选择的收藏夹为正在播放的收藏夹，则更新isCurrent为true
             if (v.NewValue == CurrentCollection.Value)
                 info.UpdateCollection(v.NewValue, true);
             else
@@ -155,10 +156,20 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private void RefreshCollections()
         {
             var oldCollection = CurrentCollection.Value;
+
+            //清空界面
             collectionsFillFlow.Clear();
             info.UpdateCollection(null, false);
             selectedpanel = null;
 
+            SelectedCollection.Value = null;
+
+            //如果收藏夹被删除，则留null
+            if ( !collectionManager.Collections.Contains(oldCollection) )
+                oldCollection = null;
+
+            //如果收藏夹为0，则淡出sollectionScroll
+            //否则，添加CollectionPanel
             if (collectionManager.Collections.Count == 0)
             {
                 collectionScroll.FadeOut(300);
@@ -176,17 +187,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 collectionScroll.FadeIn(300);
             }
 
-            //清空选择
-            SelectedCollection.Value = null;
-
-            //如果收藏夹被删除，则留null
-            if ( !collectionManager.Collections.Contains(oldCollection) )
-                oldCollection = null;
-
             //重新赋值
             CurrentCollection.Value = SelectedCollection.Value = oldCollection;
 
-            //根据选中的收藏夹寻找
+            //根据选中的收藏夹寻找对应的BeatmapPanel
             SearchForCurrentSelection();
 
             //CurrentCollection需要手动触发因为它和MvisScreen中的CurrentCollection绑在一起
