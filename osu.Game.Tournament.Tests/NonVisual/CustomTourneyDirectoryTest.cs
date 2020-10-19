@@ -20,14 +20,14 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestDefaultDirectory()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestDefaultDirectory)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<Storage>();
-                    var defaultStorage = Path.Combine(tournamentBasePath(nameof(TestDefaultDirectory)), "default");
-                    Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorage));
+
+                    Assert.That(storage.GetFullPath("."), Is.EqualTo(Path.Combine(host.Storage.GetFullPath("."), "tournaments", "default")));
                 }
                 finally
                 {
@@ -39,7 +39,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestCustomDirectory()
         {
-            using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestCustomDirectory)))
+            using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestCustomDirectory))) // don't use clean run as we are writing a config file.
             {
                 string osuDesktopStorage = basePath(nameof(TestCustomDirectory));
                 const string custom_tournament = "custom";
@@ -58,7 +58,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                     storage = osu.Dependencies.Get<Storage>();
 
-                    Assert.That(storage.GetFullPath("."), Is.EqualTo(Path.Combine(tournamentBasePath(nameof(TestCustomDirectory)), custom_tournament)));
+                    Assert.That(storage.GetFullPath("."), Is.EqualTo(Path.Combine(host.Storage.GetFullPath("."), "tournaments", custom_tournament)));
                 }
                 finally
                 {
@@ -70,7 +70,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestMigration()
         {
-            using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestMigration)))
+            using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestMigration))) // don't use clean run as we are writing test files for migration.
             {
                 string osuRoot = basePath(nameof(TestMigration));
                 string configFile = Path.Combine(osuRoot, "tournament.ini");
@@ -115,7 +115,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                     var storage = osu.Dependencies.Get<Storage>();
 
-                    var migratedPath = Path.Combine(tournamentBasePath(nameof(TestMigration)), "default");
+                    string migratedPath = Path.Combine(host.Storage.GetFullPath("."), "tournaments", "default");
 
                     videosPath = Path.Combine(migratedPath, "videos");
                     modsPath = Path.Combine(migratedPath, "mods");
@@ -165,7 +165,5 @@ namespace osu.Game.Tournament.Tests.NonVisual
         }
 
         private string basePath(string testInstance) => Path.Combine(RuntimeInfo.StartupDirectory, "headless", testInstance);
-
-        private string tournamentBasePath(string testInstance) => Path.Combine(basePath(testInstance), "tournaments");
     }
 }
