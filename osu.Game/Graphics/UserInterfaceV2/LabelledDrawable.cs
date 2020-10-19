@@ -73,6 +73,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                     },
                                     new Container
                                     {
+                                        // top right works better when the vertical height of the component changes smoothly (avoids weird layout animations).
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         RelativeSizeAxes = Axes.X,
