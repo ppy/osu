@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 Assert.IsTrue(storyboard.HasDrawable);
-                Assert.AreEqual(5, storyboard.Layers.Count());
+                Assert.AreEqual(6, storyboard.Layers.Count());
 
                 StoryboardLayer background = storyboard.Layers.FirstOrDefault(l => l.Depth == 3);
                 Assert.IsNotNull(background);
@@ -55,6 +55,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsTrue(foreground.VisibleWhenFailing);
                 Assert.IsTrue(foreground.VisibleWhenPassing);
                 Assert.AreEqual("Foreground", foreground.Name);
+
+                StoryboardLayer overlay = storyboard.Layers.FirstOrDefault(l => l.Depth == int.MinValue);
+                Assert.IsNotNull(overlay);
+                Assert.IsEmpty(overlay.Elements);
+                Assert.IsTrue(overlay.VisibleWhenFailing);
+                Assert.IsTrue(overlay.VisibleWhenPassing);
+                Assert.AreEqual("Overlay", overlay.Name);
 
                 int spriteCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSprite));
                 int animationCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardAnimation));

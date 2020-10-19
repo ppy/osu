@@ -35,10 +35,10 @@ namespace osu.Game.Tests.Rulesets.Scoring
         }
 
         [TestCase(ScoringMode.Standardised, HitResult.Meh, 750_000)]
-        [TestCase(ScoringMode.Standardised, HitResult.Good, 800_000)]
+        [TestCase(ScoringMode.Standardised, HitResult.Ok, 800_000)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, 1_000_000)]
         [TestCase(ScoringMode.Classic, HitResult.Meh, 50)]
-        [TestCase(ScoringMode.Classic, HitResult.Good, 100)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, 100)]
         [TestCase(ScoringMode.Classic, HitResult.Great, 300)]
         public void TestSingleOsuHit(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {

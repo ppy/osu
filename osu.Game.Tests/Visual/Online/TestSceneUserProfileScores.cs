@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Framework.Graphics;
 using osu.Game.Scoring;
@@ -19,13 +17,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneUserProfileScores : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableProfileScore),
-            typeof(DrawableProfileWeightedScore),
-            typeof(ProfileItemContainer),
-        };
-
         public TestSceneUserProfileScores()
         {
             var firstScore = new ScoreInfo

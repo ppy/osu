@@ -7,8 +7,6 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoDrumRollJudgement : TaikoJudgement
     {
-        public override bool AffectsCombo => false;
-
         protected override double HealthIncreaseFor(HitResult result)
         {
             // Drum rolls can be ignored with no health penalty

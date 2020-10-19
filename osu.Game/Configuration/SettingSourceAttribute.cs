@@ -57,7 +57,7 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<float>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber,
+                            Current = bNumber,
                             KeyboardStep = 0.1f,
                         };
 
@@ -67,7 +67,7 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<double>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber,
+                            Current = bNumber,
                             KeyboardStep = 0.1f,
                         };
 
@@ -77,7 +77,7 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<int>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber
+                            Current = bNumber
                         };
 
                         break;
@@ -86,7 +86,7 @@ namespace osu.Game.Configuration
                         yield return new SettingsCheckbox
                         {
                             LabelText = attr.Label,
-                            Bindable = bBool
+                            Current = bBool
                         };
 
                         break;
@@ -95,7 +95,7 @@ namespace osu.Game.Configuration
                         yield return new SettingsTextBox
                         {
                             LabelText = attr.Label,
-                            Bindable = bString
+                            Current = bString
                         };
 
                         break;
@@ -105,7 +105,7 @@ namespace osu.Game.Configuration
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType);
 
                         dropdownType.GetProperty(nameof(SettingsDropdown<object>.LabelText))?.SetValue(dropdown, attr.Label);
-                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.Bindable))?.SetValue(dropdown, bindable);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.Current))?.SetValue(dropdown, bindable);
 
                         yield return dropdown;
 

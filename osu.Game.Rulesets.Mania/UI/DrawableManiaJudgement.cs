@@ -15,6 +15,10 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
+        public DrawableManiaJudgement()
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {

@@ -13,8 +13,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
     public class TestSceneOsuModPerfect : ModPerfectTestScene
     {
+        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
+
         public TestSceneOsuModPerfect()
-            : base(new OsuRuleset(), new OsuModPerfect())
+            : base(new OsuModPerfect())
         {
         }
 

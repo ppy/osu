@@ -21,23 +21,23 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new SettingsCheckbox
                 {
                     LabelText = "Interface voices",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MenuVoice)
+                    Current = config.GetBindable<bool>(OsuSetting.MenuVoice)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "osu! music theme",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MenuMusic)
+                    Current = config.GetBindable<bool>(OsuSetting.MenuMusic)
                 },
                 new SettingsDropdown<IntroSequence>
                 {
                     LabelText = "Intro sequence",
-                    Bindable = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
+                    Current = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
                     Items = Enum.GetValues(typeof(IntroSequence)).Cast<IntroSequence>()
                 },
                 new SettingsDropdown<BackgroundSource>
                 {
                     LabelText = "Background source",
-                    Bindable = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
+                    Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
                     Items = Enum.GetValues(typeof(BackgroundSource)).Cast<BackgroundSource>()
                 }
             };

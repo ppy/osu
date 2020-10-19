@@ -397,7 +397,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
                 case 4:
                     centreProbability = 0;
-                    p2 = Math.Min(p2 * 2, 0.2);
+
+                    // Stable requires rngValue > x, which is an inverse-probability. Lazer uses true probability (1 - x).
+                    // But multiplying this value by 2 (stable) is not the same operation as dividing it by 2 (lazer),
+                    // so it needs to be converted to from a probability and then back after the multiplication.
+                    p2 = 1 - Math.Max((1 - p2) * 2, 0.8);
                     p3 = 0;
                     break;
 
@@ -408,10 +412,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
                 case 6:
                     centreProbability = 0;
-                    p2 = Math.Min(p2 * 2, 0.5);
-                    p3 = Math.Min(p3 * 2, 0.15);
+
+                    // Stable requires rngValue > x, which is an inverse-probability. Lazer uses true probability (1 - x).
+                    // But multiplying this value by 2 (stable) is not the same operation as dividing it by 2 (lazer),
+                    // so it needs to be converted to from a probability and then back after the multiplication.
+                    p2 = 1 - Math.Max((1 - p2) * 2, 0.5);
+                    p3 = 1 - Math.Max((1 - p3) * 2, 0.85);
                     break;
             }
+
+            // The stable values were allowed to exceed 1, which indicate <0% probability.
+            // These values needs to be clamped otherwise GetRandomNoteCount() will throw an exception.
+            p2 = Math.Clamp(p2, 0, 1);
+            p3 = Math.Clamp(p3, 0, 1);
 
             double centreVal = Random.NextDouble();
             int noteCount = GetRandomNoteCount(p2, p3);

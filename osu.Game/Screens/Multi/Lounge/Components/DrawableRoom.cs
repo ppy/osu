@@ -107,6 +107,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            float stripWidth = side_strip_width * (Room.Category.Value == RoomCategory.Spotlight ? 2 : 1);
+
             Children = new Drawable[]
             {
                 new StatusColouredContainer(transition_duration)
@@ -139,7 +141,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             new StatusColouredContainer(transition_duration)
                             {
                                 RelativeSizeAxes = Axes.Y,
-                                Width = side_strip_width,
+                                Width = stripWidth,
                                 Child = new Box { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
@@ -147,7 +149,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 RelativeSizeAxes = Axes.Y,
                                 Width = cover_width,
                                 Masking = true,
-                                Margin = new MarginPadding { Left = side_strip_width },
+                                Margin = new MarginPadding { Left = stripWidth },
                                 Child = new MultiplayerBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
@@ -156,7 +158,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 Padding = new MarginPadding
                                 {
                                     Vertical = content_padding,
-                                    Left = side_strip_width + cover_width + content_padding,
+                                    Left = stripWidth + cover_width + content_padding,
                                     Right = content_padding,
                                 },
                                 Children = new Drawable[]
@@ -216,6 +218,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             else
                 Alpha = 0;
         }
+
+        protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
 
         private class RoomName : OsuSpriteText
         {

@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.UI
     [Cached]
     public class ManiaPlayfield : ScrollingPlayfield
     {
+        public IReadOnlyList<Stage> Stages => stages;
+
         private readonly List<Stage> stages = new List<Stage>();
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
@@ -73,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 foreach (var column in stage.Columns)
                 {
-                    if (column.ReceivePositionalInputAt(screenSpacePosition))
+                    if (column.ReceivePositionalInputAt(new Vector2(screenSpacePosition.X, column.ScreenSpaceDrawQuad.Centre.Y)))
                     {
                         found = column;
                         break;
@@ -85,6 +87,31 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             return found;
+        }
+
+        /// <summary>
+        /// Retrieves a <see cref="Column"/> by index.
+        /// </summary>
+        /// <param name="index">The index of the column.</param>
+        /// <returns>The <see cref="Column"/> corresponding to the given index.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is less than 0 or greater than <see cref="TotalColumns"/>.</exception>
+        public Column GetColumn(int index)
+        {
+            if (index < 0 || index > TotalColumns - 1)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            foreach (var stage in stages)
+            {
+                if (index >= stage.Columns.Count)
+                {
+                    index -= stage.Columns.Count;
+                    continue;
+                }
+
+                return stage.Columns[index];
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(index));
         }
 
         /// <summary>

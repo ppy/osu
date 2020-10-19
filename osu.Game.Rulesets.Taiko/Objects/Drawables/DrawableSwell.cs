@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     }
                 }
 
-                nextTick?.TriggerResult(HitResult.Great);
+                nextTick?.TriggerResult(true);
 
                 var numHits = ticks.Count(r => r.IsHit);
 
@@ -208,12 +208,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         continue;
                     }
 
-                    tick.TriggerResult(HitResult.Miss);
+                    tick.TriggerResult(false);
                 }
 
-                var hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss;
-
-                ApplyResult(r => r.Type = hitResult);
+                ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult);
             }
         }
 
@@ -237,7 +235,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 case ArmedState.Miss:
                 case ArmedState.Hit:
-                    using (BeginAbsoluteSequence(Time.Current, true))
+                    using (BeginDelayedSequence(HitObject.Duration, true))
                     {
                         this.FadeOut(transition_duration, Easing.Out);
                         bodyContainer.ScaleTo(1.4f, transition_duration);

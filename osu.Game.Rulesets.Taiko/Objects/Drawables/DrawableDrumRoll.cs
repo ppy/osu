@@ -48,12 +48,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             colourIdle = colours.YellowDark;
             colourEngaged = colours.YellowDarker;
 
-            updateColour();
-
-            Content.Add(tickContainer = new Container { RelativeSizeAxes = Axes.Both });
-
-            if (MainPiece.Drawable is IHasAccentColour accentMain)
-                accentMain.AccentColour = colourIdle;
+            Content.Add(tickContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Depth = float.MinValue
+            });
         }
 
         protected override void LoadComplete()
@@ -61,6 +60,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.LoadComplete();
 
             OnNewResult += onNewResult;
+        }
+
+        protected override void RecreatePieces()
+        {
+            base.RecreatePieces();
+            updateColour();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -102,7 +107,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!(obj is DrawableDrumRollTick))
                 return;
 
-            if (result.Type > HitResult.Miss)
+            if (result.IsHit)
                 rollingHits++;
             else
                 rollingHits--;
@@ -121,10 +126,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             int countHit = NestedHitObjects.Count(o => o.IsHit);
+
             if (countHit >= HitObject.RequiredGoodHits)
-                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
+            {
+                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Ok);
+            }
             else
-                ApplyResult(r => r.Type = HitResult.Miss);
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
@@ -166,7 +174,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 if (!MainObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = MainObject.IsHit ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = MainObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
             }
 
             public override bool OnPressed(TaikoAction action) => false;

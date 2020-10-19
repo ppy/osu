@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -24,10 +25,13 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail), typeof(ModAutoplay) };
 
-        public bool AllowFail => false;
+        public bool PerformFail() => false;
+
         public bool RestartOnFail => false;
 
         private OsuInputManager inputManager;
+
+        private GameplayClock gameplayClock;
 
         private List<OsuReplayFrame> replayFrames;
 
@@ -37,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (currentFrame == replayFrames.Count - 1) return;
 
-            double time = playfield.Time.Current;
+            double time = gameplayClock.CurrentTime;
 
             // Very naive implementation of autopilot based on proximity to replay frames.
             // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
@@ -52,6 +56,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
+            gameplayClock = drawableRuleset.FrameStableClock;
+
             // Grab the input manager to disable the user's cursor, and for future use
             inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
             inputManager.AllowUserCursorMovement = false;

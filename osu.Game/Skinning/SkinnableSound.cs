@@ -5,33 +5,46 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableSound : SkinReloadableDrawable
+    public class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         private readonly ISampleInfo[] hitSamples;
-
-        private List<(AdjustableProperty property, BindableDouble bindable)> adjustments;
-
-        private SampleChannel[] channels;
 
         [Resolved]
         private ISampleStore samples { get; set; }
 
+        public override bool RemoveWhenNotAlive => false;
+        public override bool RemoveCompletedTransforms => false;
+
+        /// <summary>
+        /// Whether to play the underlying sample when aggregate volume is zero.
+        /// Note that this is checked at the point of calling <see cref="Play"/>; changing the volume post-play will not begin playback.
+        /// Defaults to false unless <see cref="Looping"/>.
+        /// </summary>
+        /// <remarks>
+        /// Can serve as an optimisation if it is known ahead-of-time that this behaviour is allowed in a given use case.
+        /// </remarks>
+        protected bool PlayWhenZeroVolume => Looping;
+
+        protected readonly AudioContainer<DrawableSample> SamplesContainer;
+
+        public SkinnableSound(ISampleInfo hitSamples)
+            : this(new[] { hitSamples })
+        {
+        }
+
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
             this.hitSamples = hitSamples.ToArray();
-        }
-
-        public SkinnableSound(ISampleInfo hitSamples)
-        {
-            this.hitSamples = new[] { hitSamples };
+            InternalChild = SamplesContainer = new AudioContainer<DrawableSample>();
         }
 
         private bool looping;
@@ -45,33 +58,29 @@ namespace osu.Game.Skinning
 
                 looping = value;
 
-                channels?.ForEach(c => c.Looping = looping);
+                SamplesContainer.ForEach(c => c.Looping = looping);
             }
         }
 
-        public void Play() => channels?.ForEach(c => c.Play());
-
-        public void Stop() => channels?.ForEach(c => c.Stop());
-
-        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
+        public virtual void Play()
         {
-            if (adjustments == null) adjustments = new List<(AdjustableProperty, BindableDouble)>();
-
-            adjustments.Add((type, adjustBindable));
-            channels?.ForEach(c => c.AddAdjustment(type, adjustBindable));
+            SamplesContainer.ForEach(c =>
+            {
+                if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
+                    c.Play();
+            });
         }
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable)
+        public virtual void Stop()
         {
-            adjustments?.Remove((type, adjustBindable));
-            channels?.ForEach(c => c.RemoveAdjustment(type, adjustBindable));
+            SamplesContainer.ForEach(c => c.Stop());
         }
-
-        public override bool IsPresent => Scheduler.HasPendingTasks;
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            channels = hitSamples.Select(s =>
+            bool wasPlaying = IsPlaying;
+
+            var channels = hitSamples.Select(s =>
             {
                 var ch = skin.GetSample(s);
 
@@ -88,27 +97,39 @@ namespace osu.Game.Skinning
                 {
                     ch.Looping = looping;
                     ch.Volume.Value = s.Volume / 100.0;
-
-                    if (adjustments != null)
-                    {
-                        foreach (var (property, bindable) in adjustments)
-                            ch.AddAdjustment(property, bindable);
-                    }
                 }
 
                 return ch;
-            }).Where(c => c != null).ToArray();
+            }).Where(c => c != null);
+
+            SamplesContainer.ChildrenEnumerable = channels.Select(c => new DrawableSample(c));
+
+            // Start playback internally for the new samples if the previous ones were playing beforehand.
+            if (wasPlaying)
+                Play();
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
+        #region Re-expose AudioContainer
 
-            if (channels != null)
-            {
-                foreach (var c in channels)
-                    c.Dispose();
-            }
-        }
+        public BindableNumber<double> Volume => SamplesContainer.Volume;
+
+        public BindableNumber<double> Balance => SamplesContainer.Balance;
+
+        public BindableNumber<double> Frequency => SamplesContainer.Frequency;
+
+        public BindableNumber<double> Tempo => SamplesContainer.Tempo;
+
+        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+            => SamplesContainer.AddAdjustment(type, adjustBindable);
+
+        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+            => SamplesContainer.RemoveAdjustment(type, adjustBindable);
+
+        public void RemoveAllAdjustments(AdjustableProperty type)
+            => SamplesContainer.RemoveAllAdjustments(type);
+
+        public bool IsPlaying => SamplesContainer.Any(s => s.Playing);
+
+        #endregion
     }
 }

@@ -8,6 +8,7 @@ using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 
 namespace osu.Game.Tests.Visual
@@ -32,7 +33,7 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IAdjustableClock>(new StopwatchClock());
+            dependencies.CacheAs(new EditorClock());
 
             return dependencies;
         }
@@ -71,8 +72,11 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            currentBlueprint.UpdatePosition(InputManager.CurrentState.Mouse.Position);
+            currentBlueprint.UpdatePosition(SnapForBlueprint(currentBlueprint));
         }
+
+        protected virtual SnapResult SnapForBlueprint(PlacementBlueprint blueprint) =>
+            new SnapResult(InputManager.CurrentState.Mouse.Position, null);
 
         public override void Add(Drawable drawable)
         {
@@ -81,7 +85,7 @@ namespace osu.Game.Tests.Visual
             if (drawable is PlacementBlueprint blueprint)
             {
                 blueprint.Show();
-                blueprint.UpdatePosition(InputManager.CurrentState.Mouse.Position);
+                blueprint.UpdatePosition(SnapForBlueprint(blueprint));
             }
         }
 

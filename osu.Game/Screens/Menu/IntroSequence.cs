@@ -205,6 +205,7 @@ namespace osu.Game.Screens.Menu
                 const int line_end_offset = 120;
 
                 smallRing.Foreground.ResizeTo(1, line_duration, Easing.OutQuint);
+                smallRing.Delay(400).FadeColour(Color4.Black, 300);
 
                 lineTopLeft.MoveTo(new Vector2(-line_end_offset, -line_end_offset), line_duration, Easing.OutQuint);
                 lineTopRight.MoveTo(new Vector2(line_end_offset, -line_end_offset), line_duration, Easing.OutQuint);

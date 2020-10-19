@@ -19,10 +19,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneMissHitWindowJudgements : ModTestScene
     {
-        public TestSceneMissHitWindowJudgements()
-            : base(new OsuRuleset())
-        {
-        }
+        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
         [Test]
         public void TestMissViaEarlyHit()
@@ -43,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
                 },
-                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset < -hitWindows.WindowFor(HitResult.Meh) && Player.Results[0].Type == HitResult.Miss
+                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset < -hitWindows.WindowFor(HitResult.Meh) && !Player.Results[0].IsHit
             });
         }
 
@@ -62,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Autoplay = false,
                 Beatmap = beatmap,
-                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset >= hitWindows.WindowFor(HitResult.Meh) && Player.Results[0].Type == HitResult.Miss
+                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset >= hitWindows.WindowFor(HitResult.Meh) && !Player.Results[0].IsHit
             });
         }
 

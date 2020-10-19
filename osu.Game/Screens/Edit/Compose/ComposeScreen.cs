@@ -1,8 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Skinning;
@@ -13,11 +17,28 @@ namespace osu.Game.Screens.Edit.Compose
     {
         private HitObjectComposer composer;
 
-        protected override Drawable CreateMainContent()
+        public ComposeScreen()
+            : base(EditorScreenMode.Compose)
         {
-            var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
+        }
+
+        private Ruleset ruleset;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            ruleset = parent.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo.Ruleset?.CreateInstance();
             composer = ruleset?.CreateHitObjectComposer();
 
+            // make the composer available to the timeline and other components in this screen.
+            dependencies.CacheAs(composer);
+
+            return dependencies;
+        }
+
+        protected override Drawable CreateMainContent()
+        {
             if (ruleset == null || composer == null)
                 return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "This beatmap" : $"{ruleset.Description}'s composer");
 

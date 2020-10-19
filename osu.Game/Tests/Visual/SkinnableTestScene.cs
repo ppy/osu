@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -32,16 +34,13 @@ namespace osu.Game.Tests.Visual
         {
         }
 
-        // Required to be part of the per-ruleset implementation to construct the newer version of the Ruleset.
-        protected abstract Ruleset CreateRulesetForSkinProvider();
-
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, SkinManager skinManager)
+        private void load(AudioManager audio, SkinManager skinManager, OsuGameBase game)
         {
             var dllStore = new DllResourceStore(DynamicCompilationOriginal.GetType().Assembly);
 
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
-            defaultSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
+            defaultSkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), audio);
             specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), audio, true);
             oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), audio, true);
         }
@@ -107,7 +106,7 @@ namespace osu.Game.Tests.Visual
                         {
                             new OutlineBox { Alpha = autoSize ? 1 : 0 },
                             mainProvider.WithChild(
-                                new SkinProvidingContainer(CreateRulesetForSkinProvider().CreateLegacySkinProvider(mainProvider, beatmap))
+                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
                                 {
                                     Child = created,
                                     RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
@@ -119,6 +118,14 @@ namespace osu.Game.Tests.Visual
                 }
             };
         }
+
+        /// <summary>
+        /// Creates the ruleset for adding the corresponding skin transforming component.
+        /// </summary>
+        [NotNull]
+        protected abstract Ruleset CreateRulesetForSkinProvider();
+
+        protected sealed override Ruleset CreateRuleset() => CreateRulesetForSkinProvider();
 
         protected virtual IBeatmap CreateBeatmapForSkinProvider() => CreateWorkingBeatmap(Ruleset.Value).GetPlayableBeatmap(Ruleset.Value);
 
@@ -151,18 +158,23 @@ namespace osu.Game.Tests.Visual
                 this.extrapolateAnimations = extrapolateAnimations;
             }
 
-            public override Texture GetTexture(string componentName)
+            public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
+                var lookup = base.GetTexture(componentName, wrapModeS, wrapModeT);
+
+                if (lookup != null)
+                    return lookup;
+
                 // extrapolate frames to test longer animations
                 if (extrapolateAnimations)
                 {
                     var match = Regex.Match(componentName, "-([0-9]*)");
 
                     if (match.Length > 0 && int.TryParse(match.Groups[1].Value, out var number) && number < 60)
-                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"));
+                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"), wrapModeS, wrapModeT);
                 }
 
-                return base.GetTexture(componentName);
+                return null;
             }
         }
     }

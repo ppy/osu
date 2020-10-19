@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             // Keep wiggling sliders and spinners for their duration
-            if (!(osuObject is IHasEndTime endTime))
+            if (!(osuObject is IHasDuration endTime))
                 return;
 
             amountWiggles = (int)(endTime.Duration / wiggle_duration);

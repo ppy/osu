@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "SS or quit.";
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
-            => !(result.Judgement is IgnoreJudgement)
+            => result.Type.AffectsAccuracy()
                && result.Type != result.Judgement.MaxResult;
     }
 }

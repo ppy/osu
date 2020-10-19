@@ -4,3 +4,5 @@ M:System.ValueType.Equals(System.Object)~System.Boolean;Don't use object.Equals(
 M:System.Nullable`1.Equals(System.Object)~System.Boolean;Use == instead.
 T:System.IComparable;Don't use non-generic IComparable. Use generic version instead.
 M:osu.Framework.Graphics.Sprites.SpriteText.#ctor;Use OsuSpriteText.
+T:Microsoft.EntityFrameworkCore.Internal.EnumerableExtensions;Don't use internal extension methods.
+T:Microsoft.EntityFrameworkCore.Internal.TypeExtensions;Don't use internal extension methods.

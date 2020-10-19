@@ -46,6 +46,13 @@ namespace osu.Game.Overlays
                     Width = 300,
                     Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0))
                 },
+                muteButton = new MuteButton
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Margin = new MarginPadding(10),
+                    Current = { BindTarget = IsMuted }
+                },
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
@@ -56,19 +63,11 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Left = offset },
                     Children = new Drawable[]
                     {
-                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker)
-                        {
-                            Margin = new MarginPadding { Top = 100 + MuteButton.HEIGHT } //to counter the mute button and re-center the volume meters
-                        },
+                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
                         volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker),
                         volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
-                        muteButton = new MuteButton
-                        {
-                            Margin = new MarginPadding { Top = 100 },
-                            Current = { BindTarget = IsMuted }
-                        }
                     }
-                },
+                }
             });
 
             volumeMeterMaster.Bindable.BindTo(audio.Volume);

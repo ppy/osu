@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -18,13 +17,13 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
 using osu.Game.Screens.Multi.Match.Components;
-using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Screens.Multi
@@ -51,6 +50,9 @@ namespace osu.Game.Screens.Multi
 
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
+
+        [Resolved]
+        private MusicController music { get; set; }
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
@@ -119,7 +121,7 @@ namespace osu.Game.Screens.Multi
                                         Child = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.7f), backgroundColour)
+                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.5f), backgroundColour)
                                         },
                                     }
                                 }
@@ -197,18 +199,6 @@ namespace osu.Game.Screens.Multi
             Logger.Log($"Polling adjusted (listing: {roomManager.TimeBetweenListingPolls}, selection: {roomManager.TimeBetweenSelectionPolls})");
         }
 
-        /// <summary>
-        /// Push a <see cref="Player"/> to the main screen stack to begin gameplay.
-        /// Generally called from a <see cref="MatchSubScreen"/> via DI resolution.
-        /// </summary>
-        public void Start(Func<Player> player)
-        {
-            if (!this.IsCurrentScreen())
-                return;
-
-            this.Push(new PlayerLoader(player));
-        }
-
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state != APIState.Online)
@@ -264,12 +254,6 @@ namespace osu.Game.Screens.Multi
         {
             roomManager.PartRoom();
 
-            if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
-            {
-                screenStack.Exit();
-                return true;
-            }
-
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
@@ -280,6 +264,20 @@ namespace osu.Game.Screens.Multi
             endHandlingTrack();
 
             base.OnExiting(next);
+            return false;
+        }
+
+        public override bool OnBackButton()
+        {
+            if ((screenStack.CurrentScreen as IMultiplayerSubScreen)?.OnBackButton() == true)
+                return true;
+
+            if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
+            {
+                screenStack.Exit();
+                return true;
+            }
+
             return false;
         }
 
@@ -352,8 +350,7 @@ namespace osu.Game.Screens.Multi
                     track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                     track.Looping = true;
 
-                    if (!track.IsRunning)
-                        track.Restart();
+                    music.EnsurePlayingSomething();
                 }
             }
             else
