@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Value.BeatmapInfo.BaseDifficulty.ApproachRate = approachRateSlider.Current.Value;
             Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
 
-            editorBeatmap.UpdateBeatmap();
+            editorBeatmap.UpdateAllHitObjects();
         }
     }
 }

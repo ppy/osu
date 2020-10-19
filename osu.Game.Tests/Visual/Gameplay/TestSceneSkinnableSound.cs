@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
@@ -22,27 +21,24 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSkinnableSound : OsuTestScene
     {
-        [Cached(typeof(ISamplePlaybackDisabler))]
-        private GameplayClock gameplayClock = new GameplayClock(new FramedClock());
-
         private TestSkinSourceContainer skinSource;
         private PausableSkinnableSound skinnableSound;
 
         [SetUp]
-        public void SetUp() => Schedule(() =>
+        public void SetUpSteps()
         {
-            gameplayClock.IsPaused.Value = false;
-
-            Children = new Drawable[]
+            AddStep("setup hierarchy", () =>
             {
-                skinSource = new TestSkinSourceContainer
+                Children = new Drawable[]
                 {
-                    Clock = gameplayClock,
-                    RelativeSizeAxes = Axes.Both,
-                    Child = skinnableSound = new PausableSkinnableSound(new SampleInfo("normal-sliderslide"))
-                },
-            };
-        });
+                    skinSource = new TestSkinSourceContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Child = skinnableSound = new PausableSkinnableSound(new SampleInfo("normal-sliderslide"))
+                    },
+                };
+            });
+        }
 
         [Test]
         public void TestStoppedSoundDoesntResumeAfterPause()
@@ -62,8 +58,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
 
-            AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
-            AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
+            AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
+
+            AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
 
             AddWaitStep("wait a bit", 5);
             AddAssert("sample not playing", () => !sample.Playing);
@@ -82,8 +79,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for sample to start playing", () => sample.Playing);
 
-            AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
+            AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
             AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
+
+            AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
+            AddUntilStep("wait for sample to start playing", () => sample.Playing);
         }
 
         [Test]
@@ -98,10 +98,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("sample playing", () => sample.Playing);
 
-            AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
-            AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
+            AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
 
-            AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
+            AddUntilStep("sample not playing", () => !sample.Playing);
+
+            AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
 
             AddAssert("sample not playing", () => !sample.Playing);
             AddAssert("sample not playing", () => !sample.Playing);
@@ -120,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("sample playing", () => sample.Playing);
 
-            AddStep("pause gameplay clock", () => gameplayClock.IsPaused.Value = true);
+            AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
             AddUntilStep("wait for sample to stop playing", () => !sample.Playing);
 
             AddStep("trigger skin change", () => skinSource.TriggerSourceChanged());
@@ -133,19 +134,24 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("new sample stopped", () => !sample.Playing);
-            AddStep("resume gameplay clock", () => gameplayClock.IsPaused.Value = false);
+            AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
 
             AddWaitStep("wait a bit", 5);
             AddAssert("new sample not played", () => !sample.Playing);
         }
 
         [Cached(typeof(ISkinSource))]
-        private class TestSkinSourceContainer : Container, ISkinSource
+        [Cached(typeof(ISamplePlaybackDisabler))]
+        private class TestSkinSourceContainer : Container, ISkinSource, ISamplePlaybackDisabler
         {
             [Resolved]
             private ISkinSource source { get; set; }
 
             public event Action SourceChanged;
+
+            public Bindable<bool> SamplePlaybackDisabled { get; } = new Bindable<bool>();
+
+            IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => SamplePlaybackDisabled;
 
             public Drawable GetDrawableComponent(ISkinComponent component) => source?.GetDrawableComponent(component);
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source?.GetTexture(componentName, wrapModeS, wrapModeT);

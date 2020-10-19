@@ -19,6 +19,12 @@ namespace osu.Game.Skinning
         /// </summary>
         public Drawable Drawable { get; private set; }
 
+        /// <summary>
+        /// Whether the drawable component should be centered in available space.
+        /// Defaults to true.
+        /// </summary>
+        public bool CentreComponent { get; set; } = true;
+
         public new Axes AutoSizeAxes
         {
             get => base.AutoSizeAxes;
@@ -84,8 +90,13 @@ namespace osu.Game.Skinning
             if (Drawable != null)
             {
                 scaling.Invalidate();
-                Drawable.Origin = Anchor.Centre;
-                Drawable.Anchor = Anchor.Centre;
+
+                if (CentreComponent)
+                {
+                    Drawable.Origin = Anchor.Centre;
+                    Drawable.Anchor = Anchor.Centre;
+                }
+
                 InternalChild = Drawable;
             }
             else
