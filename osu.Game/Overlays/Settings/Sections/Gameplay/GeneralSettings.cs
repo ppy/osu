@@ -76,7 +76,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsEnumDropdown<ScoringMode>
                 {
                     LabelText = "分数显示模式",
-                    Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
+                    Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
+                    Keywords = new[] { "scoring" }
                 }
             };
 
