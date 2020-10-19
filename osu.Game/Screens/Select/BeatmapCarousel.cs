@@ -590,35 +590,38 @@ namespace osu.Game.Screens.Select
             {
                 displayedRange = newDisplayRange;
 
-                var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
-
-                foreach (var panel in ScrollableContent.Children)
+                if (visibleItems.Count > 0)
                 {
-                    if (toDisplay.Remove(panel.Item))
+                    var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
+
+                    foreach (var panel in ScrollableContent.Children)
                     {
-                        // panel already displayed.
-                        continue;
+                        if (toDisplay.Remove(panel.Item))
+                        {
+                            // panel already displayed.
+                            continue;
+                        }
+
+                        // panel loaded as drawable but not required by visible range.
+                        // remove but only if too far off-screen
+                        if (panel.Y + panel.DrawHeight < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
+                        {
+                            // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
+                            panel.ClearTransforms();
+                            panel.Expire();
+                        }
                     }
 
-                    // panel loaded as drawable but not required by visible range.
-                    // remove but only if too far off-screen
-                    if (panel.Y + panel.DrawHeight < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
+                    // Add those items within the previously found index range that should be displayed.
+                    foreach (var item in toDisplay)
                     {
-                        // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
-                        panel.ClearTransforms();
-                        panel.Expire();
+                        var panel = setPool.Get(p => p.Item = item);
+
+                        panel.Depth = item.CarouselYPosition;
+                        panel.Y = item.CarouselYPosition;
+
+                        ScrollableContent.Add(panel);
                     }
-                }
-
-                // Add those items within the previously found index range that should be displayed.
-                foreach (var item in toDisplay)
-                {
-                    var panel = setPool.Get(p => p.Item = item);
-
-                    panel.Depth = item.CarouselYPosition;
-                    panel.Y = item.CarouselYPosition;
-
-                    ScrollableContent.Add(panel);
                 }
             }
 
