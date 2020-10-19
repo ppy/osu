@@ -597,10 +597,20 @@ namespace osu.Game.Screens.Edit
         {
             double amount = e.ShiftPressed ? 4 : 1;
 
+            bool trackPlaying = clock.IsRunning;
+
+            if (trackPlaying)
+            {
+                // generally users are not looking to perform tiny seeks when the track is playing,
+                // so seeks should always be by one full beat, bypassing the beatDivisor.
+                // this multiplication undoes the division that will be applied in the underlying seek operation.
+                amount *= beatDivisor.Value;
+            }
+
             if (direction < 1)
-                clock.SeekBackward(!clock.IsRunning, amount);
+                clock.SeekBackward(!trackPlaying, amount);
             else
-                clock.SeekForward(!clock.IsRunning, amount);
+                clock.SeekForward(!trackPlaying, amount);
         }
 
         private void exportBeatmap()
