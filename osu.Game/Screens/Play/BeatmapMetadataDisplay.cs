@@ -49,44 +49,6 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class EpilepsyWarning : FillFlowContainer
-        {
-            public EpilepsyWarning(bool warning)
-            {
-                if (warning)
-                    this.Show();
-                else
-                    this.Hide();
-
-                AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Vertical;
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Icon = FontAwesome.Solid.ExclamationTriangle,
-                        Size = new Vector2(40),
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Text = "This beatmap contains scenes with rapidly flashing colours.",
-                        Font = OsuFont.GetFont(size: 20),
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Text = "Please take caution if you are affected by epilepsy.",
-                        Font = OsuFont.GetFont(size: 20),
-                    }
-                };
-            }
-        }
-
         private readonly WorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable facade;
@@ -201,12 +163,6 @@ namespace osu.Game.Screens.Play
                             Margin = new MarginPadding { Top = 20 },
                             Current = mods
                         },
-                        new EpilepsyWarning(beatmap.BeatmapInfo.EpilepsyWarning)
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Margin = new MarginPadding { Top = 20 },
-                        }
                     },
                 }
             };
