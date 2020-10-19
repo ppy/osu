@@ -79,10 +79,10 @@ namespace osu.Game.Screens.Select
         }
 
         private static int getLengthScale(string value) =>
-            value.EndsWith("ms") ? 1 :
-            value.EndsWith("s") ? 1000 :
-            value.EndsWith("m") ? 60000 :
-            value.EndsWith("h") ? 3600000 : 1000;
+            value.EndsWith("ms", StringComparison.Ordinal) ? 1 :
+            value.EndsWith('s') ? 1000 :
+            value.EndsWith('m') ? 60000 :
+            value.EndsWith('h') ? 3600000 : 1000;
 
         private static bool parseFloatWithPoint(string value, out float result) =>
             float.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);

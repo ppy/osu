@@ -18,8 +18,11 @@ namespace osu.Game.Rulesets.UI
     /// A container which consumes a parent gameplay clock and standardises frame counts for children.
     /// Will ensure a minimum of 50 frames per clock second is maintained, regardless of any system lag or seeks.
     /// </summary>
-    public class FrameStabilityContainer : Container, IHasReplayHandler
+    [Cached(typeof(ISamplePlaybackDisabler))]
+    public class FrameStabilityContainer : Container, IHasReplayHandler, ISamplePlaybackDisabler
     {
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
         private readonly double gameplayStartTime;
 
         /// <summary>
@@ -58,13 +61,16 @@ namespace osu.Game.Rulesets.UI
         private int direction;
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock)
+        private void load(GameplayClock clock, ISamplePlaybackDisabler sampleDisabler)
         {
             if (clock != null)
             {
                 parentGameplayClock = stabilityGameplayClock.ParentGameplayClock = clock;
                 GameplayClock.IsPaused.BindTo(clock.IsPaused);
             }
+
+            // this is a bit temporary. should really be done inside of GameplayClock (but requires large structural changes).
+            stabilityGameplayClock.ParentSampleDisabler = sampleDisabler;
         }
 
         protected override void LoadComplete()
@@ -97,6 +103,8 @@ namespace osu.Game.Rulesets.UI
         {
             requireMoreUpdateLoops = true;
             validState = !GameplayClock.IsPaused.Value;
+
+            samplePlaybackDisabled.Value = stabilityGameplayClock.ShouldDisableSamplePlayback;
 
             int loops = 0;
 
@@ -207,18 +215,26 @@ namespace osu.Game.Rulesets.UI
 
         private void setClock()
         {
-            // in case a parent gameplay clock isn't available, just use the parent clock.
-            parentGameplayClock ??= Clock;
-
-            Clock = GameplayClock;
-            ProcessCustomClock = false;
+            if (parentGameplayClock == null)
+            {
+                // in case a parent gameplay clock isn't available, just use the parent clock.
+                parentGameplayClock ??= Clock;
+            }
+            else
+            {
+                Clock = GameplayClock;
+            }
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
 
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
+
         private class StabilityGameplayClock : GameplayClock
         {
             public GameplayClock ParentGameplayClock;
+
+            public ISamplePlaybackDisabler ParentSampleDisabler;
 
             public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
 
@@ -227,7 +243,11 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            public override bool IsSeeking => ParentGameplayClock != null && Math.Abs(CurrentTime - ParentGameplayClock.CurrentTime) > 200;
+            public override bool ShouldDisableSamplePlayback =>
+                // handle the case where playback is catching up to real-time.
+                base.ShouldDisableSamplePlayback
+                || ParentSampleDisabler?.SamplePlaybackDisabled.Value == true
+                || (ParentGameplayClock != null && Math.Abs(CurrentTime - ParentGameplayClock.CurrentTime) > 200);
         }
     }
 }

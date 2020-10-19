@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!(obj is DrawableDrumRollTick))
                 return;
 
-            if (result.Type > HitResult.Miss)
+            if (result.IsHit)
                 rollingHits++;
             else
                 rollingHits--;
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Ok);
             }
             else
-                ApplyResult(r => r.Type = HitResult.Miss);
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)

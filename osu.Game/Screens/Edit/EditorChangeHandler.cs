@@ -16,10 +16,12 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// Tracks changes to the <see cref="Editor"/>.
     /// </summary>
-    public class EditorChangeHandler : IEditorChangeHandler
+    public class EditorChangeHandler : TransactionalCommitComponent, IEditorChangeHandler
     {
         public readonly Bindable<bool> CanUndo = new Bindable<bool>();
         public readonly Bindable<bool> CanRedo = new Bindable<bool>();
+
+        public event Action OnStateChange;
 
         private readonly LegacyEditorBeatmapPatcher patcher;
         private readonly List<byte[]> savedStates = new List<byte[]>();
@@ -39,7 +41,6 @@ namespace osu.Game.Screens.Edit
         }
 
         private readonly EditorBeatmap editorBeatmap;
-        private int bulkChangesStarted;
         private bool isRestoring;
 
         public const int MAX_SAVED_STATES = 50;
@@ -52,9 +53,9 @@ namespace osu.Game.Screens.Edit
         {
             this.editorBeatmap = editorBeatmap;
 
-            editorBeatmap.HitObjectAdded += hitObjectAdded;
-            editorBeatmap.HitObjectRemoved += hitObjectRemoved;
-            editorBeatmap.HitObjectUpdated += hitObjectUpdated;
+            editorBeatmap.TransactionBegan += BeginChange;
+            editorBeatmap.TransactionEnded += EndChange;
+            editorBeatmap.SaveStateTriggered += SaveState;
 
             patcher = new LegacyEditorBeatmapPatcher(editorBeatmap);
 
@@ -62,31 +63,8 @@ namespace osu.Game.Screens.Edit
             SaveState();
         }
 
-        private void hitObjectAdded(HitObject obj) => SaveState();
-
-        private void hitObjectRemoved(HitObject obj) => SaveState();
-
-        private void hitObjectUpdated(HitObject obj) => SaveState();
-
-        public void BeginChange() => bulkChangesStarted++;
-
-        public void EndChange()
+        protected override void UpdateState()
         {
-            if (bulkChangesStarted == 0)
-                throw new InvalidOperationException($"Cannot call {nameof(EndChange)} without a previous call to {nameof(BeginChange)}.");
-
-            if (--bulkChangesStarted == 0)
-                SaveState();
-        }
-
-        /// <summary>
-        /// Saves the current <see cref="Editor"/> state.
-        /// </summary>
-        public void SaveState()
-        {
-            if (bulkChangesStarted > 0)
-                return;
-
             if (isRestoring)
                 return;
 
@@ -109,6 +87,8 @@ namespace osu.Game.Screens.Edit
                 savedStates.Add(newState);
 
                 currentState = savedStates.Count - 1;
+
+                OnStateChange?.Invoke();
                 updateBindables();
             }
         }
@@ -119,7 +99,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="direction">The direction to restore in. If less than 0, an older state will be used. If greater than 0, a newer state will be used.</param>
         public void RestoreState(int direction)
         {
-            if (bulkChangesStarted > 0)
+            if (TransactionActive)
                 return;
 
             if (savedStates.Count == 0)
@@ -136,6 +116,7 @@ namespace osu.Game.Screens.Edit
 
             isRestoring = false;
 
+            OnStateChange?.Invoke();
             updateBindables();
         }
 

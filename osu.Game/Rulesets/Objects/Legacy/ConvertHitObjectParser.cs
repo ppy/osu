@@ -70,52 +70,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
             else if (type.HasFlag(LegacyHitObjectType.Slider))
             {
-                PathType pathType = PathType.Catmull;
                 double? length = null;
-
-                string[] pointSplit = split[5].Split('|');
-
-                int pointCount = 1;
-
-                foreach (var t in pointSplit)
-                {
-                    if (t.Length > 1)
-                        pointCount++;
-                }
-
-                var points = new Vector2[pointCount];
-
-                int pointIndex = 1;
-
-                foreach (string t in pointSplit)
-                {
-                    if (t.Length == 1)
-                    {
-                        switch (t)
-                        {
-                            case @"C":
-                                pathType = PathType.Catmull;
-                                break;
-
-                            case @"B":
-                                pathType = PathType.Bezier;
-                                break;
-
-                            case @"L":
-                                pathType = PathType.Linear;
-                                break;
-
-                            case @"P":
-                                pathType = PathType.PerfectCurve;
-                                break;
-                        }
-
-                        continue;
-                    }
-
-                    string[] temp = t.Split(':');
-                    points[pointIndex++] = new Vector2((int)Parsing.ParseDouble(temp[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(temp[1], Parsing.MAX_COORDINATE_VALUE)) - pos;
-                }
 
                 int repeatCount = Parsing.ParseInt(split[6]);
 
@@ -183,10 +138,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                result = CreateSlider(pos, combo, comboOffset, convertControlPoints(points, pathType), length, repeatCount, nodeSamples);
-
-                // The samples are played when the slider ends, which is the last node
-                result.Samples = nodeSamples[^1];
+                result = CreateSlider(pos, combo, comboOffset, convertPathString(split[5], pos), length, repeatCount, nodeSamples);
             }
             else if (type.HasFlag(LegacyHitObjectType.Spinner))
             {
@@ -207,7 +159,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 {
                     string[] ss = split[5].Split(':');
                     endTime = Math.Max(startTime, Parsing.ParseDouble(ss[0]));
-                    readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
+                    readCustomSampleBanks(string.Join(':', ss.Skip(1)), bankInfo);
                 }
 
                 result = CreateHold(pos, combo, comboOffset, endTime + Offset - startTime);
@@ -255,8 +207,108 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
 
-        private PathControlPoint[] convertControlPoints(Vector2[] vertices, PathType type)
+        private PathType convertPathType(string input)
         {
+            switch (input[0])
+            {
+                default:
+                case 'C':
+                    return PathType.Catmull;
+
+                case 'B':
+                    return PathType.Bezier;
+
+                case 'L':
+                    return PathType.Linear;
+
+                case 'P':
+                    return PathType.PerfectCurve;
+            }
+        }
+
+        /// <summary>
+        /// Converts a given point string into a set of path control points.
+        /// </summary>
+        /// <remarks>
+        /// A point string takes the form: X|1:1|2:2|2:2|3:3|Y|1:1|2:2.
+        /// This has three segments:
+        /// <list type="number">
+        ///     <item>
+        ///         <description>X: { (1,1), (2,2) } (implicit segment)</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>X: { (2,2), (3,3) } (implicit segment)</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Y: { (3,3), (1,1), (2, 2) } (explicit segment)</description>
+        ///     </item>
+        /// </list>
+        /// </remarks>
+        /// <param name="pointString">The point string.</param>
+        /// <param name="offset">The positional offset to apply to the control points.</param>
+        /// <returns>All control points in the resultant path.</returns>
+        private PathControlPoint[] convertPathString(string pointString, Vector2 offset)
+        {
+            // This code takes on the responsibility of handling explicit segments of the path ("X" & "Y" from above). Implicit segments are handled by calls to convertPoints().
+            string[] pointSplit = pointString.Split('|');
+
+            var controlPoints = new List<Memory<PathControlPoint>>();
+            int startIndex = 0;
+            int endIndex = 0;
+            bool first = true;
+
+            while (++endIndex < pointSplit.Length)
+            {
+                // Keep incrementing endIndex while it's not the start of a new segment (indicated by having a type descriptor of length 1).
+                if (pointSplit[endIndex].Length > 1)
+                    continue;
+
+                // Multi-segmented sliders DON'T contain the end point as part of the current segment as it's assumed to be the start of the next segment.
+                // The start of the next segment is the index after the type descriptor.
+                string endPoint = endIndex < pointSplit.Length - 1 ? pointSplit[endIndex + 1] : null;
+
+                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), endPoint, first, offset));
+                startIndex = endIndex;
+                first = false;
+            }
+
+            if (endIndex > startIndex)
+                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), null, first, offset));
+
+            return mergePointsLists(controlPoints);
+        }
+
+        /// <summary>
+        /// Converts a given point list into a set of path segments.
+        /// </summary>
+        /// <param name="points">The point list.</param>
+        /// <param name="endPoint">Any extra endpoint to consider as part of the points. This will NOT be returned.</param>
+        /// <param name="first">Whether this is the first segment in the set. If <c>true</c> the first of the returned segments will contain a zero point.</param>
+        /// <param name="offset">The positional offset to apply to the control points.</param>
+        /// <returns>The set of points contained by <paramref name="points"/> as one or more segments of the path, prepended by an extra zero point if <paramref name="first"/> is <c>true</c>.</returns>
+        private IEnumerable<Memory<PathControlPoint>> convertPoints(ReadOnlyMemory<string> points, string endPoint, bool first, Vector2 offset)
+        {
+            PathType type = convertPathType(points.Span[0]);
+
+            int readOffset = first ? 1 : 0; // First control point is zero for the first segment.
+            int readablePoints = points.Length - 1; // Total points readable from the base point span.
+            int endPointLength = endPoint != null ? 1 : 0; // Extra length if an endpoint is given that lies outside the base point span.
+
+            var vertices = new PathControlPoint[readOffset + readablePoints + endPointLength];
+
+            // Fill any non-read points.
+            for (int i = 0; i < readOffset; i++)
+                vertices[i] = new PathControlPoint();
+
+            // Parse into control points.
+            for (int i = 1; i < points.Length; i++)
+                readPoint(points.Span[i], offset, out vertices[readOffset + i - 1]);
+
+            // If an endpoint is given, add it to the end.
+            if (endPoint != null)
+                readPoint(endPoint, offset, out vertices[^1]);
+
+            // Edge-case rules (to match stable).
             if (type == PathType.PerfectCurve)
             {
                 if (vertices.Length != 3)
@@ -268,29 +320,64 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
             }
 
-            var points = new List<PathControlPoint>(vertices.Length)
-            {
-                new PathControlPoint
-                {
-                    Position = { Value = vertices[0] },
-                    Type = { Value = type }
-                }
-            };
+            // The first control point must have a definite type.
+            vertices[0].Type.Value = type;
 
-            for (int i = 1; i < vertices.Length; i++)
+            // A path can have multiple implicit segments of the same type if there are two sequential control points with the same position.
+            // To handle such cases, this code may return multiple path segments with the final control point in each segment having a non-null type.
+            // For the point string X|1:1|2:2|2:2|3:3, this code returns the segments:
+            // X: { (1,1), (2, 2) }
+            // X: { (3, 3) }
+            // Note: (2, 2) is not returned in the second segments, as it is implicit in the path.
+            int startIndex = 0;
+            int endIndex = 0;
+
+            while (++endIndex < vertices.Length - endPointLength)
             {
-                if (vertices[i] == vertices[i - 1])
-                {
-                    points[^1].Type.Value = type;
+                if (vertices[endIndex].Position.Value != vertices[endIndex - 1].Position.Value)
                     continue;
-                }
 
-                points.Add(new PathControlPoint { Position = { Value = vertices[i] } });
+                // Force a type on the last point, and return the current control point set as a segment.
+                vertices[endIndex - 1].Type.Value = type;
+                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+
+                // Skip the current control point - as it's the same as the one that's just been returned.
+                startIndex = endIndex + 1;
             }
 
-            return points.ToArray();
+            if (endIndex > startIndex)
+                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
 
-            static bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+            static void readPoint(string value, Vector2 startPos, out PathControlPoint point)
+            {
+                string[] vertexSplit = value.Split(':');
+
+                Vector2 pos = new Vector2((int)Parsing.ParseDouble(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE)) - startPos;
+                point = new PathControlPoint { Position = { Value = pos } };
+            }
+
+            static bool isLinear(PathControlPoint[] p) => Precision.AlmostEquals(0, (p[1].Position.Value.Y - p[0].Position.Value.Y) * (p[2].Position.Value.X - p[0].Position.Value.X)
+                                                                                    - (p[1].Position.Value.X - p[0].Position.Value.X) * (p[2].Position.Value.Y - p[0].Position.Value.Y));
+        }
+
+        private PathControlPoint[] mergePointsLists(List<Memory<PathControlPoint>> controlPointList)
+        {
+            int totalCount = 0;
+
+            foreach (var arr in controlPointList)
+                totalCount += arr.Length;
+
+            var mergedArray = new PathControlPoint[totalCount];
+            var mergedArrayMemory = mergedArray.AsMemory();
+            int copyIndex = 0;
+
+            foreach (var arr in controlPointList)
+            {
+                arr.CopyTo(mergedArrayMemory.Slice(copyIndex));
+                copyIndex += arr.Length;
+            }
+
+            return mergedArray;
         }
 
         /// <summary>

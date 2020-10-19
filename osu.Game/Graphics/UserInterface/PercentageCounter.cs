@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
@@ -27,9 +26,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             Current.Value = DisplayedCount = 1.0f;
         }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => Colour = colours.BlueLighter;
 
         protected override string FormatCount(double count) => count.FormatAccuracy();
 
