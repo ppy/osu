@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -321,18 +322,24 @@ namespace osu.Game.Screens.Play
                 {
                     contentOut();
 
+                    TransformSequence<PlayerLoader> pushSequence;
+
                     if (epilepsyWarning != null)
                     {
                         epilepsyWarning.State.Value = Visibility.Visible;
 
-                        this.Delay(2000).Schedule(() =>
+                        pushSequence = this.Delay(3000).Schedule(() =>
                         {
                             epilepsyWarning.Hide();
                             epilepsyWarning.Expire();
                         });
                     }
+                    else
+                    {
+                        pushSequence = this.Delay(0);
+                    }
 
-                    this.Delay(epilepsyWarning?.State.Value == Visibility.Visible ? 2500 : 250).Schedule(() =>
+                    pushSequence.Delay(250).Schedule(() =>
                     {
                         if (!this.IsCurrentScreen()) return;
 
