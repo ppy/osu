@@ -90,8 +90,6 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
-
-        [NotMapped]
         public bool EpilepsyWarning { get; set; }
 
         // Editor
