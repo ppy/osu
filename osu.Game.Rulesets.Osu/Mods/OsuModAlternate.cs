@@ -30,7 +30,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return true;
 
             lastActionPressed = action;
-
             return false;
         }
     }
