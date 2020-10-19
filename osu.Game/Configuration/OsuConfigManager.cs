@@ -106,8 +106,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
             Set(OsuSetting.GameplayDisableWinKey, true);
 
-            Set(OsuSetting.ShowPlayfieldBorder, false);
-
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
@@ -241,6 +239,5 @@ namespace osu.Game.Configuration
         HitLighting,
         MenuBackgroundSource,
         GameplayDisableWinKey,
-        ShowPlayfieldBorder,
     }
 }

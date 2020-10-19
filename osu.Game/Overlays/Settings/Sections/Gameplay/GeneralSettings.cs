@@ -79,11 +79,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
                     Keywords = new[] { "scoring" }
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "Show playfield border",
-                    Current = config.GetBindable<bool>(OsuSetting.ShowPlayfieldBorder),
-                },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
