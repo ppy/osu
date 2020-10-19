@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -15,16 +15,9 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSprite : SkinReloadableDrawable, IFlippable, IVectorScalable
+    public class DrawableStoryboardSprite : CompositeDrawable, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
-
-        private Sprite drawableSprite;
-
-        [Resolved]
-        private TextureStore storyboardTextureStore { get; set; }
-
-        private string texturePath;
 
         private bool flipH;
 
@@ -123,29 +116,19 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            InternalChild = drawableSprite = new Sprite
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            };
+            var storyboardPath = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            var sprite = storyboardPath != null
+                ? (Drawable)new Sprite
+                {
+                    Texture = textureStore.Get(storyboardPath)
+                }
+                : new SkinnableSprite(Sprite.Path); // fall back to skin textures if not found in storyboard files.
 
-            texturePath = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            InternalChild = sprite.With(s => s.Anchor = s.Origin = Anchor.Centre);
 
             Sprite.ApplyTransforms(this);
-        }
-
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            base.SkinChanged(skin, allowFallback);
-
-            var newTexture = skin?.GetTexture(Path.GetFileNameWithoutExtension(Sprite.Path)) ?? storyboardTextureStore?.Get(texturePath);
-
-            if (drawableSprite.Texture == newTexture) return;
-
-            drawableSprite.Size = Vector2.Zero; // Sprite size needs to be recalculated (e.g. aspect ratio of combo number textures may differ between skins)
-            drawableSprite.Texture = newTexture;
         }
     }
 }
