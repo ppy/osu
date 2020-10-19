@@ -89,12 +89,12 @@ namespace osu.Game.Screens.Play
         protected override void PopIn()
         {
             this.FadeIn(500, Easing.InQuint)
-                .TransformBindableTo(trackVolumeOnEpilepsyWarning, 0.25, 500, Easing.InQuint);
+                .TransformBindableTo(trackVolumeOnEpilepsyWarning, 0.25, 500, Easing.InSine);
 
             warningContent.FadeIn(500, Easing.InQuint);
         }
 
-        protected override void PopOut() => this.FadeOut(500, Easing.InQuint);
+        protected override void PopOut() => this.FadeOut(500, Easing.OutQuint);
 
         protected override void Dispose(bool isDisposing)
         {
