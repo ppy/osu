@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -84,13 +85,14 @@ namespace osu.Game.Screens.Play
 
         private bool hideOverlays;
 
-        private bool epilepsyShown;
-
         private InputManager inputManager;
 
         private IdleTracker idleTracker;
 
         private ScheduledDelegate scheduledPushPlayer;
+
+        [CanBeNull]
+        private EpilepsyWarning epilepsyWarning;
 
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notificationOverlay { get; set; }
@@ -140,6 +142,15 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750)
             });
+
+            if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
+            {
+                AddInternal(epilepsyWarning = new EpilepsyWarning
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            }
         }
 
         protected override void LoadComplete()
@@ -310,27 +321,18 @@ namespace osu.Game.Screens.Play
                 {
                     contentOut();
 
-                    if (true && !epilepsyShown)
+                    if (epilepsyWarning != null)
                     {
-                        EpilepsyWarning warning;
-
-                        AddInternal(warning = new EpilepsyWarning
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            State = { Value = Visibility.Visible }
-                        });
-
-                        epilepsyShown = true;
+                        epilepsyWarning.State.Value = Visibility.Visible;
 
                         this.Delay(2000).Schedule(() =>
                         {
-                            warning.Hide();
-                            warning.Expire();
+                            epilepsyWarning.Hide();
+                            epilepsyWarning.Expire();
                         });
                     }
 
-                    this.Delay(epilepsyShown ? 2500 : 250).Schedule(() =>
+                    this.Delay(epilepsyWarning?.State.Value == Visibility.Visible ? 2500 : 250).Schedule(() =>
                     {
                         if (!this.IsCurrentScreen()) return;
 
