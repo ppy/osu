@@ -20,12 +20,6 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class PaginatedContainer<TModel> : FillFlowContainer
     {
-        private readonly ShowMoreButton moreButton;
-        private readonly OsuSpriteText missingText;
-        private APIRequest<List<TModel>> retrievalRequest;
-        private CancellationTokenSource loadCancellation;
-        private readonly BindableInt count = new BindableInt();
-
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -33,41 +27,40 @@ namespace osu.Game.Overlays.Profile.Sections
         protected int ItemsPerPage;
 
         protected readonly Bindable<User> User = new Bindable<User>();
-        protected readonly FillFlowContainer ItemsContainer;
+        protected FillFlowContainer ItemsContainer;
         protected RulesetStore Rulesets;
 
-        protected PaginatedContainer(Bindable<User> user, string header, string missing)
-        {
-            User.BindTo(user);
+        private APIRequest<List<TModel>> retrievalRequest;
+        private CancellationTokenSource loadCancellation;
 
+        private readonly string missingText;
+        private ShowMoreButton moreButton;
+        private OsuSpriteText missing;
+        private PaginatedContainerHeader header;
+
+        private readonly string headerText;
+        private readonly CounterVisibilityState counterVisibilityState;
+
+        protected PaginatedContainer(Bindable<User> user, string headerText = "", string missingText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        {
+            this.headerText = headerText;
+            this.missingText = missingText;
+            this.counterVisibilityState = counterVisibilityState;
+            User.BindTo(user);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
+        {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
 
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                header = new PaginatedContainerHeader(headerText, counterVisibilityState)
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5, 0),
-                    Margin = new MarginPadding { Top = 10, Bottom = 10 },
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Text = header,
-                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
-                        },
-                        new CounterPill
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Current = { BindTarget = count }
-                        }
-                    }
+                    Alpha = string.IsNullOrEmpty(headerText) ? 0 : 1
                 },
                 ItemsContainer = new FillFlowContainer
                 {
@@ -83,18 +76,14 @@ namespace osu.Game.Overlays.Profile.Sections
                     Margin = new MarginPadding { Top = 10 },
                     Action = showMore,
                 },
-                missingText = new OsuSpriteText
+                missing = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 15),
-                    Text = missing,
+                    Text = missingText,
                     Alpha = 0,
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
             Rulesets = rulesets;
 
             User.ValueChanged += onUserChanged;
@@ -112,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Sections
             if (e.NewValue != null)
             {
                 showMore();
-                count.Value = GetCount(e.NewValue);
+                SetCount(GetCount(e.NewValue));
             }
         }
 
@@ -128,17 +117,22 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected virtual void UpdateItems(List<TModel> items) => Schedule(() =>
         {
+            OnItemsReceived(items);
+
             if (!items.Any() && VisiblePages == 1)
             {
                 moreButton.Hide();
                 moreButton.IsLoading = false;
-                missingText.Show();
+
+                if (!string.IsNullOrEmpty(missing.Text))
+                    missing.Show();
+
                 return;
             }
 
             LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
             {
-                missingText.Hide();
+                missing.Hide();
                 moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
                 moreButton.IsLoading = false;
 
@@ -147,6 +141,12 @@ namespace osu.Game.Overlays.Profile.Sections
         });
 
         protected virtual int GetCount(User user) => 0;
+
+        protected void SetCount(int value) => header.Current.Value = value;
+
+        protected virtual void OnItemsReceived(List<TModel> items)
+        {
+        }
 
         protected abstract APIRequest<List<TModel>> CreateRequest();
 

@@ -34,6 +34,8 @@ namespace osu.Game.Skinning
         HoldNoteHeadImage,
         HoldNoteTailImage,
         HoldNoteBodyImage,
+        HoldNoteLightImage,
+        HoldNoteLightScale,
         ExplosionImage,
         ExplosionScale,
         ColumnLineColour,
@@ -50,5 +52,6 @@ namespace osu.Game.Skinning
         Hit100,
         Hit50,
         Hit0,
+        KeysUnderNotes,
     }
 }

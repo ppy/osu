@@ -15,17 +15,21 @@ using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Overlays
 {
-    public class DashboardOverlay : FullscreenOverlay
+    public class DashboardOverlay : FullscreenOverlay<DashboardOverlayHeader>
     {
         private CancellationTokenSource cancellationToken;
 
         private Container content;
-        private DashboardOverlayHeader header;
         private LoadingLayer loading;
         private OverlayScrollContainer scrollFlow;
 
         public DashboardOverlay()
-            : base(OverlayColourScheme.Purple)
+            : base(OverlayColourScheme.Purple, new DashboardOverlayHeader
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Depth = -float.MaxValue
+            })
         {
         }
 
@@ -50,12 +54,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new DashboardOverlayHeader
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Depth = -float.MaxValue
-                            },
+                            Header,
                             content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -72,7 +71,7 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            header.Current.BindValueChanged(onTabChanged);
+            Header.Current.BindValueChanged(onTabChanged);
         }
 
         private bool displayUpdateRequired = true;
@@ -84,7 +83,7 @@ namespace osu.Game.Overlays
             // We don't want to create a new display on every call, only when exiting from fully closed state.
             if (displayUpdateRequired)
             {
-                header.Current.TriggerChange();
+                Header.Current.TriggerChange();
                 displayUpdateRequired = false;
             }
         }
@@ -136,7 +135,7 @@ namespace osu.Game.Overlays
             if (State.Value == Visibility.Hidden)
                 return;
 
-            header.Current.TriggerChange();
+            Header.Current.TriggerChange();
         }
 
         protected override void Dispose(bool isDisposing)

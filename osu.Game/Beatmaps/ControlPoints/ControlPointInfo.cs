@@ -158,6 +158,9 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public void RemoveGroup(ControlPointGroup group)
         {
+            foreach (var item in group.ControlPoints.ToArray())
+                group.Remove(item);
+
             group.ItemAdded -= groupItemAdded;
             group.ItemRemoved -= groupItemRemoved;
 

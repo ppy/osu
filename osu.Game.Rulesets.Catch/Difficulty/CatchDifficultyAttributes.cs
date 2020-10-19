@@ -8,6 +8,5 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     public class CatchDifficultyAttributes : DifficultyAttributes
     {
         public double ApproachRate;
-        public int MaxCombo;
     }
 }

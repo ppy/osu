@@ -108,15 +108,5 @@ namespace osu.Game.Tests.Skins
             using (var stream = new LineBufferedReader(resStream))
                 Assert.That(decoder.Decode(stream).LegacyVersion, Is.EqualTo(1.0m));
         }
-
-        [Test]
-        public void TestDecodeColourWithZeroAlpha()
-        {
-            var decoder = new LegacySkinDecoder();
-
-            using (var resStream = TestResources.OpenResource("skin-zero-alpha-colour.ini"))
-            using (var stream = new LineBufferedReader(resStream))
-                Assert.That(decoder.Decode(stream).ComboColours[0].A, Is.EqualTo(1.0f));
-        }
     }
 }

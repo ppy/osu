@@ -48,22 +48,29 @@ namespace osu.Game.Screens.Play.HUD
         {
             AutoSizeAxes = Axes.Both;
 
-            Children = new Drawable[]
+            Child = new FillFlowContainer
             {
-                iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
+                    iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                    },
+                    unrankedText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Text = @"/ UNRANKED /",
+                        Font = OsuFont.Numeric.With(size: 12)
+                    }
                 },
-                unrankedText = new OsuSpriteText
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.TopCentre,
-                    Text = @"/ UNRANKED /",
-                    Font = OsuFont.Numeric.With(size: 12)
-                }
             };
 
             Current.ValueChanged += mods =>

@@ -13,17 +13,16 @@ using osu.Game.Overlays.News.Displays;
 
 namespace osu.Game.Overlays
 {
-    public class NewsOverlay : FullscreenOverlay
+    public class NewsOverlay : FullscreenOverlay<NewsHeader>
     {
         private readonly Bindable<string> article = new Bindable<string>(null);
 
         private Container content;
         private LoadingLayer loading;
-        private NewsHeader header;
         private OverlayScrollContainer scrollFlow;
 
         public NewsOverlay()
-            : base(OverlayColourScheme.Purple)
+            : base(OverlayColourScheme.Purple, new NewsHeader())
         {
         }
 
@@ -48,10 +47,10 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new NewsHeader
+                            Header.With(h =>
                             {
-                                ShowFrontPage = ShowFrontPage
-                            },
+                                h.ShowFrontPage = ShowFrontPage;
+                            }),
                             content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -112,12 +111,12 @@ namespace osu.Game.Overlays
 
             if (e.NewValue == null)
             {
-                header.SetFrontPage();
+                Header.SetFrontPage();
                 LoadDisplay(new FrontPageDisplay());
                 return;
             }
 
-            header.SetArticle(e.NewValue);
+            Header.SetArticle(e.NewValue);
             LoadDisplay(Empty());
         }
 

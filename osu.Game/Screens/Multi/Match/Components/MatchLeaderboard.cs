@@ -14,8 +14,6 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
     {
-        public Action<IEnumerable<APIUserScoreAggregate>> ScoresLoaded;
-
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<int?> roomId { get; set; }
 
@@ -39,18 +37,20 @@ namespace osu.Game.Screens.Multi.Match.Components
             if (roomId.Value == null)
                 return null;
 
-            var req = new GetRoomScoresRequest(roomId.Value ?? 0);
+            var req = new GetRoomLeaderboardRequest(roomId.Value ?? 0);
 
             req.Success += r =>
             {
-                scoresCallback?.Invoke(r);
-                ScoresLoaded?.Invoke(r);
+                scoresCallback?.Invoke(r.Leaderboard);
+                TopScore = r.UserScore;
             };
 
             return req;
         }
 
         protected override LeaderboardScore CreateDrawableScore(APIUserScoreAggregate model, int index) => new MatchLeaderboardScore(model, index);
+
+        protected override LeaderboardScore CreateDrawableTopScore(APIUserScoreAggregate model) => new MatchLeaderboardScore(model, model.Position, false);
     }
 
     public enum MatchLeaderboardScope

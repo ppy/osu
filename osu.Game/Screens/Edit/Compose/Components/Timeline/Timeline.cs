@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -21,54 +22,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
+
+        public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
+
+        public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
+
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         [Resolved]
         private EditorClock editorClock { get; set; }
-
-        public Timeline()
-        {
-            ZoomDuration = 200;
-            ZoomEasing = Easing.OutQuint;
-            ScrollbarVisible = false;
-        }
-
-        private WaveformGraph waveform;
-
-        [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
-        {
-            Add(waveform = new WaveformGraph
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = colours.Blue.Opacity(0.2f),
-                LowColour = colours.BlueLighter,
-                MidColour = colours.BlueDark,
-                HighColour = colours.BlueDarker,
-                Depth = float.MaxValue
-            });
-
-            // We don't want the centre marker to scroll
-            AddInternal(new CentreMarker { Depth = float.MaxValue });
-
-            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
-
-            Beatmap.BindTo(beatmap);
-            Beatmap.BindValueChanged(b =>
-            {
-                waveform.Waveform = b.NewValue.Waveform;
-                track = b.NewValue.Track;
-
-                if (track.Length > 0)
-                {
-                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
-                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
-                }
-            }, true);
-        }
-
-        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(track.Length / milliseconds);
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -91,6 +53,69 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private bool trackWasPlaying;
 
         private Track track;
+
+        public Timeline()
+        {
+            ZoomDuration = 200;
+            ZoomEasing = Easing.OutQuint;
+            ScrollbarVisible = false;
+        }
+
+        private WaveformGraph waveform;
+
+        private TimelineTickDisplay ticks;
+
+        private TimelineControlPointDisplay controlPoints;
+
+        [BackgroundDependencyLoader]
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
+        {
+            AddRange(new Drawable[]
+            {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                    Children = new Drawable[]
+                    {
+                        waveform = new WaveformGraph
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.Blue.Opacity(0.2f),
+                            LowColour = colours.BlueLighter,
+                            MidColour = colours.BlueDark,
+                            HighColour = colours.BlueDarker,
+                        },
+                        ticks = new TimelineTickDisplay(),
+                        controlPoints = new TimelineControlPointDisplay(),
+                    }
+                },
+            });
+
+            // We don't want the centre marker to scroll
+            AddInternal(new CentreMarker { Depth = float.MaxValue });
+
+            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            ControlPointsVisible.ValueChanged += visible => controlPoints.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+
+            Beatmap.BindTo(beatmap);
+            Beatmap.BindValueChanged(b =>
+            {
+                waveform.Waveform = b.NewValue.Waveform;
+                track = b.NewValue.Track;
+
+                // todo: i don't think this is safe, the track may not be loaded yet.
+                if (track.Length > 0)
+                {
+                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
+                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                }
+            }, true);
+        }
+
+        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => Math.Max(1, (float)(track.Length / milliseconds));
 
         protected override void Update()
         {

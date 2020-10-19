@@ -24,6 +24,11 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         int ComboIndex { get; set; }
 
+        /// <summary>
+        /// Whether the HitObject starts a new combo.
+        /// </summary>
+        new bool NewCombo { get; set; }
+
         Bindable<bool> LastInComboBindable { get; }
 
         /// <summary>

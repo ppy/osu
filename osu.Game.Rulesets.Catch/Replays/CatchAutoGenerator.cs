@@ -31,6 +31,9 @@ namespace osu.Game.Rulesets.Catch.Replays
 
         public override Replay Generate()
         {
+            if (Beatmap.HitObjects.Count == 0)
+                return Replay;
+
             // todo: add support for HT DT
             const double dash_speed = Catcher.BASE_SPEED;
             const double movement_speed = dash_speed / 2;

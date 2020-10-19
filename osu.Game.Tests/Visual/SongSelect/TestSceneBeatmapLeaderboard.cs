@@ -5,9 +5,9 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
@@ -53,53 +53,46 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void showPersonalBestWithNullPosition()
         {
-            leaderboard.TopScore = new APILegacyUserTopScoreInfo
+            leaderboard.TopScore = new ScoreInfo
             {
-                Position = null,
-                Score = new APILegacyScoreInfo
+                Rank = ScoreRank.XH,
+                Accuracy = 1,
+                MaxCombo = 244,
+                TotalScore = 1707827,
+                Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock() },
+                User = new User
                 {
-                    Rank = ScoreRank.XH,
-                    Accuracy = 1,
-                    MaxCombo = 244,
-                    TotalScore = 1707827,
-                    Mods = new[] { new OsuModHidden().Acronym, new OsuModHardRock().Acronym, },
-                    User = new User
+                    Id = 6602580,
+                    Username = @"waaiiru",
+                    Country = new Country
                     {
-                        Id = 6602580,
-                        Username = @"waaiiru",
-                        Country = new Country
-                        {
-                            FullName = @"Spain",
-                            FlagName = @"ES",
-                        },
+                        FullName = @"Spain",
+                        FlagName = @"ES",
                     },
-                }
+                },
             };
         }
 
         private void showPersonalBest()
         {
-            leaderboard.TopScore = new APILegacyUserTopScoreInfo
+            leaderboard.TopScore = new ScoreInfo
             {
                 Position = 999,
-                Score = new APILegacyScoreInfo
+                Rank = ScoreRank.XH,
+                Accuracy = 1,
+                MaxCombo = 244,
+                TotalScore = 1707827,
+                Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                User = new User
                 {
-                    Rank = ScoreRank.XH,
-                    Accuracy = 1,
-                    MaxCombo = 244,
-                    TotalScore = 1707827,
-                    Mods = new[] { new OsuModHidden().Acronym, new OsuModHardRock().Acronym, },
-                    User = new User
+                    Id = 6602580,
+                    Username = @"waaiiru",
+                    Country = new Country
                     {
-                        Id = 6602580,
-                        Username = @"waaiiru",
-                        Country = new Country
-                        {
-                            FullName = @"Spain",
-                            FlagName = @"ES",
-                        },
+                        FullName = @"Spain",
+                        FlagName = @"ES",
                     },
-                }
+                },
             };
         }
 

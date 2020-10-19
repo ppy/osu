@@ -6,6 +6,7 @@ namespace osu.Game.Screens.Edit.Design
     public class DesignScreen : EditorScreen
     {
         public DesignScreen()
+            : base(EditorScreenMode.Design)
         {
             Child = new ScreenWhiteBox.UnderConstructionMessage("Design mode");
         }
