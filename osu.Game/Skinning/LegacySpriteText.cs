@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Text;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -17,11 +18,12 @@ namespace osu.Game.Skinning
             Shadow = false;
             UseFullGlyphHeight = false;
 
-            Font = new FontUsage(font, 1);
+            Font = new FontUsage(font, 1, fixedWidth: true);
             glyphStore = new LegacyGlyphStore(skin);
         }
 
-        protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
+        protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) =>
+            new TextBuilder(glyphStore, Font, MaxWidth, UseFullGlyphHeight, Vector2.Zero, Spacing, CharactersBacking, neverFixedWidthCharacters: new[] { ',', '.', '%', 'x' }, fixedWidthCalculationCharacter: '5');
 
         private class LegacyGlyphStore : ITexturedGlyphLookupStore
         {
