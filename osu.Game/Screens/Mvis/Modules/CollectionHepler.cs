@@ -127,11 +127,22 @@ namespace osu.Game.Screens.Mvis.Modules
         public void RefreshBeatmapList(BeatmapCollection collection = null)
         {
             if (collection == null)
-                collection = collectionManager.Collections.FirstOrDefault();
+            {
+                currentCollection = null;
+                return;
+            }
 
             currentCollection = collection;
 
             updateBeatmaps(currentCollection);
+        }
+
+        public bool currentCollectionContains(WorkingBeatmap b)
+        {
+            if (beatmapList.Contains(b.BeatmapSetInfo))
+                return true;
+            else
+                return false;
         }
     }
 }

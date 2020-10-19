@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         private void OnCurrentCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
-            if ( v.NewValue == null ) return;
+            if (v.NewValue == null) return;
 
             info.UpdateCollection(v.NewValue, true);
 
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         /// </summary>
         private void UpdateSelection(ValueChangedEvent<BeatmapCollection> v)
         {
-            if ( v.NewValue == null ) return;
+            if (v.NewValue == null) return;
 
             //如果选择的收藏夹为正在播放的收藏夹，则更新isCurrent为true
             if (v.NewValue == CurrentCollection.Value)
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         private void UpdateSelectedPanel(ValueChangedEvent<CollectionPanel> v)
         {
-            if ( v.NewValue == null ) return;
+            if (v.NewValue == null) return;
             selectedpanel?.Reset();
             selectedpanel = v.NewValue;
         }
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             SelectedCollection.Value = null;
 
             //如果收藏夹被删除，则留null
-            if ( !collectionManager.Collections.Contains(oldCollection) )
+            if (!collectionManager.Collections.Contains(oldCollection))
                 oldCollection = null;
 
             //如果收藏夹为0，则淡出sollectionScroll

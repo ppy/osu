@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         private void ScrollToCurrentBeatmap()
         {
-            if ( !isCurrentCollection ) return;
+            if (!isCurrentCollection) return;
 
             float distance = 0;
             var index = beatmapFillFlow.IndexOf(currentPiece);
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
                 //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
                 //n个piece, n-1个间隔
-                if (distance + beatmapScroll.DrawHeight > (beatmapFillFlow.Count * 85 - 5) )
+                if (distance + beatmapScroll.DrawHeight > (beatmapFillFlow.Count * 85 - 5))
                 {
                     beatmapScroll.ScrollToEnd();
                     return;
@@ -255,7 +255,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     p.isCurrent = isCurrent;
 
             currentPiece?.Active.TriggerChange();
-
         }
 
         private void ClearInfo()

@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 };
             }
         }
-    
+
         private class ThumbnailScrollContainer : OsuScrollContainer
         {
             protected override bool OnMouseDown(MouseDownEvent e)
@@ -319,7 +319,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
 
             public ThumbnailScrollContainer(Direction scrollDirection)
-                :base(scrollDirection)
+                : base(scrollDirection)
             {
             }
         }

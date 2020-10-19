@@ -481,7 +481,7 @@ namespace osu.Game.Screens
             {
                 collectionHelper.RefreshBeatmapList(v.NewValue);
 
-                if (PlayFromCollection.Value)
+                if (PlayFromCollection.Value && !collectionHelper.currentCollectionContains(Beatmap.Value))
                 {
                     collectionHelper.PlayFirstBeatmap();
                 }
