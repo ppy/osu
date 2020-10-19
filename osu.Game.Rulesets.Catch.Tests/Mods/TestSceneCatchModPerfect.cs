@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
         public void TestDroplet(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Droplet { StartTime = 1000 }), shouldMiss);
 
         // We only care about testing misses, hits are tested via JuiceStream
-        [TestCase(false)]
+        [TestCase(true)]
         public void TestTinyDroplet(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new TinyDroplet { StartTime = 1000 }), shouldMiss);
     }
 }
