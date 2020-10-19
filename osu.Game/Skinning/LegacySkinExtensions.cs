@@ -62,6 +62,9 @@ namespace osu.Game.Skinning
             }
         }
 
+        public static bool HasFont(this ISkin source, string fontPrefix)
+            => source.GetTexture($"{fontPrefix}-0") != null;
+
         public class SkinnableTextureAnimation : TextureAnimation
         {
             [Resolved(canBeNull: true)]

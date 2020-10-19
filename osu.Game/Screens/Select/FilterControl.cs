@@ -66,23 +66,8 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
-            showConverted.ValueChanged += _ => updateCriteria();
-
-            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
-            minimumStars.ValueChanged += _ => updateCriteria();
-
-            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
-            maximumStars.ValueChanged += _ => updateCriteria();
-
-            ruleset.BindTo(parentRuleset);
-            ruleset.BindValueChanged(_ => updateCriteria());
-
             sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
             groupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
-
-            groupMode.BindValueChanged(_ => updateCriteria());
-            sortMode.BindValueChanged(_ => updateCriteria());
 
             Children = new Drawable[]
             {
@@ -181,6 +166,21 @@ namespace osu.Game.Screens.Select
                     }
                 }
             };
+
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
+            showConverted.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
+            minimumStars.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
+            maximumStars.ValueChanged += _ => updateCriteria();
+
+            ruleset.BindTo(parentRuleset);
+            ruleset.BindValueChanged(_ => updateCriteria());
+
+            groupMode.BindValueChanged(_ => updateCriteria());
+            sortMode.BindValueChanged(_ => updateCriteria());
 
             collectionDropdown.Current.ValueChanged += val =>
             {

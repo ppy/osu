@@ -66,6 +66,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                     return null;
 
+                case OsuSkinComponents.SliderTailHitCircle:
+                    if (hasHitCircle.Value)
+                        return new LegacyMainCirclePiece("sliderendcircle", false);
+
+                    return null;
+
                 case OsuSkinComponents.SliderHeadHitCircle:
                     if (hasHitCircle.Value)
                         return new LegacyMainCirclePiece("sliderstartcircle");
@@ -94,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCirclePrefix)?.Value ?? "default";
                     var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? -2;
 
-                    return !hasFont(font)
+                    return !this.HasFont(font)
                         ? null
                         : new LegacySpriteText(Source, font)
                         {
@@ -145,7 +151,5 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             return Source.GetConfig<TLookup, TValue>(lookup);
         }
-
-        private bool hasFont(string fontName) => Source.GetTexture($"{fontName}-0") != null;
     }
 }

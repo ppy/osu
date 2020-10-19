@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -21,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects
     {
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
+        [JsonIgnore]
         public double Duration
         {
             get => EndTime - StartTime;
@@ -112,8 +114,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double TickDistanceMultiplier = 1;
 
-        public HitCircle HeadCircle;
-        public SliderTailCircle TailCircle;
+        [JsonIgnore]
+        public HitCircle HeadCircle { get; protected set; }
+
+        [JsonIgnore]
+        public SliderTailCircle TailCircle { get; protected set; }
 
         public Slider()
         {
@@ -132,6 +137,10 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
+
+            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
+            // For now, the samples are attached to and played by the slider itself at the correct end time.
+            Samples = this.GetNodeSamples(repeatCount + 1);
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
@@ -171,6 +180,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         // if this is to change, we should revisit this.
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
+                            RepeatIndex = e.SpanIndex,
                             StartTime = e.Time,
                             Position = EndPosition,
                             StackHeight = StackHeight
@@ -178,10 +188,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new SliderRepeat
+                        AddNested(new SliderRepeat(this)
                         {
                             RepeatIndex = e.SpanIndex,
-                            SpanDuration = SpanDuration,
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
@@ -225,14 +234,11 @@ namespace osu.Game.Rulesets.Osu.Objects
                 tick.Samples = sampleList;
 
             foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                repeat.Samples = getNodeSamples(repeat.RepeatIndex + 1);
+                repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
 
             if (HeadCircle != null)
-                HeadCircle.Samples = getNodeSamples(0);
+                HeadCircle.Samples = this.GetNodeSamples(0);
         }
-
-        private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
-            nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
         public override Judgement CreateJudgement() => new OsuIgnoreJudgement();
 

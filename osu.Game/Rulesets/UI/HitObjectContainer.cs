@@ -43,10 +43,20 @@ namespace osu.Game.Rulesets.UI
             return true;
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            unbindStartTimeMap();
+        }
+
         public virtual void Clear(bool disposeChildren = true)
         {
             ClearInternal(disposeChildren);
+            unbindStartTimeMap();
+        }
 
+        private void unbindStartTimeMap()
+        {
             foreach (var kvp in startTimeMap)
                 kvp.Value.bindable.UnbindAll();
             startTimeMap.Clear();

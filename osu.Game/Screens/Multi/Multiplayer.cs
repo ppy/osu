@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Multi
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private MusicController music { get; set; }
 
         [Cached(Type = typeof(IRoomManager))]
@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Multi
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Action = createRoom
+                        Action = () => CreateRoom()
                     },
                     roomManager = new RoomManager()
                 }
@@ -289,10 +289,11 @@ namespace osu.Game.Screens.Multi
             logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
         }
 
-        private void createRoom()
-        {
-            loungeSubScreen.Open(new Room { Name = { Value = $"{api.LocalUser}'s awesome room" } });
-        }
+        /// <summary>
+        /// Create a new room.
+        /// </summary>
+        /// <param name="room">An optional template to use when creating the room.</param>
+        public void CreateRoom(Room room = null) => loungeSubScreen.Open(room ?? new Room { Name = { Value = $"{api.LocalUser}'s awesome room" } });
 
         private void beginHandlingTrack()
         {
@@ -350,7 +351,7 @@ namespace osu.Game.Screens.Multi
                     track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                     track.Looping = true;
 
-                    music.EnsurePlayingSomething();
+                    music?.EnsurePlayingSomething();
                 }
             }
             else

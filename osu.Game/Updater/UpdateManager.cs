@@ -57,25 +57,31 @@ namespace osu.Game.Updater
 
         private readonly object updateTaskLock = new object();
 
-        private Task updateCheckTask;
+        private Task<bool> updateCheckTask;
 
-        public async Task CheckForUpdateAsync()
+        public async Task<bool> CheckForUpdateAsync()
         {
             if (!CanCheckForUpdate)
-                return;
+                return false;
 
-            Task waitTask;
+            Task<bool> waitTask;
 
             lock (updateTaskLock)
                 waitTask = (updateCheckTask ??= PerformUpdateCheck());
 
-            await waitTask;
+            bool hasUpdates = await waitTask;
 
             lock (updateTaskLock)
                 updateCheckTask = null;
+
+            return hasUpdates;
         }
 
-        protected virtual Task PerformUpdateCheck() => Task.CompletedTask;
+        /// <summary>
+        /// Performs an asynchronous check for application updates.
+        /// </summary>
+        /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
+        protected virtual Task<bool> PerformUpdateCheck() => Task.FromResult(false);
 
         private class UpdateCompleteNotification : SimpleNotification
         {
