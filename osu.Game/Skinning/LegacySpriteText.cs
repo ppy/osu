@@ -12,12 +12,16 @@ namespace osu.Game.Skinning
     {
         private readonly LegacyGlyphStore glyphStore;
 
+        protected override char FixedWidthReferenceCharacter => '5';
+
+        protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x' };
+
         public LegacySpriteText(ISkin skin, string font = "score")
         {
             Shadow = false;
             UseFullGlyphHeight = false;
 
-            Font = new FontUsage(font, 1);
+            Font = new FontUsage(font, 1, fixedWidth: true);
             glyphStore = new LegacyGlyphStore(skin);
         }
 
