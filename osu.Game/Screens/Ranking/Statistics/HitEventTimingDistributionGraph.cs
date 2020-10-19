@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             foreach (var e in hitEvents)
             {
-                int binOffset = (int)(e.TimeOffset / binSize);
+                int binOffset = (int)Math.Round(e.TimeOffset / binSize, MidpointRounding.AwayFromZero);
                 bins[timing_distribution_centre_bin_index + binOffset]++;
             }
 

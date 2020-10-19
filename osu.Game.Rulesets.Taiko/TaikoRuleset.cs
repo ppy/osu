@@ -159,6 +159,33 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 
+        protected override IEnumerable<HitResult> GetValidHitResults()
+        {
+            return new[]
+            {
+                HitResult.Great,
+                HitResult.Ok,
+
+                HitResult.SmallTickHit,
+
+                HitResult.SmallBonus,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.SmallTickHit:
+                    return "drum tick";
+
+                case HitResult.SmallBonus:
+                    return "strong bonus";
+            }
+
+            return base.GetDisplayNameForHitResult(result);
+        }
+
         public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
         {
             var timedHitEvents = score.HitEvents.Where(e => e.HitObject is Hit).ToList();

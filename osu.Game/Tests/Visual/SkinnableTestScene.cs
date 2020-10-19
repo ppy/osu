@@ -35,12 +35,12 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, SkinManager skinManager)
+        private void load(AudioManager audio, SkinManager skinManager, OsuGameBase game)
         {
             var dllStore = new DllResourceStore(DynamicCompilationOriginal.GetType().Assembly);
 
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
-            defaultSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
+            defaultSkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), audio);
             specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), audio, true);
             oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), audio, true);
         }

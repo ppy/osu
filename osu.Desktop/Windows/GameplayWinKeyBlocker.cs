@@ -5,24 +5,24 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
+using osu.Game;
 using osu.Game.Configuration;
 
 namespace osu.Desktop.Windows
 {
     public class GameplayWinKeyBlocker : Component
     {
-        private Bindable<bool> allowScreenSuspension;
         private Bindable<bool> disableWinKey;
+        private Bindable<bool> localUserPlaying;
 
-        private GameHost host;
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config)
+        private void load(OsuGame game, OsuConfigManager config)
         {
-            this.host = host;
-
-            allowScreenSuspension = host.AllowScreenSuspension.GetBoundCopy();
-            allowScreenSuspension.BindValueChanged(_ => updateBlocking());
+            localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
+            localUserPlaying.BindValueChanged(_ => updateBlocking());
 
             disableWinKey = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey);
             disableWinKey.BindValueChanged(_ => updateBlocking(), true);
@@ -30,7 +30,7 @@ namespace osu.Desktop.Windows
 
         private void updateBlocking()
         {
-            bool shouldDisable = disableWinKey.Value && !allowScreenSuspension.Value;
+            bool shouldDisable = disableWinKey.Value && localUserPlaying.Value;
 
             if (shouldDisable)
                 host.InputThread.Scheduler.Add(WindowsKey.Disable);

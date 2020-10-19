@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -20,11 +21,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.OnSelectionChanged();
 
-            bool canOperate = SelectedHitObjects.Count() > 1 || SelectedHitObjects.Any(s => s is Slider);
+            bool canOperate = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
 
             SelectionBox.CanRotate = canOperate;
             SelectionBox.CanScaleX = canOperate;
             SelectionBox.CanScaleY = canOperate;
+            SelectionBox.CanReverse = canOperate;
         }
 
         protected override void OnOperationEnded()
@@ -40,6 +42,54 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
         /// </summary>
         private Vector2? referenceOrigin;
+
+        public override bool HandleReverse()
+        {
+            var hitObjects = selectedMovableObjects;
+
+            double endTime = hitObjects.Max(h => h.GetEndTime());
+            double startTime = hitObjects.Min(h => h.StartTime);
+
+            bool moreThanOneObject = hitObjects.Length > 1;
+
+            foreach (var h in hitObjects)
+            {
+                if (moreThanOneObject)
+                    h.StartTime = endTime - (h.GetEndTime() - startTime);
+
+                if (h is Slider slider)
+                {
+                    var points = slider.Path.ControlPoints.ToArray();
+                    Vector2 endPos = points.Last().Position.Value;
+
+                    slider.Path.ControlPoints.Clear();
+
+                    slider.Position += endPos;
+
+                    PathType? lastType = null;
+
+                    for (var i = 0; i < points.Length; i++)
+                    {
+                        var p = points[i];
+                        p.Position.Value -= endPos;
+
+                        // propagate types forwards to last null type
+                        if (i == points.Length - 1)
+                            p.Type.Value = lastType;
+                        else if (p.Type.Value != null)
+                        {
+                            var newType = p.Type.Value;
+                            p.Type.Value = lastType;
+                            lastType = newType;
+                        }
+
+                        slider.Path.ControlPoints.Insert(0, p);
+                    }
+                }
+            }
+
+            return true;
+        }
 
         public override bool HandleFlip(Direction direction)
         {
@@ -182,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <param name="points">The points to calculate a quad for.</param>
         private Quad getSurroundingQuad(IEnumerable<Vector2> points)
         {
-            if (!SelectedHitObjects.Any())
+            if (!EditorBeatmap.SelectedHitObjects.Any())
                 return new Quad();
 
             Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
@@ -203,10 +253,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// All osu! hitobjects which can be moved/rotated/scaled.
         /// </summary>
-        private OsuHitObject[] selectedMovableObjects => SelectedHitObjects
-                                                         .OfType<OsuHitObject>()
-                                                         .Where(h => !(h is Spinner))
-                                                         .ToArray();
+        private OsuHitObject[] selectedMovableObjects => EditorBeatmap.SelectedHitObjects
+                                                                      .OfType<OsuHitObject>()
+                                                                      .Where(h => !(h is Spinner))
+                                                                      .ToArray();
 
         /// <summary>
         /// Rotate a point around an arbitrary origin.

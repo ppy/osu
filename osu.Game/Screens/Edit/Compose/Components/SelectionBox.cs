@@ -17,9 +17,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public Action<float> OnRotation;
         public Action<Vector2, Anchor> OnScale;
         public Action<Direction> OnFlip;
+        public Action OnReverse;
 
         public Action OperationStarted;
         public Action OperationEnded;
+
+        private bool canReverse;
+
+        /// <summary>
+        /// Whether pattern reversing support should be enabled.
+        /// </summary>
+        public bool CanReverse
+        {
+            get => canReverse;
+            set
+            {
+                if (canReverse == value) return;
+
+                canReverse = value;
+                recreate();
+            }
+        }
 
         private bool canRotate;
 
@@ -125,6 +143,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (CanScaleX && CanScaleY) addFullScaleComponents();
             if (CanScaleY) addYScaleComponents();
             if (CanRotate) addRotationComponents();
+            if (CanReverse) addButton(FontAwesome.Solid.Backward, "Reverse pattern", () => OnReverse?.Invoke());
         }
 
         private void addRotationComponents()

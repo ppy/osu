@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -117,7 +116,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
                                             Spacing = new Vector2(0, 5),
-                                            ChildrenEnumerable = score.GetStatisticsForDisplay().Select(s => createStatistic(s.result, s.count, s.maxCount))
+                                            ChildrenEnumerable = score.GetStatisticsForDisplay().Where(s => !s.Result.IsBonus()).Select(createStatistic)
                                         },
                                         new FillFlowContainer
                                         {
@@ -199,8 +198,8 @@ namespace osu.Game.Screens.Ranking.Contracted
             };
         }
 
-        private Drawable createStatistic(HitResult result, int count, int? maxCount)
-            => createStatistic(result.GetDescription(), maxCount == null ? $"{count}" : $"{count}/{maxCount}");
+        private Drawable createStatistic(HitResultDisplayStatistic result)
+            => createStatistic(result.DisplayName, result.MaxCount == null ? $"{result.Count}" : $"{result.Count}/{result.MaxCount}");
 
         private Drawable createStatistic(string key, string value) => new Container
         {

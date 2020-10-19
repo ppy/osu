@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = SplitKeyVal(line);
 
-            bool isCombo = pair.Key.StartsWith(@"Combo");
+            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
             string[] split = pair.Value.Split(',');
 

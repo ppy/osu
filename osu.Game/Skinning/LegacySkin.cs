@@ -18,6 +18,8 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -323,10 +325,51 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        private string scorePrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
+
+        private string comboPrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ComboPrefix)?.Value ?? "score";
+
+        private bool hasScoreFont => this.HasFont(scorePrefix);
+
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
+                case HUDSkinComponent hudComponent:
+                {
+                    if (!hasScoreFont)
+                        return null;
+
+                    switch (hudComponent.Component)
+                    {
+                        case HUDSkinComponents.ComboCounter:
+                            return new LegacyComboCounter();
+
+                        case HUDSkinComponents.ScoreCounter:
+                            return new LegacyScoreCounter(this);
+
+                        case HUDSkinComponents.AccuracyCounter:
+                            return new LegacyAccuracyCounter(this);
+
+                        case HUDSkinComponents.HealthDisplay:
+                            return new LegacyHealthDisplay(this);
+
+                        case HUDSkinComponents.ComboText:
+                            return new LegacySpriteText(this, comboPrefix)
+                            {
+                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ComboOverlap)?.Value ?? -2), 0)
+                            };
+
+                        case HUDSkinComponents.ScoreText:
+                            return new LegacySpriteText(this, scorePrefix)
+                            {
+                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2), 0)
+                            };
+                    }
+
+                    return null;
+                }
+
                 case GameplaySkinComponent<HitResult> resultComponent:
                     switch (resultComponent.Component)
                     {
@@ -397,7 +440,7 @@ namespace osu.Game.Skinning
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
-            yield return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
+            yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
         }
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
@@ -408,7 +451,7 @@ namespace osu.Game.Skinning
                 // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
                 // using .EndsWith() is intentional as it ensures parity in all edge cases
                 // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
-                lookupNames = hitSample.LookupNames.Where(name => !name.EndsWith(hitSample.Suffix));
+                lookupNames = hitSample.LookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
 
             // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
             // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,

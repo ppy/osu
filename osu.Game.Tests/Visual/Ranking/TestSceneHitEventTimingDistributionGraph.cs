@@ -24,6 +24,12 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestAroundCentre()
+        {
+            createTest(Enumerable.Range(-150, 300).Select(i => new HitEvent(i / 50f, HitResult.Perfect, new HitCircle(), new HitCircle(), null)).ToList());
+        }
+
+        [Test]
         public void TestZeroTimeOffset()
         {
             createTest(Enumerable.Range(0, 100).Select(_ => new HitEvent(0, HitResult.Perfect, new HitCircle(), new HitCircle(), null)).ToList());
