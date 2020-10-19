@@ -5,13 +5,16 @@ using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Text;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 
 namespace osu.Game.Skinning
 {
     public class LegacySpriteText : OsuSpriteText
     {
         private readonly LegacyGlyphStore glyphStore;
+
+        protected override char FixedWidthReferenceCharacter => '5';
+
+        protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x' };
 
         public LegacySpriteText(ISkin skin, string font = "score")
         {
@@ -22,8 +25,7 @@ namespace osu.Game.Skinning
             glyphStore = new LegacyGlyphStore(skin);
         }
 
-        protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) =>
-            new TextBuilder(glyphStore, Font, MaxWidth, UseFullGlyphHeight, Vector2.Zero, Spacing, CharactersBacking, neverFixedWidthCharacters: new[] { ',', '.', '%', 'x' }, fixedWidthCalculationCharacter: '5');
+        protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
 
         private class LegacyGlyphStore : ITexturedGlyphLookupStore
         {
