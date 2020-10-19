@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Edit
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
                         {
                             LayerBelowRuleset,
-                            new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
+                            new PlayfieldBorder { RelativeSizeAxes = Axes.Both }
                         }),
                         drawableRulesetWrapper,
                         // layers above playfield
