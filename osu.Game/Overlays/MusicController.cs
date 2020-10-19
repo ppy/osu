@@ -12,12 +12,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Input.Bindings;
-using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays
@@ -25,7 +22,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// Handles playback of the global music track.
     /// </summary>
-    public class MusicController : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public class MusicController : CompositeDrawable
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -62,9 +59,6 @@ namespace osu.Game.Overlays
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private OnScreenDisplay onScreenDisplay { get; set; }
-
         [NotNull]
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
@@ -86,6 +80,11 @@ namespace osu.Game.Overlays
             beatmap.BindValueChanged(beatmapChanged, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
+
+        /// <summary>
+        /// Forcefully reload the current <see cref="WorkingBeatmap"/>'s track from disk.
+        /// </summary>
+        public void ReloadCurrentTrack() => changeTrack();
 
         /// <summary>
         /// Change the position of a <see cref="BeatmapSetInfo"/> in the current playlist.
@@ -151,7 +150,7 @@ namespace osu.Game.Overlays
         {
             if (IsUserPaused) return;
 
-            if (CurrentTrack.IsDummyDevice)
+            if (CurrentTrack.IsDummyDevice || beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 if (beatmap.Disabled)
                     return;
@@ -207,7 +206,13 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
-        public void PreviousTrack() => Schedule(() => prev());
+        /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
+        public void PreviousTrack(Action<PreviousTrackResult> onSuccess = null) => Schedule(() =>
+        {
+            PreviousTrackResult res = prev();
+            if (res != PreviousTrackResult.None)
+                onSuccess?.Invoke(res);
+        });
 
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
@@ -243,7 +248,14 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the next random or playlist track.
         /// </summary>
-        public void NextTrack() => Schedule(() => next());
+        /// <param name="onSuccess">Invoked when the operation has been performed successfully.</param>
+        /// <returns>A <see cref="ScheduledDelegate"/> of the operation.</returns>
+        public void NextTrack(Action onSuccess = null) => Schedule(() =>
+        {
+            bool res = next();
+            if (res)
+                onSuccess?.Invoke();
+        });
 
         private bool next()
         {
@@ -405,54 +417,6 @@ namespace osu.Game.Overlays
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(CurrentTrack);
-            }
-        }
-
-        public bool OnPressed(GlobalAction action)
-        {
-            if (beatmap.Disabled)
-                return false;
-
-            switch (action)
-            {
-                case GlobalAction.MusicPlay:
-                    if (TogglePause())
-                        onScreenDisplay?.Display(new MusicControllerToast(IsPlaying ? "Play track" : "Pause track"));
-                    return true;
-
-                case GlobalAction.MusicNext:
-                    if (next())
-                        onScreenDisplay?.Display(new MusicControllerToast("Next track"));
-
-                    return true;
-
-                case GlobalAction.MusicPrev:
-                    switch (prev())
-                    {
-                        case PreviousTrackResult.Restart:
-                            onScreenDisplay?.Display(new MusicControllerToast("Restart track"));
-                            break;
-
-                        case PreviousTrackResult.Previous:
-                            onScreenDisplay?.Display(new MusicControllerToast("Previous track"));
-                            break;
-                    }
-
-                    return true;
-            }
-
-            return false;
-        }
-
-        public void OnReleased(GlobalAction action)
-        {
-        }
-
-        public class MusicControllerToast : Toast
-        {
-            public MusicControllerToast(string action)
-                : base("Music Playback", action, string.Empty)
-            {
             }
         }
     }

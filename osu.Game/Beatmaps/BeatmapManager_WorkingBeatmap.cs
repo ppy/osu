@@ -8,6 +8,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Skinning;
@@ -17,6 +18,7 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
+        [ExcludeFromDynamicCompile]
         private class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
             private readonly IResourceStore<byte[]> store;
@@ -33,6 +35,9 @@ namespace osu.Game.Beatmaps
 
             protected override IBeatmap GetBeatmap()
             {
+                if (BeatmapInfo.Path == null)
+                    return new Beatmap { BeatmapInfo = BeatmapInfo };
+
                 try
                 {
                     using (var stream = new LineBufferedReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
@@ -67,6 +72,9 @@ namespace osu.Game.Beatmaps
 
             protected override Track GetBeatmapTrack()
             {
+                if (Metadata?.AudioFile == null)
+                    return null;
+
                 try
                 {
                     return trackStore.Get(getPathForFile(Metadata.AudioFile));
@@ -80,6 +88,9 @@ namespace osu.Game.Beatmaps
 
             protected override Waveform GetWaveform()
             {
+                if (Metadata?.AudioFile == null)
+                    return null;
+
                 try
                 {
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));

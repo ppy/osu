@@ -68,14 +68,14 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            FilterChanged = search => list.Filter(search),
+                            FilterChanged = criteria => list.Filter(criteria),
                             Padding = new MarginPadding(10),
                         },
                     },
                 },
             };
 
-            filter.Search.OnCommit = (sender, newText) =>
+            filter.Search.OnCommit += (sender, newText) =>
             {
                 BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
 
@@ -123,11 +123,5 @@ namespace osu.Game.Overlays.Music
             beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
             beatmap.Value.Track.Restart();
         }
-    }
-
-    //todo: placeholder
-    public enum PlaylistCollection
-    {
-        All
     }
 }

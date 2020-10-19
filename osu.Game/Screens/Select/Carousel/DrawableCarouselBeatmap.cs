@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,6 +18,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -45,6 +47,12 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private BeatmapDifficultyManager difficultyManager { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private CollectionManager collectionManager { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
         private IBindable<StarDifficulty> starDifficultyBindable;
         private CancellationTokenSource starDifficultyCancellationSource;
@@ -213,14 +221,37 @@ namespace osu.Game.Screens.Select.Carousel
                 if (editRequested != null)
                     items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested(beatmap)));
 
+                if (beatmap.OnlineBeatmapID.HasValue && beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
+
+                if (collectionManager != null)
+                {
+                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
+                    if (manageCollectionsDialog != null)
+                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+
+                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                }
+
                 if (hideRequested != null)
                     items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested(beatmap)));
 
-                if (beatmap.OnlineBeatmapID.HasValue && beatmapOverlay != null)
-                    items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
-
                 return items.ToArray();
             }
+        }
+
+        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
+        {
+            return new ToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
+            {
+                if (s)
+                    collection.Beatmaps.Add(beatmap);
+                else
+                    collection.Beatmaps.Remove(beatmap);
+            })
+            {
+                State = { Value = collection.Beatmaps.Contains(beatmap) }
+            };
         }
 
         protected override void Dispose(bool isDisposing)

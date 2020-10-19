@@ -15,6 +15,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     {
         private readonly ManualSliderBody body;
 
+        /// <summary>
+        /// Offset in absolute (local) coordinates from the start of the curve.
+        /// </summary>
+        public Vector2 PathStartLocation => body.PathOffset;
+
         public SliderBodyPiece()
         {
             InternalChild = body = new ManualSliderBody
@@ -43,6 +48,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             Size = body.Size;
             OriginPosition = body.PathOffset;
         }
+
+        public void RecyclePath() => body.RecyclePath();
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => body.ReceivePositionalInputAt(screenSpacePos);
     }
