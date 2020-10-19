@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
-using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Tournament.IO;
@@ -28,9 +27,9 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load(TournamentVideoResourceStore storage)
         {
-            var stream = (storage as TournamentStorage)?.VideoStore.GetStream(filename);
+            var stream = storage.GetStream(filename);
 
             if (stream != null)
             {
