@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 explodingFruitContainer,
                 CatcherArea.MovableCatcher.CreateProxiedContent(),
                 HitObjectContainer,
-                CatcherArea
+                CatcherArea,
             };
         }
 
@@ -62,6 +62,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public override void Add(DrawableHitObject h)
         {
             h.OnNewResult += onNewResult;
+            h.OnRevertResult += onRevertResult;
 
             base.Add(h);
 
@@ -70,6 +71,9 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
-            => CatcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
+            => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
+
+        private void onRevertResult(DrawableHitObject judgedObject, JudgementResult result)
+            => CatcherArea.OnRevertResult((DrawableCatchHitObject)judgedObject, result);
     }
 }

@@ -15,6 +15,6 @@ namespace osu.Game.Online.API.Requests
     {
         [UsedImplicitly]
         [JsonExtensionData]
-        public IDictionary<string, JToken> Properties;
+        public IDictionary<string, JToken> Properties { get; set; } = new Dictionary<string, JToken>();
     }
 }

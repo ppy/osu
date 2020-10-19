@@ -89,9 +89,23 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        protected virtual void OnDeselected() => Hide();
+        protected virtual void OnDeselected()
+        {
+            // selection blueprints are AlwaysPresent while the related DrawableHitObject is visible
+            // set the body piece's alpha directly to avoid arbitrarily rendering frame buffers etc. of children.
+            foreach (var d in InternalChildren)
+                d.Hide();
 
-        protected virtual void OnSelected() => Show();
+            Hide();
+        }
+
+        protected virtual void OnSelected()
+        {
+            foreach (var d in InternalChildren)
+                d.Show();
+
+            Show();
+        }
 
         // When not selected, input is only required for the blueprint itself to receive IsHovering
         protected override bool ShouldBeConsideredForInput(Drawable child) => State == SelectionState.Selected;

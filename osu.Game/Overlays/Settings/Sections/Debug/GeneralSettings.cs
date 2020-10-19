@@ -19,12 +19,12 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 new SettingsCheckbox
                 {
                     LabelText = "Show log overlay",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
+                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Bypass front-to-back render pass",
-                    Bindable = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
+                    Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
                 }
             };
         }

@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private void start()
         {
-            var target = directorySelector.CurrentDirectory.Value;
+            var target = directorySelector.CurrentPath.Value;
 
             try
             {
