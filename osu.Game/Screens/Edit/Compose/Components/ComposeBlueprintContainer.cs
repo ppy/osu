@@ -79,9 +79,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementNewCombo()
         {
-            if (currentPlacement == null) return;
-
-            if (currentPlacement.HitObject is IHasComboInformation c)
+            if (currentPlacement?.HitObject is IHasComboInformation c)
                 c.NewCombo = NewCombo.Value == TernaryState.True;
         }
 
