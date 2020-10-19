@@ -11,8 +11,10 @@ namespace osu.Game.Screens
     /// <summary>
     /// Provides a border around the playfield.
     /// </summary>
-    public class PlayfieldBorder : CompositeDrawable
+    public class PlayfieldBorder : VisibilityContainer
     {
+        private const int fade_duration = 200;
+
         public PlayfieldBorder()
         {
             RelativeSizeAxes = Axes.Both;
@@ -28,5 +30,8 @@ namespace osu.Game.Screens
                 AlwaysPresent = true
             };
         }
+
+        protected override void PopIn() => this.FadeIn(fade_duration, Easing.OutQuint);
+        protected override void PopOut() => this.FadeOut(fade_duration, Easing.OutQuint);
     }
 }

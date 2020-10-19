@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
+        private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
@@ -45,6 +46,11 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             InternalChildren = new Drawable[]
             {
+                playfieldBorder = new PlayfieldBorder
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = 3
+                },
                 spinnerProxies = new ProxyContainer
                 {
                     RelativeSizeAxes = Axes.Both
@@ -86,15 +92,11 @@ namespace osu.Game.Rulesets.Osu.UI
         private void load(OsuConfigManager config)
         {
             showPlayfieldBorder = config.GetBindable<bool>(OsuSetting.ShowPlayfieldBorder);
-
-            if (showPlayfieldBorder.Value)
-            {
-                AddInternal(new PlayfieldBorder
-                {
-                    RelativeSizeAxes = Axes.Both
-                });
-            }
+            showPlayfieldBorder.BindValueChanged(updateBorderVisibility, true);
         }
+
+        private void updateBorderVisibility(ValueChangedEvent<bool> settingChange)
+            => playfieldBorder.State.Value = settingChange.NewValue ? Visibility.Visible : Visibility.Hidden;
 
         public override void Add(DrawableHitObject h)
         {
