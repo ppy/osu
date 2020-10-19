@@ -15,6 +15,11 @@ namespace osu.Game.Storyboards
 
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
 
+        /// <summary>
+        /// Whether the storyboard can fall back to skin sprites in case no matching storyboard sprites are found.
+        /// </summary>
+        public bool UseSkinSprites { get; set; }
+
         public bool HasDrawable => Layers.Any(l => l.Elements.Any(e => e.IsDrawable));
 
         public double FirstEventTime => Layers.Min(l => l.Elements.FirstOrDefault()?.StartTime ?? 0);
