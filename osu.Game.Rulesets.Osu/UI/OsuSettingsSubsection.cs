@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Cursor trail",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show playfield border",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.ShowPlayfieldBorder),
+                },
             };
         }
     }
