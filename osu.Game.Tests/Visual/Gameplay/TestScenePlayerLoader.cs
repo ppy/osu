@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -249,7 +250,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("change epilepsy warning", () => epilepsyWarning = warning);
             AddStep("load dummy beatmap", () => ResetPlayer(false));
+
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<EpilepsyWarning>().Any() == warning);
         }
 
         private class TestPlayerLoaderContainer : Container
