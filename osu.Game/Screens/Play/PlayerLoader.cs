@@ -324,7 +324,9 @@ namespace osu.Game.Screens.Play
 
                     TransformSequence<PlayerLoader> pushSequence;
 
-                    if (epilepsyWarning != null)
+                    // only show if the warning was created (i.e. the beatmap needs it)
+                    // and this is not a restart of the map (the warning expires after first load).
+                    if (epilepsyWarning?.IsAlive == true)
                     {
                         epilepsyWarning.State.Value = Visibility.Visible;
 
