@@ -371,8 +371,10 @@ namespace osu.Game
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             RulesetStore?.Dispose();
             BeatmapManager?.Dispose();
+            LocalConfig?.Dispose();
 
             contextFactory.FlushConnections();
         }
