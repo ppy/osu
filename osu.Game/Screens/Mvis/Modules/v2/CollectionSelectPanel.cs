@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
         }
 
-        private void RefreshCollections()
+        public void RefreshCollections()
         {
             var oldCollection = CurrentCollection.Value;
 
