@@ -26,13 +26,15 @@ namespace osu.Game.Tests.Visual
             Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
         }
 
+        protected virtual bool EditorComponentsReady => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
+                                                        && Editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true;
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             AddStep("load editor", () => LoadScreen(Editor = CreateEditor()));
-            AddUntilStep("wait for editor to load", () => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
-                                                          && Editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true);
+            AddUntilStep("wait for editor to load", () => EditorComponentsReady);
             AddStep("get beatmap", () => EditorBeatmap = Editor.ChildrenOfType<EditorBeatmap>().Single());
             AddStep("get clock", () => EditorClock = Editor.ChildrenOfType<EditorClock>().Single());
         }

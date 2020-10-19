@@ -3,8 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
-using System;
 using osu.Framework.Allocation;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
@@ -35,9 +35,7 @@ namespace osu.Game.Screens.Edit.Components
         protected override void Update()
         {
             base.Update();
-
-            var timespan = TimeSpan.FromMilliseconds(editorClock.CurrentTime);
-            trackTimer.Text = $"{(timespan < TimeSpan.Zero ? "-" : string.Empty)}{timespan:mm\\:ss\\:fff}";
+            trackTimer.Text = editorClock.CurrentTime.ToEditorFormattedString();
         }
     }
 }

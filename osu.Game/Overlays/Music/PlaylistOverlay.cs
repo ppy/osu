@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            filter.Search.OnCommit = (sender, newText) =>
+            filter.Search.OnCommit += (sender, newText) =>
             {
                 BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
 

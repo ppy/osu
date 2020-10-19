@@ -5,7 +5,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Edit.Compose.Components;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -13,7 +12,7 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneTimelineTickDisplay : TimelineTestScene
     {
-        public override Drawable CreateTestComponent() => new TimelineTickDisplay();
+        public override Drawable CreateTestComponent() => Empty(); // tick display is implicitly inside the timeline.
 
         [BackgroundDependencyLoader]
         private void load()

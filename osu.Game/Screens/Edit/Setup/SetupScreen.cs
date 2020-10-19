@@ -1,31 +1,32 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterfaceV2;
-using osuTK;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
     public class SetupScreen : EditorScreen
     {
-        private FillFlowContainer flow;
-        private LabelledTextBox artistTextBox;
-        private LabelledTextBox titleTextBox;
-        private LabelledTextBox creatorTextBox;
-        private LabelledTextBox difficultyTextBox;
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Cached]
+        protected readonly OverlayColourProvider ColourProvider;
+
+        public SetupScreen()
+            : base(EditorScreenMode.SongSetup)
+        {
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+        }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Child = new Container
             {
@@ -43,81 +44,35 @@ namespace osu.Game.Screens.Edit.Setup
                             Colour = colours.GreySeafoamDark,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new OsuScrollContainer
+                        new SectionsContainer<SetupSection>
                         {
+                            FixedHeader = new SetupScreenHeader(),
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding(10),
-                            Child = flow = new FillFlowContainer
+                            Children = new SetupSection[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(20),
-                                Direction = FillDirection.Vertical,
-                                Children = new Drawable[]
-                                {
-                                    new Container
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        Height = 250,
-                                        Masking = true,
-                                        CornerRadius = 10,
-                                        Child = new BeatmapBackgroundSprite(Beatmap.Value)
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            FillMode = FillMode.Fill,
-                                        },
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Text = "Beatmap metadata"
-                                    },
-                                    artistTextBox = new LabelledTextBox
-                                    {
-                                        Label = "Artist",
-                                        Current = { Value = Beatmap.Value.Metadata.Artist },
-                                        TabbableContentContainer = this
-                                    },
-                                    titleTextBox = new LabelledTextBox
-                                    {
-                                        Label = "Title",
-                                        Current = { Value = Beatmap.Value.Metadata.Title },
-                                        TabbableContentContainer = this
-                                    },
-                                    creatorTextBox = new LabelledTextBox
-                                    {
-                                        Label = "Creator",
-                                        Current = { Value = Beatmap.Value.Metadata.AuthorString },
-                                        TabbableContentContainer = this
-                                    },
-                                    difficultyTextBox = new LabelledTextBox
-                                    {
-                                        Label = "Difficulty Name",
-                                        Current = { Value = Beatmap.Value.BeatmapInfo.Version },
-                                        TabbableContentContainer = this
-                                    },
-                                }
-                            },
+                                new ResourcesSection(),
+                                new MetadataSection(),
+                                new DifficultySection(),
+                            }
                         },
                     }
                 }
             };
-
-            foreach (var item in flow.OfType<LabelledTextBox>())
-                item.OnCommit += onCommit;
         }
+    }
 
-        private void onCommit(TextBox sender, bool newText)
+    internal class SetupScreenHeader : OverlayHeader
+    {
+        protected override OverlayTitle CreateTitle() => new SetupScreenTitle();
+
+        private class SetupScreenTitle : OverlayTitle
         {
-            if (!newText) return;
-
-            // for now, update these on commit rather than making BeatmapMetadata bindables.
-            // after switching database engines we can reconsider if switching to bindables is a good direction.
-            Beatmap.Value.Metadata.Artist = artistTextBox.Current.Value;
-            Beatmap.Value.Metadata.Title = titleTextBox.Current.Value;
-            Beatmap.Value.Metadata.AuthorString = creatorTextBox.Current.Value;
-            Beatmap.Value.BeatmapInfo.Version = difficultyTextBox.Current.Value;
+            public SetupScreenTitle()
+            {
+                Title = "beatmap setup";
+                Description = "change general settings of your beatmap";
+                IconTexture = "Icons/Hexacons/social";
+            }
         }
     }
 }

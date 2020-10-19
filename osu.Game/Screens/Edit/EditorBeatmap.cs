@@ -8,7 +8,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -18,7 +17,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
-    public class EditorBeatmap : Component, IBeatmap, IBeatSnapProvider
+    public class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
     {
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> is added to this <see cref="EditorBeatmap"/>.
@@ -89,7 +88,11 @@ namespace osu.Game.Screens.Edit
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
 
-        private readonly HashSet<HitObject> pendingUpdates = new HashSet<HitObject>();
+        private readonly List<HitObject> batchPendingInserts = new List<HitObject>();
+
+        private readonly List<HitObject> batchPendingDeletes = new List<HitObject>();
+
+        private readonly HashSet<HitObject> batchPendingUpdates = new HashSet<HitObject>();
 
         /// <summary>
         /// Adds a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
@@ -97,8 +100,10 @@ namespace osu.Game.Screens.Edit
         /// <param name="hitObjects">The <see cref="HitObject"/>s to add.</param>
         public void AddRange(IEnumerable<HitObject> hitObjects)
         {
+            BeginChange();
             foreach (var h in hitObjects)
                 Add(h);
+            EndChange();
         }
 
         /// <summary>
@@ -126,21 +131,28 @@ namespace osu.Game.Screens.Edit
 
             mutableHitObjects.Insert(index, hitObject);
 
-            // must be run after any change to hitobject ordering
-            beatmapProcessor?.PreProcess();
-            processHitObject(hitObject);
-            beatmapProcessor?.PostProcess();
-
-            HitObjectAdded?.Invoke(hitObject);
+            BeginChange();
+            batchPendingInserts.Add(hitObject);
+            EndChange();
         }
 
         /// <summary>
         /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
-        public void UpdateHitObject([NotNull] HitObject hitObject)
+        public void Update([NotNull] HitObject hitObject)
         {
-            pendingUpdates.Add(hitObject);
+            // updates are debounced regardless of whether a batch is active.
+            batchPendingUpdates.Add(hitObject);
+        }
+
+        /// <summary>
+        /// Update all hit objects with potentially changed difficulty or control point data.
+        /// </summary>
+        public void UpdateAllHitObjects()
+        {
+            foreach (var h in HitObjects)
+                batchPendingUpdates.Add(h);
         }
 
         /// <summary>
@@ -157,6 +169,18 @@ namespace osu.Game.Screens.Edit
 
             RemoveAt(index);
             return true;
+        }
+
+        /// <summary>
+        /// Removes a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        /// <param name="hitObjects">The <see cref="HitObject"/>s to remove.</param>
+        public void RemoveRange(IEnumerable<HitObject> hitObjects)
+        {
+            BeginChange();
+            foreach (var h in hitObjects)
+                Remove(h);
+            EndChange();
         }
 
         /// <summary>
@@ -180,44 +204,51 @@ namespace osu.Game.Screens.Edit
             bindable.UnbindAll();
             startTimeBindables.Remove(hitObject);
 
-            // must be run after any change to hitobject ordering
-            beatmapProcessor?.PreProcess();
-            processHitObject(hitObject);
-            beatmapProcessor?.PostProcess();
-
-            HitObjectRemoved?.Invoke(hitObject);
-        }
-
-        /// <summary>
-        /// Clears all <see cref="HitObjects"/> from this <see cref="EditorBeatmap"/>.
-        /// </summary>
-        public void Clear()
-        {
-            foreach (var h in HitObjects.ToArray())
-                Remove(h);
+            BeginChange();
+            batchPendingDeletes.Add(hitObject);
+            EndChange();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            // debounce updates as they are common and may come from input events, which can run needlessly many times per update frame.
-            if (pendingUpdates.Count > 0)
-            {
-                beatmapProcessor?.PreProcess();
-
-                foreach (var hitObject in pendingUpdates)
-                    processHitObject(hitObject);
-
-                beatmapProcessor?.PostProcess();
-
-                // explicitly needs to be fired after PostProcess
-                foreach (var hitObject in pendingUpdates)
-                    HitObjectUpdated?.Invoke(hitObject);
-
-                pendingUpdates.Clear();
-            }
+            if (batchPendingUpdates.Count > 0)
+                UpdateState();
         }
+
+        protected override void UpdateState()
+        {
+            if (batchPendingUpdates.Count == 0 && batchPendingDeletes.Count == 0 && batchPendingInserts.Count == 0)
+                return;
+
+            beatmapProcessor?.PreProcess();
+
+            foreach (var h in batchPendingDeletes) processHitObject(h);
+            foreach (var h in batchPendingInserts) processHitObject(h);
+            foreach (var h in batchPendingUpdates) processHitObject(h);
+
+            beatmapProcessor?.PostProcess();
+
+            // callbacks may modify the lists so let's be safe about it
+            var deletes = batchPendingDeletes.ToArray();
+            batchPendingDeletes.Clear();
+
+            var inserts = batchPendingInserts.ToArray();
+            batchPendingInserts.Clear();
+
+            var updates = batchPendingUpdates.ToArray();
+            batchPendingUpdates.Clear();
+
+            foreach (var h in deletes) HitObjectRemoved?.Invoke(h);
+            foreach (var h in inserts) HitObjectAdded?.Invoke(h);
+            foreach (var h in updates) HitObjectUpdated?.Invoke(h);
+        }
+
+        /// <summary>
+        /// Clears all <see cref="HitObjects"/> from this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        public void Clear() => RemoveRange(HitObjects.ToArray());
 
         private void processHitObject(HitObject hitObject) => hitObject.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
 
@@ -232,7 +263,7 @@ namespace osu.Game.Screens.Edit
                 var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
                 mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
-                UpdateHitObject(hitObject);
+                Update(hitObject);
             };
         }
 

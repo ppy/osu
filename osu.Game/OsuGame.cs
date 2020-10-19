@@ -95,6 +95,15 @@ namespace osu.Game
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
+        /// <summary>
+        /// Whether the local user is currently interacting with the game in a way that should not be interrupted.
+        /// </summary>
+        /// <remarks>
+        /// This is exclusively managed by <see cref="Player"/>. If other components are mutating this state, a more
+        /// resilient method should be used to ensure correct state.
+        /// </remarks>
+        public Bindable<bool> LocalUserPlaying = new BindableBool();
+
         protected OsuScreenStack ScreenStack;
 
         protected BackButton BackButton;
@@ -172,7 +181,7 @@ namespace osu.Game
 
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith(@"-")).ToArray();
+                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
                 if (paths.Length > 0)
                     Task.Run(() => Import(paths));
             }
@@ -280,7 +289,7 @@ namespace osu.Game
 
         public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
         {
-            if (url.StartsWith("/"))
+            if (url.StartsWith('/'))
                 url = $"{API.Endpoint}{url}";
 
             externalLinkOpener.OpenUrlExternally(url);
@@ -577,7 +586,8 @@ namespace osu.Game
                 rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                idleTracker
+                idleTracker,
+                new ConfineMouseTracker()
             });
 
             ScreenStack.ScreenPushed += screenPushed;
@@ -946,6 +956,9 @@ namespace osu.Game
                     menuScreen = menu;
                     break;
             }
+
+            // reset on screen change for sanity.
+            LocalUserPlaying.Value = false;
 
             if (current is IOsuScreen currentOsuScreen)
                 OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);

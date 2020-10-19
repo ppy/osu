@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -20,12 +19,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private Mod[] mods;
         private int countGreat;
-        private int countGood;
+        private int countOk;
         private int countMeh;
         private int countMiss;
 
-        public TaikoPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
-            : base(ruleset, beatmap, score)
+        public TaikoPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
+            : base(ruleset, attributes, score)
         {
         }
 
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             mods = Score.Mods;
             countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
-            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
             countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
@@ -102,6 +101,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return accValue * Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
         }
 
-        private int totalHits => countGreat + countGood + countMeh + countMiss;
+        private int totalHits => countGreat + countOk + countMeh + countMiss;
     }
 }

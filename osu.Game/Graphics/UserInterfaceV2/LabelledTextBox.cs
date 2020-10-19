@@ -44,12 +44,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Component.BorderColour = colours.Blue;
         }
 
-        protected override OsuTextBox CreateComponent() => new OsuTextBox
+        protected virtual OsuTextBox CreateTextBox() => new OsuTextBox
         {
+            CommitOnFocusLost = true,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             RelativeSizeAxes = Axes.X,
             CornerRadius = CORNER_RADIUS,
-        }.With(t => t.OnCommit += (sender, newText) => OnCommit?.Invoke(sender, newText));
+        };
+
+        protected override OsuTextBox CreateComponent() => CreateTextBox().With(t =>
+        {
+            t.OnCommit += (sender, newText) => OnCommit?.Invoke(sender, newText);
+        });
     }
 }

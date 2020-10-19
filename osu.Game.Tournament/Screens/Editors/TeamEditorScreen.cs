@@ -102,31 +102,31 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Name",
                                 Width = 0.2f,
-                                Bindable = Model.FullName
+                                Current = Model.FullName
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Acronym",
                                 Width = 0.2f,
-                                Bindable = Model.Acronym
+                                Current = Model.Acronym
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Flag",
                                 Width = 0.2f,
-                                Bindable = Model.FlagName
+                                Current = Model.FlagName
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Seed",
                                 Width = 0.2f,
-                                Bindable = Model.Seed
+                                Current = Model.Seed
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Last Year Placement",
                                 Width = 0.33f,
-                                Bindable = Model.LastYearPlacing
+                                Current = Model.LastYearPlacing
                             },
                             new SettingsButton
                             {
@@ -247,7 +247,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "User ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = userId,
+                                        Current = userId,
                                     },
                                     drawableContainer = new Container
                                     {

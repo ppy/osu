@@ -2,17 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class DrawableTestStrongHit : DrawableHit
+    public class DrawableTestStrongHit : DrawableTestHit
     {
-        private readonly HitResult type;
         private readonly bool hitBoth;
 
         public DrawableTestStrongHit(double startTime, HitResult type = HitResult.Great, bool hitBoth = true)
@@ -20,12 +17,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 IsStrong = true,
                 StartTime = startTime,
-            })
+            }, type)
         {
-            // in order to create nested strong hit
-            HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-
-            this.type = type;
             this.hitBoth = hitBoth;
         }
 
@@ -33,10 +26,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             base.LoadAsyncComplete();
 
-            Result.Type = type;
-
             var nestedStrongHit = (DrawableStrongNestedHit)NestedHitObjects.Single();
-            nestedStrongHit.Result.Type = hitBoth ? type : HitResult.Miss;
+            nestedStrongHit.Result.Type = hitBoth ? Type : HitResult.Miss;
         }
 
         public override bool OnPressed(TaikoAction action) => false;
