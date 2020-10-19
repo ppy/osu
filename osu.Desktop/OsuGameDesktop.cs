@@ -125,12 +125,14 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
+            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
+
             switch (host.Window)
             {
                 // Legacy osuTK DesktopGameWindow
                 case DesktopGameWindow desktopGameWindow:
                     desktopGameWindow.CursorState |= CursorState.Hidden;
-                    desktopGameWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
+                    desktopGameWindow.SetIconFromStream(iconStream);
                     desktopGameWindow.Title = Name;
                     desktopGameWindow.FileDrop += (_, e) => fileDrop(e.FileNames);
                     break;
@@ -138,6 +140,7 @@ namespace osu.Desktop
                 // SDL2 DesktopWindow
                 case DesktopWindow desktopWindow:
                     desktopWindow.CursorState.Value |= CursorState.Hidden;
+                    desktopWindow.SetIconFromStream(iconStream);
                     desktopWindow.Title = Name;
                     desktopWindow.DragDrop += f => fileDrop(new[] { f });
                     break;
