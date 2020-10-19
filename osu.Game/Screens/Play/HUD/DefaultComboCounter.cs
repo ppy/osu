@@ -15,8 +15,6 @@ namespace osu.Game.Screens.Play.HUD
     {
         private readonly Vector2 offset = new Vector2(20, 5);
 
-        protected override double RollingDuration => 750;
-
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
 
