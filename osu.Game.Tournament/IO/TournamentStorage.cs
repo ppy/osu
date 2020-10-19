@@ -36,6 +36,10 @@ namespace osu.Game.Tournament.IO
 
         public override void Migrate(Storage newStorage)
         {
+            // this migration only happens once on moving to the per-tournament storage system.
+            // listed files are those known at that point in time.
+            // this can be removed at some point in the future (6 months obsoletion would mean 2021-04-19)
+
             var source = new DirectoryInfo(storage.GetFullPath("tournament"));
             var destination = new DirectoryInfo(newStorage.GetFullPath("."));
 
@@ -50,6 +54,7 @@ namespace osu.Game.Tournament.IO
             moveFileIfExists("drawings.txt", destination);
             moveFileIfExists("drawings_results.txt", destination);
             moveFileIfExists("drawings.ini", destination);
+
             ChangeTargetStorage(newStorage);
             storageConfig.Set(StorageConfig.CurrentTournament, default_tournament);
             storageConfig.Save();
