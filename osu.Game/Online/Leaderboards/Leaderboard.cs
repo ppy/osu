@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -27,6 +28,7 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly OsuScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
+        private readonly UserTopScoreContainer<TScoreInfo> topScoreContainer;
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
@@ -55,13 +57,14 @@ namespace osu.Game.Online.Leaderboards
                 scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
                 scrollFlow = null;
 
-                loading.Hide();
-
                 showScoresDelegate?.Cancel();
                 showScoresCancellationSource?.Cancel();
 
                 if (scores == null || !scores.Any())
+                {
+                    loading.Hide();
                     return;
+                }
 
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
@@ -83,7 +86,22 @@ namespace osu.Game.Online.Leaderboards
                     }
 
                     scrollContainer.ScrollTo(0f, false);
+                    loading.Hide();
                 }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
+            }
+        }
+
+        public TScoreInfo TopScore
+        {
+            get => topScoreContainer.Score.Value;
+            set
+            {
+                topScoreContainer.Score.Value = value;
+
+                if (value == null)
+                    topScoreContainer.Hide();
+                else
+                    topScoreContainer.Show();
             }
         }
 
@@ -133,9 +151,9 @@ namespace osu.Game.Online.Leaderboards
                 switch (placeholderState = value)
                 {
                     case PlaceholderState.NetworkFailure:
-                        replacePlaceholder(new RetrievalFailurePlaceholder
+                        replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
                         {
-                            OnRetry = UpdateScores,
+                            Action = UpdateScores,
                         });
                         break;
 
@@ -198,8 +216,9 @@ namespace osu.Game.Online.Leaderboards
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
+                                    Child = topScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore)
                                 },
-                            }
+                            },
                         },
                     },
                 },
@@ -367,5 +386,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
+
+        protected abstract LeaderboardScore CreateDrawableTopScore(TScoreInfo model);
     }
 }

@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -25,7 +24,7 @@ namespace osu.Game.Users
 
         protected Action ViewProfile { get; private set; }
 
-        protected DelayedLoadUnloadWrapper Background { get; private set; }
+        protected Drawable Background { get; private set; }
 
         protected UserPanel(User user)
         {
@@ -56,17 +55,12 @@ namespace osu.Game.Users
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourProvider?.Background5 ?? Colours.Gray1
                 },
-                Background = new DelayedLoadUnloadWrapper(() => new UserCoverBackground
+                Background = new UserCoverBackground
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     User = User,
-                }, 300, 5000)
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    RelativeSizeAxes = Axes.Both,
                 },
                 CreateLayout()
             });

@@ -140,6 +140,22 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
+        public void TestRemoveGroupAlsoRemovedControlPoints()
+        {
+            var cpi = new ControlPointInfo();
+
+            var group = cpi.GroupAt(1000, true);
+
+            group.Add(new SampleControlPoint());
+
+            Assert.That(cpi.SamplePoints.Count, Is.EqualTo(1));
+
+            cpi.RemoveGroup(group);
+
+            Assert.That(cpi.SamplePoints.Count, Is.EqualTo(0));
+        }
+
+        [Test]
         public void TestAddControlPointToGroup()
         {
             var cpi = new ControlPointInfo();

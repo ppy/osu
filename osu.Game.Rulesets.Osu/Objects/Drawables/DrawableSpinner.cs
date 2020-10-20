@@ -3,20 +3,20 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using osuTK;
-using osuTK.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Utils;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -24,26 +24,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         protected readonly Spinner Spinner;
 
-        public readonly SpinnerDisc Disc;
-        public readonly SpinnerTicks Ticks;
+        private readonly Container<DrawableSpinnerTick> ticks;
+
+        public readonly SpinnerRotationTracker RotationTracker;
         public readonly SpinnerSpmCounter SpmCounter;
-
-        private readonly Container mainContainer;
-
-        public readonly SpinnerBackground Background;
-        private readonly Container circleContainer;
-        private readonly CirclePiece circle;
-        private readonly GlowPiece glow;
-
-        private readonly SpriteIcon symbol;
-
-        private readonly Color4 baseColour = Color4Extensions.FromHex(@"002c3c");
-        private readonly Color4 fillColour = Color4Extensions.FromHex(@"005b7c");
+        private readonly SpinnerBonusDisplay bonusDisplay;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
-        private Color4 normalColour;
-        private Color4 completeColour;
+        private bool spinnerFrequencyModulate;
 
         public DrawableSpinner(Spinner s)
             : base(s)
@@ -53,65 +42,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             RelativeSizeAxes = Axes.Both;
 
-            // we are slightly bigger than our parent, to clip the top and bottom of the circle
-            Height = 1.3f;
-
             Spinner = s;
 
             InternalChildren = new Drawable[]
             {
-                circleContainer = new Container
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Children = new Drawable[]
-                    {
-                        glow = new GlowPiece(),
-                        circle = new CirclePiece
-                        {
-                            Position = Vector2.Zero,
-                            Anchor = Anchor.Centre,
-                        },
-                        new RingPiece(),
-                        symbol = new SpriteIcon
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(48),
-                            Icon = FontAwesome.Solid.Asterisk,
-                            Shadow = false,
-                        },
-                    }
-                },
-                mainContainer = new AspectContainer
+                ticks = new Container<DrawableSpinnerTick>(),
+                new AspectContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Y,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
-                        Background = new SpinnerBackground
-                        {
-                            Disc =
-                            {
-                                Alpha = 0f,
-                            },
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        Disc = new SpinnerDisc(Spinner)
-                        {
-                            Scale = Vector2.Zero,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        circleContainer.CreateProxy(),
-                        Ticks = new SpinnerTicks
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
+                        new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinnerDisc()),
+                        RotationTracker = new SpinnerRotationTracker(Spinner)
                     }
                 },
                 SpmCounter = new SpinnerSpmCounter
@@ -120,102 +64,81 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     Y = 120,
                     Alpha = 0
+                },
+                bonusDisplay = new SpinnerBonusDisplay
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Y = -120,
                 }
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private Bindable<bool> isSpinning;
+
+        protected override void LoadComplete()
         {
-            normalColour = baseColour;
-            completeColour = colours.YellowLight;
+            base.LoadComplete();
 
-            Background.AccentColour = normalColour;
-            Ticks.AccentColour = normalColour;
-
-            Disc.AccentColour = fillColour;
-            circle.Colour = colours.BlueDark;
-            glow.Colour = colours.BlueDark;
-
-            positionBindable.BindValueChanged(pos => Position = pos.NewValue);
-            positionBindable.BindTo(HitObject.PositionBindable);
+            isSpinning = RotationTracker.IsSpinning.GetBoundCopy();
+            isSpinning.BindValueChanged(updateSpinningSample);
         }
 
-        public float Progress => Math.Clamp(Disc.CumulativeRotation / 360 / Spinner.SpinsRequired, 0, 1);
+        private PausableSkinnableSound spinningSample;
+        private const float spinning_sample_initial_frequency = 1.0f;
+        private const float spinning_sample_modulated_base_frequency = 0.5f;
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void LoadSamples()
         {
-            if (Time.Current < HitObject.StartTime) return;
+            base.LoadSamples();
 
-            if (Progress >= 1 && !Disc.Complete)
+            spinningSample?.Expire();
+            spinningSample = null;
+
+            var firstSample = HitObject.Samples.FirstOrDefault();
+
+            if (firstSample != null)
             {
-                Disc.Complete = true;
-                transformFillColour(completeColour, 200);
-            }
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
+                clone.Name = "spinnerspin";
 
-            if (userTriggered || Time.Current < Spinner.EndTime)
-                return;
-
-            ApplyResult(r =>
-            {
-                if (Progress >= 1)
-                    r.Type = HitResult.Great;
-                else if (Progress > .9)
-                    r.Type = HitResult.Good;
-                else if (Progress > .75)
-                    r.Type = HitResult.Meh;
-                else if (Time.Current >= Spinner.EndTime)
-                    r.Type = HitResult.Miss;
-            });
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            if (HandleUserInput)
-                Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            if (!SpmCounter.IsPresent && Disc.Tracking)
-                SpmCounter.FadeIn(HitObject.TimeFadeIn);
-
-            circle.Rotation = Disc.Rotation;
-            Ticks.Rotation = Disc.Rotation;
-            SpmCounter.SetRotation(Disc.CumulativeRotation);
-
-            float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
-            float targetScale = relativeCircleScale + (1 - relativeCircleScale) * Progress;
-            Disc.Scale = new Vector2((float)Interpolation.Lerp(Disc.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
-
-            symbol.Rotation = (float)Interpolation.Lerp(symbol.Rotation, Disc.Rotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
-        }
-
-        protected override void UpdateInitialTransforms()
-        {
-            base.UpdateInitialTransforms();
-
-            circleContainer.ScaleTo(0);
-            mainContainer.ScaleTo(0);
-
-            using (BeginDelayedSequence(HitObject.TimePreempt / 2, true))
-            {
-                float phaseOneScale = Spinner.Scale * 0.7f;
-
-                circleContainer.ScaleTo(phaseOneScale, HitObject.TimePreempt / 4, Easing.OutQuint);
-
-                mainContainer
-                    .ScaleTo(phaseOneScale * circle.DrawHeight / DrawHeight * 1.6f, HitObject.TimePreempt / 4, Easing.OutQuint)
-                    .RotateTo((float)(25 * Spinner.Duration / 2000), HitObject.TimePreempt + Spinner.Duration);
-
-                using (BeginDelayedSequence(HitObject.TimePreempt / 2, true))
+                AddInternal(spinningSample = new PausableSkinnableSound(clone)
                 {
-                    circleContainer.ScaleTo(Spinner.Scale, 400, Easing.OutQuint);
-                    mainContainer.ScaleTo(1, 400, Easing.OutQuint);
-                }
+                    Volume = { Value = 0 },
+                    Looping = true,
+                    Frequency = { Value = spinning_sample_initial_frequency }
+                });
+            }
+        }
+
+        private void updateSpinningSample(ValueChangedEvent<bool> tracking)
+        {
+            if (tracking.NewValue)
+            {
+                spinningSample?.Play();
+                spinningSample?.VolumeTo(1, 200);
+            }
+            else
+            {
+                spinningSample?.VolumeTo(0, 200).Finally(_ => spinningSample.Stop());
+            }
+        }
+
+        public override void StopAllSamples()
+        {
+            base.StopAllSamples();
+            spinningSample?.Stop();
+        }
+
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
+
+            switch (hitObject)
+            {
+                case DrawableSpinnerTick tick:
+                    ticks.Add(tick);
+                    break;
             }
         }
 
@@ -224,33 +147,139 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateStateTransforms(state);
 
             using (BeginDelayedSequence(Spinner.Duration, true))
-            {
                 this.FadeOut(160);
 
-                switch (state)
-                {
-                    case ArmedState.Hit:
-                        transformFillColour(completeColour, 0);
-                        this.ScaleTo(Scale * 1.2f, 320, Easing.Out);
-                        mainContainer.RotateTo(mainContainer.Rotation + 180, 320);
-                        break;
+            // skin change does a rewind of transforms, which will stop the spinning sound from playing if it's currently in playback.
+            isSpinning?.TriggerChange();
+        }
 
-                    case ArmedState.Miss:
-                        this.ScaleTo(Scale * 0.8f, 320, Easing.In);
-                        break;
-                }
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            ticks.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case SpinnerBonusTick bonusTick:
+                    return new DrawableSpinnerBonusTick(bonusTick);
+
+                case SpinnerTick tick:
+                    return new DrawableSpinnerTick(tick);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            positionBindable.BindValueChanged(pos => Position = pos.NewValue);
+            positionBindable.BindTo(HitObject.PositionBindable);
+        }
+
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
+            base.ApplySkin(skin, allowFallback);
+            spinnerFrequencyModulate = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerFrequencyModulate)?.Value ?? true;
+        }
+
+        /// <summary>
+        /// The completion progress of this spinner from 0..1 (clamped).
+        /// </summary>
+        public float Progress
+        {
+            get
+            {
+                if (Spinner.SpinsRequired == 0)
+                    // some spinners are so short they can't require an integer spin count.
+                    // these become implicitly hit.
+                    return 1;
+
+                return Math.Clamp(RotationTracker.RateAdjustedRotation / 360 / Spinner.SpinsRequired, 0, 1);
             }
         }
 
-        private void transformFillColour(Colour4 colour, double duration)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            Disc.FadeAccent(colour, duration);
+            if (Time.Current < HitObject.StartTime) return;
 
-            Background.FadeAccent(colour.Darken(1), duration);
-            Ticks.FadeAccent(colour, duration);
+            RotationTracker.Complete.Value = Progress >= 1;
 
-            circle.FadeColour(colour, duration);
-            glow.FadeColour(colour, duration);
+            if (userTriggered || Time.Current < Spinner.EndTime)
+                return;
+
+            // Trigger a miss result for remaining ticks to avoid infinite gameplay.
+            foreach (var tick in ticks.Where(t => !t.Result.HasResult))
+                tick.TriggerResult(false);
+
+            ApplyResult(r =>
+            {
+                if (Progress >= 1)
+                    r.Type = HitResult.Great;
+                else if (Progress > .9)
+                    r.Type = HitResult.Ok;
+                else if (Progress > .75)
+                    r.Type = HitResult.Meh;
+                else if (Time.Current >= Spinner.EndTime)
+                    r.Type = r.Judgement.MinResult;
+            });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (HandleUserInput)
+                RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+
+            if (spinningSample != null && spinnerFrequencyModulate)
+                spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (!SpmCounter.IsPresent && RotationTracker.Tracking)
+                SpmCounter.FadeIn(HitObject.TimeFadeIn);
+            SpmCounter.SetRotation(RotationTracker.RateAdjustedRotation);
+
+            updateBonusScore();
+        }
+
+        private int wholeSpins;
+
+        private void updateBonusScore()
+        {
+            if (ticks.Count == 0)
+                return;
+
+            int spins = (int)(RotationTracker.RateAdjustedRotation / 360);
+
+            if (spins < wholeSpins)
+            {
+                // rewinding, silently handle
+                wholeSpins = spins;
+                return;
+            }
+
+            while (wholeSpins != spins)
+            {
+                var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
+
+                // tick may be null if we've hit the spin limit.
+                if (tick != null)
+                {
+                    tick.TriggerResult(true);
+                    if (tick is DrawableSpinnerBonusTick)
+                        bonusDisplay.SetBonusCount(spins - Spinner.SpinsRequired);
+                }
+
+                wholeSpins++;
+            }
         }
     }
 }

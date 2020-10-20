@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
 
@@ -15,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private bool disjointTrail;
         private double lastTrailTime;
+        private IBindable<float> cursorSize;
 
         public LegacyCursorTrail()
         {
@@ -22,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load(ISkinSource skin, OsuConfigManager config)
         {
             Texture = skin.GetTexture("cursortrail");
             disjointTrail = skin.GetTexture("cursormiddle") == null;
@@ -32,11 +36,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
                 Texture.ScaleAdjust *= 1.6f;
             }
+
+            cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
         }
 
         protected override double FadeDuration => disjointTrail ? 150 : 500;
 
         protected override bool InterpolateMovements => !disjointTrail;
+
+        protected override float IntervalMultiplier => 1 / Math.Max(cursorSize.Value, 1);
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {

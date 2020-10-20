@@ -6,6 +6,8 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
+using osu.Game.Input;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
@@ -13,6 +15,7 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Configuration
 {
+    [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>
     {
         protected override void InitialiseDefaults()
@@ -22,6 +25,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Skin, 0, -1, int.MaxValue);
 
             Set(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
+            Set(OsuSetting.BeatmapDetailModsFilter, false);
 
             Set(OsuSetting.ShowConvertedBeatmaps, true);
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
@@ -66,6 +70,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MouseDisableButtons, false);
             Set(OsuSetting.MouseDisableWheel, false);
+            Set(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
 
             // Graphics
             Set(OsuSetting.ShowFpsDisplay, false);
@@ -99,6 +104,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
+            Set(OsuSetting.GameplayDisableWinKey, true);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -190,6 +196,7 @@ namespace osu.Game.Configuration
         FadePlayfieldWhenHealthLow,
         MouseDisableButtons,
         MouseDisableWheel,
+        ConfineMouseMode,
         AudioOffset,
         VolumeInactive,
         MenuMusic,
@@ -197,6 +204,7 @@ namespace osu.Game.Configuration
         CursorRotation,
         MenuParallax,
         BeatmapDetailTab,
+        BeatmapDetailModsFilter,
         Username,
         ReleaseStream,
         SavePassword,
@@ -229,6 +237,7 @@ namespace osu.Game.Configuration
         IntroSequence,
         UIHoldActivationDelay,
         HitLighting,
-        MenuBackgroundSource
+        MenuBackgroundSource,
+        GameplayDisableWinKey,
     }
 }

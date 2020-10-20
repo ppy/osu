@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = SplitKeyVal(line);
 
-            bool isCombo = pair.Key.StartsWith(@"Combo");
+            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
             string[] split = pair.Value.Split(',');
 
@@ -104,10 +104,6 @@ namespace osu.Game.Beatmaps.Formats
             try
             {
                 byte alpha = split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
-
-                if (alpha == 0)
-                    alpha = 255;
-
                 colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
             }
             catch

@@ -113,13 +113,13 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         new SettingsSlider<int>
                         {
                             LabelText = "Chroma width",
-                            Bindable = LadderInfo.ChromaKeyWidth,
+                            Current = LadderInfo.ChromaKeyWidth,
                             KeyboardStep = 1,
                         },
                         new SettingsSlider<int>
                         {
                             LabelText = "Players per team",
-                            Bindable = LadderInfo.PlayersPerTeam,
+                            Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
                         }
                     }

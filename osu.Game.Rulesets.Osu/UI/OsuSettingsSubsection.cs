@@ -27,17 +27,17 @@ namespace osu.Game.Rulesets.Osu.UI
                 new SettingsCheckbox
                 {
                     LabelText = "Snaking in sliders",
-                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Snaking out sliders",
-                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Cursor trail",
-                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
             };
         }

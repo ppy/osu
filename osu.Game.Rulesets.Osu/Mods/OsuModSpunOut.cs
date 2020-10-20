@@ -40,8 +40,17 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var spinner = (DrawableSpinner)drawable;
 
-            spinner.Disc.Tracking = true;
-            spinner.Disc.Rotate(MathUtils.RadiansToDegrees((float)spinner.Clock.ElapsedFrameTime * 0.03f));
+            spinner.RotationTracker.Tracking = true;
+
+            // early-return if we were paused to avoid division-by-zero in the subsequent calculations.
+            if (Precision.AlmostEquals(spinner.Clock.Rate, 0))
+                return;
+
+            // because the spinner is under the gameplay clock, it is affected by rate adjustments on the track;
+            // for that reason using ElapsedFrameTime directly leads to fewer SPM with Half Time and more SPM with Double Time.
+            // for spinners we want the real (wall clock) elapsed time; to achieve that, unapply the clock rate locally here.
+            var rateIndependentElapsedTime = spinner.Clock.ElapsedFrameTime / spinner.Clock.Rate;
+            spinner.RotationTracker.AddRotation(MathUtils.RadiansToDegrees((float)rateIndependentElapsedTime * 0.03f));
         }
     }
 }

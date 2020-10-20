@@ -209,9 +209,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
-            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementAssert(hitObjects[1], HitResult.IgnoreHit);
             addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.Miss);
-            addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.Great);
+            addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             const double time_slider = 1500;
             const double time_circle = 1510;
             Vector2 positionCircle = Vector2.Zero;
-            Vector2 positionSlider = new Vector2(80);
+            Vector2 positionSlider = new Vector2(30);
 
             var hitObjects = new List<OsuHitObject>
             {
@@ -252,9 +252,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
-            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementAssert(hitObjects[1], HitResult.IgnoreHit);
             addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.Great);
-            addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.Great);
+            addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
-            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementAssert(hitObjects[1], HitResult.IgnoreHit);
         }
 
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)

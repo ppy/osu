@@ -34,6 +34,12 @@ namespace osu.Game.Tests.Beatmaps
             var ourResult = convert(name, mods.Select(m => (Mod)Activator.CreateInstance(m)).ToArray());
             var expectedResult = read(name);
 
+            foreach (var m in ourResult.Mappings)
+                m.PostProcess();
+
+            foreach (var m in expectedResult.Mappings)
+                m.PostProcess();
+
             Assert.Multiple(() =>
             {
                 int mappingCounter = 0;
@@ -208,7 +214,7 @@ namespace osu.Game.Tests.Beatmaps
 
             protected override Texture GetBackground() => throw new NotImplementedException();
 
-            protected override Track GetTrack() => throw new NotImplementedException();
+            protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 
             protected override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
             {
@@ -237,6 +243,13 @@ namespace osu.Game.Tests.Beatmaps
         private List<TConvertValue> setObjects
         {
             set => Objects = value;
+        }
+
+        /// <summary>
+        /// Invoked after this <see cref="ConvertMapping{TConvertValue}"/> is populated to post-process the contained data.
+        /// </summary>
+        public virtual void PostProcess()
+        {
         }
 
         public virtual bool Equals(ConvertMapping<TConvertValue> other) => StartTime == other?.StartTime;
