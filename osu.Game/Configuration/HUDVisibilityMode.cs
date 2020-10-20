@@ -9,8 +9,11 @@ namespace osu.Game.Configuration
     {
         Never,
 
+        [Description("Hide during gameplay")]
+        HideDuringGameplay,
+
         [Description("Hide during breaks")]
-        DuringGameplay,
+        HideDuringBreaks,
 
         Always
     }
