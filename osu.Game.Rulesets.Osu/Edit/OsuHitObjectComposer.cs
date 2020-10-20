@@ -56,12 +56,18 @@ namespace osu.Game.Rulesets.Osu.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            LayerBelowRuleset.Add(new PlayfieldBorder
+            LayerBelowRuleset.AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible }
+                new PlayfieldBorder
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners }
+                },
+                distanceSnapGridContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                }
             });
-            LayerBelowRuleset.Add(distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both });
 
             selectedHitObjects = EditorBeatmap.SelectedHitObjects.GetBoundCopy();
             selectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();

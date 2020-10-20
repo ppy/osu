@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -39,10 +40,10 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Cursor trail",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
-                new SettingsCheckbox
+                new SettingsEnumDropdown<PlayfieldBorderStyle>
                 {
-                    LabelText = "Show playfield border",
-                    Current = config.GetBindable<bool>(OsuRulesetSetting.ShowPlayfieldBorder),
+                    LabelText = "Playfield border style",
+                    Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
             };
         }
