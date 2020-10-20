@@ -167,6 +167,9 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
+            if (epilepsyWarning != null)
+                epilepsyWarning.DimmableBackground = Background;
+
             content.ScaleTo(0.7f);
             Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
 
