@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using osu.Game.Database;
 
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    partial class OsuDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201019224408_AddEpilepsyWarning")]
+    partial class AddEpilepsyWarning
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

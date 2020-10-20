@@ -4,12 +4,14 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -90,6 +92,9 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate scheduledPushPlayer;
 
+        [CanBeNull]
+        private EpilepsyWarning epilepsyWarning;
+
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notificationOverlay { get; set; }
 
@@ -138,6 +143,15 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750)
             });
+
+            if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
+            {
+                AddInternal(epilepsyWarning = new EpilepsyWarning
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            }
         }
 
         protected override void LoadComplete()
@@ -152,6 +166,9 @@ namespace osu.Game.Screens.Play
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            if (epilepsyWarning != null)
+                epilepsyWarning.DimmableBackground = Background;
 
             content.ScaleTo(0.7f);
             Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
@@ -306,7 +323,29 @@ namespace osu.Game.Screens.Play
                 {
                     contentOut();
 
-                    this.Delay(250).Schedule(() =>
+                    TransformSequence<PlayerLoader> pushSequence = this.Delay(250);
+
+                    // only show if the warning was created (i.e. the beatmap needs it)
+                    // and this is not a restart of the map (the warning expires after first load).
+                    if (epilepsyWarning?.IsAlive == true)
+                    {
+                        const double epilepsy_display_length = 3000;
+
+                        pushSequence.Schedule(() =>
+                        {
+                            epilepsyWarning.State.Value = Visibility.Visible;
+
+                            this.Delay(epilepsy_display_length).Schedule(() =>
+                            {
+                                epilepsyWarning.Hide();
+                                epilepsyWarning.Expire();
+                            });
+                        });
+
+                        pushSequence.Delay(epilepsy_display_length);
+                    }
+
+                    pushSequence.Schedule(() =>
                     {
                         if (!this.IsCurrentScreen()) return;
 
