@@ -77,11 +77,11 @@ namespace osu.Game.Screens.Select.Carousel
 
             Header.Children = new Drawable[]
             {
-                background = new DelayedLoadWrapper(new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
+                background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                 {
                     RelativeSizeAxes = Axes.Both,
                 }, 300),
-                mainFlow = new DelayedLoadWrapper(new SetPanelContent((CarouselBeatmapSet)Item), 100),
+                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 100),
             };
 
             background.DelayedLoadComplete += fadeContentIn;
