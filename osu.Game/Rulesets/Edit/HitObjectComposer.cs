@@ -100,11 +100,7 @@ namespace osu.Game.Rulesets.Edit
                     Children = new Drawable[]
                     {
                         // layers below playfield
-                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
-                        {
-                            LayerBelowRuleset,
-                            new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
-                        }),
+                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(LayerBelowRuleset),
                         drawableRulesetWrapper,
                         // layers above playfield
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
