@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -34,6 +35,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestPlayerLoader loader;
         private TestPlayerLoaderContainer container;
         private TestPlayer player;
+
+        private bool epilepsyWarning;
 
         [Resolved]
         private AudioManager audioManager { get; set; }
@@ -59,6 +62,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             beforeLoadAction?.Invoke();
 
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            Beatmap.Value.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(Beatmap.Value.Track);
@@ -249,6 +253,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("check " + volumeName, assert);
 
             AddUntilStep("wait for player load", () => player.IsLoaded);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestEpilepsyWarning(bool warning)
+        {
+            AddStep("change epilepsy warning", () => epilepsyWarning = warning);
+            AddStep("load dummy beatmap", () => ResetPlayer(false));
+
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<EpilepsyWarning>().Any() == warning);
         }
 
         private class TestPlayerLoaderContainer : Container
