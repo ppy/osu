@@ -92,6 +92,7 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
+        public bool EpilepsyWarning { get; set; }
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]

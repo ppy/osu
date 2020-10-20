@@ -37,10 +37,10 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "在休息时段使背景变量",
                     Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
                 },
-                new SettingsCheckbox
+                new SettingsEnumDropdown<HUDVisibilityMode>
                 {
-                    LabelText = "显示分数计界面",
-                    Current = config.GetBindable<bool>(OsuSetting.ShowInterface)
+                    LabelText = "分数计界面显示模式",
+                    Current = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode)
                 },
                 new SettingsCheckbox
                 {
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "分数显示模式",
                     Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
                     Keywords = new[] { "scoring" }
-                }
+                },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)

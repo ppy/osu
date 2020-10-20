@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -38,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     LabelText = "光标轨迹",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
+                },
+                new SettingsEnumDropdown<PlayfieldBorderStyle>
+                {
+                    LabelText = "游玩区域边框风格",
+                    Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
             };
         }

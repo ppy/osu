@@ -175,6 +175,10 @@ namespace osu.Game.Beatmaps.Formats
                 case @"WidescreenStoryboard":
                     beatmap.BeatmapInfo.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
                     break;
+
+                case @"EpilepsyWarning":
+                    beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
+                    break;
             }
         }
 
