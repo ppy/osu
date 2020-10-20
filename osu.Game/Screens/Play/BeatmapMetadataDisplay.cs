@@ -308,16 +308,13 @@ namespace osu.Game.Screens.Play
                         Spacing = new Vector2(10),
                         LayoutDuration = 500,
                         LayoutEasing = Easing.OutQuint,
-                        Children = new Drawable[]
+                        Child = new ConstrainedIconContainer
                         {
-                            new ConstrainedIconContainer
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Icon = rulesetInfo.Value.CreateInstance().CreateIcon(),
-                                Colour = Color4.White,
-                                Size = new Vector2(20),
-                            }
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Icon = rulesetInfo.Value.CreateInstance().CreateIcon(),
+                            Colour = Color4.White,
+                            Size = new Vector2(20),
                         }
                     },
                 };

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -42,6 +43,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 foreach (var s in scoreCounters)
                     s.Current.Value += 300;
             });
+        }
+
+        [Test]
+        public void TestVeryLargeScore()
+        {
+            AddStep("set large score", () => scoreCounters.ForEach(counter => counter.Current.Value = 1_000_000_000));
         }
     }
 }

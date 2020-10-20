@@ -33,6 +33,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.L, GlobalAction.MvisToggleTrackLoop),
             new KeyBinding(InputKey.Enter, GlobalAction.MvisOpenInSongSelect),
             new KeyBinding(InputKey.H, GlobalAction.MvisForceLockOverlayChanges),
+            new KeyBinding(InputKey.Slash, GlobalAction.MvisSelectCollection),
         };
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
@@ -215,5 +216,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Timing设计模式")]
         EditorTimingMode,
+
+        [Description("选择收藏夹")]
+        MvisSelectCollection
     }
 }

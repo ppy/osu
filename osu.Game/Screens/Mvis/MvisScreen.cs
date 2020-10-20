@@ -38,11 +38,11 @@ using osu.Game.Graphics;
 using osu.Framework;
 using osu.Game.Users;
 using osu.Game.Screens.Mvis.Modules;
+using osu.Game.Screens.Mvis.Modules.v2;
 using osu.Game.Collections;
 
 namespace osu.Game.Screens
 {
-
     ///<summary>
     ///bug:
     ///故事版Overlay Proxy不消失(???)
@@ -111,6 +111,7 @@ namespace osu.Game.Screens
         private CollectionHelper collectionHelper;
         private Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
         private CollectionSelectPanel collectionPanel;
+        private BottomBarSwitchButton collectionButton;
 
         public MvisScreen()
         {
@@ -246,6 +247,12 @@ namespace osu.Game.Screens
                                                             Margin = new MarginPadding { Right = 5 },
                                                             Children = new Drawable[]
                                                             {
+                                                                collectionButton = new BottomBarSwitchButton
+                                                                {
+                                                                    ButtonIcon = FontAwesome.Solid.List,
+                                                                    TooltipText = "收藏夹选择",
+                                                                    Action = () => collectionPanel.ToggleVisibility()
+                                                                },
                                                                 new BottomBarButton
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Desktop,
@@ -317,7 +324,7 @@ namespace osu.Game.Screens
                                     }
                                 }
                             }
-                        },
+                        }
                     }
                 },
                 new Container
@@ -399,22 +406,19 @@ namespace osu.Game.Screens
                                             {
                                                 Text = "歌曲选择",
                                                 Action = () => this.Push(new MvisSongSelect())
-                                            },
-                                            collectionPanel = new CollectionSelectPanel
-                                            {
-                                                CurrentCollection = { BindTarget = CurrentCollection },
-                                                Padding = new MarginPadding{Horizontal = 15}
-                                            },
+                                            }
                                         }
                                     },
                                 },
                             }
                         },
+                        collectionPanel = new CollectionSelectPanel()
+                        {
+                            CurrentCollection = { BindTarget = CurrentCollection },
+                        },
                     }
                 },
             };
-
-            collectionPanel.Show();
         }
 
         [BackgroundDependencyLoader]
@@ -477,7 +481,7 @@ namespace osu.Game.Screens
             {
                 collectionHelper.RefreshBeatmapList(v.NewValue);
 
-                if (PlayFromCollection.Value)
+                if (PlayFromCollection.Value && !collectionHelper.currentCollectionContains(Beatmap.Value))
                 {
                     collectionHelper.PlayFirstBeatmap();
                 }
@@ -623,6 +627,7 @@ namespace osu.Game.Screens
 
             musicController.TrackAdjustTakenOver = true;
             collectionHelper.RefreshBeatmapList(CurrentCollection.Value);
+            collectionPanel.RefreshCollections();
 
             this.FadeIn(DURATION);
             Track.ResetSpeedAdjustments();
@@ -677,6 +682,10 @@ namespace osu.Game.Screens
 
                 case GlobalAction.MvisForceLockOverlayChanges:
                     lockChanges.Toggle();
+                    return true;
+
+                case GlobalAction.MvisSelectCollection:
+                    collectionButton.Click();
                     return true;
             }
 

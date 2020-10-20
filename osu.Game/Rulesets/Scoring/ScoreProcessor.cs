@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Scoring
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
-        private int maxHighestCombo;
+        private int maxAchievableCombo;
         private double maxBaseScore;
         private double rollingMaxBaseScore;
         private double baseScore;
@@ -196,9 +196,9 @@ namespace osu.Game.Rulesets.Scoring
 
         private double getScore(ScoringMode mode)
         {
-            return GetScore(mode, maxHighestCombo,
+            return GetScore(mode, maxAchievableCombo,
                 maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
-                maxHighestCombo > 0 ? (double)HighestCombo.Value / maxHighestCombo : 0,
+                maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1,
                 scoreResultCounts);
         }
 
@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Scoring
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return getBonusScore(statistics) + (accuracyRatio * maxCombo * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
+                    return getBonusScore(statistics) + (accuracyRatio * Math.Max(1, maxCombo) * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
             }
         }
 
@@ -266,14 +266,8 @@ namespace osu.Game.Rulesets.Scoring
 
             if (storeResults)
             {
-                maxHighestCombo = HighestCombo.Value;
+                maxAchievableCombo = HighestCombo.Value;
                 maxBaseScore = baseScore;
-
-                if (maxBaseScore == 0 || maxHighestCombo == 0)
-                {
-                    Mode.Value = ScoringMode.Classic;
-                    Mode.Disabled = true;
-                }
             }
 
             baseScore = 0;

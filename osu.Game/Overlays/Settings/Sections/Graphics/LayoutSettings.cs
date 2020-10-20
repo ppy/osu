@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 new SettingsEnumDropdown<ScalingMode>
                 {
-                    LabelText = "界面缩放",
+                    LabelText = "屏幕缩放",
                     Current = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                     Keywords = new[] { "scale", "letterbox" },
                 },
