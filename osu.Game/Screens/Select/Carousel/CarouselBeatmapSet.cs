@@ -12,6 +12,21 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
+        public override float TotalHeight
+        {
+            get
+            {
+                switch (State.Value)
+                {
+                    case CarouselItemState.Selected:
+                        return DrawableCarouselBeatmapSet.HEIGHT + Children.Count(c => c.Visible) * DrawableCarouselBeatmap.HEIGHT;
+
+                    default:
+                        return DrawableCarouselBeatmapSet.HEIGHT;
+                }
+            }
+        }
+
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
@@ -27,8 +42,6 @@ namespace osu.Game.Screens.Select.Carousel
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
         }
-
-        protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
 
         protected override CarouselItem GetNextToSelect()
         {
