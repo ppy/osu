@@ -23,7 +23,6 @@ namespace osu.Game.Screens.Play
         private readonly BindableDouble trackVolumeOnEpilepsyWarning = new BindableDouble(1f);
 
         private Track track;
-        private FillFlowContainer warningContent;
 
         public EpilepsyWarning()
         {
@@ -38,7 +37,7 @@ namespace osu.Game.Screens.Play
         {
             Children = new Drawable[]
             {
-                warningContent = new FillFlowContainer
+                new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
