@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 {
                     string[] ss = split[5].Split(':');
                     endTime = Math.Max(startTime, Parsing.ParseDouble(ss[0]));
-                    readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
+                    readCustomSampleBanks(string.Join(':', ss.Skip(1)), bankInfo);
                 }
 
                 result = CreateHold(pos, combo, comboOffset, endTime + Offset - startTime);
