@@ -90,7 +90,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.HitLighting, true);
 
-            Set(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.DuringGameplay);
+            Set(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             Set(OsuSetting.ShowProgressGraph, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.FadePlayfieldWhenHealthLow, true);
