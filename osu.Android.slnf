@@ -3,6 +3,7 @@
     "path": "osu.sln",
     "projects": [
       "osu.Android\\osu.Android.csproj",
+      "M.Resources\\M.Resources.csproj",
       "osu.Game.Rulesets.Catch.Tests.Android\\osu.Game.Rulesets.Catch.Tests.Android.csproj",
       "osu.Game.Rulesets.Catch\\osu.Game.Rulesets.Catch.csproj",
       "osu.Game.Rulesets.Mania.Tests.Android\\osu.Game.Rulesets.Mania.Tests.Android.csproj",
