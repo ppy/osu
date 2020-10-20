@@ -18,6 +18,6 @@ namespace osu.Game.Skinning
         protected virtual string ComponentName => Component.ToString();
 
         public string LookupName =>
-            string.Join("/", new[] { "Gameplay", RulesetPrefix, ComponentName }.Where(s => !string.IsNullOrEmpty(s)));
+            string.Join('/', new[] { "Gameplay", RulesetPrefix, ComponentName }.Where(s => !string.IsNullOrEmpty(s)));
     }
 }

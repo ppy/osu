@@ -18,8 +18,11 @@ namespace osu.Game.Rulesets.UI
     /// A container which consumes a parent gameplay clock and standardises frame counts for children.
     /// Will ensure a minimum of 50 frames per clock second is maintained, regardless of any system lag or seeks.
     /// </summary>
-    public class FrameStabilityContainer : Container, IHasReplayHandler
+    [Cached(typeof(ISamplePlaybackDisabler))]
+    public class FrameStabilityContainer : Container, IHasReplayHandler, ISamplePlaybackDisabler
     {
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
         private readonly double gameplayStartTime;
 
         /// <summary>
@@ -35,7 +38,6 @@ namespace osu.Game.Rulesets.UI
         public GameplayClock GameplayClock => stabilityGameplayClock;
 
         [Cached(typeof(GameplayClock))]
-        [Cached(typeof(ISamplePlaybackDisabler))]
         private readonly StabilityGameplayClock stabilityGameplayClock;
 
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
@@ -101,6 +103,8 @@ namespace osu.Game.Rulesets.UI
         {
             requireMoreUpdateLoops = true;
             validState = !GameplayClock.IsPaused.Value;
+
+            samplePlaybackDisabled.Value = stabilityGameplayClock.ShouldDisableSamplePlayback;
 
             int loops = 0;
 
@@ -224,6 +228,8 @@ namespace osu.Game.Rulesets.UI
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
 
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
+
         private class StabilityGameplayClock : GameplayClock
         {
             public GameplayClock ParentGameplayClock;
@@ -237,7 +243,7 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            protected override bool ShouldDisableSamplePlayback =>
+            public override bool ShouldDisableSamplePlayback =>
                 // handle the case where playback is catching up to real-time.
                 base.ShouldDisableSamplePlayback
                 || ParentSampleDisabler?.SamplePlaybackDisabled.Value == true
