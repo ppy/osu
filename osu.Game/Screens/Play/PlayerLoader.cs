@@ -323,26 +323,29 @@ namespace osu.Game.Screens.Play
                 {
                     contentOut();
 
-                    TransformSequence<PlayerLoader> pushSequence;
+                    TransformSequence<PlayerLoader> pushSequence = this.Delay(250);
 
                     // only show if the warning was created (i.e. the beatmap needs it)
                     // and this is not a restart of the map (the warning expires after first load).
                     if (epilepsyWarning?.IsAlive == true)
                     {
-                        epilepsyWarning.State.Value = Visibility.Visible;
+                        const double epilepsy_display_length = 3000;
 
-                        pushSequence = this.Delay(3000).Schedule(() =>
+                        pushSequence.Schedule(() =>
                         {
-                            epilepsyWarning.Hide();
-                            epilepsyWarning.Expire();
+                            epilepsyWarning.State.Value = Visibility.Visible;
+
+                            this.Delay(epilepsy_display_length).Schedule(() =>
+                            {
+                                epilepsyWarning.Hide();
+                                epilepsyWarning.Expire();
+                            });
                         });
-                    }
-                    else
-                    {
-                        pushSequence = this.Delay(0);
+
+                        pushSequence.Delay(epilepsy_display_length);
                     }
 
-                    pushSequence.Delay(250).Schedule(() =>
+                    pushSequence.Schedule(() =>
                     {
                         if (!this.IsCurrentScreen()) return;
 

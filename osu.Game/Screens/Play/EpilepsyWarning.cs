@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Play
 {
     public class EpilepsyWarning : VisibilityContainer
     {
+        public const double FADE_DURATION = 500;
+
         private readonly BindableDouble trackVolumeOnEpilepsyWarning = new BindableDouble(1f);
 
         private Track track;
@@ -90,9 +92,7 @@ namespace osu.Game.Screens.Play
             this.FadeIn(FADE_DURATION, Easing.OutQuint);
         }
 
-        protected override void PopOut()
-            => this.FadeOut(500, Easing.OutQuint)
-                   .TransformBindableTo(trackVolumeOnEpilepsyWarning, 1, 500, Easing.OutQuint);
+        protected override void PopOut() => this.FadeOut(FADE_DURATION);
 
         protected override void Dispose(bool isDisposing)
         {
