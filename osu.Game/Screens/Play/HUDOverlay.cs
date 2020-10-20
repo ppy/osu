@@ -205,7 +205,9 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            // for now align with the accuracy counter. eventually this will be user customisable.
+            // HACK: for now align with the accuracy counter.
+            // this is done for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
+            // it only works with the default skin due to padding offsetting it *just enough* to coexist.
             topRightElements.Y = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
 
             bottomRightElements.Y = -Progress.Height;
