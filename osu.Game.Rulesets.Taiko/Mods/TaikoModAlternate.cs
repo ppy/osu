@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         [SettingSource("Allow any key after drum roll")]
         public BindableBool ResetAfterDrumRoll { get; } = new BindableBool();
+
         private TaikoHitObject currentHitObject;
         private TaikoHitObject lastHitObject;
         private double lastActionTime;
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     break;
 
                 // Ignore playstyle setting during drum rolls
-                case IHasDuration d:
+                case IHasDuration _:
                     blockInput = action == LastActionPressed;
                     break;
 
