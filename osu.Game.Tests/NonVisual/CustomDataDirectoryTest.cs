@@ -111,6 +111,7 @@ namespace osu.Game.Tests.NonVisual
 
                     var osu = LoadOsuIntoHost(host);
                     var storage = osu.Dependencies.Get<Storage>();
+                    var osuStorage = storage as MigratableStorage;
 
                     // Store the current storage's path. We'll need to refer to this for assertions in the original directory after the migration completes.
                     string originalDirectory = storage.GetFullPath(".");
@@ -137,13 +138,15 @@ namespace osu.Game.Tests.NonVisual
                     Assert.That(!Directory.Exists(Path.Combine(originalDirectory, "test-nested", "cache")));
                     Assert.That(storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
 
-                    foreach (var file in OsuStorage.IGNORE_FILES)
+                    Assert.That(osuStorage, Is.Not.Null);
+
+                    foreach (var file in osuStorage.IgnoreFiles)
                     {
                         Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
                         Assert.That(storage.Exists(file), Is.False);
                     }
 
-                    foreach (var dir in OsuStorage.IGNORE_DIRECTORIES)
+                    foreach (var dir in osuStorage.IgnoreDirectories)
                     {
                         Assert.That(Directory.Exists(Path.Combine(originalDirectory, dir)));
                         Assert.That(storage.ExistsDirectory(dir), Is.False);

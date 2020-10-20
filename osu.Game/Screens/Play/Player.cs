@@ -35,7 +35,8 @@ using osu.Game.Users;
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class Player : ScreenWithBeatmapBackground
+    [Cached(typeof(ISamplePlaybackDisabler))]
+    public class Player : ScreenWithBeatmapBackground, ISamplePlaybackDisabler
     {
         /// <summary>
         /// The delay upon completion of the beatmap before displaying the results screen.
@@ -54,6 +55,8 @@ namespace osu.Game.Screens.Play
 
         // We are managing our own adjustments (see OnEntering/OnExiting).
         public override bool AllowRateAdjustments => false;
+
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         /// <summary>
         /// Whether gameplay should pause when the game window focus is lost.
@@ -218,8 +221,12 @@ namespace osu.Game.Screens.Play
                 createGameplayComponents(Beatmap.Value, playableBeatmap)
             });
 
+            // also give the HUD a ruleset container to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
+            // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
+            var hudRulesetContainer = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
+
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
-            GameplayClockContainer.Add(createOverlayComponents(Beatmap.Value));
+            GameplayClockContainer.Add(hudRulesetContainer.WithChild(createOverlayComponents(Beatmap.Value)));
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -229,7 +236,11 @@ namespace osu.Game.Screens.Play
                 skipOverlay.Hide();
             }
 
-            DrawableRuleset.IsPaused.BindValueChanged(_ => updateGameplayState());
+            DrawableRuleset.IsPaused.BindValueChanged(paused =>
+            {
+                updateGameplayState();
+                samplePlaybackDisabled.Value = paused.NewValue;
+            });
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
@@ -752,5 +763,7 @@ namespace osu.Game.Screens.Play
         }
 
         #endregion
+
+        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
     }
 }

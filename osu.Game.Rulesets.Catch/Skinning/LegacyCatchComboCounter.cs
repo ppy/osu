@@ -14,13 +14,13 @@ namespace osu.Game.Rulesets.Catch.Skinning
     /// <summary>
     /// A combo counter implementation that visually behaves almost similar to stable's osu!catch combo counter.
     /// </summary>
-    public class LegacyComboCounter : CompositeDrawable, ICatchComboCounter
+    public class LegacyCatchComboCounter : CompositeDrawable, ICatchComboCounter
     {
         private readonly LegacyRollingCounter counter;
 
         private readonly LegacyRollingCounter explosion;
 
-        public LegacyComboCounter(ISkin skin)
+        public LegacyCatchComboCounter(ISkin skin)
         {
             var fontName = skin.GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score";
             var fontOverlap = skin.GetConfig<LegacySetting, float>(LegacySetting.ComboOverlap)?.Value ?? -2f;

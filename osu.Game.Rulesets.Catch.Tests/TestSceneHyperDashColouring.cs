@@ -123,7 +123,10 @@ namespace osu.Game.Rulesets.Catch.Tests
                     Origin = Anchor.Centre,
                     Scale = new Vector2(4f),
                 }, skin);
+            });
 
+            AddStep("get trails container", () =>
+            {
                 trails = catcherArea.OfType<CatcherTrailDisplay>().Single();
                 catcherArea.MovableCatcher.SetHyperDashState(2);
             });

@@ -145,9 +145,17 @@ namespace osu.Game.Rulesets.Catch.UI
                 }
             };
 
-            trailsTarget.Add(trails = new CatcherTrailDisplay(this));
+            trails = new CatcherTrailDisplay(this);
 
             updateCatcher();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // don't add in above load as we may potentially modify a parent in an unsafe manner.
+            trailsTarget.Add(trails);
         }
 
         /// <summary>
