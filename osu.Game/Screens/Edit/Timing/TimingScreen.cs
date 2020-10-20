@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -23,6 +24,11 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         private EditorClock clock { get; set; }
+
+        public TimingScreen()
+            : base(EditorScreenMode.Timing)
+        {
+        }
 
         protected override Drawable CreateMainContent() => new GridContainer
         {
@@ -53,6 +59,12 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
+        protected override void OnTimelineLoaded(TimelineArea timelineArea)
+        {
+            base.OnTimelineLoaded(timelineArea);
+            timelineArea.Timeline.Zoom = timelineArea.Timeline.MinZoom;
+        }
+
         public class ControlPointList : CompositeDrawable
         {
             private OsuButton deleteButton;
@@ -68,6 +80,9 @@ namespace osu.Game.Screens.Edit.Timing
 
             [Resolved]
             private Bindable<ControlPointGroup> selectedGroup { get; set; }
+
+            [Resolved(canBeNull: true)]
+            private IEditorChangeHandler changeHandler { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -124,12 +139,13 @@ namespace osu.Game.Screens.Edit.Timing
                 selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
 
                 controlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
-                controlGroups.ItemsAdded += _ => createContent();
-                controlGroups.ItemsRemoved += _ => createContent();
-                createContent();
-            }
 
-            private void createContent() => table.ControlGroups = controlGroups;
+                controlGroups.BindCollectionChanged((sender, args) =>
+                {
+                    table.ControlGroups = controlGroups;
+                    changeHandler.SaveState();
+                }, true);
+            }
 
             private void delete()
             {

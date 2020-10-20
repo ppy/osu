@@ -272,7 +272,21 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("Overlay is closed", () => pauseOverlay.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestSelectionResetOnVisibilityChange()
+        {
+            showOverlay();
+            AddStep("Select last button", () => InputManager.Key(Key.Up));
+
+            hideOverlay();
+            showOverlay();
+
+            AddAssert("No button selected",
+                () => pauseOverlay.Buttons.All(button => !button.Selected.Value));
+        }
+
         private void showOverlay() => AddStep("Show overlay", () => pauseOverlay.Show());
+        private void hideOverlay() => AddStep("Hide overlay", () => pauseOverlay.Hide());
 
         private DialogButton getButton(int index) => pauseOverlay.Buttons.Skip(index).First();
 

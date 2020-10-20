@@ -10,7 +10,7 @@
         ["soft-hitnormal"],
         ["drum-hitnormal"]
       ],
-      "Samples": ["drum-hitnormal"]
+      "Samples": ["-hitnormal"]
     }, {
       "StartTime": 1875.0,
       "EndTime": 2750.0,
@@ -19,7 +19,7 @@
         ["soft-hitnormal"],
         ["drum-hitnormal"]
       ],
-      "Samples": ["drum-hitnormal"]
+      "Samples": ["-hitnormal"]
     }]
   }, {
     "StartTime": 3750.0,

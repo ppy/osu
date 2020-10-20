@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Multi
 
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
-        protected override bool ShowDragHandle => allowEdit;
-
         private Container maskingContainer;
         private Container difficultyIconContainer;
         private LinkFlowContainer beatmapText;
@@ -63,12 +61,13 @@ namespace osu.Game.Screens.Multi
 
             // TODO: edit support should be moved out into a derived class
             this.allowEdit = allowEdit;
-
             this.allowSelection = allowSelection;
 
             beatmap.BindTo(item.Beatmap);
             ruleset.BindTo(item.Ruleset);
             requiredMods.BindTo(item.RequiredMods);
+
+            ShowDragHandle.Value = allowEdit;
         }
 
         [BackgroundDependencyLoader]
@@ -104,7 +103,7 @@ namespace osu.Game.Screens.Multi
 
         private void refresh()
         {
-            difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value) { Size = new Vector2(32) };
+            difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods) { Size = new Vector2(32) };
 
             beatmapText.Clear();
             beatmapText.AddLink(Item.Beatmap.ToString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// </summary>
         protected static readonly Vector2 SPINNER_CENTRE = OsuPlayfield.BASE_SIZE / 2;
 
-        protected const float SPIN_RADIUS = 50;
+        public const float SPIN_RADIUS = 50;
 
         /// <summary>
         /// The time in ms between each ReplayFrame.

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -11,7 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Osu.UI;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 
@@ -50,6 +51,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             InternalChildren = new Drawable[]
             {
                 Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
+                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
@@ -61,7 +63,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
-                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
             };
         }
 
@@ -81,6 +82,45 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
+
+            Tracking.BindValueChanged(updateSlidingSample);
+        }
+
+        private PausableSkinnableSound slidingSample;
+
+        protected override void LoadSamples()
+        {
+            base.LoadSamples();
+
+            slidingSample?.Expire();
+            slidingSample = null;
+
+            var firstSample = HitObject.Samples.FirstOrDefault();
+
+            if (firstSample != null)
+            {
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
+                clone.Name = "sliderslide";
+
+                AddInternal(slidingSample = new PausableSkinnableSound(clone)
+                {
+                    Looping = true
+                });
+            }
+        }
+
+        public override void StopAllSamples()
+        {
+            base.StopAllSamples();
+            slidingSample?.Stop();
+        }
+
+        private void updateSlidingSample(ValueChangedEvent<bool> tracking)
+        {
+            if (tracking.NewValue)
+                slidingSample?.Play();
+            else
+                slidingSample?.Stop();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -156,6 +196,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking.Value = Ball.Tracking;
 
+            if (Tracking.Value && slidingSample != null)
+                // keep the sliding sample playing at the current tracking position
+                slidingSample.Balance.Value = CalculateSamplePlaybackBalance(Ball.X / OsuPlayfield.BASE_SIZE.X);
+
             double completionProgress = Math.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             Ball.UpdateProgress(completionProgress);
@@ -205,7 +249,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             // rather than doing it this way, we should probably attach the sample to the tail circle.
             // this can only be done after we stop using LegacyLastTick.
-            if (TailCircle.Result.Type != HitResult.Miss)
+            if (TailCircle.IsHit)
                 base.PlaySamples();
         }
 

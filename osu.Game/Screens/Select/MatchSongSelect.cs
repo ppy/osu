@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Select
             item.Ruleset.Value = Ruleset.Value;
 
             item.RequiredMods.Clear();
-            item.RequiredMods.AddRange(Mods.Value);
+            item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
         }
     }
 }
