@@ -331,18 +331,11 @@ namespace osu.Game.Screens.Play
                     {
                         const double epilepsy_display_length = 3000;
 
-                        pushSequence.Schedule(() =>
-                        {
-                            epilepsyWarning.State.Value = Visibility.Visible;
-
-                            this.Delay(epilepsy_display_length).Schedule(() =>
-                            {
-                                epilepsyWarning.Hide();
-                                epilepsyWarning.Expire();
-                            });
-                        });
-
-                        pushSequence.Delay(epilepsy_display_length);
+                        pushSequence
+                            .Schedule(() => epilepsyWarning.State.Value = Visibility.Visible)
+                            .Delay(epilepsy_display_length)
+                            .Schedule(() => epilepsyWarning.Hide())
+                            .Delay(EpilepsyWarning.FADE_DURATION);
                     }
 
                     pushSequence.Schedule(() =>
