@@ -89,17 +89,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExternalHideDoesntAffectConfig()
         {
-            bool originalConfigValue = false;
+            HUDVisibilityMode originalConfigValue = HUDVisibilityMode.HideDuringBreaks;
 
             createNew();
 
-            AddStep("get original config value", () => originalConfigValue = config.Get<bool>(OsuSetting.ShowInterface));
+            AddStep("get original config value", () => originalConfigValue = config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
-            AddAssert("config unchanged", () => originalConfigValue == config.Get<bool>(OsuSetting.ShowInterface));
+            AddAssert("config unchanged", () => originalConfigValue == config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
 
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
-            AddAssert("config unchanged", () => originalConfigValue == config.Get<bool>(OsuSetting.ShowInterface));
+            AddAssert("config unchanged", () => originalConfigValue == config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
         }
 
         [Test]
