@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
@@ -66,8 +65,6 @@ namespace osu.Game.Screens.Play
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
 
-        private readonly Container mainUIElements;
-
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
         public HUDOverlay(ScoreProcessor scoreProcessor, HealthProcessor healthProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
@@ -92,7 +89,7 @@ namespace osu.Game.Screens.Play
                         {
                             new Drawable[]
                             {
-                                mainUIElements = new Container
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
@@ -208,17 +205,11 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            float topRightOffset = 0;
+            // HACK: for now align with the accuracy counter.
+            // this is done for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
+            // it only works with the default skin due to padding offsetting it *just enough* to coexist.
+            topRightElements.Y = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
 
-            // fetch the bottom-most position of any main ui element that is anchored to the top of the screen.
-            // consider this kind of temporary.
-            foreach (var d in mainUIElements)
-            {
-                if (d is SkinnableDrawable sd && (sd.Drawable.Anchor & Anchor.y0) > 0)
-                    topRightOffset = Math.Max(sd.Drawable.ScreenSpaceDrawQuad.BottomRight.Y, topRightOffset);
-            }
-
-            topRightElements.Y = ToLocalSpace(new Vector2(0, topRightOffset)).Y;
             bottomRightElements.Y = -Progress.Height;
         }
 
