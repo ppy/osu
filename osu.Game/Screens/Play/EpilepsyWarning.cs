@@ -5,16 +5,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens.Backgrounds;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -31,16 +29,13 @@ namespace osu.Game.Screens.Play
             Alpha = 0f;
         }
 
+        public BackgroundScreenBeatmap DimmableBackground { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, IBindable<WorkingBeatmap> beatmap)
         {
             Children = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.5f),
-                },
                 warningContent = new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
@@ -88,10 +83,11 @@ namespace osu.Game.Screens.Play
 
         protected override void PopIn()
         {
-            this.FadeIn(500, Easing.InQuint)
-                .TransformBindableTo(trackVolumeOnEpilepsyWarning, 0.25, 500, Easing.InQuint);
+            this.TransformBindableTo(trackVolumeOnEpilepsyWarning, 0.25, FADE_DURATION);
 
-            warningContent.FadeIn(500, Easing.InQuint);
+            DimmableBackground?.FadeColour(OsuColour.Gray(0.5f), FADE_DURATION, Easing.OutQuint);
+
+            this.FadeIn(FADE_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
