@@ -181,7 +181,7 @@ namespace osu.Game
 
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith(@"-")).ToArray();
+                var paths = args.Where(a => !a.StartsWith('-')).ToArray();
                 if (paths.Length > 0)
                     Task.Run(() => Import(paths));
             }
@@ -289,7 +289,7 @@ namespace osu.Game
 
         public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
         {
-            if (url.StartsWith("/"))
+            if (url.StartsWith('/'))
                 url = $"{API.Endpoint}{url}";
 
             externalLinkOpener.OpenUrlExternally(url);

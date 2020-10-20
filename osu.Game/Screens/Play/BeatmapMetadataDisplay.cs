@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Play
                             AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding { Top = 20 },
                             Current = mods
-                        }
+                        },
                     },
                 }
             };

@@ -10,9 +10,11 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
@@ -22,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public abstract class ResultsScreen : OsuScreen
+    public abstract class ResultsScreen : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         protected const float BACKGROUND_BLUR = 20;
         private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
@@ -312,6 +314,22 @@ namespace osu.Game.Screens.Ranking
 
                 detachedPanel = null;
             }
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    statisticsPanel.ToggleVisibility();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         private class VerticalScrollContainer : OsuScrollContainer

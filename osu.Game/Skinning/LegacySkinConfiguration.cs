@@ -17,6 +17,8 @@ namespace osu.Game.Skinning
             Version,
             ComboPrefix,
             ComboOverlap,
+            ScorePrefix,
+            ScoreOverlap,
             AnimationFramerate,
             LayeredHitSounds
         }

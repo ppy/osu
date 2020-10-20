@@ -37,10 +37,10 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Lighten playfield during breaks",
                     Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
                 },
-                new SettingsCheckbox
+                new SettingsEnumDropdown<HUDVisibilityMode>
                 {
-                    LabelText = "Show score overlay",
-                    Current = config.GetBindable<bool>(OsuSetting.ShowInterface)
+                    LabelText = "HUD overlay visibility mode",
+                    Current = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode)
                 },
                 new SettingsCheckbox
                 {
@@ -76,8 +76,9 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsEnumDropdown<ScoringMode>
                 {
                     LabelText = "Score display mode",
-                    Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
-                }
+                    Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
+                    Keywords = new[] { "scoring" }
+                },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)

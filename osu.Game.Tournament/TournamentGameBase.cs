@@ -8,11 +8,12 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
-using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.IO;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
 using osuTK.Input;
@@ -23,13 +24,8 @@ namespace osu.Game.Tournament
     public class TournamentGameBase : OsuGameBase
     {
         private const string bracket_filename = "bracket.json";
-
         private LadderInfo ladder;
-
-        private Storage storage;
-
-        private TournamentStorage tournamentStorage;
-
+        private TournamentStorage storage;
         private DependencyContainer dependencies;
         private FileBasedIPC ipc;
 
@@ -39,15 +35,14 @@ namespace osu.Game.Tournament
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load(Storage baseStorage)
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            dependencies.CacheAs(tournamentStorage = new TournamentStorage(storage));
+            dependencies.CacheAs<Storage>(storage = new TournamentStorage(baseStorage));
+            dependencies.Cache(new TournamentVideoResourceStore(storage));
 
-            Textures.AddStore(new TextureLoaderStore(tournamentStorage));
-
-            this.storage = storage;
+            Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
             readBracket();
 

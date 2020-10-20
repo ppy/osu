@@ -197,5 +197,22 @@ namespace osu.Game.Tests.NonVisual.Filtering
             carouselItem.Filter(criteria);
             Assert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
+
+        [TestCase("202010", true)]
+        [TestCase("20201010", false)]
+        [TestCase("153", true)]
+        [TestCase("1535", false)]
+        public void TestCriteriaMatchingBeatmapIDs(string query, bool filtered)
+        {
+            var beatmap = getExampleBeatmap();
+            beatmap.OnlineBeatmapID = 20201010;
+            beatmap.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = 1535 };
+
+            var criteria = new FilterCriteria { SearchText = query };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
     }
 }
