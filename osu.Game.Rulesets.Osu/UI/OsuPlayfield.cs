@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
 
-        private readonly Bindable<bool> showPlayfieldBorder = new BindableBool();
+        private readonly Bindable<bool> playfieldBorderStyle = new BindableBool();
 
         private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
 
@@ -90,12 +90,8 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader(true)]
         private void load(OsuRulesetConfigManager config)
         {
-            config?.BindWith(OsuRulesetSetting.ShowPlayfieldBorder, showPlayfieldBorder);
-            showPlayfieldBorder.BindValueChanged(updateBorderVisibility, true);
+            config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
         }
-
-        private void updateBorderVisibility(ValueChangedEvent<bool> settingChange)
-            => playfieldBorder.State.Value = settingChange.NewValue ? Visibility.Visible : Visibility.Hidden;
 
         public override void Add(DrawableHitObject h)
         {
