@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Colour = Colour4.White.Opacity(0.5f)
+                    Colour = Colour4.White.Opacity(0.4f)
                 };
             }
 
@@ -145,7 +145,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                flashBox.FadeOutFromOne(1000);
+                if ( beatIndex % 4 == 0 || effectPoint.KiaiMode )
+                    flashBox.FadeOutFromOne(1000);
             }
         }
 
