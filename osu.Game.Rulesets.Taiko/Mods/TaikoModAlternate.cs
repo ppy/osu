@@ -18,65 +18,72 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         [SettingSource("Allow any key after drum roll")]
         public BindableBool ResetAfterDrumRoll { get; } = new BindableBool();
-
-        private TaikoAction? prevPressedAction;
-        private TaikoHitObject prevHitObject;
-        private double prevActionTime;
+        private TaikoHitObject currentHitObject;
+        private TaikoHitObject lastHitObject;
+        private double lastActionTime;
         private bool strongHitSucceeded;
         private const double strong_hit_window = 30;
 
-        protected override void ResetActionStates()
+        public override void SaveState(TaikoAction action)
         {
-            prevPressedAction = null;
+            base.SaveState(action);
+
+            lastActionTime = Interceptor.Time.Current;
+            lastHitObject = currentHitObject;
         }
 
         protected override bool OnPressed(TaikoAction action)
         {
-            if (IsBreakTime.Value)
-                return false;
-
-            var hitObject = HitObjects.FirstOrDefault(h =>
-            {
-                var time = Interceptor.Time.Current;
-                var window = (h is DrumRoll) ? ((h.NestedHitObjects.FirstOrDefault() as DrumRollTick)?.HitWindow ?? 0) : h.HitWindows.WindowFor(HitResult.Miss);
-                var endTime = (h as IHasDuration)?.EndTime ?? h.StartTime;
-                return (time > h.StartTime - window) && (time < endTime + window);
-            });
-
-            if (HighestCombo.Value == 0)
-            {
-                prevPressedAction = action;
-                prevActionTime = Interceptor.Time.Current;
-                prevHitObject = hitObject;
-
-                return false;
-            }
+            currentHitObject = getNextHitObject();
 
             bool blockInput;
 
-            var previous = HitObjects.ElementAtOrDefault(HitObjects.IndexOf(hitObject) - 1);
+            var previous = HitObjects.ElementAtOrDefault(HitObjects.IndexOf(currentHitObject) - 1);
             if ((ResetAfterDrumRoll.Value && previous is DrumRoll) || previous is Swell)
-                ResetActionStates();
+                LastActionPressed = null;
 
-            if (hitObject?.IsStrong ?? false)
-                blockInput = handleStrongHit(hitObject, action);
-            else if (hitObject is Swell)
-                blockInput = false;
-            else if (hitObject is IHasDuration)
-                blockInput = action == prevPressedAction;
-            else
-                blockInput = shouldBlock(action);
+            switch (currentHitObject)
+            {
+                // Called at the second key press to allow two keys to be pressed in succession for strong hit objects
+                case Hit h when h.IsStrong:
+                    blockInput = handleStrongHit(currentHitObject, action);
+                    break;
+
+                // Allow key mashing for swells
+                case Swell _:
+                    blockInput = false;
+                    break;
+
+                // Ignore playstyle setting during drum rolls
+                case IHasDuration d:
+                    blockInput = action == LastActionPressed;
+                    break;
+
+                default:
+                    blockInput = shouldBlock(action);
+                    break;
+            }
 
             if (!strongHitSucceeded)
-            {
-                prevPressedAction = action;
-                prevActionTime = Interceptor.Time.Current;
-                prevHitObject = hitObject;
-            }
+                SaveState(action);
 
             strongHitSucceeded = false;
 
             return blockInput;
+        }
+
+        private TaikoHitObject getNextHitObject()
+        {
+            // Get the next incoming hit object while also accounting for drum rolls and hit windows
+            return HitObjects.FirstOrDefault(h =>
+            {
+                double time = Interceptor.Time.Current;
+                double window = (h is DrumRoll)
+                    ? ((h.NestedHitObjects.FirstOrDefault() as DrumRollTick)?.HitWindow ?? 0)
+                    : h.HitWindows.WindowFor(HitResult.Miss);
+                double endTime = (h as IHasDuration)?.EndTime ?? h.StartTime;
+                return (time > h.StartTime - window) && (time < endTime + window);
+            });
         }
 
         private bool shouldBlock(TaikoAction action)
@@ -86,15 +93,15 @@ namespace osu.Game.Rulesets.Taiko.Mods
             switch (Style.Value)
             {
                 case Playstyle.KDDK:
-                    if (prevPressedAction == TaikoAction.LeftRim || prevPressedAction == TaikoAction.LeftCentre)
+                    if (LastActionPressed == TaikoAction.LeftRim || LastActionPressed == TaikoAction.LeftCentre)
                         blockInput = action == TaikoAction.LeftRim || action == TaikoAction.LeftCentre;
 
-                    if (prevPressedAction == TaikoAction.RightRim || prevPressedAction == TaikoAction.RightCentre)
+                    if (LastActionPressed == TaikoAction.RightRim || LastActionPressed == TaikoAction.RightCentre)
                         blockInput = action == TaikoAction.RightRim || action == TaikoAction.RightCentre;
                     break;
 
                 case Playstyle.KKDD:
-                    blockInput = action == prevPressedAction;
+                    blockInput = action == LastActionPressed;
                     break;
             }
 
@@ -103,14 +110,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private bool handleStrongHit(TaikoHitObject hitObject, TaikoAction action)
         {
-            if ((hitObject == prevHitObject) && (Interceptor.Time.Current - prevActionTime <= strong_hit_window))
+            if ((hitObject == lastHitObject) && (Interceptor.Time.Current - lastActionTime <= strong_hit_window))
             {
-                var actionsToCheck = (prevPressedAction, action);
+                var actionsToCheck = (LastActionPressed, action);
 
                 if (compareUnordered(actionsToCheck, (TaikoAction.LeftRim, TaikoAction.RightRim)) ||
                     compareUnordered(actionsToCheck, (TaikoAction.LeftCentre, TaikoAction.RightCentre)))
                 {
-                    ResetActionStates();
+                    LastActionPressed = null;
                     strongHitSucceeded = true;
 
                     return false;

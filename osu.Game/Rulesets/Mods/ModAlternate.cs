@@ -30,8 +30,9 @@ namespace osu.Game.Rulesets.Mods
         where THitObject : HitObject
         where TAction : struct
     {
-        protected readonly BindableBool IsBreakTime = new BindableBool();
-        protected readonly BindableInt HighestCombo = new BindableInt();
+        public readonly BindableBool IsBreakTime = new BindableBool();
+        public readonly BindableInt HighestCombo = new BindableInt();
+        public TAction? LastActionPressed { get; set; }
         protected List<THitObject> HitObjects;
         protected InputInterceptor Interceptor;
 
@@ -57,12 +58,15 @@ namespace osu.Game.Rulesets.Mods
         private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
         {
             if (!isBreakTime.NewValue)
-                ResetActionStates();
+                LastActionPressed = null;
+        }
+
+        public virtual void SaveState(TAction action)
+        {
+            LastActionPressed = action;
         }
 
         protected abstract bool OnPressed(TAction action);
-
-        protected abstract void ResetActionStates();
 
         public class InputInterceptor : Drawable, IKeyBindingHandler<TAction>
         {
@@ -73,7 +77,18 @@ namespace osu.Game.Rulesets.Mods
                 this.mod = mod;
             }
 
-            public bool OnPressed(TAction action) => mod.OnPressed(action);
+            public bool OnPressed(TAction action)
+            {
+                if (mod.IsBreakTime.Value || mod.HighestCombo.Value < 1)
+                {
+                    if (mod.HighestCombo.Value < 1)
+                        mod.SaveState(action);
+
+                    return false;
+                }
+
+                return mod.OnPressed(action);
+            }
 
             public void OnReleased(TAction action)
             {
