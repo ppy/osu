@@ -103,6 +103,20 @@ namespace osu.Game.Online.Multiplayer
         [JsonIgnore]
         public readonly Bindable<int> Position = new Bindable<int>(-1);
 
+        /// <summary>
+        /// Create a copy of this room without online information.
+        /// Should be used to create a local copy of a room for submitting in the future.
+        /// </summary>
+        public Room CreateCopy()
+        {
+            var copy = new Room();
+
+            copy.CopyFrom(this);
+            copy.RoomID.Value = null;
+
+            return copy;
+        }
+
         public void CopyFrom(Room other)
         {
             RoomID.Value = other.RoomID.Value;

@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -150,9 +151,9 @@ namespace osu.Game.Online.Leaderboards
                 switch (placeholderState = value)
                 {
                     case PlaceholderState.NetworkFailure:
-                        replacePlaceholder(new RetrievalFailurePlaceholder
+                        replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
                         {
-                            OnRetry = UpdateScores,
+                            Action = UpdateScores,
                         });
                         break;
 

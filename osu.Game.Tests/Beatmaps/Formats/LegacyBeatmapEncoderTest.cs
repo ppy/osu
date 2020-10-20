@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
     {
         private static readonly DllResourceStore beatmaps_resource_store = TestResources.GetStore();
 
-        private static IEnumerable<string> allBeatmaps = beatmaps_resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu"));
+        private static IEnumerable<string> allBeatmaps = beatmaps_resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu", StringComparison.Ordinal));
 
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)
