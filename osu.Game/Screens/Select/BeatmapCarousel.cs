@@ -590,35 +590,38 @@ namespace osu.Game.Screens.Select
             {
                 displayedRange = newDisplayRange;
 
-                var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first);
-
-                foreach (var panel in ScrollableContent.Children)
+                if (visibleItems.Count > 0)
                 {
-                    if (toDisplay.Remove(panel.Item))
+                    var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
+
+                    foreach (var panel in ScrollableContent.Children)
                     {
-                        // panel already displayed.
-                        continue;
+                        if (toDisplay.Remove(panel.Item))
+                        {
+                            // panel already displayed.
+                            continue;
+                        }
+
+                        // panel loaded as drawable but not required by visible range.
+                        // remove but only if too far off-screen
+                        if (panel.Y + panel.DrawHeight < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
+                        {
+                            // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
+                            panel.ClearTransforms();
+                            panel.Expire();
+                        }
                     }
 
-                    // panel loaded as drawable but not required by visible range.
-                    // remove but only if too far off-screen
-                    if (panel.Y < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
+                    // Add those items within the previously found index range that should be displayed.
+                    foreach (var item in toDisplay)
                     {
-                        // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
-                        panel.ClearTransforms();
-                        panel.Expire();
+                        var panel = setPool.Get(p => p.Item = item);
+
+                        panel.Depth = item.CarouselYPosition;
+                        panel.Y = item.CarouselYPosition;
+
+                        ScrollableContent.Add(panel);
                     }
-                }
-
-                // Add those items within the previously found index range that should be displayed.
-                foreach (var item in toDisplay)
-                {
-                    var panel = setPool.Get(p => p.Item = item);
-
-                    panel.Depth = item.CarouselYPosition;
-                    panel.Y = item.CarouselYPosition;
-
-                    ScrollableContent.Add(panel);
                 }
             }
 
@@ -662,7 +665,7 @@ namespace osu.Game.Screens.Select
             // as we can't be 100% sure on the size of individual carousel drawables,
             // always play it safe and extend bounds by one.
             firstIndex = Math.Max(0, firstIndex - 1);
-            lastIndex = Math.Min(visibleItems.Count, lastIndex + 1);
+            lastIndex = Math.Clamp(lastIndex + 1, firstIndex, Math.Max(0, visibleItems.Count - 1));
 
             return (firstIndex, lastIndex);
         }
@@ -762,7 +765,6 @@ namespace osu.Game.Screens.Select
                             // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
                             // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
                             // then reapply the top semi-transparent area (because carousel's screen space starts below it)
-                            // and finally add half of the panel's own height to achieve vertical centering of the panel itself
                             scrollTarget = currentY + DrawableCarouselBeatmapSet.HEIGHT - visibleHalfHeight + BleedTop;
 
                             foreach (var b in set.Beatmaps)
@@ -896,7 +898,7 @@ namespace osu.Game.Screens.Select
             /// </summary>
             public bool UserScrolling { get; private set; }
 
-            // ReSharper disable once OptionalParameterHierarchyMismatch fuck off rider
+            // ReSharper disable once OptionalParameterHierarchyMismatch 2020.3 EAP4 bug. (https://youtrack.jetbrains.com/issue/RSRP-481535?p=RIDER-51910)
             protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
             {
                 UserScrolling = true;

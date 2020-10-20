@@ -98,7 +98,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public string StoredBookmarks
         {
-            get => string.Join(",", Bookmarks);
+            get => string.Join(',', Bookmarks);
             set
             {
                 if (string.IsNullOrEmpty(value))
