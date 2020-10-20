@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Score display mode",
                     Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
                     Keywords = new[] { "scoring" }
-                }
+                },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
