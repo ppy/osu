@@ -46,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
                     return false;
 
                 // blocking touch events causes the ISourcedFromTouch versions to not be fired, potentially impeding behaviour of drawables *above* the loading layer that may utilise these.
-                // note that this will not work well if touch handling elements are beneath the this loading layer (something to consider for the future).
+                // note that this will not work well if touch handling elements are beneath this loading layer (something to consider for the future).
                 case TouchEvent _:
                     return false;
             }
