@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Ranking.Expanded
     {
         private readonly BeatmapInfo beatmap;
 
+        private StarDifficulty? difficulty;
+
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/>.
         /// </summary>
@@ -31,20 +33,33 @@ namespace osu.Game.Screens.Ranking.Expanded
         public StarRatingDisplay(BeatmapInfo beatmap)
         {
             this.beatmap = beatmap;
-            AutoSizeAxes = Axes.Both;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
+        /// </summary>
+        /// <param name="starDifficulty">The already computed <see cref="StarDifficulty"/> to display the star difficulty of.</param>
+        public StarRatingDisplay(StarDifficulty starDifficulty)
+        {
+            difficulty = starDifficulty;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, BeatmapDifficultyManager difficultyManager)
         {
-            var starRatingParts = beatmap.StarDifficulty.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
+            AutoSizeAxes = Axes.Both;
+
+            if (!difficulty.HasValue)
+                difficulty = difficultyManager.GetDifficulty(beatmap);
+
+            var starRatingParts = difficulty.Value.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
             string wholePart = starRatingParts[0];
             string fractionPart = starRatingParts[1];
             string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
-            ColourInfo backgroundColour = beatmap.DifficultyRating == DifficultyRating.ExpertPlus
+            ColourInfo backgroundColour = difficulty.Value.DifficultyRating == DifficultyRating.ExpertPlus
                 ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
-                : (ColourInfo)colours.ForDifficultyRating(beatmap.DifficultyRating);
+                : (ColourInfo)colours.ForDifficultyRating(difficulty.Value.DifficultyRating);
 
             InternalChildren = new Drawable[]
             {
