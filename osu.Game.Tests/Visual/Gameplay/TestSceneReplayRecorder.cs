@@ -3,6 +3,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +15,9 @@ using osu.Framework.Input.StateChanges;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Spectator;
 using osu.Game.Replays;
+using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
@@ -260,13 +264,27 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         internal class TestReplayRecorder : ReplayRecorder<TestAction>
         {
+            private readonly SpectatorClient client;
+
             public TestReplayRecorder(Replay target)
                 : base(target)
             {
+                var connection = new HubConnectionBuilder()
+                                 .WithUrl("http://localhost:5009/spectator")
+                                 .AddMessagePackProtocol()
+                                 // .ConfigureLogging(logging => { logging.AddConsole(); })
+                                 .Build();
+
+                connection.StartAsync().Wait();
+
+                client = new SpectatorClient(connection);
             }
 
             protected override ReplayFrame HandleFrame(Vector2 mousePosition, List<TestAction> actions, ReplayFrame previousFrame)
-                => new TestReplayFrame(Time.Current, mousePosition, actions.ToArray());
+            {
+                client.SendFrames(new FrameDataBundle(new[] { new LegacyReplayFrame(Time.Current, mousePosition.X, mousePosition.Y, ReplayButtonState.None) }));
+                return new TestReplayFrame(Time.Current, mousePosition, actions.ToArray());
+            }
         }
     }
 }
