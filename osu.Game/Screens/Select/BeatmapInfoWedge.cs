@@ -238,7 +238,7 @@ namespace osu.Game.Screens.Select
                         Shear = wedged_container_shear,
                         Children = new[]
                         {
-                            createStarRatingDisplay(beatmapInfo).With(display =>
+                            createStarRatingDisplay(starDifficulty).With(display =>
                             {
                                 display.Anchor = Anchor.TopRight;
                                 display.Origin = Anchor.TopRight;
@@ -305,8 +305,8 @@ namespace osu.Game.Screens.Select
                     StatusPill.Hide();
             }
 
-            private static Drawable createStarRatingDisplay(BeatmapInfo beatmapInfo) => beatmapInfo.StarDifficulty > 0
-                ? new StarRatingDisplay(beatmapInfo)
+            private static Drawable createStarRatingDisplay(StarDifficulty difficulty) => difficulty.Stars > 0
+                ? new StarRatingDisplay(difficulty)
                 {
                     Margin = new MarginPadding { Bottom = 5 }
                 }
