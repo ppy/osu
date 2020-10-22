@@ -188,8 +188,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     double x0 = normalizedPos0.DotProduct(s12) / d12;
                     double y0 = (normalizedPos0 - x0 * s12 / d12).L2Norm();
 
-                    double correction0Flow = MultiL2NormCorrection.FLOW_0.Evaluate(d12, x0, y0);
-                    double correction0Snap = MultiL2NormCorrection.SNAP_0.Evaluate(d12, x0, y0);
+                    double correction0Flow = AngleCorrection.FLOW_0.Evaluate(d12, x0, y0);
+                    double correction0Snap = AngleCorrection.SNAP_0.Evaluate(d12, x0, y0);
                     double correction0Stop = calcCorrection0Stop(d12, x0, y0);
 
                     flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
@@ -241,8 +241,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     double x3 = normalizedPos3.DotProduct(s12) / d12;
                     double y3 = (normalizedPos3 - x3 * s12 / d12).L2Norm();
 
-                    double correction3Flow = MultiL2NormCorrection.FLOW_3.Evaluate(d12, x3, y3);
-                    double correction3Snap = MultiL2NormCorrection.SNAP_3.Evaluate(d12, x3, y3);
+                    double correction3Flow = AngleCorrection.FLOW_3.Evaluate(d12, x3, y3);
+                    double correction3Snap = AngleCorrection.SNAP_3.Evaluate(d12, x3, y3);
 
                     flowiness123 = SpecialFunctions.Logistic((correction3Snap - correction3Flow - 0.05) * 20);
 

@@ -49,8 +49,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private L2NormCorrection[] components;
         private LinearSpline offset, scale;
 
+
+
         private static readonly double[] flow0distances = { 0.0, 1.0, 1.35, 1.7, 2.3, 3 };
-        public static readonly MultiL2NormCorrection FLOW_0 = new MultiL2NormCorrection(
+        public static readonly MultiL2NormCorrection FLOW_0_OLD = new MultiL2NormCorrection(
             distance: flow0distances,
             offset: new double[] { -11.5, -5.9, -5.4, -5.6, -2, -2 },
             scale: new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 },
@@ -93,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             });
 
         private static readonly double[] snap0distances = { 0, 1.5, 2.5, 4, 6, 8 };
-        public static readonly MultiL2NormCorrection SNAP_0 = new MultiL2NormCorrection(
+        public static readonly MultiL2NormCorrection SNAP_0_OLD = new MultiL2NormCorrection(
             distance: snap0distances,
             offset: new double[] { -1, -5, -6.7, -6.5, -4.3, -4.3 },
             scale: new double[] { 1, 0.85, 0.6, 0.8, 1, 1 },
@@ -129,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             });
 
         private static readonly double[] flow3distances = { 0, 1, 2, 3, 4 };
-        public static readonly MultiL2NormCorrection FLOW_3 = new MultiL2NormCorrection(
+        public static readonly MultiL2NormCorrection FLOW_3_OLD = new MultiL2NormCorrection(
             distance: flow3distances,
             offset: new double[] { -4, -5.3, -5.2, -2.5, -2.5 },
             scale: new double[] { 1, 1, 1, 1, 1 },
@@ -165,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             });
 
         private static readonly double[] snap3distances = { 1, 1.5, 2.5, 4, 6, 8 };
-        public static readonly MultiL2NormCorrection SNAP_3 = new MultiL2NormCorrection(
+        public static readonly MultiL2NormCorrection SNAP_3_OLD = new MultiL2NormCorrection(
             distance: snap3distances,
             offset: new double[] { -2, -2, -3, -5.4, -4.9, -4.9 },
             scale: new double[] { 1, 1, 1, 1, 1, 1 },
@@ -206,5 +208,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     scale:    new double[] { 0, 0, -0.6, -0.4, -0.3, -0.3 }
                 )
             });
+
+
     }
 }
