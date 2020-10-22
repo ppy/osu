@@ -10,10 +10,10 @@
         public double[] X { get; }
         public double[] Y { get; }
         public double[] Z { get; }
-        public double[,,] Values { get; }
+        public double[][][] Values { get; }
 
 
-        public TrilinearInterp(double[] x, double[] y, double[] z, double[,,] values)
+        public TrilinearInterp(double[] x, double[] y, double[] z, double[][][] values)
         {
             X = x;
             Y = y;
@@ -27,11 +27,11 @@
             (int yIndex, double yCoeff) = LinearInterp.FindInterpCoeffs(Y, y);
             (int zIndex, double zCoeff) = LinearInterp.FindInterpCoeffs(Z, z);
 
-            double v00 = (1 - zCoeff) * Values[xIndex, yIndex, zIndex] + (zCoeff) * Values[xIndex, yIndex, zIndex + 1];
-            double v01 = (1 - zCoeff) * Values[xIndex, yIndex + 1, zIndex] + (zCoeff) * Values[xIndex, yIndex + 1, zIndex + 1];
+            double v00 = (1 - zCoeff) * Values[xIndex][yIndex][zIndex] + (zCoeff) * Values[xIndex][yIndex][zIndex + 1];
+            double v01 = (1 - zCoeff) * Values[xIndex][yIndex + 1][zIndex] + (zCoeff) * Values[xIndex][yIndex + 1][zIndex + 1];
 
-            double v10 = (1 - zCoeff) * Values[xIndex + 1, yIndex, zIndex] + (zCoeff) * Values[xIndex + 1, yIndex, zIndex + 1];
-            double v11 = (1 - zCoeff) * Values[xIndex + 1, yIndex + 1, zIndex] + (zCoeff) * Values[xIndex + 1, yIndex + 1, zIndex + 1];
+            double v10 = (1 - zCoeff) * Values[xIndex + 1][yIndex][zIndex] + (zCoeff) * Values[xIndex + 1][yIndex][zIndex + 1];
+            double v11 = (1 - zCoeff) * Values[xIndex + 1][yIndex + 1][zIndex] + (zCoeff) * Values[xIndex + 1][yIndex + 1][zIndex + 1];
 
             double v0 = (1 - yCoeff) * v00 + yCoeff * v01;
             double v1 = (1 - yCoeff) * v10 + yCoeff * v11;

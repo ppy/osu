@@ -5,8 +5,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Interp
     public class BicubicInterp
     {
         public BicubicInterp(double[] x, double[] y, double[][] values,
-            double dxLower = 0, double dxUpper = 0,
-            double dyLower = 0, double dyUpper = 0)
+            double? dxLower = null, double? dxUpper = null,
+            double? dyLower = null, double? dyUpper = null)
         {
             xArray = x;
             this.dxLower = dxLower;
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Interp
             double d0, d1;
             if (xIndex == 0)
             {
-                d0 = dxLower;
+                d0 = dxLower ?? CubicInterp.TwoPointDerivative(x0, val0, x1, val1);
             }
             else
             {
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Interp
             }
             if (xIndex == cubicInterps.Count - 2)
             {
-                d1 = dxUpper;
+                d1 = dxUpper ?? CubicInterp.TwoPointDerivative(x0, val0, x1, val1);
             }
             else
             {
@@ -72,8 +72,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Interp
         }
 
         private double[] xArray;
-        private double dxLower;
-        private double dxUpper;
+        private double? dxLower;
+        private double? dxUpper;
         private List<CubicInterp> cubicInterps;
     }
 }
