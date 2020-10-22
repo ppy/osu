@@ -194,12 +194,13 @@ namespace osu.Game.Online.Spectator
 
         public void EndPlaying()
         {
-            if (!isConnected) return;
-
             if (!isPlaying)
                 throw new InvalidOperationException($"Cannot invoke {nameof(EndPlaying)} when not playing");
 
             isPlaying = false;
+
+            if (!isConnected) return;
+
             connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), currentState);
         }
 
