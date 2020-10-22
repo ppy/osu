@@ -31,6 +31,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             return transform?.Inverse(d, x, y) ?? (x, y);
         }
-
     }
 }
