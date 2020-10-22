@@ -3,14 +3,13 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays.Dashboard.Friends;
-using osu.Framework.Graphics;
-using osu.Game.Users;
-using osu.Game.Overlays;
-using osu.Framework.Allocation;
 using NUnit.Framework;
-using osu.Game.Online.API;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dashboard.Friends;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
