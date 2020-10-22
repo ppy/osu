@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Toolbar
             });
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
+        [BackgroundDependencyLoader]
         private void load()
         {
             apiState.BindTo(api.State);
