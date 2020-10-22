@@ -49,16 +49,12 @@ namespace osu.Game.Overlays.Toolbar
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            apiState.BindTo(api.State);
-            apiState.BindValueChanged(onlineStateChanged, true);
-        }
-
         [BackgroundDependencyLoader(true)]
         private void load(LoginOverlay login)
         {
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
+
             StateContainer = login;
         }
 

@@ -40,11 +40,7 @@ namespace osu.Game.Overlays
         {
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             Children = new Drawable[]
             {
                 new Box
