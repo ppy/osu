@@ -54,11 +54,6 @@ namespace osu.Game.Online
             apiState.BindValueChanged(onlineStateChanged, true);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-        }
-
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             switch (state.NewValue)
