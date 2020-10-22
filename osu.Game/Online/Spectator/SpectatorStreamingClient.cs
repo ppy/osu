@@ -37,6 +37,8 @@ namespace osu.Game.Online.Spectator
 
         private readonly SpectatorState currentState = new SpectatorState();
 
+        public event Action<FrameDataBundle> OnNewFrames;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -145,6 +147,7 @@ namespace osu.Game.Online.Spectator
         Task ISpectatorClient.UserSentFrames(string userId, FrameDataBundle data)
         {
             Console.WriteLine($"{connection.ConnectionId} Received frames from {userId}: {data.Frames.First()}");
+            OnNewFrames?.Invoke(data);
             return Task.CompletedTask;
         }
 
