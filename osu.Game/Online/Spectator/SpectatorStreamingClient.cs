@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -185,7 +186,7 @@ namespace osu.Game.Online.Spectator
         {
             if (!isConnected) return;
 
-            connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
+            lastSend = connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
         }
 
         public void EndPlaying()
@@ -201,21 +202,64 @@ namespace osu.Game.Online.Spectator
 
         public void WatchUser(int userId)
         {
-            if (!isConnected) return;
-
             if (watchingUsers.Contains(userId))
                 return;
 
             watchingUsers.Add(userId);
+
+            if (!isConnected) return;
+
             connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
+        }
+
+        public void StopWatchingUser(int userId)
+        {
+            watchingUsers.Remove(userId);
+
+            if (!isConnected) return;
+
+            connection.SendAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
+        }
+
+        private readonly Queue<LegacyReplayFrame> pendingFrames = new Queue<LegacyReplayFrame>();
+
+        private double lastSendTime;
+
+        private Task lastSend;
+
+        private const double time_between_sends = 200;
+
+        private const int max_pending_frames = 30;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (pendingFrames.Count > 0 && Time.Current - lastSendTime > time_between_sends)
+                purgePendingFrames();
         }
 
         public void HandleFrame(ReplayFrame frame)
         {
-            // ReSharper disable once SuspiciousTypeConversion.Global (implemented by rulesets)
             if (frame is IConvertibleReplayFrame convertible)
-                // TODO: don't send a bundle for each individual frame
-                SendFrames(new FrameDataBundle(new[] { convertible.ToLegacy(beatmap.Value.Beatmap) }));
+                pendingFrames.Enqueue(convertible.ToLegacy(beatmap.Value.Beatmap));
+
+            if (pendingFrames.Count > max_pending_frames)
+                purgePendingFrames();
+        }
+
+        private void purgePendingFrames()
+        {
+            if (lastSend?.IsCompleted == false)
+                return;
+
+            var frames = pendingFrames.ToArray();
+
+            pendingFrames.Clear();
+
+            SendFrames(new FrameDataBundle(frames));
+
+            lastSendTime = Time.Current;
         }
     }
 }
