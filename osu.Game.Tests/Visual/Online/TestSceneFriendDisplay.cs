@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOffline()
         {
-            AddStep("Populate", () => display.Users = getUsers());
+            AddStep("Populate with offline test users", () => display.Users = getUsers());
         }
 
         [Test]
@@ -80,14 +80,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestFriendDisplay : FriendDisplay
         {
-            public void Fetch()
-            {
-                base.APIStateChanged(API, APIState.Online);
-            }
-
-            public override void APIStateChanged(IAPIProvider api, APIState state)
-            {
-            }
+            public void Fetch() => PerformFetch();
         }
     }
 }
