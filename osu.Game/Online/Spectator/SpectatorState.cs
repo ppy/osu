@@ -1,3 +1,6 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -21,7 +24,7 @@ namespace osu.Game.Online.Spectator
                 Mods = mods;
         }
 
-        public bool Equals(SpectatorState other) => this.BeatmapID == other?.BeatmapID && this.Mods.SequenceEqual(other?.Mods);
+        public bool Equals(SpectatorState other) => BeatmapID == other?.BeatmapID && Mods.SequenceEqual(other?.Mods);
 
         public override string ToString() => $"Beatmap:{BeatmapID} Mods:{string.Join(',', Mods)}";
     }
