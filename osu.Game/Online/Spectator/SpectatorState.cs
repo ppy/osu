@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Game.Online.API;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Online.Spectator
 {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -20,7 +21,11 @@ namespace osu.Game.Online.Spectator
     {
         private HubConnection connection;
 
-        private readonly List<string> watchingUsers = new List<string>();
+        private readonly List<int> watchingUsers = new List<int>();
+
+        public IBindableList<int> PlayingUsers => playingUsers;
+
+        private readonly BindableList<int> playingUsers = new BindableList<int>();
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
@@ -37,7 +42,12 @@ namespace osu.Game.Online.Spectator
 
         private readonly SpectatorState currentState = new SpectatorState();
 
-        public event Action<FrameDataBundle> OnNewFrames;
+        private bool isPlaying;
+
+        /// <summary>
+        /// Called whenever new frames arrive from the server.
+        /// </summary>
+        public event Action<int, FrameDataBundle> OnNewFrames;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -82,13 +92,15 @@ namespace osu.Game.Online.Spectator
                          .Build();
 
             // until strong typed client support is added, each method must be manually bound (see https://github.com/dotnet/aspnetcore/issues/15198)
-            connection.On<string, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
-            connection.On<string, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
-            connection.On<string, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
+            connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
+            connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
+            connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
 
             connection.Closed += async ex =>
             {
                 isConnected = false;
+                playingUsers.Clear();
+
                 if (ex != null) await tryUntilConnected();
             };
 
@@ -105,6 +117,17 @@ namespace osu.Game.Online.Spectator
 
                         // success
                         isConnected = true;
+
+                        // resubscribe to watched users
+                        var users = watchingUsers.ToArray();
+                        watchingUsers.Clear();
+                        foreach (var userId in users)
+                            WatchUser(userId);
+
+                        // re-send state in case it wasn't received
+                        if (isPlaying)
+                            beginPlaying();
+
                         break;
                     }
                     catch
@@ -115,39 +138,23 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-        Task ISpectatorClient.UserBeganPlaying(string userId, SpectatorState state)
+        Task ISpectatorClient.UserBeganPlaying(int userId, SpectatorState state)
         {
-            if (connection.ConnectionId != userId)
-            {
-                if (watchingUsers.Contains(userId))
-                {
-                    Console.WriteLine($"{connection.ConnectionId} received began playing for already watched user {userId}");
-                }
-                else
-                {
-                    Console.WriteLine($"{connection.ConnectionId} requesting watch other user {userId}");
-                    WatchUser(userId);
-                    watchingUsers.Add(userId);
-                }
-            }
-            else
-            {
-                Console.WriteLine($"{connection.ConnectionId} Received user playing event for self {state}");
-            }
+            if (!playingUsers.Contains(userId))
+                playingUsers.Add(userId);
 
             return Task.CompletedTask;
         }
 
-        Task ISpectatorClient.UserFinishedPlaying(string userId, SpectatorState state)
+        Task ISpectatorClient.UserFinishedPlaying(int userId, SpectatorState state)
         {
-            Console.WriteLine($"{connection.ConnectionId} Received user finished event {state}");
+            playingUsers.Remove(userId);
             return Task.CompletedTask;
         }
 
-        Task ISpectatorClient.UserSentFrames(string userId, FrameDataBundle data)
+        Task ISpectatorClient.UserSentFrames(int userId, FrameDataBundle data)
         {
-            Console.WriteLine($"{connection.ConnectionId} Received frames from {userId}: {data.Frames.First()}");
-            OnNewFrames?.Invoke(data);
+            OnNewFrames?.Invoke(userId, data);
             return Task.CompletedTask;
         }
 
@@ -155,9 +162,21 @@ namespace osu.Game.Online.Spectator
         {
             if (!isConnected) return;
 
+            if (isPlaying)
+                throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
+
+            isPlaying = true;
+
             // transfer state at point of beginning play
             currentState.BeatmapID = beatmap.Value.BeatmapInfo.OnlineBeatmapID;
             currentState.Mods = mods.Value.Select(m => new APIMod(m));
+
+            beginPlaying();
+        }
+
+        private void beginPlaying()
+        {
+            Debug.Assert(isPlaying);
 
             connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), currentState);
         }
@@ -173,13 +192,21 @@ namespace osu.Game.Online.Spectator
         {
             if (!isConnected) return;
 
+            if (!isPlaying)
+                throw new InvalidOperationException($"Cannot invoke {nameof(EndPlaying)} when not playing");
+
+            isPlaying = false;
             connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), currentState);
         }
 
-        public void WatchUser(string userId)
+        public void WatchUser(int userId)
         {
             if (!isConnected) return;
 
+            if (watchingUsers.Contains(userId))
+                return;
+
+            watchingUsers.Add(userId);
             connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
         }
 

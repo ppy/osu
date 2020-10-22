@@ -30,12 +30,12 @@ namespace osu.Game.Online.Spectator
         /// For offline users, a subscription will be created and data will begin streaming on next play.
         /// </summary>
         /// <param name="userId">The user to subscribe to.</param>
-        Task StartWatchingUser(string userId);
+        Task StartWatchingUser(int userId);
 
         /// <summary>
         /// Stop requesting spectating data for the specified user. Unsubscribes from receiving further data.
         /// </summary>
         /// <param name="userId">The user to unsubscribe from.</param>
-        Task EndWatchingUser(string userId);
+        Task EndWatchingUser(int userId);
     }
 }

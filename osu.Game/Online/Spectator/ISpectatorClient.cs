@@ -12,20 +12,20 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         /// <param name="userId">The user.</param>
         /// <param name="state">The state of gameplay.</param>
-        Task UserBeganPlaying(string userId, SpectatorState state);
+        Task UserBeganPlaying(int userId, SpectatorState state);
 
         /// <summary>
         /// Signals that a user has finished a play session.
         /// </summary>
         /// <param name="userId">The user.</param>
         /// <param name="state">The state of gameplay.</param>
-        Task UserFinishedPlaying(string userId, SpectatorState state);
+        Task UserFinishedPlaying(int userId, SpectatorState state);
 
         /// <summary>
         /// Called when new frames are available for a subscribed user's play session.
         /// </summary>
         /// <param name="userId">The user.</param>
         /// <param name="data">The frame data.</param>
-        Task UserSentFrames(string userId, FrameDataBundle data);
+        Task UserSentFrames(int userId, FrameDataBundle data);
     }
 }
