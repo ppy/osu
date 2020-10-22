@@ -50,13 +50,13 @@ namespace osu.Game.Rulesets.UI
 
             inputManager = GetContainingInputManager();
 
-            spectatorStreaming?.BeginPlaying(beatmap.Value.BeatmapInfo.ID);
+            spectatorStreaming?.BeginPlaying();
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            spectatorStreaming?.EndPlaying(beatmap.Value.BeatmapInfo.ID);
+            spectatorStreaming?.EndPlaying();
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)

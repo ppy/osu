@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 
@@ -29,6 +30,11 @@ namespace osu.Game.Online.Spectator
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+
+        private readonly SpectatorState currentState = new SpectatorState();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -73,9 +79,9 @@ namespace osu.Game.Online.Spectator
                          .Build();
 
             // until strong typed client support is added, each method must be manually bound (see https://github.com/dotnet/aspnetcore/issues/15198)
-            connection.On<string, int>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
+            connection.On<string, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
             connection.On<string, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
-            connection.On<string, int>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
+            connection.On<string, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
 
             connection.Closed += async ex =>
             {
@@ -106,7 +112,7 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-        Task ISpectatorClient.UserBeganPlaying(string userId, int beatmapId)
+        Task ISpectatorClient.UserBeganPlaying(string userId, SpectatorState state)
         {
             if (connection.ConnectionId != userId)
             {
@@ -123,15 +129,15 @@ namespace osu.Game.Online.Spectator
             }
             else
             {
-                Console.WriteLine($"{connection.ConnectionId} Received user playing event for self {beatmapId}");
+                Console.WriteLine($"{connection.ConnectionId} Received user playing event for self {state}");
             }
 
             return Task.CompletedTask;
         }
 
-        Task ISpectatorClient.UserFinishedPlaying(string userId, int beatmapId)
+        Task ISpectatorClient.UserFinishedPlaying(string userId, SpectatorState state)
         {
-            Console.WriteLine($"{connection.ConnectionId} Received user finished event {beatmapId}");
+            Console.WriteLine($"{connection.ConnectionId} Received user finished event {state}");
             return Task.CompletedTask;
         }
 
@@ -155,11 +161,11 @@ namespace osu.Game.Online.Spectator
             connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
         }
 
-        public void EndPlaying(int beatmapId)
+        public void EndPlaying()
         {
             if (!isConnected) return;
 
-            connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), beatmapId);
+            connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), currentState);
         }
 
         public void WatchUser(string userId)
@@ -171,6 +177,7 @@ namespace osu.Game.Online.Spectator
 
         public void HandleFrame(ReplayFrame frame)
         {
+            // ReSharper disable once SuspiciousTypeConversion.Global (implemented by rulesets)
             if (frame is IConvertibleReplayFrame convertible)
                 // TODO: don't send a bundle for each individual frame
                 SendFrames(new FrameDataBundle(new[] { convertible.ToLegacy(beatmap.Value.Beatmap) }));
