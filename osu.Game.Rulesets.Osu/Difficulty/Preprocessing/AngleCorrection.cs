@@ -10,8 +10,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
     {
         public double Evaluate(double distance1, double x, double y)
         {
-            double distance2scale = 1 / d2Scale(distance1);
-            (x, y) = (distance2scale * x, distance2scale * y);
+            if (d2Scale != null)
+            {
+                double distance2scale = 1 / d2Scale(distance1);
+                (x, y) = (distance2scale * x, distance2scale * y);
+            }
 
             double angle = Math.Abs(Math.Atan2(y, x));
             double distance2 = Math.Sqrt(x * x + y * y);
