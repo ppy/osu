@@ -161,8 +161,6 @@ namespace osu.Game.Online.Spectator
 
         public void BeginPlaying()
         {
-            if (!isConnected) return;
-
             if (isPlaying)
                 throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
 
@@ -178,6 +176,8 @@ namespace osu.Game.Online.Spectator
         private void beginPlaying()
         {
             Debug.Assert(isPlaying);
+
+            if (!isConnected) return;
 
             connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), currentState);
         }
