@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using MessagePack;
 using osu.Game.Rulesets.Replays;
 using osuTK;
 
@@ -9,7 +8,6 @@ namespace osu.Game.Replays.Legacy
 {
     public class LegacyReplayFrame : ReplayFrame
     {
-        [IgnoreMember]
         public Vector2 Position => new Vector2(MouseX ?? 0, MouseY ?? 0);
 
         public float? MouseX;
