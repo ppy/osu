@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Toolbar
             StateContainer = login;
         }
 
-        private void onlineStateChanged(ValueChangedEvent<APIState> state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             switch (state.NewValue)
             {
@@ -72,6 +72,6 @@ namespace osu.Game.Overlays.Toolbar
                     avatar.User = api.LocalUser.Value;
                     break;
             }
-        }
+        });
     }
 }
