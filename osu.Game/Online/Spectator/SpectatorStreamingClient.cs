@@ -23,7 +23,7 @@ namespace osu.Game.Online.Spectator
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }

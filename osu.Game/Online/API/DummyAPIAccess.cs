@@ -20,6 +20,8 @@ namespace osu.Game.Online.API
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
+        public string AccessToken => "token";
+
         public bool IsLoggedIn => State.Value == APIState.Online;
 
         public string ProvidedUsername => LocalUser.Value.Username;
