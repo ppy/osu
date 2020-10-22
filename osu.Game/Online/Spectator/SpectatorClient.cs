@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
-using osu.Server.Spectator.Hubs;
 
 namespace osu.Game.Online.Spectator
 {
