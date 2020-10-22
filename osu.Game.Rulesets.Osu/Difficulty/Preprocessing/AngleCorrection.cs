@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Game.Rulesets.Osu.Difficulty.Interp;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
@@ -41,110 +40,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             interp = new TricubicInterp(d1, d2, angles, values, dzLower: 0, dzUpper: 0);
         }
 
-        /// <summary>
-        /// Create a new AngleCorrection by resampling another correction
-        /// </summary>
-        public AngleCorrection(MultiL2NormCorrection correction, double[] d1, double[] d2, double[] angle, string print_name = "", bool print = true,
-            CubicInterp min=null, CubicInterp max=null, Transform posTransform=null)
-        {
-            this.posTransform = posTransform;
-            this.min = min;
-            this.max = max;
-            double[][][] values = new double[d1.Length][][];
-            for (int i = 0; i < d1.Length; ++i)
-            {
-                values[i] = new double[d2.Length][];
-                for (int j = 0; j < d2.Length; ++j)
-                {
-                    values[i][j] = new double[angle.Length];
-                    for (int k = 0; k < angle.Length; ++k)
-                    {
-                        double distance = d1[i];
-                        (double x, double y) = Transform.Inverse(posTransform, distance, d2[j] * Math.Cos(angle[k]), d2[j] * Math.Abs(Math.Sin(angle[k])));
-                        double maxVal = max?.Evaluate(distance) ?? 1;
-                        double minVal = min?.Evaluate(distance) ?? 0;
-                        double scale = maxVal - minVal;
-
-                        double corr = correction.Evaluate(distance, x, y);
-
-                        values[i][j][k] = Math.Clamp((corr - minVal)/scale,0,1);
-                    }
-                }
-            }
-            if (print_name.Length != 0 && print)
-            {
-                string indent = "    ";
-                string indent2 = indent + indent;
-                string indent3 = indent2 + indent;
-                string indent4 = indent3 + indent;
-                string indent5 = indent4 + indent;
-
-                Console.WriteLine($"{indent2}public static readonly AngleCorrection {print_name} = new AngleCorrection(");
-
-                Console.WriteLine($"{indent3}d1: new double[]{{ {string.Join(", ", d1)} }},");
-                Console.WriteLine($"{indent3}d2: new double[]{{ {string.Join(", ", d2)} }},");
-                Console.WriteLine($"{indent3}angles: angles,");
-                if (min != null) Console.WriteLine($"{indent3}min: min,");
-                if (max != null) Console.WriteLine($"{indent3}max: max,");
-                if (posTransform != null) Console.WriteLine($"{indent3}posTransform: posTransform,");
-                Console.WriteLine($"{indent3}values: new double[,,]{{");
-
-                for (int i=0; i<d1.Length; ++i)
-                {
-                    Console.WriteLine($"{indent4}{{ // d1={d1[i]}");
-                    Console.WriteLine($"{indent5}// 0,   45,   90,   135,   180 degrees ");
-                    for (int j = 0; j < d2.Length; ++j)
-                    {
-                        Console.WriteLine($"{indent4}{indent}{{ {string.Join(", ", values[i][j].Select(x => x.ToString("F2")))} }}, // d2={d2[j]}");
-                    }
-                    Console.WriteLine($"{indent4}}},");
-                }
-                Console.WriteLine($"{indent3}}});\n");
-            }
-
-            interp = new TricubicInterp(d1, d2, angle, values, dzLower: 0, dzUpper: 0);
-        }
-
-
         private TricubicInterp interp;
         private CubicInterp min, max;
         private Transform posTransform;
-
 
         private const double angle = Math.PI / 4.0;
         private static readonly double[] angles = { 0, angle, 2 * angle, 3 * angle, 4 * angle };
         private static readonly Transform snap_scale_transform = new Transform { Scale = d => Math.Clamp(d, 2, 5) };
         private static readonly CubicInterp snap_0_max = new CubicInterp(new double[] { 0, 1.5, 2.5, 4, 6, 6.01 }, new double[] { 1, 0.85, 0.6, 0.8, 1, 1 });
-
-
-
-
-
-        /*
-        // code to resample original corrections
-        private static readonly double[] flow_0_distances = { 0.2, 0.6, 1, 1.3, 1.7, 2.1 };
-        private static readonly double[] flowdistances2 = { 0.1, 0.6, 1, 1.3, 1.8, 3.0 };
-
-
-        private static readonly double[] snapdistances = { 0.6, 1.5, 2.4, 3.5, 5, 6.5, 9 };
-        private static readonly double[] snapdistances2 = { 0, 0.5, 1, 1.5, 2.5 };
-
-        private static readonly double[] flow_3_distances = { 0.2, 0.6, 1, 1.5, 2.8 };
-
-
-        public static readonly AngleCorrection FLOW_0 = new AngleCorrection(MultiL2NormCorrection.FLOW_0_OLD, flow_0_distances, flowdistances2, angles, "FLOW_0");
-        //public static readonly MultiL2NormCorrection FLOW_0 = MultiL2NormCorrection.FLOW_0_OLD;
-
-        public static readonly AngleCorrection FLOW_3 = new AngleCorrection(MultiL2NormCorrection.FLOW_3_OLD, flow_3_distances, flowdistances2, angles, "FLOW_3");
-        //public static readonly MultiL2NormCorrection FLOW_3 = MultiL2NormCorrection.FLOW_3_OLD;
-
-        public static readonly AngleCorrection SNAP_0 = new AngleCorrection(MultiL2NormCorrection.SNAP_0_OLD, snapdistances, snapdistances2, angles, "SNAP_0", max: snap_0_max, posTransform: snap_scale_transform);
-        //public static readonly MultiL2NormCorrection SNAP_0 = MultiL2NormCorrection.SNAP_0_OLD;
-
-        public static readonly AngleCorrection SNAP_3 = new AngleCorrection(MultiL2NormCorrection.SNAP_3_OLD, snapdistances, snapdistances2, angles, "SNAP_3", posTransform: snap_scale_transform);
-        //public static readonly MultiL2NormCorrection SNAP_3 = MultiL2NormCorrection.SNAP_3_OLD;
-        */
-
 
         public static readonly AngleCorrection FLOW_0 = new AngleCorrection(
             d1: new double[] { 0.2, 0.6, 1, 1.3, 1.7, 2.1 },
