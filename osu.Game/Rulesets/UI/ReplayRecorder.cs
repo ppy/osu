@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 using osuTK;
@@ -60,6 +62,9 @@ namespace osu.Game.Rulesets.UI
             recordFrame(true);
         }
 
+        [Resolved(canBeNull: true)]
+        private SpectatorStreamingClient spectatorStreaming { get; set; }
+
         private void recordFrame(bool important)
         {
             var last = target.Frames.LastOrDefault();
@@ -72,7 +77,11 @@ namespace osu.Game.Rulesets.UI
             var frame = HandleFrame(position, pressedActions, last);
 
             if (frame != null)
+            {
                 target.Frames.Add(frame);
+
+                spectatorStreaming?.HandleFrame(frame);
+            }
         }
 
         protected abstract ReplayFrame HandleFrame(Vector2 mousePosition, List<T> actions, ReplayFrame previousFrame);
