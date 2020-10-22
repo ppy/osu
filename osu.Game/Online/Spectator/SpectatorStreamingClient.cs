@@ -154,7 +154,7 @@ namespace osu.Game.Online.Spectator
 
             // transfer state at point of beginning play
             currentState.BeatmapID = beatmap.Value.BeatmapInfo.OnlineBeatmapID;
-            currentState.Mods = mods.Value.ToArray();
+            currentState.Mods = mods.Value.Select(m => new APIMod(m));
 
             connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), currentState);
         }
