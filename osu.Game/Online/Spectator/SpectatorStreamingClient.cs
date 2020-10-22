@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -75,7 +76,7 @@ namespace osu.Game.Online.Spectator
                          {
                              options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
                          })
-                         .AddMessagePackProtocol()
+                         .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
                          .Build();
 
             // until strong typed client support is added, each method must be manually bound (see https://github.com/dotnet/aspnetcore/issues/15198)
@@ -147,11 +148,15 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        public void BeginPlaying(int beatmapId)
+        public void BeginPlaying()
         {
             if (!isConnected) return;
 
-            connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), beatmapId);
+            // transfer state at point of beginning play
+            currentState.BeatmapID = beatmap.Value.BeatmapInfo.OnlineBeatmapID;
+            currentState.Mods = mods.Value.ToArray();
+
+            connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), currentState);
         }
 
         public void SendFrames(FrameDataBundle data)
