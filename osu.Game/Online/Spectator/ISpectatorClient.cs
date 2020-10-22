@@ -11,15 +11,15 @@ namespace osu.Game.Online.Spectator
         /// Signals that a user has begun a new play session.
         /// </summary>
         /// <param name="userId">The user.</param>
-        /// <param name="beatmapId">The beatmap the user is playing.</param>
-        Task UserBeganPlaying(string userId, int beatmapId);
+        /// <param name="state">The state of gameplay.</param>
+        Task UserBeganPlaying(string userId, SpectatorState state);
 
         /// <summary>
         /// Signals that a user has finished a play session.
         /// </summary>
         /// <param name="userId">The user.</param>
-        /// <param name="beatmapId">The beatmap the user has finished playing.</param>
-        Task UserFinishedPlaying(string userId, int beatmapId);
+        /// <param name="state">The state of gameplay.</param>
+        Task UserFinishedPlaying(string userId, SpectatorState state);
 
         /// <summary>
         /// Called when new frames are available for a subscribed user's play session.
