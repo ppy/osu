@@ -20,6 +20,11 @@ namespace osu.Game.Online.API
         Bindable<UserActivity> Activity { get; }
 
         /// <summary>
+        /// Retrieve the OAuth access token.
+        /// </summary>
+        public string AccessToken { get; }
+
+        /// <summary>
         /// Returns whether the local user is logged in.
         /// </summary>
         bool IsLoggedIn { get; }
