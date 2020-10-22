@@ -55,6 +55,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                         foreach (int user in args.NewItems)
                             streamingClient.WatchUser(user);
                         break;
+
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (int user in args.OldItems)
+                            streamingClient.StopWatchingUser(user);
+                        break;
                 }
             }, true);
 
