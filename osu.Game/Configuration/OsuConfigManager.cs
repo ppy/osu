@@ -130,7 +130,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
-            Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
+            Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Seasonal);
         }
 
         public OsuConfigManager(Storage storage)
