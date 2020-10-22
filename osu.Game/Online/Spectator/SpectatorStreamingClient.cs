@@ -3,24 +3,70 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Game.Online.API;
 
 namespace osu.Game.Online.Spectator
 {
-    public class SpectatorClient : ISpectatorClient
+    public class SpectatorStreamingClient : Component, ISpectatorClient
     {
-        private readonly HubConnection connection;
+        private HubConnection connection;
 
         private readonly List<string> watchingUsers = new List<string>();
 
-        public SpectatorClient(HubConnection connection)
-        {
-            this.connection = connection;
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
-            // this is kind of SILLY
-            // https://github.com/dotnet/aspnetcore/issues/15198
+        [Resolved]
+        private APIAccess api { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(apiStateChanged, true);
+        }
+
+        private void apiStateChanged(ValueChangedEvent<APIState> state)
+        {
+            switch (state.NewValue)
+            {
+                case APIState.Failing:
+                case APIState.Offline:
+                    connection?.StopAsync();
+                    connection = null;
+                    break;
+
+                case APIState.Online:
+                    connect();
+                    break;
+            }
+        }
+
+#if DEBUG
+        private const string endpoint = "http://localhost:5009/spectator";
+#else
+        private const string endpoint = "https://spectator.ppy.sh/spectator";
+#endif
+
+        private void connect()
+        {
+            connection = new HubConnectionBuilder()
+                         .WithUrl(endpoint, options =>
+                         {
+                             options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
+                         })
+                         .AddMessagePackProtocol()
+                         .Build();
+
+            // until strong typed client support is added, each method must be manually bound (see https://github.com/dotnet/aspnetcore/issues/15198)
             connection.On<string, int>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
             connection.On<string, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
             connection.On<string, int>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
+
+            connection.StartAsync();
         }
 
         Task ISpectatorClient.UserBeganPlaying(string userId, int beatmapId)
