@@ -33,6 +33,15 @@ namespace osu.Game.Overlays
         {
         }
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -130,13 +139,13 @@ namespace osu.Game.Overlays
             }
         }
 
-        public override void APIStateChanged(IAPIProvider api, APIState state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             if (State.Value == Visibility.Hidden)
                 return;
 
             Header.Current.TriggerChange();
-        }
+        });
 
         protected override void Dispose(bool isDisposing)
         {

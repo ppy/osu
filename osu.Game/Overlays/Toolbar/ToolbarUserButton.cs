@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
@@ -14,9 +15,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarUserButton : ToolbarOverlayToggleButton, IOnlineComponent
+    public class ToolbarUserButton : ToolbarOverlayToggleButton
     {
         private readonly UpdateableAvatar avatar;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         public ToolbarUserButton()
         {
@@ -43,17 +49,22 @@ namespace osu.Game.Overlays.Toolbar
             });
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(IAPIProvider api, LoginOverlay login)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load()
         {
-            api.Register(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
+        }
 
+        [BackgroundDependencyLoader(true)]
+        private void load(LoginOverlay login)
+        {
             StateContainer = login;
         }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state)
         {
-            switch (state)
+            switch (state.NewValue)
             {
                 default:
                     Text = @"Guest";
