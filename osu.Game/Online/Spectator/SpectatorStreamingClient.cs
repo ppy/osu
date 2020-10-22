@@ -22,6 +22,8 @@ namespace osu.Game.Online.Spectator
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
+        private bool isConnected;
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -46,7 +48,7 @@ namespace osu.Game.Online.Spectator
                     break;
 
                 case APIState.Online:
-                    connect();
+                    Task.Run(connect);
                     break;
             }
         }
@@ -57,8 +59,11 @@ namespace osu.Game.Online.Spectator
         private const string endpoint = "https://spectator.ppy.sh/spectator";
 #endif
 
-        private void connect()
+        private async Task connect()
         {
+            if (connection != null)
+                return;
+
             connection = new HubConnectionBuilder()
                          .WithUrl(endpoint, options =>
                          {
@@ -72,7 +77,33 @@ namespace osu.Game.Online.Spectator
             connection.On<string, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
             connection.On<string, int>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
 
-            connection.StartAsync();
+            connection.Closed += async ex =>
+            {
+                isConnected = false;
+                if (ex != null) await tryUntilConnected();
+            };
+
+            await tryUntilConnected();
+
+            async Task tryUntilConnected()
+            {
+                while (api.State.Value == APIState.Online)
+                {
+                    try
+                    {
+                        // reconnect on any failure
+                        await connection.StartAsync();
+
+                        // success
+                        isConnected = true;
+                        break;
+                    }
+                    catch
+                    {
+                        await Task.Delay(5000);
+                    }
+                }
+            }
         }
 
         Task ISpectatorClient.UserBeganPlaying(string userId, int beatmapId)
@@ -106,17 +137,37 @@ namespace osu.Game.Online.Spectator
 
         Task ISpectatorClient.UserSentFrames(string userId, FrameDataBundle data)
         {
-            Console.WriteLine($"{connection.ConnectionId} Received frames from {userId}: {data.Frames.First().ToString()}");
+            Console.WriteLine($"{connection.ConnectionId} Received frames from {userId}: {data.Frames.First()}");
             return Task.CompletedTask;
         }
 
-        public Task BeginPlaying(int beatmapId) => connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), beatmapId);
+        public void BeginPlaying(int beatmapId)
+        {
+            if (!isConnected) return;
 
-        public Task SendFrames(FrameDataBundle data) => connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
+            connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), beatmapId);
+        }
 
-        public Task EndPlaying(int beatmapId) => connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), beatmapId);
+        public void SendFrames(FrameDataBundle data)
+        {
+            if (!isConnected) return;
 
-        private Task WatchUser(string userId) => connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
+            connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
+        }
+
+        public void EndPlaying(int beatmapId)
+        {
+            if (!isConnected) return;
+
+            connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), beatmapId);
+        }
+
+        public void WatchUser(string userId)
+        {
+            if (!isConnected) return;
+
+            connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
+        }
 
         public void HandleFrame(ReplayFrame frame)
         {
