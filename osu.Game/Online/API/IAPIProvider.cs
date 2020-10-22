@@ -11,11 +11,13 @@ namespace osu.Game.Online.API
     {
         /// <summary>
         /// The local user.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         Bindable<User> LocalUser { get; }
 
         /// <summary>
         /// The current user's activity.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         Bindable<UserActivity> Activity { get; }
 
@@ -35,6 +37,10 @@ namespace osu.Game.Online.API
         /// </summary>
         string Endpoint { get; }
 
+        /// <summary>
+        /// The current connection state of the API.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// </summary>
         IBindable<APIState> State { get; }
 
         /// <summary>
