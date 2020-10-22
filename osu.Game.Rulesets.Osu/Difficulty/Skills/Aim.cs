@@ -79,6 +79,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (movements.Count < missSectionAmount)
                 missSectionAmount = movements.Count;
 
+            if (movements.Count == 0)
+            {
+                return new AimAttributes
+                {
+                    FcProbabilityThroughput = 0.0,
+                    HiddenFactor = 0.0,
+                    ComboThroughputs = Array.Empty<double>(),
+                    MissThroughputs = Array.Empty<double>(),
+                    MissCounts = Array.Empty<double>(),
+                    CheeseNoteCount = 0.0,
+                    CheeseLevels = Array.Empty<double>(),
+                    CheeseFactors = Array.Empty<double>()
+                };
+            }
+
             var mapHitProbs = new HitProbabilities(movements, default_cheese_level, difficultyCount: comboSectionAmount);
             double fcProbTp = calculateFcProbTp(movements);
             double fcProbTpHidden = calculateFcProbTp(movementsHidden);
@@ -127,20 +142,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // the rest
             for (int i = 1; i < hitObjects.Count; i++)
             {
-                var objMinus2 = i > 3 ? hitObjects[i - 4] : null;
-                var obj0 = i > 1 ? hitObjects[i - 2] : null;
-                var obj1 = hitObjects[i - 1];
-                var obj2 = hitObjects[i];
-                var obj3 = i < hitObjects.Count - 1 ? hitObjects[i + 1] : null;
+                var objNeg4 = i > 3 ? hitObjects[i - 4] : null;
+                var objNeg2 = i > 1 ? hitObjects[i - 2] : null;
+                var objPrev = hitObjects[i - 1];
+                var objCurr = hitObjects[i];
+                var objNext = i < hitObjects.Count - 1 ? hitObjects[i + 1] : null;
                 var tapStrain = strainHistory[i];
 
                 if (hidden)
                 {
-                    movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate,
-                        hidden: true, noteDensity: noteDensities[i], objMinus2: objMinus2));
+                    movements.AddRange(OsuMovement.ExtractMovement(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate,
+                        hidden: true, noteDensity: noteDensities[i], objNeg4: objNeg4));
                 }
                 else
-                    movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate, objMinus2: objMinus2));
+                    movements.AddRange(OsuMovement.ExtractMovement(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate, objNeg4: objNeg4));
             }
 
             return movements;
@@ -267,7 +282,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             foreach (var movement in movements)
             {
-                double cheeseness = SpecialFunctions.Logistic((movement.Ip12 / tp - 0.6) * 15) * movement.Cheesablility;
+                double cheeseness = SpecialFunctions.Logistic((movement.IndexOfPerformance / tp - 0.6) * 15) * movement.Cheesablility;
                 count += cheeseness;
             }
 

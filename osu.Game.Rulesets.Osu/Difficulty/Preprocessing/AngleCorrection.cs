@@ -46,10 +46,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private const double angle = Math.PI / 4.0;
         private static readonly double[] angles = { 0, angle, 2 * angle, 3 * angle, 4 * angle };
-        private static readonly Transform snap_scale_transform = new Transform { Scale = d => Math.Clamp(d, 2, 5) };
-        private static readonly CubicInterp snap_0_max = new CubicInterp(new double[] { 0, 1.5, 2.5, 4, 6, 6.01 }, new double[] { 1, 0.85, 0.6, 0.8, 1, 1 });
 
-        public static readonly AngleCorrection FLOW_0 = new AngleCorrection(
+        public static readonly AngleCorrection FLOW_NEG2 = new AngleCorrection(
             d1: new double[] { 0.2, 0.6, 1, 1.3, 1.7, 2.1 },
             d2: new double[] { 0.1, 0.6, 1, 1.3, 1.8, 3 },
             angles: angles,
@@ -110,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 },
     });
 
-        public static readonly AngleCorrection FLOW_3 = new AngleCorrection(
+        public static readonly AngleCorrection FLOW_NEXT = new AngleCorrection(
             d1: new double[] { 0.2, 0.6, 1, 1.5, 2.8 },
             d2: new double[] { 0.1, 0.6, 1, 1.3, 1.8, 3 },
             angles: angles,
@@ -162,11 +160,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 },
             });
 
-        public static readonly AngleCorrection SNAP_0 = new AngleCorrection(
+        private static readonly Transform snap_scale_transform = new Transform { Scale = d => Math.Clamp(d, 2, 5) };
+        private static readonly CubicInterp snap_neg2_max = new CubicInterp(new double[] { 0, 1.5, 2.5, 4, 6, 6.01 }, new double[] { 1, 0.85, 0.6, 0.8, 1, 1 });
+
+        public static readonly AngleCorrection SNAP_NEG2 = new AngleCorrection(
             d1: new double[] { 0.6, 1.5, 2.4, 3.5, 5, 6.5, 9 },
             d2: new double[] { 0, 0.5, 1, 1.5, 2.5 },
             angles: angles,
-            max: snap_0_max,
+            max: snap_neg2_max,
             posTransform: snap_scale_transform,
             values: new double[,,]{
                 { // d1=0.6
@@ -227,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 },
             });
 
-        public static readonly AngleCorrection SNAP_3 = new AngleCorrection(
+        public static readonly AngleCorrection SNAP_NEXT = new AngleCorrection(
             d1: new double[] { 0.6, 1.5, 2.4, 3.5, 5, 6.5, 9 },
             d2: new double[] { 0, 0.5, 1, 1.5, 2.5 },
             angles: angles,
