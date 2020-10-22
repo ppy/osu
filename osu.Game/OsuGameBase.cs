@@ -250,8 +250,11 @@ namespace osu.Game
 
             FileStore.Cleanup();
 
+            // add api components to hierarchy.
             if (API is APIAccess apiAccess)
                 AddInternal(apiAccess);
+            AddInternal(spectatorStreaming);
+
             AddInternal(RulesetConfigCache);
 
             MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };

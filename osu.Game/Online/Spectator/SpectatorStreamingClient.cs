@@ -7,7 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Replays.Types;
 
 namespace osu.Game.Online.Spectator
 {
@@ -21,6 +24,9 @@ namespace osu.Game.Online.Spectator
 
         [Resolved]
         private APIAccess api { get; set; }
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -111,5 +117,12 @@ namespace osu.Game.Online.Spectator
         public Task EndPlaying(int beatmapId) => connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), beatmapId);
 
         private Task WatchUser(string userId) => connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
+
+        public void HandleFrame(ReplayFrame frame)
+        {
+            if (frame is IConvertibleReplayFrame convertible)
+                // TODO: don't send a bundle for each individual frame
+                SendFrames(new FrameDataBundle(new[] { convertible.ToLegacy(beatmap.Value.Beatmap) }));
+        }
     }
 }
