@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
@@ -27,6 +29,12 @@ namespace osu.Game.Rulesets.UI
 
         public int RecordFrameRate = 60;
 
+        [Resolved(canBeNull: true)]
+        private SpectatorStreamingClient spectatorStreaming { get; set; }
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
         protected ReplayRecorder(Replay target)
         {
             this.target = target;
@@ -41,6 +49,14 @@ namespace osu.Game.Rulesets.UI
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+
+            spectatorStreaming?.BeginPlaying(beatmap.Value.BeatmapInfo.ID);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            spectatorStreaming?.EndPlaying(beatmap.Value.BeatmapInfo.ID);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -61,9 +77,6 @@ namespace osu.Game.Rulesets.UI
             pressedActions.Remove(action);
             recordFrame(true);
         }
-
-        [Resolved(canBeNull: true)]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
 
         private void recordFrame(bool important)
         {
