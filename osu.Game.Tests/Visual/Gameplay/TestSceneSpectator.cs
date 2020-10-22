@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -34,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Replay replay;
 
-        private TestReplayRecorder recorder;
+        private IBindableList<int> users;
 
         [Resolved]
         private SpectatorStreamingClient streamingClient { get; set; }
@@ -44,7 +46,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             replay = new Replay();
 
-            streamingClient.OnNewFrames += frames =>
+            users = streamingClient.PlayingUsers.GetBoundCopy();
+            users.BindCollectionChanged((obj, args) =>
+            {
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (int user in args.NewItems)
+                            streamingClient.WatchUser(user);
+                        break;
+                }
+            }, true);
+
+            streamingClient.OnNewFrames += (userId, frames) =>
             {
                 foreach (var legacyFrame in frames.Frames)
                 {
@@ -63,7 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = recorder = new TestReplayRecorder
+                            Recorder = new TestReplayRecorder
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
                             },
