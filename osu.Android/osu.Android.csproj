@@ -45,10 +45,6 @@
       <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
       <Name>osu.Game.Rulesets.Taiko</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Tau\osu.Game.Rulesets.Tau.csproj">
-      <Project>{be14421e-703f-44f9-91cf-9d7c542177c7}</Project>
-      <Name>osu.Game.Rulesets.Tau</Name>
-    </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
       <Name>osu.Game</Name>

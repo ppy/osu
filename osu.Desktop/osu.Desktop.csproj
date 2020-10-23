@@ -36,7 +36,6 @@
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup Label="Resources">
-    <EmbeddedResource Include="osu.Game.Rulesets.Tau\Resources\**" />
     <EmbeddedResource Include="lazer.ico" />
   </ItemGroup>
 </Project>
