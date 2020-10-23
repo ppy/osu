@@ -6,14 +6,12 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
@@ -158,16 +156,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             working.BindValueChanged(OnBeatmapChanged);
         }
 
-        private void AddBeatmapToFillFlow()
-        {
-            beatmapFillFlow.Clear();
-
-            foreach (var b in beatmapSets)
-            {
-                beatmapFillFlow.Add(new BeatmapPiece(beatmaps.GetWorkingBeatmap(b.Beatmaps.First())));
-            }
-        }
-
         private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
             var c = v.NewValue;
@@ -179,7 +167,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 return;
             }
 
-            beatmapScroll.ScrollToStart();
             beatmapSets.Clear();
             //From CollectionHelper.cs
             foreach (var item in c.Beatmaps)
@@ -198,8 +185,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             cover.updateBackground(beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()));
             flashBox.FlashColour(Colour4.White, 1000, Easing.OutQuint);
 
-            AddBeatmapToFillFlow();
-            this.Delay(5).Schedule(() => working.TriggerChange());
+            beatmapFillFlow.Clear();
+            beatmapFillFlow.AddRange(beatmapSets.Select(s => new BeatmapPiece(beatmaps.GetWorkingBeatmap(s.Beatmaps.First()))));
+
+            working.TriggerChange();
         }
 
         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
@@ -213,15 +202,22 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     {
                         currentPiece = piece;
                         piece.MakeActive();
-                        ScrollToCurrentBeatmap();
                         break;
                     }
             }
+
+            this.Delay(5).Schedule(ScrollToCurrentBeatmap);
         }
 
         private void ScrollToCurrentBeatmap()
         {
-            if (!isCurrentCollection) return;
+            if ( !isCurrentCollection )
+            {
+                beatmapScroll.ScrollToStart();
+                return;
+            }
+
+            if ( currentPiece == null ) return;
 
             float distance = 0;
             var index = beatmapFillFlow.IndexOf(currentPiece);

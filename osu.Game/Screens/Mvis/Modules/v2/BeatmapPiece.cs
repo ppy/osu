@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -153,8 +154,18 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if ( beatIndex % 4 == 0 || effectPoint.KiaiMode )
-                    flashBox.FadeOutFromOne(1000);
+                switch(timingPoint.TimeSignature)
+                {
+                    case TimeSignatures.SimpleQuadruple:
+                        if ( beatIndex % 4 == 0 || effectPoint.KiaiMode )
+                            flashBox.FadeOutFromOne(1000);
+                        break;
+
+                    case TimeSignatures.SimpleTriple:
+                        if ( beatIndex % 3 == 0 || effectPoint.KiaiMode )
+                            flashBox.FadeOutFromOne(1000);
+                        break;
+                }
             }
         }
 
