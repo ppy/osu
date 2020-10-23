@@ -109,6 +109,8 @@ namespace osu.Game.Storyboards.Drawables
 
             LifetimeStart = sprite.StartTime;
             LifetimeEnd = sprite.EndTime;
+
+            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
@@ -117,7 +119,7 @@ namespace osu.Game.Storyboards.Drawables
             var drawable = storyboard.CreateSpriteFromResourcePath(Sprite.Path, textureStore);
 
             if (drawable != null)
-                InternalChild = drawable.With(s => s.Anchor = s.Origin = Anchor.Centre);
+                InternalChild = drawable;
 
             Sprite.ApplyTransforms(this);
         }
