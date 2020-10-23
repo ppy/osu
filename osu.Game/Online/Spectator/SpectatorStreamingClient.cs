@@ -194,9 +194,6 @@ namespace osu.Game.Online.Spectator
 
         public void EndPlaying()
         {
-            if (!isPlaying)
-                throw new InvalidOperationException($"Cannot invoke {nameof(EndPlaying)} when not playing");
-
             isPlaying = false;
 
             if (!isConnected) return;
