@@ -1,4 +1,5 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -9,22 +10,23 @@ using osuTK;
 
 namespace osu.Game.Overlays.MfMenu
 {
-    public class MfMenuFaqSection : MfMenuSection, IOnlineComponent
+    public class MfMenuFaqSection : MfMenuSection
     {
         public override string Title => "常见问题";
         public override string SectionId => "Faq";
 
-        private IAPIProvider API;
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private OsuSpriteText faqCannotUseOnlineFunctionText = new OsuSpriteText();
 
         public static void AnswerTitleFont(SpriteText t) => t.Font = OsuFont.GetFont(weight: FontWeight.SemiBold);
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        private void load()
         {
-            this.API = api;
-
             ChildDrawable = new GridContainer
             {
                 Anchor = Anchor.TopCentre,
@@ -98,7 +100,8 @@ namespace osu.Game.Overlays.MfMenu
 
         protected override void LoadComplete()
         {
-            API.Register(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onApiStateChanged, true);
             base.LoadComplete();
         }
 
@@ -168,12 +171,12 @@ namespace osu.Game.Overlays.MfMenu
         #endregion faq
 
         #region 功能函数
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        private void onApiStateChanged(ValueChangedEvent<APIState> v)
         {
-            switch (state)
+            switch (v.NewValue)
             {
                 default:
-                    faqCannotUseOnlineFunctionText.Text = "请点击右上角的\"游客\"进行登录。";
+                    faqCannotUseOnlineFunctionText.Text = "请点击右上角的\"游客\"进行登录/注册。";
                     break;
 
                 case APIState.Failing:
