@@ -22,18 +22,7 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// </summary>
     public class StarRatingDisplay : CompositeDrawable
     {
-        private readonly BeatmapInfo beatmap;
-
-        private StarDifficulty? difficulty;
-
-        /// <summary>
-        /// Creates a new <see cref="StarRatingDisplay"/>.
-        /// </summary>
-        /// <param name="beatmap">The <see cref="BeatmapInfo"/> to display the star difficulty of.</param>
-        public StarRatingDisplay(BeatmapInfo beatmap)
-        {
-            this.beatmap = beatmap;
-        }
+        private readonly StarDifficulty difficulty;
 
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
@@ -49,17 +38,14 @@ namespace osu.Game.Screens.Ranking.Expanded
         {
             AutoSizeAxes = Axes.Both;
 
-            if (!difficulty.HasValue)
-                difficulty = difficultyManager.GetDifficulty(beatmap);
-
-            var starRatingParts = difficulty.Value.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
+            var starRatingParts = difficulty.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
             string wholePart = starRatingParts[0];
             string fractionPart = starRatingParts[1];
             string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
-            ColourInfo backgroundColour = difficulty.Value.DifficultyRating == DifficultyRating.ExpertPlus
+            ColourInfo backgroundColour = difficulty.DifficultyRating == DifficultyRating.ExpertPlus
                 ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
-                : (ColourInfo)colours.ForDifficultyRating(difficulty.Value.DifficultyRating);
+                : (ColourInfo)colours.ForDifficultyRating(difficulty.DifficultyRating);
 
             InternalChildren = new Drawable[]
             {
