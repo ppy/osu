@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
@@ -53,7 +52,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public Bindable<bool> ShowHud { get; } = new BindableBool();
 
-        private Bindable<bool> configShowHud;
+        private Bindable<HUDVisibilityMode> configVisibilityMode;
 
         private readonly Container visibilityContainer;
 
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Play
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
 
-        private readonly Container mainUIElements;
+        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
@@ -92,7 +91,7 @@ namespace osu.Game.Screens.Play
                         {
                             new Drawable[]
                             {
-                                mainUIElements = new Container
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
@@ -170,9 +169,9 @@ namespace osu.Game.Screens.Play
 
             ModDisplay.Current.Value = mods;
 
-            configShowHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
+            configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
 
-            if (!configShowHud.Value && !hasShownNotificationOnce)
+            if (configVisibilityMode.Value == HUDVisibilityMode.Never && !hasShownNotificationOnce)
             {
                 hasShownNotificationOnce = true;
 
@@ -195,11 +194,8 @@ namespace osu.Game.Screens.Play
             ShowHealthbar.BindValueChanged(healthBar => HealthDisplay.FadeTo(healthBar.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING), true);
             ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
-            configShowHud.BindValueChanged(visible =>
-            {
-                if (!ShowHud.Disabled)
-                    ShowHud.Value = visible.NewValue;
-            }, true);
+            IsBreakTime.BindValueChanged(_ => updateVisibility());
+            configVisibilityMode.BindValueChanged(_ => updateVisibility(), true);
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
@@ -208,18 +204,39 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            float topRightOffset = 0;
+            // HACK: for now align with the accuracy counter.
+            // this is done for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
+            // it only works with the default skin due to padding offsetting it *just enough* to coexist.
+            topRightElements.Y = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
 
-            // fetch the bottom-most position of any main ui element that is anchored to the top of the screen.
-            // consider this kind of temporary.
-            foreach (var d in mainUIElements)
-            {
-                if (d is SkinnableDrawable sd && (sd.Drawable.Anchor & Anchor.y0) > 0)
-                    topRightOffset = Math.Max(sd.Drawable.ScreenSpaceDrawQuad.BottomRight.Y, topRightOffset);
-            }
-
-            topRightElements.Y = ToLocalSpace(new Vector2(0, topRightOffset)).Y;
             bottomRightElements.Y = -Progress.Height;
+        }
+
+        private void updateVisibility()
+        {
+            if (ShowHud.Disabled)
+                return;
+
+            switch (configVisibilityMode.Value)
+            {
+                case HUDVisibilityMode.Never:
+                    ShowHud.Value = false;
+                    break;
+
+                case HUDVisibilityMode.HideDuringBreaks:
+                    // always show during replay as we want the seek bar to be visible.
+                    ShowHud.Value = replayLoaded.Value || !IsBreakTime.Value;
+                    break;
+
+                case HUDVisibilityMode.HideDuringGameplay:
+                    // always show during replay as we want the seek bar to be visible.
+                    ShowHud.Value = replayLoaded.Value || IsBreakTime.Value;
+                    break;
+
+                case HUDVisibilityMode.Always:
+                    ShowHud.Value = true;
+                    break;
+            }
         }
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
@@ -238,6 +255,8 @@ namespace osu.Game.Screens.Play
                 ModDisplay.Delay(2000).FadeOut(200);
                 KeyCounter.Margin = new MarginPadding(10);
             }
+
+            updateVisibility();
         }
 
         protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
@@ -258,7 +277,9 @@ namespace osu.Game.Screens.Play
                 switch (e.Key)
                 {
                     case Key.Tab:
-                        configShowHud.Value = !configShowHud.Value;
+                        configVisibilityMode.Value = configVisibilityMode.Value != HUDVisibilityMode.Never
+                            ? HUDVisibilityMode.Never
+                            : HUDVisibilityMode.HideDuringGameplay;
                         return true;
                 }
             }

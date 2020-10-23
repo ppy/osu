@@ -10,6 +10,8 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmap : CarouselItem
     {
+        public override float TotalHeight => DrawableCarouselBeatmap.HEIGHT;
+
         public readonly BeatmapInfo Beatmap;
 
         public CarouselBeatmap(BeatmapInfo beatmap)
@@ -18,7 +20,7 @@ namespace osu.Game.Screens.Select.Carousel
             State.Value = CarouselItemState.Collapsed;
         }
 
-        protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
+        public override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
 
         public override void Filter(FilterCriteria criteria)
         {

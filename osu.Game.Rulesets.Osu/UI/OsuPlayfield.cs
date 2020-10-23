@@ -17,12 +17,16 @@ using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
+        private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
@@ -33,12 +37,19 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
 
+        private readonly Bindable<bool> playfieldBorderStyle = new BindableBool();
+
         private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
 
         public OsuPlayfield()
         {
             InternalChildren = new Drawable[]
             {
+                playfieldBorder = new PlayfieldBorder
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = 3
+                },
                 spinnerProxies = new ProxyContainer
                 {
                     RelativeSizeAxes = Axes.Both
@@ -74,6 +85,12 @@ namespace osu.Game.Rulesets.Osu.UI
                 poolDictionary.Add(result, new DrawableJudgementPool(result));
 
             AddRangeInternal(poolDictionary.Values);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuRulesetConfigManager config)
+        {
+            config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
         }
 
         public override void Add(DrawableHitObject h)

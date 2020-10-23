@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class FullscreenOverlay<T> : WaveOverlayContainer, IOnlineComponent, INamedOverlayComponent
+    public abstract class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
         where T : OverlayHeader
     {
         public virtual string IconTexture => Header?.Title.IconTexture ?? string.Empty;
@@ -84,22 +84,6 @@ namespace osu.Game.Overlays
         }
 
         protected virtual void PopOutComplete()
-        {
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            API.Register(this);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            API?.Unregister(this);
-        }
-
-        public virtual void APIStateChanged(IAPIProvider api, APIState state)
         {
         }
     }
