@@ -2,16 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
-using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -116,14 +112,12 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore, Storyboard storyboard)
+        private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            var storyboardPath = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
-            var sprite = storyboard.UseSkinSprites && storyboardPath == null
-                ? (Drawable)new SkinnableSprite(Sprite.Path)
-                : new Sprite { Texture = textureStore.Get(storyboardPath) };
+            var drawable = storyboard.CreateSpriteFromResourcePath(Sprite.Path, textureStore);
 
-            InternalChild = sprite.With(s => s.Anchor = s.Origin = Anchor.Centre);
+            if (drawable != null)
+                InternalChild = drawable.With(s => s.Anchor = s.Origin = Anchor.Centre);
 
             Sprite.ApplyTransforms(this);
         }
