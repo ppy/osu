@@ -29,6 +29,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             var anchor = flip ? Anchor.TopLeft : Anchor.TopRight;
 
             Flag.RelativeSizeAxes = Axes.None;
+            Flag.Scale = new Vector2(0.8f);
             Flag.Origin = anchor;
             Flag.Anchor = anchor;
 
