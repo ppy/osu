@@ -166,6 +166,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             playbackManager?.ReplayInputHandler.SetFrameFromTime(Time.Current - 100);
         }
 
+        [TearDownSteps]
+        public void TearDown()
+        {
+            AddStep("stop recorder", () => recorder.Expire());
+        }
+
         public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>
         {
             public TestFramedReplayInputHandler(Replay replay)

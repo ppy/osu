@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Spectator;
@@ -37,6 +38,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private Replay replay;
 
         private IBindableList<int> users;
+
+        private TestReplayRecorder recorder;
 
         [Resolved]
         private SpectatorStreamingClient streamingClient { get; set; }
@@ -82,7 +85,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = new TestReplayRecorder
+                            Recorder = recorder = new TestReplayRecorder
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
                             },
@@ -151,6 +154,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.Update();
             playbackManager?.ReplayInputHandler.SetFrameFromTime(Time.Current - 100);
+        }
+
+        [TearDownSteps]
+        public void TearDown()
+        {
+            AddStep("stop recorder", () => recorder.Expire());
         }
 
         public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>
