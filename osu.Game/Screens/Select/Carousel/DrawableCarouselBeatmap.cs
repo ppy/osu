@@ -31,6 +31,15 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class DrawableCarouselBeatmap : DrawableCarouselItem, IHasContextMenu
     {
+        public const float CAROUSEL_BEATMAP_SPACING = 5;
+
+        /// <summary>
+        /// The height of a carousel beatmap, including vertical spacing.
+        /// </summary>
+        public const float HEIGHT = height + CAROUSEL_BEATMAP_SPACING;
+
+        private const float height = MAX_HEIGHT * 0.6f;
+
         private readonly BeatmapInfo beatmap;
 
         private Sprite background;
@@ -58,15 +67,16 @@ namespace osu.Game.Screens.Select.Carousel
         private CancellationTokenSource starDifficultyCancellationSource;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
-            : base(panel)
         {
             beatmap = panel.Beatmap;
-            Height *= 0.60f;
+            Item = panel;
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager manager, SongSelect songSelect)
         {
+            Header.Height = height;
+
             if (songSelect != null)
             {
                 startRequested = b => songSelect.FinaliseSelection(b);
@@ -77,7 +87,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (manager != null)
                 hideRequested = manager.Hide;
 
-            Children = new Drawable[]
+            Header.Children = new Drawable[]
             {
                 background = new Box
                 {
@@ -168,6 +178,8 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Selected();
 
+            MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
+
             background.Colour = ColourInfo.GradientVertical(
                 new Color4(20, 43, 51, 255),
                 new Color4(40, 86, 102, 255));
@@ -178,6 +190,8 @@ namespace osu.Game.Screens.Select.Carousel
         protected override void Deselected()
         {
             base.Deselected();
+
+            MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
             background.Colour = new Color4(20, 43, 51, 255);
             triangles.Colour = OsuColour.Gray(0.5f);

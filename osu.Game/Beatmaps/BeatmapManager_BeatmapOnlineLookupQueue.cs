@@ -63,7 +63,7 @@ namespace osu.Game.Beatmaps
                 if (checkLocalCache(set, beatmap))
                     return;
 
-                if (api?.State != APIState.Online)
+                if (api?.State.Value != APIState.Online)
                     return;
 
                 var req = new GetBeatmapRequest(beatmap);
