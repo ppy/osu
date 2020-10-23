@@ -15,6 +15,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -40,6 +41,9 @@ namespace osu.Game.Online.Spectator
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
@@ -171,6 +175,7 @@ namespace osu.Game.Online.Spectator
 
             // transfer state at point of beginning play
             currentState.BeatmapID = beatmap.Value.BeatmapInfo.OnlineBeatmapID;
+            currentState.RulesetID = ruleset.Value.ID;
             currentState.Mods = mods.Value.Select(m => new APIMod(m));
 
             beginPlaying();
