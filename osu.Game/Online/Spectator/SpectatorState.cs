@@ -14,18 +14,13 @@ namespace osu.Game.Online.Spectator
     {
         public int? BeatmapID { get; set; }
 
+        public int? RulesetID { get; set; }
+
         [NotNull]
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
-        public SpectatorState(int? beatmapId = null, IEnumerable<APIMod> mods = null)
-        {
-            BeatmapID = beatmapId;
-            if (mods != null)
-                Mods = mods;
-        }
+        public bool Equals(SpectatorState other) => BeatmapID == other?.BeatmapID && Mods.SequenceEqual(other?.Mods) && RulesetID == other?.RulesetID;
 
-        public bool Equals(SpectatorState other) => BeatmapID == other?.BeatmapID && Mods.SequenceEqual(other?.Mods);
-
-        public override string ToString() => $"Beatmap:{BeatmapID} Mods:{string.Join(',', Mods)}";
+        public override string ToString() => $"Beatmap:{BeatmapID} Mods:{string.Join(',', Mods)} Ruleset:{RulesetID}";
     }
 }
