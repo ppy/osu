@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double minVal = min?.Evaluate(distance1) ?? 0;
 
             double scale = maxVal - minVal;
-            return minVal + scale * Math.Clamp(interp.Evaluate(distance1, distance2, angle),0,1);
+            return minVal + scale * Math.Clamp(interp.Evaluate(distance1, distance2, angle), 0, 1);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <param name="min">spline mapping d1 to minimum value (default 0)</param>
         /// <param name="max">spline mapping d1 to max value (default 1)</param>
         /// <param name="d2Scale">scale for distance to "other" note</param>
-        public AngleCorrection(double[] d1, double[] d2, double[] angles, double[,,] values, CubicInterp min=null, CubicInterp max=null,
+        public AngleCorrection(double[] d1, double[] d2, double[] angles, double[,,] values, CubicInterp min = null, CubicInterp max = null,
             Func<double, double> d2Scale = null)
         {
             this.d2Scale = d2Scale;
@@ -184,16 +184,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 { // d1=1.5
                     // 0,   45,   90,   135,   180 degrees
                     { 0.76, 0.76, 0.76, 0.76, 0.76 }, // d2=0
-                    { 0.37, 0.48, 0.75, 0.91, 0.94 }, // d2=1
-                    { 0.21, 0.36, 0.81, 0.97, 0.99 }, // d2=2
+                    { 0.37, 0.48, 0.60, 0.48, 0.94 }, // d2=1
+                    { 0.21, 0.36, 0.65, 0.55, 0.98 }, // d2=2
                     { 0.32, 0.52, 0.92, 0.99, 1.00 }, // d2=3
                     { 0.90, 0.96, 1.00, 1.00, 1.00 }, // d2=5
                 },
                 { // d1=2.4
                     // 0,   45,   90,   135,   180 degrees
                     { 0.45, 0.45, 0.45, 0.45, 0.45 }, // d2=0
-                    { 0.12, 0.18, 0.39, 0.71, 0.81 }, // d2=1.2
-                    { 0.05, 0.11, 0.39, 0.88, 0.96 }, // d2=2.4
+                    { 0.12, 0.18, 0.35, 0.61, 0.81 }, // d2=1.2
+                    { 0.05, 0.11, 0.35, 0.73, 0.96 }, // d2=2.4
                     { 0.07, 0.17, 0.60, 0.98, 1.00 }, // d2=3.6
                     { 0.56, 0.77, 0.99, 1.00, 1.00 }, // d2=6
                 },
