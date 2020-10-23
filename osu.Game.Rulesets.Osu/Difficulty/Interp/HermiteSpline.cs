@@ -1,4 +1,7 @@
-﻿namespace osu.Game.Rulesets.Osu.Difficulty.Interp
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+namespace osu.Game.Rulesets.Osu.Difficulty.Interp
 {
     public struct HermiteSpline
     {
@@ -10,7 +13,7 @@
             X0 = x0;
             X1 = x1;
             D1 = d1;
-            Val1=val1;
+            Val1 = val1;
 
             C0 = val0;
             C1 = d0;

@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Interp
 {
@@ -35,10 +38,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Interp
             int zSize = values.GetLength(2);
 
             var result = new double[xSize][][];
-            for (int i=0; i<xSize; ++i)
+            for (int i = 0; i < xSize; ++i)
             {
                 result[i] = new double[ySize][];
-                for (int j=0; j<ySize; ++j)
+                for (int j = 0; j < ySize; ++j)
                 {
                     result[i][j] = new double[zSize];
                     for (int k = 0; k < zSize; ++k)
