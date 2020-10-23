@@ -2,16 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
-using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -117,18 +113,13 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore, Storyboard storyboard)
+        private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            for (var frame = 0; frame < Animation.FrameCount; frame++)
+            for (int frame = 0; frame < Animation.FrameCount; frame++)
             {
-                var framePath = Animation.Path.Replace(".", frame + ".");
+                string framePath = Animation.Path.Replace(".", frame + ".");
 
-                var storyboardPath = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.Equals(framePath, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
-                var frameSprite = storyboard.UseSkinSprites && storyboardPath == null
-                    ? (Drawable)new SkinnableSprite(framePath)
-                    : new Sprite { Texture = textureStore.Get(storyboardPath) };
-
-                AddFrame(frameSprite, Animation.FrameDelay);
+                AddFrame(storyboard.CreateSpriteFromResourcePath(framePath, textureStore), Animation.FrameDelay);
             }
 
             Animation.ApplyTransforms(this);
