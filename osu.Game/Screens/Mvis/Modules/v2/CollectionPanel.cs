@@ -93,8 +93,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             Name = "标题容器",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
                                 new CircularContainer
@@ -138,10 +136,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             Name = "谱面图标容器",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Width = 0.98f,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            ScrollbarVisible = false,
                             Child = new BeatmapThumbnailFlow(beatmapSets)
                         }
                     }
@@ -157,7 +151,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 Add(new BeatmapCover(beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()))
                 {
-                    Depth = float.MaxValue
+                    Depth = float.MaxValue,
+                    BackgroundBox = false
                 });
                 state.Value = ActiveState.Idle;
             }
@@ -321,6 +316,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             public ThumbnailScrollContainer(Direction scrollDirection)
                 : base(scrollDirection)
             {
+                ScrollbarVisible = false;
+                Scrollbar.Width = 0;
             }
         }
     }

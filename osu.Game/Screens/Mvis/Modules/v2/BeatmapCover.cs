@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         private CancellationTokenSource ChangeCoverTask;
 
+        public bool BackgroundBox = true;
+
         public BeatmapCover(WorkingBeatmap beatmap)
         {
             b = beatmap;
@@ -28,12 +30,13 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(new Box
-            {
-                Depth = float.MaxValue,
-                RelativeSizeAxes = Axes.Both,
-                Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),   
-            });
+            if ( BackgroundBox )
+                AddInternal(new Box
+                {
+                    Depth = float.MaxValue,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),   
+                });
         }
 
         protected override void LoadComplete()
@@ -46,7 +49,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             ChangeCoverTask?.Cancel();
 
-            if ( beatmap == null) cover?.FadeOut(300);
+            if ( beatmap == null)
+            {
+                 cover?.FadeOut(300);
+                 return;
+            }
 
             LoadComponentAsync(new BeatmapBackground(beatmap)
             {

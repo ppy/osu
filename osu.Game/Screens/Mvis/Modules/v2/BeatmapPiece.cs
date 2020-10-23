@@ -50,7 +50,15 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             InternalChildren = new Drawable[]
             {
-                new BeatmapCover(beatmap),
+                new Box
+                {
+                    RelativeSizeAxes= Axes.Both,
+                    Colour = Colour4.Gray
+                },
+                new BeatmapCover(beatmap)
+                {
+                    BackgroundBox = false
+                },
                 maskBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,

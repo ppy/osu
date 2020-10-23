@@ -6,12 +6,14 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
@@ -53,7 +55,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     Colour = colourProvider.Background3,
                     RelativeSizeAxes = Axes.Both
                 },
-                cover = new BeatmapCover(null),
+                cover = new BeatmapCover(null)
+                {
+                    BackgroundBox = false
+                },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -91,7 +96,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(12),
-                                        Padding = new MarginPadding(35),
+                                        Padding = new MarginPadding{ Horizontal = 35, Vertical = 25 },
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Children = new Drawable[]
@@ -118,7 +123,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                         Anchor = Anchor.BottomLeft,
                                     }
                                 }
-                            },
+                            }
                         },
                         new Drawable[]
                         {
@@ -143,6 +148,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     }
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             collection.BindValueChanged(OnCollectionChanged);
             working.BindValueChanged(OnBeatmapChanged);
