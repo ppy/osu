@@ -93,7 +93,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Position = new Vector2(-300, 10),
-                    Scale = new Vector2(2.2f)
+                    Scale = new Vector2(2f)
                 },
                 new FillFlowContainer
                 {
