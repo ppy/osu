@@ -12,11 +12,6 @@ namespace osu.iOS
     {
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Add(new UpdateManager());
-        }
+        protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
     }
 }

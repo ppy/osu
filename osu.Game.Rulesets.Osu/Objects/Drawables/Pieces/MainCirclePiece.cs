@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                     using (BeginDelayedSequence(flash_in, true))
                     {
-                        //after the flash, we can hide some elements that were behind it
+                        // after the flash, we can hide some elements that were behind it
                         ring.FadeOut();
                         circle.FadeOut();
                         number.FadeOut();

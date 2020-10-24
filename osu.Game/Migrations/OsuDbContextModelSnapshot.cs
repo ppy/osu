@@ -43,7 +43,7 @@ namespace osu.Game.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AudioLeadIn");
+                    b.Property<double>("AudioLeadIn");
 
                     b.Property<double>("BPM");
 
@@ -56,6 +56,8 @@ namespace osu.Game.Migrations
                     b.Property<bool>("Countdown");
 
                     b.Property<double>("DistanceSpacing");
+
+                    b.Property<bool>("EpilepsyWarning");
 
                     b.Property<int>("GridSize");
 

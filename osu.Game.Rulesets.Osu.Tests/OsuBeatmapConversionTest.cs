@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
@@ -12,6 +12,7 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
+    [Timeout(10000)]
     public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";

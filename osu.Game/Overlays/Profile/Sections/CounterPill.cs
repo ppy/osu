@@ -7,35 +7,35 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
     public class CounterPill : CircularContainer
     {
-        private const int duration = 200;
-
         public readonly BindableInt Current = new BindableInt();
 
-        private readonly OsuSpriteText counter;
+        private OsuSpriteText counter;
 
-        public CounterPill()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             AutoSizeAxes = Axes.Both;
-            Alpha = 0;
             Masking = true;
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.05f)
+                    Colour = colourProvider.Background6
                 },
                 counter = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
+                    Margin = new MarginPadding { Horizontal = 10, Bottom = 1 },
+                    Font = OsuFont.GetFont(size: 11.2f, weight: FontWeight.Bold),
+                    Colour = colourProvider.Foreground1
                 }
             };
         }
@@ -48,14 +48,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void onCurrentChanged(ValueChangedEvent<int> value)
         {
-            if (value.NewValue == 0)
-            {
-                this.FadeOut(duration, Easing.OutQuint);
-                return;
-            }
-
-            counter.Text = value.NewValue.ToString();
-            this.FadeIn(duration, Easing.OutQuint);
+            counter.Text = value.NewValue.ToString("N0");
         }
     }
 }

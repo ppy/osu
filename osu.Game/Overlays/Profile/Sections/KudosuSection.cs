@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Profile.Sections
             Children = new Drawable[]
             {
                 new KudosuInfo(User),
-                new PaginatedKudosuHistoryContainer(User, null, @"This user hasn't received any kudosu!"),
+                new PaginatedKudosuHistoryContainer(User),
             };
         }
     }

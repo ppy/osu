@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -32,9 +33,9 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Invoked after <see cref="ApplyDefaults"/> has completed on this <see cref="HitObject"/>.
         /// </summary>
-        public event Action DefaultsApplied;
+        public event Action<HitObject> DefaultsApplied;
 
-        public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
+        public readonly Bindable<double> StartTimeBindable = new BindableDouble();
 
         /// <summary>
         /// The time at which the HitObject starts.
@@ -76,6 +77,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
+        [JsonIgnore]
         public HitWindows HitWindows { get; set; }
 
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
@@ -99,7 +101,8 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         /// <param name="controlPointInfo">The control points.</param>
         /// <param name="difficulty">The difficulty settings to use.</param>
-        public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty, CancellationToken cancellationToken = default)
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
@@ -108,7 +111,7 @@ namespace osu.Game.Rulesets.Objects
 
             nestedHitObjects.Clear();
 
-            CreateNestedHitObjects();
+            CreateNestedHitObjects(cancellationToken);
 
             if (this is IHasComboInformation hasCombo)
             {
@@ -122,20 +125,28 @@ namespace osu.Game.Rulesets.Objects
             nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             foreach (var h in nestedHitObjects)
-                h.ApplyDefaults(controlPointInfo, difficulty);
+                h.ApplyDefaults(controlPointInfo, difficulty, cancellationToken);
 
-            DefaultsApplied?.Invoke();
+            DefaultsApplied?.Invoke(this);
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 
-            if (HitWindows == null)
-                HitWindows = CreateHitWindows();
+            HitWindows ??= CreateHitWindows();
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 
+        protected virtual void CreateNestedHitObjects(CancellationToken cancellationToken)
+        {
+            // ReSharper disable once MethodSupportsCancellation (https://youtrack.jetbrains.com/issue/RIDER-44520)
+#pragma warning disable 618
+            CreateNestedHitObjects();
+#pragma warning restore 618
+        }
+
+        [Obsolete("Use the cancellation-supporting override")] // Can be removed 20210318
         protected virtual void CreateNestedHitObjects()
         {
         }
@@ -144,9 +155,9 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
-        /// May be null.
         /// </summary>
-        public virtual Judgement CreateJudgement() => null;
+        [NotNull]
+        public virtual Judgement CreateJudgement() => new Judgement();
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
@@ -165,10 +176,10 @@ namespace osu.Game.Rulesets.Objects
         /// Returns the end time of this object.
         /// </summary>
         /// <remarks>
-        /// This returns the <see cref="IHasEndTime.EndTime"/> where available, falling back to <see cref="HitObject.StartTime"/> otherwise.
+        /// This returns the <see cref="IHasDuration.EndTime"/> where available, falling back to <see cref="HitObject.StartTime"/> otherwise.
         /// </remarks>
         /// <param name="hitObject">The object.</param>
         /// <returns>The end time of this object.</returns>
-        public static double GetEndTime(this HitObject hitObject) => (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime;
+        public static double GetEndTime(this HitObject hitObject) => (hitObject as IHasDuration)?.EndTime ?? hitObject.StartTime;
     }
 }

@@ -10,7 +10,6 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -52,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+        private readonly IBindable<float> scaleBindable = new BindableFloat();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -64,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void UpdateInitialTransforms()

@@ -5,13 +5,14 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -23,15 +24,14 @@ namespace osu.Game.Screens.Edit.Components
     {
         private IconButton playButton;
 
-        private IAdjustableClock adjustableClock;
+        [Resolved]
+        private EditorClock editorClock { get; set; }
+
+        private readonly BindableNumber<double> tempo = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load(IAdjustableClock adjustableClock)
+        private void load()
         {
-            this.adjustableClock = adjustableClock;
-
-            PlaybackTabControl tabs;
-
             Children = new Drawable[]
             {
                 playButton = new IconButton
@@ -58,11 +58,18 @@ namespace osu.Game.Screens.Edit.Components
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                     Padding = new MarginPadding { Left = 45 },
-                    Child = tabs = new PlaybackTabControl(),
+                    Child = new PlaybackTabControl { Current = tempo },
                 }
             };
 
-            tabs.Current.ValueChanged += tempo => Beatmap.Value.Track.Tempo.Value = tempo.NewValue;
+            Track.BindValueChanged(tr => tr.NewValue?.AddAdjustment(AdjustableProperty.Tempo, tempo), true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            Track.Value?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
+
+            base.Dispose(isDisposing);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -79,17 +86,17 @@ namespace osu.Game.Screens.Edit.Components
 
         private void togglePause()
         {
-            if (adjustableClock.IsRunning)
-                adjustableClock.Stop();
+            if (editorClock.IsRunning)
+                editorClock.Stop();
             else
-                adjustableClock.Start();
+                editorClock.Start();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            playButton.Icon = adjustableClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+            playButton.Icon = editorClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
         }
 
         private class PlaybackTabControl : OsuTabControl<double>

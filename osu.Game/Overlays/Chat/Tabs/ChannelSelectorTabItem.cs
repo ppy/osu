@@ -39,6 +39,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             public ChannelSelectorTabChannel()
             {
                 Name = "+";
+                Type = ChannelType.System;
             }
         }
     }

@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
 
-        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
@@ -76,12 +76,12 @@ namespace osu.Game.Graphics.Containers
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (closeOnMouseUp && !base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
                 Hide();
 
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         public virtual bool OnPressed(GlobalAction action)
@@ -99,7 +99,11 @@ namespace osu.Game.Graphics.Containers
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
+
+        private bool playedPopInSound;
 
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
@@ -108,16 +112,24 @@ namespace osu.Game.Graphics.Containers
                 case Visibility.Visible:
                     if (OverlayActivationMode.Value == OverlayActivation.Disabled)
                     {
+                        // todo: visual/audible feedback that this operation could not complete.
                         State.Value = Visibility.Hidden;
                         return;
                     }
 
                     samplePopIn?.Play();
+                    playedPopInSound = true;
+
                     if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    samplePopOut?.Play();
+                    if (playedPopInSound)
+                    {
+                        samplePopOut?.Play();
+                        playedPopInSound = false;
+                    }
+
                     if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
                     break;
             }

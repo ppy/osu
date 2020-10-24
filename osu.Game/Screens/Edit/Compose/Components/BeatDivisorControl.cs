@@ -262,10 +262,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 marker.Active = false;
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
 
             protected override bool OnClick(ClickEvent e)
@@ -274,10 +274,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return true;
             }
 
-            protected override bool OnDrag(DragEvent e)
+            protected override void OnDrag(DragEvent e)
             {
                 handleMouseInput(e.ScreenSpaceMousePosition);
-                return true;
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                handleMouseInput(e.ScreenSpaceMousePosition);
             }
 
             private void handleMouseInput(Vector2 screenSpaceMousePosition)

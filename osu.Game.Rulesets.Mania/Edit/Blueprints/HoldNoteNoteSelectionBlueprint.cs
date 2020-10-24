@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             // Todo: This shouldn't exist, mania should not reference the drawable hitobject directly.
             if (DrawableObject.IsLoaded)
             {
-                DrawableNote note = position == HoldNotePosition.Start ? DrawableObject.Head : DrawableObject.Tail;
+                DrawableNote note = position == HoldNotePosition.Start ? (DrawableNote)DrawableObject.Head : DrawableObject.Tail;
 
                 Anchor = note.Anchor;
                 Origin = note.Origin;

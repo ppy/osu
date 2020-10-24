@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Daycore";
         public override string Acronym => "DC";
-        public override IconUsage Icon => FontAwesome.Solid.Question;
+        public override IconUsage? Icon => null;
         public override string Description => "Whoaaaaa...";
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
             }, true);
         }
 
-        public override void ApplyToTrack(Track track)
+        public override void ApplyToTrack(ITrack track)
         {
             // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);

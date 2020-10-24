@@ -4,22 +4,21 @@
 using System;
 using System.Linq;
 using osu.Framework;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Toolbar;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
     public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>
     {
         private readonly FillFlowContainer<SidebarButton> content;
-        public const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
+        public const float DEFAULT_WIDTH = Toolbar.Toolbar.HEIGHT * 1.4f;
         public const int EXPANDED_WIDTH = 200;
 
         public event Action<ExpandedState> StateChanged;

@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 ModeButtonLine = new Container
                 {
-                    Size = new Vector2(ToolbarButton.WIDTH, 3),
+                    Size = new Vector2(Toolbar.HEIGHT, 3),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 int requested = e.Key - Key.Number1;
 
-                RulesetInfo found = Rulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
+                RulesetInfo found = Rulesets.AvailableRulesets.ElementAtOrDefault(requested);
                 if (found != null)
                     Current.Value = found;
                 return true;

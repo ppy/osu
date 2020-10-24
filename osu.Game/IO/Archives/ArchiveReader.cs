@@ -45,7 +45,5 @@ namespace osu.Game.IO.Archives
                 return buffer;
             }
         }
-
-        public abstract Stream GetUnderlyingStream();
     }
 }

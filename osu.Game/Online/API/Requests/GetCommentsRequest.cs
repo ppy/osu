@@ -10,27 +10,32 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetCommentsRequest : APIRequest<CommentBundle>
     {
-        private readonly long id;
-        private readonly int page;
+        private readonly long commentableId;
         private readonly CommentableType type;
         private readonly CommentsSortCriteria sort;
+        private readonly int page;
+        private readonly long? parentId;
 
-        public GetCommentsRequest(CommentableType type, long id, CommentsSortCriteria sort = CommentsSortCriteria.New, int page = 1)
+        public GetCommentsRequest(long commentableId, CommentableType type, CommentsSortCriteria sort = CommentsSortCriteria.New, int page = 1, long? parentId = null)
         {
+            this.commentableId = commentableId;
             this.type = type;
             this.sort = sort;
-            this.id = id;
             this.page = page;
+            this.parentId = parentId;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
 
+            req.AddParameter("commentable_id", commentableId.ToString());
             req.AddParameter("commentable_type", type.ToString().Underscore().ToLowerInvariant());
-            req.AddParameter("commentable_id", id.ToString());
-            req.AddParameter("sort", sort.ToString().ToLowerInvariant());
             req.AddParameter("page", page.ToString());
+            req.AddParameter("sort", sort.ToString().ToLowerInvariant());
+
+            if (parentId != null)
+                req.AddParameter("parent_id", parentId.ToString());
 
             return req;
         }

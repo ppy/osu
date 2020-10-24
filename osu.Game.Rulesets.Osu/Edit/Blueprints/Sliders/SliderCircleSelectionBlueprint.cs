@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             : base(slider)
         {
             this.position = position;
+
             InternalChild = CirclePiece = new HitCirclePiece();
 
             Select();

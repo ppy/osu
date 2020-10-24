@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -30,11 +30,13 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerLoader : ManualInputManagerTestScene
+    public class TestScenePlayerLoader : OsuManualInputManagerTestScene
     {
         private TestPlayerLoader loader;
         private TestPlayerLoaderContainer container;
         private TestPlayer player;
+
+        private bool epilepsyWarning;
 
         [Resolved]
         private AudioManager audioManager { get; set; }
@@ -47,25 +49,37 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// </summary>
         /// <param name="interactive">If the test player should behave like the production one.</param>
         /// <param name="beforeLoadAction">An action to run before player load but after bindable leases are returned.</param>
-        /// <param name="afterLoadAction">An action to run after container load.</param>
-        public void ResetPlayer(bool interactive, Action beforeLoadAction = null, Action afterLoadAction = null)
+        public void ResetPlayer(bool interactive, Action beforeLoadAction = null)
         {
+            player = null;
+
             audioManager.Volume.SetDefault();
 
             InputManager.Clear();
 
+            container = new TestPlayerLoaderContainer(loader = new TestPlayerLoader(() => player = new TestPlayer(interactive, interactive)));
+
             beforeLoadAction?.Invoke();
+
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            Beatmap.Value.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(Beatmap.Value.Track);
 
-            InputManager.Child = container = new TestPlayerLoaderContainer(
-                loader = new TestPlayerLoader(() =>
-                {
-                    afterLoadAction?.Invoke();
-                    return player = new TestPlayer(interactive, interactive);
-                }));
+            InputManager.Child = container;
+        }
+
+        [Test]
+        public void TestEarlyExitBeforePlayerConstruction()
+        {
+            AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+            AddStep("exit loader", () => loader.Exit());
+            AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
+            AddAssert("player did not load", () => player == null);
+            AddUntilStep("player disposed", () => loader.DisposalTask == null);
+            AddAssert("mod rate still applied", () => Beatmap.Value.Track.Rate != 1);
         }
 
         /// <summary>
@@ -74,11 +88,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// speed adjustments were undone too late, causing cross-screen pollution.
         /// </summary>
         [Test]
-        public void TestEarlyExit()
+        public void TestEarlyExitAfterPlayerConstruction()
         {
             AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
+            AddUntilStep("wait for non-null player", () => player != null);
             AddStep("exit loader", () => loader.Exit());
             AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
             AddAssert("player did not load", () => !player.IsLoaded);
@@ -91,8 +106,43 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("load dummy beatmap", () => ResetPlayer(false));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
-            AddRepeatStep("move mouse", () => InputManager.MoveMouseTo(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle()), 20);
+
+            AddUntilStep("wait for load ready", () =>
+            {
+                moveMouse();
+                return player?.LoadState == LoadState.Ready;
+            });
+            AddRepeatStep("move mouse", moveMouse, 20);
+
             AddAssert("loader still active", () => loader.IsCurrentScreen());
+            AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
+
+            void moveMouse()
+            {
+                InputManager.MoveMouseTo(
+                    loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft
+                    + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft)
+                    * RNG.NextSingle());
+            }
+        }
+
+        [Test]
+        public void TestBlockLoadViaFocus()
+        {
+            OsuFocusedOverlayContainer overlay = null;
+
+            AddStep("load dummy beatmap", () => ResetPlayer(false));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddStep("show focused overlay", () => { container.Add(overlay = new ChangelogOverlay { State = { Value = Visibility.Visible } }); });
+            AddUntilStep("overlay visible", () => overlay.IsPresent);
+
+            AddUntilStep("wait for load ready", () => player.LoadState == LoadState.Ready);
+            AddRepeatStep("twiddle thumbs", () => { }, 20);
+
+            AddAssert("loader still active", () => loader.IsCurrentScreen());
+
+            AddStep("hide overlay", () => overlay.Hide());
             AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
         }
 
@@ -147,27 +197,47 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestMutedNotificationMasterVolume() => addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
+        public void TestModDisplayChanges()
+        {
+            var testMod = new TestMod();
+
+            AddStep("load player", () => ResetPlayer(true));
+
+            AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
+            AddStep("set test mod in loader", () => loader.Mods.Value = new[] { testMod });
+            AddAssert("test mod is displayed", () => (TestMod)loader.DisplayedMods.Single() == testMod);
+        }
 
         [Test]
-        public void TestMutedNotificationTrackVolume() => addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, null, () => audioManager.VolumeTrack.IsDefault);
+        public void TestMutedNotificationMasterVolume()
+        {
+            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.IsDefault);
+        }
 
         [Test]
-        public void TestMutedNotificationMuteButton() => addVolumeSteps("mute button", null, () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
+        public void TestMutedNotificationTrackVolume()
+        {
+            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, () => audioManager.VolumeTrack.IsDefault);
+        }
+
+        [Test]
+        public void TestMutedNotificationMuteButton()
+        {
+            addVolumeSteps("mute button", () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
+        }
 
         /// <remarks>
         /// Created for avoiding copy pasting code for the same steps.
         /// </remarks>
         /// <param name="volumeName">What part of the volume system is checked</param>
         /// <param name="beforeLoad">The action to be invoked to set the volume before loading</param>
-        /// <param name="afterLoad">The action to be invoked to set the volume after loading</param>
         /// <param name="assert">The function to be invoked and checked</param>
-        private void addVolumeSteps(string volumeName, Action beforeLoad, Action afterLoad, Func<bool> assert)
+        private void addVolumeSteps(string volumeName, Action beforeLoad, Func<bool> assert)
         {
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
 
-            AddStep("load player", () => ResetPlayer(false, beforeLoad, afterLoad));
-            AddUntilStep("wait for player", () => player.IsLoaded);
+            AddStep("load player", () => ResetPlayer(false, beforeLoad));
+            AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
 
             AddAssert("check for notification", () => container.NotificationOverlay.UnreadCount.Value == 1);
             AddStep("click notification", () =>
@@ -181,6 +251,20 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("check " + volumeName, assert);
+
+            AddUntilStep("wait for player load", () => player.IsLoaded);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestEpilepsyWarning(bool warning)
+        {
+            AddStep("change epilepsy warning", () => epilepsyWarning = warning);
+            AddStep("load dummy beatmap", () => ResetPlayer(false));
+
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<EpilepsyWarning>().Any() == warning);
         }
 
         private class TestPlayerLoaderContainer : Container
@@ -195,9 +279,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 RelativeSizeAxes = Axes.Both;
 
+                OsuScreenStack stack;
+
                 InternalChildren = new Drawable[]
                 {
-                    new OsuScreenStack(screen)
+                    stack = new OsuScreenStack
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -212,6 +298,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Origin = Anchor.TopLeft,
                     }
                 };
+
+                stack.Push(screen);
             }
         }
 
@@ -220,6 +308,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new VisualSettings VisualSettings => base.VisualSettings;
 
             public new Task DisposalTask => base.DisposalTask;
+
+            public IReadOnlyList<Mod> DisplayedMods => MetadataInfo.Mods.Value;
 
             public TestPlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)
@@ -243,17 +333,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         }
 
-        private class TestPlayer : Visual.TestPlayer
-        {
-            public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
-
-            public TestPlayer(bool allowPause = true, bool showResults = true)
-                : base(allowPause, showResults)
-            {
-            }
-        }
-
-        protected class SlowLoadPlayer : Visual.TestPlayer
+        protected class SlowLoadPlayer : TestPlayer
         {
             public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim(false);
 

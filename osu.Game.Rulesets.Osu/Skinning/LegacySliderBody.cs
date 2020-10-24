@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK.Graphics;
@@ -17,6 +17,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private class LegacyDrawableSliderPath : DrawableSliderPath
         {
             private const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
+
+            protected new float CalculatedBorderPortion
+                // Roughly matches osu!stable's slider border portions.
+                => base.CalculatedBorderPortion * 0.77f;
 
             public new Color4 AccentColour => new Color4(base.AccentColour.R, base.AccentColour.G, base.AccentColour.B, base.AccentColour.A * 0.70f);
 

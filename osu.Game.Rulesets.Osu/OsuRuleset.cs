@@ -29,16 +29,20 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
+using System.Linq;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuRuleset : Ruleset
+    public class OsuRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
-        public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new OsuScoreProcessor(beatmap);
+        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
@@ -52,7 +56,7 @@ namespace osu.Game.Rulesets.Osu
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new OsuModNightcore();
@@ -113,7 +117,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModEasy(),
                         new OsuModNoFail(),
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
-                        new OsuModSpunOut(),
                     };
 
                 case ModType.DifficultyIncrease:
@@ -130,6 +133,7 @@ namespace osu.Game.Rulesets.Osu
                     return new Mod[]
                     {
                         new OsuModTarget(),
+                        new OsuModDifficultyAdjust(),
                     };
 
                 case ModType.Automation:
@@ -138,6 +142,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
+                        new OsuModSpunOut(),
                     };
 
                 case ModType.Fun:
@@ -166,7 +171,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(this, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new OsuPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new OsuPerformanceCalculator(this, attributes, score);
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
@@ -174,14 +179,93 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Clicking circles";
+
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new OsuLegacySkinTransformer(source);
+        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new OsuLegacySkinTransformer(source);
 
-        public override int? LegacyID => 0;
+        public int LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
+
+        protected override IEnumerable<HitResult> GetValidHitResults()
+        {
+            return new[]
+            {
+                HitResult.Great,
+                HitResult.Ok,
+                HitResult.Meh,
+
+                HitResult.LargeTickHit,
+                HitResult.SmallTickHit,
+                HitResult.SmallBonus,
+                HitResult.LargeBonus,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LargeTickHit:
+                    return "slider tick";
+
+                case HitResult.SmallTickHit:
+                    return "slider end";
+
+                case HitResult.SmallBonus:
+                    return "spinner spin";
+
+                case HitResult.LargeBonus:
+                    return "spinner bonus";
+            }
+
+            return base.GetDisplayNameForHitResult(result);
+        }
+
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        {
+            var timedHitEvents = score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
+
+            return new[]
+            {
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem("Timing Distribution",
+                            new HitEventTimingDistributionGraph(timedHitEvents)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 250
+                            }),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        {
+                            new UnstableRate(timedHitEvents)
+                        }))
+                    }
+                }
+            };
+        }
     }
 }

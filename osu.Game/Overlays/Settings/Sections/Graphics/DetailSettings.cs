@@ -18,33 +18,28 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Storyboards",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "Video",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowVideoBackground)
+                    LabelText = "Storyboard / Video",
+                    Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show Judgement detail (FAST/SLOW)",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowJudgementDetail)
+                    Current = config.GetBindable<bool>(OsuSetting.ShowJudgementDetail)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Hit Lighting",
-                    Bindable = config.GetBindable<bool>(OsuSetting.HitLighting)
+                    Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
                 new SettingsEnumDropdown<ScreenshotFormat>
                 {
                     LabelText = "Screenshot format",
-                    Bindable = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
+                    Current = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show menu cursor in screenshots",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
+                    Current = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
                 }
             };
         }

@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -26,7 +28,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 
         public readonly BindableBool IsSelected = new BindableBool();
-
         public readonly PathControlPoint ControlPoint;
 
         private readonly Slider slider;
@@ -34,7 +35,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly Drawable markerRing;
 
         [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider snapProvider { get; set; }
+        private IEditorChangeHandler changeHandler { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private IPositionSnapProvider snapProvider { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -46,6 +50,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             ControlPoint = controlPoint;
+
+            controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
 
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
@@ -135,22 +141,33 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e) => RequestSelection != null;
-
         protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
-        protected override bool OnDragStart(DragStartEvent e) => e.Button == MouseButton.Left;
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (RequestSelection == null)
+                return false;
 
-        protected override bool OnDrag(DragEvent e)
+            if (e.Button == MouseButton.Left)
+            {
+                changeHandler?.BeginChange();
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override void OnDrag(DragEvent e)
         {
             if (ControlPoint == slider.Path.ControlPoints[0])
             {
                 // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
-                (Vector2 snappedPosition, double snappedTime) = snapProvider?.GetSnappedPosition(e.MousePosition, slider.StartTime) ?? (e.MousePosition, slider.StartTime);
-                Vector2 movementDelta = snappedPosition - slider.Position;
+                var result = snapProvider?.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition);
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? e.ScreenSpaceMousePosition) - slider.Position;
 
                 slider.Position += movementDelta;
-                slider.StartTime = snappedTime;
+                slider.StartTime = result?.Time ?? slider.StartTime;
 
                 // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
                 for (int i = 1; i < slider.Path.ControlPoints.Count; i++)
@@ -158,11 +175,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
                 ControlPoint.Position.Value += e.Delta;
-
-            return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e) => true;
+        protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
 
         /// <summary>
         /// Updates the state of the circular control point marker.
@@ -174,8 +189,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
             Color4 colour = ControlPoint.Type.Value != null ? colours.Red : colours.Yellow;
+
             if (IsHovered || IsSelected.Value)
-                colour = Color4.White;
+                colour = colour.Lighten(1);
+
             marker.Colour = colour;
         }
     }

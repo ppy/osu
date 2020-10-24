@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 
@@ -35,18 +35,15 @@ namespace osu.Game.Rulesets.Catch.Replays
             }
         }
 
-        public override List<IInput> GetPendingInputs()
+        public override void CollectPendingInputs(List<IInput> inputs)
         {
-            if (!Position.HasValue) return new List<IInput>();
+            if (!Position.HasValue) return;
 
-            return new List<IInput>
+            inputs.Add(new CatchReplayState
             {
-                new CatchReplayState
-                {
-                    PressedActions = CurrentFrame?.Actions ?? new List<CatchAction>(),
-                    CatcherX = Position.Value
-                },
-            };
+                PressedActions = CurrentFrame?.Actions ?? new List<CatchAction>(),
+                CatcherX = Position.Value
+            });
         }
 
         public class CatchReplayState : ReplayState<CatchAction>

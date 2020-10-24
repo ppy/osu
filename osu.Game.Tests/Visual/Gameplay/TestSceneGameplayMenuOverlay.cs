@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -18,10 +17,8 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("player pause/fail screens")]
-    public class TestSceneGameplayMenuOverlay : ManualInputManagerTestScene
+    public class TestSceneGameplayMenuOverlay : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PauseOverlay) };
-
         private FailOverlay failOverlay;
         private PauseOverlay pauseOverlay;
 
@@ -275,7 +272,21 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("Overlay is closed", () => pauseOverlay.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestSelectionResetOnVisibilityChange()
+        {
+            showOverlay();
+            AddStep("Select last button", () => InputManager.Key(Key.Up));
+
+            hideOverlay();
+            showOverlay();
+
+            AddAssert("No button selected",
+                () => pauseOverlay.Buttons.All(button => !button.Selected.Value));
+        }
+
         private void showOverlay() => AddStep("Show overlay", () => pauseOverlay.Show());
+        private void hideOverlay() => AddStep("Hide overlay", () => pauseOverlay.Hide());
 
         private DialogButton getButton(int index) => pauseOverlay.Buttons.Skip(index).First();
 

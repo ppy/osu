@@ -14,11 +14,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneFooterButtonMods : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(FooterButtonMods)
-        };
-
         private readonly TestFooterButtonMods footerButtonMods;
 
         public TestSceneFooterButtonMods()

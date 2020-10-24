@@ -4,13 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -20,6 +21,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
@@ -198,7 +200,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new TestDrawableScrollingRuleset(this, beatmap, mods);
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap);
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap, null);
 
             public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
 
@@ -268,19 +270,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestBeatmapConverter : BeatmapConverter<TestHitObject>
         {
-            public TestBeatmapConverter(IBeatmap beatmap)
-                : base(beatmap)
+            public TestBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+                : base(beatmap, ruleset)
             {
             }
 
-            protected override IEnumerable<Type> ValidConversionTypes => new[] { typeof(HitObject) };
+            public override bool CanConvert() => true;
 
-            protected override IEnumerable<TestHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
+            protected override IEnumerable<TestHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
             {
                 yield return new TestHitObject
                 {
                     StartTime = original.StartTime,
-                    EndTime = (original as IHasEndTime)?.EndTime ?? (original.StartTime + 100)
+                    Duration = (original as IHasDuration)?.Duration ?? 100
                 };
             }
         }
@@ -289,11 +291,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         #region HitObject
 
-        private class TestHitObject : HitObject, IHasEndTime
+        private class TestHitObject : ConvertHitObject, IHasDuration
         {
-            public double EndTime { get; set; }
+            public double EndTime => StartTime + Duration;
 
-            public double Duration => EndTime - StartTime;
+            public double Duration { get; set; }
         }
 
         private class DrawableTestHitObject : DrawableHitObject<TestHitObject>

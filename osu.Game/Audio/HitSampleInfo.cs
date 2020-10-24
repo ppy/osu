@@ -18,9 +18,9 @@ namespace osu.Game.Audio
         public const string HIT_CLAP = @"hitclap";
 
         /// <summary>
-        /// An optional ruleset namespace.
+        /// All valid sample addition constants.
         /// </summary>
-        public string Namespace;
+        public static IEnumerable<string> AllAdditions => new[] { HIT_WHISTLE, HIT_CLAP, HIT_FINISH };
 
         /// <summary>
         /// The bank to load the sample from.
@@ -49,15 +49,6 @@ namespace osu.Game.Audio
         {
             get
             {
-                if (!string.IsNullOrEmpty(Namespace))
-                {
-                    if (!string.IsNullOrEmpty(Suffix))
-                        yield return $"{Namespace}/{Bank}-{Name}{Suffix}";
-
-                    yield return $"{Namespace}/{Bank}-{Name}";
-                }
-
-                // check non-namespace as a fallback even when we have a namespace
                 if (!string.IsNullOrEmpty(Suffix))
                     yield return $"{Bank}-{Name}{Suffix}";
 

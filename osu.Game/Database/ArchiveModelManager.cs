@@ -11,6 +11,7 @@ using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
@@ -21,6 +22,7 @@ using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
+using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using FileInfo = osu.Game.IO.FileInfo;
 
@@ -34,7 +36,7 @@ namespace osu.Game.Database
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
     public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
-        where TFileModel : INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, new()
     {
         private const int import_queue_request_concurrency = 1;
 
@@ -53,18 +55,22 @@ namespace osu.Game.Database
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
-        /// Fired when a new <typeparamref name="TModel"/> becomes available in the database.
+        /// Fired when a new or updated <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event Action<TModel> ItemAdded;
+        public IBindable<WeakReference<TModel>> ItemUpdated => itemUpdated;
+
+        private readonly Bindable<WeakReference<TModel>> itemUpdated = new Bindable<WeakReference<TModel>>();
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event Action<TModel> ItemRemoved;
+        public IBindable<WeakReference<TModel>> ItemRemoved => itemRemoved;
 
-        public virtual string[] HandledExtensions => new[] { ".zip" };
+        private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
+
+        public virtual IEnumerable<string> HandledExtensions => new[] { ".zip" };
 
         public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
@@ -77,13 +83,17 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
+        private readonly Storage exportStorage;
+
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item));
-            ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
+            ModelStore.ItemUpdated += item => handleEvent(() => itemUpdated.Value = new WeakReference<TModel>(item));
+            ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
+
+            exportStorage = storage.GetStorageForDirectory("exports");
 
             Files = new FileStore(contextFactory, storage);
 
@@ -222,9 +232,8 @@ namespace osu.Game.Database
             {
                 model = CreateModel(archive);
 
-                if (model == null) return Task.FromResult<TModel>(null);
-
-                model.Hash = computeHash(archive);
+                if (model == null)
+                    return Task.FromResult<TModel>(null);
             }
             catch (TaskCanceledException)
             {
@@ -244,9 +253,12 @@ namespace osu.Game.Database
         /// Generally should include all file types which determine the file's uniqueness.
         /// Large files should be avoided if possible.
         /// </summary>
+        /// <remarks>
+        /// This is only used by the default hash implementation. If <see cref="ComputeHash"/> is overridden, it will not be used.
+        /// </remarks>
         protected abstract string[] HashableFileTypes { get; }
 
-        protected static void LogForModel(TModel model, string message, Exception e = null)
+        internal static void LogForModel(TModel model, string message, Exception e = null)
         {
             string prefix = $"[{(model?.Hash ?? "?????").Substring(0, 5)}]";
 
@@ -259,18 +271,27 @@ namespace osu.Game.Database
         /// <summary>
         /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
         /// </summary>
-        private string computeHash(ArchiveReader reader)
+        /// <remarks>
+        ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
+        /// </remarks>
+        protected virtual string ComputeHash(TModel item, ArchiveReader reader = null)
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
-            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
+            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
             {
-                using (Stream s = reader.GetStream(file))
+                using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
                     s.CopyTo(hashable);
             }
 
-            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : null;
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            if (reader != null)
+                return reader.Name.ComputeSHA2Hash();
+
+            return item.Hash;
         }
 
         /// <summary>
@@ -300,6 +321,7 @@ namespace osu.Game.Database
                 LogForModel(item, "Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+                item.Hash = ComputeHash(item, archive);
 
                 await Populate(item, archive, cancellationToken);
 
@@ -313,7 +335,7 @@ namespace osu.Game.Database
 
                         if (existing != null)
                         {
-                            if (CanUndelete(existing, item))
+                            if (CanReuseExisting(existing, item))
                             {
                                 Undelete(existing);
                                 LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
@@ -356,11 +378,100 @@ namespace osu.Game.Database
         }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
         /// <summary>
+        /// Exports an item to a legacy (.zip based) package.
+        /// </summary>
+        /// <param name="item">The item to export.</param>
+        public void Export(TModel item)
+        {
+            var retrievedItem = ModelStore.ConsumableItems.FirstOrDefault(s => s.ID == item.ID);
+
+            if (retrievedItem == null)
+                throw new ArgumentException("Specified model could not be found", nameof(item));
+
+            using (var archive = ZipArchive.Create())
+            {
+                foreach (var file in retrievedItem.Files)
+                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
+
+                using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
+                    archive.SaveTo(outputStream);
+
+                exportStorage.OpenInNativeExplorer();
+            }
+        }
+
+        /// <summary>
+        /// Replace an existing file with a new version.
+        /// </summary>
+        /// <param name="model">The item to operate on.</param>
+        /// <param name="file">The existing file to be replaced.</param>
+        /// <param name="contents">The new file contents.</param>
+        /// <param name="filename">An optional filename for the new file. Will use the previous filename if not specified.</param>
+        public void ReplaceFile(TModel model, TFileModel file, Stream contents, string filename = null)
+        {
+            using (ContextFactory.GetForWrite())
+            {
+                DeleteFile(model, file);
+                AddFile(model, contents, filename ?? file.Filename);
+            }
+        }
+
+        /// <summary>
+        /// Delete new file.
+        /// </summary>
+        /// <param name="model">The item to operate on.</param>
+        /// <param name="file">The existing file to be deleted.</param>
+        public void DeleteFile(TModel model, TFileModel file)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                // Dereference the existing file info, since the file model will be removed.
+                if (file.FileInfo != null)
+                {
+                    Files.Dereference(file.FileInfo);
+
+                    // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
+                    // Definitely can be removed once we rework the database backend.
+                    usage.Context.Set<TFileModel>().Remove(file);
+                }
+
+                model.Files.Remove(file);
+            }
+        }
+
+        /// <summary>
+        /// Add a new file.
+        /// </summary>
+        /// <param name="model">The item to operate on.</param>
+        /// <param name="contents">The new file contents.</param>
+        /// <param name="filename">The filename for the new file.</param>
+        public void AddFile(TModel model, Stream contents, string filename)
+        {
+            using (ContextFactory.GetForWrite())
+            {
+                model.Files.Add(new TFileModel
+                {
+                    Filename = filename,
+                    FileInfo = Files.Add(contents)
+                });
+
+                Update(model);
+            }
+        }
+
+        /// <summary>
         /// Perform an update of the specified item.
-        /// TODO: Support file changes.
+        /// TODO: Support file additions/removals.
         /// </summary>
         /// <param name="item">The item to update.</param>
-        public void Update(TModel item) => ModelStore.Update(item);
+        public void Update(TModel item)
+        {
+            using (ContextFactory.GetForWrite())
+            {
+                item.Hash = ComputeHash(item);
+                ModelStore.Update(item);
+            }
+        }
 
         /// <summary>
         /// Delete an item from the manager.
@@ -482,7 +593,7 @@ namespace osu.Game.Database
             var fileInfos = new List<TFileModel>();
 
             string prefix = reader.Filenames.GetCommonPrefix();
-            if (!(prefix.EndsWith("/") || prefix.EndsWith("\\")))
+            if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
                 prefix = string.Empty;
 
             // import files to manager
@@ -588,13 +699,29 @@ namespace osu.Game.Database
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
-        /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to restore the existing
+        /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to use/restore the existing
         /// item and skip the import. This method allows changing that behaviour.
         /// </summary>
         /// <param name="existing">The existing model.</param>
         /// <param name="import">The newly imported model.</param>
         /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
-        protected virtual bool CanUndelete(TModel existing, TModel import) => true;
+        protected virtual bool CanReuseExisting(TModel existing, TModel import) =>
+            // for the best or worst, we copy and import files of a new import before checking whether
+            // it is a duplicate. so to check if anything has changed, we can just compare all FileInfo IDs.
+            getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files));
+
+        private IEnumerable<long> getIDs(List<TFileModel> files)
+        {
+            foreach (var f in files.OrderBy(f => f.Filename))
+                yield return f.FileInfo.ID;
+        }
+
+        private IEnumerable<string> getFilenames(List<TFileModel> files)
+        {
+            foreach (var f in files.OrderBy(f => f.Filename))
+                yield return f.Filename;
+        }
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
@@ -666,5 +793,12 @@ namespace osu.Game.Database
         }
 
         #endregion
+
+        private string getValidFilename(string filename)
+        {
+            foreach (char c in Path.GetInvalidFileNameChars())
+                filename = filename.Replace(c, '_');
+            return filename;
+        }
     }
 }

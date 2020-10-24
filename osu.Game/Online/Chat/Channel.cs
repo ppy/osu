@@ -37,6 +37,11 @@ namespace osu.Game.Online.Chat
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
 
         /// <summary>
+        /// Contains all the messages that weren't read by the user.
+        /// </summary>
+        public IEnumerable<Message> UnreadMessages => Messages.Where(m => LastReadId < m.Id);
+
+        /// <summary>
         /// Contains all the messages that are still pending for submission to the server.
         /// </summary>
         private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
@@ -56,7 +61,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public event Action<Message> MessageRemoved;
 
-        public bool ReadOnly => false; //todo not yet used.
+        public bool ReadOnly => false; // todo: not yet used.
 
         public override string ToString() => Name;
 
@@ -75,8 +80,12 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"last_message_id")]
         public long? LastMessageId;
 
+        [JsonProperty(@"last_read_id")]
+        public long? LastReadId;
+
         /// <summary>
-        /// Signalles if the current user joined this channel or not. Defaults to false.
+        /// Signals if the current user joined this channel or not. Defaults to false.
+        /// Note that this does not guarantee a join has completed. Check Id > 0 for confirmation.
         /// </summary>
         public Bindable<bool> Joined = new Bindable<bool>();
 

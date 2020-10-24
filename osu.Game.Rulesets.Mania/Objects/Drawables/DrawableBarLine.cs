@@ -71,8 +71,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
-        {
-        }
+        protected override void UpdateStateTransforms(ArmedState state) => this.FadeOut(150);
     }
 }

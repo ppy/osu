@@ -2,7 +2,8 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
-    "tasks": [{
+    "tasks": [
+        {
             "label": "Build osu! (Debug)",
             "type": "shell",
             "command": "dotnet",
@@ -78,7 +79,8 @@
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
-        }, {
+        },
+        {
             "label": "Build tournament tests (Release)",
             "type": "shell",
             "command": "dotnet",
@@ -86,6 +88,22 @@
                 "build",
                 "--no-restore",
                 "osu.Game.Tournament.Tests",
+                "/p:Configuration=Release",
+                "/p:GenerateFullPaths=true",
+                "/m",
+                "/verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build benchmarks",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "--no-restore",
+                "osu.Game.Benchmarks",
                 "/p:Configuration=Release",
                 "/p:GenerateFullPaths=true",
                 "/m",

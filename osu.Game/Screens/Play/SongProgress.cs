@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 
@@ -18,8 +19,9 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
     {
+        private const int info_height = 20;
         private const int bottom_bar_height = 5;
-
+        private const float graph_height = SquareGraph.Column.WIDTH * 6;
         private static readonly Vector2 handle_size = new Vector2(10, 18);
 
         private const float transition_duration = 200;
@@ -30,11 +32,18 @@ namespace osu.Game.Screens.Play
 
         public Action<double> RequestSeek;
 
-        public override bool HandleNonPositionalInput => AllowSeeking;
-        public override bool HandlePositionalInput => AllowSeeking;
+        /// <summary>
+        /// Whether seeking is allowed and the progress bar should be shown.
+        /// </summary>
+        public readonly Bindable<bool> AllowSeeking = new Bindable<bool>();
+
+        public readonly Bindable<bool> ShowGraph = new Bindable<bool>();
 
         //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
         private double lastHitTime => objects.Last().GetEndTime() + 1;
+
+        public override bool HandleNonPositionalInput => AllowSeeking.Value;
+        public override bool HandlePositionalInput => AllowSeeking.Value;
 
         private double firstHitTime => objects.First().StartTime;
 
@@ -54,27 +63,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private readonly BindableBool replayLoaded = new BindableBool();
-
         public IClock ReferenceClock;
 
         private IClock gameplayClock;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, GameplayClock clock)
-        {
-            if (clock != null)
-                gameplayClock = clock;
-
-            graph.FillColour = bar.FillColour = colours.BlueLighter;
-        }
-
         public SongProgress()
         {
-            const float graph_height = SquareGraph.Column.WIDTH * 6;
-
-            Height = bottom_bar_height + graph_height + handle_size.Y;
-            Y = bottom_bar_height;
+            Masking = true;
 
             Children = new Drawable[]
             {
@@ -83,8 +78,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding { Bottom = bottom_bar_height + graph_height },
+                    Height = info_height,
                 },
                 graph = new SongProgressGraph
                 {
@@ -96,7 +90,6 @@ namespace osu.Game.Screens.Play
                 },
                 bar = new SongProgressBar(bottom_bar_height, graph_height, handle_size)
                 {
-                    Alpha = 0,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     OnSeek = time => RequestSeek?.Invoke(time),
@@ -104,46 +97,34 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, GameplayClock clock, OsuConfigManager config)
         {
             base.LoadComplete();
 
+            if (clock != null)
+                gameplayClock = clock;
+
+            config.BindWith(OsuSetting.ShowProgressGraph, ShowGraph);
+
+            graph.FillColour = bar.FillColour = colours.BlueLighter;
+        }
+
+        protected override void LoadComplete()
+        {
             Show();
 
-            replayLoaded.ValueChanged += loaded => AllowSeeking = loaded.NewValue;
-            replayLoaded.TriggerChange();
+            AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
+            ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
         }
 
         public void BindDrawableRuleset(DrawableRuleset drawableRuleset)
         {
-            replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
-        }
-
-        private bool allowSeeking;
-
-        public bool AllowSeeking
-        {
-            get => allowSeeking;
-            set
-            {
-                if (allowSeeking == value) return;
-
-                allowSeeking = value;
-                updateBarVisibility();
-            }
-        }
-
-        private void updateBarVisibility()
-        {
-            bar.FadeTo(allowSeeking ? 1 : 0, transition_duration, Easing.In);
-            this.MoveTo(new Vector2(0, allowSeeking ? 0 : bottom_bar_height), transition_duration, Easing.In);
-
-            info.Margin = new MarginPadding { Bottom = Height - (allowSeeking ? 0 : handle_size.Y) };
+            AllowSeeking.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
         protected override void PopIn()
         {
-            updateBarVisibility();
             this.FadeIn(500, Easing.OutQuint);
         }
 
@@ -166,6 +147,31 @@ namespace osu.Game.Screens.Play
 
             bar.CurrentTime = gameplayTime;
             graph.Progress = (int)(graph.ColumnCount * progress);
+
+            Height = bottom_bar_height + graph_height + handle_size.Y + info_height - graph.Y;
+        }
+
+        private void updateBarVisibility()
+        {
+            bar.ShowHandle = AllowSeeking.Value;
+
+            updateInfoMargin();
+        }
+
+        private void updateGraphVisibility()
+        {
+            float barHeight = bottom_bar_height + handle_size.Y;
+
+            bar.ResizeHeightTo(ShowGraph.Value ? barHeight + graph_height : barHeight, transition_duration, Easing.In);
+            graph.MoveToY(ShowGraph.Value ? 0 : bottom_bar_height + graph_height, transition_duration, Easing.In);
+
+            updateInfoMargin();
+        }
+
+        private void updateInfoMargin()
+        {
+            float finalMargin = bottom_bar_height + (AllowSeeking.Value ? handle_size.Y : 0) + (ShowGraph.Value ? graph_height : 0);
+            info.TransformTo(nameof(info.Margin), new MarginPadding { Bottom = finalMargin }, transition_duration, Easing.In);
         }
     }
 }

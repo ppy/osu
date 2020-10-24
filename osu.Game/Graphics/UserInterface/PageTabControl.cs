@@ -78,7 +78,7 @@ namespace osu.Game.Graphics.UserInterface
                     new HoverClickSounds()
                 };
 
-                Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Exo, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
+                Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Torus, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
             protected virtual string CreateText() => (Value as Enum)?.GetDescription() ?? Value.ToString();

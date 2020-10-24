@@ -5,11 +5,9 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -30,30 +28,17 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         private Color4 selectedBackgroundColour;
         private Color4 selectedBubbleColour;
 
-        private readonly Drawable bubble;
+        private Drawable icon;
         private readonly RadioButton button;
 
         public DrawableRadioButton(RadioButton button)
         {
             this.button = button;
 
-            Text = button.Text;
-            Action = button.Action;
+            Text = button.Item.ToString();
+            Action = button.Select;
 
             RelativeSizeAxes = Axes.X;
-
-            bubble = new CircularContainer
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                Scale = new Vector2(0.5f),
-                X = 10,
-                Masking = true,
-                Blending = BlendingParameters.Additive,
-                Child = new Box { RelativeSizeAxes = Axes.Both }
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -74,7 +59,14 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                 Colour = Color4.Black.Opacity(0.5f)
             };
 
-            Add(bubble);
+            Add(icon = (button.CreateIcon?.Invoke() ?? new Circle()).With(b =>
+            {
+                b.Blending = BlendingParameters.Additive;
+                b.Anchor = Anchor.CentreLeft;
+                b.Origin = Anchor.CentreLeft;
+                b.Size = new Vector2(20);
+                b.X = 10;
+            }));
         }
 
         protected override void LoadComplete()
@@ -97,20 +89,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                 return;
 
             BackgroundColour = button.Selected.Value ? selectedBackgroundColour : defaultBackgroundColour;
-            bubble.Colour = button.Selected.Value ? selectedBubbleColour : defaultBubbleColour;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (button.Selected.Value)
-                return true;
-
-            if (!Enabled.Value)
-                return true;
-
-            button.Selected.Value = true;
-
-            return base.OnClick(e);
+            icon.Colour = button.Selected.Value ? selectedBubbleColour : defaultBubbleColour;
         }
 
         protected override SpriteText CreateText() => new OsuSpriteText

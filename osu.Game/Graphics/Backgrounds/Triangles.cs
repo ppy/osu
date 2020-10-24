@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osuTK;
 using osuTK.Graphics;
 using System;
@@ -29,8 +29,33 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         private const float edge_smoothness = 1;
 
-        public Color4 ColourLight = Color4.White;
-        public Color4 ColourDark = Color4.Black;
+        private Color4 colourLight = Color4.White;
+
+        public Color4 ColourLight
+        {
+            get => colourLight;
+            set
+            {
+                if (colourLight == value) return;
+
+                colourLight = value;
+                updateColours();
+            }
+        }
+
+        private Color4 colourDark = Color4.Black;
+
+        public Color4 ColourDark
+        {
+            get => colourDark;
+            set
+            {
+                if (colourDark == value) return;
+
+                colourDark = value;
+                updateColours();
+            }
+        }
 
         /// <summary>
         /// Whether we want to expire triangles as they exit our draw area completely.
@@ -61,13 +86,24 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         public float Velocity = 1;
 
+        private readonly Random stableRandom;
+
+        private float nextRandom() => (float)(stableRandom?.NextDouble() ?? RNG.NextSingle());
+
         private readonly SortedList<TriangleParticle> parts = new SortedList<TriangleParticle>(Comparer<TriangleParticle>.Default);
 
         private IShader shader;
         private readonly Texture texture;
 
-        public Triangles()
+        /// <summary>
+        /// Construct a new triangle visualisation.
+        /// </summary>
+        /// <param name="seed">An optional seed to stabilise random positions / attributes. Note that this does not guarantee stable playback when seeking in time.</param>
+        public Triangles(int? seed = null)
         {
+            if (seed != null)
+                stableRandom = new Random(seed.Value);
+
             texture = Texture.WhitePixel;
         }
 
@@ -104,7 +140,7 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
-            Invalidate(Invalidation.DrawNode, shallPropagate: false);
+            Invalidate(Invalidation.DrawNode);
 
             if (CreateNewTriangles)
                 addTriangles(false);
@@ -150,8 +186,9 @@ namespace osu.Game.Graphics.Backgrounds
         {
             TriangleParticle particle = CreateTriangle();
 
-            particle.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() : 1);
-            particle.Colour = CreateTriangleShade();
+            particle.Position = new Vector2(nextRandom(), randomY ? nextRandom() : 1);
+            particle.ColourShade = nextRandom();
+            particle.Colour = CreateTriangleShade(particle.ColourShade);
 
             return particle;
         }
@@ -165,10 +202,10 @@ namespace osu.Game.Graphics.Backgrounds
             const float std_dev = 0.16f;
             const float mean = 0.5f;
 
-            float u1 = 1 - RNG.NextSingle(); //uniform(0,1] random floats
-            float u2 = 1 - RNG.NextSingle();
-            float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); //random normal(0,1)
-            var scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); //random normal(mean,stdDev^2)
+            float u1 = 1 - nextRandom(); //uniform(0,1] random floats
+            float u2 = 1 - nextRandom();
+            float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); // random normal(0,1)
+            var scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); // random normal(mean,stdDev^2)
 
             return new TriangleParticle { Scale = scale };
         }
@@ -177,7 +214,17 @@ namespace osu.Game.Graphics.Backgrounds
         /// Creates a shade of colour for the triangles.
         /// </summary>
         /// <returns>The colour.</returns>
-        protected virtual Color4 CreateTriangleShade() => Interpolation.ValueAt(RNG.NextSingle(), ColourDark, ColourLight, 0, 1);
+        protected virtual Color4 CreateTriangleShade(float shade) => Interpolation.ValueAt(shade, colourDark, colourLight, 0, 1);
+
+        private void updateColours()
+        {
+            for (int i = 0; i < parts.Count; i++)
+            {
+                TriangleParticle newParticle = parts[i];
+                newParticle.Colour = CreateTriangleShade(newParticle.ColourShade);
+                parts[i] = newParticle;
+            }
+        }
 
         protected override DrawNode CreateDrawNode() => new TrianglesDrawNode(this);
 
@@ -263,6 +310,12 @@ namespace osu.Game.Graphics.Backgrounds
             /// The position of the top vertex of the triangle.
             /// </summary>
             public Vector2 Position;
+
+            /// <summary>
+            /// The colour shade of the triangle.
+            /// This is needed for colour recalculation of visible triangles when <see cref="ColourDark"/> or <see cref="ColourLight"/> is changed.
+            /// </summary>
+            public float ColourShade;
 
             /// <summary>
             /// The colour of the triangle.

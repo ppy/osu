@@ -3,10 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
-using osu.Game.Online.API.Requests;
-using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
@@ -14,46 +20,109 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneCommentsContainer : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CommentsContainer),
-            typeof(CommentsHeader),
-            typeof(DrawableComment),
-            typeof(HeaderButton),
-            typeof(SortTabControl),
-            typeof(ShowChildrenButton),
-            typeof(DeletedChildrenPlaceholder),
-            typeof(VotePill)
-        };
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        protected override bool UseOnlineAPI => true;
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        public TestSceneCommentsContainer()
-        {
-            BasicScrollContainer scrollFlow;
+        private CommentsContainer commentsContainer;
 
-            Add(scrollFlow = new BasicScrollContainer
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+            Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Child = commentsContainer = new CommentsContainer()
             });
 
-            AddStep("Big Black comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 41823));
-            });
-
-            AddStep("Airman comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 24313));
-            });
-
-            AddStep("lazer build comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Build, 4772));
-            });
+        [Test]
+        public void TestIdleState()
+        {
+            AddUntilStep("loading spinner shown",
+                () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().IsLoading);
         }
+
+        [Test]
+        public void TestSingleCommentsPage()
+        {
+            setUpCommentsResponse(exampleComments);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("show more button hidden",
+                () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().Alpha == 0);
+        }
+
+        [Test]
+        public void TestMultipleCommentPages()
+        {
+            var comments = exampleComments;
+            comments.HasMore = true;
+            comments.TopLevelCount = 10;
+
+            setUpCommentsResponse(comments);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("show more button visible",
+                () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().Alpha == 1);
+        }
+
+        [Test]
+        public void TestMultipleLoads()
+        {
+            var comments = exampleComments;
+            int topLevelCommentCount = exampleComments.Comments.Count;
+
+            AddStep("hide container", () => commentsContainer.Hide());
+            setUpCommentsResponse(comments);
+            AddRepeatStep("show comments multiple times",
+                () => commentsContainer.ShowComments(CommentableType.Beatmapset, 456), 2);
+            AddStep("show container", () => commentsContainer.Show());
+            AddUntilStep("comment count is correct",
+                () => commentsContainer.ChildrenOfType<DrawableComment>().Count() == topLevelCommentCount);
+        }
+
+        private void setUpCommentsResponse(CommentBundle commentBundle)
+            => AddStep("set up response", () =>
+            {
+                dummyAPI.HandleRequest = request =>
+                {
+                    if (!(request is GetCommentsRequest getCommentsRequest))
+                        return;
+
+                    getCommentsRequest.TriggerSuccess(commentBundle);
+                };
+            });
+
+        private CommentBundle exampleComments => new CommentBundle
+        {
+            Comments = new List<Comment>
+            {
+                new Comment
+                {
+                    Id = 1,
+                    Message = "This is a comment",
+                    LegacyName = "FirstUser",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 19,
+                    RepliesCount = 1
+                },
+                new Comment
+                {
+                    Id = 5,
+                    ParentId = 1,
+                    Message = "This is a child comment",
+                    LegacyName = "SecondUser",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 4,
+                },
+                new Comment
+                {
+                    Id = 10,
+                    Message = "This is another comment",
+                    LegacyName = "ThirdUser",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 0
+                },
+            },
+            IncludedComments = new List<Comment>(),
+        };
     }
 }

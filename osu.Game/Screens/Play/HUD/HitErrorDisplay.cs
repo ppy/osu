@@ -66,30 +66,76 @@ namespace osu.Game.Screens.Play.HUD
             switch (type.NewValue)
             {
                 case ScoreMeterType.HitErrorBoth:
-                    createBar(false);
-                    createBar(true);
+                    createBar(Anchor.CentreLeft);
+                    createBar(Anchor.CentreRight);
                     break;
 
                 case ScoreMeterType.HitErrorLeft:
-                    createBar(false);
+                    createBar(Anchor.CentreLeft);
                     break;
 
                 case ScoreMeterType.HitErrorRight:
-                    createBar(true);
+                    createBar(Anchor.CentreRight);
+                    break;
+
+                case ScoreMeterType.HitErrorBottom:
+                    createBar(Anchor.BottomCentre);
+                    break;
+
+                case ScoreMeterType.ColourBoth:
+                    createColour(Anchor.CentreLeft);
+                    createColour(Anchor.CentreRight);
+                    break;
+
+                case ScoreMeterType.ColourLeft:
+                    createColour(Anchor.CentreLeft);
+                    break;
+
+                case ScoreMeterType.ColourRight:
+                    createColour(Anchor.CentreRight);
+                    break;
+
+                case ScoreMeterType.ColourBottom:
+                    createColour(Anchor.BottomCentre);
                     break;
             }
         }
 
-        private void createBar(bool rightAligned)
+        private void createBar(Anchor anchor)
         {
+            bool rightAligned = (anchor & Anchor.x2) > 0;
+            bool bottomAligned = (anchor & Anchor.y2) > 0;
+
             var display = new BarHitErrorMeter(hitWindows, rightAligned)
             {
                 Margin = new MarginPadding(margin),
-                Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
-                Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                Anchor = anchor,
+                Origin = bottomAligned ? Anchor.CentreLeft : anchor,
                 Alpha = 0,
+                Rotation = bottomAligned ? 270 : 0
             };
 
+            completeDisplayLoading(display);
+        }
+
+        private void createColour(Anchor anchor)
+        {
+            bool bottomAligned = (anchor & Anchor.y2) > 0;
+
+            var display = new ColourHitErrorMeter(hitWindows)
+            {
+                Margin = new MarginPadding(margin),
+                Anchor = anchor,
+                Origin = bottomAligned ? Anchor.CentreLeft : anchor,
+                Alpha = 0,
+                Rotation = bottomAligned ? 270 : 0
+            };
+
+            completeDisplayLoading(display);
+        }
+
+        private void completeDisplayLoading(HitErrorMeter display)
+        {
             Add(display);
             display.FadeInFromZero(fade_duration, Easing.OutQuint);
         }

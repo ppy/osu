@@ -13,7 +13,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API.Requests;
@@ -22,11 +21,9 @@ using osu.Game.Overlays.Changelog;
 
 namespace osu.Game.Overlays
 {
-    public class ChangelogOverlay : FullscreenOverlay
+    public class ChangelogOverlay : FullscreenOverlay<ChangelogHeader>
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
-
-        private ChangelogHeader header;
 
         private Container<ChangelogContent> content;
 
@@ -34,24 +31,24 @@ namespace osu.Game.Overlays
 
         private List<APIChangelogBuild> builds;
 
-        private List<APIUpdateStream> streams;
+        protected List<APIUpdateStream> Streams;
+
+        public ChangelogOverlay()
+            : base(OverlayColourScheme.Purple, new ChangelogHeader())
+        {
+        }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colour)
+        private void load(AudioManager audio)
         {
-            Waves.FirstWaveColour = colour.GreyVioletLight;
-            Waves.SecondWaveColour = colour.GreyViolet;
-            Waves.ThirdWaveColour = colour.GreyVioletDark;
-            Waves.FourthWaveColour = colour.GreyVioletDarker;
-
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colour.PurpleDarkAlternative,
+                    Colour = ColourProvider.Background4,
                 },
-                new OsuScrollContainer
+                new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -62,10 +59,11 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new ChangelogHeader
+                            Header.With(h =>
                             {
-                                ListingSelected = ShowListing,
-                            },
+                                h.ListingSelected = ShowListing;
+                                h.Build.BindTarget = Current;
+                            }),
                             content = new Container<ChangelogContent>
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -77,8 +75,6 @@ namespace osu.Game.Overlays
             };
 
             sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
-
-            header.Current.BindTo(Current);
 
             Current.BindValueChanged(e =>
             {
@@ -117,7 +113,7 @@ namespace osu.Game.Overlays
             performAfterFetch(() =>
             {
                 var build = builds.Find(b => b.Version == version && b.UpdateStream.Name == updateStream)
-                            ?? streams.Find(s => s.Name == updateStream)?.LatestBuild;
+                            ?? Streams.Find(s => s.Name == updateStream)?.LatestBuild;
 
                 if (build != null)
                     ShowBuild(build);
@@ -158,7 +154,8 @@ namespace osu.Game.Overlays
 
         private Task initialFetchTask;
 
-        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ => Schedule(action));
+        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ =>
+            Schedule(action), TaskContinuationOptions.OnlyOnRanToCompletion);
 
         private Task fetchListing()
         {
@@ -178,17 +175,17 @@ namespace osu.Game.Overlays
                     res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
 
                     builds = res.Builds;
-                    streams = res.Streams;
+                    Streams = res.Streams;
 
-                    header.Streams.Populate(res.Streams);
+                    Header.Populate(res.Streams);
 
                     tcs.SetResult(true);
                 });
 
-                req.Failure += _ =>
+                req.Failure += e =>
                 {
                     initialFetchTask = null;
-                    tcs.SetResult(false);
+                    tcs.SetException(e);
                 };
 
                 await API.PerformAsync(req);

@@ -10,15 +10,14 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePause : PlayerTestScene
+    public class TestScenePause : OsuPlayerTestScene
     {
         protected new PausePlayer Player => (PausePlayer)base.Player;
 
@@ -27,7 +26,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override Container<Drawable> Content => content;
 
         public TestScenePause()
-            : base(new OsuRuleset())
         {
             base.Content.Add(content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both });
         }
@@ -36,6 +34,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
             AddStep("resume player", () => Player.GameplayClockContainer.Start());
             confirmClockRunning(true);
         }
@@ -52,7 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestResumeWithResumeOverlay()
         {
             AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
 
             pauseAndConfirm();
             resume();
@@ -73,7 +72,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestPauseWithResumeOverlay()
         {
             AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
 
             pauseAndConfirm();
 
@@ -92,7 +91,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move cursor to button", () =>
                 InputManager.MoveMouseTo(Player.HUDOverlay.HoldToQuit.Children.OfType<HoldToConfirmContainer>().First().ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
 
             pauseAndConfirm();
             resumeAndConfirm();
@@ -159,7 +158,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestQuickRetryFromFailedGameplay()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddStep("quick retry", () => Player.GameplayClockContainer.OfType<HotkeyRetryOverlay>().First().Action?.Invoke());
+            AddStep("quick retry", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyRetryOverlay>().First().Action?.Invoke());
 
             confirmExited();
         }
@@ -168,7 +167,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestQuickExitFromFailedGameplay()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddStep("quick exit", () => Player.GameplayClockContainer.OfType<HotkeyExitOverlay>().First().Action?.Invoke());
+            AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
 
             confirmExited();
         }
@@ -176,9 +175,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitFromGameplay()
         {
-            AddStep("exit", () => Player.Exit());
-            confirmPaused();
-
+            // an externally triggered exit should immediately exit, skipping all pause logic.
             AddStep("exit", () => Player.Exit());
             confirmExited();
         }
@@ -186,7 +183,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickExitFromGameplay()
         {
-            AddStep("quick exit", () => Player.GameplayClockContainer.OfType<HotkeyExitOverlay>().First().Action?.Invoke());
+            AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
 
             confirmExited();
         }
@@ -223,6 +220,31 @@ namespace osu.Game.Tests.Visual.Gameplay
             resumeAndConfirm();
             restart();
             confirmExited();
+        }
+
+        [Test]
+        public void TestPauseSoundLoop()
+        {
+            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
+
+            SkinnableSound getLoop() => Player.ChildrenOfType<PauseOverlay>().FirstOrDefault()?.ChildrenOfType<SkinnableSound>().FirstOrDefault();
+
+            pauseAndConfirm();
+            AddAssert("loop is playing", () => getLoop().IsPlaying);
+
+            resumeAndConfirm();
+            AddUntilStep("loop is stopped", () => !getLoop().IsPlaying);
+
+            AddUntilStep("pause again", () =>
+            {
+                Player.Pause();
+                return !Player.GameplayClockContainer.GameplayClock.IsRunning;
+            });
+
+            AddAssert("loop is playing", () => getLoop().IsPlaying);
+
+            resumeAndConfirm();
+            AddUntilStep("loop is stopped", () => !getLoop().IsPlaying);
         }
 
         private void pauseAndConfirm()
@@ -281,14 +303,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override bool AllowFail => true;
 
-        protected override Player CreatePlayer(Ruleset ruleset) => new PausePlayer();
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new PausePlayer();
 
         protected class PausePlayer : TestPlayer
         {
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
-
-            public new HUDOverlay HUDOverlay => base.HUDOverlay;
-
             public bool FailOverlayVisible => FailOverlay.State.Value == Visibility.Visible;
 
             public bool PauseOverlayVisible => PauseOverlay.State.Value == Visibility.Visible;
