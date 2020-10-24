@@ -104,6 +104,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private AudioManager audioManager { get; set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
         public PlayerLoader(Func<Player> createPlayer)
         {
             this.createPlayer = createPlayer;
@@ -332,9 +335,17 @@ namespace osu.Game.Screens.Play
                         const double epilepsy_display_length = 3000;
 
                         pushSequence
-                            .Schedule(() => epilepsyWarning.State.Value = Visibility.Visible)
+                            .Schedule(() =>
+                            {
+                                musicController.CurrentTrack.VolumeTo(0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint);
+                                epilepsyWarning.State.Value = Visibility.Visible;
+                            })
                             .Delay(epilepsy_display_length)
-                            .Schedule(() => epilepsyWarning.Hide())
+                            .Schedule(() =>
+                            {
+                                epilepsyWarning.Hide();
+                                epilepsyWarning.Expire();
+                            })
                             .Delay(EpilepsyWarning.FADE_DURATION);
                     }
 
@@ -347,6 +358,10 @@ namespace osu.Game.Screens.Play
                         // By default, we want to load the player and never be returned to.
                         // Note that this may change if the player we load requested a re-run.
                         ValidForResume = false;
+
+                        // restore full volume immediately - there's a usually a period of silence at start of gameplay anyway.
+                        // note that this is delayed slightly to avoid volume spikes just before push.
+                        musicController.CurrentTrack.Delay(50).VolumeTo(1);
 
                         if (player.LoadedBeatmapSuccessfully)
                             this.Push(player);
@@ -363,6 +378,10 @@ namespace osu.Game.Screens.Play
 
         private void cancelLoad()
         {
+            // in case the epilepsy warning is being displayed, restore full volume.
+            if (epilepsyWarning?.IsAlive == true)
+                musicController.CurrentTrack.VolumeTo(1, EpilepsyWarning.FADE_DURATION, Easing.OutQuint);
+
             scheduledPushPlayer?.Cancel();
             scheduledPushPlayer = null;
         }
