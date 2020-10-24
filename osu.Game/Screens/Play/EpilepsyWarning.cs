@@ -16,6 +16,7 @@ namespace osu.Game.Screens.Play
 {
     public class EpilepsyWarning : VisibilityContainer
     {
+        public const double FADE_DURATION = 250;
 
         public EpilepsyWarning()
         {
