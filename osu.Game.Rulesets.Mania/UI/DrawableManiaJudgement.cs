@@ -30,6 +30,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void ApplyHitAnimations()
         {
+            ApplyConfigUpdates();
             JudgementBody.ScaleTo(0.8f);
             JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
 
