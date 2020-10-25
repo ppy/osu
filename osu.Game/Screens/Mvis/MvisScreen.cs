@@ -40,6 +40,7 @@ using osu.Game.Users;
 using osu.Game.Screens.Mvis.Modules;
 using osu.Game.Screens.Mvis.Modules.v2;
 using osu.Game.Collections;
+using System.Collections.Generic;
 
 namespace osu.Game.Screens
 {
@@ -112,6 +113,7 @@ namespace osu.Game.Screens
         private Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
         private CollectionSelectPanel collectionPanel;
         private BottomBarSwitchButton collectionButton;
+        private List<VisibilityContainer> overlays = new List<VisibilityContainer>();
 
         public MvisScreen()
         {
@@ -261,8 +263,10 @@ namespace osu.Game.Screens
                                                                         //隐藏界面，锁定更改并隐藏锁定按钮
                                                                         lockChanges.Value = false;
                                                                         HideOverlays();
-                                                                        if ( sidebarToggleButton.ToggleableValue.Value )
-                                                                            sidebarToggleButton.Click();
+                                                                        sidebarToggleButton.ToggleableValue.Value = false;
+                                                                        
+                                                                        foreach (var o in overlays)
+                                                                            o.Hide();
 
                                                                         //防止手机端无法退出桌面背景模式
                                                                         if (RuntimeInfo.IsDesktop)
@@ -525,6 +529,9 @@ namespace osu.Game.Screens
             songProgressButton.ToggleableValue.BindTo(TrackRunning);
 
             ShowOverlays();
+
+            overlays.Add(collectionPanel);
+            overlays.Add(sidebarContainer);
 
             base.LoadComplete();
         }
