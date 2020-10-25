@@ -44,6 +44,11 @@ namespace osu.Game.Graphics.UserInterface
                 // blocking scroll can cause weird behaviour when this layer is used within a ScrollContainer.
                 case ScrollEvent _:
                     return false;
+
+                // blocking touch events causes the ISourcedFromTouch versions to not be fired, potentially impeding behaviour of drawables *above* the loading layer that may utilise these.
+                // note that this will not work well if touch handling elements are beneath this loading layer (something to consider for the future).
+                case TouchEvent _:
+                    return false;
             }
 
             return true;

@@ -15,6 +15,7 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
+        [Cached]
         public Storyboard Storyboard { get; }
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
