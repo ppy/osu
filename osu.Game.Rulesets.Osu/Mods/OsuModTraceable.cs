@@ -39,10 +39,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected void ApplyTraceableState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawableOsuHitObject drawableOsu))
+            if (!(drawable is DrawableOsuHitObject))
                 return;
-
-            var h = drawableOsu.HitObject;
 
             //todo: expose and hide spinner background somehow
 
