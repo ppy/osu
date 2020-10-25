@@ -15,7 +15,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select
 {
-    public class DifficultyRecommender : Component, IOnlineComponent
+    public class DifficultyRecommender : Component
     {
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -28,10 +28,13 @@ namespace osu.Game.Screens.Select
 
         private readonly Dictionary<RulesetInfo, double> recommendedStarDifficulty = new Dictionary<RulesetInfo, double>();
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            api.Register(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
         }
 
         /// <summary>
@@ -72,21 +75,14 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            switch (state)
+            switch (state.NewValue)
             {
                 case APIState.Online:
                     calculateRecommendedDifficulties();
                     break;
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            api?.Unregister(this);
-        }
+        });
     }
 }
