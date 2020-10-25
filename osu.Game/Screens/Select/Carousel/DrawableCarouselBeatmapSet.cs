@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Select.Carousel
                 LoadComponentAsync(beatmapContainer, loaded =>
                 {
                     // make sure the pooled target hasn't changed.
-                    if (carouselBeatmapSet != Item)
+                    if (beatmapContainer != loaded)
                         return;
 
                     Content.Child = loaded;
