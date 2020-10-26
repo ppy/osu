@@ -31,7 +31,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSpectator : OsuManualInputManagerTestScene
+    public class TestSceneSpectatorPlayback : OsuManualInputManagerTestScene
     {
         protected override bool UseOnlineAPI => true;
 
