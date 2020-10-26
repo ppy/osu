@@ -29,11 +29,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private MusicController controller { get; set; }
 
         public readonly BindableBool Active = new BindableBool();
+        public bool IsCurrent;
 
         public readonly WorkingBeatmap beatmap;
         private Flash flash;
         private Box maskBox;
-        public bool isCurrent;
 
         public BeatmapPiece(WorkingBeatmap b)
         {
@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             switch (v.NewValue)
             {
                 case true:
-                    if ( isCurrent )
+                    if ( IsCurrent )
                             BorderColour = colourProvider.Highlight1;
                     else
                             BorderColour = Colour4.Gold;
@@ -192,10 +192,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         public void MakeActive() => Active.Value = true;
         public void InActive() => Active.Value = false;
+        public void TriggerActiveChange() => Active.TriggerChange();
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (isCurrent && b.Value != beatmap )
+            if (IsCurrent && b.Value != beatmap )
             {
                 b.Value = beatmap;
                 controller.Play();

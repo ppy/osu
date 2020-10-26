@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 state.Value = ActiveState.Disabled;
 
             collectionName.Text = collection.Name.Value;
-            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲, {collection.Beatmaps.Count}个谱面";
+            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
             state.BindValueChanged(OnStateChanged, true);
         }
@@ -287,21 +287,58 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             private void AddBeatmapThumbnails()
             {
+                short collections = 0;
+                short limit = 32767;
+
+                if (beatmapSetList.Count > 10)
+                    limit = 15;
+
                 foreach (var c in beatmapSetList)
                 {
+                    collections++;
+
                     var b = beatmaps.GetWorkingBeatmap(c.Beatmaps.First());
                     string tooltip = $"{b.Metadata.ArtistUnicode ?? b.Metadata.Artist}"
                                    + " - "
                                    + $"{b.Metadata.TitleUnicode ?? b.Metadata.Title}";
 
+                    if (collections < limit)
+                    {
+                        Add(new TooltipContainer
+                        {
+                            Size = new Vector2(40),
+                            Masking = true,
+                            CornerRadius = 7.25f,
+                            TooltipText = tooltip,
+                            Child = new BeatmapCover(b)
+                        });
+                        continue;
+                    }
+
+                    int remaining = beatmapSetList.Count - limit;
                     Add(new TooltipContainer
                     {
                         Size = new Vector2(40),
                         Masking = true,
                         CornerRadius = 7.25f,
-                        TooltipText = tooltip,
-                        Child = new BeatmapCover(b)
+                        TooltipText = tooltip + $" 等{remaining}首歌曲",
+                        Children = new Drawable[]
+                        {
+                            new BeatmapCover(b),
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Colour4.Black.Opacity(0.7f),
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = $"+{remaining}",
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
+                        }
                     });
+                    break;
                 };
             }
         }

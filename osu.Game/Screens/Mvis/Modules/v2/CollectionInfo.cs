@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,6 +13,7 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -21,22 +24,17 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        [Resolved]
-        private Bindable<WorkingBeatmap> working { get; set; }
-
         private Box flashBox;
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;
         private Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
         private List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
         private BeatmapCover cover;
-        private BeatmapPiece currentPiece;
 
         [Cached]
         public readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
-        private FillFlowContainer beatmapFillFlow;
-        private OsuScrollContainer beatmapScroll;
-        private bool isCurrentCollection;
+        private BeatmapList beatmapList;
+        private BindableBool isCurrentCollection = new BindableBool();
 
         public CollectionInfo()
         {
@@ -128,17 +126,16 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding{Left = 35, Right = 20, Vertical = 20},
-                                Child = beatmapScroll = new OsuScrollContainer
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    RightMouseScrollbar = true,
-                                    Child = beatmapFillFlow = new FillFlowContainer
+                                    listContainer = new Container
                                     {
-                                        Padding = new MarginPadding{Right = 15},
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Spacing = new Vector2(5)
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding{Left = 35, Vertical = 20},
+                                    },
+                                    loadingSpinner = new LoadingSpinner(true)
+                                    {
+                                        Size = new Vector2(50)
                                     }
                                 }
                             },
@@ -153,14 +150,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             base.LoadComplete();
 
             collection.BindValueChanged(OnCollectionChanged);
-            working.BindValueChanged(OnBeatmapChanged);
         }
 
         private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
             var c = v.NewValue;
 
-            currentPiece = null;
             if (c == null)
             {
                 ClearInfo();
@@ -180,68 +175,44 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
 
             collectionName.Text = c.Name.Value;
-            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲, {c.Beatmaps.Count}个谱面";
+            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
             cover.updateBackground(beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()));
             flashBox.FlashColour(Colour4.White, 1000, Easing.OutQuint);
 
-            beatmapFillFlow.Clear();
-            beatmapFillFlow.AddRange(beatmapSets.Select(s => new BeatmapPiece(beatmaps.GetWorkingBeatmap(s.Beatmaps.First()))));
-
-            working.TriggerChange();
+            RefreshBeatmapSetList();
         }
 
-        private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
+        private CancellationTokenSource refreshTaskCancellationToken;
+        private Container listContainer;
+        private LoadingSpinner loadingSpinner;
+
+        private void RefreshBeatmapSetList()
         {
-            currentPiece?.InActive();
+            Task refreshTask;
+            refreshTaskCancellationToken?.Cancel();
+            refreshTaskCancellationToken = new CancellationTokenSource();
 
-            foreach (var d in beatmapFillFlow)
+            beatmapList?.FadeOut(250).Then().Expire();
+            loadingSpinner.Show();
+
+            Task.Run(async () =>
             {
-                if (d is BeatmapPiece piece)
-                    if (piece.beatmap.BeatmapSetInfo.Hash == v.NewValue.BeatmapSetInfo.Hash)
-                    {
-                        currentPiece = piece;
-                        piece.MakeActive();
-                        break;
-                    }
-            }
-
-            this.Delay(5).Schedule(ScrollToCurrentBeatmap);
-        }
-
-        private void ScrollToCurrentBeatmap()
-        {
-            if ( !isCurrentCollection )
-            {
-                beatmapScroll.ScrollToStart();
-                return;
-            }
-
-            if ( currentPiece == null ) return;
-
-            float distance = 0;
-            var index = beatmapFillFlow.IndexOf(currentPiece);
-
-            //如果是第一个，那么滚动到头
-            if (index == 0)
-            {
-                beatmapScroll.ScrollToStart();
-                return;
-            }
-            else
-            {
-                distance = (index - 1) * 85;
-
-                //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
-                //n个piece, n-1个间隔
-                if (distance + beatmapScroll.DrawHeight > (beatmapFillFlow.Count * 85 - 5))
+                refreshTask = Task.Run(() =>
                 {
-                    beatmapScroll.ScrollToEnd();
-                    return;
-                }
-            }
+                    LoadComponentAsync(new BeatmapList(beatmapSets), newList =>
+                    {
+                        newList.IsCurrent.BindTo(isCurrentCollection);
+                        beatmapList = newList;
 
-            beatmapScroll.ScrollTo(distance);
+                        listContainer.Add(newList);
+                        newList.Show();
+                        loadingSpinner.Hide();
+                    }, refreshTaskCancellationToken.Token);
+                }, refreshTaskCancellationToken.Token);
+
+                await refreshTask;
+            });
         }
 
         public void UpdateCollection(BeatmapCollection collection, bool isCurrent)
@@ -249,18 +220,17 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             if (!isCurrent) flashBox.FadeColour(Colour4.Gold, 300, Easing.OutQuint);
             else flashBox.FadeColour(Color4Extensions.FromHex("#88b300"), 300, Easing.OutQuint);
 
+            if ( collection != this.collection.Value && beatmapList != null )
+            {
+                beatmapList.IsCurrent.UnbindAll();
+                beatmapList.IsCurrent.Value = false;
+            }
+
             //设置当前选择是否为正在播放的收藏夹
-            isCurrentCollection = isCurrent;
+            isCurrentCollection.Value = isCurrent;
 
             //将当前收藏夹设为collection
             this.collection.Value = collection;
-
-            //更新BeatmapPiece
-            foreach (var d in beatmapFillFlow)
-                if (d is BeatmapPiece p)
-                    p.isCurrent = isCurrent;
-
-            currentPiece?.Active.TriggerChange();
         }
 
         private void ClearInfo()
@@ -268,7 +238,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             cover.updateBackground(null);
 
             beatmapSets.Clear();
-            beatmapFillFlow.Clear();
+            beatmapList.ClearList();
             collectionName.Text = "未选择收藏夹";
             collectionBeatmapCount.Text = "请先选择一个收藏夹!";
 

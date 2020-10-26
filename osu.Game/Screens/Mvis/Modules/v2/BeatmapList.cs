@@ -1,0 +1,157 @@
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Caching;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
+using osuTK;
+
+namespace osu.Game.Screens.Mvis.Modules.v2
+{
+    public class BeatmapList : VisibilityContainer
+    {
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
+        private Bindable<WorkingBeatmap> working { get; set; }
+
+        private readonly List<BeatmapSetInfo> beatmapSets;
+        private BeatmapPiece currentPiece;
+        public BindableBool IsCurrent = new BindableBool();
+        private OsuScrollContainer beatmapScroll;
+        private FillFlowContainer fillFlow;
+        private Cached scrollCache = new Cached();
+
+        public BeatmapList(List<BeatmapSetInfo> set)
+        {
+            Padding = new MarginPadding { Right = 15 };
+            RelativeSizeAxes = Axes.Both;
+            Alpha = 0;
+
+            InternalChildren = new Drawable[]
+            {
+                beatmapScroll = new OsuScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RightMouseScrollbar = true,
+                    Child = fillFlow = new FillFlowContainer
+                    {
+                        Padding = new MarginPadding{Right = 20},
+                        Spacing = new Vector2(5),
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    }
+                }
+            };
+
+            beatmapSets = set;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddBeatmapSets();
+
+            working.BindValueChanged(OnBeatmapChanged);
+            IsCurrent.BindValueChanged(v =>
+            {
+                foreach (var d in fillFlow)
+                    if ( d is BeatmapPiece piece )
+                        piece.IsCurrent = v.NewValue;
+
+                currentPiece?.TriggerActiveChange();
+            });
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if ( !scrollCache.IsValid )
+                ScrollToCurrent();
+        }
+
+        private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
+        {
+            currentPiece?.InActive();
+
+            foreach (var d in fillFlow)
+            {
+                if (d is BeatmapPiece piece)
+                    if (piece.beatmap.BeatmapSetInfo.Hash == v.NewValue.BeatmapSetInfo.Hash)
+                    {
+                        currentPiece = piece;
+                        piece.MakeActive();
+                        break;
+                    }
+            }
+
+            scrollCache.Invalidate();
+        }
+
+        private void AddBeatmapSets()
+        {
+            fillFlow.AddRange(beatmapSets.Select(s => new BeatmapPiece(beatmaps.GetWorkingBeatmap(s.Beatmaps.First()))));
+
+            scrollCache.Invalidate();
+        }
+
+        private void ScrollToCurrent()
+        {
+            if (!IsCurrent.Value)
+            {
+                beatmapScroll.ScrollToStart();
+                scrollCache.Validate();
+                return;
+            }
+
+            if (currentPiece == null)
+            {
+                scrollCache.Validate();
+                return;
+            }
+
+            float distance = 0;
+            var index = fillFlow.IndexOf(currentPiece);
+
+            //如果是第一个，那么滚动到头
+            if (index == 0)
+            {
+                beatmapScroll.ScrollToStart();
+            }
+            else
+            {
+                distance = (index - 1) * 85;
+
+                //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
+                //n个piece, n-1个间隔
+                if (distance + beatmapScroll.DrawHeight > (fillFlow?.Count * 85 - 5))
+                    beatmapScroll.ScrollToEnd();
+                else
+                    beatmapScroll.ScrollTo(distance);
+            }
+
+            scrollCache.Validate();
+        }
+
+        public void ClearList() =>
+            fillFlow.Clear();
+
+        protected override void PopIn()
+        {
+            this.FadeIn(250);
+
+            //猜测: 因为没显示，所以beatmapScroll因为不Update而无法滚动到指定的位置
+            working.TriggerChange();
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut(250);
+        }
+    }
+}
