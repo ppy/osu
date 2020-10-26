@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -107,7 +108,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             OnDragHandled = handleScrollViaDrag
         };
 
-        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect);
+        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect, this);
 
         private void handleScrollViaDrag(DragEvent e)
         {
@@ -138,11 +139,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private class TimelineDragBox : DragBox
         {
             private Vector2 lastMouseDown;
+            private float? lastZoom;
             private float localMouseDown;
 
-            public TimelineDragBox(Action<RectangleF> performSelect)
+            private readonly TimelineBlueprintContainer parent;
+
+            public TimelineDragBox(Action<RectangleF> performSelect, TimelineBlueprintContainer parent)
                 : base(performSelect)
             {
+                this.parent = parent;
             }
 
             protected override Drawable CreateBox() => new Box
@@ -158,7 +163,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     lastMouseDown = e.ScreenSpaceMouseDownPosition;
                     localMouseDown = e.MouseDownPosition.X;
+                    lastZoom = null;
                 }
+
+                //Zooming the timeline shifts the coordinate system this compensates for this shift
+                float zoomCorrection = lastZoom.HasValue ? (parent.timeline.Zoom / lastZoom.Value) : 1;
+                localMouseDown *= zoomCorrection;
+                lastZoom = parent.timeline.Zoom;
 
                 float selection1 = localMouseDown;
                 float selection2 = e.MousePosition.X;
