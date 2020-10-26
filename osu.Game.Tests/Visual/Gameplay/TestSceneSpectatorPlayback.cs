@@ -1,42 +1,94 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
-using osu.Framework.Threading;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
+using osu.Game.Online.Spectator;
 using osu.Game.Replays;
+using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneReplayRecorder : OsuManualInputManagerTestScene
+    public class TestSceneSpectatorPlayback : OsuManualInputManagerTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         private TestRulesetInputManager playbackManager;
         private TestRulesetInputManager recordingManager;
 
         private Replay replay;
 
+        private IBindableList<int> users;
+
         private TestReplayRecorder recorder;
+
+        private readonly ManualClock manualClock = new ManualClock();
+
+        private OsuSpriteText latencyDisplay;
+
+        private TestFramedReplayInputHandler replayHandler;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private SpectatorStreamingClient streamingClient { get; set; }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             replay = new Replay();
+
+            users = streamingClient.PlayingUsers.GetBoundCopy();
+            users.BindCollectionChanged((obj, args) =>
+            {
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (int user in args.NewItems)
+                        {
+                            if (user == api.LocalUser.Value.Id)
+                                streamingClient.WatchUser(user);
+                        }
+
+                        break;
+
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (int user in args.OldItems)
+                        {
+                            if (user == api.LocalUser.Value.Id)
+                                streamingClient.StopWatchingUser(user);
+                        }
+
+                        break;
+                }
+            }, true);
+
+            streamingClient.OnNewFrames += onNewFrames;
 
             Add(new GridContainer
             {
@@ -47,7 +99,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = recorder = new TestReplayRecorder(replay)
+                            Recorder = recorder = new TestReplayRecorder
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
                             },
@@ -63,7 +115,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     },
                                     new OsuSpriteText
                                     {
-                                        Text = "Recording",
+                                        Text = "Sending",
                                         Scale = new Vector2(3),
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
@@ -77,7 +129,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         playbackManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            ReplayInputHandler = new TestFramedReplayInputHandler(replay)
+                            Clock = new FramedClock(manualClock),
+                            ReplayInputHandler = replayHandler = new TestFramedReplayInputHandler(replay)
                             {
                                 GamefieldToScreenSpace = pos => playbackManager.ToScreenSpace(pos),
                             },
@@ -93,7 +146,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     },
                                     new OsuSpriteText
                                     {
-                                        Text = "Playback",
+                                        Text = "Receiving",
                                         Scale = new Vector2(3),
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
@@ -105,71 +158,73 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 }
             });
+
+            Add(latencyDisplay = new OsuSpriteText());
         });
+
+        private void onNewFrames(int userId, FrameDataBundle frames)
+        {
+            Logger.Log($"Received {frames.Frames.Count()} new frames ({string.Join(',', frames.Frames.Select(f => ((int)f.Time).ToString()))})");
+
+            foreach (var legacyFrame in frames.Frames)
+            {
+                var frame = new TestReplayFrame();
+                frame.FromLegacy(legacyFrame, null, null);
+                replay.Frames.Add(frame);
+            }
+        }
 
         [Test]
         public void TestBasic()
         {
-            AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("one frame recorded", () => replay.Frames.Count == 1);
-            AddAssert("position matches", () => playbackManager.ChildrenOfType<Box>().First().Position == recordingManager.ChildrenOfType<Box>().First().Position);
         }
 
-        [Test]
-        public void TestHighFrameRate()
-        {
-            ScheduledDelegate moveFunction = null;
-
-            AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
-            AddStep("much move", () => moveFunction = Scheduler.AddDelayed(() =>
-                InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0)), 10, true));
-            AddWaitStep("move", 10);
-            AddStep("stop move", () => moveFunction.Cancel());
-            AddAssert("at least 60 frames recorded", () => replay.Frames.Count > 60);
-        }
-
-        [Test]
-        public void TestLimitedFrameRate()
-        {
-            ScheduledDelegate moveFunction = null;
-
-            AddStep("lower rate", () => recorder.RecordFrameRate = 2);
-            AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
-            AddStep("much move", () => moveFunction = Scheduler.AddDelayed(() =>
-                InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0)), 10, true));
-            AddWaitStep("move", 10);
-            AddStep("stop move", () => moveFunction.Cancel());
-            AddAssert("less than 10 frames recorded", () => replay.Frames.Count < 10);
-        }
-
-        [Test]
-        public void TestLimitedFrameRateWithImportantFrames()
-        {
-            ScheduledDelegate moveFunction = null;
-
-            AddStep("lower rate", () => recorder.RecordFrameRate = 2);
-            AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
-            AddStep("much move with press", () => moveFunction = Scheduler.AddDelayed(() =>
-            {
-                InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0));
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
-            }, 10, true));
-            AddWaitStep("move", 10);
-            AddStep("stop move", () => moveFunction.Cancel());
-            AddAssert("at least 60 frames recorded", () => replay.Frames.Count > 60);
-        }
+        private double latency = SpectatorStreamingClient.TIME_BETWEEN_SENDS;
 
         protected override void Update()
         {
             base.Update();
-            playbackManager?.ReplayInputHandler.SetFrameFromTime(Time.Current - 100);
+
+            if (latencyDisplay == null) return;
+
+            // propagate initial time value
+            if (manualClock.CurrentTime == 0)
+            {
+                manualClock.CurrentTime = Time.Current;
+                return;
+            }
+
+            if (replayHandler.NextFrame != null)
+            {
+                var lastFrame = replay.Frames.LastOrDefault();
+
+                // this isn't perfect as we basically can't be aware of the rate-of-send here (the streamer is not sending data when not being moved).
+                // in gameplay playback, the case where NextFrame is null would pause gameplay and handle this correctly; it's strictly a test limitation / best effort implementation.
+                if (lastFrame != null)
+                    latency = Math.Max(latency, Time.Current - lastFrame.Time);
+
+                latencyDisplay.Text = $"latency: {latency:N1}";
+
+                double proposedTime = Time.Current - latency + Time.Elapsed;
+
+                // this will either advance by one or zero frames.
+                double? time = replayHandler.SetFrameFromTime(proposedTime);
+
+                if (time == null)
+                    return;
+
+                manualClock.CurrentTime = time.Value;
+            }
         }
 
         [TearDownSteps]
         public void TearDown()
         {
-            AddStep("stop recorder", () => recorder.Expire());
+            AddStep("stop recorder", () =>
+            {
+                recorder.Expire();
+                streamingClient.OnNewFrames -= onNewFrames;
+            });
         }
 
         public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>
@@ -245,7 +300,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        public class TestReplayFrame : ReplayFrame
+        public class TestReplayFrame : ReplayFrame, IConvertibleReplayFrame
         {
             public Vector2 Position;
 
@@ -257,6 +312,28 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Position = position;
                 Actions.AddRange(actions);
             }
+
+            public TestReplayFrame()
+            {
+            }
+
+            public void FromLegacy(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
+            {
+                Position = currentFrame.Position;
+                Time = currentFrame.Time;
+                if (currentFrame.MouseLeft)
+                    Actions.Add(TestAction.Down);
+            }
+
+            public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
+            {
+                ReplayButtonState state = ReplayButtonState.None;
+
+                if (Actions.Contains(TestAction.Down))
+                    state |= ReplayButtonState.Left1;
+
+                return new LegacyReplayFrame(Time, Position.X, Position.Y, state);
+            }
         }
 
         public enum TestAction
@@ -266,13 +343,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         internal class TestReplayRecorder : ReplayRecorder<TestAction>
         {
-            public TestReplayRecorder(Replay target)
-                : base(target)
+            public TestReplayRecorder()
+                : base(new Replay())
             {
             }
 
             protected override ReplayFrame HandleFrame(Vector2 mousePosition, List<TestAction> actions, ReplayFrame previousFrame)
-                => new TestReplayFrame(Time.Current, mousePosition, actions.ToArray());
+            {
+                return new TestReplayFrame(Time.Current, mousePosition, actions.ToArray());
+            }
         }
     }
 }
