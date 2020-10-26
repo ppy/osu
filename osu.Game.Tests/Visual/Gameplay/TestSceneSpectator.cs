@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,7 +13,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Spectator;
@@ -41,6 +44,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private TestReplayRecorder recorder;
 
+        private readonly ManualClock manualClock = new ManualClock();
+
+        private OsuSpriteText latencyDisplay;
+
         [Resolved]
         private SpectatorStreamingClient streamingClient { get; set; }
 
@@ -66,15 +73,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             }, true);
 
-            streamingClient.OnNewFrames += (userId, frames) =>
-            {
-                foreach (var legacyFrame in frames.Frames)
-                {
-                    var frame = new TestReplayFrame();
-                    frame.FromLegacy(legacyFrame, null, null);
-                    replay.Frames.Add(frame);
-                }
-            };
+            streamingClient.OnNewFrames += onNewFrames;
 
             Add(new GridContainer
             {
@@ -115,6 +114,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         playbackManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
+                            Clock = new FramedClock(manualClock),
                             ReplayInputHandler = new TestFramedReplayInputHandler(replay)
                             {
                                 GamefieldToScreenSpace = pos => playbackManager.ToScreenSpace(pos),
@@ -143,7 +143,21 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 }
             });
+
+            Add(latencyDisplay = new OsuSpriteText());
         });
+
+        private void onNewFrames(int userId, FrameDataBundle frames)
+        {
+            Logger.Log($"Received {frames.Frames.Count()} new frames ({string.Join(',', frames.Frames.Select(f => ((int)f.Time).ToString()))})");
+
+            foreach (var legacyFrame in frames.Frames)
+            {
+                var frame = new TestReplayFrame();
+                frame.FromLegacy(legacyFrame, null, null);
+                replay.Frames.Add(frame);
+            }
+        }
 
         [Test]
         public void TestBasic()
@@ -153,13 +167,30 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void Update()
         {
             base.Update();
-            playbackManager?.ReplayInputHandler.SetFrameFromTime(Time.Current - 100);
+
+            double elapsed = Time.Elapsed;
+            double? time = playbackManager?.ReplayInputHandler.SetFrameFromTime(manualClock.CurrentTime + elapsed);
+
+            if (time != null)
+            {
+                manualClock.CurrentTime = time.Value;
+
+                latencyDisplay.Text = $"latency: {Time.Current - time.Value:N1}ms";
+            }
+            else
+            {
+                manualClock.CurrentTime = Time.Current;
+            }
         }
 
         [TearDownSteps]
         public void TearDown()
         {
-            AddStep("stop recorder", () => recorder.Expire());
+            AddStep("stop recorder", () =>
+            {
+                recorder.Expire();
+                streamingClient.OnNewFrames -= onNewFrames;
+            });
         }
 
         public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>
