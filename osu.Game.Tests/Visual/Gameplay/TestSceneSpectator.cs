@@ -21,12 +21,36 @@ namespace osu.Game.Tests.Visual.Gameplay
         private OsuGameBase game { get; set; }
 
         [Test]
-        public void TestSpectating()
+        public void TestBasicSpectatingFlow()
         {
             AddStep("add streaming client", () => Add(testSpectatorStreamingClient));
             AddStep("load screen", () => LoadScreen(new Spectator(testSpectatorStreamingClient.StreamingUser)));
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
             AddStep("send frames", () => testSpectatorStreamingClient.SendFrames());
+        }
+
+        [Test]
+        public void TestSpectatingDuringGameplay()
+        {
+            // should seek immediately to available frames
+        }
+
+        [Test]
+        public void TestHostStartsPlayingWhileAlreadyWatching()
+        {
+            // should restart either immediately or after running out of frames
+        }
+
+        [Test]
+        public void TestHostFails()
+        {
+            // should replay until running out of frames then fail
+        }
+
+        [Test]
+        public void TestStopWatchingDuringPlay()
+        {
+            // should immediately exit and unbind from streaming client
         }
 
         internal class TestSpectatorStreamingClient : SpectatorStreamingClient
