@@ -152,7 +152,9 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            PrepareReplay();
+            // replays should never be recorded or played back when autoplay is enabled
+            if (!Mods.Value.Any(m => m is ModAutoplay))
+                PrepareReplay();
         }
 
         private Replay recordingReplay;
