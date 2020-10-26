@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania
                 },
                 new SettingsSlider<double, TimeSlider>
                 {
-                    LabelText = "下落时间",
+                    LabelText = "下落速度",
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
                     KeyboardStep = 5
                 },
