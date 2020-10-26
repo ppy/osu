@@ -80,11 +80,7 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-#if DEBUG
-        private const string endpoint = "http://localhost:5009/spectator";
-#else
         private const string endpoint = "https://spectator.ppy.sh/spectator";
-#endif
 
         private async Task connect()
         {
