@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
+        private bool shiftPressed;
+
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
@@ -163,6 +166,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <returns>Whether any <see cref="DrawableHitObject"/>s could be reversed.</returns>
         public virtual bool HandleReverse() => false;
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            shiftPressed = e.ShiftPressed;
+            return false;
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            shiftPressed = e.ShiftPressed;
+        }
 
         public bool OnPressed(PlatformAction action)
         {
@@ -455,6 +469,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             get
             {
+                if (shiftPressed)
+                {
+                    deleteSelected();
+                    return null;
+                }
+
                 if (!selectedBlueprints.Any(b => b.IsHovered))
                     return Array.Empty<MenuItem>();
 
