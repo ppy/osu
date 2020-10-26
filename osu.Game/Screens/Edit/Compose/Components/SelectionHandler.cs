@@ -226,11 +226,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="state">The input state at the point of selection.</param>
         internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
-            shiftClickDeleteCheck(blueprint, state);
-            multiSelectionHandler(blueprint, state);
+            if (!shiftClickDeleteCheck(blueprint, state))
+                handleMultiSelection(blueprint, state);
         }
 
-        private void multiSelectionHandler(SelectionBlueprint blueprint, InputState state)
+        private void handleMultiSelection(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ControlPressed)
             {
@@ -249,13 +249,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private void shiftClickDeleteCheck(SelectionBlueprint blueprint, InputState state)
+        private bool shiftClickDeleteCheck(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ShiftPressed && state.Mouse.IsPressed(MouseButton.Right))
             {
                 EditorBeatmap.Remove(blueprint.HitObject);
-                return;
+                return true;
             }
+            return false;
         }
 
         private void deleteSelected()
