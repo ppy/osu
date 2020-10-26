@@ -5,15 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.UI
         private SpectatorStreamingClient spectatorStreaming { get; set; }
 
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
+        private GameplayBeatmap gameplayBeatmap { get; set; }
 
         protected ReplayRecorder(Replay target)
         {
@@ -50,7 +49,7 @@ namespace osu.Game.Rulesets.UI
 
             inputManager = GetContainingInputManager();
 
-            spectatorStreaming?.BeginPlaying();
+            spectatorStreaming?.BeginPlaying(gameplayBeatmap);
         }
 
         protected override void Dispose(bool isDisposing)
