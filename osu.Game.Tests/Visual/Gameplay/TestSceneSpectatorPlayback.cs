@@ -19,7 +19,6 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Input.Handlers;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
