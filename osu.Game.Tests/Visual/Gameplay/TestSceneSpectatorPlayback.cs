@@ -27,6 +27,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 using osuTK.Graphics;
@@ -57,6 +58,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Resolved]
         private SpectatorStreamingClient streamingClient { get; set; }
+
+        [Cached]
+        private GameplayBeatmap gameplayBeatmap = new GameplayBeatmap(new Beatmap());
 
         [SetUp]
         public void SetUp() => Schedule(() =>
