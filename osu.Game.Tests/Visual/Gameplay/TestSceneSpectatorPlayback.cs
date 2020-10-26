@@ -18,6 +18,7 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
@@ -49,6 +50,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         private OsuSpriteText latencyDisplay;
 
         [Resolved]
+        private IAPIProvider api { get; set; }
+
+        [Resolved]
         private SpectatorStreamingClient streamingClient { get; set; }
 
         [SetUp]
@@ -63,12 +67,20 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     case NotifyCollectionChangedAction.Add:
                         foreach (int user in args.NewItems)
-                            streamingClient.WatchUser(user);
+                        {
+                            if (user == api.LocalUser.Value.Id)
+                                streamingClient.WatchUser(user);
+                        }
+
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
                         foreach (int user in args.OldItems)
-                            streamingClient.StopWatchingUser(user);
+                        {
+                            if (user == api.LocalUser.Value.Id)
+                                streamingClient.StopWatchingUser(user);
+                        }
+
                         break;
                 }
             }, true);
