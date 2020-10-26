@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -226,37 +225,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="state">The input state at the point of selection.</param>
         internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
-            if (!shiftClickDeleteCheck(blueprint, state))
-                handleMultiSelection(blueprint, state);
-        }
-
-        private void handleMultiSelection(SelectionBlueprint blueprint, InputState state)
-        {
-            if (state.Keyboard.ControlPressed)
-            {
-                if (blueprint.IsSelected)
-                    blueprint.Deselect();
-                else
-                    blueprint.Select();
-            }
-            else
-            {
-                if (blueprint.IsSelected)
-                    return;
-
-                DeselectAll?.Invoke();
-                blueprint.Select();
-            }
-        }
-
-        private bool shiftClickDeleteCheck(SelectionBlueprint blueprint, InputState state)
-        {
             if (state.Keyboard.ShiftPressed && state.Mouse.IsPressed(MouseButton.Right))
-            {
                 EditorBeatmap.Remove(blueprint.HitObject);
-                return true;
-            }
-            return false;
+            else if (state.Keyboard.ControlPressed)
+                blueprint.ToggleSelection();
+            else
+                ensureSelected(blueprint);
+        }
+
+        private void ensureSelected(SelectionBlueprint blueprint)
+        {
+            if (blueprint.IsSelected)
+                return;
+
+            DeselectAll?.Invoke();
+            blueprint.Select();
         }
 
         private void deleteSelected()
