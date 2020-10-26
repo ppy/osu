@@ -64,6 +64,16 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public event Action<int, FrameDataBundle> OnNewFrames;
 
+        /// <summary>
+        /// Called whenever a user starts a play session.
+        /// </summary>
+        public event Action<int, SpectatorState> OnUserBeganPlaying;
+
+        /// <summary>
+        /// Called whenever a user starts a play session.
+        /// </summary>
+        public event Action<int, SpectatorState> OnUserFinishedPlaying;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -154,18 +164,24 @@ namespace osu.Game.Online.Spectator
             if (!playingUsers.Contains(userId))
                 playingUsers.Add(userId);
 
+            OnUserBeganPlaying?.Invoke(userId, state);
+
             return Task.CompletedTask;
         }
 
         Task ISpectatorClient.UserFinishedPlaying(int userId, SpectatorState state)
         {
             playingUsers.Remove(userId);
+
+            OnUserFinishedPlaying?.Invoke(userId, state);
+
             return Task.CompletedTask;
         }
 
         Task ISpectatorClient.UserSentFrames(int userId, FrameDataBundle data)
         {
             OnNewFrames?.Invoke(userId, data);
+
             return Task.CompletedTask;
         }
 
