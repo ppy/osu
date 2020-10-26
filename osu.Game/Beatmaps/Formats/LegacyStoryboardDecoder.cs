@@ -48,6 +48,10 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (section)
             {
+                case Section.General:
+                    handleGeneral(storyboard, line);
+                    return;
+
                 case Section.Events:
                     handleEvents(line);
                     return;
@@ -58,6 +62,18 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             base.ParseLine(storyboard, section, line);
+        }
+
+        private void handleGeneral(Storyboard storyboard, string line)
+        {
+            var pair = SplitKeyVal(line);
+
+            switch (pair.Key)
+            {
+                case "UseSkinSprites":
+                    storyboard.UseSkinSprites = pair.Value == "1";
+                    break;
+            }
         }
 
         private void handleEvents(string line)
