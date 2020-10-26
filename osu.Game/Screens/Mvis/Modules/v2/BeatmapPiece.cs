@@ -17,7 +17,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class BeatmapPiece : Container
+    public class BeatmapPiece : OsuClickableContainer
     {
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public readonly WorkingBeatmap beatmap;
         private Flash flash;
         private Box maskBox;
+        private Box hover;
 
         public BeatmapPiece(WorkingBeatmap b)
         {
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new Box
                 {
@@ -131,8 +132,14 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 flash = new Flash
                 {
                     RelativeSizeAxes = Axes.Both
+                },
+                hover = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Colour4.White.Opacity(0.1f),
+                    Alpha = 0
                 }
-            };
+            });
 
             Active.BindValueChanged(OnActiveChanged, true);
         }
@@ -202,6 +209,19 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 controller.Play();
             }
             return base.OnClick(e);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            hover.FadeIn(250);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+
+            hover.FadeOut(250);
         }
     }
 }

@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class CollectionPanel : Container
+    public class CollectionPanel : OsuClickableContainer
     {
         ///<summary>
         ///判断该panel所显示的BeatmapCollection
@@ -64,7 +64,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            SortBeatmapCollection();
+
+            WorkingBeatmap targetBeatmap;
+            targetBeatmap = beatmapSets.Count > 0 ? beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()) : null;
+
+            AddRangeInternal(new Drawable[]
             {
                 new Box
                 {
@@ -73,6 +78,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         Color4Extensions.FromHex("#111").Opacity(0),
                         Color4Extensions.FromHex("#111")
                     ),
+                },
+                new BeatmapCover(targetBeatmap)
+                {
+                    Depth = float.MaxValue,
+                    BackgroundBox = false
                 },
                 new Box
                 {
@@ -140,22 +150,13 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         }
                     }
                 }
-            };
+            });
 
             thumbnailScroll.ScrollContent.RelativeSizeAxes = Axes.None;
             thumbnailScroll.ScrollContent.AutoSizeAxes = Axes.Both;
 
-            SortBeatmapCollection();
-
             if (beatmapSets.Count > 0)
-            {
-                Add(new BeatmapCover(beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()))
-                {
-                    Depth = float.MaxValue,
-                    BackgroundBox = false
-                });
                 state.Value = ActiveState.Idle;
-            }
             else
                 state.Value = ActiveState.Disabled;
 
@@ -302,7 +303,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                    + " - "
                                    + $"{b.Metadata.TitleUnicode ?? b.Metadata.Title}";
 
-                    if (collections < limit)
+                    if (collections <= limit)
                     {
                         Add(new TooltipContainer
                         {
@@ -315,27 +316,22 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         continue;
                     }
 
+                    TooltipContainer t = this.Children.Last() as TooltipContainer;
                     int remaining = beatmapSetList.Count - limit;
-                    Add(new TooltipContainer
+
+                    t.TooltipText+=$" 等{remaining}首歌曲";
+                    t.AddRange(new Drawable[]
                     {
-                        Size = new Vector2(40),
-                        Masking = true,
-                        CornerRadius = 7.25f,
-                        TooltipText = tooltip + $" 等{remaining}首歌曲",
-                        Children = new Drawable[]
+                        new Box
                         {
-                            new BeatmapCover(b),
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Colour4.Black.Opacity(0.7f),
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = $"+{remaining}",
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            }
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Colour4.Black.Opacity(0.7f),
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = $"+{remaining}",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                         }
                     });
                     break;

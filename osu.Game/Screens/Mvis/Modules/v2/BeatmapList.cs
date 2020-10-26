@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private OsuScrollContainer beatmapScroll;
         private FillFlowContainer fillFlow;
         private Cached scrollCache = new Cached();
+        private bool firstScroll = true;
 
         public BeatmapList(List<BeatmapSetInfo> set)
         {
@@ -104,7 +105,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             if (!IsCurrent.Value)
             {
-                beatmapScroll.ScrollToStart();
+                beatmapScroll.ScrollToStart(!firstScroll);
+                firstScroll = false;
                 scrollCache.Validate();
                 return;
             }
@@ -121,7 +123,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             //如果是第一个，那么滚动到头
             if (index == 0)
             {
-                beatmapScroll.ScrollToStart();
+                beatmapScroll.ScrollToStart(!firstScroll);
             }
             else
             {
@@ -130,12 +132,13 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
                 //n个piece, n-1个间隔
                 if (distance + beatmapScroll.DrawHeight > (fillFlow?.Count * 85 - 5))
-                    beatmapScroll.ScrollToEnd();
+                    beatmapScroll.ScrollToEnd(!firstScroll);
                 else
-                    beatmapScroll.ScrollTo(distance);
+                    beatmapScroll.ScrollTo(distance, !firstScroll);
             }
 
             scrollCache.Validate();
+            firstScroll = false;
         }
 
         public void ClearList() =>
