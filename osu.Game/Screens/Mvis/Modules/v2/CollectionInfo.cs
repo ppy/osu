@@ -53,7 +53,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 },
                 cover = new BeatmapCover(null)
                 {
-                    BackgroundBox = false
+                    BackgroundBox = false,
+                    UseBufferedBackground = true
                 },
                 new Box
                 {

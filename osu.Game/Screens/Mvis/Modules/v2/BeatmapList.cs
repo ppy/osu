@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
             else
             {
-                distance = (index - 1) * 85;
+                distance = (index - 1) * 85 - 1;
 
                 //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
                 //n个piece, n-1个间隔
