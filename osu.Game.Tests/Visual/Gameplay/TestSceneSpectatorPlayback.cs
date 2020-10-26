@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -18,6 +19,7 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Handlers;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
@@ -48,6 +50,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly ManualClock manualClock = new ManualClock();
 
         private OsuSpriteText latencyDisplay;
+
+        private TestFramedReplayInputHandler replayHandler;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -127,7 +131,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         playbackManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
                             Clock = new FramedClock(manualClock),
-                            ReplayInputHandler = new TestFramedReplayInputHandler(replay)
+                            ReplayInputHandler = replayHandler = new TestFramedReplayInputHandler(replay)
                             {
                                 GamefieldToScreenSpace = pos => playbackManager.ToScreenSpace(pos),
                             },
@@ -176,22 +180,41 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
         }
 
+        private double latency = SpectatorStreamingClient.TIME_BETWEEN_SENDS;
+
         protected override void Update()
         {
             base.Update();
 
-            double elapsed = Time.Elapsed;
-            double? time = playbackManager?.ReplayInputHandler.SetFrameFromTime(manualClock.CurrentTime + elapsed);
+            if (latencyDisplay == null) return;
 
-            if (time != null)
-            {
-                manualClock.CurrentTime = time.Value;
-
-                latencyDisplay.Text = $"latency: {Time.Current - time.Value:N1}ms";
-            }
-            else
+            // propagate initial time value
+            if (manualClock.CurrentTime == 0)
             {
                 manualClock.CurrentTime = Time.Current;
+                return;
+            }
+
+            if (replayHandler.NextFrame != null)
+            {
+                var lastFrame = replay.Frames.LastOrDefault();
+
+                // this isn't perfect as we basically can't be aware of the rate-of-send here (the streamer is not sending data when not being moved).
+                // in gameplay playback, the case where NextFrame is null would pause gameplay and handle this correctly; it's strictly a test limitation / best effort implementation.
+                if (lastFrame != null)
+                    latency = Math.Max(latency, Time.Current - lastFrame.Time);
+
+                latencyDisplay.Text = $"latency: {latency:N1}";
+
+                double proposedTime = Time.Current - latency + Time.Elapsed;
+
+                // this will either advance by one or zero frames.
+                double? time = replayHandler.SetFrameFromTime(proposedTime);
+
+                if (time == null)
+                    return;
+
+                manualClock.CurrentTime = time.Value;
             }
         }
 
