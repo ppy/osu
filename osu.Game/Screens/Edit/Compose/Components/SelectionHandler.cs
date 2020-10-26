@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -33,7 +34,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
-        private bool shiftPressed;
 
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
@@ -167,17 +167,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether any <see cref="DrawableHitObject"/>s could be reversed.</returns>
         public virtual bool HandleReverse() => false;
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            shiftPressed = e.ShiftPressed;
-            return false;
-        }
-
-        protected override void OnKeyUp(KeyUpEvent e)
-        {
-            shiftPressed = e.ShiftPressed;
-        }
-
         public bool OnPressed(PlatformAction action)
         {
             switch (action.ActionMethod)
@@ -238,6 +227,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="state">The input state at the point of selection.</param>
         internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
+            shiftClickDeleteCheck(blueprint, state);
+            multiSelectionHandler(blueprint, state);
+
+        }
+
+        private void multiSelectionHandler(SelectionBlueprint blueprint, InputState state)
+        {
             if (state.Keyboard.ControlPressed)
             {
                 if (blueprint.IsSelected)
@@ -252,6 +248,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 DeselectAll?.Invoke();
                 blueprint.Select();
+            }
+        }
+
+        private void shiftClickDeleteCheck(SelectionBlueprint blueprint, InputState state)
+        {
+            if (state.Keyboard.ShiftPressed && state.Mouse.IsPressed(MouseButton.Right))
+            {
+                EditorBeatmap.Remove(blueprint.HitObject);
+                return;
             }
         }
 
@@ -469,12 +474,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             get
             {
-                if (shiftPressed)
-                {
-                    deleteSelected();
-                    return null;
-                }
-
                 if (!selectedBlueprints.Any(b => b.IsHovered))
                     return Array.Empty<MenuItem>();
 
