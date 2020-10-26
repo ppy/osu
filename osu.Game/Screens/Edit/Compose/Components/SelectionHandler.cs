@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
-
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
@@ -229,7 +228,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             shiftClickDeleteCheck(blueprint, state);
             multiSelectionHandler(blueprint, state);
-
         }
 
         private void multiSelectionHandler(SelectionBlueprint blueprint, InputState state)
