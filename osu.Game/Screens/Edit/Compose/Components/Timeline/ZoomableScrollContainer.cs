@@ -37,7 +37,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public float CurrentZoom => currentZoom;
 
-
         [Resolved(canBeNull: true)]
         private IFrameBasedClock editorClock { get; set; }
 
