@@ -25,6 +25,10 @@ using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 
+using osu.Game.Online.Placeholders;
+using osu.Game.Online.API;
+using osu.Game.Online.Leaderboards;
+
 namespace osu.Game.Overlays
 {
     public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
@@ -42,6 +46,12 @@ namespace osu.Game.Overlays
         private Container<DrawableChannel> currentChannelContainer;
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
+
+        private Placeholder errorPlaceholder;
+        private Container placeholderContainer;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private LoadingSpinner loading;
 
@@ -152,6 +162,10 @@ namespace osu.Game.Overlays
                                     }
                                 },
                                 loading = new LoadingSpinner(),
+                                placeholderContainer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                }
                             }
                         },
                         tabsArea = new TabsArea
@@ -185,6 +199,9 @@ namespace osu.Game.Overlays
                 },
             };
 
+            errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
+            placeholderContainer.Child = errorPlaceholder;
+            checkIsLoggedIn();
             textbox.OnCommit += postMessage;
 
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
@@ -217,7 +234,7 @@ namespace osu.Game.Overlays
 
             chatBackground.Colour = colours.ChatBlue;
 
-            loading.Show();
+            placeholderContainer.Show();
 
             // This is a relatively expensive (and blocking) operation.
             // Scheduling it ensures that it won't be performed unless the user decides to open chat.
@@ -288,6 +305,8 @@ namespace osu.Game.Overlays
             // mark channel as read when channel switched
             if (e.NewValue.Messages.Any())
                 channelManager.MarkChannelAsRead(e.NewValue);
+
+            checkIsLoggedIn();
         }
 
         private float startDragChatHeight;
@@ -440,6 +459,7 @@ namespace osu.Game.Overlays
 
         private void postMessage(TextBox textbox, bool newText)
         {
+            checkIsLoggedIn();
             var text = textbox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
@@ -451,6 +471,23 @@ namespace osu.Game.Overlays
                 channelManager.PostMessage(text);
 
             textbox.Text = string.Empty;
+        }
+
+        private void checkIsLoggedIn()
+        {
+            //hide the chat and asks to log in if the user is not logged in
+            if (api?.IsLoggedIn != true)
+            {
+                currentChannelContainer.Hide();
+                placeholderContainer.Show();
+                textbox.Hide();
+            }
+            else
+            {
+                currentChannelContainer.Show();
+                placeholderContainer.Hide();
+                textbox.Show();
+            }
         }
 
         private class TabsArea : Container
