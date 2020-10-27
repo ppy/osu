@@ -227,7 +227,7 @@ namespace osu.Game.Online.Spectator
             connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), currentState);
         }
 
-        public void WatchUser(int userId)
+        public virtual void WatchUser(int userId)
         {
             if (watchingUsers.Contains(userId))
                 return;

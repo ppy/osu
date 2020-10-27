@@ -43,6 +43,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private OsuFramedReplayInputHandler replayHandler =>
             (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
 
+        private Player player => Stack.CurrentScreen as Player;
+
         [Test]
         public void TestBasicSpectatingFlow()
         {
@@ -53,6 +55,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
             AddAssert("ensure frames arrived", () => replayHandler.HasFrames);
+
+            AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
+            AddAssert("game is paused", () => !player.ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning);
         }
 
         [Test]
@@ -127,14 +132,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public readonly User StreamingUser = new User { Id = 1234, Username = "Test user" };
 
-            public void StartPlay()
-            {
-                ((ISpectatorClient)this).UserBeganPlaying((int)StreamingUser.Id, new SpectatorState
-                {
-                    BeatmapID = beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID,
-                    RulesetID = 0,
-                });
-            }
+            public void StartPlay() => sendState();
 
             public void EndPlay()
             {
@@ -152,6 +150,23 @@ namespace osu.Game.Tests.Visual.Gameplay
                     // todo: populate more frames
                     new LegacyReplayFrame(0, 0, 0, ReplayButtonState.Left1)
                 }));
+            }
+
+            public override void WatchUser(int userId)
+            {
+                // usually the server would do this.
+                sendState();
+
+                base.WatchUser(userId);
+            }
+
+            private void sendState()
+            {
+                ((ISpectatorClient)this).UserBeganPlaying((int)StreamingUser.Id, new SpectatorState
+                {
+                    BeatmapID = beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID,
+                    RulesetID = 0,
+                });
             }
         }
     }
