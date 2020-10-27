@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             control.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
             control.Genre.BindValueChanged(g => genre.Text = $"Genre: {g.NewValue}", true);
             control.Language.BindValueChanged(l => language.Text = $"Language: {l.NewValue}", true);
-            control.Extra.BindValueChanged(e => extra.Text = $"Extra: {e.NewValue}", true);
+            control.Extra.BindValueChanged(e => extra.Text = $"Extra: {(e.NewValue == null ? "" : string.Join(".", e.NewValue.Select(i => i.ToString().ToLowerInvariant())))}", true);
             control.Played.BindValueChanged(p => played.Text = $"Played: {p.NewValue}", true);
         }
 

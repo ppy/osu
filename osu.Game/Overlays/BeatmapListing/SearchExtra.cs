@@ -5,9 +5,7 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public enum SearchExtra
     {
-        Any,
         Video,
-        Storyboard,
-        Both
+        Storyboard
     }
 }

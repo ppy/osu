@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
 using osu.Game.Overlays;
@@ -21,7 +23,7 @@ namespace osu.Game.Online.API.Requests
 
         public SearchLanguage Language { get; }
 
-        public SearchExtra Extra { get; }
+        public List<SearchExtra> Extra { get; }
 
         public SearchPlayed Played { get; }
 
@@ -40,7 +42,7 @@ namespace osu.Game.Online.API.Requests
             SortDirection sortDirection = SortDirection.Descending,
             SearchGenre genre = SearchGenre.Any,
             SearchLanguage language = SearchLanguage.Any,
-            SearchExtra extra = SearchExtra.Any,
+            List<SearchExtra> extra = null,
             SearchPlayed played = SearchPlayed.Any)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
@@ -74,32 +76,13 @@ namespace osu.Game.Online.API.Requests
 
             req.AddParameter("sort", $"{SortCriteria.ToString().ToLowerInvariant()}_{directionString}");
 
-            req.AddCursor(cursor);
-
-            if (Extra != SearchExtra.Any)
-            {
-                string extraString = string.Empty;
-
-                switch (Extra)
-                {
-                    case SearchExtra.Both:
-                        extraString = "video.storyboard";
-                        break;
-
-                    case SearchExtra.Storyboard:
-                        extraString = "storyboard";
-                        break;
-
-                    case SearchExtra.Video:
-                        extraString = "video";
-                        break;
-                }
-
-                req.AddParameter("e", extraString);
-            }
+            if (Extra != null && Extra.Any())
+                req.AddParameter("e", string.Join(".", Extra.Select(e => e.ToString().ToLowerInvariant())));
 
             if (Played != SearchPlayed.Any)
                 req.AddParameter("played", Played.ToString().ToLowerInvariant());
+
+            req.AddCursor(cursor);
 
             return req;
         }
