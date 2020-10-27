@@ -178,6 +178,9 @@ namespace osu.Game.Screens.Edit.Timing
             private readonly Box hoveredBackground;
 
             [Resolved]
+            private EditorClock clock { get; set; }
+
+            [Resolved]
             private Bindable<ControlPointGroup> selectedGroup { get; set; }
 
             public RowBackground(ControlPointGroup controlGroup)
@@ -200,7 +203,11 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                 };
 
-                Action = () => selectedGroup.Value = controlGroup;
+                Action = () =>
+                {
+                    selectedGroup.Value = controlGroup;
+                    clock.SeekTo(controlGroup.Time);
+                };
             }
 
             private Color4 colourHover;
