@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -11,18 +13,16 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public abstract class BeatmapSearchMultipleSelectionFilterRow<T> : BeatmapSearchFilterRow<List<T>>
+    public class BeatmapSearchMultipleSelectionFilterRow<T> : BeatmapSearchFilterRow<List<T>>
     {
-        protected BeatmapSearchMultipleSelectionFilterRow(string headerName)
+        public BeatmapSearchMultipleSelectionFilterRow(string headerName)
             : base(headerName)
         {
         }
 
-        protected override Drawable CreateFilter() => CreateMultipleSelectionFilter();
+        protected override Drawable CreateFilter() => new MultipleSelectionFilter();
 
-        protected abstract MultipleSelectionFilter CreateMultipleSelectionFilter();
-
-        protected abstract class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>, IHasCurrentValue<List<T>>
+        private class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>, IHasCurrentValue<List<T>>
         {
             private readonly BindableWithCurrent<List<T>> current = new BindableWithCurrent<List<T>>();
 
@@ -32,20 +32,19 @@ namespace osu.Game.Overlays.BeatmapListing
                 set => current.Current = value;
             }
 
-            protected MultipleSelectionFilter()
+            public MultipleSelectionFilter()
             {
                 Anchor = Anchor.BottomLeft;
                 Origin = Anchor.BottomLeft;
                 RelativeSizeAxes = Axes.X;
                 Height = 15;
                 Spacing = new Vector2(10, 0);
-                AddRange(CreateItems());
+
+                ((T[])Enum.GetValues(typeof(T))).ForEach(i => Add(new MultipleSelectionFilterTabItem(i)));
 
                 foreach (var item in Children)
                     item.Active.BindValueChanged(_ => updateBindable());
             }
-
-            protected abstract MultipleSelectionFilterTabItem[] CreateItems();
 
             private void updateBindable()
             {
@@ -61,7 +60,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        protected class MultipleSelectionFilterTabItem : FilterTabItem<T>
+        private class MultipleSelectionFilterTabItem : FilterTabItem<T>
         {
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
