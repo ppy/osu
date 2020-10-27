@@ -192,7 +192,6 @@ namespace osu.Game.Tests.Visual.Background
 
             AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(new ScoreInfo
             {
-                Ruleset = new OsuRuleset().RulesetInfo,
                 User = new User { Username = "osu!" },
                 Beatmap = new TestBeatmap(Ruleset.Value).BeatmapInfo,
                 Ruleset = Ruleset.Value,
