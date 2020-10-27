@@ -21,6 +21,8 @@ namespace osu.Game.Online.API.Requests
 
         public SearchLanguage Language { get; }
 
+        public SearchExtra Extra { get; }
+
         private readonly string query;
         private readonly RulesetInfo ruleset;
         private readonly Cursor cursor;
@@ -35,7 +37,8 @@ namespace osu.Game.Online.API.Requests
             SortCriteria sortCriteria = SortCriteria.Ranked,
             SortDirection sortDirection = SortDirection.Descending,
             SearchGenre genre = SearchGenre.Any,
-            SearchLanguage language = SearchLanguage.Any)
+            SearchLanguage language = SearchLanguage.Any,
+            SearchExtra extra = SearchExtra.Any)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
@@ -46,6 +49,7 @@ namespace osu.Game.Online.API.Requests
             SortDirection = sortDirection;
             Genre = genre;
             Language = language;
+            Extra = extra;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -67,6 +71,28 @@ namespace osu.Game.Online.API.Requests
             req.AddParameter("sort", $"{SortCriteria.ToString().ToLowerInvariant()}_{directionString}");
 
             req.AddCursor(cursor);
+
+            if (Extra != SearchExtra.Any)
+            {
+                string extraString = string.Empty;
+
+                switch (Extra)
+                {
+                    case SearchExtra.Both:
+                        extraString = "video.storyboard";
+                        break;
+
+                    case SearchExtra.Storyboard:
+                        extraString = "storyboard";
+                        break;
+
+                    case SearchExtra.Video:
+                        extraString = "video";
+                        break;
+                }
+
+                req.AddParameter("e", extraString);
+            }
 
             return req;
         }
