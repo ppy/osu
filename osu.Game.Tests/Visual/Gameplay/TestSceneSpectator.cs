@@ -30,9 +30,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private OsuGameBase game { get; set; }
 
+        private int nextFrame = 0;
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddStep("reset sent frames", () => nextFrame = 0);
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Wait());
 
@@ -53,18 +57,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+
             sendFrames();
+
             AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
             AddAssert("ensure frames arrived", () => replayHandler.HasFrames);
 
             AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
             AddAssert("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
-        }
+            sendFrames();
+            AddUntilStep("game resumed", () => !player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
 
-        private void sendFrames(int count = 10)
-        {
-            AddStep("send frames", () => testSpectatorStreamingClient.SendFrames(count));
+            AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
+            AddAssert("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
         }
 
         [Test]
@@ -123,6 +129,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             // player should never arrive.
         }
 
+        private void sendFrames(int count = 10)
+        {
+            AddStep("send frames", () =>
+            {
+                testSpectatorStreamingClient.SendFrames(nextFrame, count);
+                nextFrame += count;
+            });
+        }
+
         private void loadSpectatingScreen() =>
             AddStep("load screen", () => LoadScreen(spectatorScreen = new Spectator(testSpectatorStreamingClient.StreamingUser)));
 
@@ -146,16 +161,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             private bool sentState;
 
-            public void SendFrames(int count)
+            public void SendFrames(int index, int count)
             {
                 var frames = new List<LegacyReplayFrame>();
 
-                for (int i = 0; i < count; i++)
+                for (int i = index; i < index + count; i++)
                 {
-                    frames.Add(new LegacyReplayFrame(i * 100, RNG.Next(0, 512), RNG.Next(0, 512), ReplayButtonState.Left1));
-                }
+                    var buttonState = i == index + count - 1 ? ReplayButtonState.None : ReplayButtonState.Left1;
 
-                frames.Add(new LegacyReplayFrame(count * 100, 0, 0, ReplayButtonState.None));
+                    frames.Add(new LegacyReplayFrame(i * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
+                }
 
                 var bundle = new FrameDataBundle(frames);
                 ((ISpectatorClient)this).UserSentFrames((int)StreamingUser.Id, bundle);
