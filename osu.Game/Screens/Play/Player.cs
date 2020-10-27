@@ -238,11 +238,8 @@ namespace osu.Game.Screens.Play
                 skipOverlay.Hide();
             }
 
-            DrawableRuleset.IsPaused.BindValueChanged(paused =>
-            {
-                updateGameplayState();
-                samplePlaybackDisabled.Value = paused.NewValue;
-            });
+            DrawableRuleset.IsPaused.BindValueChanged(_ => updateGameplayState());
+
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
@@ -369,6 +366,13 @@ namespace osu.Game.Screens.Play
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
             }
         };
+
+        protected override void Update()
+        {
+            base.Update();
+
+            samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.ShouldDisableSamplePlayback;
+        }
 
         private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
         {

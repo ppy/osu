@@ -2,10 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -18,11 +15,8 @@ namespace osu.Game.Rulesets.UI
     /// A container which consumes a parent gameplay clock and standardises frame counts for children.
     /// Will ensure a minimum of 50 frames per clock second is maintained, regardless of any system lag or seeks.
     /// </summary>
-    [Cached(typeof(ISamplePlaybackDisabler))]
-    public class FrameStabilityContainer : Container, IHasReplayHandler, ISamplePlaybackDisabler
+    public class FrameStabilityContainer : Container, IHasReplayHandler
     {
-        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
-
         private readonly double gameplayStartTime;
 
         /// <summary>
@@ -35,16 +29,14 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal bool FrameStablePlayback = true;
 
-        public GameplayClock GameplayClock => stabilityGameplayClock;
-
         [Cached(typeof(GameplayClock))]
-        private readonly StabilityGameplayClock stabilityGameplayClock;
+        public readonly FrameStableClock FrameStableClock;
 
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
         {
             RelativeSizeAxes = Axes.Both;
 
-            stabilityGameplayClock = new StabilityGameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+            FrameStableClock = new FrameStableClock(framedClock = new FramedClock(manualClock = new ManualClock()));
 
             this.gameplayStartTime = gameplayStartTime;
         }
@@ -65,12 +57,9 @@ namespace osu.Game.Rulesets.UI
         {
             if (clock != null)
             {
-                parentGameplayClock = stabilityGameplayClock.ParentGameplayClock = clock;
-                GameplayClock.IsPaused.BindTo(clock.IsPaused);
+                parentGameplayClock = FrameStableClock.ParentGameplayClock = clock;
+                FrameStableClock.IsPaused.BindTo(clock.IsPaused);
             }
-
-            // this is a bit temporary. should really be done inside of GameplayClock (but requires large structural changes).
-            stabilityGameplayClock.ParentSampleDisabler = sampleDisabler;
         }
 
         protected override void LoadComplete()
@@ -102,9 +91,7 @@ namespace osu.Game.Rulesets.UI
         public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
-            validState = !GameplayClock.IsPaused.Value;
-
-            samplePlaybackDisabled.Value = stabilityGameplayClock.ShouldDisableSamplePlayback;
+            validState = !FrameStableClock.IsPaused.Value;
 
             int loops = 0;
 
@@ -222,32 +209,10 @@ namespace osu.Game.Rulesets.UI
             }
             else
             {
-                Clock = GameplayClock;
+                Clock = FrameStableClock;
             }
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
-
-        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
-
-        private class StabilityGameplayClock : GameplayClock
-        {
-            public GameplayClock ParentGameplayClock;
-
-            public ISamplePlaybackDisabler ParentSampleDisabler;
-
-            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
-
-            public StabilityGameplayClock(FramedClock underlyingClock)
-                : base(underlyingClock)
-            {
-            }
-
-            public override bool ShouldDisableSamplePlayback =>
-                // handle the case where playback is catching up to real-time.
-                base.ShouldDisableSamplePlayback
-                || ParentSampleDisabler?.SamplePlaybackDisabled.Value == true
-                || (ParentGameplayClock != null && Math.Abs(CurrentTime - ParentGameplayClock.CurrentTime) > 200);
-        }
     }
 }
