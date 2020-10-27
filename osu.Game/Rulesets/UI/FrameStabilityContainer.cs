@@ -197,9 +197,11 @@ namespace osu.Game.Rulesets.UI
                 manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
                 manualClock.IsRunning = parentGameplayClock.IsRunning;
 
-                requireMoreUpdateLoops |= manualClock.CurrentTime != parentGameplayClock.CurrentTime;
+                double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
 
-                frameStableClock.IsCatchingUp.Value = requireMoreUpdateLoops;
+                requireMoreUpdateLoops |= timeBehind != 0;
+
+                frameStableClock.IsCatchingUp.Value = timeBehind > 200;
 
                 // The manual clock time has changed in the above code. The framed clock now needs to be updated
                 // to ensure that the its time is valid for our children before input is processed
