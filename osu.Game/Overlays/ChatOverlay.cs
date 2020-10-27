@@ -24,10 +24,8 @@ using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-
 using osu.Game.Online.Placeholders;
 using osu.Game.Online.API;
-using osu.Game.Online.Leaderboards;
 
 namespace osu.Game.Overlays
 {
