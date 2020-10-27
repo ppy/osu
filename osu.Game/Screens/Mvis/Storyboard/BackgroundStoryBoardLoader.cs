@@ -9,7 +9,6 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Skinning;
-using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Mvis.Storyboard
 {
@@ -22,7 +21,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
     public class BackgroundStoryBoardLoader : Container
     {
         private const float DURATION = 750;
-        private CancellationTokenSource ChangeSB;
         private BindableBool EnableSB = new BindableBool();
         ///<summary>
         ///用于内部确定故事版是否已加载
@@ -37,27 +35,14 @@ namespace osu.Game.Screens.Mvis.Storyboard
         public readonly BindableBool storyboardReplacesBackground = new BindableBool();
 
         /// <summary>
-        /// This will log which beatmap's storyboard we are loading
-        /// </summary>
-        private Task LogTask;
-
-        /// <summary>
-        /// This will invoke LoadSBTask and run asyncly
-        /// </summary>
-        private Task LoadSBAsyncTask;
-
-        /// <summary>
-        /// This will be invoked by LoadSBAsyncTask and loads the current beatmap's storyboard
-        /// </summary>
-        private Task LoadSBTask;
-
-        /// <summary>
         /// 当准备的故事版加载完毕时要调用的Action
         /// </summary>
         private Action OnComplete;
 
         private StoryboardClock StoryboardClock = new StoryboardClock();
-        private BeatmapSkinProvidingContainer ClockContainer;
+        private Container ClockContainer;
+        private Task<bool> loadTask;
+        private CancellationTokenSource cancellationTokenSource;
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
@@ -102,28 +87,11 @@ namespace osu.Game.Screens.Mvis.Storyboard
             }
         }
 
-        public bool UpdateComponent(WorkingBeatmap beatmap)
+        public bool LoadStoryboardFor(WorkingBeatmap beatmap)
         {
             try
             {
-                StoryboardClock.IsCoupled = false;
-                StoryboardClock.Stop();
-
-                if (!EnableSB.Value)
-                {
-                    IsReady.Value = true;
-                    return false;
-                }
-
-                Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
-
-                if (ClockContainer != null)
-                {
-                    ClockContainer.FadeOut(DURATION, Easing.OutQuint);
-                    ClockContainer.Expire();
-                }
-
-                LoadSBTask = LoadComponentAsync(new BeatmapSkinProvidingContainer(b.Value.Skin)
+                LoadComponentAsync(new BeatmapSkinProvidingContainer(b.Value.Skin)
                 {
                     Name = "Storyboard Container",
                     RelativeSizeAxes = Axes.Both,
@@ -132,7 +100,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     {
                         RelativeSizeAxes = Axes.Both,
                         Clock = StoryboardClock = new StoryboardClock(),
-                        Child = CreateDrawableStoryboard(b.Value)
+                        Child = b.Value.Storyboard.CreateDrawable()
                     }
                 }, newClockContainer =>
                 {
@@ -151,7 +119,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     OnComplete = null;
 
                     Logger.Log($"Load Storyboard for Beatmap \"{beatmap.BeatmapSetInfo}\" complete!");
-                }, (ChangeSB = new CancellationTokenSource()).Token);
+                }, cancellationTokenSource.Token);
             }
             catch (Exception e)
             {
@@ -165,14 +133,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
         public void Seek(double position) =>
             StoryboardClock?.Seek(position);
 
-        public void CancelAllTasks()
-        {
-            ChangeSB?.Cancel();
-
-            LoadSBTask = null;
-            LoadSBAsyncTask = null;
-            LogTask = null;
-        }
+        public void CancelAllTasks() =>
+            cancellationTokenSource?.Cancel();
 
         public void UpdateStoryBoardAsync(Action OnComplete = null)
         {
@@ -186,25 +148,29 @@ namespace osu.Game.Screens.Mvis.Storyboard
             storyboardReplacesBackground.Value = false;
             this.OnComplete = OnComplete;
 
-            Schedule(() =>
-            {
-                LoadSBAsyncTask = Task.Run(async () =>
-                {
-                    LogTask = Task.Run(() =>
-                    {
-                        UpdateComponent(b.Value);
-                    });
+            cancellationTokenSource = new CancellationTokenSource();
 
-                    await LogTask;
-                });
-            });
-        }
-    
-        private DrawableStoryboard CreateDrawableStoryboard(WorkingBeatmap beatmap)
-        {
-            var sb = new DrawableStoryboard(beatmap.Storyboard);
-            sb.Width = sb.Height * (beatmap.Storyboard.BeatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f);
-            return sb;
+            StoryboardClock.IsCoupled = false;
+            StoryboardClock.Stop();
+
+            if (!EnableSB.Value)
+            {
+                IsReady.Value = true;
+                return;
+            }
+
+            if (ClockContainer != null)
+            {
+                ClockContainer.FadeOut(DURATION, Easing.OutQuint);
+                ClockContainer.Expire();
+            }
+
+            Task.Run(async () =>
+            {
+                loadTask = Task.Run(() => LoadStoryboardFor(b.Value), cancellationTokenSource.Token);
+
+                await loadTask;
+            }, cancellationTokenSource.Token);
         }
     }
 }
