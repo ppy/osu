@@ -96,6 +96,7 @@ namespace osu.Game.Rulesets.UI
         public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
+
             validState = !frameStableClock.IsPaused.Value;
 
             int loops = 0;
@@ -191,7 +192,7 @@ namespace osu.Game.Rulesets.UI
             finally
             {
                 if (newProposedTime != manualClock.CurrentTime)
-                    direction = newProposedTime > manualClock.CurrentTime ? 1 : -1;
+                    direction = newProposedTime >= manualClock.CurrentTime ? 1 : -1;
 
                 manualClock.CurrentTime = newProposedTime;
                 manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
