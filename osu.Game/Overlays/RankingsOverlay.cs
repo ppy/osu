@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
+using osu.Game.Online.Placeholders;
 using osu.Game.Online.API;
 using System.Threading;
 using osu.Game.Graphics.UserInterface;
@@ -30,6 +31,8 @@ namespace osu.Game.Overlays
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
+        private Placeholder errorPlaceholder;
+        private Container placeholderContainer;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -75,12 +78,25 @@ namespace osu.Game.Overlays
                                         Margin = new MarginPadding { Bottom = 10 }
                                     },
                                     loading = new LoadingLayer(contentContainer),
+                                    placeholderContainer = new Container
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        Margin = new MarginPadding { Bottom = 10, Top = 200}
+                                    }
                                 }
                             }
                         }
                     }
                 }
             };
+            errorPlaceholder = new LoginPlaceholder(@"blahblahblah");
+            placeholderContainer.Child = errorPlaceholder;
+            
+            checkIsLoggedIn();
+            
         }
 
         [BackgroundDependencyLoader]
@@ -212,6 +228,22 @@ namespace osu.Game.Overlays
             }
 
             return null;
+        }
+
+        private void checkIsLoggedIn()
+        {
+            //ask to log in if the user is not logged in
+            if (api?.IsLoggedIn != true)
+            {
+                errorPlaceholder = new LoginPlaceholder(@"Please sign in to view ranking leaderboards");
+                placeholderContainer.Child = errorPlaceholder;
+                placeholderContainer.Show();
+                
+            }
+            else
+            {
+                placeholderContainer.Hide();
+            }
         }
 
         private void loadContent(Drawable content)
