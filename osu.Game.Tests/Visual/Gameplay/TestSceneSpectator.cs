@@ -1,16 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Users;
@@ -50,22 +53,25 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             beginSpectating();
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
-            AddStep("send frames", () => testSpectatorStreamingClient.SendFrames());
-
+            sendFrames();
             AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
             AddAssert("ensure frames arrived", () => replayHandler.HasFrames);
 
             AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
-            AddAssert("game is paused", () => !player.ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning);
+            AddAssert("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
+        }
+
+        private void sendFrames(int count = 10)
+        {
+            AddStep("send frames", () => testSpectatorStreamingClient.SendFrames(count));
         }
 
         [Test]
         public void TestSpectatingDuringGameplay()
         {
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
-            AddStep("send frames", () => testSpectatorStreamingClient.SendFrames());
-
+            sendFrames();
             // should seek immediately to available frames
             beginSpectating();
         }
@@ -76,11 +82,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             beginSpectating();
 
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
-            AddStep("send frames", () => testSpectatorStreamingClient.SendFrames());
-
+            sendFrames();
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
-            AddStep("send frames", () => testSpectatorStreamingClient.SendFrames());
-            // should restart either immediately or after running out of frames
+            sendFrames();
         }
 
         [Test]
@@ -89,8 +93,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             beginSpectating();
 
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
-            AddStep("send frames", () => testSpectatorStreamingClient.SendFrames());
-            // todo: send fail state
+            sendFrames();
 
             // should replay until running out of frames then fail
         }
@@ -101,8 +104,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             beginSpectating();
 
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
-            AddStep("send frames", () => testSpectatorStreamingClient.SendFrames());
-
+            sendFrames();
             AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
             // should immediately exit and unbind from streaming client
@@ -117,8 +119,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             beginSpectating();
 
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
-            AddStep("send frames", () => testSpectatorStreamingClient.SendFrames());
-
+            sendFrames();
             // player should never arrive.
         }
 
@@ -143,13 +144,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                 });
             }
 
-            public void SendFrames()
+            public void SendFrames(int count)
             {
-                ((ISpectatorClient)this).UserSentFrames((int)StreamingUser.Id, new FrameDataBundle(new[]
+                var frames = new List<LegacyReplayFrame>();
+
+                for (int i = 0; i < count; i++)
                 {
-                    // todo: populate more frames
-                    new LegacyReplayFrame(0, 0, 0, ReplayButtonState.Left1)
-                }));
+                    frames.Add(new LegacyReplayFrame(i * 100, RNG.Next(0, 512), RNG.Next(0, 512), ReplayButtonState.Left1));
+                }
+
+                frames.Add(new LegacyReplayFrame(count * 100, 0, 0, ReplayButtonState.None));
+
+                var bundle = new FrameDataBundle(frames);
+                ((ISpectatorClient)this).UserSentFrames((int)StreamingUser.Id, bundle);
             }
 
             public override void WatchUser(int userId)
