@@ -29,6 +29,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuSpriteText genre;
             OsuSpriteText language;
             OsuSpriteText extra;
+            OsuSpriteText ranks;
             OsuSpriteText played;
 
             Add(control = new BeatmapListingSearchControl
@@ -50,6 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     genre = new OsuSpriteText(),
                     language = new OsuSpriteText(),
                     extra = new OsuSpriteText(),
+                    ranks = new OsuSpriteText(),
                     played = new OsuSpriteText()
                 }
             });
@@ -60,6 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             control.Genre.BindValueChanged(g => genre.Text = $"Genre: {g.NewValue}", true);
             control.Language.BindValueChanged(l => language.Text = $"Language: {l.NewValue}", true);
             control.Extra.BindValueChanged(e => extra.Text = $"Extra: {(e.NewValue == null ? "" : string.Join(".", e.NewValue.Select(i => i.ToString().ToLowerInvariant())))}", true);
+            control.Ranks.BindValueChanged(r => ranks.Text = $"Ranks: {(r.NewValue == null ? "" : string.Join(".", r.NewValue.Select(i => i.ToString())))}", true);
             control.Played.BindValueChanged(p => played.Text = $"Played: {p.NewValue}", true);
         }
 

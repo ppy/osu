@@ -131,6 +131,7 @@ namespace osu.Game.Overlays.BeatmapListing
             searchControl.Genre.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Language.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Extra.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.Ranks.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Played.BindValueChanged(_ => queueUpdateSearch());
 
             sortCriteria.BindValueChanged(_ => queueUpdateSearch());
@@ -183,6 +184,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 searchControl.Genre.Value,
                 searchControl.Language.Value,
                 searchControl.Extra.Value,
+                searchControl.Ranks.Value,
                 searchControl.Played.Value);
 
             getSetsRequest.Success += response =>

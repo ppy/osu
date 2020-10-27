@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public abstract class BeatmapSearchMultipleSelectionFilterRow<T> : BeatmapSearchFilterRow<List<T>>
     {
-        public BeatmapSearchMultipleSelectionFilterRow(string headerName)
+        protected BeatmapSearchMultipleSelectionFilterRow(string headerName)
             : base(headerName)
         {
         }
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 set => current.Current = value;
             }
 
-            public MultipleSelectionFilter()
+            protected MultipleSelectionFilter()
             {
                 Anchor = Anchor.BottomLeft;
                 Origin = Anchor.BottomLeft;

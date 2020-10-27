@@ -27,6 +27,8 @@ namespace osu.Game.Online.API.Requests
 
         public SearchPlayed Played { get; }
 
+        public List<SearchRank> Ranks { get; }
+
         private readonly string query;
         private readonly RulesetInfo ruleset;
         private readonly Cursor cursor;
@@ -43,6 +45,7 @@ namespace osu.Game.Online.API.Requests
             SearchGenre genre = SearchGenre.Any,
             SearchLanguage language = SearchLanguage.Any,
             List<SearchExtra> extra = null,
+            List<SearchRank> ranks = null,
             SearchPlayed played = SearchPlayed.Any)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
@@ -55,6 +58,7 @@ namespace osu.Game.Online.API.Requests
             Genre = genre;
             Language = language;
             Extra = extra;
+            Ranks = ranks;
             Played = played;
         }
 
@@ -78,6 +82,9 @@ namespace osu.Game.Online.API.Requests
 
             if (Extra != null && Extra.Any())
                 req.AddParameter("e", string.Join(".", Extra.Select(e => e.ToString().ToLowerInvariant())));
+
+            if (Ranks != null && Ranks.Any())
+                req.AddParameter("r", string.Join(".", Ranks.Select(r => r.ToString())));
 
             if (Played != SearchPlayed.Any)
                 req.AddParameter("played", Played.ToString().ToLowerInvariant());
