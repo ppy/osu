@@ -13,6 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 using osu.Game.Rulesets;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<SearchLanguage> Language => languageFilter.Current;
 
-        public Bindable<SearchExtra> Extra => extraFilter.Current;
+        public Bindable<List<SearchExtra>> Extra => extraFilter.Current;
 
         public Bindable<SearchPlayed> Played => playedFilter.Current;
 
