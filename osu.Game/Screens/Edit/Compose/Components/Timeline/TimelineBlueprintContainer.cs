@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -139,6 +138,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private class TimelineDragBox : DragBox
         {
             private Vector2 lastMouseDown;
+
             private float? lastZoom;
             private float localMouseDown;
 
@@ -166,13 +166,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     lastZoom = null;
                 }
 
-                //Zooming the timeline shifts the coordinate system this compensates for this shift
-                float zoomCorrection = lastZoom.HasValue ? (parent.timeline.Zoom / lastZoom.Value) : 1;
+                //Zooming the timeline shifts the coordinate system. zoomCorrection compensates for that
+                float zoomCorrection = lastZoom.HasValue ? (parent.timeline.CurrentZoom / lastZoom.Value) : 1;
                 localMouseDown *= zoomCorrection;
-                lastZoom = parent.timeline.Zoom;
+                lastZoom = parent.timeline.CurrentZoom;
 
                 float selection1 = localMouseDown;
-                float selection2 = e.MousePosition.X;
+                float selection2 = e.MousePosition.X * zoomCorrection;
 
                 Box.X = Math.Min(selection1, selection2);
                 Box.Width = Math.Abs(selection1 - selection2);
