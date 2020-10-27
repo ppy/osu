@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play
             if (userId != targetUser.Id)
                 return;
 
-            replay ??= new Replay();
+            replay ??= new Replay { HasReceivedAllFrames = false };
 
             var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == state.RulesetID)?.CreateInstance();
 
@@ -138,7 +138,9 @@ namespace osu.Game.Screens.Play
 
         private void userFinishedPlaying(int userId, SpectatorState state)
         {
-            // todo: handle this in some way?
+            if (replay == null) return;
+
+            replay.HasReceivedAllFrames = true;
         }
 
         protected override void Dispose(bool isDisposing)
