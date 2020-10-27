@@ -238,6 +238,14 @@ namespace osu.Game.Screens.Play
                 skipOverlay.Hide();
             }
 
+            DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
+            {
+                if (waiting.NewValue)
+                    GameplayClockContainer.Stop();
+                else
+                    GameplayClockContainer.Start();
+            });
+
             DrawableRuleset.IsPaused.BindValueChanged(paused =>
             {
                 updateGameplayState();
