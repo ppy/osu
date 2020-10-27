@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Replays
         /// </summary>
         public bool FrameAccuratePlayback = false;
 
-        protected bool HasFrames => Frames.Count > 0;
+        public bool HasFrames => Frames.Count > 0;
 
         private bool inImportantSection
         {
