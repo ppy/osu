@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
