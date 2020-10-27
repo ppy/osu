@@ -50,10 +50,10 @@ namespace osu.Game.Online.Spectator
         private IBeatmap currentBeatmap;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private IBindable<RulesetInfo> currentRuleset { get; set; }
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+        private IBindable<IReadOnlyList<Mod>> currentMods { get; set; }
 
         private readonly SpectatorState currentState = new SpectatorState();
 
@@ -178,8 +178,8 @@ namespace osu.Game.Online.Spectator
 
             // transfer state at point of beginning play
             currentState.BeatmapID = beatmap.BeatmapInfo.OnlineBeatmapID;
-            currentState.RulesetID = ruleset.Value.ID;
-            currentState.Mods = mods.Value.Select(m => new APIMod(m));
+            currentState.RulesetID = currentRuleset.Value.ID;
+            currentState.Mods = currentMods.Value.Select(m => new APIMod(m));
 
             currentBeatmap = beatmap.PlayableBeatmap;
             beginPlaying();
