@@ -63,7 +63,11 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.Centre,
                 },
             };
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             spectatorStreaming.OnUserBeganPlaying += userBeganPlaying;
             spectatorStreaming.OnUserFinishedPlaying += userFinishedPlaying;
             spectatorStreaming.OnNewFrames += userSentFrames;
@@ -74,6 +78,11 @@ namespace osu.Game.Screens.Play
         private void userSentFrames(int userId, FrameDataBundle data)
         {
             if (userId != targetUser.Id)
+                return;
+
+            // this should never happen as the server sends the user's state on watching,
+            // but is here as a safety measure.
+            if (replay == null)
                 return;
 
             var rulesetInstance = ruleset.Value.CreateInstance();
