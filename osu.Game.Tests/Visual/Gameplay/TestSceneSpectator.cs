@@ -25,6 +25,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(SpectatorStreamingClient))]
         private TestSpectatorStreamingClient testSpectatorStreamingClient = new TestSpectatorStreamingClient();
 
+        // used just to show beatmap card for the time being.
+        protected override bool UseOnlineAPI => true;
+
         private Spectator spectatorScreen;
 
         [Resolved]
@@ -134,9 +137,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             start();
             sendFrames();
             waitForPlayer();
+
             // should immediately exit and unbind from streaming client
             AddStep("stop spectating", () => (Stack.CurrentScreen as Player)?.Exit());
-
             AddUntilStep("spectating stopped", () => spectatorScreen.GetParentScreen() == null);
         }
 
@@ -145,14 +148,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            start();
+            start(88);
             sendFrames();
-            // player should never arrive.
+
+            AddAssert("screen didn't change", () => Stack.CurrentScreen is Spectator);
         }
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
-        private void start() => AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorStreamingClient.StartPlay(beatmapId));
 
         private void checkPaused(bool state) =>
             AddAssert($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
@@ -176,7 +180,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public readonly User StreamingUser = new User { Id = 1234, Username = "Test user" };
 
-            public void StartPlay() => sendState();
+            public void StartPlay(int? beatmapId = null) => sendState(beatmapId);
 
             public void EndPlay()
             {
@@ -218,12 +222,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 base.WatchUser(userId);
             }
 
-            private void sendState()
+            private void sendState(int? beatmapId = null)
             {
                 sentState = true;
                 ((ISpectatorClient)this).UserBeganPlaying((int)StreamingUser.Id, new SpectatorState
                 {
-                    BeatmapID = beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID,
+                    BeatmapID = beatmapId ?? beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID,
                     RulesetID = 0,
                 });
             }
