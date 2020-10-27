@@ -4,18 +4,23 @@
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Tournament.Models;
+using osuTK;
 
 namespace osu.Game.Tournament.Components
 {
-    public class DrawableTeamFlag : Sprite
+    public class DrawableTeamFlag : Container
     {
         private readonly TournamentTeam team;
 
         [UsedImplicitly]
         private Bindable<string> flag;
+
+        private Sprite flagSprite;
 
         public DrawableTeamFlag(TournamentTeam team)
         {
@@ -27,7 +32,18 @@ namespace osu.Game.Tournament.Components
         {
             if (team == null) return;
 
-            (flag = team.FlagName.GetBoundCopy()).BindValueChanged(acronym => Texture = textures.Get($@"Flags/{team.FlagName}"), true);
+            Size = new Vector2(75, 50);
+            Masking = true;
+            CornerRadius = 5;
+            Child = flagSprite = new Sprite
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fill
+            };
+
+            (flag = team.FlagName.GetBoundCopy()).BindValueChanged(acronym => flagSprite.Texture = textures.Get($@"Flags/{team.FlagName}"), true);
         }
     }
 }
