@@ -9,6 +9,7 @@ namespace osu.Game.Overlays.BeatmapListing
     {
         [Description("Has Video")]
         Video,
+
         [Description("Has Storyboard")]
         Storyboard
     }
