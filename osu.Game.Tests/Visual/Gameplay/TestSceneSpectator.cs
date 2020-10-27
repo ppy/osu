@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        private int nextFrame = 0;
+        private int nextFrame;
 
         public override void SetUpSteps()
         {

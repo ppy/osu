@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play
         public ReplayPlayer(Score score, bool allowPause = true, bool showResults = true)
             : base(allowPause, showResults)
         {
-            this.Score = score;
+            Score = score;
         }
 
         protected override void PrepareReplay()
