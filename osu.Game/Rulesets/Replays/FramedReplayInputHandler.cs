@@ -124,20 +124,42 @@ namespace osu.Game.Rulesets.Replays
 
             if (HasFrames)
             {
+                var next = NextFrame;
+
                 // check if the next frame is valid for the current playback direction.
                 // validity is if the next frame is equal or "earlier"
-                var compare = time.CompareTo(NextFrame?.Time);
+                var compare = time.CompareTo(next?.Time);
 
-                if (compare == 0 || compare == currentDirection)
+                if (next != null && (compare == 0 || compare == currentDirection))
                 {
                     if (advanceFrame())
                         return CurrentTime = CurrentFrame.Time;
                 }
                 else
                 {
-                    // if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
+                    // this is the case where the frame can't be advanced (in the replay).
+                    // even so, we may be able to move the clock forward due to being at the end of the replay or
+                    // in a section where replay accuracy doesn't matter.
+
+                    // important section is always respected to block the update loop.
                     if (inImportantSection)
                         return null;
+
+                    if (next == null)
+                    {
+                        // in the case we have no more frames and haven't received the full replay, block.
+                        if (!replay.HasReceivedAllFrames)
+                            return null;
+
+                        // else allow play to end.
+                    }
+                    else if (next.Time.CompareTo(time) != currentDirection)
+                    {
+                        // in the case we have more frames, block if the next frame's time is less than the current time.
+                        return null;
+                    }
+
+                    // if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
                 }
             }
 
