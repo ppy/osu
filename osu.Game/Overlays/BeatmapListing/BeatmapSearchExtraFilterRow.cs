@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private class ExtraFilter : MultipleSelectionFilter
         {
-            protected override MultipleSelectionFilterTabItem[] CreateItems() => new[]
+            protected override MultipleSelectionFilterTabItem[] CreateItems() => new MultipleSelectionFilterTabItem[]
             {
                 new ExtraFilterTabItem(SearchExtra.Video),
                 new ExtraFilterTabItem(SearchExtra.Storyboard)
