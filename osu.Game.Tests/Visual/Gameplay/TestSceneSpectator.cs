@@ -59,21 +59,20 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("screen hasn't changed", () => Stack.CurrentScreen is Spectator);
 
-            AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
-
+            start();
             sendFrames();
 
-            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
-
+            waitForPlayer();
             AddAssert("ensure frames arrived", () => replayHandler.HasFrames);
 
             AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
-            AddAssert("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
-            sendFrames();
-            AddUntilStep("game resumed", () => !player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
+            checkPaused(true);
 
+            sendFrames();
+
+            checkPaused(false);
             AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
-            AddAssert("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
+            checkPaused(true);
         }
 
         [Test]
@@ -81,17 +80,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
-
-            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
-
+            start();
+            waitForPlayer();
             AddUntilStep("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
+
+            sendFrames();
+
+            checkPaused(false);
         }
 
         [Test]
         public void TestSpectatingDuringGameplay()
         {
-            AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+            start();
             sendFrames();
             // should seek immediately to available frames
             loadSpectatingScreen();
@@ -102,9 +103,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+            start();
             sendFrames();
-            AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+            start();
             sendFrames();
         }
 
@@ -113,10 +114,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+            start();
             sendFrames();
 
-            // should replay until running out of frames then fail
+            // TODO: should replay until running out of frames then fail
         }
 
         [Test]
@@ -124,10 +125,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+            start();
             sendFrames();
-            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
-
+            waitForPlayer();
             // should immediately exit and unbind from streaming client
             AddStep("stop spectating", () => (Stack.CurrentScreen as Player)?.Exit());
 
@@ -139,10 +139,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+            start();
             sendFrames();
             // player should never arrive.
         }
+
+        private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+
+        private void start() => AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+
+        private void checkPaused(bool state) =>
+            AddAssert($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
 
         private void sendFrames(int count = 10)
         {
