@@ -23,6 +23,8 @@ namespace osu.Game.Online.API.Requests
 
         public SearchExtra Extra { get; }
 
+        public SearchPlayed Played { get; }
+
         private readonly string query;
         private readonly RulesetInfo ruleset;
         private readonly Cursor cursor;
@@ -38,7 +40,8 @@ namespace osu.Game.Online.API.Requests
             SortDirection sortDirection = SortDirection.Descending,
             SearchGenre genre = SearchGenre.Any,
             SearchLanguage language = SearchLanguage.Any,
-            SearchExtra extra = SearchExtra.Any)
+            SearchExtra extra = SearchExtra.Any,
+            SearchPlayed played = SearchPlayed.Any)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
@@ -50,6 +53,7 @@ namespace osu.Game.Online.API.Requests
             Genre = genre;
             Language = language;
             Extra = extra;
+            Played = played;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -93,6 +97,9 @@ namespace osu.Game.Online.API.Requests
 
                 req.AddParameter("e", extraString);
             }
+
+            if (Played != SearchPlayed.Any)
+                req.AddParameter("played", Played.ToString().ToLowerInvariant());
 
             return req;
         }
