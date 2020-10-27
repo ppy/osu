@@ -23,11 +23,11 @@ namespace osu.Game.Online.API.Requests
 
         public SearchLanguage Language { get; }
 
-        public List<SearchExtra> Extra { get; }
+        public IReadOnlyCollection<SearchExtra> Extra { get; }
 
         public SearchPlayed Played { get; }
 
-        public List<SearchRank> Ranks { get; }
+        public IReadOnlyCollection<SearchRank> Ranks { get; }
 
         private readonly string query;
         private readonly RulesetInfo ruleset;
@@ -44,8 +44,8 @@ namespace osu.Game.Online.API.Requests
             SortDirection sortDirection = SortDirection.Descending,
             SearchGenre genre = SearchGenre.Any,
             SearchLanguage language = SearchLanguage.Any,
-            List<SearchExtra> extra = null,
-            List<SearchRank> ranks = null,
+            IReadOnlyCollection<SearchExtra> extra = null,
+            IReadOnlyCollection<SearchRank> ranks = null,
             SearchPlayed played = SearchPlayed.Any)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
