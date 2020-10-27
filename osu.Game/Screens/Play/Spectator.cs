@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Play
                 spectatorStreaming.StopWatchingUser((int)targetUser.Id);
             }
 
-            managerUpdated.UnbindAll();
+            managerUpdated?.UnbindAll();
         }
     }
 }
