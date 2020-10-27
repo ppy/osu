@@ -22,9 +22,6 @@ namespace osu.Game.Screens.Edit.Timing
         [Cached]
         private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
 
-        [Resolved]
-        private EditorClock clock { get; set; }
-
         public TimingScreen()
             : base(EditorScreenMode.Timing)
         {
@@ -47,17 +44,6 @@ namespace osu.Game.Screens.Edit.Timing
                 },
             }
         };
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            selectedGroup.BindValueChanged(selected =>
-            {
-                if (selected.NewValue != null)
-                    clock.SeekTo(selected.NewValue.Time);
-            });
-        }
 
         protected override void OnTimelineLoaded(TimelineArea timelineArea)
         {
