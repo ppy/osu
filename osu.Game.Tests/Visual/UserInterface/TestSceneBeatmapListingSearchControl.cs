@@ -61,8 +61,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             control.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
             control.Genre.BindValueChanged(g => genre.Text = $"Genre: {g.NewValue}", true);
             control.Language.BindValueChanged(l => language.Text = $"Language: {l.NewValue}", true);
-            control.Extra.BindValueChanged(e => extra.Text = $"Extra: {(e.NewValue == null ? "" : string.Join(".", e.NewValue.Select(i => i.ToString().ToLowerInvariant())))}", true);
-            control.Ranks.BindValueChanged(r => ranks.Text = $"Ranks: {(r.NewValue == null ? "" : string.Join(".", r.NewValue.Select(i => i.ToString())))}", true);
+            control.Extra.BindValueChanged(e => extra.Text = $"Extra: {(e.NewValue == null ? "" : string.Join('.', e.NewValue.Select(i => i.ToString().ToLowerInvariant())))}", true);
+            control.Ranks.BindValueChanged(r => ranks.Text = $"Ranks: {(r.NewValue == null ? "" : string.Join('.', r.NewValue.Select(i => i.ToString())))}", true);
             control.Played.BindValueChanged(p => played.Text = $"Played: {p.NewValue}", true);
         }
 
