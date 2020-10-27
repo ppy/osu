@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -29,14 +32,16 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal bool FrameStablePlayback = true;
 
+        public IFrameStableClock FrameStableClock => frameStableClock;
+
         [Cached(typeof(GameplayClock))]
-        public readonly FrameStableClock FrameStableClock;
+        private readonly FrameStabilityClock frameStableClock;
 
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
         {
             RelativeSizeAxes = Axes.Both;
 
-            FrameStableClock = new FrameStableClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+            frameStableClock = new FrameStabilityClock(framedClock = new FramedClock(manualClock = new ManualClock()));
 
             this.gameplayStartTime = gameplayStartTime;
         }
@@ -57,8 +62,8 @@ namespace osu.Game.Rulesets.UI
         {
             if (clock != null)
             {
-                parentGameplayClock = FrameStableClock.ParentGameplayClock = clock;
-                FrameStableClock.IsPaused.BindTo(clock.IsPaused);
+                parentGameplayClock = frameStableClock.ParentGameplayClock = clock;
+                frameStableClock.IsPaused.BindTo(clock.IsPaused);
             }
         }
 
@@ -91,7 +96,7 @@ namespace osu.Game.Rulesets.UI
         public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
-            validState = !FrameStableClock.IsPaused.Value;
+            validState = !frameStableClock.IsPaused.Value;
 
             int loops = 0;
 
@@ -194,6 +199,8 @@ namespace osu.Game.Rulesets.UI
 
                 requireMoreUpdateLoops |= manualClock.CurrentTime != parentGameplayClock.CurrentTime;
 
+                frameStableClock.IsCatchingUp.Value = requireMoreUpdateLoops;
+
                 // The manual clock time has changed in the above code. The framed clock now needs to be updated
                 // to ensure that the its time is valid for our children before input is processed
                 framedClock.ProcessFrame();
@@ -209,10 +216,26 @@ namespace osu.Game.Rulesets.UI
             }
             else
             {
-                Clock = FrameStableClock;
+                Clock = frameStableClock;
             }
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
+
+        private class FrameStabilityClock : GameplayClock, IFrameStableClock
+        {
+            public GameplayClock ParentGameplayClock;
+
+            public readonly Bindable<bool> IsCatchingUp = new Bindable<bool>();
+
+            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
+
+            public FrameStabilityClock(FramedClock underlyingClock)
+                : base(underlyingClock)
+            {
+            }
+
+            IBindable<bool> IFrameStableClock.IsCatchingUp => IsCatchingUp;
+        }
     }
 }

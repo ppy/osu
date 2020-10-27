@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private OsuInputManager inputManager;
 
-        private GameplayClock gameplayClock;
+        private IFrameStableClock gameplayClock;
 
         private List<OsuReplayFrame> replayFrames;
 
