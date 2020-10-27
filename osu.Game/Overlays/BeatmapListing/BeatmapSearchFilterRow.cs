@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public BeatmapSearchFilterRow(string headerName)
         {
+            Drawable filter;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
             AddInternal(new GridContainer
@@ -49,7 +50,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 },
                 Content = new[]
                 {
-                    new Drawable[]
+                    new[]
                     {
                         new OsuSpriteText
                         {
@@ -58,17 +59,17 @@ namespace osu.Game.Overlays.BeatmapListing
                             Font = OsuFont.GetFont(size: 13),
                             Text = headerName.Titleize()
                         },
-                        CreateFilter().With(f =>
-                        {
-                            f.Current = current;
-                        })
+                        filter = CreateFilter()
                     }
                 }
             });
+
+            if (filter is IHasCurrentValue<T> filterWithValue)
+                filterWithValue.Current = current;
         }
 
         [NotNull]
-        protected virtual BeatmapSearchFilter CreateFilter() => new BeatmapSearchFilter();
+        protected virtual Drawable CreateFilter() => new BeatmapSearchFilter();
 
         protected class BeatmapSearchFilter : TabControl<T>
         {
@@ -99,62 +100,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
             protected override TabItem<T> CreateTabItem(T value) => new FilterTabItem(value);
 
-            protected class FilterTabItem : TabItem<T>
-            {
-                protected virtual float TextSize => 13;
-
-                [Resolved]
-                private OverlayColourProvider colourProvider { get; set; }
-
-                private readonly OsuSpriteText text;
-
-                public FilterTabItem(T value)
-                    : base(value)
-                {
-                    AutoSizeAxes = Axes.Both;
-                    Anchor = Anchor.BottomLeft;
-                    Origin = Anchor.BottomLeft;
-                    AddRangeInternal(new Drawable[]
-                    {
-                        text = new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Regular),
-                            Text = (value as Enum)?.GetDescription() ?? value.ToString()
-                        },
-                        new HoverClickSounds()
-                    });
-
-                    Enabled.Value = true;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load()
-                {
-                    updateState();
-                }
-
-                protected override bool OnHover(HoverEvent e)
-                {
-                    base.OnHover(e);
-                    updateState();
-                    return true;
-                }
-
-                protected override void OnHoverLost(HoverLostEvent e)
-                {
-                    base.OnHoverLost(e);
-                    updateState();
-                }
-
-                protected override void OnActivated() => updateState();
-
-                protected override void OnDeactivated() => updateState();
-
-                private void updateState() => text.FadeColour(Active.Value ? Color4.White : getStateColour(), 200, Easing.OutQuint);
-
-                private Color4 getStateColour() => IsHovered ? colourProvider.Light1 : colourProvider.Light3;
-            }
-
             private class FilterDropdown : OsuTabDropdown<T>
             {
                 protected override DropdownHeader CreateHeader() => new FilterHeader
@@ -171,6 +116,64 @@ namespace osu.Game.Overlays.BeatmapListing
                     }
                 }
             }
+        }
+
+        protected class FilterTabItem : TabItem<T>
+        {
+            protected virtual float TextSize => 13;
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; }
+
+            private readonly OsuSpriteText text;
+
+            public FilterTabItem(T value)
+                : base(value)
+            {
+                AutoSizeAxes = Axes.Both;
+                Anchor = Anchor.BottomLeft;
+                Origin = Anchor.BottomLeft;
+                AddRangeInternal(new Drawable[]
+                {
+                    text = new OsuSpriteText
+                    {
+                        Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Regular),
+                        Text = CreateText(value)
+                    },
+                    new HoverClickSounds()
+                });
+
+                Enabled.Value = true;
+            }
+
+            protected virtual string CreateText(T value) => (value as Enum)?.GetDescription() ?? value.ToString();
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                updateState();
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                base.OnHover(e);
+                updateState();
+                return true;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                base.OnHoverLost(e);
+                updateState();
+            }
+
+            protected override void OnActivated() => updateState();
+
+            protected override void OnDeactivated() => updateState();
+
+            private void updateState() => text.FadeColour(Active.Value ? Color4.White : getStateColour(), 200, Easing.OutQuint);
+
+            private Color4 getStateColour() => IsHovered ? colourProvider.Light1 : colourProvider.Light3;
         }
     }
 }

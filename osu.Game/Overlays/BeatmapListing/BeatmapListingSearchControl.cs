@@ -28,6 +28,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<SearchLanguage> Language => languageFilter.Current;
 
+        public Bindable<SearchExtra> Extra => extraFilter.Current;
+
         public BeatmapSetInfo BeatmapSet
         {
             set
@@ -48,6 +50,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
         private readonly BeatmapSearchFilterRow<SearchLanguage> languageFilter;
+        private readonly BeatmapSearchExtraFilterRow extraFilter;
 
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
@@ -105,6 +108,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                     categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(@"Categories"),
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"Genre"),
                                     languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"Language"),
+                                    extraFilter = new BeatmapSearchExtraFilterRow()
                                 }
                             }
                         }
