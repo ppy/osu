@@ -238,7 +238,13 @@ namespace osu.Game.Screens.Play
                 skipOverlay.Hide();
             }
 
-            DrawableRuleset.IsPaused.BindValueChanged(_ => updateGameplayState());
+            DrawableRuleset.IsPaused.BindValueChanged(paused =>
+            {
+                updateGameplayState();
+                updateSampleDisabledState();
+            });
+
+            DrawableRuleset.FrameStableClock.IsCatchingUp.BindValueChanged(_ => updateSampleDisabledState());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
 
@@ -367,13 +373,6 @@ namespace osu.Game.Screens.Play
             }
         };
 
-        protected override void Update()
-        {
-            base.Update();
-
-            samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.ShouldDisableSamplePlayback;
-        }
-
         private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
         {
             updateGameplayState();
@@ -386,6 +385,11 @@ namespace osu.Game.Screens.Play
             bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value;
             OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
             LocalUserPlaying.Value = inGameplay;
+        }
+
+        private void updateSampleDisabledState()
+        {
+            samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.IsCatchingUp.Value || GameplayClockContainer.GameplayClock.IsPaused.Value;
         }
 
         private void updatePauseOnFocusLostState() =>
