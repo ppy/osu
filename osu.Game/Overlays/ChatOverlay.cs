@@ -201,7 +201,7 @@ namespace osu.Game.Overlays
 
             errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
             placeholderContainer.Child = errorPlaceholder;
-            checkIsLoggedIn();
+            
             textbox.OnCommit += postMessage;
 
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
@@ -235,6 +235,7 @@ namespace osu.Game.Overlays
             chatBackground.Colour = colours.ChatBlue;
 
             placeholderContainer.Show();
+            checkIsLoggedIn();
 
             // This is a relatively expensive (and blocking) operation.
             // Scheduling it ensures that it won't be performed unless the user decides to open chat.
@@ -478,6 +479,7 @@ namespace osu.Game.Overlays
             //hide the chat and asks to log in if the user is not logged in
             if (api?.IsLoggedIn != true)
             {
+                errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
                 currentChannelContainer.Hide();
                 placeholderContainer.Show();
                 textbox.Hide();
