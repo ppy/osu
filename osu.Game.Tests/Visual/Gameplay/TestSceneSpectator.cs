@@ -56,6 +56,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestBasicSpectatingFlow()
         {
             loadSpectatingScreen();
+
+            AddAssert("screen hasn't changed", () => Stack.CurrentScreen is Spectator);
+
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
 
             sendFrames();
@@ -71,6 +74,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
             AddAssert("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
+        }
+
+        [Test]
+        public void TestPlayStartsWithNoFrames()
+        {
+            loadSpectatingScreen();
+
+            AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+
+            AddUntilStep("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
         }
 
         [Test]
