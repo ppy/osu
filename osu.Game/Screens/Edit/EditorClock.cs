@@ -11,14 +11,13 @@ using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// A decoupled clock which adds editor-specific functionality, such as snapping to a user-defined beat divisor.
     /// </summary>
-    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock, ISamplePlaybackDisabler
+    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
         public IBindable<Track> Track => track;
 
@@ -32,9 +31,9 @@ namespace osu.Game.Screens.Edit
 
         private readonly DecoupleableInterpolatingFramedClock underlyingClock;
 
-        public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
+        public IBindable<bool> SeekingOrStopped => seekingOrStopped;
 
-        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+        private readonly Bindable<bool> seekingOrStopped = new Bindable<bool>(true);
 
         public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
             : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
@@ -171,13 +170,13 @@ namespace osu.Game.Screens.Edit
 
         public void Stop()
         {
-            samplePlaybackDisabled.Value = true;
+            seekingOrStopped.Value = true;
             underlyingClock.Stop();
         }
 
         public bool Seek(double position)
         {
-            samplePlaybackDisabled.Value = true;
+            seekingOrStopped.Value = true;
 
             ClearTransforms();
             return underlyingClock.Seek(position);
@@ -228,7 +227,7 @@ namespace osu.Game.Screens.Edit
 
         private void updateSeekingState()
         {
-            if (samplePlaybackDisabled.Value)
+            if (seekingOrStopped.Value)
             {
                 if (track.Value?.IsRunning != true)
                 {
@@ -240,13 +239,13 @@ namespace osu.Game.Screens.Edit
                 // we are either running a seek tween or doing an immediate seek.
                 // in the case of an immediate seek the seeking bool will be set to false after one update.
                 // this allows for silencing hit sounds and the likes.
-                samplePlaybackDisabled.Value = Transforms.Any();
+                seekingOrStopped.Value = Transforms.Any();
             }
         }
 
         public void SeekTo(double seekDestination)
         {
-            samplePlaybackDisabled.Value = true;
+            seekingOrStopped.Value = true;
 
             if (IsRunning)
                 Seek(seekDestination);
