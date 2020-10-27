@@ -81,10 +81,10 @@ namespace osu.Game.Online.API.Requests
             req.AddParameter("sort", $"{SortCriteria.ToString().ToLowerInvariant()}_{directionString}");
 
             if (Extra != null && Extra.Any())
-                req.AddParameter("e", string.Join(".", Extra.Select(e => e.ToString().ToLowerInvariant())));
+                req.AddParameter("e", string.Join('.', Extra.Select(e => e.ToString().ToLowerInvariant())));
 
             if (Ranks != null && Ranks.Any())
-                req.AddParameter("r", string.Join(".", Ranks.Select(r => r.ToString())));
+                req.AddParameter("r", string.Join('.', Ranks.Select(r => r.ToString())));
 
             if (Played != SearchPlayed.Any)
                 req.AddParameter("played", Played.ToString().ToLowerInvariant());
