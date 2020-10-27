@@ -37,6 +37,7 @@ namespace osu.Game.Screens.Play
         private readonly DecoupleableInterpolatingFramedClock adjustableClock;
 
         private readonly double gameplayStartTime;
+        private readonly bool startAtGameplayStart;
 
         private readonly double firstHitObjectTime;
 
@@ -62,10 +63,11 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock platformOffsetClock;
 
-        public GameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime)
+        public GameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
         {
             this.beatmap = beatmap;
             this.gameplayStartTime = gameplayStartTime;
+            this.startAtGameplayStart = startAtGameplayStart;
             track = beatmap.Track;
 
             firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
@@ -103,16 +105,21 @@ namespace osu.Game.Screens.Play
             userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
 
             // sane default provided by ruleset.
-            double startTime = Math.Min(0, gameplayStartTime);
+            double startTime = gameplayStartTime;
 
-            // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
-            // this is commonly used to display an intro before the audio track start.
-            startTime = Math.Min(startTime, beatmap.Storyboard.FirstEventTime);
+            if (!startAtGameplayStart)
+            {
+                startTime = Math.Min(0, startTime);
 
-            // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
-            // this is not available as an option in the live editor but can still be applied via .osu editing.
-            if (beatmap.BeatmapInfo.AudioLeadIn > 0)
-                startTime = Math.Min(startTime, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+                // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
+                // this is commonly used to display an intro before the audio track start.
+                startTime = Math.Min(startTime, beatmap.Storyboard.FirstEventTime);
+
+                // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
+                // this is not available as an option in the live editor but can still be applied via .osu editing.
+                if (beatmap.BeatmapInfo.AudioLeadIn > 0)
+                    startTime = Math.Min(startTime, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+            }
 
             Seek(startTime);
 

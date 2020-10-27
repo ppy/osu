@@ -93,9 +93,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestSpectatingDuringGameplay()
         {
             start();
-            sendFrames();
-            // should seek immediately to available frames
+
             loadSpectatingScreen();
+
+            AddStep("advance frame count", () => nextFrame = 300);
+            sendFrames();
+
+            waitForPlayer();
+
+            AddUntilStep("playing from correct point in time", () => player.ChildrenOfType<DrawableRuleset>().First().FrameStableClock.CurrentTime > 30000);
         }
 
         [Test]

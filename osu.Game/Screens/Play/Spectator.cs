@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Play
             ruleset.Value = resolvedRuleset.RulesetInfo;
             beatmap.Value = beatmaps.GetWorkingBeatmap(resolvedBeatmap);
 
-            this.Push(new ReplayPlayerLoader(new Score
+            this.Push(new SpectatorPlayerLoader(new Score
             {
                 ScoreInfo = scoreInfo,
                 Replay = replay,
