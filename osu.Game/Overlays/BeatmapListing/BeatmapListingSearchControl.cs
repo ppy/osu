@@ -55,8 +55,8 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
         private readonly BeatmapSearchFilterRow<SearchLanguage> languageFilter;
-        private readonly BeatmapSearchExtraFilterRow extraFilter;
-        private readonly BeatmapSearchRankFilterRow ranksFilter;
+        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchExtra> extraFilter;
+        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchRank> ranksFilter;
         private readonly BeatmapSearchFilterRow<SearchPlayed> playedFilter;
 
         private readonly Box background;
@@ -115,8 +115,8 @@ namespace osu.Game.Overlays.BeatmapListing
                                     categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(@"Categories"),
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"Genre"),
                                     languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"Language"),
-                                    extraFilter = new BeatmapSearchExtraFilterRow(),
-                                    ranksFilter = new BeatmapSearchRankFilterRow(),
+                                    extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(@"Extra"),
+                                    ranksFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchRank>(@"Rank Achieved"),
                                     playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played")
                                 }
                             }
