@@ -101,6 +101,13 @@ namespace osu.Game.Rulesets.UI
 
             int loops = 0;
 
+            if (frameStableClock.WaitingOnFrames.Value)
+            {
+                // for now, force one update loop to check if frames have arrived
+                // this may have to change in the future where we want stable user pausing during replay playback.
+                validState = true;
+            }
+
             while (validState && requireMoreUpdateLoops && loops++ < MaxCatchUpFrames)
             {
                 updateClock();
@@ -203,6 +210,7 @@ namespace osu.Game.Rulesets.UI
                 requireMoreUpdateLoops |= timeBehind != 0;
 
                 frameStableClock.IsCatchingUp.Value = timeBehind > 200;
+                frameStableClock.WaitingOnFrames.Value = !validState;
 
                 // The manual clock time has changed in the above code. The framed clock now needs to be updated
                 // to ensure that the its time is valid for our children before input is processed
@@ -231,6 +239,8 @@ namespace osu.Game.Rulesets.UI
 
             public readonly Bindable<bool> IsCatchingUp = new Bindable<bool>();
 
+            public readonly Bindable<bool> WaitingOnFrames = new Bindable<bool>();
+
             public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
 
             public FrameStabilityClock(FramedClock underlyingClock)
@@ -239,6 +249,8 @@ namespace osu.Game.Rulesets.UI
             }
 
             IBindable<bool> IFrameStableClock.IsCatchingUp => IsCatchingUp;
+
+            IBindable<bool> IFrameStableClock.WaitingOnFrames => WaitingOnFrames;
         }
     }
 }

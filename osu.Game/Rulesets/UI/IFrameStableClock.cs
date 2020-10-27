@@ -9,5 +9,7 @@ namespace osu.Game.Rulesets.UI
     public interface IFrameStableClock : IFrameBasedClock
     {
         IBindable<bool> IsCatchingUp { get; }
+
+        IBindable<bool> WaitingOnFrames { get; }
     }
 }
