@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             spectatorStreaming.OnUserBeganPlaying += userBeganPlaying;
             spectatorStreaming.OnUserFinishedPlaying += userFinishedPlaying;
             spectatorStreaming.OnNewFrames += userSentFrames;
