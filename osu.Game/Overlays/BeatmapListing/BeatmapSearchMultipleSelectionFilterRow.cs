@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -43,7 +42,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 AddRange(CreateItems());
 
                 foreach (var item in Children)
-                    item.StateUpdated += updateBindable;
+                    item.Active.BindValueChanged(_ => updateBindable());
             }
 
             protected abstract MultipleSelectionFilterTabItem[] CreateItems();
@@ -64,18 +63,15 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected class MultipleSelectionFilterTabItem : FilterTabItem<T>
         {
-            public event Action StateUpdated;
-
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
             {
-                Active.BindValueChanged(_ => StateUpdated?.Invoke());
             }
 
             protected override bool OnClick(ClickEvent e)
             {
                 base.OnClick(e);
-                Active.Value = !Active.Value;
+                Active.Toggle();
                 return true;
             }
         }
