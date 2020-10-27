@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestBasicSpectatingFlow()
         {
-            beginSpectating();
+            loadSpectatingScreen();
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
             sendFrames();
             AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
@@ -73,13 +73,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
             sendFrames();
             // should seek immediately to available frames
-            beginSpectating();
+            loadSpectatingScreen();
         }
 
         [Test]
         public void TestHostStartsPlayingWhileAlreadyWatching()
         {
-            beginSpectating();
+            loadSpectatingScreen();
 
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
             sendFrames();
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestHostFails()
         {
-            beginSpectating();
+            loadSpectatingScreen();
 
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
             sendFrames();
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStopWatchingDuringPlay()
         {
-            beginSpectating();
+            loadSpectatingScreen();
 
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
             sendFrames();
@@ -116,14 +116,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestWatchingBeatmapThatDoesntExistLocally()
         {
-            beginSpectating();
+            loadSpectatingScreen();
 
             AddStep("start play", () => testSpectatorStreamingClient.StartPlay());
             sendFrames();
             // player should never arrive.
         }
 
-        private void beginSpectating() =>
+        private void loadSpectatingScreen() =>
             AddStep("load screen", () => LoadScreen(spectatorScreen = new Spectator(testSpectatorStreamingClient.StreamingUser)));
 
         internal class TestSpectatorStreamingClient : SpectatorStreamingClient
@@ -144,6 +144,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 });
             }
 
+            private bool sentState;
+
             public void SendFrames(int count)
             {
                 var frames = new List<LegacyReplayFrame>();
@@ -157,18 +159,25 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var bundle = new FrameDataBundle(frames);
                 ((ISpectatorClient)this).UserSentFrames((int)StreamingUser.Id, bundle);
+
+                if (!sentState)
+                    sendState();
             }
 
             public override void WatchUser(int userId)
             {
-                // usually the server would do this.
-                sendState();
+                if (sentState)
+                {
+                    // usually the server would do this.
+                    sendState();
+                }
 
                 base.WatchUser(userId);
             }
 
             private void sendState()
             {
+                sentState = true;
                 ((ISpectatorClient)this).UserBeganPlaying((int)StreamingUser.Id, new SpectatorState
                 {
                     BeatmapID = beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID,
