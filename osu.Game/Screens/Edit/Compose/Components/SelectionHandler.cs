@@ -225,9 +225,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="state">The input state at the point of selection.</param>
         internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
-            if (state.Keyboard.ShiftPressed && state.Mouse.IsPressed(MouseButton.Right))
-                EditorBeatmap.Remove(blueprint.HitObject);
-            else if (state.Keyboard.ControlPressed)
+            if (state.Keyboard.ControlPressed)
                 blueprint.ToggleSelection();
             else
                 ensureSelected(blueprint);
