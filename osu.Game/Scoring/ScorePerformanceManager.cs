@@ -24,14 +24,14 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <param name="score">The score to do the calculation on. </param>
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
-        public async Task<double?> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default)
+        public Task<double?> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default)
         {
             var lookupKey = new PerformanceCacheLookup(score);
 
             if (performanceCache.TryGetValue(lookupKey, out double performance))
-                return performance;
+                return Task.FromResult((double?)performance);
 
-            return await computePerformanceAsync(score, lookupKey, token);
+            return computePerformanceAsync(score, lookupKey, token);
         }
 
         private async Task<double?> computePerformanceAsync(ScoreInfo score, PerformanceCacheLookup lookupKey, CancellationToken token = default)
