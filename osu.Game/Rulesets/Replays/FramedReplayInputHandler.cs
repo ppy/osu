@@ -162,6 +162,12 @@ namespace osu.Game.Rulesets.Replays
                     // if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
                 }
             }
+            else
+            {
+                // if we never received frames and are expecting to, block.
+                if (!replay.HasReceivedAllFrames)
+                    return null;
+            }
 
             return CurrentTime = time;
         }
