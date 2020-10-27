@@ -24,7 +24,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
