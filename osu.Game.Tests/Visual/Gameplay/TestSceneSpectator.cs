@@ -158,7 +158,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            start(88);
+            start(-1234);
             sendFrames();
 
             AddAssert("screen didn't change", () => Stack.CurrentScreen is Spectator);
