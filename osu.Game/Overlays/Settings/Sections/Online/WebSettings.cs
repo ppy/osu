@@ -27,6 +27,12 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                     Keywords = new[] { "no-video" },
                     Current = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Automatically download beatmaps when spectating",
+                    Keywords = new[] { "spectator" },
+                    Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
+                },
             };
         }
     }

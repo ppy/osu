@@ -7,12 +7,14 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -20,6 +22,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Overlays.Settings;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -69,13 +72,17 @@ namespace osu.Game.Screens.Play
 
         private TriangleButton watchButton;
 
+        private SettingsCheckbox automaticDownload;
+
+        private BeatmapSetInfo onlineBeatmap;
+
         public Spectator([NotNull] User targetUser)
         {
             this.targetUser = targetUser ?? throw new ArgumentNullException(nameof(targetUser));
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             InternalChild = new Container
             {
@@ -141,6 +148,13 @@ namespace osu.Game.Screens.Play
                                     },
                                 }
                             },
+                            automaticDownload = new SettingsCheckbox
+                            {
+                                LabelText = "Automatically download beatmaps",
+                                Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
                             watchButton = new PurpleTriangleButton
                             {
                                 Text = "Start Watching",
@@ -167,6 +181,8 @@ namespace osu.Game.Screens.Play
 
             managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
+
+            automaticDownload.Current.BindValueChanged(_ => checkForAutomaticDownload());
         }
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> beatmap)
@@ -246,7 +262,9 @@ namespace osu.Game.Screens.Play
             var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == state.BeatmapID);
 
             if (resolvedBeatmap == null)
+            {
                 return;
+            }
 
             if (replay == null)
                 return;
@@ -277,6 +295,7 @@ namespace osu.Game.Screens.Play
             if (state?.BeatmapID == null)
             {
                 beatmapPanelContainer.Clear();
+                onlineBeatmap = null;
                 return;
             }
 
@@ -286,10 +305,26 @@ namespace osu.Game.Screens.Play
                 if (state != this.state)
                     return;
 
-                beatmapPanelContainer.Child = new GridBeatmapPanel(res.ToBeatmapSet(rulesets));
+                onlineBeatmap = res.ToBeatmapSet(rulesets);
+                beatmapPanelContainer.Child = new GridBeatmapPanel(onlineBeatmap);
+                checkForAutomaticDownload();
             });
 
             api.Queue(req);
+        }
+
+        private void checkForAutomaticDownload()
+        {
+            if (onlineBeatmap == null)
+                return;
+
+            if (!automaticDownload.Current.Value)
+                return;
+
+            if (beatmaps.IsAvailableLocally(onlineBeatmap))
+                return;
+
+            beatmaps.Download(onlineBeatmap);
         }
 
         protected override void Dispose(bool isDisposing)
