@@ -18,11 +18,8 @@ namespace osu.Game.Rulesets.UI
     /// A container which consumes a parent gameplay clock and standardises frame counts for children.
     /// Will ensure a minimum of 50 frames per clock second is maintained, regardless of any system lag or seeks.
     /// </summary>
-    [Cached(typeof(ISamplePlaybackDisabler))]
-    public class FrameStabilityContainer : Container, IHasReplayHandler, ISamplePlaybackDisabler
+    public class FrameStabilityContainer : Container, IHasReplayHandler
     {
-        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
-
         private readonly double gameplayStartTime;
 
         /// <summary>
@@ -35,16 +32,16 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal bool FrameStablePlayback = true;
 
-        public GameplayClock GameplayClock => stabilityGameplayClock;
+        public IFrameStableClock FrameStableClock => frameStableClock;
 
         [Cached(typeof(GameplayClock))]
-        private readonly StabilityGameplayClock stabilityGameplayClock;
+        private readonly FrameStabilityClock frameStableClock;
 
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
         {
             RelativeSizeAxes = Axes.Both;
 
-            stabilityGameplayClock = new StabilityGameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+            frameStableClock = new FrameStabilityClock(framedClock = new FramedClock(manualClock = new ManualClock()));
 
             this.gameplayStartTime = gameplayStartTime;
         }
@@ -65,12 +62,9 @@ namespace osu.Game.Rulesets.UI
         {
             if (clock != null)
             {
-                parentGameplayClock = stabilityGameplayClock.ParentGameplayClock = clock;
-                GameplayClock.IsPaused.BindTo(clock.IsPaused);
+                parentGameplayClock = frameStableClock.ParentGameplayClock = clock;
+                frameStableClock.IsPaused.BindTo(clock.IsPaused);
             }
-
-            // this is a bit temporary. should really be done inside of GameplayClock (but requires large structural changes).
-            stabilityGameplayClock.ParentSampleDisabler = sampleDisabler;
         }
 
         protected override void LoadComplete()
@@ -102,9 +96,7 @@ namespace osu.Game.Rulesets.UI
         public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
-            validState = !GameplayClock.IsPaused.Value;
-
-            samplePlaybackDisabled.Value = stabilityGameplayClock.ShouldDisableSamplePlayback;
+            validState = !frameStableClock.IsPaused.Value;
 
             int loops = 0;
 
@@ -205,7 +197,11 @@ namespace osu.Game.Rulesets.UI
                 manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
                 manualClock.IsRunning = parentGameplayClock.IsRunning;
 
-                requireMoreUpdateLoops |= manualClock.CurrentTime != parentGameplayClock.CurrentTime;
+                double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
+
+                requireMoreUpdateLoops |= timeBehind != 0;
+
+                frameStableClock.IsCatchingUp.Value = timeBehind > 200;
 
                 // The manual clock time has changed in the above code. The framed clock now needs to be updated
                 // to ensure that the its time is valid for our children before input is processed
@@ -222,32 +218,26 @@ namespace osu.Game.Rulesets.UI
             }
             else
             {
-                Clock = GameplayClock;
+                Clock = frameStableClock;
             }
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
 
-        IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => samplePlaybackDisabled;
-
-        private class StabilityGameplayClock : GameplayClock
+        private class FrameStabilityClock : GameplayClock, IFrameStableClock
         {
             public GameplayClock ParentGameplayClock;
 
-            public ISamplePlaybackDisabler ParentSampleDisabler;
+            public readonly Bindable<bool> IsCatchingUp = new Bindable<bool>();
 
             public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
 
-            public StabilityGameplayClock(FramedClock underlyingClock)
+            public FrameStabilityClock(FramedClock underlyingClock)
                 : base(underlyingClock)
             {
             }
 
-            public override bool ShouldDisableSamplePlayback =>
-                // handle the case where playback is catching up to real-time.
-                base.ShouldDisableSamplePlayback
-                || ParentSampleDisabler?.SamplePlaybackDisabled.Value == true
-                || (ParentGameplayClock != null && Math.Abs(CurrentTime - ParentGameplayClock.CurrentTime) > 200);
+            IBindable<bool> IFrameStableClock.IsCatchingUp => IsCatchingUp;
         }
     }
 }
