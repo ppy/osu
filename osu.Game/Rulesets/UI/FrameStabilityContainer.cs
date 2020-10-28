@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.UI
 
         protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
 
-        private bool isAttached => ReplayInputHandler != null;
+        private bool hasReplayAttached => ReplayInputHandler != null;
 
         private const double sixty_frame_time = 1000.0 / 60;
 
@@ -133,44 +133,8 @@ namespace osu.Game.Rulesets.UI
                     // frame interval in the current direction.
                     applyFrameStability(ref proposedTime);
 
-                if (isAttached)
-                {
-                    double? newTime;
-
-                    if (FrameStablePlayback)
-                    {
-                        // when stability is turned on, we shouldn't execute for time values the replay is unable to satisfy.
-                        if ((newTime = ReplayInputHandler.SetFrameFromTime(proposedTime)) == null)
-                        {
-                            // setting invalid state here ensures that gameplay will not continue (ie. our child
-                            // hierarchy won't be updated).
-                            validState = false;
-
-                            // potentially loop to catch-up playback.
-                            requireMoreUpdateLoops = true;
-
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        // when stability is disabled, we don't really care about accuracy.
-                        // looping over the replay will allow it to catch up and feed out the required values
-                        // for the current time.
-                        while ((newTime = ReplayInputHandler.SetFrameFromTime(proposedTime)) != proposedTime)
-                        {
-                            if (newTime == null)
-                            {
-                                // special case for when the replay actually can't arrive at the required time.
-                                // protects from potential endless loop.
-                                validState = false;
-                                return;
-                            }
-                        }
-                    }
-
-                    proposedTime = newTime.Value;
-                }
+                if (hasReplayAttached)
+                    updateReplay(ref proposedTime);
             }
             finally
             {
@@ -191,6 +155,49 @@ namespace osu.Game.Rulesets.UI
                 // to ensure that the its time is valid for our children before input is processed
                 framedClock.ProcessFrame();
             }
+        }
+
+        /// <summary>
+        /// Attempt to advance replay playback for a given time.
+        /// </summary>
+        /// <param name="proposedTime">The time which is to be displayed.</param>
+        private bool updateReplay(ref double proposedTime)
+        {
+            double? newTime;
+
+            if (FrameStablePlayback)
+            {
+                // when stability is turned on, we shouldn't execute for time values the replay is unable to satisfy.
+                if ((newTime = ReplayInputHandler.SetFrameFromTime(proposedTime)) == null)
+                {
+                    // setting invalid state here ensures that gameplay will not continue (ie. our child
+                    // hierarchy won't be updated).
+                    validState = false;
+
+                    // potentially loop to catch-up playback.
+                    requireMoreUpdateLoops = true;
+
+                    return false;
+                }
+            }
+            else
+            {
+                // when stability is disabled, we don't really care about accuracy.
+                // looping over the replay will allow it to catch up and feed out the required values
+                // for the current time.
+                while ((newTime = ReplayInputHandler.SetFrameFromTime(proposedTime)) != proposedTime)
+                {
+                    if (newTime == null)
+                    {
+                        // special case for when the replay actually can't arrive at the required time.
+                        // protects from potential endless loop.
+                        return false;
+                    }
+                }
+            }
+
+            proposedTime = newTime.Value;
+            return true;
         }
 
         /// <summary>
