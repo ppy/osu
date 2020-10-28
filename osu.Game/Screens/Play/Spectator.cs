@@ -9,6 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -24,6 +26,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 using osuTK;
 
@@ -72,55 +75,83 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new Container
             {
-                new FillFlowContainer
+                Masking = true,
+                CornerRadius = 20,
+                AutoSizeAxes = Axes.Both,
+                AutoSizeDuration = 500,
+                AutoSizeEasing = Easing.OutQuint,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Spacing = new Vector2(15),
-                    Children = new Drawable[]
+                    new Box
                     {
-                        new OsuSpriteText
+                        Colour = colours.GreySeafoamDark,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new FillFlowContainer
+                    {
+                        Margin = new MarginPadding(20),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Spacing = new Vector2(15),
+                        Children = new Drawable[]
                         {
-                            Text = "Currently spectating",
-                            Font = OsuFont.Default.With(size: 30),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        new UserGridPanel(targetUser)
-                        {
-                            Width = 290,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = "playing",
-                            Font = OsuFont.Default.With(size: 30),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        beatmapPanelContainer = new Container
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        watchButton = new TriangleButton
-                        {
-                            Text = "Watch",
-                            Width = 250,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Action = attemptStart
+                            new OsuSpriteText
+                            {
+                                Text = "Spectator Mode",
+                                Font = OsuFont.Default.With(size: 30),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            new FillFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Spacing = new Vector2(15),
+                                Children = new Drawable[]
+                                {
+                                    new UserGridPanel(targetUser)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Height = 145,
+                                        Width = 290,
+                                    },
+                                    new SpriteIcon
+                                    {
+                                        Size = new Vector2(40),
+                                        Icon = FontAwesome.Solid.ArrowRight,
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                    },
+                                    beatmapPanelContainer = new Container
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                    },
+                                }
+                            },
+                            watchButton = new PurpleTriangleButton
+                            {
+                                Text = "Start Watching",
+                                Width = 250,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Action = attemptStart
+                            }
                         }
                     }
-                },
+                }
             };
         }
 
@@ -141,7 +172,7 @@ namespace osu.Game.Screens.Play
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> beatmap)
         {
             if (beatmap.NewValue.TryGetTarget(out var beatmapSet) && beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID == state.BeatmapID))
-                attemptStart();
+                Schedule(attemptStart);
         }
 
         private void userSentFrames(int userId, FrameDataBundle data)
@@ -189,14 +220,18 @@ namespace osu.Game.Screens.Play
                 replay = null;
             }
 
-            // not really going to start anything, but will clear the beatmap card out.
-            attemptStart();
+            clearDisplay();
+        }
+
+        private void clearDisplay()
+        {
+            watchButton.Enabled.Value = false;
+            beatmapPanelContainer.Clear();
         }
 
         private void attemptStart()
         {
-            watchButton.Enabled.Value = false;
-
+            clearDisplay();
             showBeatmapPanel(state);
 
             var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == state.RulesetID)?.CreateInstance();
@@ -211,6 +246,9 @@ namespace osu.Game.Screens.Play
             var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == state.BeatmapID);
 
             if (resolvedBeatmap == null)
+                return;
+
+            if (replay == null)
                 return;
 
             var scoreInfo = new ScoreInfo
@@ -236,7 +274,7 @@ namespace osu.Game.Screens.Play
 
         private void showBeatmapPanel(SpectatorState state)
         {
-            if (state.BeatmapID == null)
+            if (state?.BeatmapID == null)
             {
                 beatmapPanelContainer.Clear();
                 return;
