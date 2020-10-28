@@ -3,8 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -32,7 +33,8 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public readonly BindableList<T> Current = new BindableList<T>();
 
-            public MultipleSelectionFilter()
+            [BackgroundDependencyLoader]
+            private void load()
             {
                 Anchor = Anchor.BottomLeft;
                 Origin = Anchor.BottomLeft;
@@ -40,17 +42,22 @@ namespace osu.Game.Overlays.BeatmapListing
                 Height = 15;
                 Spacing = new Vector2(10, 0);
 
-                GetValues().ForEach(i => Add(CreateTabItem(i)));
-
-                foreach (var item in Children)
-                    item.Active.BindValueChanged(active => updateBindable(item.Value, active.NewValue));
+                AddRange(GetValues().Select(CreateTabItem));
             }
 
-            protected virtual T[] GetValues() => (T[])Enum.GetValues(typeof(T));
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                foreach (var item in Children)
+                    item.Active.BindValueChanged(active => toggleItem(item.Value, active.NewValue));
+            }
+
+            protected virtual IEnumerable<T> GetValues() => Enum.GetValues(typeof(T)).Cast<T>();
 
             protected virtual MultipleSelectionFilterTabItem CreateTabItem(T value) => new MultipleSelectionFilterTabItem(value);
 
-            private void updateBindable(T value, bool active)
+            private void toggleItem(T value, bool active)
             {
                 if (active)
                     Current.Add(value);
