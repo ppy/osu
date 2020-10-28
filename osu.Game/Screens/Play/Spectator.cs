@@ -38,6 +38,8 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private Bindable<RulesetInfo> ruleset { get; set; }
 
+        private Ruleset rulesetInstance;
+
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; }
 
@@ -141,12 +143,10 @@ namespace osu.Game.Screens.Play
             if (replay == null)
                 return;
 
-            var rulesetInstance = ruleset.Value.CreateInstance();
-
             foreach (var frame in data.Frames)
             {
                 IConvertibleReplayFrame convertibleFrame = rulesetInstance.CreateConvertibleReplayFrame();
-                convertibleFrame.FromLegacy(frame, beatmap.Value.Beatmap, null);
+                convertibleFrame.FromLegacy(frame, beatmap.Value.Beatmap);
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;
                 convertedFrame.Time = frame.Time;
@@ -206,6 +206,8 @@ namespace osu.Game.Screens.Play
             };
 
             ruleset.Value = resolvedRuleset.RulesetInfo;
+            rulesetInstance = resolvedRuleset;
+
             beatmap.Value = beatmaps.GetWorkingBeatmap(resolvedBeatmap);
 
             this.Push(new SpectatorPlayerLoader(new Score
