@@ -88,6 +88,7 @@ namespace osu.Game.Overlays.Dashboard
                 panel.Anchor = Anchor.TopCentre;
                 panel.Origin = Anchor.TopCentre;
                 panel.Width = 290;
+                panel.ShowProfileOnClick = false;
                 panel.Action = () => game.PerformFromScreen(s => s.Push(new Spectator(user)));
             });
         }
