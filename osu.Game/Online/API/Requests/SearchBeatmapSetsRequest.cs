@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
 using osu.Game.Overlays;
@@ -24,10 +25,12 @@ namespace osu.Game.Online.API.Requests
 
         public SearchLanguage Language { get; }
 
+        [CanBeNull]
         public IReadOnlyCollection<SearchExtra> Extra { get; }
 
         public SearchPlayed Played { get; }
 
+        [CanBeNull]
         public IReadOnlyCollection<ScoreRank> Ranks { get; }
 
         private readonly string query;
