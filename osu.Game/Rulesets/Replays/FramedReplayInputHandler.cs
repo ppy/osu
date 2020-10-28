@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
@@ -112,15 +113,9 @@ namespace osu.Game.Rulesets.Replays
         /// <returns>The usable time value. If null, we should not advance time as we do not have enough data.</returns>
         public override double? SetFrameFromTime(double time)
         {
-            if (!CurrentTime.HasValue)
-            {
-                currentDirection = 1;
-            }
-            else
-            {
-                currentDirection = time.CompareTo(CurrentTime);
-                if (currentDirection == 0) currentDirection = 1;
-            }
+            updateDirection(time);
+
+            Debug.Assert(currentDirection != 0);
 
             if (HasFrames)
             {
@@ -170,6 +165,19 @@ namespace osu.Game.Rulesets.Replays
             }
 
             return CurrentTime = time;
+        }
+
+        private void updateDirection(double time)
+        {
+            if (!CurrentTime.HasValue)
+            {
+                currentDirection = 1;
+            }
+            else
+            {
+                currentDirection = time.CompareTo(CurrentTime);
+                if (currentDirection == 0) currentDirection = 1;
+            }
         }
     }
 }
