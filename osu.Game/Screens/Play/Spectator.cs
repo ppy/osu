@@ -160,8 +160,6 @@ namespace osu.Game.Screens.Play
             if (userId != targetUser.Id)
                 return;
 
-            replay ??= new Replay { HasReceivedAllFrames = false };
-
             this.state = state;
 
             Schedule(attemptStart);
@@ -196,6 +194,8 @@ namespace osu.Game.Screens.Play
                 showBeatmapPanel(state.BeatmapID.Value);
                 return;
             }
+
+            replay ??= new Replay { HasReceivedAllFrames = false };
 
             var scoreInfo = new ScoreInfo
             {
