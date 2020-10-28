@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Spectator;
@@ -63,6 +64,8 @@ namespace osu.Game.Screens.Play
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
+        private TriangleButton watchButton;
+
         public Spectator([NotNull] User targetUser)
         {
             this.targetUser = targetUser ?? throw new ArgumentNullException(nameof(targetUser));
@@ -108,6 +111,14 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
+                        watchButton = new TriangleButton
+                        {
+                            Text = "Watch",
+                            Width = 250,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Action = attemptStart
+                        }
                     }
                 },
             };
@@ -191,9 +202,11 @@ namespace osu.Game.Screens.Play
 
             var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == state.BeatmapID);
 
+            showBeatmapPanel(state.BeatmapID.Value);
+
             if (resolvedBeatmap == null)
             {
-                showBeatmapPanel(state.BeatmapID.Value);
+                watchButton.Enabled.Value = false;
                 return;
             }
 
@@ -209,6 +222,7 @@ namespace osu.Game.Screens.Play
             rulesetInstance = resolvedRuleset;
 
             beatmap.Value = beatmaps.GetWorkingBeatmap(resolvedBeatmap);
+            watchButton.Enabled.Value = true;
 
             this.Push(new SpectatorPlayerLoader(new Score
             {
