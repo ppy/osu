@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             start();
             waitForPlayer();
-            AddUntilStep("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
+            checkPaused(true);
 
             sendFrames();
 
@@ -134,8 +134,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadSpectatingScreen();
 
             start();
-            sendFrames();
 
+            waitForPlayer();
+            checkPaused(true);
+
+            finish();
+
+            checkPaused(false);
             // TODO: should replay until running out of frames then fail
         }
 
@@ -168,8 +173,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorStreamingClient.StartPlay(beatmapId ?? importedBeatmapId));
 
+        private void finish(int? beatmapId = null) => AddStep("end play", () => testSpectatorStreamingClient.EndPlay(beatmapId ?? importedBeatmapId));
+
         private void checkPaused(bool state) =>
-            AddAssert($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
+            AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
 
         private void sendFrames(int count = 10)
         {
