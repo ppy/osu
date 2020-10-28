@@ -167,6 +167,16 @@ namespace osu.Game.Screens.Play
             attemptStart();
         }
 
+        private void userFinishedPlaying(int userId, SpectatorState state)
+        {
+            if (userId != targetUser.Id)
+                return;
+
+            if (replay == null) return;
+
+            replay.HasReceivedAllFrames = true;
+        }
+
         private void attemptStart()
         {
             var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == state.RulesetID)?.CreateInstance();
@@ -214,13 +224,6 @@ namespace osu.Game.Screens.Play
             });
 
             api.Queue(req);
-        }
-
-        private void userFinishedPlaying(int userId, SpectatorState state)
-        {
-            if (replay == null) return;
-
-            replay.HasReceivedAllFrames = true;
         }
 
         protected override void Dispose(bool isDisposing)
