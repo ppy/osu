@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 13, weight: FontWeight.Regular),
-                    Text = (value as Enum)?.GetDescription() ?? value.ToString()
+                    Text = CreateText(value)
                 },
                 new HoverClickSounds()
             });
@@ -62,6 +62,8 @@ namespace osu.Game.Overlays.BeatmapListing
         protected override void OnActivated() => updateState();
 
         protected override void OnDeactivated() => updateState();
+
+        protected virtual string CreateText(T value) => (value as Enum)?.GetDescription() ?? value.ToString();
 
         private void updateState()
         {

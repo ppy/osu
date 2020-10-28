@@ -8,6 +8,7 @@ using osu.Game.Extensions;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Online.API.Requests
 
         public SearchPlayed Played { get; }
 
-        public IReadOnlyCollection<SearchRank> Ranks { get; }
+        public IReadOnlyCollection<ScoreRank> Ranks { get; }
 
         private readonly string query;
         private readonly RulesetInfo ruleset;
@@ -45,7 +46,7 @@ namespace osu.Game.Online.API.Requests
             SearchGenre genre = SearchGenre.Any,
             SearchLanguage language = SearchLanguage.Any,
             IReadOnlyCollection<SearchExtra> extra = null,
-            IReadOnlyCollection<SearchRank> ranks = null,
+            IReadOnlyCollection<ScoreRank> ranks = null,
             SearchPlayed played = SearchPlayed.Any)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);

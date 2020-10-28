@@ -24,9 +24,11 @@ namespace osu.Game.Overlays.BeatmapListing
             Current.BindTo(filter.Current);
         }
 
-        protected override Drawable CreateFilter() => filter = new MultipleSelectionFilter();
+        protected override Drawable CreateFilter() => filter = CreateMultipleSelectionFilter();
 
-        private class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>
+        protected virtual MultipleSelectionFilter CreateMultipleSelectionFilter() => new MultipleSelectionFilter();
+
+        protected class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>
         {
             public readonly BindableList<T> Current = new BindableList<T>();
 
@@ -38,11 +40,15 @@ namespace osu.Game.Overlays.BeatmapListing
                 Height = 15;
                 Spacing = new Vector2(10, 0);
 
-                ((T[])Enum.GetValues(typeof(T))).ForEach(i => Add(new MultipleSelectionFilterTabItem(i)));
+                GetValues().ForEach(i => Add(CreateTabItem(i)));
 
                 foreach (var item in Children)
                     item.Active.BindValueChanged(active => updateBindable(item.Value, active.NewValue));
             }
+
+            protected virtual T[] GetValues() => (T[])Enum.GetValues(typeof(T));
+
+            protected virtual MultipleSelectionFilterTabItem CreateTabItem(T value) => new MultipleSelectionFilterTabItem(value);
 
             private void updateBindable(T value, bool active)
             {
@@ -53,7 +59,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private class MultipleSelectionFilterTabItem : FilterTabItem<T>
+        protected class MultipleSelectionFilterTabItem : FilterTabItem<T>
         {
             public MultipleSelectionFilterTabItem(T value)
                 : base(value)
