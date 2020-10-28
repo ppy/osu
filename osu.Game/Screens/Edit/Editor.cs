@@ -43,8 +43,9 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
+    [Cached(typeof(ISamplePlaybackDisabler))]
     [Cached]
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -63,6 +64,10 @@ namespace osu.Game.Screens.Edit
 
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
+
+        public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         private bool exitConfirmed;
 
@@ -109,8 +114,9 @@ namespace osu.Game.Screens.Edit
             UpdateClockSource();
 
             dependencies.CacheAs(clock);
-            dependencies.CacheAs<ISamplePlaybackDisabler>(clock);
             AddInternal(clock);
+
+            clock.SeekingOrStopped.BindValueChanged(_ => updateSampleDisabledState());
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
@@ -564,40 +570,52 @@ namespace osu.Game.Screens.Edit
                 .ScaleTo(0.98f, 200, Easing.OutQuint)
                 .FadeOut(200, Easing.OutQuint);
 
-            if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
+            try
             {
-                screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
+                if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
+                {
+                    screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
 
-                currentScreen
-                    .ScaleTo(1, 200, Easing.OutQuint)
-                    .FadeIn(200, Easing.OutQuint);
-                return;
+                    currentScreen
+                        .ScaleTo(1, 200, Easing.OutQuint)
+                        .FadeIn(200, Easing.OutQuint);
+                    return;
+                }
+
+                switch (e.NewValue)
+                {
+                    case EditorScreenMode.SongSetup:
+                        currentScreen = new SetupScreen();
+                        break;
+
+                    case EditorScreenMode.Compose:
+                        currentScreen = new ComposeScreen();
+                        break;
+
+                    case EditorScreenMode.Design:
+                        currentScreen = new DesignScreen();
+                        break;
+
+                    case EditorScreenMode.Timing:
+                        currentScreen = new TimingScreen();
+                        break;
+                }
+
+                LoadComponentAsync(currentScreen, newScreen =>
+                {
+                    if (newScreen == currentScreen)
+                        screenContainer.Add(newScreen);
+                });
             }
-
-            switch (e.NewValue)
+            finally
             {
-                case EditorScreenMode.SongSetup:
-                    currentScreen = new SetupScreen();
-                    break;
-
-                case EditorScreenMode.Compose:
-                    currentScreen = new ComposeScreen();
-                    break;
-
-                case EditorScreenMode.Design:
-                    currentScreen = new DesignScreen();
-                    break;
-
-                case EditorScreenMode.Timing:
-                    currentScreen = new TimingScreen();
-                    break;
+                updateSampleDisabledState();
             }
+        }
 
-            LoadComponentAsync(currentScreen, newScreen =>
-            {
-                if (newScreen == currentScreen)
-                    screenContainer.Add(newScreen);
-            });
+        private void updateSampleDisabledState()
+        {
+            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value || !(currentScreen is ComposeScreen);
         }
 
         private void seek(UIEvent e, int direction)
