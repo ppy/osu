@@ -8,13 +8,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Screens.Edit;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -53,20 +50,6 @@ namespace osu.Game.Rulesets.Edit
         {
             base.LoadComplete();
             updateState();
-        }
-
-        [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (e.CurrentState.Keyboard.ShiftPressed && e.IsPressed(MouseButton.Right))
-            {
-                editorBeatmap.Remove(HitObject);
-                return true;
-            }
-
-            return base.OnMouseDown(e);
         }
 
         private SelectionState state;
