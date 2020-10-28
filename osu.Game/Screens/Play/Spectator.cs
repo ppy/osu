@@ -220,7 +220,7 @@ namespace osu.Game.Screens.Play
                 replay = null;
             }
 
-            clearDisplay();
+            Schedule(clearDisplay);
         }
 
         private void clearDisplay()
