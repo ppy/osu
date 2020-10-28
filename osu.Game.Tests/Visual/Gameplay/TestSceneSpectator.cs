@@ -57,6 +57,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Remove(testSpectatorStreamingClient);
                 Add(testSpectatorStreamingClient);
             });
+
+            finish();
         }
 
         private OsuFramedReplayInputHandler replayHandler =>
@@ -212,6 +214,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     BeatmapID = beatmapId,
                     RulesetID = 0,
                 });
+
+                sentState = false;
             }
 
             private bool sentState;
