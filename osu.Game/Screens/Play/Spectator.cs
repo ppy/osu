@@ -183,14 +183,22 @@ namespace osu.Game.Screens.Play
             if (userId != targetUser.Id)
                 return;
 
-            if (replay == null) return;
+            if (replay != null)
+            {
+                replay.HasReceivedAllFrames = true;
+                replay = null;
+            }
 
-            replay.HasReceivedAllFrames = true;
-            replay = null;
+            // not really going to start anything, but will clear the beatmap card out.
+            attemptStart();
         }
 
         private void attemptStart()
         {
+            watchButton.Enabled.Value = false;
+
+            showBeatmapPanel(state);
+
             var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == state.RulesetID)?.CreateInstance();
 
             // ruleset not available
@@ -202,13 +210,8 @@ namespace osu.Game.Screens.Play
 
             var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == state.BeatmapID);
 
-            showBeatmapPanel(state.BeatmapID.Value);
-
             if (resolvedBeatmap == null)
-            {
-                watchButton.Enabled.Value = false;
                 return;
-            }
 
             var scoreInfo = new ScoreInfo
             {
@@ -231,11 +234,20 @@ namespace osu.Game.Screens.Play
             }));
         }
 
-        private void showBeatmapPanel(int beatmapId)
+        private void showBeatmapPanel(SpectatorState state)
         {
-            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
+            if (state.BeatmapID == null)
+            {
+                beatmapPanelContainer.Clear();
+                return;
+            }
+
+            var req = new GetBeatmapSetRequest(state.BeatmapID.Value, BeatmapSetLookupType.BeatmapId);
             req.Success += res => Schedule(() =>
             {
+                if (state != this.state)
+                    return;
+
                 beatmapPanelContainer.Child = new GridBeatmapPanel(res.ToBeatmapSet(rulesets));
             });
 
