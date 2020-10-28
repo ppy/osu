@@ -73,19 +73,9 @@ namespace osu.Game.Rulesets.UI
             setClock();
         }
 
-        /// <summary>
-        /// Whether we are running up-to-date with our parent clock.
-        /// If not, we will need to keep processing children until we catch up.
-        /// </summary>
-        private bool requireMoreUpdateLoops;
+        private PlaybackState state;
 
-        /// <summary>
-        /// Whether we are in a valid state (ie. should we keep processing children frames).
-        /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
-        /// </summary>
-        private bool validState;
-
-        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
+        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && state != PlaybackState.NotValid;
 
         private bool hasReplayAttached => ReplayInputHandler != null;
 
@@ -95,20 +85,19 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            requireMoreUpdateLoops = true;
-            validState = !frameStableClock.IsPaused.Value;
+            state = frameStableClock.IsPaused.Value ? PlaybackState.NotValid : PlaybackState.Valid;
 
-            int loops = 0;
+            int loops = MaxCatchUpFrames;
 
-            while (validState && requireMoreUpdateLoops && loops++ < MaxCatchUpFrames)
+            while (state != PlaybackState.NotValid && loops-- > 0)
             {
                 updateClock();
 
-                if (validState)
-                {
-                    base.UpdateSubTree();
-                    UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-                }
+                if (state == PlaybackState.NotValid)
+                    break;
+
+                base.UpdateSubTree();
+                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
             }
 
             return true;
@@ -120,8 +109,7 @@ namespace osu.Game.Rulesets.UI
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
             // each update start with considering things in valid state.
-            validState = true;
-            requireMoreUpdateLoops = false;
+            state = PlaybackState.Valid;
 
             // our goal is to catch up to the time provided by the parent clock.
             var proposedTime = parentGameplayClock.CurrentTime;
@@ -134,7 +122,7 @@ namespace osu.Game.Rulesets.UI
                     applyFrameStability(ref proposedTime);
 
                 if (hasReplayAttached)
-                    updateReplay(ref proposedTime);
+                    state = updateReplay(ref proposedTime);
             }
             finally
             {
@@ -147,7 +135,9 @@ namespace osu.Game.Rulesets.UI
 
                 double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
 
-                requireMoreUpdateLoops |= timeBehind != 0;
+                // determine whether catch-up is required.
+                if (state != PlaybackState.NotValid)
+                    state = timeBehind > 0 ? PlaybackState.RequiresCatchUp : PlaybackState.Valid;
 
                 frameStableClock.IsCatchingUp.Value = timeBehind > 200;
 
@@ -161,24 +151,14 @@ namespace osu.Game.Rulesets.UI
         /// Attempt to advance replay playback for a given time.
         /// </summary>
         /// <param name="proposedTime">The time which is to be displayed.</param>
-        private bool updateReplay(ref double proposedTime)
+        private PlaybackState updateReplay(ref double proposedTime)
         {
             double? newTime;
 
             if (FrameStablePlayback)
             {
                 // when stability is turned on, we shouldn't execute for time values the replay is unable to satisfy.
-                if ((newTime = ReplayInputHandler.SetFrameFromTime(proposedTime)) == null)
-                {
-                    // setting invalid state here ensures that gameplay will not continue (ie. our child
-                    // hierarchy won't be updated).
-                    validState = false;
-
-                    // potentially loop to catch-up playback.
-                    requireMoreUpdateLoops = true;
-
-                    return false;
-                }
+                newTime = ReplayInputHandler.SetFrameFromTime(proposedTime);
             }
             else
             {
@@ -191,13 +171,16 @@ namespace osu.Game.Rulesets.UI
                     {
                         // special case for when the replay actually can't arrive at the required time.
                         // protects from potential endless loop.
-                        return false;
+                        break;
                     }
                 }
             }
 
+            if (newTime == null)
+                return PlaybackState.NotValid;
+
             proposedTime = newTime.Value;
-            return true;
+            return PlaybackState.Valid;
         }
 
         /// <summary>
@@ -243,6 +226,26 @@ namespace osu.Game.Rulesets.UI
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
+
+        private enum PlaybackState
+        {
+            /// <summary>
+            /// Playback is not possible. Child hierarchy should not be processed.
+            /// </summary>
+            NotValid,
+
+            /// <summary>
+            /// Whether we are running up-to-date with our parent clock.
+            /// If not, we will need to keep processing children until we catch up.
+            /// </summary>
+            RequiresCatchUp,
+
+            /// <summary>
+            /// Whether we are in a valid state (ie. should we keep processing children frames).
+            /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
+            /// </summary>
+            Valid
+        }
 
         private class FrameStabilityClock : GameplayClock, IFrameStableClock
         {
