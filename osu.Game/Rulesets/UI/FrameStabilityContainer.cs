@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.UI
                 state = updateReplay(ref proposedTime);
 
             if (proposedTime != manualClock.CurrentTime)
-                direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
+                direction = proposedTime > manualClock.CurrentTime ? 1 : -1;
 
             manualClock.CurrentTime = proposedTime;
             manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
