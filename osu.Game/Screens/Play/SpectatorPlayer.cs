@@ -2,16 +2,34 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
 {
     public class SpectatorPlayer : ReplayPlayer
     {
+        [Resolved]
+        private SpectatorStreamingClient spectatorStreaming { get; set; }
+
         public SpectatorPlayer(Score score)
             : base(score)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            spectatorStreaming.OnUserBeganPlaying += userBeganPlaying;
+        }
+
+        private void userBeganPlaying(int userId, SpectatorState state)
+        {
+            if (userId == Score.ScoreInfo.UserID)
+                Schedule(this.Exit);
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
