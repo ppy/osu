@@ -42,6 +42,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Username, string.Empty);
             Set(OsuSetting.Token, string.Empty);
 
+            Set(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
+
             Set(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
                 if (enabled.NewValue) Set(OsuSetting.SaveUsername, true);
@@ -239,5 +241,6 @@ namespace osu.Game.Configuration
         HitLighting,
         MenuBackgroundSource,
         GameplayDisableWinKey,
+        AutomaticallyDownloadWhenSpectating,
     }
 }
