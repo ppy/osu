@@ -36,19 +36,29 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private int nextFrame;
 
+        private BeatmapSetInfo importedBeatmap;
+
+        private int importedBeatmapId;
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             AddStep("reset sent frames", () => nextFrame = 0);
 
-            AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Wait());
+            AddStep("import beatmap", () =>
+            {
+                importedBeatmap = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Result;
+                importedBeatmapId = importedBeatmap.Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID ?? -1;
+            });
 
             AddStep("add streaming client", () =>
             {
                 Remove(testSpectatorStreamingClient);
                 Add(testSpectatorStreamingClient);
             });
+
+            finish();
         }
 
         private OsuFramedReplayInputHandler replayHandler =>
@@ -86,7 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             start();
             waitForPlayer();
-            AddUntilStep("game is paused", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value);
+            checkPaused(true);
 
             sendFrames();
 
@@ -115,6 +125,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             start();
             sendFrames();
+
             start();
             sendFrames();
         }
@@ -125,8 +136,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadSpectatingScreen();
 
             start();
-            sendFrames();
 
+            waitForPlayer();
+            checkPaused(true);
+
+            finish();
+
+            checkPaused(false);
             // TODO: should replay until running out of frames then fail
         }
 
@@ -149,7 +165,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            start(88);
+            start(-1234);
             sendFrames();
 
             AddAssert("screen didn't change", () => Stack.CurrentScreen is Spectator);
@@ -157,10 +173,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
-        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorStreamingClient.StartPlay(beatmapId));
+        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorStreamingClient.StartPlay(beatmapId ?? importedBeatmapId));
+
+        private void finish(int? beatmapId = null) => AddStep("end play", () => testSpectatorStreamingClient.EndPlay(beatmapId ?? importedBeatmapId));
 
         private void checkPaused(bool state) =>
-            AddAssert($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
+            AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
 
         private void sendFrames(int count = 10)
         {
@@ -179,20 +197,25 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         internal class TestSpectatorStreamingClient : SpectatorStreamingClient
         {
-            [Resolved]
-            private BeatmapManager beatmaps { get; set; }
-
             public readonly User StreamingUser = new User { Id = 1234, Username = "Test user" };
 
-            public void StartPlay(int? beatmapId = null) => sendState(beatmapId);
+            private int beatmapId;
 
-            public void EndPlay()
+            public void StartPlay(int beatmapId)
+            {
+                this.beatmapId = beatmapId;
+                sendState(beatmapId);
+            }
+
+            public void EndPlay(int beatmapId)
             {
                 ((ISpectatorClient)this).UserFinishedPlaying((int)StreamingUser.Id, new SpectatorState
                 {
-                    BeatmapID = beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID,
+                    BeatmapID = beatmapId,
                     RulesetID = 0,
                 });
+
+                sentState = false;
             }
 
             private bool sentState;
@@ -212,7 +235,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 ((ISpectatorClient)this).UserSentFrames((int)StreamingUser.Id, bundle);
 
                 if (!sentState)
-                    sendState();
+                    sendState(beatmapId);
             }
 
             public override void WatchUser(int userId)
@@ -220,18 +243,18 @@ namespace osu.Game.Tests.Visual.Gameplay
                 if (sentState)
                 {
                     // usually the server would do this.
-                    sendState();
+                    sendState(beatmapId);
                 }
 
                 base.WatchUser(userId);
             }
 
-            private void sendState(int? beatmapId = null)
+            private void sendState(int beatmapId)
             {
                 sentState = true;
                 ((ISpectatorClient)this).UserBeganPlaying((int)StreamingUser.Id, new SpectatorState
                 {
-                    BeatmapID = beatmapId ?? beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID,
+                    BeatmapID = beatmapId,
                     RulesetID = 0,
                 });
             }

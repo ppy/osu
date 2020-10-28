@@ -76,6 +76,11 @@ namespace osu.Game.Screens.Play
 
         private BeatmapSetInfo onlineBeatmap;
 
+        /// <summary>
+        /// Becomes true if a new state is waiting to be loaded (while this screen was not active).
+        /// </summary>
+        private bool newStatePending;
+
         public Spectator([NotNull] User targetUser)
         {
             this.targetUser = targetUser ?? throw new ArgumentNullException(nameof(targetUser));
@@ -218,11 +223,23 @@ namespace osu.Game.Screens.Play
             if (userId != targetUser.Id)
                 return;
 
-            replay ??= new Replay { HasReceivedAllFrames = false };
-
             this.state = state;
 
-            Schedule(attemptStart);
+            if (this.IsCurrentScreen())
+                Schedule(attemptStart);
+            else
+                newStatePending = true;
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            if (newStatePending)
+            {
+                attemptStart();
+                newStatePending = false;
+            }
         }
 
         private void userFinishedPlaying(int userId, SpectatorState state)
@@ -266,8 +283,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            if (replay == null)
-                return;
+            replay ??= new Replay { HasReceivedAllFrames = false };
 
             var scoreInfo = new ScoreInfo
             {
