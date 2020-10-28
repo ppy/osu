@@ -19,10 +19,15 @@ namespace osu.Game.Overlays.BeatmapListing
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        private readonly OsuSpriteText text;
+        private OsuSpriteText text;
 
         public FilterTabItem(T value)
             : base(value)
+        {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomLeft;
@@ -32,17 +37,12 @@ namespace osu.Game.Overlays.BeatmapListing
                 text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 13, weight: FontWeight.Regular),
-                    Text = LabelFor(value)
+                    Text = LabelFor(Value)
                 },
                 new HoverClickSounds()
             });
 
             Enabled.Value = true;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             updateState();
         }
 
