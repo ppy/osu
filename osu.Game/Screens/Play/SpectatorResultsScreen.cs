@@ -28,7 +28,12 @@ namespace osu.Game.Screens.Play
         private void userBeganPlaying(int userId, SpectatorState state)
         {
             if (userId == Score.UserID)
-                Schedule(this.Exit);
+            {
+                Schedule(() =>
+                {
+                    if (this.IsCurrentScreen()) this.Exit();
+                });
+            }
         }
 
         protected override void Dispose(bool isDisposing)
