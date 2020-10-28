@@ -3,9 +3,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osuTK;
@@ -94,6 +96,15 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         info = new CollectionInfo()
                     }
                 },
+                new IconButton()
+                {
+                    Icon = FontAwesome.Solid.Times,
+                    Margin = new MarginPadding(25),
+                    Size = new Vector2(30),
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Action = Hide
+                }
             };
         }
 
