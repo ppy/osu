@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapListing
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
             }
 
-            protected override string CreateText(ScoreRank value)
+            protected override string LabelFor(ScoreRank value)
             {
                 switch (value)
                 {
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.BeatmapListing
                         return @"Silver S";
 
                     default:
-                        return base.CreateText(value);
+                        return value.GetDescription();
                 }
             }
         }
