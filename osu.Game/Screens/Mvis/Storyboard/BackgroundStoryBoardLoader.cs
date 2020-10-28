@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.Storyboard
 {
@@ -40,9 +39,11 @@ namespace osu.Game.Screens.Mvis.Storyboard
         private Action OnComplete;
 
         private StoryboardClock StoryboardClock = new StoryboardClock();
-        private Container ClockContainer;
+        private BackgroundStoryboard ClockContainer;
         private Task<bool> loadTask;
+
         private CancellationTokenSource cancellationTokenSource;
+        private BackgroundStoryboard nextStoryboard;
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
@@ -91,34 +92,13 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             try
             {
-                LoadComponentAsync(new BeatmapSkinProvidingContainer(b.Value.Skin)
-                {
-                    Name = "Storyboard Container",
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Child = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Clock = StoryboardClock = new StoryboardClock(),
-                        Child = b.Value.Storyboard.CreateDrawable()
-                    }
-                }, newClockContainer =>
+                LoadComponentAsync(nextStoryboard, newClockContainer =>
                 {
                     StoryboardClock.ChangeSource(beatmap.Track);
                     Seek(beatmap.Track.CurrentTime);
 
                     this.Add(newClockContainer);
                     ClockContainer = newClockContainer;
-
-                    SBLoaded.Value = true;
-                    IsReady.Value = true;
-                    NeedToHideTriangles.Value = beatmap.Storyboard.HasDrawable;
-
-                    EnableSB.TriggerChange();
-                    OnComplete?.Invoke();
-                    OnComplete = null;
-
-                    Logger.Log($"Load Storyboard for Beatmap \"{beatmap.BeatmapSetInfo}\" complete!");
                 }, cancellationTokenSource.Token);
             }
             catch (Exception e)
@@ -138,14 +118,12 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
         public void UpdateStoryBoardAsync(Action OnComplete = null)
         {
-            if (b == null)
-                return;
-
             CancelAllTasks();
             IsReady.Value = false;
             SBLoaded.Value = false;
             NeedToHideTriangles.Value = false;
             storyboardReplacesBackground.Value = false;
+            nextStoryboard = null;
             this.OnComplete = OnComplete;
 
             cancellationTokenSource = new CancellationTokenSource();
@@ -153,20 +131,34 @@ namespace osu.Game.Screens.Mvis.Storyboard
             StoryboardClock.IsCoupled = false;
             StoryboardClock.Stop();
 
-            if (!EnableSB.Value)
+            foreach (var item in this)
+                (item as BackgroundStoryboard).Cleanup(DURATION);
+
+            if (!EnableSB.Value || b == null)
             {
                 IsReady.Value = true;
                 return;
             }
 
-            if (ClockContainer != null)
-            {
-                ClockContainer.FadeOut(DURATION, Easing.OutQuint);
-                ClockContainer.Expire();
-            }
-
             Task.Run(async () =>
             {
+                nextStoryboard = new BackgroundStoryboard(b.Value.Storyboard, b.Value.Skin)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RunningClock = StoryboardClock = new StoryboardClock(),
+                    Alpha = 0.1f,
+                    onStoryboardReadyAction = () =>
+                    {
+                        SBLoaded.Value = true;
+                        IsReady.Value = true;
+                        NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
+
+                        EnableSB.TriggerChange();
+                        OnComplete?.Invoke();
+                        OnComplete = null;
+                    }
+                };
+
                 loadTask = Task.Run(() => LoadStoryboardFor(b.Value), cancellationTokenSource.Token);
 
                 await loadTask;
