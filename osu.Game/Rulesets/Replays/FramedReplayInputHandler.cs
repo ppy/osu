@@ -42,31 +42,23 @@ namespace osu.Game.Rulesets.Replays
                 if (!currentFrameIndex.HasValue)
                     return (TFrame)Frames[0];
 
-                if (currentDirection > 0)
-                    return currentFrameIndex == Frames.Count - 1 ? null : (TFrame)Frames[currentFrameIndex.Value + 1];
-                else
-                    return currentFrameIndex == 0 ? null : (TFrame)Frames[nextFrameIndex];
+                int nextFrame = clampedNextFrameIndex;
+
+                if (nextFrame == currentFrameIndex.Value)
+                    return null;
+
+                return (TFrame)Frames[clampedNextFrameIndex];
             }
         }
 
         private int? currentFrameIndex;
 
-        private int nextFrameIndex => currentFrameIndex.HasValue ? Math.Clamp(currentFrameIndex.Value + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1) : 0;
+        private int clampedNextFrameIndex =>
+            currentFrameIndex.HasValue ? Math.Clamp(currentFrameIndex.Value + currentDirection, 0, Frames.Count - 1) : 0;
 
         protected FramedReplayInputHandler(Replay replay)
         {
             this.replay = replay;
-        }
-
-        private bool advanceFrame()
-        {
-            int newFrame = nextFrameIndex;
-
-            // ensure we aren't at an extent.
-            if (newFrame == currentFrameIndex) return false;
-
-            currentFrameIndex = newFrame;
-            return true;
         }
 
         private const double sixty_frame_time = 1000.0 / 60;
@@ -75,7 +67,7 @@ namespace osu.Game.Rulesets.Replays
 
         protected double? CurrentTime { get; private set; }
 
-        private int currentDirection;
+        private int currentDirection = 1;
 
         /// <summary>
         /// When set, we will ensure frames executed by nested drawables are frame-accurate to replay data.
@@ -117,52 +109,28 @@ namespace osu.Game.Rulesets.Replays
 
             Debug.Assert(currentDirection != 0);
 
-            if (HasFrames)
+            TFrame next = NextFrame;
+
+            // check if the next frame is valid for the current playback direction.
+            // validity is if the next frame is equal or "earlier" than the current point in time (so we can change to it)
+            int compare = time.CompareTo(next?.Time);
+
+            if (next != null && (compare == 0 || compare == currentDirection))
             {
-                var next = NextFrame;
-
-                // check if the next frame is valid for the current playback direction.
-                // validity is if the next frame is equal or "earlier"
-                var compare = time.CompareTo(next?.Time);
-
-                if (next != null && (compare == 0 || compare == currentDirection))
-                {
-                    if (advanceFrame())
-                        return CurrentTime = CurrentFrame.Time;
-                }
-                else
-                {
-                    // this is the case where the frame can't be advanced (in the replay).
-                    // even so, we may be able to move the clock forward due to being at the end of the replay or
-                    // in a section where replay accuracy doesn't matter.
-
-                    // important section is always respected to block the update loop.
-                    if (inImportantSection)
-                        return null;
-
-                    if (next == null)
-                    {
-                        // in the case we have no more frames and haven't received the full replay, block.
-                        if (!replay.HasReceivedAllFrames)
-                            return null;
-
-                        // else allow play to end.
-                    }
-                    else if (next.Time.CompareTo(time) != currentDirection)
-                    {
-                        // in the case we have more frames, block if the next frame's time is less than the current time.
-                        return null;
-                    }
-
-                    // if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
-                }
+                currentFrameIndex = clampedNextFrameIndex;
+                return CurrentTime = CurrentFrame.Time;
             }
-            else
-            {
-                // if we never received frames and are expecting to, block.
-                if (!replay.HasReceivedAllFrames)
-                    return null;
-            }
+
+            // at this point, the frame can't be advanced (in the replay).
+            // even so, we may be able to move the clock forward due to being at the end of the replay or
+            // moving towards the next valid frame.
+
+            // the exception is if currently in an important section, which is respected above all.
+            if (inImportantSection)
+                return null;
+
+            // in the case we have no next frames and haven't received the full replay, block.
+            if (next == null && !replay.HasReceivedAllFrames) return null;
 
             return CurrentTime = time;
         }
