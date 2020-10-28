@@ -1,0 +1,48 @@
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Linq;
+using osu.Game.Scoring;
+
+namespace osu.Game.Overlays.BeatmapListing
+{
+    public class BeatmapSearchScoreFilterRow : BeatmapSearchMultipleSelectionFilterRow<ScoreRank>
+    {
+        public BeatmapSearchScoreFilterRow()
+            : base(@"Rank Achieved")
+        {
+        }
+
+        protected override MultipleSelectionFilter CreateMultipleSelectionFilter() => new RankFilter();
+
+        private class RankFilter : MultipleSelectionFilter
+        {
+            protected override MultipleSelectionFilterTabItem CreateTabItem(ScoreRank value) => new RankItem(value);
+
+            protected override ScoreRank[] GetValues() => base.GetValues().Reverse().ToArray();
+        }
+
+        private class RankItem : MultipleSelectionFilterTabItem
+        {
+            public RankItem(ScoreRank value)
+                : base(value)
+            {
+            }
+
+            protected override string CreateText(ScoreRank value)
+            {
+                switch (value)
+                {
+                    case ScoreRank.XH:
+                        return @"Silver SS";
+
+                    case ScoreRank.SH:
+                        return @"Silver S";
+
+                    default:
+                        return base.CreateText(value);
+                }
+            }
+        }
+    }
+}

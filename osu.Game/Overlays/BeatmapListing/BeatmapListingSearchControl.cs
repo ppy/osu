@@ -13,6 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public BindableList<SearchExtra> Extra => extraFilter.Current;
 
-        public BindableList<SearchRank> Ranks => ranksFilter.Current;
+        public BindableList<ScoreRank> Ranks => ranksFilter.Current;
 
         public Bindable<SearchPlayed> Played => playedFilter.Current;
 
@@ -55,7 +56,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
         private readonly BeatmapSearchFilterRow<SearchLanguage> languageFilter;
         private readonly BeatmapSearchMultipleSelectionFilterRow<SearchExtra> extraFilter;
-        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchRank> ranksFilter;
+        private readonly BeatmapSearchScoreFilterRow ranksFilter;
         private readonly BeatmapSearchFilterRow<SearchPlayed> playedFilter;
 
         private readonly Box background;
@@ -115,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"Genre"),
                                     languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"Language"),
                                     extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(@"Extra"),
-                                    ranksFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchRank>(@"Rank Achieved"),
+                                    ranksFilter = new BeatmapSearchScoreFilterRow(),
                                     playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played")
                                 }
                             }
