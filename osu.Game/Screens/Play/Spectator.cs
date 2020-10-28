@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
 
             this.state = state;
 
-            attemptStart();
+            Schedule(attemptStart);
         }
 
         private void userFinishedPlaying(int userId, SpectatorState state)
@@ -175,6 +175,7 @@ namespace osu.Game.Screens.Play
             if (replay == null) return;
 
             replay.HasReceivedAllFrames = true;
+            replay = null;
         }
 
         private void attemptStart()
@@ -188,8 +189,6 @@ namespace osu.Game.Screens.Play
             if (state.BeatmapID == null)
                 return;
 
-            this.MakeCurrent();
-
             var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == state.BeatmapID);
 
             if (resolvedBeatmap == null)
@@ -201,6 +200,7 @@ namespace osu.Game.Screens.Play
             var scoreInfo = new ScoreInfo
             {
                 Beatmap = resolvedBeatmap,
+                User = targetUser,
                 Mods = state.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
                 Ruleset = resolvedRuleset.RulesetInfo,
             };
