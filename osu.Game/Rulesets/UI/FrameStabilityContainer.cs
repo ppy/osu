@@ -119,35 +119,19 @@ namespace osu.Game.Rulesets.UI
             if (parentGameplayClock == null)
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
+            // each update start with considering things in valid state.
             validState = true;
             requireMoreUpdateLoops = false;
 
-            var newProposedTime = parentGameplayClock.CurrentTime;
+            // our goal is to catch up to the time provided by the parent clock.
+            var proposedTime = parentGameplayClock.CurrentTime;
 
             try
             {
                 if (FrameStablePlayback)
-                {
-                    if (firstConsumption)
-                    {
-                        // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
-                        // Instead we perform an initial seek to the proposed time.
-
-                        // process frame (in addition to finally clause) to clear out ElapsedTime
-                        manualClock.CurrentTime = newProposedTime;
-                        framedClock.ProcessFrame();
-
-                        firstConsumption = false;
-                    }
-                    else if (manualClock.CurrentTime < gameplayStartTime)
-                        manualClock.CurrentTime = newProposedTime = Math.Min(gameplayStartTime, newProposedTime);
-                    else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
-                    {
-                        newProposedTime = newProposedTime > manualClock.CurrentTime
-                            ? Math.Min(newProposedTime, manualClock.CurrentTime + sixty_frame_time)
-                            : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
-                    }
-                }
+                    // if we require frame stability, the proposed time will be adjusted to move at most one known
+                    // frame interval in the current direction.
+                    applyFrameStability(ref proposedTime);
 
                 if (isAttached)
                 {
@@ -156,7 +140,7 @@ namespace osu.Game.Rulesets.UI
                     if (FrameStablePlayback)
                     {
                         // when stability is turned on, we shouldn't execute for time values the replay is unable to satisfy.
-                        if ((newTime = ReplayInputHandler.SetFrameFromTime(newProposedTime)) == null)
+                        if ((newTime = ReplayInputHandler.SetFrameFromTime(proposedTime)) == null)
                         {
                             // setting invalid state here ensures that gameplay will not continue (ie. our child
                             // hierarchy won't be updated).
@@ -173,7 +157,7 @@ namespace osu.Game.Rulesets.UI
                         // when stability is disabled, we don't really care about accuracy.
                         // looping over the replay will allow it to catch up and feed out the required values
                         // for the current time.
-                        while ((newTime = ReplayInputHandler.SetFrameFromTime(newProposedTime)) != newProposedTime)
+                        while ((newTime = ReplayInputHandler.SetFrameFromTime(proposedTime)) != proposedTime)
                         {
                             if (newTime == null)
                             {
@@ -185,15 +169,15 @@ namespace osu.Game.Rulesets.UI
                         }
                     }
 
-                    newProposedTime = newTime.Value;
+                    proposedTime = newTime.Value;
                 }
             }
             finally
             {
-                if (newProposedTime != manualClock.CurrentTime)
-                    direction = newProposedTime > manualClock.CurrentTime ? 1 : -1;
+                if (proposedTime != manualClock.CurrentTime)
+                    direction = proposedTime > manualClock.CurrentTime ? 1 : -1;
 
-                manualClock.CurrentTime = newProposedTime;
+                manualClock.CurrentTime = proposedTime;
                 manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
                 manualClock.IsRunning = parentGameplayClock.IsRunning;
 
@@ -206,6 +190,35 @@ namespace osu.Game.Rulesets.UI
                 // The manual clock time has changed in the above code. The framed clock now needs to be updated
                 // to ensure that the its time is valid for our children before input is processed
                 framedClock.ProcessFrame();
+            }
+        }
+
+        /// <summary>
+        /// Apply frame stability modifier to a time.
+        /// </summary>
+        /// <param name="proposedTime">The time which is to be displayed.</param>
+        private void applyFrameStability(ref double proposedTime)
+        {
+            if (firstConsumption)
+            {
+                // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
+                // Instead we perform an initial seek to the proposed time.
+
+                // process frame (in addition to finally clause) to clear out ElapsedTime
+                manualClock.CurrentTime = proposedTime;
+                framedClock.ProcessFrame();
+
+                firstConsumption = false;
+                return;
+            }
+
+            if (manualClock.CurrentTime < gameplayStartTime)
+                manualClock.CurrentTime = proposedTime = Math.Min(gameplayStartTime, proposedTime);
+            else if (Math.Abs(manualClock.CurrentTime - proposedTime) > sixty_frame_time * 1.2f)
+            {
+                proposedTime = proposedTime > manualClock.CurrentTime
+                    ? Math.Min(proposedTime, manualClock.CurrentTime + sixty_frame_time)
+                    : Math.Max(proposedTime, manualClock.CurrentTime - sixty_frame_time);
             }
         }
 
