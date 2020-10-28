@@ -22,6 +22,8 @@ namespace osu.Game.Users
 
         public new Action Action;
 
+        public bool ShowProfileOnClick = true;
+
         protected Action ViewProfile { get; private set; }
 
         protected Drawable Background { get; private set; }
@@ -68,7 +70,8 @@ namespace osu.Game.Users
             base.Action = ViewProfile = () =>
             {
                 Action?.Invoke();
-                profileOverlay?.ShowUser(User);
+                if (ShowProfileOnClick)
+                    profileOverlay?.ShowUser(User);
             };
         }
 
