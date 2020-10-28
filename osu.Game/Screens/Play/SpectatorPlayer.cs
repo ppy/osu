@@ -3,8 +3,11 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
@@ -35,6 +38,15 @@ namespace osu.Game.Screens.Play
         private void load()
         {
             spectatorStreaming.OnUserBeganPlaying += userBeganPlaying;
+
+            AddInternal(new OsuSpriteText
+            {
+                Text = $"Watching {score.ScoreInfo.User.Username} playing live!",
+                Font = OsuFont.Default.With(size: 30),
+                Y = 100,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            });
         }
 
         protected override void PrepareReplay()
