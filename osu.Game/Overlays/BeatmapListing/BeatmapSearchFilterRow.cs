@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.BeatmapListing
             });
 
             if (filter is IHasCurrentValue<T> filterWithValue)
-                filterWithValue.Current = current;
+                Current = filterWithValue.Current;
         }
 
         [NotNull]

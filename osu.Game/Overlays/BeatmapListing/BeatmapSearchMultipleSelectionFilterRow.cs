@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osuTK;
 
@@ -15,22 +14,21 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public class BeatmapSearchMultipleSelectionFilterRow<T> : BeatmapSearchFilterRow<List<T>>
     {
+        public new readonly BindableList<T> Current = new BindableList<T>();
+
+        private MultipleSelectionFilter filter;
+
         public BeatmapSearchMultipleSelectionFilterRow(string headerName)
             : base(headerName)
         {
+            Current.BindTo(filter.Current);
         }
 
-        protected override Drawable CreateFilter() => new MultipleSelectionFilter();
+        protected override Drawable CreateFilter() => filter = new MultipleSelectionFilter();
 
-        private class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>, IHasCurrentValue<List<T>>
+        private class MultipleSelectionFilter : FillFlowContainer<MultipleSelectionFilterTabItem>
         {
-            private readonly BindableWithCurrent<List<T>> current = new BindableWithCurrent<List<T>>();
-
-            public Bindable<List<T>> Current
-            {
-                get => current.Current;
-                set => current.Current = value;
-            }
+            public readonly BindableList<T> Current = new BindableList<T>();
 
             public MultipleSelectionFilter()
             {
@@ -43,20 +41,15 @@ namespace osu.Game.Overlays.BeatmapListing
                 ((T[])Enum.GetValues(typeof(T))).ForEach(i => Add(new MultipleSelectionFilterTabItem(i)));
 
                 foreach (var item in Children)
-                    item.Active.BindValueChanged(_ => updateBindable());
+                    item.Active.BindValueChanged(active => updateBindable(item.Value, active.NewValue));
             }
 
-            private void updateBindable()
+            private void updateBindable(T value, bool active)
             {
-                var selectedValues = new List<T>();
-
-                foreach (var item in Children)
-                {
-                    if (item.Active.Value)
-                        selectedValues.Add(item.Value);
-                }
-
-                Current.Value = selectedValues;
+                if (active)
+                    Current.Add(value);
+                else
+                    Current.Remove(value);
             }
         }
 
