@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -170,8 +171,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void loadSpectatingScreen() =>
+        private void loadSpectatingScreen()
+        {
             AddStep("load screen", () => LoadScreen(spectatorScreen = new Spectator(testSpectatorStreamingClient.StreamingUser)));
+            AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded);
+        }
 
         internal class TestSpectatorStreamingClient : SpectatorStreamingClient
         {
