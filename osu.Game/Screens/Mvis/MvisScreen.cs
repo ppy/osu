@@ -113,7 +113,7 @@ namespace osu.Game.Screens
         private Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
         private CollectionSelectPanel collectionPanel;
         private BottomBarSwitchButton collectionButton;
-        private List<VisibilityContainer> overlays = new List<VisibilityContainer>();
+        private List<BottomBarSwitchButton> overlayTriggerButtons = new List<BottomBarSwitchButton>();
 
         public MvisScreen()
         {
@@ -265,8 +265,11 @@ namespace osu.Game.Screens
                                                                         HideOverlays();
                                                                         sidebarToggleButton.ToggleableValue.Value = false;
                                                                         
-                                                                        foreach (var o in overlays)
-                                                                            o.Hide();
+                                                                        foreach (var b in overlayTriggerButtons)
+                                                                            if ( b.ToggleableValue.Value )
+                                                                                b.Click();
+
+                                                                        sidebarContainer.Hide();
 
                                                                         //防止手机端无法退出桌面背景模式
                                                                         if (RuntimeInfo.IsDesktop)
@@ -530,8 +533,8 @@ namespace osu.Game.Screens
 
             ShowOverlays();
 
-            overlays.Add(collectionPanel);
-            overlays.Add(sidebarContainer);
+            overlayTriggerButtons.Add(sidebarToggleButton);
+            overlayTriggerButtons.Add(collectionButton);
 
             base.LoadComplete();
         }
