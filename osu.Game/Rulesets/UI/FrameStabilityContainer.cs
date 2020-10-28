@@ -114,37 +114,32 @@ namespace osu.Game.Rulesets.UI
             // our goal is to catch up to the time provided by the parent clock.
             var proposedTime = parentGameplayClock.CurrentTime;
 
-            try
-            {
-                if (FrameStablePlayback)
-                    // if we require frame stability, the proposed time will be adjusted to move at most one known
-                    // frame interval in the current direction.
-                    applyFrameStability(ref proposedTime);
+            if (FrameStablePlayback)
+                // if we require frame stability, the proposed time will be adjusted to move at most one known
+                // frame interval in the current direction.
+                applyFrameStability(ref proposedTime);
 
-                if (hasReplayAttached)
-                    state = updateReplay(ref proposedTime);
-            }
-            finally
-            {
-                if (proposedTime != manualClock.CurrentTime)
-                    direction = proposedTime > manualClock.CurrentTime ? 1 : -1;
+            if (hasReplayAttached)
+                state = updateReplay(ref proposedTime);
 
-                manualClock.CurrentTime = proposedTime;
-                manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
-                manualClock.IsRunning = parentGameplayClock.IsRunning;
+            if (proposedTime != manualClock.CurrentTime)
+                direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
 
-                double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
+            manualClock.CurrentTime = proposedTime;
+            manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
+            manualClock.IsRunning = parentGameplayClock.IsRunning;
 
-                // determine whether catch-up is required.
-                if (state != PlaybackState.NotValid)
-                    state = timeBehind > 0 ? PlaybackState.RequiresCatchUp : PlaybackState.Valid;
+            double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
 
-                frameStableClock.IsCatchingUp.Value = timeBehind > 200;
+            // determine whether catch-up is required.
+            if (state != PlaybackState.NotValid)
+                state = timeBehind > 0 ? PlaybackState.RequiresCatchUp : PlaybackState.Valid;
 
-                // The manual clock time has changed in the above code. The framed clock now needs to be updated
-                // to ensure that the its time is valid for our children before input is processed
-                framedClock.ProcessFrame();
-            }
+            frameStableClock.IsCatchingUp.Value = timeBehind > 200;
+
+            // The manual clock time has changed in the above code. The framed clock now needs to be updated
+            // to ensure that the its time is valid for our children before input is processed
+            framedClock.ProcessFrame();
         }
 
         /// <summary>
