@@ -127,7 +127,12 @@ namespace osu.Game.Rulesets.UI
                 applyFrameStability(ref proposedTime);
 
             if (hasReplayAttached)
-                state = updateReplay(ref proposedTime);
+            {
+                bool valid = updateReplay(ref proposedTime);
+
+                if (!valid)
+                    state = PlaybackState.NotValid;
+            }
 
             if (proposedTime != manualClock.CurrentTime)
                 direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
@@ -139,8 +144,8 @@ namespace osu.Game.Rulesets.UI
             double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
 
             // determine whether catch-up is required.
-            if (state != PlaybackState.NotValid)
-                state = timeBehind > 0 ? PlaybackState.RequiresCatchUp : PlaybackState.Valid;
+            if (state == PlaybackState.Valid && timeBehind > 0)
+                state = PlaybackState.RequiresCatchUp;
 
             frameStableClock.IsCatchingUp.Value = timeBehind > 200;
             frameStableClock.WaitingOnFrames.Value = state == PlaybackState.NotValid;
@@ -154,7 +159,8 @@ namespace osu.Game.Rulesets.UI
         /// Attempt to advance replay playback for a given time.
         /// </summary>
         /// <param name="proposedTime">The time which is to be displayed.</param>
-        private PlaybackState updateReplay(ref double proposedTime)
+        /// <returns>Whether playback is still valid.</returns>
+        private bool updateReplay(ref double proposedTime)
         {
             double? newTime;
 
@@ -180,10 +186,10 @@ namespace osu.Game.Rulesets.UI
             }
 
             if (newTime == null)
-                return PlaybackState.NotValid;
+                return false;
 
             proposedTime = newTime.Value;
-            return PlaybackState.Valid;
+            return true;
         }
 
         /// <summary>
