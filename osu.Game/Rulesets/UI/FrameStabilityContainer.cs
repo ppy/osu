@@ -73,21 +73,11 @@ namespace osu.Game.Rulesets.UI
             setClock();
         }
 
-        /// <summary>
-        /// Whether we are running up-to-date with our parent clock.
-        /// If not, we will need to keep processing children until we catch up.
-        /// </summary>
-        private bool requireMoreUpdateLoops;
+        private PlaybackState state;
 
-        /// <summary>
-        /// Whether we are in a valid state (ie. should we keep processing children frames).
-        /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
-        /// </summary>
-        private bool validState;
+        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && state != PlaybackState.NotValid;
 
-        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
-
-        private bool isAttached => ReplayInputHandler != null;
+        private bool hasReplayAttached => ReplayInputHandler != null;
 
         private const double sixty_frame_time = 1000.0 / 60;
 
@@ -95,28 +85,26 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            requireMoreUpdateLoops = true;
-
-            validState = !frameStableClock.IsPaused.Value;
-
-            int loops = 0;
+            state = frameStableClock.IsPaused.Value ? PlaybackState.NotValid : PlaybackState.Valid;
 
             if (frameStableClock.WaitingOnFrames.Value)
             {
                 // for now, force one update loop to check if frames have arrived
                 // this may have to change in the future where we want stable user pausing during replay playback.
-                validState = true;
+                state = PlaybackState.Valid;
             }
 
-            while (validState && requireMoreUpdateLoops && loops++ < MaxCatchUpFrames)
+            int loops = MaxCatchUpFrames;
+
+            while (state != PlaybackState.NotValid && loops-- > 0)
             {
                 updateClock();
 
-                if (validState)
-                {
-                    base.UpdateSubTree();
-                    UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-                }
+                if (state == PlaybackState.NotValid)
+                    break;
+
+                base.UpdateSubTree();
+                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
             }
 
             return true;
@@ -127,94 +115,103 @@ namespace osu.Game.Rulesets.UI
             if (parentGameplayClock == null)
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
-            validState = true;
-            requireMoreUpdateLoops = false;
+            // each update start with considering things in valid state.
+            state = PlaybackState.Valid;
 
-            var newProposedTime = parentGameplayClock.CurrentTime;
+            // our goal is to catch up to the time provided by the parent clock.
+            var proposedTime = parentGameplayClock.CurrentTime;
 
-            try
+            if (FrameStablePlayback)
+                // if we require frame stability, the proposed time will be adjusted to move at most one known
+                // frame interval in the current direction.
+                applyFrameStability(ref proposedTime);
+
+            if (hasReplayAttached)
+                state = updateReplay(ref proposedTime);
+
+            if (proposedTime != manualClock.CurrentTime)
+                direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
+
+            manualClock.CurrentTime = proposedTime;
+            manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
+            manualClock.IsRunning = parentGameplayClock.IsRunning;
+
+            double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
+
+            // determine whether catch-up is required.
+            if (state != PlaybackState.NotValid)
+                state = timeBehind > 0 ? PlaybackState.RequiresCatchUp : PlaybackState.Valid;
+
+            frameStableClock.IsCatchingUp.Value = timeBehind > 200;
+            frameStableClock.WaitingOnFrames.Value = state == PlaybackState.NotValid;
+
+            // The manual clock time has changed in the above code. The framed clock now needs to be updated
+            // to ensure that the its time is valid for our children before input is processed
+            framedClock.ProcessFrame();
+        }
+
+        /// <summary>
+        /// Attempt to advance replay playback for a given time.
+        /// </summary>
+        /// <param name="proposedTime">The time which is to be displayed.</param>
+        private PlaybackState updateReplay(ref double proposedTime)
+        {
+            double? newTime;
+
+            if (FrameStablePlayback)
             {
-                if (FrameStablePlayback)
+                // when stability is turned on, we shouldn't execute for time values the replay is unable to satisfy.
+                newTime = ReplayInputHandler.SetFrameFromTime(proposedTime);
+            }
+            else
+            {
+                // when stability is disabled, we don't really care about accuracy.
+                // looping over the replay will allow it to catch up and feed out the required values
+                // for the current time.
+                while ((newTime = ReplayInputHandler.SetFrameFromTime(proposedTime)) != proposedTime)
                 {
-                    if (firstConsumption)
+                    if (newTime == null)
                     {
-                        // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
-                        // Instead we perform an initial seek to the proposed time.
-
-                        // process frame (in addition to finally clause) to clear out ElapsedTime
-                        manualClock.CurrentTime = newProposedTime;
-                        framedClock.ProcessFrame();
-
-                        firstConsumption = false;
+                        // special case for when the replay actually can't arrive at the required time.
+                        // protects from potential endless loop.
+                        break;
                     }
-                    else if (manualClock.CurrentTime < gameplayStartTime)
-                        manualClock.CurrentTime = newProposedTime = Math.Min(gameplayStartTime, newProposedTime);
-                    else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
-                    {
-                        newProposedTime = newProposedTime > manualClock.CurrentTime
-                            ? Math.Min(newProposedTime, manualClock.CurrentTime + sixty_frame_time)
-                            : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
-                    }
-                }
-
-                if (isAttached)
-                {
-                    double? newTime;
-
-                    if (FrameStablePlayback)
-                    {
-                        // when stability is turned on, we shouldn't execute for time values the replay is unable to satisfy.
-                        if ((newTime = ReplayInputHandler.SetFrameFromTime(newProposedTime)) == null)
-                        {
-                            // setting invalid state here ensures that gameplay will not continue (ie. our child
-                            // hierarchy won't be updated).
-                            validState = false;
-
-                            // potentially loop to catch-up playback.
-                            requireMoreUpdateLoops = true;
-
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        // when stability is disabled, we don't really care about accuracy.
-                        // looping over the replay will allow it to catch up and feed out the required values
-                        // for the current time.
-                        while ((newTime = ReplayInputHandler.SetFrameFromTime(newProposedTime)) != newProposedTime)
-                        {
-                            if (newTime == null)
-                            {
-                                // special case for when the replay actually can't arrive at the required time.
-                                // protects from potential endless loop.
-                                validState = false;
-                                return;
-                            }
-                        }
-                    }
-
-                    newProposedTime = newTime.Value;
                 }
             }
-            finally
+
+            if (newTime == null)
+                return PlaybackState.NotValid;
+
+            proposedTime = newTime.Value;
+            return PlaybackState.Valid;
+        }
+
+        /// <summary>
+        /// Apply frame stability modifier to a time.
+        /// </summary>
+        /// <param name="proposedTime">The time which is to be displayed.</param>
+        private void applyFrameStability(ref double proposedTime)
+        {
+            if (firstConsumption)
             {
-                if (newProposedTime != manualClock.CurrentTime)
-                    direction = newProposedTime >= manualClock.CurrentTime ? 1 : -1;
+                // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
+                // Instead we perform an initial seek to the proposed time.
 
-                manualClock.CurrentTime = newProposedTime;
-                manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
-                manualClock.IsRunning = parentGameplayClock.IsRunning;
-
-                double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
-
-                requireMoreUpdateLoops |= timeBehind != 0;
-
-                frameStableClock.IsCatchingUp.Value = timeBehind > 200;
-                frameStableClock.WaitingOnFrames.Value = !validState;
-
-                // The manual clock time has changed in the above code. The framed clock now needs to be updated
-                // to ensure that the its time is valid for our children before input is processed
+                // process frame (in addition to finally clause) to clear out ElapsedTime
+                manualClock.CurrentTime = proposedTime;
                 framedClock.ProcessFrame();
+
+                firstConsumption = false;
+                return;
+            }
+
+            if (manualClock.CurrentTime < gameplayStartTime)
+                manualClock.CurrentTime = proposedTime = Math.Min(gameplayStartTime, proposedTime);
+            else if (Math.Abs(manualClock.CurrentTime - proposedTime) > sixty_frame_time * 1.2f)
+            {
+                proposedTime = proposedTime > manualClock.CurrentTime
+                    ? Math.Min(proposedTime, manualClock.CurrentTime + sixty_frame_time)
+                    : Math.Max(proposedTime, manualClock.CurrentTime - sixty_frame_time);
             }
         }
 
@@ -232,6 +229,26 @@ namespace osu.Game.Rulesets.UI
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
+
+        private enum PlaybackState
+        {
+            /// <summary>
+            /// Playback is not possible. Child hierarchy should not be processed.
+            /// </summary>
+            NotValid,
+
+            /// <summary>
+            /// Whether we are running up-to-date with our parent clock.
+            /// If not, we will need to keep processing children until we catch up.
+            /// </summary>
+            RequiresCatchUp,
+
+            /// <summary>
+            /// Whether we are in a valid state (ie. should we keep processing children frames).
+            /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
+            /// </summary>
+            Valid
+        }
 
         private class FrameStabilityClock : GameplayClock, IFrameStableClock
         {
