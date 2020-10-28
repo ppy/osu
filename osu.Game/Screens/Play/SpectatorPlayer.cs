@@ -11,11 +11,16 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public class SpectatorPlayer : ReplayPlayer
+    public class SpectatorPlayer : Player
     {
+        private readonly Score score;
+
+        protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
+
         public SpectatorPlayer(Score score)
-            : base(score)
+            : base(true, true)
         {
+            this.score = score;
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
@@ -32,9 +37,14 @@ namespace osu.Game.Screens.Play
             spectatorStreaming.OnUserBeganPlaying += userBeganPlaying;
         }
 
+        protected override void PrepareReplay()
+        {
+            DrawableRuleset?.SetReplayScore(score);
+        }
+
         private void userBeganPlaying(int userId, SpectatorState state)
         {
-            if (userId == Score.ScoreInfo.UserID)
+            if (userId == score.ScoreInfo.UserID)
                 Schedule(this.Exit);
         }
 
@@ -49,7 +59,7 @@ namespace osu.Game.Screens.Play
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
         {
             // if we already have frames, start gameplay at the point in time they exist, should they be too far into the beatmap.
-            double? firstFrameTime = Score.Replay.Frames.FirstOrDefault()?.Time;
+            double? firstFrameTime = score.Replay.Frames.FirstOrDefault()?.Time;
 
             if (firstFrameTime == null || firstFrameTime <= gameplayStart + 5000)
                 return base.CreateGameplayClockContainer(beatmap, gameplayStart);
