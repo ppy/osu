@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -89,8 +91,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
+            if (withFlair)
+                applauseSound = audio.Samples.Get(score.Rank >= ScoreRank.A ? "Results/rankpass" : "Results/rankfail");
+
             InternalChildren = new Drawable[]
             {
                 new SmoothCircularProgress
@@ -239,11 +244,16 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         continue;
 
                     using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(1 - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION, true))
+                    {
                         badge.Appear();
+                    }
                 }
 
                 using (BeginDelayedSequence(TEXT_APPEAR_DELAY, true))
+                {
+                    this.Delay(-1440).Schedule(() => applauseSound?.Play());
                     rankText.Appear();
+                }
             }
         }
 
