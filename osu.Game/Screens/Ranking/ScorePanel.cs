@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Ranking
 
         public readonly ScoreInfo Score;
 
-        private readonly bool isNewLocalScore;
+        private bool displayWithFlair;
 
         private Container content;
 
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Ranking
         public ScorePanel(ScoreInfo score, bool isNewLocalScore = false)
         {
             Score = score;
-            this.isNewLocalScore = isNewLocalScore;
+            displayWithFlair = isNewLocalScore;
         }
 
         [BackgroundDependencyLoader]
@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Ranking
 
                 state = value;
 
-                if (LoadState >= LoadState.Ready)
+                if (IsLoaded)
                     updateState();
 
                 StateChanged?.Invoke(value);
@@ -212,7 +212,10 @@ namespace osu.Game.Screens.Ranking
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
 
                     topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, isNewLocalScore).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair).With(d => d.Alpha = 0));
+
+                    // only the first expanded display should happen with flair.
+                    displayWithFlair = false;
                     break;
 
                 case PanelState.Contracted:
