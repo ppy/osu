@@ -30,6 +30,7 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
@@ -73,6 +74,8 @@ namespace osu.Game
         protected RulesetConfigCache RulesetConfigCache;
 
         protected IAPIProvider API;
+
+        private SpectatorStreamingClient spectatorStreaming;
 
         protected MenuCursorContainer MenuCursorContainer;
 
@@ -189,9 +192,9 @@ namespace osu.Game
             dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            API ??= new APIAccess(LocalConfig);
+            dependencies.CacheAs(API ??= new APIAccess(LocalConfig));
 
-            dependencies.CacheAs(API);
+            dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient());
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
@@ -232,9 +235,9 @@ namespace osu.Game
             dependencies.Cache(new SessionStatics());
             dependencies.Cache(new OsuColour());
 
-            fileImporters.Add(BeatmapManager);
-            fileImporters.Add(ScoreManager);
-            fileImporters.Add(SkinManager);
+            RegisterImportHandler(BeatmapManager);
+            RegisterImportHandler(ScoreManager);
+            RegisterImportHandler(SkinManager);
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
@@ -247,8 +250,11 @@ namespace osu.Game
 
             FileStore.Cleanup();
 
+            // add api components to hierarchy.
             if (API is APIAccess apiAccess)
                 AddInternal(apiAccess);
+            AddInternal(spectatorStreaming);
+
             AddInternal(RulesetConfigCache);
 
             MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
@@ -343,6 +349,18 @@ namespace osu.Game
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 
+        /// <summary>
+        /// Register a global handler for file imports. Most recently registered will have precedence.
+        /// </summary>
+        /// <param name="handler">The handler to register.</param>
+        public void RegisterImportHandler(ICanAcceptFiles handler) => fileImporters.Insert(0, handler);
+
+        /// <summary>
+        /// Unregister a global handler for file imports.
+        /// </summary>
+        /// <param name="handler">The previously registered handler.</param>
+        public void UnregisterImportHandler(ICanAcceptFiles handler) => fileImporters.Remove(handler);
+
         public async Task Import(params string[] paths)
         {
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
@@ -354,13 +372,15 @@ namespace osu.Game
             }
         }
 
-        public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
+        public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             RulesetStore?.Dispose();
             BeatmapManager?.Dispose();
+            LocalConfig?.Dispose();
 
             contextFactory.FlushConnections();
         }
@@ -394,7 +414,7 @@ namespace osu.Game
         public void Migrate(string path)
         {
             contextFactory.FlushConnections();
-            (Storage as OsuStorage)?.Migrate(path);
+            (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
         }
     }
 }

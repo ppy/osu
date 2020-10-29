@@ -22,29 +22,30 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// </summary>
     public class StarRatingDisplay : CompositeDrawable
     {
-        private readonly BeatmapInfo beatmap;
+        private readonly StarDifficulty difficulty;
 
         /// <summary>
-        /// Creates a new <see cref="StarRatingDisplay"/>.
+        /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
         /// </summary>
-        /// <param name="beatmap">The <see cref="BeatmapInfo"/> to display the star difficulty of.</param>
-        public StarRatingDisplay(BeatmapInfo beatmap)
+        /// <param name="starDifficulty">The already computed <see cref="StarDifficulty"/> to display the star difficulty of.</param>
+        public StarRatingDisplay(StarDifficulty starDifficulty)
         {
-            this.beatmap = beatmap;
-            AutoSizeAxes = Axes.Both;
+            difficulty = starDifficulty;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, BeatmapDifficultyManager difficultyManager)
         {
-            var starRatingParts = beatmap.StarDifficulty.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
+            AutoSizeAxes = Axes.Both;
+
+            var starRatingParts = difficulty.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
             string wholePart = starRatingParts[0];
             string fractionPart = starRatingParts[1];
             string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
-            ColourInfo backgroundColour = beatmap.DifficultyRating == DifficultyRating.ExpertPlus
+            ColourInfo backgroundColour = difficulty.DifficultyRating == DifficultyRating.ExpertPlus
                 ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
-                : (ColourInfo)colours.ForDifficultyRating(beatmap.DifficultyRating);
+                : (ColourInfo)colours.ForDifficultyRating(difficulty.DifficultyRating);
 
             InternalChildren = new Drawable[]
             {

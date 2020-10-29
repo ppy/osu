@@ -18,12 +18,14 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
+    [ExcludeFromDynamicCompile]
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource
     {
         private readonly AudioManager audio;
@@ -33,7 +35,7 @@ namespace osu.Game.Skinning
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
-        public override string[] HandledExtensions => new[] { ".osk" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
 
         protected override string[] HashableFileTypes => new[] { ".ini" };
 

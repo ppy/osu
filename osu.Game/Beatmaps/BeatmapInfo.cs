@@ -92,13 +92,14 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
+        public bool EpilepsyWarning { get; set; }
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
         [JsonIgnore]
         public string StoredBookmarks
         {
-            get => string.Join(",", Bookmarks);
+            get => string.Join(',', Bookmarks);
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -135,21 +136,7 @@ namespace osu.Game.Beatmaps
         public List<ScoreInfo> Scores { get; set; }
 
         [JsonIgnore]
-        public DifficultyRating DifficultyRating
-        {
-            get
-            {
-                var rating = StarDifficulty;
-
-                if (rating < 2.0) return DifficultyRating.Easy;
-                if (rating < 2.7) return DifficultyRating.Normal;
-                if (rating < 4.0) return DifficultyRating.Hard;
-                if (rating < 5.3) return DifficultyRating.Insane;
-                if (rating < 6.5) return DifficultyRating.Expert;
-
-                return DifficultyRating.ExpertPlus;
-            }
-        }
+        public DifficultyRating DifficultyRating => BeatmapDifficultyManager.GetDifficultyRating(StarDifficulty);
 
         public string[] SearchableTerms => new[]
         {

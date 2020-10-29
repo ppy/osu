@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class SliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T>
+    public class SliderWithTextBoxInput<T> : CompositeDrawable, IHasCurrentValue<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         private readonly SettingsSlider<T> slider;
@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Edit.Timing
                         },
                         slider = new SettingsSlider<T>
                         {
+                            TransferValueOnCommit = true,
                             RelativeSizeAxes = Axes.X,
                         }
                     }
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                 try
                 {
-                    slider.Bindable.Parse(t.Text);
+                    slider.Current.Parse(t.Text);
                 }
                 catch
                 {
@@ -70,8 +71,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         public Bindable<T> Current
         {
-            get => slider.Bindable;
-            set => slider.Bindable = value;
+            get => slider.Current;
+            set => slider.Current = value;
         }
     }
 }

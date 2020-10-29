@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
                             LabelText = "Show specific team",
-                            Bindable = currentTeam,
+                            Current = currentTeam,
                         }
                     }
                 }
@@ -288,8 +288,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     AutoSizeAxes = Axes.Both;
 
                     Flag.RelativeSizeAxes = Axes.None;
-                    Flag.Size = new Vector2(300, 200);
-                    Flag.Scale = new Vector2(0.3f);
+                    Flag.Scale = new Vector2(1.2f);
 
                     InternalChild = new FillFlowContainer
                     {

@@ -29,7 +29,7 @@ using osuTK;
 namespace osu.Game.Screens.Multi
 {
     [Cached]
-    public class Multiplayer : OsuScreen, IOnlineComponent
+    public class Multiplayer : OsuScreen
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Multi
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private MusicController music { get; set; }
 
         [Cached(Type = typeof(IRoomManager))]
@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Multi
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Action = createRoom
+                        Action = () => CreateRoom()
                     },
                     roomManager = new RoomManager()
                 }
@@ -146,14 +146,23 @@ namespace osu.Game.Screens.Multi
             screenStack.ScreenExited += screenExited;
         }
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [BackgroundDependencyLoader(true)]
         private void load(IdleTracker idleTracker)
         {
-            api.Register(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
 
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
         }
+
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
+        {
+            if (state.NewValue != APIState.Online)
+                Schedule(forcefullyExit);
+        });
 
         protected override void LoadComplete()
         {
@@ -197,12 +206,6 @@ namespace osu.Game.Screens.Multi
             }
 
             Logger.Log($"Polling adjusted (listing: {roomManager.TimeBetweenListingPolls}, selection: {roomManager.TimeBetweenSelectionPolls})");
-        }
-
-        public void APIStateChanged(IAPIProvider api, APIState state)
-        {
-            if (state != APIState.Online)
-                Schedule(forcefullyExit);
         }
 
         private void forcefullyExit()
@@ -289,10 +292,11 @@ namespace osu.Game.Screens.Multi
             logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
         }
 
-        private void createRoom()
-        {
-            loungeSubScreen.Open(new Room { Name = { Value = $"{api.LocalUser}'s awesome room" } });
-        }
+        /// <summary>
+        /// Create a new room.
+        /// </summary>
+        /// <param name="room">An optional template to use when creating the room.</param>
+        public void CreateRoom(Room room = null) => loungeSubScreen.Open(room ?? new Room { Name = { Value = $"{api.LocalUser}'s awesome room" } });
 
         private void beginHandlingTrack()
         {
@@ -350,7 +354,7 @@ namespace osu.Game.Screens.Multi
                     track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                     track.Looping = true;
 
-                    music.EnsurePlayingSomething();
+                    music?.EnsurePlayingSomething();
                 }
             }
             else
@@ -368,12 +372,6 @@ namespace osu.Game.Screens.Multi
                 track.Looping = false;
                 track.RestartPoint = 0;
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            api?.Unregister(this);
         }
 
         private class MultiplayerWaveContainer : WaveContainer
