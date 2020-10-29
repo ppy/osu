@@ -118,22 +118,24 @@ namespace osu.Game.Screens.Ranking
                 d.Origin = Anchor.Centre;
             }));
 
-            if (SelectedScore.Value == score)
+            if (IsLoaded)
             {
-                if (IsLoaded)
-                    SelectedScore.TriggerChange();
-            }
-            else
-            {
-                // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
-                // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
-                if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
+                if (SelectedScore.Value == score)
                 {
-                    // A somewhat hacky property is used here because we need to:
-                    // 1) Scroll after the scroll container's visible range is updated.
-                    // 2) Scroll before the scroll container's scroll position is updated.
-                    // Without this, we would have a 1-frame positioning error which looks very jarring.
-                    scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
+                    SelectedScore.TriggerChange();
+                }
+                else
+                {
+                    // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
+                    // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
+                    if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
+                    {
+                        // A somewhat hacky property is used here because we need to:
+                        // 1) Scroll after the scroll container's visible range is updated.
+                        // 2) Scroll before the scroll container's scroll position is updated.
+                        // Without this, we would have a 1-frame positioning error which looks very jarring.
+                        scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
+                    }
                 }
             }
 
@@ -170,12 +172,15 @@ namespace osu.Game.Screens.Ranking
             expandedTrackingComponent.Margin = new MarginPadding { Horizontal = expanded_panel_spacing };
             expandedPanel.State = PanelState.Expanded;
 
-            // Scroll to the new panel. This is done manually since we need:
-            // 1) To scroll after the scroll container's visible range is updated.
-            // 2) To account for the centre anchor/origins of panels.
-            // In the end, it's easier to compute the scroll position manually.
-            float scrollOffset = flow.GetPanelIndex(expandedPanel.Score) * (ScorePanel.CONTRACTED_WIDTH + panel_spacing);
-            scroll.ScrollTo(scrollOffset);
+            SchedulerAfterChildren.Add(() =>
+            {
+                // Scroll to the new panel. This is done manually since we need:
+                // 1) To scroll after the scroll container's visible range is updated.
+                // 2) To account for the centre anchor/origins of panels.
+                // In the end, it's easier to compute the scroll position manually.
+                float scrollOffset = flow.GetPanelIndex(expandedPanel.Score) * (ScorePanel.CONTRACTED_WIDTH + panel_spacing);
+                scroll.ScrollTo(scrollOffset);
+            });
         }
 
         protected override void Update()
