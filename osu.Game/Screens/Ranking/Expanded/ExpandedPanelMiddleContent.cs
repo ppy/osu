@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Ranking.Expanded
         private const float padding = 10;
 
         private readonly ScoreInfo score;
+        private readonly bool withFlair;
+
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
 
         private FillFlowContainer starAndModDisplay;
@@ -41,9 +43,11 @@ namespace osu.Game.Screens.Ranking.Expanded
         /// Creates a new <see cref="ExpandedPanelMiddleContent"/>.
         /// </summary>
         /// <param name="score">The score to display.</param>
-        public ExpandedPanelMiddleContent(ScoreInfo score)
+        /// <param name="withFlair">Whether to add flair for a new score being set.</param>
+        public ExpandedPanelMiddleContent(ScoreInfo score, bool withFlair = false)
         {
             this.score = score;
+            this.withFlair = withFlair;
 
             RelativeSizeAxes = Axes.Both;
             Masking = true;
@@ -116,7 +120,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     Margin = new MarginPadding { Top = 40 },
                                     RelativeSizeAxes = Axes.X,
                                     Height = 230,
-                                    Child = new AccuracyCircle(score)
+                                    Child = new AccuracyCircle(score, withFlair)
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
