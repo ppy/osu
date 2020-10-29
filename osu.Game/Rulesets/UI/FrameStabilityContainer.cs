@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            double proposedTime = manualClock.CurrentTime;
+            double aimTime = manualClock.CurrentTime;
 
             if (frameStableClock.WaitingOnFrames.Value)
             {
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.UI
                 if (parentGameplayClock == null)
                     setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
-                proposedTime = parentGameplayClock.CurrentTime;
+                aimTime = parentGameplayClock.CurrentTime;
             }
             else
             {
@@ -113,7 +113,9 @@ namespace osu.Game.Rulesets.UI
 
             while (loops-- > 0)
             {
-                updateClock(ref proposedTime);
+                // update clock is always trying to approach the aim time.
+                // it should be provided as the original value each loop.
+                updateClock(aimTime);
 
                 if (state == PlaybackState.NotValid)
                     break;
@@ -125,7 +127,7 @@ namespace osu.Game.Rulesets.UI
             return true;
         }
 
-        private void updateClock(ref double proposedTime)
+        private void updateClock(double proposedTime)
         {
             // each update start with considering things in valid state.
             state = PlaybackState.Valid;
