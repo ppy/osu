@@ -270,6 +270,9 @@ namespace osu.Game.Screens.Ranking.Expanded
                         delay += 200;
                     }
                 }
+
+                if (!withFlair)
+                    FinishTransforms(true);
             });
         }
     }
