@@ -25,7 +25,6 @@ namespace osu.Game.Screens.Backgrounds
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> mode;
         private Bindable<IntroSequence> introSequence;
-        private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -51,7 +50,7 @@ namespace osu.Game.Screens.Backgrounds
 
             currentDisplay = RNG.Next(0, background_count);
 
-            LoadComponentAsync(seasonalBackgroundLoader, _ => LoadComponentAsync(createBackground(), display));
+            display(createBackground());
         }
 
         private void display(Background newBackground)
@@ -91,10 +90,6 @@ namespace osu.Game.Screens.Backgrounds
             {
                 switch (mode.Value)
                 {
-                    case BackgroundSource.Seasonal:
-                        newBackground = seasonalBackgroundLoader.LoadBackground(backgroundName);
-                        break;
-
                     case BackgroundSource.Beatmap:
                         newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
                         break;
@@ -105,18 +100,7 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
             else
-            {
-                switch (mode.Value)
-                {
-                    case BackgroundSource.Seasonal:
-                        newBackground = seasonalBackgroundLoader.LoadBackground(backgroundName);
-                        break;
-
-                    default:
-                        newBackground = new Background(backgroundName);
-                        break;
-                }
-            }
+                newBackground = new Background(backgroundName);
 
             newBackground.Depth = currentDisplay;
 
