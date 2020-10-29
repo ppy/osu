@@ -236,14 +236,13 @@ namespace osu.Game.Rulesets.UI
             NotValid,
 
             /// <summary>
-            /// Whether we are running up-to-date with our parent clock.
-            /// If not, we will need to keep processing children until we catch up.
+            /// Playback is running behind real-time. Catch-up will be attempted by processing more than once per
+            /// game loop (limited to a sane maximum to avoid frame drops).
             /// </summary>
             RequiresCatchUp,
 
             /// <summary>
-            /// Whether we are in a valid state (ie. should we keep processing children frames).
-            /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
+            /// In a valid state, progressing one child hierarchy loop per game loop.
             /// </summary>
             Valid
         }
