@@ -61,13 +61,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             finish();
         }
 
-        private OsuFramedReplayInputHandler replayHandler =>
-            (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
-
-        private Player player => Stack.CurrentScreen as Player;
-
         [Test]
-        public void TestBasicSpectatingFlow()
+        public void TestFrameStarvationAndResume()
         {
             loadSpectatingScreen();
 
@@ -82,11 +77,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
             checkPaused(true);
 
+            double? pausedTime = null;
+
+            AddStep("store time", () => pausedTime = currentFrameStableTime);
+
             sendFrames();
 
-            checkPaused(false);
             AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
             checkPaused(true);
+
+            AddAssert("time advanced", () => currentFrameStableTime > pausedTime);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForPlayer();
             checkPaused(true);
 
-            sendFrames();
+            sendFrames(1000); // send enough frames to ensure play won't be paused
 
             checkPaused(false);
         }
@@ -119,15 +119,23 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestHostStartsPlayingWhileAlreadyWatching()
+        public void TestHostRetriesWhileWatching()
         {
             loadSpectatingScreen();
 
             start();
             sendFrames();
 
+            waitForPlayer();
+
+            Player lastPlayer = null;
+            AddStep("store first player", () => lastPlayer = player);
+
             start();
             sendFrames();
+
+            waitForPlayer();
+            AddAssert("player is different", () => lastPlayer != player);
         }
 
         [Test]
@@ -155,9 +163,25 @@ namespace osu.Game.Tests.Visual.Gameplay
             sendFrames();
             waitForPlayer();
 
-            // should immediately exit and unbind from streaming client
             AddStep("stop spectating", () => (Stack.CurrentScreen as Player)?.Exit());
-            AddUntilStep("spectating stopped", () => spectatorScreen.GetParentScreen() == null);
+            AddUntilStep("spectating stopped", () => spectatorScreen.GetChildScreen() == null);
+        }
+
+        [Test]
+        public void TestStopWatchingThenHostRetries()
+        {
+            loadSpectatingScreen();
+
+            start();
+            sendFrames();
+            waitForPlayer();
+
+            AddStep("stop spectating", () => (Stack.CurrentScreen as Player)?.Exit());
+            AddUntilStep("spectating stopped", () => spectatorScreen.GetChildScreen() == null);
+
+            // host starts playing a new session
+            start();
+            waitForPlayer();
         }
 
         [Test]
@@ -170,6 +194,14 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("screen didn't change", () => Stack.CurrentScreen is Spectator);
         }
+
+        private OsuFramedReplayInputHandler replayHandler =>
+            (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
+
+        private Player player => Stack.CurrentScreen as Player;
+
+        private double currentFrameStableTime
+            => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
