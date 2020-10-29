@@ -61,11 +61,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             finish();
         }
 
-        private OsuFramedReplayInputHandler replayHandler =>
-            (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
-
-        private Player player => Stack.CurrentScreen as Player;
-
         [Test]
         public void TestFrameStarvationAndResume()
         {
@@ -93,9 +88,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("time advanced", () => currentFrameStableTime > pausedTime);
         }
-
-        private double currentFrameStableTime
-            => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
 
         [Test]
         public void TestPlayStartsWithNoFrames()
@@ -202,6 +194,14 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("screen didn't change", () => Stack.CurrentScreen is Spectator);
         }
+
+        private OsuFramedReplayInputHandler replayHandler =>
+            (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
+
+        private Player player => Stack.CurrentScreen as Player;
+
+        private double currentFrameStableTime
+            => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
