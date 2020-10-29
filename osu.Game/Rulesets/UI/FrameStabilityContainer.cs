@@ -96,6 +96,10 @@ namespace osu.Game.Rulesets.UI
             else if (!frameStableClock.IsPaused.Value)
             {
                 state = PlaybackState.Valid;
+
+                if (parentGameplayClock == null)
+                    setClock(); // LoadComplete may not be run yet, but we still want the clock.
+
                 proposedTime = parentGameplayClock.CurrentTime;
             }
             else
@@ -123,9 +127,6 @@ namespace osu.Game.Rulesets.UI
 
         private void updateClock(ref double proposedTime)
         {
-            if (parentGameplayClock == null)
-                setClock(); // LoadComplete may not be run yet, but we still want the clock.
-
             // each update start with considering things in valid state.
             state = PlaybackState.Valid;
 
