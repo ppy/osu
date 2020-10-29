@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Backgrounds
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> mode;
         private Bindable<IntroSequence> introSequence;
+        private Bindable<SeasonalBackgrounds> showSeasonalBackgrounds;
         private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
 
         [Resolved]
@@ -42,12 +43,14 @@ namespace osu.Game.Screens.Backgrounds
             skin = skinManager.CurrentSkin.GetBoundCopy();
             mode = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
+            showSeasonalBackgrounds = config.GetBindable<SeasonalBackgrounds>(OsuSetting.SeasonalBackgrounds);
 
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
             mode.ValueChanged += _ => Next();
             beatmap.ValueChanged += _ => Next();
             introSequence.ValueChanged += _ => Next();
+            showSeasonalBackgrounds.ValueChanged += _ => Next();
 
             currentDisplay = RNG.Next(0, background_count);
 
