@@ -450,12 +450,21 @@ namespace osu.Game.Screens.Edit
                 if (dialogOverlay == null || dialogOverlay.CurrentDialog is PromptForSaveDialog)
                 {
                     confirmExit();
-                    return true;
+                    return false;
                 }
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
-                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                    dialogOverlay?.Push(new PromptForSaveDialog(() =>
+                    {
+                        confirmExit();
+                        this.Exit();
+                    }, () =>
+                    {
+                        confirmExitWithSave();
+                        this.Exit();
+                    }));
+
                     return true;
                 }
             }
@@ -470,7 +479,6 @@ namespace osu.Game.Screens.Edit
         {
             exitConfirmed = true;
             Save();
-            this.Exit();
         }
 
         private void confirmExit()
@@ -489,7 +497,6 @@ namespace osu.Game.Screens.Edit
             }
 
             exitConfirmed = true;
-            this.Exit();
         }
 
         private readonly Bindable<string> clipboard = new Bindable<string>();
