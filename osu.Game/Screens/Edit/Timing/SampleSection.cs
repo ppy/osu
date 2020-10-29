@@ -35,7 +35,10 @@ namespace osu.Game.Screens.Edit.Timing
             if (point.NewValue != null)
             {
                 bank.Current = point.NewValue.SampleBankBindable;
+                bank.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
+
                 volume.Current = point.NewValue.SampleVolumeBindable;
+                volume.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 

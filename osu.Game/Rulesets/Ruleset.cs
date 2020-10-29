@@ -23,8 +23,10 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using JetBrains.Annotations;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets
 {
@@ -158,7 +160,28 @@ namespace osu.Game.Rulesets
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
 
-        public virtual PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => null;
+        /// <summary>
+        /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
+        /// </summary>
+        /// <param name="attributes">Difficulty attributes for the beatmap related to the provided score.</param>
+        /// <param name="score">The score to be processed.</param>
+        /// <returns>A performance calculator instance for the provided score.</returns>
+        [CanBeNull]
+        public virtual PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => null;
+
+        /// <summary>
+        /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to use as a source for generating <see cref="DifficultyAttributes"/>.</param>
+        /// <param name="score">The score to be processed.</param>
+        /// <returns>A performance calculator instance for the provided score.</returns>
+        [CanBeNull]
+        public PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score)
+        {
+            var difficultyCalculator = CreateDifficultyCalculator(beatmap);
+            var difficultyAttributes = difficultyCalculator.Calculate(score.Mods);
+            return CreatePerformanceCalculator(difficultyAttributes, score);
+        }
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
@@ -220,5 +243,52 @@ namespace osu.Game.Rulesets
         /// <returns>The <see cref="StatisticRow"/>s to display. Each <see cref="StatisticRow"/> may contain 0 or more <see cref="StatisticItem"/>.</returns>
         [NotNull]
         public virtual StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticRow>();
+
+        /// <summary>
+        /// Get all valid <see cref="HitResult"/>s for this ruleset.
+        /// Generally used for results display purposes, where it can't be determined if zero-count means the user has not achieved any or the type is not used by this ruleset.
+        /// </summary>
+        /// <returns>
+        /// All valid <see cref="HitResult"/>s along with a display-friendly name.
+        /// </returns>
+        public IEnumerable<(HitResult result, string displayName)> GetHitResults()
+        {
+            var validResults = GetValidHitResults();
+
+            // enumerate over ordered list to guarantee return order is stable.
+            foreach (var result in OrderAttributeUtils.GetValuesInOrder<HitResult>())
+            {
+                switch (result)
+                {
+                    // hard blocked types, should never be displayed even if the ruleset tells us to.
+                    case HitResult.None:
+                    case HitResult.IgnoreHit:
+                    case HitResult.IgnoreMiss:
+                    // display is handled as a completion count with corresponding "hit" type.
+                    case HitResult.LargeTickMiss:
+                    case HitResult.SmallTickMiss:
+                        continue;
+                }
+
+                if (result == HitResult.Miss || validResults.Contains(result))
+                    yield return (result, GetDisplayNameForHitResult(result));
+            }
+        }
+
+        /// <summary>
+        /// Get all valid <see cref="HitResult"/>s for this ruleset.
+        /// Generally used for results display purposes, where it can't be determined if zero-count means the user has not achieved any or the type is not used by this ruleset.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="HitResult.Miss"/> is implicitly included. Special types like <see cref="HitResult.IgnoreHit"/> are ignored even when specified.
+        /// </remarks>
+        protected virtual IEnumerable<HitResult> GetValidHitResults() => OrderAttributeUtils.GetValuesInOrder<HitResult>();
+
+        /// <summary>
+        /// Get a display friendly name for the specified result type.
+        /// </summary>
+        /// <param name="result">The result type to get the name for.</param>
+        /// <returns>The display name.</returns>
+        public virtual string GetDisplayNameForHitResult(HitResult result) => result.GetDescription();
     }
 }

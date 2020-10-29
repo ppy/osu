@@ -19,12 +19,14 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestSlidingSampleStopsOnSeek()
         {
             DrawableSlider slider = null;
-            DrawableSample[] samples = null;
+            DrawableSample[] loopingSamples = null;
+            DrawableSample[] onceOffSamples = null;
 
             AddStep("get first slider", () =>
             {
                 slider = Editor.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).First();
-                samples = slider.ChildrenOfType<DrawableSample>().ToArray();
+                onceOffSamples = slider.ChildrenOfType<DrawableSample>().Where(s => !s.Looping).ToArray();
+                loopingSamples = slider.ChildrenOfType<DrawableSample>().Where(s => s.Looping).ToArray();
             });
 
             AddStep("start playback", () => EditorClock.Start());
@@ -34,14 +36,15 @@ namespace osu.Game.Tests.Visual.Editing
                 if (!slider.Tracking.Value)
                     return false;
 
-                if (!samples.Any(s => s.Playing))
+                if (!loopingSamples.Any(s => s.Playing))
                     return false;
 
                 EditorClock.Seek(20000);
                 return true;
             });
 
-            AddAssert("slider samples are not playing", () => samples.Length == 5 && samples.All(s => s.Played && !s.Playing));
+            AddAssert("non-looping samples are playing", () => onceOffSamples.Length == 4 && loopingSamples.All(s => s.Played || s.Playing));
+            AddAssert("looping samples are not playing", () => loopingSamples.Length == 1 && loopingSamples.All(s => s.Played && !s.Playing));
         }
     }
 }

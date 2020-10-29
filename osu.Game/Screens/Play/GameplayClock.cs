@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
     /// </remarks>
     /// </summary>
-    public class GameplayClock : IFrameBasedClock, ISamplePlaybackDisabler
+    public class GameplayClock : IFrameBasedClock
     {
         private readonly IFrameBasedClock underlyingClock;
 
@@ -61,14 +61,9 @@ namespace osu.Game.Screens.Play
 
         public bool IsRunning => underlyingClock.IsRunning;
 
-        /// <summary>
-        /// Whether an ongoing seek operation is active.
-        /// </summary>
-        public virtual bool IsSeeking => false;
-
         public void ProcessFrame()
         {
-            // we do not want to process the underlying clock.
+            // intentionally not updating the underlying clock (handled externally).
         }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
@@ -78,7 +73,5 @@ namespace osu.Game.Screens.Play
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
         public IClock Source => underlyingClock;
-
-        public IBindable<bool> SamplePlaybackDisabled => IsPaused;
     }
 }

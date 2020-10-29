@@ -13,6 +13,7 @@ using osu.Framework.Development;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -23,6 +24,7 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
+        [ExcludeFromDynamicCompile]
         private class BeatmapOnlineLookupQueue : IDisposable
         {
             private readonly IAPIProvider api;
@@ -61,7 +63,7 @@ namespace osu.Game.Beatmaps
                 if (checkLocalCache(set, beatmap))
                     return;
 
-                if (api?.State != APIState.Online)
+                if (api?.State.Value != APIState.Online)
                     return;
 
                 var req = new GetBeatmapRequest(beatmap);

@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Edit.Timing
             if (point.NewValue != null)
             {
                 multiplierSlider.Current = point.NewValue.SpeedMultiplierBindable;
+                multiplierSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
             }
         }
 

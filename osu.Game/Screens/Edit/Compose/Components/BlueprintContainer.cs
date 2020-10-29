@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // handle positional change etc.
                 foreach (var obj in selectedHitObjects)
-                    Beatmap.UpdateHitObject(obj);
+                    Beatmap.Update(obj);
 
                 changeHandler?.EndChange();
                 isDraggingBlueprint = false;
@@ -297,13 +297,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void beginClickSelection(MouseButtonEvent e)
         {
             Debug.Assert(!clickSelectionBegan);
-
-            // Deselections are only allowed for control + left clicks
-            bool allowDeselection = e.ControlPressed && e.Button == MouseButton.Left;
-
-            // Todo: This is probably incorrectly disallowing multiple selections on stacked objects
-            if (!allowDeselection && SelectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
-                return;
 
             foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren)
             {
@@ -436,8 +429,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // Apply the start time at the newly snapped-to position
                 double offset = result.Time.Value - draggedObject.StartTime;
-                foreach (HitObject obj in SelectionHandler.SelectedHitObjects)
+
+                foreach (HitObject obj in Beatmap.SelectedHitObjects)
+                {
                     obj.StartTime += offset;
+                    Beatmap.Update(obj);
+                }
             }
 
             return true;

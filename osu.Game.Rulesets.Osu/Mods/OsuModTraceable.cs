@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -38,10 +39,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected void ApplyTraceableState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawableOsuHitObject drawableOsu))
+            if (!(drawable is DrawableOsuHitObject))
                 return;
-
-            var h = drawableOsu.HitObject;
 
             //todo: expose and hide spinner background somehow
 
@@ -49,9 +48,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case DrawableHitCircle circle:
                     // we only want to see the approach circle
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
-                        circle.CirclePiece.Hide();
+                    applyCirclePieceState(circle, circle.CirclePiece);
+                    break;
 
+                case DrawableSliderTail sliderTail:
+                    applyCirclePieceState(sliderTail);
+                    break;
+
+                case DrawableSliderRepeat sliderRepeat:
+                    // show only the repeat arrow
+                    applyCirclePieceState(sliderRepeat, sliderRepeat.CirclePiece);
                     break;
 
                 case DrawableSlider slider:
@@ -59,6 +65,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                     applySliderState(slider);
                     break;
             }
+        }
+
+        private void applyCirclePieceState(DrawableOsuHitObject hitObject, IDrawable hitCircle = null)
+        {
+            var h = hitObject.HitObject;
+            using (hitObject.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                (hitCircle ?? hitObject).Hide();
         }
 
         private void applySliderState(DrawableSlider slider)
