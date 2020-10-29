@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private Player player => Stack.CurrentScreen as Player;
 
         [Test]
-        public void TestBasicSpectatingFlow()
+        public void TestFrameStarvationAndResume()
         {
             loadSpectatingScreen();
 
