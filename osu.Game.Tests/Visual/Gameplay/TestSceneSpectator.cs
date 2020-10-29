@@ -134,8 +134,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             start();
             sendFrames();
 
+            waitForPlayer();
+
+            Player lastPlayer = null;
+            AddStep("store first player", () => lastPlayer = player);
+
             start();
             sendFrames();
+
+            waitForPlayer();
+            AddAssert("player is different", () => lastPlayer != player);
         }
 
         [Test]
