@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
             Task.Run(async () =>
             {
-                nextStoryboard = new BackgroundStoryboard(b.Value.Storyboard, b.Value.Skin)
+                nextStoryboard = new BackgroundStoryboard(b.Value, b.Value.Skin)
                 {
                     RelativeSizeAxes = Axes.Both,
                     RunningClock = StoryboardClock = new StoryboardClock(),
