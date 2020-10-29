@@ -176,6 +176,23 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestStopWatchingThenHostRetries()
+        {
+            loadSpectatingScreen();
+
+            start();
+            sendFrames();
+            waitForPlayer();
+
+            AddStep("stop spectating", () => (Stack.CurrentScreen as Player)?.Exit());
+            AddUntilStep("spectating stopped", () => spectatorScreen.GetChildScreen() == null);
+
+            // host starts playing a new session
+            start();
+            waitForPlayer();
+        }
+
+        [Test]
         public void TestWatchingBeatmapThatDoesntExistLocally()
         {
             loadSpectatingScreen();
