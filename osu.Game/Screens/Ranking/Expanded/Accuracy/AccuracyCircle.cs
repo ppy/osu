@@ -73,14 +73,19 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
         private readonly ScoreInfo score;
 
+        private readonly bool withFlair;
+
         private SmoothCircularProgress accuracyCircle;
         private SmoothCircularProgress innerMask;
         private Container<RankBadge> badges;
         private RankText rankText;
 
-        public AccuracyCircle(ScoreInfo score)
+        private SampleChannel applauseSound;
+
+        public AccuracyCircle(ScoreInfo score, bool withFlair)
         {
             this.score = score;
+            this.withFlair = withFlair;
         }
 
         [BackgroundDependencyLoader]

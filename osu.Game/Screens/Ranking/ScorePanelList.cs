@@ -95,9 +95,10 @@ namespace osu.Game.Screens.Ranking
         /// Adds a <see cref="ScoreInfo"/> to this list.
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to add.</param>
-        public ScorePanel AddScore(ScoreInfo score)
+        /// <param name="isNewLocalScore">Whether this is a score that has just been achieved locally. Controls whether flair is added to the display or not.</param>
+        public ScorePanel AddScore(ScoreInfo score, bool isNewLocalScore = false)
         {
-            var panel = new ScorePanel(score)
+            var panel = new ScorePanel(score, isNewLocalScore)
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
