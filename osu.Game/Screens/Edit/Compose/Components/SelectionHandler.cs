@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -224,21 +225,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="state">The input state at the point of selection.</param>
         internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
-            if (state.Keyboard.ControlPressed)
-            {
-                if (blueprint.IsSelected)
-                    blueprint.Deselect();
-                else
-                    blueprint.Select();
-            }
+            if (state.Keyboard.ShiftPressed && state.Mouse.IsPressed(MouseButton.Right))
+                EditorBeatmap.Remove(blueprint.HitObject);
+            else if (state.Keyboard.ControlPressed && state.Mouse.IsPressed(MouseButton.Left))
+                blueprint.ToggleSelection();
             else
-            {
-                if (blueprint.IsSelected)
-                    return;
+                ensureSelected(blueprint);
+        }
 
-                DeselectAll?.Invoke();
-                blueprint.Select();
-            }
+        private void ensureSelected(SelectionBlueprint blueprint)
+        {
+            if (blueprint.IsSelected)
+                return;
+
+            DeselectAll?.Invoke();
+            blueprint.Select();
         }
 
         private void deleteSelected()
