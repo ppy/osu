@@ -85,6 +85,8 @@ namespace osu.Game.Screens.Ranking
 
         public readonly ScoreInfo Score;
 
+        private readonly bool isNewLocalScore;
+
         private Container content;
 
         private Container topLayerContainer;
@@ -97,9 +99,10 @@ namespace osu.Game.Screens.Ranking
         private Container middleLayerContentContainer;
         private Drawable middleLayerContent;
 
-        public ScorePanel(ScoreInfo score)
+        public ScorePanel(ScoreInfo score, bool isNewLocalScore = false)
         {
             Score = score;
+            this.isNewLocalScore = isNewLocalScore;
         }
 
         [BackgroundDependencyLoader]
@@ -209,7 +212,7 @@ namespace osu.Game.Screens.Ranking
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
 
                     topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, isNewLocalScore).With(d => d.Alpha = 0));
                     break;
 
                 case PanelState.Contracted:
