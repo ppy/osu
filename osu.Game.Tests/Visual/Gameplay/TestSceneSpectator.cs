@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestHostStartsPlayingWhileAlreadyWatching()
+        public void TestHostRetriesWhileWatching()
         {
             loadSpectatingScreen();
 
@@ -171,9 +171,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             sendFrames();
             waitForPlayer();
 
-            // should immediately exit and unbind from streaming client
             AddStep("stop spectating", () => (Stack.CurrentScreen as Player)?.Exit());
-            AddUntilStep("spectating stopped", () => spectatorScreen.GetParentScreen() == null);
+            AddUntilStep("spectating stopped", () => spectatorScreen.GetChildScreen() == null);
         }
 
         [Test]
