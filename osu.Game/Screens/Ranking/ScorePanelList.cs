@@ -119,7 +119,10 @@ namespace osu.Game.Screens.Ranking
             }));
 
             if (SelectedScore.Value == score)
-                selectedScoreChanged(new ValueChangedEvent<ScoreInfo>(SelectedScore.Value, SelectedScore.Value));
+            {
+                if (IsLoaded)
+                    SelectedScore.TriggerChange();
+            }
             else
             {
                 // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
@@ -143,11 +146,15 @@ namespace osu.Game.Screens.Ranking
         /// <param name="score">The <see cref="ScoreInfo"/> to present.</param>
         private void selectedScoreChanged(ValueChangedEvent<ScoreInfo> score)
         {
-            // Contract the old panel.
-            foreach (var t in flow.Where(t => t.Panel.Score == score.OldValue))
+            // avoid contracting panels unnecessarily when TriggerChange is fired manually.
+            if (score.OldValue != score.NewValue)
             {
-                t.Panel.State = PanelState.Contracted;
-                t.Margin = new MarginPadding();
+                // Contract the old panel.
+                foreach (var t in flow.Where(t => t.Panel.Score == score.OldValue))
+                {
+                    t.Panel.State = PanelState.Contracted;
+                    t.Margin = new MarginPadding();
+                }
             }
 
             // Find the panel corresponding to the new score.
