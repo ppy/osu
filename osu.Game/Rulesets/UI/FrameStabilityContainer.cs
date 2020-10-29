@@ -96,7 +96,10 @@ namespace osu.Game.Rulesets.UI
 
             int loops = MaxCatchUpFrames;
 
-            while (state != PlaybackState.NotValid && loops-- > 0)
+            if (state == PlaybackState.NotValid)
+                return true;
+
+            while (loops-- > 0)
             {
                 updateClock();
 
