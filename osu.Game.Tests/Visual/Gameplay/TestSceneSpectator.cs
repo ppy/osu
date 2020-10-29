@@ -82,12 +82,20 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
             checkPaused(true);
 
+            double? pausedTime = null;
+
+            AddStep("store time", () => pausedTime = currentFrameStableTime);
+
             sendFrames();
 
-            checkPaused(false);
             AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
             checkPaused(true);
+
+            AddAssert("time advanced", () => currentFrameStableTime > pausedTime);
         }
+
+        private double currentFrameStableTime
+            => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
 
         [Test]
         public void TestPlayStartsWithNoFrames()
@@ -98,7 +106,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForPlayer();
             checkPaused(true);
 
-            sendFrames();
+            sendFrames(1000); // send enough frames to ensure play won't be paused
 
             checkPaused(false);
         }
