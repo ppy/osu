@@ -85,20 +85,31 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            state = frameStableClock.IsPaused.Value ? PlaybackState.NotValid : PlaybackState.Valid;
+            double proposedTime = manualClock.CurrentTime;
 
             if (frameStableClock.WaitingOnFrames.Value)
             {
-                // for now, force one update loop to check if frames have arrived
-                // this may have to change in the future where we want stable user pausing during replay playback.
+                // when waiting on frames, the update loop still needs to be run (at least once) to check for newly arrived frames.
+                // time should not be sourced from the parent clock in this case.
                 state = PlaybackState.Valid;
+            }
+            else if (!frameStableClock.IsPaused.Value)
+            {
+                state = PlaybackState.Valid;
+                proposedTime = parentGameplayClock.CurrentTime;
+            }
+            else
+            {
+                // time should not advance while paused, not should anything run.
+                state = PlaybackState.NotValid;
+                return true;
             }
 
             int loops = MaxCatchUpFrames;
 
-            while (state != PlaybackState.NotValid && loops-- > 0)
+            while (loops-- > 0)
             {
-                updateClock();
+                updateClock(ref proposedTime);
 
                 if (state == PlaybackState.NotValid)
                     break;
@@ -110,16 +121,13 @@ namespace osu.Game.Rulesets.UI
             return true;
         }
 
-        private void updateClock()
+        private void updateClock(ref double proposedTime)
         {
             if (parentGameplayClock == null)
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
             // each update start with considering things in valid state.
             state = PlaybackState.Valid;
-
-            // our goal is to catch up to the time provided by the parent clock.
-            var proposedTime = parentGameplayClock.CurrentTime;
 
             if (FrameStablePlayback)
                 // if we require frame stability, the proposed time will be adjusted to move at most one known
