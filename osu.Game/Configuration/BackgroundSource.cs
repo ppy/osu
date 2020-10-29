@@ -6,7 +6,6 @@ namespace osu.Game.Configuration
     public enum BackgroundSource
     {
         Skin,
-        Beatmap,
-        Seasonal
+        Beatmap
     }
 }
