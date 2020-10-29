@@ -298,13 +298,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             Debug.Assert(!clickSelectionBegan);
 
-            // Deselections are only allowed for control + left clicks
-            bool allowDeselection = e.ControlPressed && e.Button == MouseButton.Left;
-
-            // Todo: This is probably incorrectly disallowing multiple selections on stacked objects
-            if (!allowDeselection && SelectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
-                return;
-
             foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren)
             {
                 if (blueprint.IsHovered)

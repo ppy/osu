@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapListing
@@ -9,11 +10,11 @@ namespace osu.Game.Overlays.BeatmapListing
     public class BeatmapSearchRulesetFilterRow : BeatmapSearchFilterRow<RulesetInfo>
     {
         public BeatmapSearchRulesetFilterRow()
-            : base(@"游戏模式")
+            : base(@"模式")
         {
         }
 
-        protected override BeatmapSearchFilter CreateFilter() => new RulesetFilter();
+        protected override Drawable CreateFilter() => new RulesetFilter();
 
         private class RulesetFilter : BeatmapSearchFilter
         {
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 AddItem(new RulesetInfo
                 {
-                    Name = @"任意"
+                    Name = @"所有"
                 });
 
                 foreach (var r in rulesets.AvailableRulesets)
