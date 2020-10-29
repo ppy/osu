@@ -11,9 +11,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
@@ -82,7 +84,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private Container<RankBadge> badges;
         private RankText rankText;
 
-        private SampleChannel applauseSound;
+        private SkinnableSound applauseSound;
 
         public AccuracyCircle(ScoreInfo score, bool withFlair)
         {
@@ -93,9 +95,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            if (withFlair)
-                applauseSound = audio.Samples.Get(score.Rank >= ScoreRank.A ? "Results/rankpass" : "Results/rankfail");
-
             InternalChildren = new Drawable[]
             {
                 new SmoothCircularProgress
@@ -213,6 +212,13 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 },
                 rankText = new RankText(score.Rank)
             };
+
+            if (withFlair)
+            {
+                AddInternal(applauseSound = score.Rank >= ScoreRank.A
+                    ? new SkinnableSound(new SampleInfo("Results/rankpass", "applause"))
+                    : new SkinnableSound(new SampleInfo("Results/rankfail")));
+            }
         }
 
         private ScoreRank getRank(ScoreRank rank)
