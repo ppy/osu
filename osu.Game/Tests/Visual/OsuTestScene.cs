@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual
 
                 if (beatmap.HitObjects.Count > 0)
                     // add buffer after last hitobject to allow for final replay frames etc.
-                    trackLength = beatmap.HitObjects.Max(h => h.GetEndTime()) + 2000;
+                    trackLength = Math.Max(trackLength, beatmap.HitObjects.Max(h => h.GetEndTime()) + 2000);
 
                 if (referenceClock != null)
                 {
