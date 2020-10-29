@@ -106,6 +106,18 @@ namespace osu.Game.Screens.Backgrounds
             else
                 newBackground = new Background(backgroundName);
 
+            switch (showSeasonalBackgrounds.Value)
+            {
+                case SeasonalBackgrounds.Sometimes:
+                    if (RNG.NextBool())
+                        goto case SeasonalBackgrounds.Always;
+                    break;
+
+                case SeasonalBackgrounds.Always:
+                    newBackground = seasonalBackgroundLoader.LoadBackground() ?? newBackground;
+                    break;
+            }
+
             newBackground.Depth = currentDisplay;
 
             return newBackground;
