@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -38,17 +37,14 @@ namespace osu.Game.Graphics.Backgrounds
             api.PerformAsync(request);
         }
 
-        public SeasonalBackground LoadBackground(string fallbackTextureName)
+        public SeasonalBackground LoadBackground()
         {
-            string url = null;
+            if (!backgrounds.Value.Any()) return null;
 
-            if (backgrounds.Value.Any())
-            {
-                current = (current + 1) % backgrounds.Value.Count;
-                url = backgrounds.Value[current].Url;
-            }
+            current = (current + 1) % backgrounds.Value.Count;
+            string url = backgrounds.Value[current].Url;
 
-            return new SeasonalBackground(url, fallbackTextureName);
+            return new SeasonalBackground(url);
         }
     }
 
@@ -56,18 +52,17 @@ namespace osu.Game.Graphics.Backgrounds
     public class SeasonalBackground : Background
     {
         private readonly string url;
-        private readonly string fallbackTextureName;
+        private const string fallback_texture_name = @"Backgrounds/bg1";
 
-        public SeasonalBackground([CanBeNull] string url, string fallbackTextureName = @"Backgrounds/bg1")
+        public SeasonalBackground(string url)
         {
             this.url = url;
-            this.fallbackTextureName = fallbackTextureName;
         }
 
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
-            Sprite.Texture = textures.Get(url) ?? textures.Get(fallbackTextureName);
+            Sprite.Texture = textures.Get(url) ?? textures.Get(fallback_texture_name);
         }
     }
 }
