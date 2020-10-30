@@ -85,22 +85,6 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            if (frameStableClock.WaitingOnFrames.Value)
-            {
-                // waiting on frames is a special case where we want to avoid doing any update propagation, unless new frame data has arrived.
-                state = PlaybackState.Valid;
-            }
-            else if (!frameStableClock.IsPaused.Value)
-            {
-                state = PlaybackState.Valid;
-            }
-            else
-            {
-                // time should not advance while paused, nor should anything run.
-                state = PlaybackState.NotValid;
-                return true;
-            }
-
             int loops = MaxCatchUpFrames;
 
             do
@@ -121,13 +105,26 @@ namespace osu.Game.Rulesets.UI
 
         private void updateClock()
         {
+            if (frameStableClock.WaitingOnFrames.Value)
+            {
+                // if waiting on frames, run one update loop to determine if frames have arrived.
+                state = PlaybackState.Valid;
+            }
+            else if (frameStableClock.IsPaused.Value)
+            {
+                // time should not advance while paused, nor should anything run.
+                state = PlaybackState.NotValid;
+                return;
+            }
+            else
+            {
+                state = PlaybackState.Valid;
+            }
+
             if (parentGameplayClock == null)
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
             double proposedTime = parentGameplayClock.CurrentTime;
-
-            // each update start with considering things in valid state.
-            state = PlaybackState.Valid;
 
             if (FrameStablePlayback)
                 // if we require frame stability, the proposed time will be adjusted to move at most one known
