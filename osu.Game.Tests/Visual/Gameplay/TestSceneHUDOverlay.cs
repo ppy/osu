@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExternalHideDoesntAffectConfig()
         {
-            HUDVisibilityMode originalConfigValue = HUDVisibilityMode.HideDuringBreaks;
+            HUDVisibilityMode originalConfigValue = HUDVisibilityMode.HideDuringGameplay;
 
             createNew();
 
