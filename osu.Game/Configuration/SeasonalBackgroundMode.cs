@@ -5,8 +5,19 @@ namespace osu.Game.Configuration
 {
     public enum SeasonalBackgroundMode
     {
+        /// <summary>
+        /// Seasonal backgrounds are shown regardless of season, if at all available.
+        /// </summary>
         Always,
+
+        /// <summary>
+        /// Seasonal backgrounds are shown only during their corresponding season.
+        /// </summary>
         Sometimes,
+
+        /// <summary>
+        /// Seasonal backgrounds are never shown.
+        /// </summary>
         Never
     }
 }
