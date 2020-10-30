@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     skinSource = new TestSkinSourceContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = skinnableSound = new PausableSkinnableSound(new SampleInfo("normal-sliderslide"))
+                        Child = skinnableSound = new PausableSkinnableSound(new SampleInfo("Gameplay/normal-sliderslide"))
                     },
                 };
             });
