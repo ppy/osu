@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.Backgrounds
             return new SeasonalBackground(url);
         }
 
-        public bool IsInSeason() => DateTimeOffset.Now < endDate.Value;
+        public bool IsInSeason => DateTimeOffset.Now < endDate.Value;
     }
 
     [LongRunningLoad]
