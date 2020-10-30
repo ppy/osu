@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.UI
 
             int loops = MaxCatchUpFrames;
 
-            while (loops-- > 0)
+            do
             {
                 // update clock is always trying to approach the aim time.
                 // it should be provided as the original value each loop.
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.UI
 
                 base.UpdateSubTree();
                 UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-            }
+            } while (state == PlaybackState.RequiresCatchUp && loops-- > 0);
 
             return true;
         }
