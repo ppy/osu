@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -18,19 +19,24 @@ namespace osu.Game.Graphics.Backgrounds
     [LongRunningLoad]
     public class SeasonalBackgroundLoader : Component
     {
+        private Bindable<DateTimeOffset> endDate;
         private Bindable<List<APISeasonalBackground>> backgrounds;
         private int current;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics sessionStatics, IAPIProvider api)
         {
+            endDate = sessionStatics.GetBindable<DateTimeOffset>(Static.SeasonEndDate);
             backgrounds = sessionStatics.GetBindable<List<APISeasonalBackground>>(Static.SeasonalBackgrounds);
+
             if (backgrounds.Value.Any()) return;
 
             var request = new GetSeasonalBackgroundsRequest();
             request.Success += response =>
             {
+                endDate.Value = response.EndDate;
                 backgrounds.Value = response.Backgrounds ?? backgrounds.Value;
+
                 current = RNG.Next(0, backgrounds.Value.Count);
             };
 
@@ -46,6 +52,8 @@ namespace osu.Game.Graphics.Backgrounds
 
             return new SeasonalBackground(url);
         }
+
+        public bool IsInSeason() => DateTimeOffset.Now < endDate.Value;
     }
 
     [LongRunningLoad]
