@@ -417,7 +417,7 @@ namespace osu.Game.Skinning
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo)
         {
-            IEnumerable<string> lookupNames = null;
+            IEnumerable<string> lookupNames;
 
             if (sampleInfo is HitSampleInfo hitSample)
                 lookupNames = getLegacyLookupNames(hitSample);
