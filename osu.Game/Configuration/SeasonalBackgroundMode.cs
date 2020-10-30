@@ -3,7 +3,7 @@
 
 namespace osu.Game.Configuration
 {
-    public enum SeasonalBackgrounds
+    public enum SeasonalBackgroundMode
     {
         Always,
         Sometimes,

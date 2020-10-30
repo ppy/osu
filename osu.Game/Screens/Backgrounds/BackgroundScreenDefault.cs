@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Backgrounds
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> mode;
         private Bindable<IntroSequence> introSequence;
-        private Bindable<SeasonalBackgrounds> showSeasonalBackgrounds;
+        private Bindable<SeasonalBackgroundMode> seasonalBackgroundMode;
         private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
 
         [Resolved]
@@ -43,14 +43,14 @@ namespace osu.Game.Screens.Backgrounds
             skin = skinManager.CurrentSkin.GetBoundCopy();
             mode = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
-            showSeasonalBackgrounds = config.GetBindable<SeasonalBackgrounds>(OsuSetting.SeasonalBackgrounds);
+            seasonalBackgroundMode = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode);
 
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
             mode.ValueChanged += _ => Next();
             beatmap.ValueChanged += _ => Next();
             introSequence.ValueChanged += _ => Next();
-            showSeasonalBackgrounds.ValueChanged += _ => Next();
+            seasonalBackgroundMode.ValueChanged += _ => Next();
 
             currentDisplay = RNG.Next(0, background_count);
 
@@ -106,14 +106,14 @@ namespace osu.Game.Screens.Backgrounds
             else
                 newBackground = new Background(backgroundName);
 
-            switch (showSeasonalBackgrounds.Value)
+            switch (seasonalBackgroundMode.Value)
             {
-                case SeasonalBackgrounds.Sometimes:
+                case SeasonalBackgroundMode.Sometimes:
                     if (seasonalBackgroundLoader.IsInSeason())
-                        goto case SeasonalBackgrounds.Always;
+                        goto case SeasonalBackgroundMode.Always;
                     break;
 
-                case SeasonalBackgrounds.Always:
+                case SeasonalBackgroundMode.Always:
                     newBackground = seasonalBackgroundLoader.LoadBackground() ?? newBackground;
                     break;
             }
