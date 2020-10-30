@@ -67,6 +67,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
+            new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -187,5 +188,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Timing Mode")]
         EditorTimingMode,
+
+        [Description("Hold for HUD")]
+        HoldForHUD,
     }
 }
