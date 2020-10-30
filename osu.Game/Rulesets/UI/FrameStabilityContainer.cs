@@ -85,29 +85,28 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            double aimTime = manualClock.CurrentTime;
+            if (parentGameplayClock == null)
+                setClock(); // LoadComplete may not be run yet, but we still want the clock.
+
+            double aimTime = parentGameplayClock.CurrentTime;
 
             if (frameStableClock.WaitingOnFrames.Value)
             {
-                // when waiting on frames, the update loop still needs to be run (at least once) to check for newly arrived frames.
-                // time should not be sourced from the parent clock in this case.
-                state = PlaybackState.Valid;
+                // waiting on frames is a special case where we want to avoid doing any update propagation, unless new frame data has arrived.
+                state = ReplayInputHandler.SetFrameFromTime(aimTime) != null ? PlaybackState.Valid : PlaybackState.NotValid;
             }
             else if (!frameStableClock.IsPaused.Value)
             {
                 state = PlaybackState.Valid;
-
-                if (parentGameplayClock == null)
-                    setClock(); // LoadComplete may not be run yet, but we still want the clock.
-
-                aimTime = parentGameplayClock.CurrentTime;
             }
             else
             {
-                // time should not advance while paused, not should anything run.
+                // time should not advance while paused, nor should anything run.
                 state = PlaybackState.NotValid;
-                return true;
             }
+
+            if (state == PlaybackState.NotValid)
+                return true;
 
             int loops = MaxCatchUpFrames;
 
