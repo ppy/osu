@@ -79,16 +79,12 @@ namespace osu.Game.Screens.Backgrounds
             Background newBackground;
             string backgroundName;
 
-            if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Always
-                || (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && seasonalBackgroundLoader.IsInSeason))
-            {
-                var seasonalBackground = seasonalBackgroundLoader.LoadBackground();
+            var seasonalBackground = seasonalBackgroundLoader.LoadNextBackground();
 
-                if (seasonalBackground != null)
-                {
-                    seasonalBackground.Depth = currentDisplay;
-                    return seasonalBackground;
-                }
+            if (seasonalBackground != null)
+            {
+                seasonalBackground.Depth = currentDisplay;
+                return seasonalBackground;
             }
 
             switch (introSequence.Value)
