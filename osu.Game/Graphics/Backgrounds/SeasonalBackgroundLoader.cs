@@ -18,6 +18,12 @@ namespace osu.Game.Graphics.Backgrounds
     [LongRunningLoad]
     public class SeasonalBackgroundLoader : Component
     {
+        /// <summary>
+        /// Fired when background change should be changed due to receiving backgrounds from API
+        /// or when the user setting is changed (as it might require unloading the seasonal background).
+        /// </summary>
+        public event Action SeasonalBackgroundChanged;
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -31,7 +37,10 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(OsuConfigManager config, SessionStatics sessionStatics)
         {
             seasonalBackgroundMode = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode);
+            seasonalBackgroundMode.BindValueChanged(_ => SeasonalBackgroundChanged?.Invoke());
+
             seasonalBackgrounds = sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds);
+            seasonalBackgrounds.BindValueChanged(_ => SeasonalBackgroundChanged?.Invoke());
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(fetchSeasonalBackgrounds, true);
