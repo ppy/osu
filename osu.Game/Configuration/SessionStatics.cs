@@ -14,7 +14,7 @@ namespace osu.Game.Configuration
         {
             Set(Static.LoginOverlayDisplayed, false);
             Set(Static.MutedAudioNotificationShownOnce, false);
-            Set<APISeasonalBackgrounds>(Static.SeasonalBackgroundsResponse, null);
+            Set<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
         }
     }
 
@@ -22,6 +22,6 @@ namespace osu.Game.Configuration
     {
         LoginOverlayDisplayed,
         MutedAudioNotificationShownOnce,
-        SeasonalBackgroundsResponse,
+        SeasonalBackgrounds,
     }
 }
