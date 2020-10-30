@@ -77,7 +77,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             createNew();
 
-            HUDVisibilityMode originalConfigValue = HUDVisibilityMode.HideDuringBreaks;
+            HUDVisibilityMode originalConfigValue = HUDVisibilityMode.HideDuringGameplay;
+
             AddStep("get original config value", () => originalConfigValue = config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
 
             AddStep("set hud to never show", () => config.Set(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
