@@ -277,9 +277,25 @@ namespace osu.Game.Screens.Play
                 switch (e.Key)
                 {
                     case Key.Tab:
-                        configVisibilityMode.Value = configVisibilityMode.Value != HUDVisibilityMode.Never
-                            ? HUDVisibilityMode.Never
-                            : HUDVisibilityMode.HideDuringGameplay;
+                        switch (configVisibilityMode.Value)
+                        {
+                            case HUDVisibilityMode.Never:
+                                configVisibilityMode.Value = HUDVisibilityMode.HideDuringGameplay;
+                                break;
+
+                            case HUDVisibilityMode.HideDuringGameplay:
+                                configVisibilityMode.Value = HUDVisibilityMode.HideDuringBreaks;
+                                break;
+
+                            case HUDVisibilityMode.HideDuringBreaks:
+                                configVisibilityMode.Value = HUDVisibilityMode.Always;
+                                break;
+
+                            case HUDVisibilityMode.Always:
+                                configVisibilityMode.Value = HUDVisibilityMode.Never;
+                                break;
+                        }
+
                         return true;
                 }
             }
