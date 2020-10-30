@@ -40,11 +40,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
                     Items = Enum.GetValues(typeof(BackgroundSource)).Cast<BackgroundSource>()
                 },
-                new SettingsDropdown<SeasonalBackgrounds>
+                new SettingsDropdown<SeasonalBackgroundMode>
                 {
                     LabelText = "Seasonal backgrounds",
-                    Current = config.GetBindable<SeasonalBackgrounds>(OsuSetting.SeasonalBackgrounds),
-                    Items = Enum.GetValues(typeof(SeasonalBackgrounds)).Cast<SeasonalBackgrounds>()
+                    Current = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode),
+                    Items = Enum.GetValues(typeof(SeasonalBackgroundMode)).Cast<SeasonalBackgroundMode>()
                 }
             };
         }
