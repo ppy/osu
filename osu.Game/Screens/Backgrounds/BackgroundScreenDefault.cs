@@ -79,6 +79,18 @@ namespace osu.Game.Screens.Backgrounds
             Background newBackground;
             string backgroundName;
 
+            if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Always
+                || seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && seasonalBackgroundLoader.IsInSeason)
+            {
+                var seasonalBackground = seasonalBackgroundLoader.LoadBackground();
+
+                if (seasonalBackground != null)
+                {
+                    seasonalBackground.Depth = currentDisplay;
+                    return seasonalBackground;
+                }
+            }
+
             switch (introSequence.Value)
             {
                 case IntroSequence.Welcome:
@@ -105,12 +117,6 @@ namespace osu.Game.Screens.Backgrounds
             }
             else
                 newBackground = new Background(backgroundName);
-
-            if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Always
-                || seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && seasonalBackgroundLoader.IsInSeason)
-            {
-                newBackground = seasonalBackgroundLoader.LoadBackground() ?? newBackground;
-            }
 
             newBackground.Depth = currentDisplay;
 
