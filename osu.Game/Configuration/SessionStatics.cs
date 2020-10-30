@@ -22,6 +22,11 @@ namespace osu.Game.Configuration
     {
         LoginOverlayDisplayed,
         MutedAudioNotificationShownOnce,
+
+        /// <summary>
+        /// Info about seasonal backgrounds available fetched from API - see <see cref="APISeasonalBackgrounds"/>.
+        /// Value under this lookup can be <c>null</c> if there are no backgrounds available (or API is not reachable).
+        /// </summary>
         SeasonalBackgrounds,
     }
 }
