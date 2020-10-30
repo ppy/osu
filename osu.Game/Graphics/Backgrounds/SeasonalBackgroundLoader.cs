@@ -18,17 +18,29 @@ namespace osu.Game.Graphics.Backgrounds
     [LongRunningLoad]
     public class SeasonalBackgroundLoader : Component
     {
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private Bindable<SeasonalBackgroundMode> seasonalBackgroundMode;
         private Bindable<APISeasonalBackgrounds> seasonalBackgrounds;
+
         private int current;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, SessionStatics sessionStatics, IAPIProvider api)
+        private void load(OsuConfigManager config, SessionStatics sessionStatics)
         {
             seasonalBackgroundMode = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode);
             seasonalBackgrounds = sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds);
 
-            if (seasonalBackgrounds.Value != null) return;
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(fetchSeasonalBackgrounds, true);
+        }
+
+        private void fetchSeasonalBackgrounds(ValueChangedEvent<APIState> stateChanged)
+        {
+            if (seasonalBackgrounds.Value != null || stateChanged.NewValue != APIState.Online)
+                return;
 
             var request = new GetSeasonalBackgroundsRequest();
             request.Success += response =>
@@ -48,7 +60,7 @@ namespace osu.Game.Graphics.Backgrounds
                 return null;
             }
 
-            var backgrounds = seasonalBackgrounds.Value.Backgrounds;
+            var backgrounds = seasonalBackgrounds.Value?.Backgrounds;
             if (backgrounds == null || !backgrounds.Any())
                 return null;
 
