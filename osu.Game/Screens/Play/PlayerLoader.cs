@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Play
 
         private bool backgroundBrightnessReduction;
 
+        private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
+
         protected bool BackgroundBrightnessReduction
         {
             set
@@ -169,6 +171,7 @@ namespace osu.Game.Screens.Play
 
             if (epilepsyWarning != null)
                 epilepsyWarning.DimmableBackground = Background;
+            Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             content.ScaleTo(0.7f);
             Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
@@ -197,6 +200,11 @@ namespace osu.Game.Screens.Play
             cancelLoad();
 
             BackgroundBrightnessReduction = false;
+
+            // we're moving to player, so a period of silence is upcoming.
+            // stop the track before removing adjustment to avoid a volume spike.
+            Beatmap.Value.Track.Stop();
+            Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
         }
 
         public override bool OnExiting(IScreen next)
@@ -208,6 +216,7 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = false;
             BackgroundBrightnessReduction = false;
+            Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             return base.OnExiting(next);
         }
@@ -331,18 +340,16 @@ namespace osu.Game.Screens.Play
                     {
                         const double epilepsy_display_length = 3000;
 
-                        pushSequence.Schedule(() =>
-                        {
-                            epilepsyWarning.State.Value = Visibility.Visible;
-
-                            this.Delay(epilepsy_display_length).Schedule(() =>
+                        pushSequence
+                            .Schedule(() => epilepsyWarning.State.Value = Visibility.Visible)
+                            .TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint)
+                            .Delay(epilepsy_display_length)
+                            .Schedule(() =>
                             {
                                 epilepsyWarning.Hide();
                                 epilepsyWarning.Expire();
-                            });
-                        });
-
-                        pushSequence.Delay(epilepsy_display_length);
+                            })
+                            .Delay(EpilepsyWarning.FADE_DURATION);
                     }
 
                     pushSequence.Schedule(() =>
