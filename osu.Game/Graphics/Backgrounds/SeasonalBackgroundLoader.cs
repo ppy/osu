@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,25 +18,21 @@ namespace osu.Game.Graphics.Backgrounds
     [LongRunningLoad]
     public class SeasonalBackgroundLoader : Component
     {
-        private Bindable<DateTimeOffset> endDate;
-        private Bindable<List<APISeasonalBackground>> backgrounds;
+        private Bindable<APISeasonalBackgrounds> cachedResponse;
         private int current;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics sessionStatics, IAPIProvider api)
         {
-            endDate = sessionStatics.GetBindable<DateTimeOffset>(Static.SeasonEndDate);
-            backgrounds = sessionStatics.GetBindable<List<APISeasonalBackground>>(Static.SeasonalBackgrounds);
+            cachedResponse = sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgroundsResponse);
 
-            if (backgrounds.Value.Any()) return;
+            if (cachedResponse.Value != null) return;
 
             var request = new GetSeasonalBackgroundsRequest();
             request.Success += response =>
             {
-                endDate.Value = response.EndDate;
-                backgrounds.Value = response.Backgrounds ?? backgrounds.Value;
-
-                current = RNG.Next(0, backgrounds.Value.Count);
+                cachedResponse.Value = response;
+                current = RNG.Next(0, cachedResponse.Value.Backgrounds.Count);
             };
 
             api.PerformAsync(request);
@@ -45,15 +40,16 @@ namespace osu.Game.Graphics.Backgrounds
 
         public SeasonalBackground LoadBackground()
         {
-            if (!backgrounds.Value.Any()) return null;
+            var backgrounds = cachedResponse.Value.Backgrounds;
+            if (!backgrounds.Any()) return null;
 
-            current = (current + 1) % backgrounds.Value.Count;
-            string url = backgrounds.Value[current].Url;
+            current = (current + 1) % backgrounds.Count;
+            string url = backgrounds[current].Url;
 
             return new SeasonalBackground(url);
         }
 
-        public bool IsInSeason => DateTimeOffset.Now < endDate.Value;
+        public bool IsInSeason => DateTimeOffset.Now < cachedResponse.Value.EndDate;
     }
 
     [LongRunningLoad]
