@@ -18,20 +18,20 @@ namespace osu.Game.Graphics.Backgrounds
     [LongRunningLoad]
     public class SeasonalBackgroundLoader : Component
     {
-        private Bindable<APISeasonalBackgrounds> cachedResponse;
+        private Bindable<APISeasonalBackgrounds> seasonalBackgrounds;
         private int current;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics sessionStatics, IAPIProvider api)
         {
-            cachedResponse = sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgroundsResponse);
+            seasonalBackgrounds = sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds);
 
-            if (cachedResponse.Value != null) return;
+            if (seasonalBackgrounds.Value != null) return;
 
             var request = new GetSeasonalBackgroundsRequest();
             request.Success += response =>
             {
-                cachedResponse.Value = response;
+                seasonalBackgrounds.Value = response;
                 current = RNG.Next(0, response.Backgrounds?.Count ?? 0);
             };
 
@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         public SeasonalBackground LoadBackground()
         {
-            var backgrounds = cachedResponse.Value.Backgrounds;
+            var backgrounds = seasonalBackgrounds.Value.Backgrounds;
             if (backgrounds == null || !backgrounds.Any()) return null;
 
             current = (current + 1) % backgrounds.Count;
@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.Backgrounds
             return new SeasonalBackground(url);
         }
 
-        public bool IsInSeason => cachedResponse.Value != null && DateTimeOffset.Now < cachedResponse.Value.EndDate;
+        public bool IsInSeason => seasonalBackgrounds.Value != null && DateTimeOffset.Now < seasonalBackgrounds.Value.EndDate;
     }
 
     [LongRunningLoad]
