@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Backgrounds
             switch (showSeasonalBackgrounds.Value)
             {
                 case SeasonalBackgrounds.Sometimes:
-                    if (RNG.NextBool())
+                    if (seasonalBackgroundLoader.IsInSeason())
                         goto case SeasonalBackgrounds.Always;
                     break;
 
