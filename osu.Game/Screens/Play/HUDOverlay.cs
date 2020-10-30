@@ -223,11 +223,6 @@ namespace osu.Game.Screens.Play
                     ShowHud.Value = false;
                     break;
 
-                case HUDVisibilityMode.HideDuringBreaks:
-                    // always show during replay as we want the seek bar to be visible.
-                    ShowHud.Value = replayLoaded.Value || !IsBreakTime.Value;
-                    break;
-
                 case HUDVisibilityMode.HideDuringGameplay:
                     // always show during replay as we want the seek bar to be visible.
                     ShowHud.Value = replayLoaded.Value || IsBreakTime.Value;
@@ -284,10 +279,6 @@ namespace osu.Game.Screens.Play
                                 break;
 
                             case HUDVisibilityMode.HideDuringGameplay:
-                                configVisibilityMode.Value = HUDVisibilityMode.HideDuringBreaks;
-                                break;
-
-                            case HUDVisibilityMode.HideDuringBreaks:
                                 configVisibilityMode.Value = HUDVisibilityMode.Always;
                                 break;
 
