@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Backgrounds
             string backgroundName;
 
             if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Always
-                || seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && seasonalBackgroundLoader.IsInSeason)
+                || (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && seasonalBackgroundLoader.IsInSeason))
             {
                 var seasonalBackground = seasonalBackgroundLoader.LoadBackground();
 
