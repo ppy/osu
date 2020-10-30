@@ -8,8 +8,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -22,7 +24,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class HUDOverlay : Container
+    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_DURATION = 400;
 
@@ -66,6 +68,8 @@ namespace osu.Game.Screens.Play
         private readonly FillFlowContainer topRightElements;
 
         internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+
+        private bool holdingForHUD;
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
@@ -217,6 +221,12 @@ namespace osu.Game.Screens.Play
             if (ShowHud.Disabled)
                 return;
 
+            if (holdingForHUD)
+            {
+                ShowHud.Value = true;
+                return;
+            }
+
             switch (configVisibilityMode.Value)
             {
                 case HUDVisibilityMode.Never:
@@ -357,6 +367,30 @@ namespace osu.Game.Screens.Play
         {
             HealthDisplay?.BindHealthProcessor(processor);
             FailingLayer?.BindHealthProcessor(processor);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.HoldForHUD:
+                    holdingForHUD = true;
+                    updateVisibility();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.HoldForHUD:
+                    holdingForHUD = false;
+                    updateVisibility();
+                    break;
+            }
         }
     }
 }
