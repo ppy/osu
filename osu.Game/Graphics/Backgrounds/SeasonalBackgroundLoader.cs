@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Backgrounds
     public class SeasonalBackgroundLoader : Component
     {
         /// <summary>
-        /// Fired when background change should be changed due to receiving backgrounds from API
+        /// Fired when background should be changed due to receiving backgrounds from API
         /// or when the user setting is changed (as it might require unloading the seasonal background).
         /// </summary>
         public event Action SeasonalBackgroundChanged;
