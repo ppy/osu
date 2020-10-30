@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
                 objects.Add(new Note { StartTime = time });
 
+                // don't hit the first note
                 if (i > 0)
                 {
                     frames.Add(new ManiaReplayFrame(time + 10, ManiaAction.Key1));
