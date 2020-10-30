@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -52,7 +53,8 @@ namespace osu.Game.Screens.Backgrounds
 
             currentDisplay = RNG.Next(0, background_count);
 
-            LoadComponentAsync(seasonalBackgroundLoader, _ => LoadComponentAsync(createBackground(), display));
+            LoadComponentAsync(seasonalBackgroundLoader);
+            Next();
         }
 
         private void display(Background newBackground)
@@ -65,11 +67,14 @@ namespace osu.Game.Screens.Backgrounds
         }
 
         private ScheduledDelegate nextTask;
+        private CancellationTokenSource cancellationTokenSource;
 
         public void Next()
         {
             nextTask?.Cancel();
-            nextTask = Scheduler.AddDelayed(() => { LoadComponentAsync(createBackground(), display); }, 100);
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+            nextTask = Scheduler.AddDelayed(() => LoadComponentAsync(createBackground(), display, cancellationTokenSource.Token), 100);
         }
 
         private Background createBackground()

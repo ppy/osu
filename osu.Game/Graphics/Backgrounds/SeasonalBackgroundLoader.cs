@@ -97,6 +97,8 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(LargeTextureStore textures)
         {
             Sprite.Texture = textures.Get(url) ?? textures.Get(fallback_texture_name);
+            // ensure we're not loading in without a transition.
+            this.FadeInFromZero(200, Easing.InOutSine);
         }
     }
 }
