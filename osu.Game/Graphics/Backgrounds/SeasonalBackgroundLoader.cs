@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.Backgrounds
             request.Success += response =>
             {
                 cachedResponse.Value = response;
-                current = RNG.Next(0, cachedResponse.Value.Backgrounds.Count);
+                current = RNG.Next(0, response.Backgrounds?.Count ?? 0);
             };
 
             api.PerformAsync(request);
@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.Backgrounds
         public SeasonalBackground LoadBackground()
         {
             var backgrounds = cachedResponse.Value.Backgrounds;
-            if (!backgrounds.Any()) return null;
+            if (backgrounds == null || !backgrounds.Any()) return null;
 
             current = (current + 1) % backgrounds.Count;
             string url = backgrounds[current].Url;
