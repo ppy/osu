@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Configuration
@@ -16,8 +14,7 @@ namespace osu.Game.Configuration
         {
             Set(Static.LoginOverlayDisplayed, false);
             Set(Static.MutedAudioNotificationShownOnce, false);
-            Set(Static.SeasonEndDate, DateTimeOffset.MinValue);
-            Set(Static.SeasonalBackgrounds, new List<APISeasonalBackground>());
+            Set<APISeasonalBackgrounds>(Static.SeasonalBackgroundsResponse, null);
         }
     }
 
@@ -25,7 +22,6 @@ namespace osu.Game.Configuration
     {
         LoginOverlayDisplayed,
         MutedAudioNotificationShownOnce,
-        SeasonEndDate,
-        SeasonalBackgrounds,
+        SeasonalBackgroundsResponse,
     }
 }
