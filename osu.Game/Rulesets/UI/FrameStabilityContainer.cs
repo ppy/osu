@@ -144,21 +144,21 @@ namespace osu.Game.Rulesets.UI
                     state = PlaybackState.NotValid;
             }
 
-            if (proposedTime != manualClock.CurrentTime)
+            if (state == PlaybackState.Valid)
                 direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
+
+            double timeBehind = Math.Abs(proposedTime - parentGameplayClock.CurrentTime);
+
+            frameStableClock.IsCatchingUp.Value = timeBehind > 200;
+            frameStableClock.WaitingOnFrames.Value = state == PlaybackState.NotValid;
 
             manualClock.CurrentTime = proposedTime;
             manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
             manualClock.IsRunning = parentGameplayClock.IsRunning;
 
-            double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
-
             // determine whether catch-up is required.
             if (state == PlaybackState.Valid && timeBehind > 0)
                 state = PlaybackState.RequiresCatchUp;
-
-            frameStableClock.IsCatchingUp.Value = timeBehind > 200;
-            frameStableClock.WaitingOnFrames.Value = state == PlaybackState.NotValid;
 
             // The manual clock time has changed in the above code. The framed clock now needs to be updated
             // to ensure that the its time is valid for our children before input is processed
