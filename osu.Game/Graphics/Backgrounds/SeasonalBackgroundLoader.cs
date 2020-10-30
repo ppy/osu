@@ -18,12 +18,14 @@ namespace osu.Game.Graphics.Backgrounds
     [LongRunningLoad]
     public class SeasonalBackgroundLoader : Component
     {
+        private Bindable<SeasonalBackgroundMode> seasonalBackgroundMode;
         private Bindable<APISeasonalBackgrounds> seasonalBackgrounds;
         private int current;
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, IAPIProvider api)
+        private void load(OsuConfigManager config, SessionStatics sessionStatics, IAPIProvider api)
         {
+            seasonalBackgroundMode = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode);
             seasonalBackgrounds = sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds);
 
             if (seasonalBackgrounds.Value != null) return;
@@ -38,10 +40,17 @@ namespace osu.Game.Graphics.Backgrounds
             api.PerformAsync(request);
         }
 
-        public SeasonalBackground LoadBackground()
+        public SeasonalBackground LoadNextBackground()
         {
+            if (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Never
+                || (seasonalBackgroundMode.Value == SeasonalBackgroundMode.Sometimes && !isInSeason))
+            {
+                return null;
+            }
+
             var backgrounds = seasonalBackgrounds.Value.Backgrounds;
-            if (backgrounds == null || !backgrounds.Any()) return null;
+            if (backgrounds == null || !backgrounds.Any())
+                return null;
 
             current = (current + 1) % backgrounds.Count;
             string url = backgrounds[current].Url;
@@ -49,7 +58,7 @@ namespace osu.Game.Graphics.Backgrounds
             return new SeasonalBackground(url);
         }
 
-        public bool IsInSeason => seasonalBackgrounds.Value != null && DateTimeOffset.Now < seasonalBackgrounds.Value.EndDate;
+        private bool isInSeason => seasonalBackgrounds.Value != null && DateTimeOffset.Now < seasonalBackgrounds.Value.EndDate;
     }
 
     [LongRunningLoad]
