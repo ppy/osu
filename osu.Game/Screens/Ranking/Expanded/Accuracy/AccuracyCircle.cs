@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private Container<RankBadge> badges;
         private RankText rankText;
 
-        public AccuracyCircle(ScoreInfo score, bool withFlair)
+        public AccuracyCircle(ScoreInfo score)
         {
             this.score = score;
         }
