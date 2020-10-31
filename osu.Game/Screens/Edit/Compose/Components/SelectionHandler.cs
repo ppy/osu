@@ -256,11 +256,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
 
-            if (count > 0)
-                Show();
-            else
-                Hide();
-
+            this.FadeTo(count > 0 ? 1 : 0);
             OnSelectionChanged();
         }
 
