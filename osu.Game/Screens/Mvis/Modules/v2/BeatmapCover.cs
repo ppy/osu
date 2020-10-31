@@ -2,11 +2,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Mvis.UI.Objects;
 using System.Threading;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Game.Screens.Mvis.UI.Objects;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
@@ -14,9 +16,13 @@ namespace osu.Game.Screens.Mvis.Modules.v2
     {
         private WorkingBeatmap b;
 
-        private BeatmapBackground cover;
+        private Drawable cover;
 
         private CancellationTokenSource ChangeCoverTask;
+
+        public bool BackgroundBox = true;
+
+        public bool UseBufferedBackground = false;
 
         public BeatmapCover(WorkingBeatmap beatmap)
         {
@@ -28,12 +34,13 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(new Box
-            {
-                Depth = float.MaxValue,
-                RelativeSizeAxes = Axes.Both,
-                Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),   
-            });
+            if ( BackgroundBox )
+                AddInternal(new Box
+                {
+                    Depth = float.MaxValue,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),   
+                });
         }
 
         protected override void LoadComplete()
@@ -45,27 +52,74 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public void updateBackground(WorkingBeatmap beatmap)
         {
             ChangeCoverTask?.Cancel();
+            ChangeCoverTask = new CancellationTokenSource();
 
-            if ( beatmap == null) cover?.FadeOut(300);
-
-            LoadComponentAsync(new BeatmapBackground(beatmap)
+            if ( beatmap == null)
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Alpha = 0,
-            }, newCover =>
+                 cover?.FadeOut(300);
+                 return;
+            }
+
+            if ( !UseBufferedBackground )
+                LoadComponentAsync(new DelayedLoadUnloadWrapper( () =>
+                {
+                    var c = new Cover(beatmap)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 0
+                    };
+
+                    c.OnLoadComplete += d => d.FadeIn(300);
+
+                    return c;
+                }), newCover =>
+                {
+                    var oldCover = cover ?? null;
+                    oldCover?.FadeOut(300);
+                    oldCover?.Expire();
+
+                    cover = newCover;
+                    Add(cover);
+
+                    oldCover = null;
+                }, ChangeCoverTask.Token);
+            else
+                LoadComponentAsync(new BeatmapBackground(beatmap)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Alpha = 0,
+                }, newCover =>
+                {
+                    var oldCover = cover ?? null;
+                    oldCover?.FadeOut(300);
+                    oldCover?.Expire();
+
+                    cover = newCover;
+                    Add(cover);
+
+                    Schedule(() => cover?.FadeIn(300));
+                    oldCover = null;
+                }, ChangeCoverTask.Token);
+        }
+
+        private class Cover : Sprite
+        {
+            private WorkingBeatmap b;
+            public Cover(WorkingBeatmap beatmap = null)
             {
-                var oldCover = cover ?? null;
-                oldCover?.FadeOut(300);
-                oldCover?.Expire();
+                RelativeSizeAxes = Axes.Both;
+                FillMode = FillMode.Fill;
 
-                cover = newCover;
-                Add(cover);
+                b = beatmap;
+            }
 
-                Schedule(() => cover?.FadeIn(300));
-                oldCover = null;
-            },
-            (ChangeCoverTask = new CancellationTokenSource()).Token);
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                Texture = b?.Background ?? null;
+            }
         }
     }
 }

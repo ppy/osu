@@ -30,9 +30,10 @@ namespace osu.Game.Screens.Mvis.Modules
         private int currentPosition = 0;
         private int maxCount = 0;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             RefreshBeatmapList();
         }
 

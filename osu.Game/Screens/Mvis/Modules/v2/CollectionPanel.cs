@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class CollectionPanel : Container
+    public class CollectionPanel : OsuClickableContainer
     {
         ///<summary>
         ///判断该panel所显示的BeatmapCollection
@@ -64,7 +64,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            SortBeatmapCollection();
+
+            WorkingBeatmap targetBeatmap;
+            targetBeatmap = beatmapSets.Count > 0 ? beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()) : null;
+
+            AddRangeInternal(new Drawable[]
             {
                 new Box
                 {
@@ -73,6 +78,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         Color4Extensions.FromHex("#111").Opacity(0),
                         Color4Extensions.FromHex("#111")
                     ),
+                },
+                new BeatmapCover(targetBeatmap)
+                {
+                    Depth = float.MaxValue,
+                    BackgroundBox = false
                 },
                 new Box
                 {
@@ -93,8 +103,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             Name = "标题容器",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
                                 new CircularContainer
@@ -138,34 +146,22 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             Name = "谱面图标容器",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Width = 0.98f,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            ScrollbarVisible = false,
                             Child = new BeatmapThumbnailFlow(beatmapSets)
                         }
                     }
                 }
-            };
+            });
 
             thumbnailScroll.ScrollContent.RelativeSizeAxes = Axes.None;
             thumbnailScroll.ScrollContent.AutoSizeAxes = Axes.Both;
 
-            SortBeatmapCollection();
-
             if (beatmapSets.Count > 0)
-            {
-                Add(new BeatmapCover(beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()))
-                {
-                    Depth = float.MaxValue
-                });
                 state.Value = ActiveState.Idle;
-            }
             else
                 state.Value = ActiveState.Disabled;
 
             collectionName.Text = collection.Name.Value;
-            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲, {collection.Beatmaps.Count}个谱面";
+            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
             state.BindValueChanged(OnStateChanged, true);
         }
@@ -292,21 +288,53 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             private void AddBeatmapThumbnails()
             {
+                short collections = 0;
+                short limit = 32767;
+
+                if (beatmapSetList.Count > 10)
+                    limit = 15;
+
                 foreach (var c in beatmapSetList)
                 {
+                    collections++;
+
                     var b = beatmaps.GetWorkingBeatmap(c.Beatmaps.First());
                     string tooltip = $"{b.Metadata.ArtistUnicode ?? b.Metadata.Artist}"
                                    + " - "
                                    + $"{b.Metadata.TitleUnicode ?? b.Metadata.Title}";
 
-                    Add(new TooltipContainer
+                    if (collections <= limit)
                     {
-                        Size = new Vector2(40),
-                        Masking = true,
-                        CornerRadius = 7.25f,
-                        TooltipText = tooltip,
-                        Child = new BeatmapCover(b)
+                        Add(new TooltipContainer
+                        {
+                            Size = new Vector2(40),
+                            Masking = true,
+                            CornerRadius = 7.25f,
+                            TooltipText = tooltip,
+                            Child = new BeatmapCover(b)
+                        });
+                        continue;
+                    }
+
+                    TooltipContainer t = this.Children.Last() as TooltipContainer;
+                    int remaining = beatmapSetList.Count - limit;
+
+                    t.TooltipText+=$" 等{remaining}首歌曲";
+                    t.AddRange(new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Colour4.Black.Opacity(0.7f),
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = $"+{remaining}",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
                     });
+                    break;
                 };
             }
         }
@@ -321,6 +349,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             public ThumbnailScrollContainer(Direction scrollDirection)
                 : base(scrollDirection)
             {
+                ScrollbarVisible = false;
+                Scrollbar.Width = 0;
             }
         }
     }

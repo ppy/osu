@@ -13,9 +13,6 @@ namespace osu.Game.Configuration
         [Description("在非游玩时段显示")]
         HideDuringGameplay,
 
-        [Description("在非休息时段显示")]
-        HideDuringBreaks,
-
         [Description("总是显示")]
         Always
     }

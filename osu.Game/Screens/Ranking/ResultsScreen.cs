@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Ranking
             };
 
             if (Score != null)
-                ScorePanelList.AddScore(Score);
+                ScorePanelList.AddScore(Score, true);
 
             if (player != null && allowRetry)
             {

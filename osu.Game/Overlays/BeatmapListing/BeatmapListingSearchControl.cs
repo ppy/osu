@@ -13,6 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -27,6 +28,12 @@ namespace osu.Game.Overlays.BeatmapListing
         public Bindable<SearchGenre> Genre => genreFilter.Current;
 
         public Bindable<SearchLanguage> Language => languageFilter.Current;
+
+        public BindableList<SearchExtra> Extra => extraFilter.Current;
+
+        public BindableList<ScoreRank> Ranks => ranksFilter.Current;
+
+        public Bindable<SearchPlayed> Played => playedFilter.Current;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -48,6 +55,9 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
         private readonly BeatmapSearchFilterRow<SearchLanguage> languageFilter;
+        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchExtra> extraFilter;
+        private readonly BeatmapSearchScoreFilterRow ranksFilter;
+        private readonly BeatmapSearchFilterRow<SearchPlayed> playedFilter;
 
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
@@ -105,6 +115,9 @@ namespace osu.Game.Overlays.BeatmapListing
                                     categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(@"分类"),
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"流派"),
                                     languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"语言"),
+                                    extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(@"其他"),
+                                    ranksFilter = new BeatmapSearchScoreFilterRow(),
+                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"玩过")
                                 }
                             }
                         }

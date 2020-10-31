@@ -47,7 +47,7 @@ namespace osu.Game.Collections
             if (collectionManager != null)
                 collections.BindTo(collectionManager.Collections);
 
-            collections.CollectionChanged += (_, __) => collectionsChanged();
+            collections.CollectionChanged += (_, __) => Schedule( () => collectionsChanged() );
             collectionsChanged();
         }
 

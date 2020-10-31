@@ -131,6 +131,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
+            Set(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
         }
 
         public OsuConfigManager(Storage storage)
@@ -169,8 +170,9 @@ namespace osu.Game.Configuration
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
-            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "游戏内鼠标按键", v ? "已关闭" : "已开启")),
-            new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "屏幕缩放", m.GetDescription())),
+            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "游戏内鼠标按键", v ? "已禁用" : "已启用")),
+            new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD可见度", m.GetDescription())),
+            new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "缩放", m.GetDescription())),
         };
     }
 
@@ -239,5 +241,6 @@ namespace osu.Game.Configuration
         HitLighting,
         MenuBackgroundSource,
         GameplayDisableWinKey,
+        SeasonalBackgroundMode
     }
 }

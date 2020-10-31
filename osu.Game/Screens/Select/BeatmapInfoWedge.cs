@@ -39,6 +39,11 @@ namespace osu.Game.Screens.Select
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
+        [Resolved]
+        private BeatmapDifficultyManager difficultyManager { get; set; }
+
+        private IBindable<StarDifficulty> beatmapDifficulty;
+
         protected BufferedWedgeInfo Info;
 
         public BeatmapInfoWedge()
@@ -88,6 +93,11 @@ namespace osu.Game.Screens.Select
                 if (beatmap == value) return;
 
                 beatmap = value;
+
+                beatmapDifficulty?.UnbindAll();
+                beatmapDifficulty = difficultyManager.GetBindableDifficulty(beatmap.BeatmapInfo);
+                beatmapDifficulty.BindValueChanged(_ => updateDisplay());
+
                 updateDisplay();
             }
         }
@@ -113,7 +123,7 @@ namespace osu.Game.Screens.Select
                 return;
             }
 
-            LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value)
+            LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, beatmapDifficulty.Value)
             {
                 Shear = -Shear,
                 Depth = Info?.Depth + 1 ?? 0
@@ -141,12 +151,14 @@ namespace osu.Game.Screens.Select
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
+            private readonly StarDifficulty starDifficulty;
 
-            public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset)
+            public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset, StarDifficulty difficulty)
                 : base(pixelSnapping: true)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
+                starDifficulty = difficulty;
             }
 
             [BackgroundDependencyLoader]
@@ -190,7 +202,7 @@ namespace osu.Game.Screens.Select
                             },
                         },
                     },
-                    new DifficultyColourBar(beatmapInfo)
+                    new DifficultyColourBar(starDifficulty)
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 20,
@@ -226,7 +238,7 @@ namespace osu.Game.Screens.Select
                         Shear = wedged_container_shear,
                         Children = new[]
                         {
-                            createStarRatingDisplay(beatmapInfo).With(display =>
+                            createStarRatingDisplay(starDifficulty).With(display =>
                             {
                                 display.Anchor = Anchor.TopRight;
                                 display.Origin = Anchor.TopRight;
@@ -293,8 +305,8 @@ namespace osu.Game.Screens.Select
                     StatusPill.Hide();
             }
 
-            private static Drawable createStarRatingDisplay(BeatmapInfo beatmapInfo) => beatmapInfo.StarDifficulty > 0
-                ? new StarRatingDisplay(beatmapInfo)
+            private static Drawable createStarRatingDisplay(StarDifficulty difficulty) => difficulty.Stars > 0
+                ? new StarRatingDisplay(difficulty)
                 {
                     Margin = new MarginPadding { Bottom = 5 }
                 }
@@ -447,11 +459,11 @@ namespace osu.Game.Screens.Select
 
             private class DifficultyColourBar : Container
             {
-                private readonly BeatmapInfo beatmap;
+                private readonly StarDifficulty difficulty;
 
-                public DifficultyColourBar(BeatmapInfo beatmap)
+                public DifficultyColourBar(StarDifficulty difficulty)
                 {
-                    this.beatmap = beatmap;
+                    this.difficulty = difficulty;
                 }
 
                 [BackgroundDependencyLoader]
@@ -459,7 +471,7 @@ namespace osu.Game.Screens.Select
                 {
                     const float full_opacity_ratio = 0.7f;
 
-                    var difficultyColour = colours.ForDifficultyRating(beatmap.DifficultyRating);
+                    var difficultyColour = colours.ForDifficultyRating(difficulty.DifficultyRating);
 
                     Children = new Drawable[]
                     {

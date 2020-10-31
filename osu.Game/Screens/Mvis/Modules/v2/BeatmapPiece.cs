@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -16,7 +18,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class BeatmapPiece : Container
+    public class BeatmapPiece : OsuClickableContainer
     {
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
@@ -28,11 +30,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private MusicController controller { get; set; }
 
         public readonly BindableBool Active = new BindableBool();
+        public bool IsCurrent;
 
         public readonly WorkingBeatmap beatmap;
         private Flash flash;
         private Box maskBox;
-        public bool isCurrent;
+        private Box hover;
 
         public BeatmapPiece(WorkingBeatmap b)
         {
@@ -48,9 +51,17 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
-                new BeatmapCover(beatmap),
+                new Box
+                {
+                    RelativeSizeAxes= Axes.Both,
+                    Colour = Colour4.Gray
+                },
+                new BeatmapCover(beatmap)
+                {
+                    BackgroundBox = false
+                },
                 maskBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -122,8 +133,14 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 flash = new Flash
                 {
                     RelativeSizeAxes = Axes.Both
+                },
+                hover = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Colour4.White.Opacity(0.1f),
+                    Alpha = 0
                 }
-            };
+            });
 
             Active.BindValueChanged(OnActiveChanged, true);
         }
@@ -145,8 +162,18 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if ( beatIndex % 4 == 0 || effectPoint.KiaiMode )
-                    flashBox.FadeOutFromOne(1000);
+                switch(timingPoint.TimeSignature)
+                {
+                    case TimeSignatures.SimpleQuadruple:
+                        if ( beatIndex % 4 == 0 || effectPoint.KiaiMode )
+                            flashBox.FadeOutFromOne(1000);
+                        break;
+
+                    case TimeSignatures.SimpleTriple:
+                        if ( beatIndex % 3 == 0 || effectPoint.KiaiMode )
+                            flashBox.FadeOutFromOne(1000);
+                        break;
+                }
             }
         }
 
@@ -155,7 +182,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             switch (v.NewValue)
             {
                 case true:
-                    if ( isCurrent )
+                    if ( IsCurrent )
                             BorderColour = colourProvider.Highlight1;
                     else
                             BorderColour = Colour4.Gold;
@@ -173,15 +200,29 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         public void MakeActive() => Active.Value = true;
         public void InActive() => Active.Value = false;
+        public void TriggerActiveChange() => Active.TriggerChange();
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (isCurrent && b.Value != beatmap )
+            if (IsCurrent && b.Value != beatmap )
             {
                 b.Value = beatmap;
                 controller.Play();
             }
             return base.OnClick(e);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            hover.FadeIn(250);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+
+            hover.FadeOut(250);
         }
     }
 }
