@@ -182,9 +182,14 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Stop playing the current track and pause at the current position.
         /// </summary>
-        public void Stop()
+        /// <param name="requestedByUser">
+        /// Whether the request to stop was issued by the user rather than internally.
+        /// Specifying <c>true</c> will ensure that other methods like <see cref="EnsurePlayingSomething"/>
+        /// will not resume music playback until the next explicit call to <see cref="Play"/>.
+        /// </param>
+        public void Stop(bool requestedByUser = true)
         {
-            IsUserPaused = true;
+            IsUserPaused |= requestedByUser;
             if (CurrentTrack.IsRunning)
                 CurrentTrack.Stop();
         }
