@@ -120,6 +120,11 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public void Deselect() => State = SelectionState.NotSelected;
 
+        /// <summary>
+        /// Toggles the selection state of this <see cref="OverlaySelectionBlueprint"/>.
+        /// </summary>
+        public void ToggleSelection() => State = IsSelected ? SelectionState.NotSelected : SelectionState.Selected;
+
         public bool IsSelected => State == SelectionState.Selected;
 
         /// <summary>
