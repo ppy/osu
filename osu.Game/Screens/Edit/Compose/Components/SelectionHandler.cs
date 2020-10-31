@@ -201,8 +201,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // there are potentially multiple SelectionHandlers active, but we only want to add hitobjects to the selected list once.
             if (!EditorBeatmap.SelectedHitObjects.Contains(blueprint.HitObject))
                 EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
-
-            UpdateVisibility();
         }
 
         /// <summary>
@@ -214,8 +212,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectedBlueprints.Remove(blueprint);
 
             EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
-
-            UpdateVisibility();
         }
 
         /// <summary>
@@ -254,7 +250,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Updates whether this <see cref="SelectionHandler"/> is visible.
         /// </summary>
-        internal void UpdateVisibility()
+        private void updateVisibility()
         {
             int count = selectedBlueprints.Count;
 
@@ -421,7 +417,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // bring in updates from selection changes
             EditorBeatmap.HitObjectUpdated += _ => UpdateTernaryStates();
-            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) => UpdateTernaryStates();
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) =>
+            {
+                updateVisibility();
+                UpdateTernaryStates();
+            };
         }
 
         /// <summary>
