@@ -226,11 +226,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ShiftPressed && state.Mouse.IsPressed(MouseButton.Right))
-                EditorBeatmap.Remove(blueprint.HitObject);
+                handleQuickDeletion(blueprint);
             else if (state.Keyboard.ControlPressed && state.Mouse.IsPressed(MouseButton.Left))
                 blueprint.ToggleSelection();
             else
                 ensureSelected(blueprint);
+        }
+
+        private void handleQuickDeletion(SelectionBlueprint blueprint)
+        {
+            if (!blueprint.IsSelected)
+                EditorBeatmap.Remove(blueprint.HitObject);
+            else
+                deleteSelected();
         }
 
         private void ensureSelected(SelectionBlueprint blueprint)
