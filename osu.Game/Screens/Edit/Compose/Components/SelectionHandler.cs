@@ -414,7 +414,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             EditorBeatmap.HitObjectUpdated += _ => UpdateTernaryStates();
             EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) =>
             {
-                updateVisibility();
+                Scheduler.AddOnce(updateVisibility);
                 UpdateTernaryStates();
             };
         }
