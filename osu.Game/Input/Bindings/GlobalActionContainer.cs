@@ -80,6 +80,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
+            new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -218,6 +219,9 @@ namespace osu.Game.Input.Bindings
         EditorTimingMode,
 
         [Description("选择收藏夹")]
-        MvisSelectCollection
+        MvisSelectCollection,
+
+        [Description("长按以显示HUD")]
+        HoldForHUD,
     }
 }

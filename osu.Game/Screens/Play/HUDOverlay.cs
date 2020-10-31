@@ -8,8 +8,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -22,7 +24,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class HUDOverlay : Container
+    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_DURATION = 400;
 
@@ -66,6 +68,8 @@ namespace osu.Game.Screens.Play
         private readonly FillFlowContainer topRightElements;
 
         internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+
+        private bool holdingForHUD;
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
@@ -217,15 +221,16 @@ namespace osu.Game.Screens.Play
             if (ShowHud.Disabled)
                 return;
 
+            if (holdingForHUD)
+            {
+                ShowHud.Value = true;
+                return;
+            }
+
             switch (configVisibilityMode.Value)
             {
                 case HUDVisibilityMode.Never:
                     ShowHud.Value = false;
-                    break;
-
-                case HUDVisibilityMode.HideDuringBreaks:
-                    // always show during replay as we want the seek bar to be visible.
-                    ShowHud.Value = replayLoaded.Value || !IsBreakTime.Value;
                     break;
 
                 case HUDVisibilityMode.HideDuringGameplay:
@@ -277,9 +282,21 @@ namespace osu.Game.Screens.Play
                 switch (e.Key)
                 {
                     case Key.Tab:
-                        configVisibilityMode.Value = configVisibilityMode.Value != HUDVisibilityMode.Never
-                            ? HUDVisibilityMode.Never
-                            : HUDVisibilityMode.HideDuringGameplay;
+                        switch (configVisibilityMode.Value)
+                        {
+                            case HUDVisibilityMode.Never:
+                                configVisibilityMode.Value = HUDVisibilityMode.HideDuringGameplay;
+                                break;
+
+                            case HUDVisibilityMode.HideDuringGameplay:
+                                configVisibilityMode.Value = HUDVisibilityMode.Always;
+                                break;
+
+                            case HUDVisibilityMode.Always:
+                                configVisibilityMode.Value = HUDVisibilityMode.Never;
+                                break;
+                        }
+
                         return true;
                 }
             }
@@ -350,6 +367,30 @@ namespace osu.Game.Screens.Play
         {
             HealthDisplay?.BindHealthProcessor(processor);
             FailingLayer?.BindHealthProcessor(processor);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.HoldForHUD:
+                    holdingForHUD = true;
+                    updateVisibility();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.HoldForHUD:
+                    holdingForHUD = false;
+                    updateVisibility();
+                    break;
+            }
         }
     }
 }

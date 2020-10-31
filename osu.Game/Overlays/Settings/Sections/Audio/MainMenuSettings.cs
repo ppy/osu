@@ -39,6 +39,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     LabelText = "背景来源(需要osu!supporter)",
                     Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
                     Items = Enum.GetValues(typeof(BackgroundSource)).Cast<BackgroundSource>()
+                },
+                new SettingsDropdown<SeasonalBackgroundMode>
+                {
+                    LabelText = "季节背景",
+                    Current = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode),
+                    Items = Enum.GetValues(typeof(SeasonalBackgroundMode)).Cast<SeasonalBackgroundMode>()
                 }
             };
         }
