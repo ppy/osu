@@ -257,16 +257,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
 
             if (count > 0)
-            {
                 Show();
-                OnSelectionChanged();
-            }
             else
                 Hide();
+
+            OnSelectionChanged();
         }
 
         /// <summary>
-        /// Triggered whenever more than one object is selected, on each change.
+        /// Triggered whenever the set of selected objects changes.
         /// Should update the selection box's state to match supported operations.
         /// </summary>
         protected virtual void OnSelectionChanged()
