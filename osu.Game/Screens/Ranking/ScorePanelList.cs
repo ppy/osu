@@ -172,7 +172,8 @@ namespace osu.Game.Screens.Ranking
             expandedTrackingComponent.Margin = new MarginPadding { Horizontal = expanded_panel_spacing };
             expandedPanel.State = PanelState.Expanded;
 
-            SchedulerAfterChildren.Add(() =>
+            // requires schedule after children to ensure the flow (and thus ScrollContainer's ScrollableExtent) has been updated.
+            ScheduleAfterChildren(() =>
             {
                 // Scroll to the new panel. This is done manually since we need:
                 // 1) To scroll after the scroll container's visible range is updated.
