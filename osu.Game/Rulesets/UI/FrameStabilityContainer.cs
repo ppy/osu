@@ -85,50 +85,46 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            double proposedTime = manualClock.CurrentTime;
-
-            if (frameStableClock.WaitingOnFrames.Value)
-            {
-                // when waiting on frames, the update loop still needs to be run (at least once) to check for newly arrived frames.
-                // time should not be sourced from the parent clock in this case.
-                state = PlaybackState.Valid;
-            }
-            else if (!frameStableClock.IsPaused.Value)
-            {
-                state = PlaybackState.Valid;
-
-                if (parentGameplayClock == null)
-                    setClock(); // LoadComplete may not be run yet, but we still want the clock.
-
-                proposedTime = parentGameplayClock.CurrentTime;
-            }
-            else
-            {
-                // time should not advance while paused, not should anything run.
-                state = PlaybackState.NotValid;
-                return true;
-            }
-
             int loops = MaxCatchUpFrames;
 
-            while (loops-- > 0)
+            do
             {
-                updateClock(ref proposedTime);
+                // update clock is always trying to approach the aim time.
+                // it should be provided as the original value each loop.
+                updateClock();
 
                 if (state == PlaybackState.NotValid)
                     break;
 
                 base.UpdateSubTree();
                 UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-            }
+            } while (state == PlaybackState.RequiresCatchUp && loops-- > 0);
 
             return true;
         }
 
-        private void updateClock(ref double proposedTime)
+        private void updateClock()
         {
-            // each update start with considering things in valid state.
-            state = PlaybackState.Valid;
+            if (frameStableClock.WaitingOnFrames.Value)
+            {
+                // if waiting on frames, run one update loop to determine if frames have arrived.
+                state = PlaybackState.Valid;
+            }
+            else if (frameStableClock.IsPaused.Value)
+            {
+                // time should not advance while paused, nor should anything run.
+                state = PlaybackState.NotValid;
+                return;
+            }
+            else
+            {
+                state = PlaybackState.Valid;
+            }
+
+            if (parentGameplayClock == null)
+                setClock(); // LoadComplete may not be run yet, but we still want the clock.
+
+            double proposedTime = parentGameplayClock.CurrentTime;
 
             if (FrameStablePlayback)
                 // if we require frame stability, the proposed time will be adjusted to move at most one known
@@ -143,21 +139,21 @@ namespace osu.Game.Rulesets.UI
                     state = PlaybackState.NotValid;
             }
 
-            if (proposedTime != manualClock.CurrentTime)
+            if (state == PlaybackState.Valid)
                 direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
+
+            double timeBehind = Math.Abs(proposedTime - parentGameplayClock.CurrentTime);
+
+            frameStableClock.IsCatchingUp.Value = timeBehind > 200;
+            frameStableClock.WaitingOnFrames.Value = state == PlaybackState.NotValid;
 
             manualClock.CurrentTime = proposedTime;
             manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
             manualClock.IsRunning = parentGameplayClock.IsRunning;
 
-            double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
-
             // determine whether catch-up is required.
             if (state == PlaybackState.Valid && timeBehind > 0)
                 state = PlaybackState.RequiresCatchUp;
-
-            frameStableClock.IsCatchingUp.Value = timeBehind > 200;
-            frameStableClock.WaitingOnFrames.Value = state == PlaybackState.NotValid;
 
             // The manual clock time has changed in the above code. The framed clock now needs to be updated
             // to ensure that the its time is valid for our children before input is processed
@@ -253,14 +249,13 @@ namespace osu.Game.Rulesets.UI
             NotValid,
 
             /// <summary>
-            /// Whether we are running up-to-date with our parent clock.
-            /// If not, we will need to keep processing children until we catch up.
+            /// Playback is running behind real-time. Catch-up will be attempted by processing more than once per
+            /// game loop (limited to a sane maximum to avoid frame drops).
             /// </summary>
             RequiresCatchUp,
 
             /// <summary>
-            /// Whether we are in a valid state (ie. should we keep processing children frames).
-            /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
+            /// In a valid state, progressing one child hierarchy loop per game loop.
             /// </summary>
             Valid
         }
