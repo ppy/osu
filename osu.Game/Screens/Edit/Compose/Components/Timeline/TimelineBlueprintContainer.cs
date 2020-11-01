@@ -9,10 +9,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             OnDragHandled = handleScrollViaDrag
         };
 
-        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect, this);
+        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect);
 
         private void handleScrollViaDrag(DragEvent e)
         {
@@ -137,17 +137,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private class TimelineDragBox : DragBox
         {
-            private Vector2 lastMouseDown;
+            // the following values hold the start and end X positions of the drag box in the timeline's local space,
+            // but with zoom unapplied in order to be able to compensate for positional changes
+            // while the timeline is being zoomed in/out.
+            private float? selectionStart;
+            private float selectionEnd;
 
-            private float? lastZoom;
-            private float localMouseDown;
+            [Resolved]
+            private Timeline timeline { get; set; }
 
-            private readonly TimelineBlueprintContainer parent;
-
-            public TimelineDragBox(Action<RectangleF> performSelect, TimelineBlueprintContainer parent)
+            public TimelineDragBox(Action<RectangleF> performSelect)
                 : base(performSelect)
             {
-                this.parent = parent;
             }
 
             protected override Drawable CreateBox() => new Box
@@ -158,27 +159,34 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool HandleDrag(MouseButtonEvent e)
             {
-                // store the original position of the mouse down, as we may be scrolled during selection.
-                if (lastMouseDown != e.ScreenSpaceMouseDownPosition)
-                {
-                    lastMouseDown = e.ScreenSpaceMouseDownPosition;
-                    localMouseDown = e.MouseDownPosition.X;
-                    lastZoom = null;
-                }
+                selectionStart ??= e.MouseDownPosition.X / timeline.CurrentZoom;
 
-                //Zooming the timeline shifts the coordinate system. zoomCorrection compensates for that
-                float zoomCorrection = lastZoom.HasValue ? (parent.timeline.CurrentZoom / lastZoom.Value) : 1;
-                localMouseDown *= zoomCorrection;
-                lastZoom = parent.timeline.CurrentZoom;
+                // only calculate end when a transition is not in progress to avoid bouncing.
+                if (Precision.AlmostEquals(timeline.CurrentZoom, timeline.Zoom))
+                    selectionEnd = e.MousePosition.X / timeline.CurrentZoom;
 
-                float selection1 = localMouseDown;
-                float selection2 = e.MousePosition.X * zoomCorrection;
+                updateDragBoxPosition();
+                return true;
+            }
 
-                Box.X = Math.Min(selection1, selection2);
-                Box.Width = Math.Abs(selection1 - selection2);
+            private void updateDragBoxPosition()
+            {
+                if (selectionStart == null)
+                    return;
+
+                float rescaledStart = selectionStart.Value * timeline.CurrentZoom;
+                float rescaledEnd = selectionEnd * timeline.CurrentZoom;
+
+                Box.X = Math.Min(rescaledStart, rescaledEnd);
+                Box.Width = Math.Abs(rescaledStart - rescaledEnd);
 
                 PerformSelection?.Invoke(Box.ScreenSpaceDrawQuad.AABBFloat);
-                return true;
+            }
+
+            public override void Hide()
+            {
+                base.Hide();
+                selectionStart = null;
             }
         }
 
