@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Whether custom test steps are provided. Custom tests should invoke <see cref="CreateTest"/> to create the test steps.
         /// </summary>
-        protected virtual bool HasCustomSteps { get; } = false;
+        protected virtual bool HasCustomSteps => false;
 
         protected TestPlayer Player;
 
