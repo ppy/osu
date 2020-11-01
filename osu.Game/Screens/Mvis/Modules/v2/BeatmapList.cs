@@ -29,7 +29,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         public BeatmapList(List<BeatmapSetInfo> set)
         {
-            Padding = new MarginPadding { Right = 15 };
+            //Padding = new MarginPadding { Right = 15 };
+            Padding = new MarginPadding{Vertical = 20};
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
 
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     RightMouseScrollbar = true,
                     Child = fillFlow = new FillFlowContainer
                     {
-                        Padding = new MarginPadding{Right = 20},
+                        Padding = new MarginPadding{Horizontal = 35},
                         Spacing = new Vector2(5),
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,

@@ -131,7 +131,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                     listContainer = new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding{Left = 35, Vertical = 20},
                                     },
                                     loadingSpinner = new LoadingSpinner(true)
                                     {

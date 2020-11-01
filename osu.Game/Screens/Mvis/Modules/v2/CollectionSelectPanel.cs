@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             RelativeSizeAxes = Axes.Both;
             Masking = true;
-            CornerRadius = 25f;
+            CornerRadius = 12.5f;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             Size = new Vector2(0.9f, 0.8f);
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 {
                     Name = "收藏夹选择界面",
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.45f,
+                    Width = 0.3f,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     Children = new Drawable[]
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 {
                     Name = "收藏夹信息界面",
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.55f,
+                    Width = 0.7f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
@@ -218,16 +218,16 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override void PopIn()
         {
-            this.FadeOut().Then().ScaleTo(0.8f)
+            this.FadeOut().Then().ScaleTo(0.9f)
                             .Then()
-                            .ScaleTo(1, 1000, Easing.OutElastic)
+                            .ScaleTo(1, 300, Easing.OutExpo)
                             .FadeIn(500);
         }
 
         protected override void PopOut()
         {
-            this.ScaleTo(0.8f, 500, Easing.OutExpo);
-            this.FadeOut(500, Easing.OutExpo);
+            this.ScaleTo(0.9f, 300, Easing.OutExpo);
+            this.FadeOut(300, Easing.OutExpo);
         }
     }
 }

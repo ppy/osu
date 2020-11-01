@@ -164,10 +164,18 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
             state.BindValueChanged(OnStateChanged, true);
+
+            AutoSizeDuration = 400;
+            AutoSizeEasing = Easing.OutQuint;
         }
 
         private void OnStateChanged(ValueChangedEvent<ActiveState> v)
         {
+            if ( v.NewValue >= ActiveState.Selected )
+                thumbnailScroll.Show();
+            else
+                thumbnailScroll.Hide();
+
             switch (v.NewValue)
             {
                 case ActiveState.Active:
@@ -289,10 +297,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             private void AddBeatmapThumbnails()
             {
                 short collections = 0;
-                short limit = 32767;
-
-                if (beatmapSetList.Count > 10)
-                    limit = 15;
+                short limit = 8;
 
                 foreach (var c in beatmapSetList)
                 {
