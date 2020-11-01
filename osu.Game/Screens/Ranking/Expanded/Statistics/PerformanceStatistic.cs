@@ -5,11 +5,13 @@ using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    public class PerformanceStatistic : CounterStatistic
+    public class PerformanceStatistic : StatisticDisplay
     {
         private readonly ScoreInfo score;
 
@@ -17,8 +19,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
+        private RollingCounter<int> counter;
+
         public PerformanceStatistic(ScoreInfo score)
-            : base("PP", 0)
+            : base("PP")
         {
             this.score = score;
         }
@@ -46,7 +50,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         public override void Appear()
         {
             base.Appear();
-            Counter.Current.BindTo(performance);
+            counter.Current.BindTo(performance);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -54,5 +58,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             cancellationTokenSource?.Cancel();
             base.Dispose(isDisposing);
         }
+
+        protected override Drawable CreateContent() => counter = new StatisticCounter
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre
+        };
     }
 }
