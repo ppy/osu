@@ -63,6 +63,14 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock platformOffsetClock;
 
+        /// <summary>
+        /// Creates a new <see cref="GameplayClockContainer"/>.
+        /// </summary>
+        /// <param name="beatmap">The beatmap being played.</param>
+        /// <param name="gameplayStartTime">The suggested time to start gameplay at.</param>
+        /// <param name="startAtGameplayStart">
+        /// Whether <paramref name="gameplayStartTime"/> should be used regardless of when storyboard events and hitobjects are supposed to start.
+        /// </param>
         public GameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
         {
             this.beatmap = beatmap;
