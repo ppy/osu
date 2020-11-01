@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Backgrounds
             mode = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
 
+            AddInternal(seasonalBackgroundLoader);
+
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
             mode.ValueChanged += _ => Next();
@@ -53,7 +55,6 @@ namespace osu.Game.Screens.Backgrounds
 
             currentDisplay = RNG.Next(0, background_count);
 
-            LoadComponentAsync(seasonalBackgroundLoader);
             Next();
         }
 
