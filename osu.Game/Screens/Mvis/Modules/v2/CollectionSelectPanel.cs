@@ -1,3 +1,4 @@
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -187,14 +188,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
             else
             {
-                foreach (var collection in collectionManager.Collections)
+                collectionsFillFlow.AddRange(collectionManager.Collections.Select(c => new CollectionPanel(c, MakeCurrentSelected)
                 {
-                    collectionsFillFlow.Add(new CollectionPanel(collection, MakeCurrentSelected)
-                    {
-                        SelectedCollection = { BindTarget = this.SelectedCollection },
-                        SelectedPanel = { BindTarget = this.SelectedPanel }
-                    });
-                };
+                    SelectedCollection = { BindTarget = this.SelectedCollection },
+                    SelectedPanel = { BindTarget = this.SelectedPanel }
+                }));
                 collectionScroll.FadeIn(300);
             }
 
