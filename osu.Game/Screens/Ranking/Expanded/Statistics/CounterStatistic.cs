@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
@@ -19,7 +18,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         private readonly int count;
         private readonly int? maxCount;
 
-        protected RollingCounter<int> Counter { get; private set; }
+        private RollingCounter<int> counter;
 
         /// <summary>
         /// Creates a new <see cref="CounterStatistic"/>.
@@ -37,7 +36,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         public override void Appear()
         {
             base.Appear();
-            Counter.Current.Value = count;
+            counter.Current.Value = count;
         }
 
         protected override Drawable CreateContent()
@@ -46,7 +45,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
-                Child = Counter = new StatisticCounter
+                Child = counter = new StatisticCounter
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
@@ -66,19 +65,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             }
 
             return container;
-        }
-
-        private class StatisticCounter : RollingCounter<int>
-        {
-            protected override double RollingDuration => AccuracyCircle.ACCURACY_TRANSFORM_DURATION;
-
-            protected override Easing RollingEasing => AccuracyCircle.ACCURACY_TRANSFORM_EASING;
-
-            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
-            {
-                s.Font = OsuFont.Torus.With(size: 20, fixedWidth: true);
-                s.Spacing = new Vector2(-2, 0);
-            });
         }
     }
 }
