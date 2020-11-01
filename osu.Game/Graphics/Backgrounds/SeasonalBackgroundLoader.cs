@@ -15,7 +15,6 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    [LongRunningLoad]
     public class SeasonalBackgroundLoader : Component
     {
         /// <summary>
