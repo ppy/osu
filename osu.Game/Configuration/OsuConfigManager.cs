@@ -90,7 +90,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.HitLighting, true);
 
-            Set(OsuSetting.ShowInterface, true);
+            Set(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             Set(OsuSetting.ShowProgressGraph, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.FadePlayfieldWhenHealthLow, true);
@@ -131,6 +131,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
+            Set(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
         }
 
         public OsuConfigManager(Storage storage)
@@ -170,6 +171,7 @@ namespace osu.Game.Configuration
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
             new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled")),
+            new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription())),
             new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
         };
     }
@@ -190,7 +192,7 @@ namespace osu.Game.Configuration
         AlwaysPlayFirstComboBreak,
         ScoreMeter,
         FloatingComments,
-        ShowInterface,
+        HUDVisibilityMode,
         ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
@@ -239,5 +241,6 @@ namespace osu.Game.Configuration
         HitLighting,
         MenuBackgroundSource,
         GameplayDisableWinKey,
+        SeasonalBackgroundMode
     }
 }

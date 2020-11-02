@@ -210,10 +210,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             if (DragBox.State == Visibility.Visible)
-            {
                 DragBox.Hide();
-                SelectionHandler.UpdateVisibility();
-            }
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -298,13 +295,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             Debug.Assert(!clickSelectionBegan);
 
-            // Deselections are only allowed for control + left clicks
-            bool allowDeselection = e.ControlPressed && e.Button == MouseButton.Left;
-
-            // Todo: This is probably incorrectly disallowing multiple selections on stacked objects
-            if (!allowDeselection && SelectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
-                return;
-
             foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren)
             {
                 if (blueprint.IsHovered)
@@ -359,11 +349,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Selects all <see cref="SelectionBlueprint"/>s.
         /// </summary>
-        private void selectAll()
-        {
-            SelectionBlueprints.ToList().ForEach(m => m.Select());
-            SelectionHandler.UpdateVisibility();
-        }
+        private void selectAll() => SelectionBlueprints.ToList().ForEach(m => m.Select());
 
         /// <summary>
         /// Deselects all selected <see cref="SelectionBlueprint"/>s.
