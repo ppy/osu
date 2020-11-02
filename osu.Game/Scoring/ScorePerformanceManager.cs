@@ -12,6 +12,9 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Scoring
 {
+    /// <summary>
+    /// A global component which calculates and caches results of performance calculations for locally databased scores.
+    /// </summary>
     public class ScorePerformanceManager : Component
     {
         private readonly ConcurrentDictionary<PerformanceCacheLookup, double> performanceCache = new ConcurrentDictionary<PerformanceCacheLookup, double>();
