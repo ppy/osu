@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -44,9 +43,6 @@ namespace osu.Game.Overlays.Dashboard
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        // temporary, should be game-global but i don't want to add more manager classes for now.
-        private static readonly Dictionary<int, User> user_cache = new Dictionary<int, User>();
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -57,24 +53,15 @@ namespace osu.Game.Overlays.Dashboard
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        foreach (int userId in e.NewItems.OfType<int>())
+                        foreach (var u in e.NewItems.OfType<int>())
                         {
-                            if (user_cache.TryGetValue(userId, out var user))
+                            var request = new GetUserRequest(u);
+                            request.Success += user => Schedule(() =>
                             {
-                                addUser(user);
-                                continue;
-                            }
-
-                            var request = new GetUserRequest(userId);
-                            request.Success += u => Schedule(() => addUser(u));
+                                if (playingUsers.Contains((int)user.Id))
+                                    userFlow.Add(createUserPanel(user));
+                            });
                             api.Queue(request);
-
-                            void addUser(User u)
-                            {
-                                user_cache[userId] = u;
-                                if (playingUsers.Contains(userId))
-                                    userFlow.Add(createUserPanel(u));
-                            }
                         }
 
                         break;
