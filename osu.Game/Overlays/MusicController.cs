@@ -45,7 +45,10 @@ namespace osu.Game.Overlays
 
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
-        public bool IsUserPaused { get; private set; }
+        /// <summary>
+        /// Whether the user has requested the track to be paused. Use <see cref="IsPlaying"/> to determine whether the track is still playing.
+        /// </summary>
+        public bool UserPauseRequested { get; private set; }
 
         /// <summary>
         /// Fired when the global <see cref="WorkingBeatmap"/> has changed.
@@ -148,7 +151,7 @@ namespace osu.Game.Overlays
         /// </summary>
         public void EnsurePlayingSomething()
         {
-            if (IsUserPaused) return;
+            if (UserPauseRequested) return;
 
             if (CurrentTrack.IsDummyDevice || beatmap.Value.BeatmapSetInfo.DeletePending)
             {
@@ -176,7 +179,7 @@ namespace osu.Game.Overlays
         public bool Play(bool restart = false, bool requestedByUser = false)
         {
             if (requestedByUser)
-                IsUserPaused = false;
+                UserPauseRequested = false;
 
             if (restart)
                 CurrentTrack.Restart();
@@ -196,7 +199,7 @@ namespace osu.Game.Overlays
         /// </param>
         public void Stop(bool requestedByUser = false)
         {
-            IsUserPaused |= requestedByUser;
+            UserPauseRequested |= requestedByUser;
             if (CurrentTrack.IsRunning)
                 CurrentTrack.Stop();
         }
