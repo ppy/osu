@@ -8,7 +8,7 @@ namespace osu.Game.Screens.Play
 {
     public class ReplayPlayer : Player
     {
-        private readonly Score score;
+        protected readonly Score Score;
 
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure() => false;
@@ -16,12 +16,12 @@ namespace osu.Game.Screens.Play
         public ReplayPlayer(Score score, bool allowPause = true, bool showResults = true)
             : base(allowPause, showResults)
         {
-            this.score = score;
+            Score = score;
         }
 
         protected override void PrepareReplay()
         {
-            DrawableRuleset?.SetReplayScore(score);
+            DrawableRuleset?.SetReplayScore(Score);
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
@@ -31,9 +31,9 @@ namespace osu.Game.Screens.Play
             var baseScore = base.CreateScore();
 
             // Since the replay score doesn't contain statistics, we'll pass them through here.
-            score.ScoreInfo.HitEvents = baseScore.HitEvents;
+            Score.ScoreInfo.HitEvents = baseScore.HitEvents;
 
-            return score.ScoreInfo;
+            return Score.ScoreInfo;
         }
     }
 }

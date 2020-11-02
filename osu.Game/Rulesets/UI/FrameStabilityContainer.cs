@@ -85,12 +85,12 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            state = frameStableClock.IsPaused.Value ? PlaybackState.NotValid : PlaybackState.Valid;
-
             int loops = MaxCatchUpFrames;
 
-            while (state != PlaybackState.NotValid && loops-- > 0)
+            do
             {
+                // update clock is always trying to approach the aim time.
+                // it should be provided as the original value each loop.
                 updateClock();
 
                 if (state == PlaybackState.NotValid)
@@ -98,21 +98,33 @@ namespace osu.Game.Rulesets.UI
 
                 base.UpdateSubTree();
                 UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-            }
+            } while (state == PlaybackState.RequiresCatchUp && loops-- > 0);
 
             return true;
         }
 
         private void updateClock()
         {
+            if (frameStableClock.WaitingOnFrames.Value)
+            {
+                // if waiting on frames, run one update loop to determine if frames have arrived.
+                state = PlaybackState.Valid;
+            }
+            else if (frameStableClock.IsPaused.Value)
+            {
+                // time should not advance while paused, nor should anything run.
+                state = PlaybackState.NotValid;
+                return;
+            }
+            else
+            {
+                state = PlaybackState.Valid;
+            }
+
             if (parentGameplayClock == null)
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
-            // each update start with considering things in valid state.
-            state = PlaybackState.Valid;
-
-            // our goal is to catch up to the time provided by the parent clock.
-            var proposedTime = parentGameplayClock.CurrentTime;
+            double proposedTime = parentGameplayClock.CurrentTime;
 
             if (FrameStablePlayback)
                 // if we require frame stability, the proposed time will be adjusted to move at most one known
@@ -127,20 +139,21 @@ namespace osu.Game.Rulesets.UI
                     state = PlaybackState.NotValid;
             }
 
-            if (proposedTime != manualClock.CurrentTime)
-                direction = proposedTime > manualClock.CurrentTime ? 1 : -1;
+            if (state == PlaybackState.Valid)
+                direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
+
+            double timeBehind = Math.Abs(proposedTime - parentGameplayClock.CurrentTime);
+
+            frameStableClock.IsCatchingUp.Value = timeBehind > 200;
+            frameStableClock.WaitingOnFrames.Value = state == PlaybackState.NotValid;
 
             manualClock.CurrentTime = proposedTime;
             manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
             manualClock.IsRunning = parentGameplayClock.IsRunning;
 
-            double timeBehind = Math.Abs(manualClock.CurrentTime - parentGameplayClock.CurrentTime);
-
             // determine whether catch-up is required.
             if (state == PlaybackState.Valid && timeBehind > 0)
                 state = PlaybackState.RequiresCatchUp;
-
-            frameStableClock.IsCatchingUp.Value = timeBehind > 200;
 
             // The manual clock time has changed in the above code. The framed clock now needs to be updated
             // to ensure that the its time is valid for our children before input is processed
@@ -253,6 +266,8 @@ namespace osu.Game.Rulesets.UI
 
             public readonly Bindable<bool> IsCatchingUp = new Bindable<bool>();
 
+            public readonly Bindable<bool> WaitingOnFrames = new Bindable<bool>();
+
             public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
 
             public FrameStabilityClock(FramedClock underlyingClock)
@@ -261,6 +276,8 @@ namespace osu.Game.Rulesets.UI
             }
 
             IBindable<bool> IFrameStableClock.IsCatchingUp => IsCatchingUp;
+
+            IBindable<bool> IFrameStableClock.WaitingOnFrames => WaitingOnFrames;
         }
     }
 }
