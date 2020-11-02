@@ -59,8 +59,6 @@ namespace osu.Game
 
         protected ScoreManager ScoreManager;
 
-        protected ScorePerformanceManager ScorePerformanceManager;
-
         protected BeatmapDifficultyManager DifficultyManager;
 
         protected SkinManager SkinManager;
@@ -231,8 +229,9 @@ namespace osu.Game
             dependencies.Cache(DifficultyManager = new BeatmapDifficultyManager());
             AddInternal(DifficultyManager);
 
-            dependencies.Cache(ScorePerformanceManager = new ScorePerformanceManager());
-            AddInternal(ScorePerformanceManager);
+            var scorePerformanceManager = new ScorePerformanceManager();
+            dependencies.Cache(scorePerformanceManager);
+            AddInternal(scorePerformanceManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
