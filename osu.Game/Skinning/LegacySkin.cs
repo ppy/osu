@@ -446,20 +446,11 @@ namespace osu.Game.Skinning
                 // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
                 // using .EndsWith() is intentional as it ensures parity in all edge cases
                 // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
-                foreach (var l in lookupNames)
-                {
-                    if (!l.EndsWith(hitSample.Suffix, StringComparison.Ordinal))
-                    {
-                        foreach (var n in getFallbackNames(l))
-                            yield return n;
-                    }
-                }
+                lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
             }
-            else
-            {
-                foreach (var l in lookupNames)
-                    yield return l;
-            }
+
+            foreach (var l in lookupNames)
+                yield return l;
 
             // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
             // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
