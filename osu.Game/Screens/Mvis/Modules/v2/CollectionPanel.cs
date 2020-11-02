@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 12.5f;
+            Alpha = 0;
 
             collection = c;
             doubleClick = doubleClickAction;
@@ -164,9 +165,13 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
             state.BindValueChanged(OnStateChanged, true);
+        }
 
-            AutoSizeDuration = 400;
-            AutoSizeEasing = Easing.OutQuint;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            this.FadeIn(300);
         }
 
         private void OnStateChanged(ValueChangedEvent<ActiveState> v)
@@ -240,6 +245,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             if (state.Value == ActiveState.Disabled)
                 return base.OnClick(e);
+
+            AutoSizeDuration = 400;
+            AutoSizeEasing = Easing.OutQuint;
 
             //如果已经被选中了，则触发双击
             if (state.Value == ActiveState.Selected)

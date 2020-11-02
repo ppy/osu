@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -12,8 +15,10 @@ namespace osu.Game.Screens.Mvis.SideBar
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
         private List<Drawable> components = new List<Drawable>();
         public bool IsHidden = true;
-        private float DURATION = 400;
+        private readonly float DURATION = 400;
         private ISidebarContent currentDisplay;
+        private SampleChannel popInSample;
+        private SampleChannel popOutSample;
 
         public SidebarContainer()
         {
@@ -30,23 +35,37 @@ namespace osu.Game.Screens.Mvis.SideBar
             Depth = -float.MaxValue;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audioManager)
+        {
+            popInSample = audioManager.Samples.Get(@"UI/overlay-pop-in");
+            popOutSample = audioManager.Samples.Get(@"UI/overlay-pop-out");
+        }
+
         public void resizeFor(Drawable d)
         {
             if ( ! (d is ISidebarContent isc) || !components.Contains(d) ) return;
 
             var c = d as ISidebarContent;
+            Show();
 
-            if ( currentDisplay == c ) return;
-            currentDisplay = c;
-
-            foreach (var item in components)
+            //如果要显示的是当前正在显示的内容，则中断
+            if ( currentDisplay == c )
             {
-                item.FadeOut(DURATION / 2, Easing.OutQuint);
+                IsHidden = false;
+                return;
             }
 
-            d.Delay(DURATION / 2).FadeIn(DURATION / 2);
+            currentDisplay = c;
+            var duration = IsHidden ? 0 : DURATION;
 
-            this.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), DURATION, Easing.OutQuint);
+            foreach (var item in components)
+                item.FadeOut(duration / 2, Easing.OutQuint);
+
+            d.Delay(duration / 2).FadeIn(duration / 2);
+
+            this.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), duration, Easing.OutQuint);
+            IsHidden = false;
         }
 
         public void AddDrawableToList(Drawable d) =>
@@ -55,13 +74,15 @@ namespace osu.Game.Screens.Mvis.SideBar
         protected override void PopOut()
         {
             base.PopOut();
-            IsHidden = true;
+            this.FadeEdgeEffectTo(0, DISAPPEAR_DURATION).OnComplete(_ => IsHidden = true);
+            popOutSample.Play();
         }
 
         protected override void PopIn()
         {
             base.PopIn();
-            IsHidden = false;
+            this.FadeEdgeEffectTo(1f);
+            popInSample.Play();
         }
     }
 }

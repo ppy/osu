@@ -377,6 +377,12 @@ namespace osu.Game.Screens
                             Name = "Sidebar Container",
                             Children = new Drawable[]
                             {
+                                new Container
+                                {
+                                    Padding = new MarginPadding{ Bottom = 50 },
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -408,13 +414,13 @@ namespace osu.Game.Screens
                                             }
                                         }
                                     },
-                                    Padding = new MarginPadding{Bottom = 50}
                                 },
                                 collectionPanel = new CollectionSelectPanel()
                                 {
                                     CurrentCollection = { BindTarget = CurrentCollection },
                                     Alpha = 0,
-                                    Padding = new MarginPadding{Bottom = 50}
+                                },
+                                    }
                                 },
                                 new Container
                                 {
@@ -578,8 +584,6 @@ namespace osu.Game.Screens
                     sidebar.Hide();
                     return;
                 }
-                else
-                    sidebar.Show();
 
                 oldSidebarState = state;
                 switch( state )
@@ -659,8 +663,6 @@ namespace osu.Game.Screens
             gameplayContent.MoveToX(-DrawWidth, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30, DURATION, Easing.OutQuint);
 
-            sidebar.Hide();
-
             this.FadeOut(DURATION, Easing.OutQuint);
             beatmapLogo.StopResponseOnBeatmapChanges();
             Beatmap.UnbindEvents();
@@ -690,9 +692,6 @@ namespace osu.Game.Screens
             //非背景层的动画
             gameplayContent.MoveToX(0, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, DURATION, Easing.OutQuint);
-
-            if (sidebar.IsHidden)
-                sidebar.Show();
         }
 
         public bool OnPressed(GlobalAction action)
