@@ -40,7 +40,7 @@ using osu.Game.Users;
 using osu.Game.Screens.Mvis.Modules;
 using osu.Game.Screens.Mvis.Modules.v2;
 using osu.Game.Collections;
-using System.Collections.Generic;
+using osu.Framework.Graphics.Effects;
 
 namespace osu.Game.Screens
 {
@@ -78,14 +78,14 @@ namespace osu.Game.Screens
         private InputManager inputManager { get; set; }
         private BottomBar bottomBar;
         private Container gameplayContent;
-        private SideBarSettingsPanel sidebarContainer;
+        private SidebarContainer sidebar;
         private BeatmapLogo beatmapLogo;
         private HoverableProgressBarContainer progressBarContainer;
         private BottomBarButton soloButton;
         private BottomBarButton prevButton;
         private BottomBarButton nextButton;
+        private BottomBarButton sidebarToggleButton;
         private BottomBarSwitchButton loopToggleButton;
-        private BottomBarSwitchButton sidebarToggleButton;
         private BottomBarOverlayLockSwitchButton lockButton;
         private BottomBarSwitchButton songProgressButton;
         private BottomBarButton collectionButton;
@@ -113,7 +113,9 @@ namespace osu.Game.Screens
         private CollectionHelper collectionHelper;
         private Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
         private CollectionSelectPanel collectionPanel;
-        private List<VisibilityContainer> overlays = new List<VisibilityContainer>();
+        private SidebarSettingsScrollContainer settingsScroll;
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
+        private SidebarContentState oldSidebarState;
 
         public MvisScreen()
         {
@@ -253,7 +255,7 @@ namespace osu.Game.Screens
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.List,
                                                                     TooltipText = "收藏夹选择",
-                                                                    Action = () => collectionPanel.ToggleVisibility()
+                                                                    Action = () => UpdateSidebarState(SidebarContentState.Collection)
                                                                 },
                                                                 new BottomBarButton
                                                                 {
@@ -263,14 +265,8 @@ namespace osu.Game.Screens
                                                                         //隐藏界面，锁定更改并隐藏锁定按钮
                                                                         lockChanges.Value = false;
                                                                         HideOverlays();
-                                                                        sidebarToggleButton.ToggleableValue.Value = false;
-                                                                        
-                                                                        foreach (var o in overlays)
-                                                                            o.Hide();
-                                                                        
-                                                                        sidebarToggleButton.ToggleableValue.Value = false;
 
-                                                                        sidebarContainer.Hide();
+                                                                        sidebar.Hide();
 
                                                                         //防止手机端无法退出桌面背景模式
                                                                         if (RuntimeInfo.IsDesktop)
@@ -298,11 +294,11 @@ namespace osu.Game.Screens
                                                                     Action = () => PresentBeatmap(),
                                                                     TooltipText = "在选歌界面中查看",
                                                                 },
-                                                                sidebarToggleButton = new BottomBarSwitchButton()
+                                                                sidebarToggleButton = new BottomBarButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Atom,
-                                                                    Action = () => sidebarContainer.ToggleVisibility(),
-                                                                    TooltipText = "侧边栏",
+                                                                    Action = () => UpdateSidebarState(SidebarContentState.Settings),
+                                                                    TooltipText = "播放器设置",
                                                                 },
                                                             }
                                                         },
@@ -376,37 +372,28 @@ namespace osu.Game.Screens
                                 },
                             }
                         },
-                        collectionPanel = new CollectionSelectPanel()
-                        {
-                            CurrentCollection = { BindTarget = CurrentCollection },
-                        },
-                        sidebarContainer = new SideBarSettingsPanel
+                        sidebar = new SidebarContainer
                         {
                             Name = "Sidebar Container",
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 400,
-                            Depth = -float.MaxValue,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
                             Children = new Drawable[]
                             {
                                 new Box
                                 {
-                                    Width = 400 + HORIZONTAL_OVERFLOW_PADDING,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Colour = Color4.Black,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background5,
                                     Alpha = 0.5f,
                                 },
-                                new OsuScrollContainer
+                                settingsScroll = new SidebarSettingsScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
                                     Child = new FillFlowContainer
                                     {
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
                                         Spacing = new Vector2(20),
                                         Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
-                                        Margin = new MarginPadding{Bottom = 50},
+                                        Margin = new MarginPadding{Bottom = 10},
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
@@ -421,12 +408,41 @@ namespace osu.Game.Screens
                                             }
                                         }
                                     },
+                                    Padding = new MarginPadding{Bottom = 50}
+                                },
+                                collectionPanel = new CollectionSelectPanel()
+                                {
+                                    CurrentCollection = { BindTarget = CurrentCollection },
+                                    Alpha = 0,
+                                    Padding = new MarginPadding{Bottom = 50}
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Masking = true,
+                                    Height = 50,
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomCentre,
+                                    EdgeEffect = new EdgeEffectParameters
+                                    {
+                                        Type = EdgeEffectType.Shadow,
+                                        Colour = Colour4.Black.Opacity(0.6f),
+                                        Radius = 10,
+                                    },
+                                    Child = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = colourProvider.Background4,
+                                    }
                                 },
                             }
                         }
                     }
                 },
             };
+
+            sidebar.AddDrawableToList(settingsScroll);
+            sidebar.AddDrawableToList(collectionPanel);
         }
 
         [BackgroundDependencyLoader]
@@ -534,9 +550,6 @@ namespace osu.Game.Screens
 
             ShowOverlays();
 
-            overlays.Add(sidebarContainer);
-            overlays.Add(collectionPanel);
-
             base.LoadComplete();
         }
 
@@ -555,6 +568,30 @@ namespace osu.Game.Screens
                     bgTriangles.Show();
                     break;
             }
+        }
+
+        private void UpdateSidebarState(SidebarContentState state)
+        {
+                if ( state == oldSidebarState )
+                {
+                    oldSidebarState = SidebarContentState.None;
+                    sidebar.Hide();
+                    return;
+                }
+                else
+                    sidebar.Show();
+
+                oldSidebarState = state;
+                switch( state )
+                {
+                    case SidebarContentState.Settings:
+                        sidebar.resizeFor(settingsScroll);
+                        break;
+
+                    case SidebarContentState.Collection:
+                        sidebar.resizeFor(collectionPanel);
+                        break;
+                }
         }
 
         private void SeekTo(double position)
@@ -622,8 +659,7 @@ namespace osu.Game.Screens
             gameplayContent.MoveToX(-DrawWidth, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30, DURATION, Easing.OutQuint);
 
-            if (sidebarContainer.Alpha != 0)
-                sidebarContainer.Hide();
+            sidebar.Hide();
 
             this.FadeOut(DURATION, Easing.OutQuint);
             beatmapLogo.StopResponseOnBeatmapChanges();
@@ -655,8 +691,8 @@ namespace osu.Game.Screens
             gameplayContent.MoveToX(0, DURATION, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, DURATION, Easing.OutQuint);
 
-            if (sidebarToggleButton.ToggleableValue.Value)
-                sidebarContainer.Show();
+            if (sidebar.IsHidden)
+                sidebar.Show();
         }
 
         public bool OnPressed(GlobalAction action)
@@ -894,6 +930,13 @@ namespace osu.Game.Screens
             });
 
             sbLoader.UpdateStoryBoardAsync();
+        }
+
+        private enum SidebarContentState
+        {
+            None,
+            Settings,
+            Collection
         }
     }
 }

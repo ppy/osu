@@ -3,19 +3,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class CollectionSelectPanel : VisibilityContainer
+    public class CollectionSelectPanel : Container, ISidebarContent
     {
         [Resolved]
         private CollectionManager collectionManager { get; set; }
@@ -31,22 +28,14 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private OsuScrollContainer collectionScroll;
         private CollectionInfo info;
 
+        public float ResizeWidth => 0.85f;
+
         public CollectionSelectPanel()
         {
             RelativeSizeAxes = Axes.Both;
-            Masking = true;
-            CornerRadius = 12.5f;
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-            Size = new Vector2(0.9f, 0.8f);
-            RelativeSizeAxes = Axes.Both;
+
             Children = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
                 new Container
                 {
                     Name = "收藏夹选择界面",
@@ -92,19 +81,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     Width = 0.7f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Children = new Drawable[]
-                    {
-                        info = new CollectionInfo()
-                    }
-                },
-                new IconButton()
-                {
-                    Icon = FontAwesome.Solid.Times,
-                    Margin = new MarginPadding(25),
-                    Size = new Vector2(30),
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Action = Hide
+                    Child = info = new CollectionInfo()
                 }
             };
         }
@@ -212,20 +189,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 CurrentCollection.TriggerChange();
             else
                 CurrentCollection.Value = SelectedCollection.Value;
-        }
-
-        protected override void PopIn()
-        {
-            this.FadeOut().Then().ScaleTo(0.9f)
-                            .Then()
-                            .ScaleTo(1, 300, Easing.OutExpo)
-                            .FadeIn(500);
-        }
-
-        protected override void PopOut()
-        {
-            this.ScaleTo(0.9f, 300, Easing.OutExpo);
-            this.FadeOut(300, Easing.OutExpo);
         }
     }
 }

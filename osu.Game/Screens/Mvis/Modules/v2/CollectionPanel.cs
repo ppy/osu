@@ -297,7 +297,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             private void AddBeatmapThumbnails()
             {
                 short collections = 0;
-                short limit = 8;
+                short limit = 10;
 
                 foreach (var c in beatmapSetList)
                 {
