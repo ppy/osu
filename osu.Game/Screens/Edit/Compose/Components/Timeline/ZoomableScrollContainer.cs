@@ -29,8 +29,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Container zoomedContent;
         protected override Container<Drawable> Content => zoomedContent;
-
         private float currentZoom = 1;
+
+        /// <summary>
+        /// The current zoom level of <see cref="ZoomableScrollContainer" />.
+        /// It may differ from <see cref="Zoom" /> during transitions.
+        /// </summary>
+        public float CurrentZoom => currentZoom;
 
         [Resolved(canBeNull: true)]
         private IFrameBasedClock editorClock { get; set; }

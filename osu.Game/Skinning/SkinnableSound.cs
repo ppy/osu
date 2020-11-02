@@ -88,7 +88,7 @@ namespace osu.Game.Skinning
                 {
                     foreach (var lookup in s.LookupNames)
                     {
-                        if ((ch = samples.Get($"Gameplay/{lookup}")) != null)
+                        if ((ch = samples.Get(lookup)) != null)
                             break;
                     }
                 }
