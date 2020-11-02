@@ -2,6 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
@@ -18,9 +21,24 @@ namespace osu.Game.Rulesets.Taiko.Audio
         private readonly ControlPointInfo controlPoints;
         private readonly Dictionary<double, DrumSample> mappings = new Dictionary<double, DrumSample>();
 
+        private IBindableList<ControlPointGroup> groups;
+
         public DrumSampleContainer(ControlPointInfo controlPoints)
         {
             this.controlPoints = controlPoints;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            groups = controlPoints.Groups.GetBoundCopy();
+            groups.BindCollectionChanged((_, __) => recreateMappings(), true);
+        }
+
+        private void recreateMappings()
+        {
+            mappings.Clear();
+            ClearInternal();
 
             IReadOnlyList<SampleControlPoint> samplePoints = controlPoints.SamplePoints.Count == 0 ? new[] { controlPoints.SamplePointAt(double.MinValue) } : controlPoints.SamplePoints;
 
@@ -28,37 +46,56 @@ namespace osu.Game.Rulesets.Taiko.Audio
             {
                 var samplePoint = samplePoints[i];
 
-                var centre = samplePoint.GetSampleInfo();
-                var rim = samplePoint.GetSampleInfo(HitSampleInfo.HIT_CLAP);
-
                 var lifetimeStart = i > 0 ? samplePoint.Time : double.MinValue;
                 var lifetimeEnd = i + 1 < samplePoints.Count ? samplePoints[i + 1].Time : double.MaxValue;
 
-                mappings[samplePoint.Time] = new DrumSample
+                AddInternal(mappings[samplePoint.Time] = new DrumSample(samplePoint)
                 {
-                    Centre = addSound(centre, lifetimeStart, lifetimeEnd),
-                    Rim = addSound(rim, lifetimeStart, lifetimeEnd)
-                };
+                    LifetimeStart = lifetimeStart,
+                    LifetimeEnd = lifetimeEnd
+                });
             }
-        }
-
-        private PausableSkinnableSound addSound(HitSampleInfo hitSampleInfo, double lifetimeStart, double lifetimeEnd)
-        {
-            var drawable = new PausableSkinnableSound(hitSampleInfo)
-            {
-                LifetimeStart = lifetimeStart,
-                LifetimeEnd = lifetimeEnd
-            };
-            AddInternal(drawable);
-            return drawable;
         }
 
         public DrumSample SampleAt(double time) => mappings[controlPoints.SamplePointAt(time).Time];
 
-        public class DrumSample
+        public class DrumSample : CompositeDrawable
         {
-            public PausableSkinnableSound Centre;
-            public PausableSkinnableSound Rim;
+            public override bool RemoveWhenNotAlive => false;
+
+            public PausableSkinnableSound Centre { get; private set; }
+            public PausableSkinnableSound Rim { get; private set; }
+
+            private readonly SampleControlPoint samplePoint;
+
+            private Bindable<string> sampleBank;
+            private BindableNumber<int> sampleVolume;
+
+            public DrumSample(SampleControlPoint samplePoint)
+            {
+                this.samplePoint = samplePoint;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                sampleBank = samplePoint.SampleBankBindable.GetBoundCopy();
+                sampleBank.BindValueChanged(_ => recreate());
+
+                sampleVolume = samplePoint.SampleVolumeBindable.GetBoundCopy();
+                sampleVolume.BindValueChanged(_ => recreate());
+
+                recreate();
+            }
+
+            private void recreate()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    Centre = new PausableSkinnableSound(samplePoint.GetSampleInfo()),
+                    Rim = new PausableSkinnableSound(samplePoint.GetSampleInfo(HitSampleInfo.HIT_CLAP))
+                };
+            }
         }
     }
 }
