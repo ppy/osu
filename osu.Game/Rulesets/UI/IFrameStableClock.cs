@@ -10,6 +10,9 @@ namespace osu.Game.Rulesets.UI
     {
         IBindable<bool> IsCatchingUp { get; }
 
+        /// <summary>
+        /// Whether the frame stable clock is waiting on new frames to arrive to be able to progress time.
+        /// </summary>
         IBindable<bool> WaitingOnFrames { get; }
     }
 }

@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             {
                 new AccuracyStatistic(score.Accuracy),
                 new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out var missCount) || missCount == 0),
-                new CounterStatistic("pp", (int)(score.PP ?? 0)),
+                new PerformanceStatistic(score),
             };
 
             var bottomStatistics = new List<HitResultStatistic>();
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     Margin = new MarginPadding { Top = 40 },
                                     RelativeSizeAxes = Axes.X,
                                     Height = 230,
-                                    Child = new AccuracyCircle(score)
+                                    Child = new AccuracyCircle(score, withFlair)
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,

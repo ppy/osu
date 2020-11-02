@@ -54,25 +54,6 @@ namespace osu.Game.Screens.Play
             DrawableRuleset?.SetReplayScore(score);
         }
 
-        private void userBeganPlaying(int userId, SpectatorState state)
-        {
-            if (userId == score.ScoreInfo.UserID)
-            {
-                Schedule(() =>
-                {
-                    if (this.IsCurrentScreen()) this.Exit();
-                });
-            }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (spectatorStreaming != null)
-                spectatorStreaming.OnUserBeganPlaying -= userBeganPlaying;
-        }
-
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
         {
             // if we already have frames, start gameplay at the point in time they exist, should they be too far into the beatmap.
@@ -82,6 +63,30 @@ namespace osu.Game.Screens.Play
                 return base.CreateGameplayClockContainer(beatmap, gameplayStart);
 
             return new GameplayClockContainer(beatmap, firstFrameTime.Value, true);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            spectatorStreaming.OnUserBeganPlaying -= userBeganPlaying;
+            return base.OnExiting(next);
+        }
+
+        private void userBeganPlaying(int userId, SpectatorState state)
+        {
+            if (userId != score.ScoreInfo.UserID) return;
+
+            Schedule(() =>
+            {
+                if (this.IsCurrentScreen()) this.Exit();
+            });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (spectatorStreaming != null)
+                spectatorStreaming.OnUserBeganPlaying -= userBeganPlaying;
         }
     }
 }
