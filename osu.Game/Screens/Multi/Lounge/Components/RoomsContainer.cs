@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     matchingFilter &= r.Room.Playlist.Count == 0 || r.Room.Playlist.Any(i => i.Ruleset.Value.Equals(criteria.Ruleset));
 
                     if (!string.IsNullOrEmpty(criteria.SearchString))
-                        matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
+                        matchingFilter &= r.FilterTerms.Any(term => term.Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
 
                     r.MatchingFilter = matchingFilter;
                 }
