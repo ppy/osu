@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void Update()
         {
-            Track track = null;
+            ITrack track = null;
             IBeatmap beatmap = null;
 
             double currentTrackTime = 0;

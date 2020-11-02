@@ -21,7 +21,7 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings);
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -50,6 +50,14 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
         };
 
+        public IEnumerable<KeyBinding> EditorKeyBindings => new[]
+        {
+            new KeyBinding(new[] { InputKey.F1 }, GlobalAction.EditorComposeMode),
+            new KeyBinding(new[] { InputKey.F2 }, GlobalAction.EditorDesignMode),
+            new KeyBinding(new[] { InputKey.F3 }, GlobalAction.EditorTimingMode),
+            new KeyBinding(new[] { InputKey.F4 }, GlobalAction.EditorSetupMode),
+        };
+
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
@@ -59,6 +67,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
+            new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -68,7 +77,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Alt, InputKey.Down }, GlobalAction.DecreaseVolume),
             new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.DecreaseVolume),
 
-            new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
+            new KeyBinding(new[] { InputKey.Control, InputKey.F4 }, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.TrackPrevious, GlobalAction.MusicPrev),
             new KeyBinding(InputKey.F1, GlobalAction.MusicPrev),
@@ -139,7 +148,7 @@ namespace osu.Game.Input.Bindings
         [Description("Quick exit (Hold)")]
         QuickExit,
 
-        // Game-wide beatmap msi ccotolle keybindings
+        // Game-wide beatmap music controller keybindings
         [Description("Next track")]
         MusicNext,
 
@@ -166,5 +175,21 @@ namespace osu.Game.Input.Bindings
 
         [Description("Pause")]
         PauseGameplay,
+
+        // Editor
+        [Description("Setup Mode")]
+        EditorSetupMode,
+
+        [Description("Compose Mode")]
+        EditorComposeMode,
+
+        [Description("Design Mode")]
+        EditorDesignMode,
+
+        [Description("Timing Mode")]
+        EditorTimingMode,
+
+        [Description("Hold for HUD")]
+        HoldForHUD,
     }
 }

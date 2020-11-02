@@ -12,6 +12,8 @@ namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
+        public OverlayTitle Title { get; }
+
         private float contentSidePadding;
 
         /// <summary>
@@ -73,7 +75,7 @@ namespace osu.Game.Overlays
                                         AutoSizeAxes = Axes.Y,
                                         Children = new[]
                                         {
-                                            CreateTitle().With(title =>
+                                            Title = CreateTitle().With(title =>
                                             {
                                                 title.Anchor = Anchor.CentreLeft;
                                                 title.Origin = Anchor.CentreLeft;

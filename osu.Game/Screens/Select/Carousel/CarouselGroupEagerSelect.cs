@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Screens.Select.Carousel
@@ -52,6 +53,14 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (i != LastSelected)
                 updateSelectedIndex();
+        }
+
+        public void AddChildren(IEnumerable<CarouselItem> items)
+        {
+            foreach (var i in items)
+                base.AddChild(i);
+
+            attemptSelection();
         }
 
         public override void AddChild(CarouselItem i)

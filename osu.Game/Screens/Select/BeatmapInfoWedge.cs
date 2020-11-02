@@ -27,6 +27,7 @@ using osu.Framework.Logging;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Ranking.Expanded;
 
 namespace osu.Game.Screens.Select
 {
@@ -37,6 +38,11 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGE_HEIGHT, 0);
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+
+        [Resolved]
+        private BeatmapDifficultyManager difficultyManager { get; set; }
+
+        private IBindable<StarDifficulty> beatmapDifficulty;
 
         protected BufferedWedgeInfo Info;
 
@@ -87,6 +93,11 @@ namespace osu.Game.Screens.Select
                 if (beatmap == value) return;
 
                 beatmap = value;
+
+                beatmapDifficulty?.UnbindAll();
+                beatmapDifficulty = difficultyManager.GetBindableDifficulty(beatmap.BeatmapInfo);
+                beatmapDifficulty.BindValueChanged(_ => updateDisplay());
+
                 updateDisplay();
             }
         }
@@ -112,7 +123,7 @@ namespace osu.Game.Screens.Select
                 return;
             }
 
-            LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value)
+            LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, beatmapDifficulty.Value)
             {
                 Shear = -Shear,
                 Depth = Info?.Depth + 1 ?? 0
@@ -140,12 +151,14 @@ namespace osu.Game.Screens.Select
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
+            private readonly StarDifficulty starDifficulty;
 
-            public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset)
+            public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset, StarDifficulty difficulty)
                 : base(pixelSnapping: true)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
+                starDifficulty = difficulty;
             }
 
             [BackgroundDependencyLoader]
@@ -189,7 +202,7 @@ namespace osu.Game.Screens.Select
                             },
                         },
                     },
-                    new DifficultyColourBar(beatmapInfo)
+                    new DifficultyColourBar(starDifficulty)
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 20,
@@ -222,10 +235,20 @@ namespace osu.Game.Screens.Select
                         Direction = FillDirection.Vertical,
                         Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        Shear = wedged_container_shear,
+                        Children = new[]
                         {
+                            createStarRatingDisplay(starDifficulty).With(display =>
+                            {
+                                display.Anchor = Anchor.TopRight;
+                                display.Origin = Anchor.TopRight;
+                                display.Shear = -wedged_container_shear;
+                            }),
                             StatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Shear = -wedged_container_shear,
                                 TextSize = 11,
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapInfo.Status,
@@ -282,6 +305,13 @@ namespace osu.Game.Screens.Select
                     StatusPill.Hide();
             }
 
+            private static Drawable createStarRatingDisplay(StarDifficulty difficulty) => difficulty.Stars > 0
+                ? new StarRatingDisplay(difficulty)
+                {
+                    Margin = new MarginPadding { Bottom = 5 }
+                }
+                : Empty();
+
             private void setMetadata(string source)
             {
                 ArtistLabel.Text = artistBinding.Value;
@@ -300,14 +330,14 @@ namespace osu.Game.Screens.Select
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
-                        Icon = FontAwesome.Regular.Clock,
+                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
                         Content = TimeSpan.FromMilliseconds(b.BeatmapInfo.Length).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "BPM",
-                        Icon = FontAwesome.Regular.Circle,
+                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Bpm),
                         Content = getBPMRange(b),
                     }));
 
@@ -400,10 +430,18 @@ namespace osu.Game.Screens.Select
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
-                                    Scale = new Vector2(0.8f),
                                     Colour = Color4Extensions.FromHex(@"f7dd55"),
-                                    Icon = statistic.Icon,
+                                    Icon = FontAwesome.Regular.Circle,
+                                    Size = new Vector2(0.8f)
                                 },
+                                statistic.CreateIcon().With(i =>
+                                {
+                                    i.Anchor = Anchor.Centre;
+                                    i.Origin = Anchor.Centre;
+                                    i.RelativeSizeAxes = Axes.Both;
+                                    i.Colour = Color4Extensions.FromHex(@"f7dd55");
+                                    i.Size = new Vector2(0.64f);
+                                }),
                             }
                         },
                         new OsuSpriteText
@@ -421,11 +459,11 @@ namespace osu.Game.Screens.Select
 
             private class DifficultyColourBar : Container
             {
-                private readonly BeatmapInfo beatmap;
+                private readonly StarDifficulty difficulty;
 
-                public DifficultyColourBar(BeatmapInfo beatmap)
+                public DifficultyColourBar(StarDifficulty difficulty)
                 {
-                    this.beatmap = beatmap;
+                    this.difficulty = difficulty;
                 }
 
                 [BackgroundDependencyLoader]
@@ -433,7 +471,7 @@ namespace osu.Game.Screens.Select
                 {
                     const float full_opacity_ratio = 0.7f;
 
-                    var difficultyColour = colours.ForDifficultyRating(beatmap.DifficultyRating);
+                    var difficultyColour = colours.ForDifficultyRating(difficulty.DifficultyRating);
 
                     Children = new Drawable[]
                     {

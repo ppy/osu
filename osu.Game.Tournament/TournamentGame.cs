@@ -31,6 +31,7 @@ namespace osu.Game.Tournament
         public static readonly Color4 TEXT_COLOUR = Color4Extensions.FromHex("#fff");
         private Drawable heightWarning;
         private Bindable<Size> windowSize;
+        private Bindable<WindowMode> windowMode;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
@@ -41,6 +42,12 @@ namespace osu.Game.Tournament
                 var minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
 
                 heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
+            }), true);
+
+            windowMode = frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            windowMode.BindValueChanged(mode => ScheduleAfterChildren(() =>
+            {
+                windowMode.Value = WindowMode.Windowed;
             }), true);
 
             AddRange(new[]
@@ -80,30 +87,7 @@ namespace osu.Game.Tournament
                         },
                     }
                 },
-                heightWarning = new Container
-                {
-                    Masking = true,
-                    CornerRadius = 5,
-                    Depth = float.MinValue,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = Color4.Red,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new TournamentSpriteText
-                        {
-                            Text = "Please make the window wider",
-                            Font = OsuFont.Torus.With(weight: FontWeight.Bold),
-                            Colour = Color4.White,
-                            Padding = new MarginPadding(20)
-                        }
-                    }
-                },
+                heightWarning = new WarningBox("Please make the window wider"),
                 new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,

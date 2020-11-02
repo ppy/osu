@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Whether custom test steps are provided. Custom tests should invoke <see cref="CreateTest"/> to create the test steps.
         /// </summary>
-        protected virtual bool HasCustomSteps { get; } = false;
+        protected virtual bool HasCustomSteps => false;
 
         protected TestPlayer Player;
 
@@ -79,6 +79,12 @@ namespace osu.Game.Tests.Visual
 
             Player = CreatePlayer(ruleset);
             LoadScreen(Player);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            LocalConfig?.Dispose();
+            base.Dispose(isDisposing);
         }
 
         /// <summary>

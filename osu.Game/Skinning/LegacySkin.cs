@@ -18,6 +18,8 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -173,6 +175,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ShowJudgementLine:
                     return SkinUtils.As<TValue>(new Bindable<bool>(existing.ShowJudgementLine));
 
+                case LegacyManiaSkinConfigurationLookups.ExplosionImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "LightingN"));
+
                 case LegacyManiaSkinConfigurationLookups.ExplosionScale:
                     Debug.Assert(maniaLookup.TargetColumn != null);
 
@@ -217,6 +222,20 @@ namespace osu.Game.Skinning
                     Debug.Assert(maniaLookup.TargetColumn != null);
                     return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}L"));
 
+                case LegacyManiaSkinConfigurationLookups.HoldNoteLightImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "LightingL"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteLightScale:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+
+                    if (GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<float>(1));
+
+                    if (existing.HoldNoteLightWidth[maniaLookup.TargetColumn.Value] != 0)
+                        return SkinUtils.As<TValue>(new Bindable<float>(existing.HoldNoteLightWidth[maniaLookup.TargetColumn.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.TargetColumn.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
                 case LegacyManiaSkinConfigurationLookups.KeyImage:
                     Debug.Assert(maniaLookup.TargetColumn != null);
                     return SkinUtils.As<TValue>(getManiaImage(existing, $"KeyImage{maniaLookup.TargetColumn}"));
@@ -255,6 +274,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.Hit300:
                 case LegacyManiaSkinConfigurationLookups.Hit300g:
                     return SkinUtils.As<TValue>(getManiaImage(existing, maniaLookup.Lookup.ToString()));
+
+                case LegacyManiaSkinConfigurationLookups.KeysUnderNotes:
+                    return SkinUtils.As<TValue>(new Bindable<bool>(existing.KeysUnderNotes));
             }
 
             return null;
@@ -303,10 +325,51 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        private string scorePrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
+
+        private string comboPrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ComboPrefix)?.Value ?? "score";
+
+        private bool hasScoreFont => this.HasFont(scorePrefix);
+
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
+                case HUDSkinComponent hudComponent:
+                {
+                    if (!hasScoreFont)
+                        return null;
+
+                    switch (hudComponent.Component)
+                    {
+                        case HUDSkinComponents.ComboCounter:
+                            return new LegacyComboCounter();
+
+                        case HUDSkinComponents.ScoreCounter:
+                            return new LegacyScoreCounter(this);
+
+                        case HUDSkinComponents.AccuracyCounter:
+                            return new LegacyAccuracyCounter(this);
+
+                        case HUDSkinComponents.HealthDisplay:
+                            return new LegacyHealthDisplay(this);
+
+                        case HUDSkinComponents.ComboText:
+                            return new LegacySpriteText(this, comboPrefix)
+                            {
+                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ComboOverlap)?.Value ?? -2), 0)
+                            };
+
+                        case HUDSkinComponents.ScoreText:
+                            return new LegacySpriteText(this, scorePrefix)
+                            {
+                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2), 0)
+                            };
+                    }
+
+                    return null;
+                }
+
                 case GameplaySkinComponent<HitResult> resultComponent:
                     switch (resultComponent.Component)
                     {
@@ -316,7 +379,7 @@ namespace osu.Game.Skinning
                         case HitResult.Meh:
                             return this.GetAnimation("hit50", true, false);
 
-                        case HitResult.Good:
+                        case HitResult.Ok:
                             return this.GetAnimation("hit100", true, false);
 
                         case HitResult.Great:
@@ -354,10 +417,14 @@ namespace osu.Game.Skinning
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo)
         {
-            var lookupNames = sampleInfo.LookupNames;
+            IEnumerable<string> lookupNames;
 
             if (sampleInfo is HitSampleInfo hitSample)
                 lookupNames = getLegacyLookupNames(hitSample);
+            else
+            {
+                lookupNames = sampleInfo.LookupNames.SelectMany(getFallbackNames);
+            }
 
             foreach (var lookup in lookupNames)
             {
@@ -370,6 +437,27 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
+        {
+            var lookupNames = hitSample.LookupNames.SelectMany(getFallbackNames);
+
+            if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
+            {
+                // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
+                // using .EndsWith() is intentional as it ensures parity in all edge cases
+                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
+                lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
+            }
+
+            foreach (var l in lookupNames)
+                yield return l;
+
+            // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
+            // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
+            // which is why this is done locally here.
+            yield return hitSample.Name;
+        }
+
         private IEnumerable<string> getFallbackNames(string componentName)
         {
             // May be something like "Gameplay/osu/approachcircle" from lazer, or "Arrows/note1" from a user skin.
@@ -377,25 +465,7 @@ namespace osu.Game.Skinning
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
-            yield return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
-        }
-
-        private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
-        {
-            var lookupNames = hitSample.LookupNames;
-
-            if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
-                // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
-                // using .EndsWith() is intentional as it ensures parity in all edge cases
-                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
-                lookupNames = hitSample.LookupNames.Where(name => !name.EndsWith(hitSample.Suffix));
-
-            // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
-            // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
-            // which is why this is done locally here.
-            lookupNames = lookupNames.Append(hitSample.Name);
-
-            return lookupNames;
+            yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
         }
     }
 }
