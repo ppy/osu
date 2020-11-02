@@ -229,7 +229,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded);
         }
 
-        internal class TestSpectatorStreamingClient : SpectatorStreamingClient
+        public class TestSpectatorStreamingClient : SpectatorStreamingClient
         {
             public readonly User StreamingUser = new User { Id = 1234, Username = "Test user" };
 

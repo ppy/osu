@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Spectator;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK;
@@ -21,7 +22,7 @@ namespace osu.Game.Overlays.Dashboard
     {
         private IBindableList<int> playingUsers;
 
-        private FillFlowContainer<UserPanel> userFlow;
+        private FillFlowContainer<PlayingUserPanel> userFlow;
 
         [Resolved]
         private SpectatorStreamingClient spectatorStreaming { get; set; }
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.Dashboard
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = userFlow = new FillFlowContainer<UserPanel>
+            InternalChild = userFlow = new FillFlowContainer<PlayingUserPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -78,19 +79,53 @@ namespace osu.Game.Overlays.Dashboard
             }), true);
         }
 
-        [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
-
-        private UserPanel createUserPanel(User user)
-        {
-            return new UserGridPanel(user).With(panel =>
+        private PlayingUserPanel createUserPanel(User user) =>
+            new PlayingUserPanel(user).With(panel =>
             {
                 panel.Anchor = Anchor.TopCentre;
                 panel.Origin = Anchor.TopCentre;
-                panel.Width = 290;
-                panel.ShowProfileOnClick = false;
-                panel.Action = () => game?.PerformFromScreen(s => s.Push(new Spectator(user)));
             });
+
+        private class PlayingUserPanel : CompositeDrawable
+        {
+            public readonly User User;
+
+            [Resolved(canBeNull: true)]
+            private OsuGame game { get; set; }
+
+            public PlayingUserPanel(User user)
+            {
+                User = user;
+
+                AutoSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(2),
+                        Children = new Drawable[]
+                        {
+                            new UserGridPanel(user)
+                            {
+                                Width = 290,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            new PurpleTriangleButton
+                            {
+                                Width = 290,
+                                Text = "Watch",
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Action = () => game?.PerformFromScreen(s => s.Push(new Spectator(user)))
+                            }
+                        }
+                    },
+                };
+            }
         }
     }
 }

@@ -20,9 +20,11 @@ namespace osu.Game.Users
     {
         public readonly User User;
 
+        /// <summary>
+        /// Perform an action in addition to showing the user's profile.
+        /// This should be used to perform auxiliary tasks and not as a primary action for clicking a user panel (to maintain a consistent UX).
+        /// </summary>
         public new Action Action;
-
-        public bool ShowProfileOnClick = true;
 
         protected Action ViewProfile { get; private set; }
 
@@ -70,8 +72,7 @@ namespace osu.Game.Users
             base.Action = ViewProfile = () =>
             {
                 Action?.Invoke();
-                if (ShowProfileOnClick)
-                    profileOverlay?.ShowUser(User);
+                profileOverlay?.ShowUser(User);
             };
         }
 
