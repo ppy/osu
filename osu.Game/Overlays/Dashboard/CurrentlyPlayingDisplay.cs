@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Dashboard
             }), true);
         }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
         private UserPanel createUserPanel(User user)
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Dashboard
                 panel.Origin = Anchor.TopCentre;
                 panel.Width = 290;
                 panel.ShowProfileOnClick = false;
-                panel.Action = () => game.PerformFromScreen(s => s.Push(new Spectator(user)));
+                panel.Action = () => game?.PerformFromScreen(s => s.Push(new Spectator(user)));
             });
         }
     }
