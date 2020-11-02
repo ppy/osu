@@ -12,6 +12,8 @@ namespace osu.Game.Screens.Mvis.SideBar
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
         private List<Drawable> components = new List<Drawable>();
         public bool IsHidden = true;
+        private float DURATION = 400;
+        private ISidebarContent currentDisplay;
 
         public SidebarContainer()
         {
@@ -34,14 +36,17 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             var c = d as ISidebarContent;
 
+            if ( currentDisplay == c ) return;
+            currentDisplay = c;
+
             foreach (var item in components)
             {
-                item.FadeOut(300);
+                item.FadeOut(DURATION / 2, Easing.OutQuint);
             }
 
-            d.FadeIn(300);
+            d.Delay(DURATION / 2).FadeIn(DURATION / 2);
 
-            this.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), 600, Easing.OutQuint);
+            this.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), DURATION, Easing.OutQuint);
         }
 
         public void AddDrawableToList(Drawable d) =>
