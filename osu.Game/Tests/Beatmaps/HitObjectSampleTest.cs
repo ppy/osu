@@ -180,9 +180,8 @@ namespace osu.Game.Tests.Beatmaps
             private readonly BeatmapInfo skinBeatmapInfo;
             private readonly IResourceStore<byte[]> resourceStore;
 
-            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> resourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio,
-                                      double length = 60000)
-                : base(beatmap, storyboard, referenceClock, audio, length)
+            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> resourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio)
+                : base(beatmap, storyboard, referenceClock, audio)
             {
                 this.skinBeatmapInfo = skinBeatmapInfo;
                 this.resourceStore = resourceStore;
