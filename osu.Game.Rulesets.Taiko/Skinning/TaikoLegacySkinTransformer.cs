@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 get
                 {
                     foreach (var name in source.LookupNames)
-                        yield return $"taiko-{name}";
+                        yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
 
                     foreach (var name in source.LookupNames)
                         yield return name;
