@@ -9,10 +9,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -137,8 +137,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private class TimelineDragBox : DragBox
         {
-            private Vector2 lastMouseDown;
-            private float localMouseDown;
+            // the following values hold the start and end X positions of the drag box in the timeline's local space,
+            // but with zoom unapplied in order to be able to compensate for positional changes
+            // while the timeline is being zoomed in/out.
+            private float? selectionStart;
+            private float selectionEnd;
+
+            [Resolved]
+            private Timeline timeline { get; set; }
 
             public TimelineDragBox(Action<RectangleF> performSelect)
                 : base(performSelect)
@@ -153,21 +159,34 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool HandleDrag(MouseButtonEvent e)
             {
-                // store the original position of the mouse down, as we may be scrolled during selection.
-                if (lastMouseDown != e.ScreenSpaceMouseDownPosition)
-                {
-                    lastMouseDown = e.ScreenSpaceMouseDownPosition;
-                    localMouseDown = e.MouseDownPosition.X;
-                }
+                selectionStart ??= e.MouseDownPosition.X / timeline.CurrentZoom;
 
-                float selection1 = localMouseDown;
-                float selection2 = e.MousePosition.X;
+                // only calculate end when a transition is not in progress to avoid bouncing.
+                if (Precision.AlmostEquals(timeline.CurrentZoom, timeline.Zoom))
+                    selectionEnd = e.MousePosition.X / timeline.CurrentZoom;
 
-                Box.X = Math.Min(selection1, selection2);
-                Box.Width = Math.Abs(selection1 - selection2);
+                updateDragBoxPosition();
+                return true;
+            }
+
+            private void updateDragBoxPosition()
+            {
+                if (selectionStart == null)
+                    return;
+
+                float rescaledStart = selectionStart.Value * timeline.CurrentZoom;
+                float rescaledEnd = selectionEnd * timeline.CurrentZoom;
+
+                Box.X = Math.Min(rescaledStart, rescaledEnd);
+                Box.Width = Math.Abs(rescaledStart - rescaledEnd);
 
                 PerformSelection?.Invoke(Box.ScreenSpaceDrawQuad.AABBFloat);
-                return true;
+            }
+
+            public override void Hide()
+            {
+                base.Hide();
+                selectionStart = null;
             }
         }
 

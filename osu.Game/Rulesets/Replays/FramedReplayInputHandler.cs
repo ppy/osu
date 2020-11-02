@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Replays
         /// When set, we will ensure frames executed by nested drawables are frame-accurate to replay data.
         /// Disabling this can make replay playback smoother (useful for autoplay, currently).
         /// </summary>
-        public bool FrameAccuratePlayback = false;
+        public bool FrameAccuratePlayback;
 
         protected bool HasFrames => Frames.Count > 0;
 
