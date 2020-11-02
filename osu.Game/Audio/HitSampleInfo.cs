@@ -50,9 +50,9 @@ namespace osu.Game.Audio
             get
             {
                 if (!string.IsNullOrEmpty(Suffix))
-                    yield return $"{Bank}-{Name}{Suffix}";
+                    yield return $"Gameplay/{Bank}-{Name}{Suffix}";
 
-                yield return $"{Bank}-{Name}";
+                yield return $"Gameplay/{Bank}-{Name}";
             }
         }
 

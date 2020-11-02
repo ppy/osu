@@ -70,7 +70,7 @@ namespace osu.Game.Online.Spectator
         public event Action<int, SpectatorState> OnUserBeganPlaying;
 
         /// <summary>
-        /// Called whenever a user starts a play session.
+        /// Called whenever a user finishes a play session.
         /// </summary>
         public event Action<int, SpectatorState> OnUserFinishedPlaying;
 
