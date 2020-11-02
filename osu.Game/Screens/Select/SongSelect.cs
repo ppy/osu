@@ -519,6 +519,7 @@ namespace osu.Game.Screens.Select
 
             ModSelect.SelectedMods.BindTo(selectedMods);
 
+            music.CurrentTrack.Looping = true;
             music.TrackChanged += ensureTrackLooping;
         }
 
