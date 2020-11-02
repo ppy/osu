@@ -187,7 +187,7 @@ namespace osu.Game.Overlays
         /// Specifying <c>true</c> will ensure that other methods like <see cref="EnsurePlayingSomething"/>
         /// will not resume music playback until the next explicit call to <see cref="Play"/>.
         /// </param>
-        public void Stop(bool requestedByUser = true)
+        public void Stop(bool requestedByUser = false)
         {
             IsUserPaused |= requestedByUser;
             if (CurrentTrack.IsRunning)
@@ -201,7 +201,7 @@ namespace osu.Game.Overlays
         public bool TogglePause()
         {
             if (CurrentTrack.IsRunning)
-                Stop();
+                Stop(true);
             else
                 Play();
 

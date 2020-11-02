@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
             if (withUserPause)
-                AddStep("pause", () => Game.Dependencies.Get<MusicController>().Stop());
+                AddStep("pause", () => Game.Dependencies.Get<MusicController>().Stop(true));
 
             AddStep("press enter", () => pressAndRelease(Key.Enter));
 
