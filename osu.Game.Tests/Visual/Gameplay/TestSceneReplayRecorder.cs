@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,11 +13,13 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 using osuTK.Graphics;
@@ -32,6 +35,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         private Replay replay;
 
         private TestReplayRecorder recorder;
+
+        [Cached]
+        private GameplayBeatmap gameplayBeatmap = new GameplayBeatmap(new Beatmap());
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -164,6 +170,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.Update();
             playbackManager?.ReplayInputHandler.SetFrameFromTime(Time.Current - 100);
+        }
+
+        [TearDownSteps]
+        public void TearDown()
+        {
+            AddStep("stop recorder", () => recorder.Expire());
         }
 
         public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>

@@ -821,15 +821,13 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var manager = osu.Dependencies.Get<BeatmapManager>();
 
-            await manager.Import(temp);
-
-            var imported = manager.GetAllUsableBeatmapSets();
+            var importedSet = await manager.Import(temp);
 
             ensureLoaded(osu);
 
             waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
 
-            return imported.LastOrDefault();
+            return manager.GetAllUsableBeatmapSets().Find(beatmapSet => beatmapSet.ID == importedSet.ID);
         }
 
         private void deleteBeatmapSet(BeatmapSetInfo imported, OsuGameBase osu)

@@ -61,11 +61,6 @@ namespace osu.Game.Screens.Play
 
         public bool IsRunning => underlyingClock.IsRunning;
 
-        /// <summary>
-        /// Whether nested samples supporting the <see cref="ISamplePlaybackDisabler"/> interface should be paused.
-        /// </summary>
-        public virtual bool ShouldDisableSamplePlayback => IsPaused.Value;
-
         public void ProcessFrame()
         {
             // intentionally not updating the underlying clock (handled externally).
