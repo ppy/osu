@@ -17,6 +17,8 @@ namespace osu.Game.Scoring
     /// </summary>
     public class ScorePerformanceManager : Component
     {
+        // this cache will grow indefinitely per session and should be considered temporary.
+        // this whole component should likely be replaced with database persistence.
         private readonly ConcurrentDictionary<PerformanceCacheLookup, double> performanceCache = new ConcurrentDictionary<PerformanceCacheLookup, double>();
 
         [Resolved]
