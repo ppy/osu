@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
         private readonly ControlPointInfo controlPoints;
         private readonly Dictionary<double, DrumSample> mappings = new Dictionary<double, DrumSample>();
 
-        private IBindableList<ControlPointGroup> groups;
+        private IBindableList<SampleControlPoint> samplePoints;
 
         public DrumSampleContainer(ControlPointInfo controlPoints)
         {
@@ -31,8 +32,8 @@ namespace osu.Game.Rulesets.Taiko.Audio
         [BackgroundDependencyLoader]
         private void load()
         {
-            groups = controlPoints.Groups.GetBoundCopy();
-            groups.BindCollectionChanged((_, __) => recreateMappings(), true);
+            samplePoints = controlPoints.SamplePoints.GetBoundCopy();
+            samplePoints.BindCollectionChanged((_, __) => recreateMappings(), true);
         }
 
         private void recreateMappings()
@@ -40,14 +41,16 @@ namespace osu.Game.Rulesets.Taiko.Audio
             mappings.Clear();
             ClearInternal();
 
-            IReadOnlyList<SampleControlPoint> samplePoints = controlPoints.SamplePoints.Count == 0 ? new[] { controlPoints.SamplePointAt(double.MinValue) } : controlPoints.SamplePoints;
+            SampleControlPoint[] points = samplePoints.Count == 0
+                ? new[] { controlPoints.SamplePointAt(double.MinValue) }
+                : samplePoints.ToArray();
 
-            for (int i = 0; i < samplePoints.Count; i++)
+            for (int i = 0; i < points.Length; i++)
             {
-                var samplePoint = samplePoints[i];
+                var samplePoint = points[i];
 
                 var lifetimeStart = i > 0 ? samplePoint.Time : double.MinValue;
-                var lifetimeEnd = i + 1 < samplePoints.Count ? samplePoints[i + 1].Time : double.MaxValue;
+                var lifetimeEnd = i + 1 < points.Length ? points[i + 1].Time : double.MaxValue;
 
                 AddInternal(mappings[samplePoint.Time] = new DrumSample(samplePoint)
                 {
