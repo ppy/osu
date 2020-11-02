@@ -579,7 +579,8 @@ namespace osu.Game.Screens.Select
                 updateComponentFromBeatmap(Beatmap.Value);
 
                 // restart playback on returning to song select, regardless.
-                music.Play();
+                // not sure this should be a permanent thing (we may want to leave a user pause paused even on returning)
+                music.Play(requestedByUser: true);
             }
 
             this.FadeIn(250);
