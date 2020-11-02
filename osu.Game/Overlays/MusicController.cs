@@ -166,10 +166,17 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Start playing the current track (if not already playing).
         /// </summary>
+        /// <param name="restart">Whether to restart the track from the beginning.</param>
+        /// <param name="requestedByUser">
+        /// Whether the request to play was issued by the user rather than internally.
+        /// Specifying <c>true</c> will ensure that other methods like <see cref="EnsurePlayingSomething"/>
+        /// will resume music playback going forward.
+        /// </param>
         /// <returns>Whether the operation was successful.</returns>
-        public bool Play(bool restart = false)
+        public bool Play(bool restart = false, bool requestedByUser = false)
         {
-            IsUserPaused = false;
+            if (requestedByUser)
+                IsUserPaused = false;
 
             if (restart)
                 CurrentTrack.Restart();
@@ -182,9 +189,14 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Stop playing the current track and pause at the current position.
         /// </summary>
-        public void Stop()
+        /// <param name="requestedByUser">
+        /// Whether the request to stop was issued by the user rather than internally.
+        /// Specifying <c>true</c> will ensure that other methods like <see cref="EnsurePlayingSomething"/>
+        /// will not resume music playback until the next explicit call to <see cref="Play"/>.
+        /// </param>
+        public void Stop(bool requestedByUser = false)
         {
-            IsUserPaused = true;
+            IsUserPaused |= requestedByUser;
             if (CurrentTrack.IsRunning)
                 CurrentTrack.Stop();
         }
@@ -196,9 +208,9 @@ namespace osu.Game.Overlays
         public bool TogglePause()
         {
             if (CurrentTrack.IsRunning)
-                Stop();
+                Stop(true);
             else
-                Play();
+                Play(requestedByUser: true);
 
             return true;
         }
