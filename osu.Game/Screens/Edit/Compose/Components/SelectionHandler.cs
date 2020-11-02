@@ -201,8 +201,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // there are potentially multiple SelectionHandlers active, but we only want to add hitobjects to the selected list once.
             if (!EditorBeatmap.SelectedHitObjects.Contains(blueprint.HitObject))
                 EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
-
-            UpdateVisibility();
         }
 
         /// <summary>
@@ -214,8 +212,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectedBlueprints.Remove(blueprint);
 
             EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
-
-            UpdateVisibility();
         }
 
         /// <summary>
@@ -226,11 +222,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ShiftPressed && state.Mouse.IsPressed(MouseButton.Right))
-                EditorBeatmap.Remove(blueprint.HitObject);
+                handleQuickDeletion(blueprint);
             else if (state.Keyboard.ControlPressed && state.Mouse.IsPressed(MouseButton.Left))
                 blueprint.ToggleSelection();
             else
                 ensureSelected(blueprint);
+        }
+
+        private void handleQuickDeletion(SelectionBlueprint blueprint)
+        {
+            if (!blueprint.IsSelected)
+                EditorBeatmap.Remove(blueprint.HitObject);
+            else
+                deleteSelected();
         }
 
         private void ensureSelected(SelectionBlueprint blueprint)
@@ -254,23 +258,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Updates whether this <see cref="SelectionHandler"/> is visible.
         /// </summary>
-        internal void UpdateVisibility()
+        private void updateVisibility()
         {
             int count = selectedBlueprints.Count;
 
             selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
 
-            if (count > 0)
-            {
-                Show();
-                OnSelectionChanged();
-            }
-            else
-                Hide();
+            this.FadeTo(count > 0 ? 1 : 0);
+            OnSelectionChanged();
         }
 
         /// <summary>
-        /// Triggered whenever more than one object is selected, on each change.
+        /// Triggered whenever the set of selected objects changes.
         /// Should update the selection box's state to match supported operations.
         /// </summary>
         protected virtual void OnSelectionChanged()
@@ -421,7 +420,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // bring in updates from selection changes
             EditorBeatmap.HitObjectUpdated += _ => UpdateTernaryStates();
-            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) => UpdateTernaryStates();
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) =>
+            {
+                Scheduler.AddOnce(updateVisibility);
+                UpdateTernaryStates();
+            };
         }
 
         /// <summary>
