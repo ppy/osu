@@ -1,7 +1,4 @@
 using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -16,10 +13,7 @@ namespace osu.Game.Screens.Mvis.SideBar
         private List<Drawable> components = new List<Drawable>();
         public bool IsHidden = true;
         private readonly float DURATION = 400;
-        private ISidebarContent currentDisplay;
-        private SampleChannel popInSample;
-        private SampleChannel popOutSample;
-
+        private Drawable currentDisplay;
         public SidebarContainer()
         {
             //与其他Overlay保持一致
@@ -35,13 +29,6 @@ namespace osu.Game.Screens.Mvis.SideBar
             Depth = -float.MaxValue;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audioManager)
-        {
-            popInSample = audioManager.Samples.Get(@"UI/overlay-pop-in");
-            popOutSample = audioManager.Samples.Get(@"UI/overlay-pop-out");
-        }
-
         public void resizeFor(Drawable d)
         {
             if ( ! (d is ISidebarContent isc) || !components.Contains(d) ) return;
@@ -50,17 +37,17 @@ namespace osu.Game.Screens.Mvis.SideBar
             Show();
 
             //如果要显示的是当前正在显示的内容，则中断
-            if ( currentDisplay == c )
+            if ( currentDisplay == d )
             {
                 IsHidden = false;
                 return;
             }
 
-            currentDisplay = c;
             var duration = IsHidden ? 0 : DURATION;
 
-            foreach (var item in components)
-                item.FadeOut(duration / 2, Easing.OutQuint);
+            currentDisplay?.FadeOut(duration / 2, Easing.OutQuint);
+
+            currentDisplay = d;
 
             d.Delay(duration / 2).FadeIn(duration / 2);
 
@@ -68,21 +55,22 @@ namespace osu.Game.Screens.Mvis.SideBar
             IsHidden = false;
         }
 
-        public void AddDrawableToList(Drawable d) =>
+        public void AddDrawableToList(Drawable d)
+        {
+            d.Alpha = 0;
             components.Add(d);
+        }
 
         protected override void PopOut()
         {
             base.PopOut();
             this.FadeEdgeEffectTo(0, DISAPPEAR_DURATION).OnComplete(_ => IsHidden = true);
-            popOutSample.Play();
         }
 
         protected override void PopIn()
         {
             base.PopIn();
             this.FadeEdgeEffectTo(1f);
-            popInSample.Play();
         }
     }
 }

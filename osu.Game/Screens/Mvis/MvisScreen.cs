@@ -383,43 +383,41 @@ namespace osu.Game.Screens
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background5,
-                                    Alpha = 0.5f,
-                                },
-                                settingsScroll = new SidebarSettingsScrollContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                    Child = new FillFlowContainer
-                                    {
-                                        AutoSizeAxes = Axes.Y,
-                                        RelativeSizeAxes = Axes.X,
-                                        Spacing = new Vector2(20),
-                                        Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
-                                        Margin = new MarginPadding{Bottom = 10},
-                                        Direction = FillDirection.Vertical,
-                                        Children = new Drawable[]
+                                        new Box
                                         {
-                                            new MfMvisSection
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = colourProvider.Background5,
+                                            Alpha = 0.5f,
+                                        },
+                                        settingsScroll = new SidebarSettingsScrollContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = new FillFlowContainer
                                             {
-                                                Margin = new MarginPadding { Top = 0 },
+                                                AutoSizeAxes = Axes.Y,
+                                                RelativeSizeAxes = Axes.X,
+                                                Spacing = new Vector2(20),
+                                                Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
+                                                Margin = new MarginPadding{Bottom = 10},
+                                                Direction = FillDirection.Vertical,
+                                                Children = new Drawable[]
+                                                {
+                                                    new MfMvisSection
+                                                    {
+                                                        Margin = new MarginPadding { Top = 0 },
+                                                    },
+                                                    new SettingsButton()
+                                                    {
+                                                        Text = "歌曲选择",
+                                                        Action = () => this.Push(new MvisSongSelect())
+                                                    }
+                                                }
                                             },
-                                            new SettingsButton()
-                                            {
-                                                Text = "歌曲选择",
-                                                Action = () => this.Push(new MvisSongSelect())
-                                            }
-                                        }
-                                    },
-                                },
-                                collectionPanel = new CollectionSelectPanel()
-                                {
-                                    CurrentCollection = { BindTarget = CurrentCollection },
-                                    Alpha = 0,
-                                },
+                                        },
+                                        collectionPanel = new CollectionSelectPanel()
+                                        {
+                                            CurrentCollection = { BindTarget = CurrentCollection },
+                                        },
                                     }
                                 },
                                 new Container

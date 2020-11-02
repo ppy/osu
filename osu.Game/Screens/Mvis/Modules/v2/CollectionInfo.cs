@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
@@ -50,16 +51,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     Colour = colourProvider.Background3,
                     RelativeSizeAxes = Axes.Both
                 },
-                cover = new BeatmapCover(null)
-                {
-                    BackgroundBox = false,
-                    UseBufferedBackground = true
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3.Opacity(0.5f)
-                },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -81,10 +72,14 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                 AutoSizeEasing = Easing.OutQuint,
                                 Children = new Drawable[]
                                 {
-                                    new Box
+                                    cover = new BeatmapCover(null)
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = colourProvider.Background3.Opacity(0.5f)
+                                        BackgroundBox = false,
+                                        UseBufferedBackground = true,
+                                        Colour = ColourInfo.GradientVertical(
+                                            Colour4.LightGray,
+                                            Colour4.LightGray.Opacity(0)
+                                        )
                                     },
                                     new FillFlowContainer
                                     {
@@ -116,7 +111,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                         Height = 3,
                                         RelativeSizeAxes = Axes.X,
                                         Colour = Colour4.Gold,
-                                        Anchor = Anchor.BottomLeft,
                                     }
                                 }
                             }
@@ -176,7 +170,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             collectionName.Text = c.Name.Value;
             collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
-            cover.updateBackground(beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()));
+            cover.updateBackground(beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First()));
             flashBox.FlashColour(Colour4.White, 1000, Easing.OutQuint);
 
             RefreshBeatmapSetList();

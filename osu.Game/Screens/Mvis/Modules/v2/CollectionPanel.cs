@@ -67,8 +67,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             SortBeatmapCollection();
 
-            WorkingBeatmap targetBeatmap;
-            targetBeatmap = beatmapSets.Count > 0 ? beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()) : null;
+            WorkingBeatmap targetBeatmap = beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First());
 
             AddRangeInternal(new Drawable[]
             {

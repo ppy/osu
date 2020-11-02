@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 if (d is CollectionPanel panel)
                     panel.Reset(true);
 
-            if (selectedpanel != null)
+            if (selectedpanel != null && CurrentCollection.Value.Beatmaps.Count != 0 )
                 selectedpanel.state.Value = ActiveState.Active;
         }
 
