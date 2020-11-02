@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            InternalChild = comboBreakSample = new SkinnableSound(new SampleInfo("combobreak"));
+            InternalChild = comboBreakSample = new SkinnableSound(new SampleInfo("Gameplay/combobreak"));
             alwaysPlay = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak);
         }
 

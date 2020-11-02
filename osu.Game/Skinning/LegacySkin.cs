@@ -417,10 +417,14 @@ namespace osu.Game.Skinning
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo)
         {
-            var lookupNames = sampleInfo.LookupNames;
+            IEnumerable<string> lookupNames;
 
             if (sampleInfo is HitSampleInfo hitSample)
                 lookupNames = getLegacyLookupNames(hitSample);
+            else
+            {
+                lookupNames = sampleInfo.LookupNames.SelectMany(getFallbackNames);
+            }
 
             foreach (var lookup in lookupNames)
             {
@@ -433,6 +437,27 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
+        {
+            var lookupNames = hitSample.LookupNames.SelectMany(getFallbackNames);
+
+            if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
+            {
+                // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
+                // using .EndsWith() is intentional as it ensures parity in all edge cases
+                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
+                lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
+            }
+
+            foreach (var l in lookupNames)
+                yield return l;
+
+            // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
+            // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
+            // which is why this is done locally here.
+            yield return hitSample.Name;
+        }
+
         private IEnumerable<string> getFallbackNames(string componentName)
         {
             // May be something like "Gameplay/osu/approachcircle" from lazer, or "Arrows/note1" from a user skin.
@@ -441,24 +466,6 @@ namespace osu.Game.Skinning
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
             yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
-        }
-
-        private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
-        {
-            var lookupNames = hitSample.LookupNames;
-
-            if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
-                // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
-                // using .EndsWith() is intentional as it ensures parity in all edge cases
-                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
-                lookupNames = hitSample.LookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
-
-            // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
-            // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
-            // which is why this is done locally here.
-            lookupNames = lookupNames.Append(hitSample.Name);
-
-            return lookupNames;
         }
     }
 }
