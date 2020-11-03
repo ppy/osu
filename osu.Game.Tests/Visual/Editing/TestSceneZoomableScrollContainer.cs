@@ -102,6 +102,24 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestMouseZoomInThenScroll()
+        {
+            reset();
+
+            // Scroll in at 0.25
+            AddStep("Move mouse to 0.25x", () => InputManager.MoveMouseTo(new Vector2(scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X, scrollQuad.Centre.Y)));
+            AddStep("Press alt down", () => InputManager.PressKey(Key.AltLeft));
+            AddStep("Zoom by 3", () => InputManager.ScrollBy(new Vector2(0, 3)));
+            AddStep("Release alt", () => InputManager.ReleaseKey(Key.AltLeft));
+
+            AddStep("Scroll far left", () => InputManager.ScrollBy(new Vector2(0, 30)));
+            AddUntilStep("Scroll is at start", () => Precision.AlmostEquals(scrollQuad.TopLeft.X, boxQuad.TopLeft.X, 1));
+
+            AddStep("Scroll far right", () => InputManager.ScrollBy(new Vector2(0, -300)));
+            AddUntilStep("Scroll is at end", () => Precision.AlmostEquals(scrollQuad.TopRight.X, boxQuad.TopRight.X, 1));
+        }
+
+        [Test]
         public void TestMouseZoomInTwiceOutTwice()
         {
             reset();
