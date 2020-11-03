@@ -165,7 +165,8 @@ namespace osu.Game.Screens.Play
                                 Width = 250,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Action = attemptStart
+                                Action = attemptStart,
+                                Enabled = { Value = false }
                             }
                         }
                     }
