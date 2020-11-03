@@ -115,13 +115,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Key)
             {
                 case Key.G:
-                    return OnReverse?.Invoke() == true;
+                    return CanReverse && OnReverse?.Invoke() == true;
 
                 case Key.H:
-                    return OnFlip?.Invoke(Direction.Horizontal) == true;
+                    return CanScaleX && OnFlip?.Invoke(Direction.Horizontal) == true;
 
                 case Key.J:
-                    return OnFlip?.Invoke(Direction.Vertical) == true;
+                    return CanScaleY && OnFlip?.Invoke(Direction.Vertical) == true;
             }
 
             return base.OnKeyDown(e);
