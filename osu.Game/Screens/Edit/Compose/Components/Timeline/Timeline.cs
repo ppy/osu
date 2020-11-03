@@ -165,6 +165,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (!track.IsLoaded || track.Length == 0)
                 return;
 
+            // covers the case where the user starts playback after a drag is in progress.
+            // we want to ensure the clock is always stopped during drags to avoid weird audio playback.
+            if (handlingDragInput)
+                editorClock.Stop();
+
             ScrollTo((float)(editorClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
 
