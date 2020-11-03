@@ -116,7 +116,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            beginClickSelection(e);
+            if (beginClickSelection(e)) return true;
+
             prepareSelectionMovement();
 
             return e.Button == MouseButton.Left;
@@ -291,19 +292,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Attempts to select any hovered blueprints.
         /// </summary>
         /// <param name="e">The input event that triggered this selection.</param>
-        private void beginClickSelection(MouseButtonEvent e)
+        private bool beginClickSelection(MouseButtonEvent e)
         {
             Debug.Assert(!clickSelectionBegan);
+
+            bool rightClickHandled = false;
 
             foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren)
             {
                 if (blueprint.IsHovered)
                 {
-                    SelectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
+                    rightClickHandled |= SelectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
                     clickSelectionBegan = true;
                     break;
                 }
             }
+
+            return rightClickHandled;
         }
 
         /// <summary>

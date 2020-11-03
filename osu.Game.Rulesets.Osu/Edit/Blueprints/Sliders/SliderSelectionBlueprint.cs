@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -70,6 +71,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             pathVersion.BindValueChanged(_ => updatePath());
 
             BodyPiece.UpdateFrom(HitObject);
+        }
+
+        public override bool HandleQuickDeletion()
+        {
+            var hoveredControlPoint = ControlPointVisualiser.Pieces.FirstOrDefault(p => p.IsHovered);
+
+            if (hoveredControlPoint == null)
+                return false;
+
+            hoveredControlPoint.IsSelected.Value = true;
+            ControlPointVisualiser.DeleteSelected();
+            return true;
         }
 
         protected override void Update()
@@ -216,7 +229,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override Vector2 ScreenSpaceSelectionPoint => BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => BodyPiece.ReceivePositionalInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.ReceivePositionalInputAt(screenSpacePos) == true;
 
         protected virtual SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position) => new SliderCircleSelectionBlueprint(slider, position);
     }
