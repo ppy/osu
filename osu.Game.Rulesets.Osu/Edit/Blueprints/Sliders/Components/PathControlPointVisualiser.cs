@@ -18,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
@@ -105,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (action.ActionMethod)
             {
                 case PlatformActionMethod.Delete:
-                    return deleteSelected();
+                    return DeleteSelected();
             }
 
             return false;
@@ -114,6 +115,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public void OnReleased(PlatformAction action)
         {
         }
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos));
 
         private void selectPiece(PathControlPointPiece piece, MouseButtonEvent e)
         {
@@ -126,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
-        private bool deleteSelected()
+        public bool DeleteSelected()
         {
             List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.ControlPoint).ToList();
 
@@ -169,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => deleteSelected()),
+                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => DeleteSelected()),
                     new OsuMenuItem("Curve type")
                     {
                         Items = items
