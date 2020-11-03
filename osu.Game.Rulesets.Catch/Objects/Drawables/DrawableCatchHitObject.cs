@@ -62,6 +62,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
+        protected override double InitialLifetimeOffset => HitObject.TimePreempt;
+
         public virtual bool StaysOnPlate => HitObject.CanBePlated;
 
         public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
