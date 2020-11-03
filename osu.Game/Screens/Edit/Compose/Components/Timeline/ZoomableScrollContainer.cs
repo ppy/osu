@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.CurrentState.Keyboard.AltPressed)
+            if (e.AltPressed)
             {
                 // zoom when holding alt.
                 setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
