@@ -113,19 +113,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.IsPrecise)
+            if (e.AltPressed)
             {
-                // can't handle scroll correctly while playing.
-                // the editor will handle this case for us.
-                if (editorClock?.IsRunning == true)
-                    return false;
-
-                // for now, we don't support zoom when using a precision scroll device. this needs gesture support.
-                return base.OnScroll(e);
+                // zoom when holding alt.
+                setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                return true;
             }
 
-            setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
-            return true;
+            // can't handle scroll correctly while playing.
+            // the editor will handle this case for us.
+            if (editorClock?.IsRunning == true)
+                return false;
+
+            return base.OnScroll(e);
         }
 
         private void updateZoomedContentWidth() => zoomedContent.Width = DrawWidth * currentZoom;
