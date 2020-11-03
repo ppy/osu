@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Online
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("register request handling", () => ((DummyAPIAccess)API).HandleRequest = req =>
+            AddStep("register request handling", () => dummyAPI.HandleRequest = req =>
             {
                 switch (req)
                 {
