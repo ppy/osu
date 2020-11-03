@@ -636,7 +636,10 @@ namespace osu.Game.Screens.Select
 
         private void endLooping()
         {
-            Debug.Assert(isHandlingLooping);
+            // may be called multiple times during screen exit process.
+            if (!isHandlingLooping)
+                return;
+
             music.CurrentTrack.Looping = isHandlingLooping = false;
 
             music.TrackChanged -= ensureTrackLooping;
