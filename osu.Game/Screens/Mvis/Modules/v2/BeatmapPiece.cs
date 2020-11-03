@@ -70,21 +70,21 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.75f,
+                    Colour = colourProvider.Background4,
                     Children = new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.3f,
-                            Colour = colourProvider.Background3
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.2f,
                             Colour = ColourInfo.GradientHorizontal(
-                                colourProvider.Background3,
-                                colourProvider.Background3.Opacity(0.5f)
+                                Colour4.White,
+                                Colour4.White.Opacity(0.5f)
                             )
                         },
                         new Box
@@ -92,8 +92,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.1f,
                             Colour = ColourInfo.GradientHorizontal(
-                                colourProvider.Background3.Opacity(0.5f),
-                                colourProvider.Background3.Opacity(0.2f)
+                                Colour4.White.Opacity(0.5f),
+                                Colour4.White.Opacity(0.2f)
                             )
                         },
                         new Box
@@ -101,8 +101,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.1f,
                             Colour = ColourInfo.GradientHorizontal(
-                                colourProvider.Background3.Opacity(0.2f),
-                                colourProvider.Background3.Opacity(0)
+                                Colour4.White.Opacity(0.2f),
+                                Colour4.White.Opacity(0)
                             )
                         }
                     }
@@ -182,15 +182,15 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 case true:
                     if ( IsCurrent )
-                            BorderColour = colourProvider.Highlight1;
+                        BorderColour = colourProvider.Highlight1;
                     else
-                            BorderColour = Colour4.Gold;
+                        BorderColour = colourProvider.Light2;
                     maskBox.FadeOut(500);
                     flash.Show();
                     break;
 
                 case false:
-                    BorderColour = Colour4.Gray;
+                    BorderColour = colourProvider.Background1;
                     maskBox.FadeIn(500);
                     flash.Hide();
                     break;

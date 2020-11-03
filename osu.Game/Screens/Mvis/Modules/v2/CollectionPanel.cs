@@ -14,6 +14,7 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
@@ -35,6 +36,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
 
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;
@@ -184,8 +188,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 case ActiveState.Active:
                     BorderThickness = 3f;
-                    BorderColour = Color4Extensions.FromHex(@"88b300");
-                    stateBox.FadeColour(Color4Extensions.FromHex("#88b300"), 300, Easing.OutQuint);
+                    BorderColour = colourProvider.Highlight1;
+                    stateBox.FadeColour(colourProvider.Highlight1, 300, Easing.OutQuint);
                     break;
 
                 case ActiveState.Disabled:
@@ -197,8 +201,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
                 case ActiveState.Selected:
                     BorderThickness = 3f;
-                    BorderColour = Colour4.Gold;
-                    stateBox.FadeColour(Colour4.Gold, 300, Easing.OutQuint);
+                    BorderColour = colourProvider.Light2;
+                    stateBox.FadeColour(colourProvider.Light2, 300, Easing.OutQuint);
                     break;
 
                 default:

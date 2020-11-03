@@ -113,6 +113,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             if (currentPiece == null)
             {
+                firstScroll = false;
                 scrollCache.Validate();
                 return;
             }

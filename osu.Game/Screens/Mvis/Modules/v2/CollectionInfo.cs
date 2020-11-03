@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        private Box flashBox;
+        private Container flashBox;
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;
         private Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
@@ -106,11 +106,24 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                             }
                                         }
                                     },
-                                    flashBox = new Box
+                                    flashBox = new Container
                                     {
-                                        Height = 3,
+                                        AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Colour = Colour4.Gold,
+                                        Children = new Drawable[]
+                                        {
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 8 + 5,
+                                                Alpha = 0.6f
+                                            },
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 8
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -210,8 +223,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         public void UpdateCollection(BeatmapCollection collection, bool isCurrent)
         {
-            if (!isCurrent) flashBox.FadeColour(Colour4.Gold, 300, Easing.OutQuint);
-            else flashBox.FadeColour(Color4Extensions.FromHex("#88b300"), 300, Easing.OutQuint);
+            if (!isCurrent) flashBox.FadeColour(colourProvider.Light2, 300, Easing.OutQuint);
+            else flashBox.FadeColour(colourProvider.Highlight1, 300, Easing.OutQuint);
 
             if ( collection != this.collection.Value && beatmapList != null )
             {
