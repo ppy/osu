@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
@@ -85,6 +86,8 @@ namespace osu.Game.Screens.Select
 
         private WorkingBeatmap beatmap;
 
+        private CancellationTokenSource cancellationSource;
+
         public WorkingBeatmap Beatmap
         {
             get => beatmap;
@@ -93,10 +96,12 @@ namespace osu.Game.Screens.Select
                 if (beatmap == value) return;
 
                 beatmap = value;
+                cancellationSource?.Cancel();
+                cancellationSource = new CancellationTokenSource();
 
                 beatmapDifficulty?.UnbindAll();
-                beatmapDifficulty = difficultyManager.GetBindableDifficulty(beatmap.BeatmapInfo);
-                beatmapDifficulty.BindValueChanged(_ => updateDisplay());
+                beatmapDifficulty = difficultyManager.GetBindableDifficulty(beatmap.BeatmapInfo, cancellationSource.Token);
+                beatmapDifficulty.BindValueChanged(_ => Schedule(updateDisplay));
 
                 updateDisplay();
             }
@@ -135,6 +140,12 @@ namespace osu.Game.Screens.Select
                 removeOldInfo();
                 Add(Info = loaded);
             });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            cancellationSource?.Cancel();
         }
 
         public class BufferedWedgeInfo : BufferedContainer
