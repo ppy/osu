@@ -112,15 +112,15 @@ namespace osu.Game.Overlays.Dashboard
                             new UserGridPanel(user)
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
                             },
                             new PurpleTriangleButton
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Text = "Watch",
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
                                 Action = () => game?.PerformFromScreen(s => s.Push(new Spectator(user)))
                             }
                         }
