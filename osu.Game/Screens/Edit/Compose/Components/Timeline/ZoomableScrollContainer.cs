@@ -117,6 +117,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 // zoom when holding alt.
                 setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                return true;
             }
 
             // can't handle scroll correctly while playing.
