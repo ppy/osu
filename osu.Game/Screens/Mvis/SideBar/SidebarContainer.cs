@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.Modules;
@@ -8,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.SideBar
 {
-    public class SidebarContainer : WaveContainer
+    public class SidebarContainer : VisibilityContainer
     {
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
@@ -17,6 +18,9 @@ namespace osu.Game.Screens.Mvis.SideBar
         private readonly float DURATION = 400;
         private Drawable currentDisplay;
 
+        private readonly WaveContainer waveContainer;
+        protected override Container<Drawable> Content => waveContainer;
+
         public SidebarContainer()
         {
             Anchor = Anchor.BottomRight;
@@ -24,16 +28,21 @@ namespace osu.Game.Screens.Mvis.SideBar
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(0.3f, 1f);
             Depth = -float.MaxValue;
+
+            AddInternal(waveContainer = new WaveContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             //与其他Overlay保持一致
-            FirstWaveColour = colourProvider.Light4;
-            SecondWaveColour = colourProvider.Light3;
-            ThirdWaveColour = colourProvider.Dark4;
-            FourthWaveColour = colourProvider.Dark3;
+            waveContainer.FirstWaveColour = colourProvider.Light4;
+            waveContainer.SecondWaveColour = colourProvider.Light3;
+            waveContainer.ThirdWaveColour = colourProvider.Dark4;
+            waveContainer.FourthWaveColour = colourProvider.Dark3;
         }
 
         public void resizeFor(Drawable d)
@@ -70,14 +79,14 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         protected override void PopOut()
         {
-            base.PopOut();
-            this.FadeEdgeEffectTo(0, DISAPPEAR_DURATION).OnComplete(_ => IsHidden = true);
+            waveContainer.Hide();
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InExpo).OnComplete(_ => IsHidden = true);
         }
 
         protected override void PopIn()
         {
-            base.PopIn();
-            this.FadeEdgeEffectTo(1f);
+            waveContainer.Show();
+            this.FadeIn(200);
         }
     }
 }

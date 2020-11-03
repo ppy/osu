@@ -116,7 +116,7 @@ namespace osu.Game.Screens
         private SidebarSettingsScrollContainer settingsScroll;
 
         [Cached]
-        public readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
+        public readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Mvis);
         private SidebarContentState oldSidebarState;
 
         public MvisScreen()
