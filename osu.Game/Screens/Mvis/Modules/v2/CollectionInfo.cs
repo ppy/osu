@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             InternalChildren = new Drawable[]
             {
-                new Box
+                bgBox = new Box
                 {
                     Colour = colourProvider.Background3,
                     RelativeSizeAxes = Axes.Both
@@ -153,6 +153,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             base.LoadComplete();
 
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                bgBox.Colour =  colourProvider.Background3;
+
+                flashBox.Colour = isCurrentCollection.Value ? colourProvider.Highlight1 : colourProvider.Light1 ;
+            }, true);
             collection.BindValueChanged(OnCollectionChanged);
         }
 
@@ -190,6 +196,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private CancellationTokenSource refreshTaskCancellationToken;
         private Container listContainer;
         private LoadingSpinner loadingSpinner;
+        private Box bgBox;
 
         private void RefreshBeatmapSetList()
         {
@@ -246,7 +253,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             collectionName.Text = "未选择收藏夹";
             collectionBeatmapCount.Text = "请先选择一个收藏夹!";
 
-            flashBox.FadeColour(Colour4.Gold);
+            flashBox.FadeColour(Colour4.Gray);
         }
     }
 }

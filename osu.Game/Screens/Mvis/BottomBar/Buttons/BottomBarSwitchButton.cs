@@ -10,6 +10,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
     {
         public BindableBool ToggleableValue = new BindableBool();
         public bool DefaultValue { get; set; }
+        private bool Clicked = false;
         protected override void LoadComplete()
         {
             ToggleableValue.Value = DefaultValue;
@@ -17,11 +18,14 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
             UpdateVisuals();
 
+            ColourProvider.HueColour.BindValueChanged(_ => UpdateVisuals());
+
             base.LoadComplete();
         }
 
         protected override bool OnClick(Framework.Input.Events.ClickEvent e)
         {
+            Clicked = true;
             Toggle();
             return base.OnClick(e);
         }
@@ -31,19 +35,22 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
         private void UpdateVisuals()
         {
+            var duration = Clicked ? 500 : 0;
             switch (ToggleableValue.Value)
             {
                 case true:
-                    bgBox.FadeColour(ColourProvider.Highlight1, 500, Easing.OutQuint);
-                    contentFillFlow.FadeColour(Colour4.Black, 500, Easing.OutQuint);
-                    OnToggledOnAnimation();
+                    bgBox.FadeColour(ColourProvider.Highlight1, duration, Easing.OutQuint);
+                    contentFillFlow.FadeColour(Colour4.Black, duration, Easing.OutQuint);
+                    if ( Clicked )
+                        OnToggledOnAnimation();
                     break;
 
                 case false:
-                    bgBox.FadeColour(ColourProvider.Background3, 500, Easing.OutQuint);
-                    contentFillFlow.FadeColour(Colour4.White, 500, Easing.OutQuint);
+                    bgBox.FadeColour(ColourProvider.Background3, duration, Easing.OutQuint);
+                    contentFillFlow.FadeColour(Colour4.White, duration, Easing.OutQuint);
                     break;
             }
+            Clicked = false;
         }
 
         protected virtual void OnToggledOnAnimation()

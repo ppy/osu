@@ -109,6 +109,12 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
             content.BorderColour = ColourProvider.Content2;
             content.BorderThickness = 1.5f;
+
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                content.BorderColour = ColourProvider.Content2;
+                bgBox.Colour = ColourProvider.Background3;
+            });
         }
 
         protected override bool OnMouseDown(Framework.Input.Events.MouseDownEvent e)

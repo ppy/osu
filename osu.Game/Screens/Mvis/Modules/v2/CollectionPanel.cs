@@ -167,6 +167,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
             state.BindValueChanged(OnStateChanged, true);
+
+            if ( state.Value != ActiveState.Disabled )
+                colourProvider.HueColour.BindValueChanged(_ => state.TriggerChange());
         }
 
         protected override void LoadComplete()

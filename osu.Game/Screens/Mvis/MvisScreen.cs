@@ -119,6 +119,8 @@ namespace osu.Game.Screens
         
         private SidebarContentState oldSidebarState;
         private DependencyContainer dependencies;
+        private Box sidebarBg;
+        private Box sidebarBottomBox;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -135,9 +137,15 @@ namespace osu.Game.Screens
             var iG = config.Get<float>(MfSetting.MvisInterfaceGreen);
             var iB = config.Get<float>(MfSetting.MvisInterfaceBlue);
             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
+            colourProvider.HueColour.BindValueChanged(v =>
+            {
+                sidebarBg.Colour = colourProvider.Background5;
+                sidebarBottomBox.Colour = colourProvider.Background4;
+            });
 
             InternalChildren = new Drawable[]
             {
+                colourProvider,
                 nightcoreBeatContainer = new NightcoreBeatContainer
                 {
                     Alpha = 0
@@ -392,7 +400,7 @@ namespace osu.Game.Screens
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new Box
+                                        sidebarBg = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = colourProvider.Background5,
@@ -442,7 +450,7 @@ namespace osu.Game.Screens
                                         Colour = Colour4.Black.Opacity(0.6f),
                                         Radius = 10,
                                     },
-                                    Child = new Box
+                                    Child = sidebarBottomBox = new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = colourProvider.Background4,

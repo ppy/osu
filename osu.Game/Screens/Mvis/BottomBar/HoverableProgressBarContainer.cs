@@ -32,6 +32,12 @@ namespace osu.Game.Screens.Mvis.UI
                     Alpha = idle_alpha,
                 },
             };
+
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                progressBar.FillColour = colourProvider.Highlight1;
+                progressBar.BackgroundColour = colourProvider.Background3.Opacity(0.5f);
+            });
         }
 
         private class HoverableProgressBar : ProgressBar

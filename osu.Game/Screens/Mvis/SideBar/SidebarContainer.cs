@@ -37,6 +37,11 @@ namespace osu.Game.Screens.Mvis.SideBar
         [BackgroundDependencyLoader]
         private void load()
         {
+            colourProvider.HueColour.BindValueChanged(_ => UpdateWaves(), true);
+        }
+
+        private void UpdateWaves()
+        {
             //与其他Overlay保持一致
             waveContainer.FirstWaveColour = colourProvider.Light4;
             waveContainer.SecondWaveColour = colourProvider.Light3;

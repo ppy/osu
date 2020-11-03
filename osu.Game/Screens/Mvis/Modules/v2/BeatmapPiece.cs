@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private Flash flash;
         private Box maskBox;
         private Box hover;
+        private FillFlowContainer maskFillFlow;
+        private Box bgBox;
 
         public BeatmapPiece(WorkingBeatmap b)
         {
@@ -52,10 +54,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             AddRangeInternal(new Drawable[]
             {
-                new Box
+                bgBox = new Box
                 {
                     RelativeSizeAxes= Axes.Both,
-                    Colour = Colour4.Gray
+                    Colour = colourProvider.Background4
                 },
                 new BeatmapCover(beatmap)
                 {
@@ -66,7 +68,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background3.Opacity(0.65f)
                 },
-                new FillFlowContainer
+                maskFillFlow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.75f,
@@ -142,6 +144,20 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             });
 
             Active.BindValueChanged(OnActiveChanged, true);
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                maskBox.Colour = colourProvider.Background3.Opacity(0.65f);
+                maskFillFlow.Colour = bgBox.Colour = colourProvider.Background4;
+                if ( Active.Value )
+                {
+                    if ( IsCurrent )
+                        BorderColour = colourProvider.Highlight1;
+                    else
+                        BorderColour = colourProvider.Light2;
+                }
+                else
+                    BorderColour = colourProvider.Background1;
+            });
         }
 
         private class Flash : BeatSyncedContainer

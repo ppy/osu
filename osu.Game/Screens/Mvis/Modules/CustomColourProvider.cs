@@ -1,6 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -10,7 +14,7 @@ namespace osu.Game.Screens.Mvis.Modules
     ///<summary>
     ///更改自<see cref="OverlayColourProvider"/>
     ///</summary>
-    public class CustomColourProvider
+    public class CustomColourProvider : Component
     {
         public Color4 Highlight1 => getColour(1, 0.7f);
         public Color4 Content1 => getColour(0.4f, 1);
@@ -32,17 +36,35 @@ namespace osu.Game.Screens.Mvis.Modules
         public Color4 Background4 => getColour(0.1f, 0.2f);
         public Color4 Background5 => getColour(0.1f, 0.15f);
         public Color4 Background6 => getColour(0.1f, 0.1f);
-        private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(HueColour, saturation, lightness, 1));
-        public float HueColour;
+        private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(HueColour.Value, saturation, lightness, 1));
+        public BindableFloat HueColour = new BindableFloat();
 
         public CustomColourProvider(float r, float g, float b)
         {
-            HueColour = Color4.ToHsl(new Color4(r,g,b,1)).X;
+            HueColour.Value = Color4.ToHsl(new Color4(r,g,b,1)).X;
         }
+
+        private BindableFloat iR = new BindableFloat();
+        private BindableFloat iG = new BindableFloat();
+        private BindableFloat iB = new BindableFloat();
+
+        [BackgroundDependencyLoader]
+        private void load(MfConfigManager config)
+        {
+            config.BindWith(MfSetting.MvisInterfaceRed, iR);
+            config.BindWith(MfSetting.MvisInterfaceGreen, iG);
+            config.BindWith(MfSetting.MvisInterfaceBlue, iB);
+
+            iR.BindValueChanged(_ => UpdateColor());
+            iG.BindValueChanged(_ => UpdateColor());
+            iB.BindValueChanged(_ => UpdateColor());
+        }
+
+        private void UpdateColor() => UpdateHueColor(iR.Value, iG.Value, iB.Value);
 
         public void UpdateHueColor(float r, float g, float b)
         {
-            HueColour = Color4.ToHsl(new Color4(r,g,b,1)).X;
+            HueColour.Value = Color4.ToHsl(new Color4(r,g,b,1)).X;
         }
     }
 }
