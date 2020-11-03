@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
     public class BeatmapPiece : OsuClickableContainer
     {
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private CustomColourProvider colourProvider { get; set; }
 
         [Resolved]
         private Bindable<WorkingBeatmap> b { get; set; }

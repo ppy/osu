@@ -9,7 +9,6 @@ using osuTK;
 using osu.Framework.Graphics.Containers;
 using osuTK.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis.Modules;
 using osu.Game.Configuration;
@@ -19,8 +18,8 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
     public class BottomBarButton : OsuClickableContainer
     {
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
-        protected OverlayColourProvider ColourProvider;
+        private CustomColourProvider colourProvider { get; set; }
+        protected CustomColourProvider ColourProvider;
         protected FillFlowContainer contentFillFlow;
         protected Box bgBox;
         private Box flashBox;

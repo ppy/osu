@@ -4,7 +4,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
+using osu.Game.Screens.Mvis.Modules;
 
 namespace osu.Game.Screens.Mvis.UI
 {
@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Mvis.UI
         public ProgressBar progressBar;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private CustomColourProvider colourProvider { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

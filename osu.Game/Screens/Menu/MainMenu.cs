@@ -39,8 +39,6 @@ namespace osu.Game.Screens.Menu
 
         private Screen songSelect;
 
-        private Screen mvisScreen;
-
         private MenuSideFlashes sideFlashes;
 
         private ButtonSystem buttons;
@@ -145,7 +143,6 @@ namespace osu.Game.Screens.Menu
             buttons.OnMfMenuButton = () => mfoverlay?.ToggleVisibility();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
-            LoadComponentAsync(mvisScreen = new MvisScreen());
             preloadScreens();
         }
 
@@ -164,9 +161,6 @@ namespace osu.Game.Screens.Menu
         {
             if (songSelect == null)
                 LoadComponentAsync(songSelect = new PlaySongSelect());
-
-            if (mvisScreen == null)
-                LoadComponentAsync(mvisScreen = new MvisScreen());
         }
 
         public void LoadToSolo() => Schedule(onSolo);
@@ -186,8 +180,7 @@ namespace osu.Game.Screens.Menu
 
         private Screen consumeMvis()
         {
-            var s = mvisScreen;
-            mvisScreen = null;
+            var s = new MvisScreen();
             return s;
         }
 

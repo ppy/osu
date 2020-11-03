@@ -115,13 +115,26 @@ namespace osu.Game.Screens
         private CollectionSelectPanel collectionPanel;
         private SidebarSettingsScrollContainer settingsScroll;
 
-        [Cached]
-        public readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Mvis);
+        public CustomColourProvider colourProvider;
+        
         private SidebarContentState oldSidebarState;
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         public MvisScreen()
         {
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(MfConfigManager config, IdleTracker idleTracker)
+        {
+            var iR = config.Get<float>(MfSetting.MvisInterfaceRed);
+            var iG = config.Get<float>(MfSetting.MvisInterfaceGreen);
+            var iB = config.Get<float>(MfSetting.MvisInterfaceBlue);
+            dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
 
             InternalChildren = new Drawable[]
             {
@@ -443,11 +456,7 @@ namespace osu.Game.Screens
 
             sidebar.AddDrawableToList(settingsScroll);
             sidebar.AddDrawableToList(collectionPanel);
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(MfConfigManager config, IdleTracker idleTracker)
-        {
             IsIdle.BindTo(idleTracker.IsIdle);
             config.BindWith(MfSetting.MvisBgBlur, BgBlur);
             config.BindWith(MfSetting.MvisIdleBgDim, IdleBgDim);

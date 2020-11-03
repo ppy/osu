@@ -14,7 +14,6 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
@@ -38,7 +37,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private CustomColourProvider colourProvider { get; set; }
 
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;

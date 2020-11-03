@@ -3,7 +3,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.Modules;
 using osuTK;
 
@@ -12,7 +11,7 @@ namespace osu.Game.Screens.Mvis.SideBar
     public class SidebarContainer : VisibilityContainer
     {
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private CustomColourProvider colourProvider { get; set; }
         private List<Drawable> components = new List<Drawable>();
         public bool IsHidden = true;
         private readonly float DURATION = 400;

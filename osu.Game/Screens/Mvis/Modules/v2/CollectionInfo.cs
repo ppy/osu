@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +13,6 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
@@ -32,7 +30,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private BeatmapCover cover;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private CustomColourProvider colourProvider { get; set; }
         private BeatmapList beatmapList;
         private BindableBool isCurrentCollection = new BindableBool();
 
