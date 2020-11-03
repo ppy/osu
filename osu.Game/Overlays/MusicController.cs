@@ -45,7 +45,10 @@ namespace osu.Game.Overlays
 
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
-        public bool IsUserPaused { get; private set; }
+        /// <summary>
+        /// Whether the user has requested the track to be paused. Use <see cref="IsPlaying"/> to determine whether the track is still playing.
+        /// </summary>
+        public bool UserPauseRequested { get; private set; }
 
         /// <summary>
         /// Fired when the global <see cref="WorkingBeatmap"/> has changed.
@@ -148,7 +151,7 @@ namespace osu.Game.Overlays
         /// </summary>
         public void EnsurePlayingSomething()
         {
-            if (IsUserPaused) return;
+            if (UserPauseRequested) return;
 
             if (CurrentTrack.IsDummyDevice || beatmap.Value.BeatmapSetInfo.DeletePending)
             {
@@ -166,10 +169,17 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Start playing the current track (if not already playing).
         /// </summary>
+        /// <param name="restart">Whether to restart the track from the beginning.</param>
+        /// <param name="requestedByUser">
+        /// Whether the request to play was issued by the user rather than internally.
+        /// Specifying <c>true</c> will ensure that other methods like <see cref="EnsurePlayingSomething"/>
+        /// will resume music playback going forward.
+        /// </param>
         /// <returns>Whether the operation was successful.</returns>
-        public bool Play(bool restart = false)
+        public bool Play(bool restart = false, bool requestedByUser = false)
         {
-            IsUserPaused = false;
+            if (requestedByUser)
+                UserPauseRequested = false;
 
             if (restart)
                 CurrentTrack.Restart();
@@ -182,9 +192,14 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Stop playing the current track and pause at the current position.
         /// </summary>
-        public void Stop()
+        /// <param name="requestedByUser">
+        /// Whether the request to stop was issued by the user rather than internally.
+        /// Specifying <c>true</c> will ensure that other methods like <see cref="EnsurePlayingSomething"/>
+        /// will not resume music playback until the next explicit call to <see cref="Play"/>.
+        /// </param>
+        public void Stop(bool requestedByUser = false)
         {
-            IsUserPaused = true;
+            UserPauseRequested |= requestedByUser;
             if (CurrentTrack.IsRunning)
                 CurrentTrack.Stop();
         }
@@ -196,9 +211,9 @@ namespace osu.Game.Overlays
         public bool TogglePause()
         {
             if (CurrentTrack.IsRunning)
-                Stop();
+                Stop(true);
             else
-                Play();
+                Play(requestedByUser: true);
 
             return true;
         }
