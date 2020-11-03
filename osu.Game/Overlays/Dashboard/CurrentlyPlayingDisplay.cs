@@ -103,20 +103,21 @@ namespace osu.Game.Overlays.Dashboard
                 {
                     new FillFlowContainer
                     {
-                        AutoSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(2),
+                        Width = 290,
                         Children = new Drawable[]
                         {
                             new UserGridPanel(user)
                             {
-                                Width = 290,
+                                RelativeSizeAxes = Axes.X,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },
                             new PurpleTriangleButton
                             {
-                                Width = 290,
+                                RelativeSizeAxes = Axes.X,
                                 Text = "Watch",
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
