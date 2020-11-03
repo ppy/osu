@@ -50,6 +50,8 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 };
             });
+
+            AddStep("Reset players", () => testSpectatorStreamingClient.PlayingUsers.Clear());
         }
 
         [Test]
