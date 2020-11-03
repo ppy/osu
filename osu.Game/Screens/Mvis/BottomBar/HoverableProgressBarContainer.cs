@@ -3,8 +3,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.UI
 {
@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Mvis.UI
         public ProgressBar progressBar;
 
         [Resolved]
-        private OsuColour colour { get; set; }
+        private OverlayColourProvider colourProvider { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -27,8 +27,8 @@ namespace osu.Game.Screens.Mvis.UI
                     Anchor = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.1f,
-                    FillColour = colour.Yellow,
-                    BackgroundColour = colour.YellowDarker.Opacity(0.5f),
+                    FillColour = colourProvider.Highlight1,
+                    BackgroundColour = colourProvider.Background3.Opacity(0.5f),
                     Alpha = idle_alpha,
                 },
             };

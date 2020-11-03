@@ -31,8 +31,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
         private BeatmapCover cover;
 
-        [Cached]
-        public readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
         private BeatmapList beatmapList;
         private BindableBool isCurrentCollection = new BindableBool();
 

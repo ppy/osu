@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -10,24 +9,56 @@ using osuTK;
 using osu.Framework.Graphics.Containers;
 using osuTK.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
+using osu.Game.Overlays;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Mvis.Modules;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
     public class BottomBarButton : OsuClickableContainer
     {
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+        protected OverlayColourProvider ColourProvider;
         protected FillFlowContainer contentFillFlow;
-        protected readonly Box bgBox;
+        protected Box bgBox;
         private Box flashBox;
         private Container content;
-        public SpriteIcon spriteIcon;
-        public IconUsage ButtonIcon;
+        public IconUsage ButtonIcon
+        {
+            get => spriteIcon.Icon;
+            set => spriteIcon.Icon = value;
+        }
         public Drawable ExtraDrawable;
-        public bool NoIcon;
+        public string Text
+        {
+            get => spriteText.Text;
+            set => spriteText.Text = value;
+        }
+        private OsuSpriteText spriteText  = new OsuSpriteText
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+        };
+        protected SpriteIcon spriteIcon = new SpriteIcon
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Size = new Vector2(13),
+        };
+
+        public bool NoIcon = false;
 
         public BottomBarButton()
         {
             Size = new Vector2(30, 30);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(MfConfigManager config)
+        {
+            ColourProvider = colourProvider;
 
             Children = new Drawable[]
             {
@@ -38,18 +69,12 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                     Origin = Anchor.Centre,
                     Masking = true,
                     CornerRadius = 5,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 3f,
-                        Colour = Color4.Black.Opacity(0.6f),
-                    },
                     Children = new Drawable[]
                     {
                         bgBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#5a5a5a"),
+                            Colour = ColourProvider.Background3
                         },
                         contentFillFlow = new FillFlowContainer
                         {
@@ -58,17 +83,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                             RelativeSizeAxes = Axes.Y,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Spacing = new Vector2(5),
-                            Children = new Drawable[]
-                            {
-                                spriteIcon = new SpriteIcon
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Size = new Vector2(13),
-                                    Icon = ButtonIcon,
-                                },
-                            }
+                            Spacing = new Vector2(5)
                         },
                         flashBox = new Box
                         {
@@ -79,21 +94,12 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                     }
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            this.spriteIcon.Icon = ButtonIcon;
-
-            if ( ExtraDrawable != null )
-            {
-                this.contentFillFlow.Add(ExtraDrawable);
-                this.spriteIcon.Size = new Vector2(18);
-            }
-
-            if ( NoIcon == true )
-                this.contentFillFlow.Remove(spriteIcon);
+            if ( !NoIcon )
+                contentFillFlow.Add(spriteIcon);
+            
+            if ( Text != null )
+                contentFillFlow.Add(spriteText);
 
             // From OsuAnimatedButton
             if (AutoSizeAxes != Axes.None)
@@ -101,6 +107,9 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                 content.RelativeSizeAxes = (Axes.Both & ~AutoSizeAxes);
                 content.AutoSizeAxes = AutoSizeAxes;
             }
+
+            content.BorderColour = ColourProvider.Content2;
+            content.BorderThickness = 1.5f;
         }
 
         protected override bool OnMouseDown(Framework.Input.Events.MouseDownEvent e)
@@ -119,8 +128,13 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
         protected override bool OnClick(Framework.Input.Events.ClickEvent e)
         {
-            flashBox.FadeTo(1).Then().FadeOut(300); // `this.FlashColour(Color4.White, 300)` 不管用
+            OnClickAnimation();
             return base.OnClick(e);
+        }
+
+        protected virtual void OnClickAnimation()
+        {
+            flashBox.FadeTo(1).Then().FadeOut(300);
         }
     }
 }

@@ -29,7 +29,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         public BeatmapList(List<BeatmapSetInfo> set)
         {
-            //Padding = new MarginPadding { Right = 15 };
             Padding = new MarginPadding{Vertical = 20};
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;

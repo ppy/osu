@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -9,24 +10,30 @@ namespace osu.Game.Screens.Mvis.SideBar
 {
     public class SidebarContainer : WaveContainer
     {
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
         private List<Drawable> components = new List<Drawable>();
         public bool IsHidden = true;
         private readonly float DURATION = 400;
         private Drawable currentDisplay;
+
         public SidebarContainer()
+        {
+            Anchor = Anchor.BottomRight;
+            Origin = Anchor.BottomRight;
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(0.3f, 1f);
+            Depth = -float.MaxValue;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             //与其他Overlay保持一致
             FirstWaveColour = colourProvider.Light4;
             SecondWaveColour = colourProvider.Light3;
             ThirdWaveColour = colourProvider.Dark4;
             FourthWaveColour = colourProvider.Dark3;
-
-            Anchor = Anchor.BottomRight;
-            Origin = Anchor.BottomRight;
-            RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(0.3f, 1f);
-            Depth = -float.MaxValue;
         }
 
         public void resizeFor(Drawable d)

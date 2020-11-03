@@ -114,7 +114,9 @@ namespace osu.Game.Screens
         private Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
         private CollectionSelectPanel collectionPanel;
         private SidebarSettingsScrollContainer settingsScroll;
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
+
+        [Cached]
+        public readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
         private SidebarContentState oldSidebarState;
 
         public MvisScreen()
@@ -215,7 +217,7 @@ namespace osu.Game.Screens
                                                                     Action = PrevTrack,
                                                                     TooltipText = "上一首/从头开始",
                                                                 },
-                                                                songProgressButton = new BottomBarSwitchButton()
+                                                                songProgressButton = new SongProgressButton()
                                                                 {
                                                                     TooltipText = "切换暂停",
                                                                     AutoSizeAxes = Axes.X,
@@ -223,12 +225,6 @@ namespace osu.Game.Screens
                                                                     Anchor = Anchor.Centre,
                                                                     Origin = Anchor.Centre,
                                                                     NoIcon = true,
-                                                                    ExtraDrawable = new BottomBarSongProgressInfo
-                                                                    {
-                                                                        AutoSizeAxes = Axes.Both,
-                                                                        Anchor = Anchor.Centre,
-                                                                        Origin = Anchor.Centre,
-                                                                    }
                                                                 },
                                                                 nextButton = new BottomBarButton()
                                                                 {
@@ -282,7 +278,7 @@ namespace osu.Game.Screens
                                                                     },
                                                                     TooltipText = "桌面背景模式(切换强制锁定后移动鼠标即可恢复正常)"
                                                                 },
-                                                                loopToggleButton = new BottomBarSwitchButton()
+                                                                loopToggleButton = new ToggleLoopButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Undo,
                                                                     Action = () => Track.Looping = loopToggleButton.ToggleableValue.Value,
@@ -296,7 +292,7 @@ namespace osu.Game.Screens
                                                                 },
                                                                 sidebarToggleButton = new BottomBarButton()
                                                                 {
-                                                                    ButtonIcon = FontAwesome.Solid.Atom,
+                                                                    ButtonIcon = FontAwesome.Solid.Cog,
                                                                     Action = () => UpdateSidebarState(SidebarContentState.Settings),
                                                                     TooltipText = "播放器设置",
                                                                 },

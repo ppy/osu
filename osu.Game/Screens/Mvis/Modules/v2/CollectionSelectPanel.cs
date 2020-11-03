@@ -22,7 +22,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private Bindable<BeatmapCollection> SelectedCollection = new Bindable<BeatmapCollection>();
         private Bindable<CollectionPanel> SelectedPanel = new Bindable<CollectionPanel>();
 
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
         private FillFlowContainer collectionsFillFlow;
         private CollectionPanel selectedpanel;
         private OsuScrollContainer collectionScroll;
@@ -61,14 +60,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         {
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            Size = new Vector2(60, 40),
+                            Size = new Vector2(90, 30),
+                            Text = "刷新列表",
                             NoIcon = true,
-                            ExtraDrawable = new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Text = "刷新列表"
-                            },
                             Action = () => RefreshCollections(),
                             Margin = new MarginPadding(5),
                         }
