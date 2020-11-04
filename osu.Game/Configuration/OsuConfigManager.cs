@@ -42,6 +42,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Username, string.Empty);
             Set(OsuSetting.Token, string.Empty);
 
+            Set(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
+
             Set(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
                 if (enabled.NewValue) Set(OsuSetting.SaveUsername, true);
@@ -132,6 +134,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
             Set(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
+
+            Set(OsuSetting.EditorWaveformOpacity, 1f);
         }
 
         public OsuConfigManager(Storage storage)
@@ -241,6 +245,8 @@ namespace osu.Game.Configuration
         HitLighting,
         MenuBackgroundSource,
         GameplayDisableWinKey,
-        SeasonalBackgroundMode
+        SeasonalBackgroundMode,
+        EditorWaveformOpacity,
+        AutomaticallyDownloadWhenSpectating,
     }
 }

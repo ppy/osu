@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
@@ -92,14 +93,14 @@ namespace osu.Game.Online.Spectator
                     break;
 
                 case APIState.Online:
-                    Task.Run(connect);
+                    Task.Run(Connect);
                     break;
             }
         }
 
         private const string endpoint = "https://spectator.ppy.sh/spectator";
 
-        private async Task connect()
+        protected virtual async Task Connect()
         {
             if (connection != null)
                 return;
@@ -122,19 +123,26 @@ namespace osu.Game.Online.Spectator
                 isConnected = false;
                 playingUsers.Clear();
 
-                if (ex != null) await tryUntilConnected();
+                if (ex != null)
+                {
+                    Logger.Log($"Spectator client lost connection: {ex}", LoggingTarget.Network);
+                    await tryUntilConnected();
+                }
             };
 
             await tryUntilConnected();
 
             async Task tryUntilConnected()
             {
+                Logger.Log("Spectator client connecting...", LoggingTarget.Network);
+
                 while (api.State.Value == APIState.Online)
                 {
                     try
                     {
                         // reconnect on any failure
                         await connection.StartAsync();
+                        Logger.Log("Spectator client connected!", LoggingTarget.Network);
 
                         // success
                         isConnected = true;
@@ -151,8 +159,9 @@ namespace osu.Game.Online.Spectator
 
                         break;
                     }
-                    catch
+                    catch (Exception e)
                     {
+                        Logger.Log($"Spectator client connection error: {e}", LoggingTarget.Network);
                         await Task.Delay(5000);
                     }
                 }
