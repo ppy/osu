@@ -257,8 +257,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             using (BeginAbsoluteSequence(transformTime, true))
                 UpdateInitialTransforms();
 
-            using (BeginAbsoluteSequence(StateUpdateTime, true))
+#pragma warning disable 618
+            using (BeginAbsoluteSequence(StateUpdateTime + (Result?.TimeOffset ?? 0), true))
                 UpdateStateTransforms(newState);
+#pragma warning restore 618
+
+            using (BeginAbsoluteSequence(StateUpdateTime, true))
+                UpdateStartTimeStateTransforms();
 
             if (newState != ArmedState.Idle)
             {
@@ -298,13 +303,23 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// In the case of a non-idle <see cref="ArmedState"/>, and if <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
         /// </summary>
         /// <param name="state">The new armed state.</param>
+        [Obsolete("Use UpdateStartTimeStateTransforms and UpdateHitStateTransforms instead")] // Can be removed 20210504
         protected virtual void UpdateStateTransforms(ArmedState state)
         {
         }
 
         /// <summary>
+        /// Apply passive transforms at the <see cref="HitObject"/>'s StartTime.
+        /// This is called each time <see cref="State"/> changes.
+        /// Previous states are automatically cleared.
+        /// </summary>
+        protected virtual void UpdateStartTimeStateTransforms()
+        {
+        }
+
+        /// <summary>
         /// Apply transforms based on the current <see cref="ArmedState"/>. This call is offset by <see cref="HitStateUpdateTime"/> (HitObject.EndTime + Result.Offset), equivalent to when the user hit the object.
-        /// This method is only called on <see cref="ArmedState.Hit"/> or <see cref="ArmedState.Miss"/>.
+        /// This method is only called on <see cref="ArmedState.Hit"/> or <see cref="ArmedState.Miss"/>. If <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
         /// Previous states are automatically cleared.
         /// </summary>
         /// <param name="state">The new armed state.</param>
