@@ -77,9 +77,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             );
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            base.UpdateStateTransforms(state);
+            base.UpdateHitStateTransforms(state);
 
             switch (state)
             {

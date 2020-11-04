@@ -142,12 +142,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            base.UpdateStateTransforms(state);
+            base.UpdateHitStateTransforms(state);
 
-            using (BeginDelayedSequence(Spinner.Duration, true))
-                this.FadeOut(160);
+            this.FadeOut(160);
 
             // skin change does a rewind of transforms, which will stop the spinning sound from playing if it's currently in playback.
             isSpinning?.TriggerChange();

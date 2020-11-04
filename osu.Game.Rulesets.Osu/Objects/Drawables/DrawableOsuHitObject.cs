@@ -51,17 +51,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateInitialTransforms()
         {
-            base.UpdateStateTransforms(state);
+            base.UpdateInitialTransforms();
 
-            switch (state)
-            {
-                case ArmedState.Idle:
-                    // Manually set to reduce the number of future alive objects to a bare minimum.
-                    LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
-                    break;
-            }
+            // Manually set to reduce the number of future alive objects to a bare minimum.
+            LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
         }
 
         /// <summary>
