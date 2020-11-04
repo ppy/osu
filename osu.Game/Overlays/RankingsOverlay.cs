@@ -18,7 +18,7 @@ using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays
 {
-    public class RankingsOverlay : FullscreenOverlay<RankingsOverlayHeader>
+    public class RankingsOverlay : FullscreenOverlay<RankingsOverlayHeader>, IOnlineComponent
     {
         protected Bindable<Country> Country => Header.Country;
 
@@ -92,11 +92,6 @@ namespace osu.Game.Overlays
                     }
                 }
             };
-            errorPlaceholder = new LoginPlaceholder(@"blahblahblah");
-            placeholderContainer.Child = errorPlaceholder;
-            
-            checkIsLoggedIn();
-            
         }
 
         [BackgroundDependencyLoader]
@@ -141,6 +136,7 @@ namespace osu.Game.Overlays
             });
 
             Scheduler.AddOnce(loadNewContent);
+            api?.Register(this);
         }
 
         public void ShowCountry(Country requested)
@@ -188,6 +184,7 @@ namespace osu.Game.Overlays
             request.Failure += _ => Schedule(() => loadContent(null));
 
             api.Queue(request);
+            api?.Register(this);
         }
 
         private APIRequest createScopedRequest()
@@ -235,16 +232,16 @@ namespace osu.Game.Overlays
             //ask to log in if the user is not logged in
             if (api?.IsLoggedIn != true)
             {
+                contentContainer.Hide();
                 errorPlaceholder = new LoginPlaceholder(@"Please sign in to view ranking leaderboards");
-                placeholderContainer.Show();
                 placeholderContainer.Child = errorPlaceholder;
-                
+                placeholderContainer.Show();
+                loading.Hide();
             }
             else
             {
-                errorPlaceholder = new LoginPlaceholder(@"Please sign in to view ranking leaderboards");
                 placeholderContainer.Hide();
-                placeholderContainer.Child = errorPlaceholder;
+                contentContainer.Show();
             }
         }
 
@@ -264,6 +261,8 @@ namespace osu.Game.Overlays
                 loading.Hide();
                 contentContainer.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
+
+            api?.Register(this);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -272,6 +271,11 @@ namespace osu.Game.Overlays
             cancellationToken?.Cancel();
 
             base.Dispose(isDisposing);
+        }
+
+        public override void APIStateChanged(IAPIProvider api, APIState state)
+        {
+            checkIsLoggedIn();
         }
     }
 }
