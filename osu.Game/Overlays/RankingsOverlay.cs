@@ -236,13 +236,15 @@ namespace osu.Game.Overlays
             if (api?.IsLoggedIn != true)
             {
                 errorPlaceholder = new LoginPlaceholder(@"Please sign in to view ranking leaderboards");
-                placeholderContainer.Child = errorPlaceholder;
                 placeholderContainer.Show();
+                placeholderContainer.Child = errorPlaceholder;
                 
             }
             else
             {
+                errorPlaceholder = new LoginPlaceholder(@"Please sign in to view ranking leaderboards");
                 placeholderContainer.Hide();
+                placeholderContainer.Child = errorPlaceholder;
             }
         }
 

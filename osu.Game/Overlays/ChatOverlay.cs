@@ -479,21 +479,21 @@ namespace osu.Game.Overlays
             textbox.Text = string.Empty;
         }
 
-        private void checkIsLoggedIn()
+        public void checkIsLoggedIn()
         {
             //hide the chat and asks to log in if the user is not logged in
             if (api?.IsLoggedIn != true)
             {
-                errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
-                currentChannelContainer.Hide();
-                placeholderContainer.Show();
-                textbox.Hide();
+                this.errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
+                this.currentChannelContainer.Hide();
+                this.placeholderContainer.Show();
+                this.textbox.Hide();
             }
             else
             {
-                currentChannelContainer.Show();
-                placeholderContainer.Hide();
-                textbox.Show();
+                this.currentChannelContainer.Show();
+                this.placeholderContainer.Hide();
+                this.textbox.Show();
             }
         }
 
