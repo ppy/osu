@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             get => spriteText.Text;
             set => spriteText.Text = value;
         }
-        private OsuSpriteText spriteText  = new OsuSpriteText
+        private OsuSpriteText spriteText = new OsuSpriteText
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -104,10 +104,10 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                 }
             };
 
-            if ( !NoIcon )
+            if (!NoIcon)
                 contentFillFlow.Add(spriteIcon);
-            
-            if ( Text != null )
+
+            if (Text != null)
                 contentFillFlow.Add(spriteText);
 
             // From OsuAnimatedButton
@@ -125,8 +125,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
         protected override bool OnMouseDown(Framework.Input.Events.MouseDownEvent e)
         {
-            content.ScaleTo(0.8f, 2000, Easing.OutQuint);
-            flashBox.FadeTo(0.6f, 2000, Easing.OutQuint);
+            content.ScaleTo(0.9f, 2000, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 
@@ -151,12 +150,13 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+            base.OnHoverLost(e);
             flashBox.FadeTo(0f, 300);
         }
 
         protected virtual void OnClickAnimation()
         {
-            flashBox.FadeTo(0.6f).Then().FadeOut(300);
+            flashBox.FadeTo(0.3f).Then().FadeTo(IsHovered ? 0.2f : 0f, 300);
         }
     }
 }

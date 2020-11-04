@@ -17,9 +17,5 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
             spriteIcon.RotateTo(0).RotateTo(-360, 1000, Easing.OutQuint);
         }
-
-        protected override void OnClickAnimation()
-        {
-        }
     }
 }

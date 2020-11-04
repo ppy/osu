@@ -29,9 +29,5 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                       .RotateTo(-15, DURATION).Loop(0, 2).Then()
                       .RotateTo(0, DURATION);
         }
-
-        protected override void OnClickAnimation()
-        {
-        }
     }
 }
