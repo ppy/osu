@@ -134,6 +134,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
             Set(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
+
+            Set(OsuSetting.EditorWaveformOpacity, 1f);
         }
 
         public OsuConfigManager(Storage storage)
@@ -244,6 +246,7 @@ namespace osu.Game.Configuration
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
+        EditorWaveformOpacity,
         AutomaticallyDownloadWhenSpectating,
     }
 }
