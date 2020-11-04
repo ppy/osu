@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Mvis.UI
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.1f,
                     FillColour = colourProvider.Highlight1,
-                    BackgroundColour = colourProvider.Background3.Opacity(0.5f),
+                    BackgroundColour = colourProvider.Light4.Opacity(0.5f),
                     Alpha = idle_alpha,
                 },
             };
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Mvis.UI
             colourProvider.HueColour.BindValueChanged(_ =>
             {
                 progressBar.FillColour = colourProvider.Highlight1;
-                progressBar.BackgroundColour = colourProvider.Background3.Opacity(0.5f);
+                progressBar.BackgroundColour = colourProvider.Light4.Opacity(0.5f);
             });
         }
 

@@ -107,6 +107,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 Height = 50;
                 RelativeSizeAxes = Axes.X;
+                Padding = new MarginPadding{ Horizontal = 15 };
                 InternalChildren = new Drawable[]
                 {
                     new FillFlowContainer

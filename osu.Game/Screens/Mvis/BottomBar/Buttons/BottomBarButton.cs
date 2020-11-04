@@ -12,6 +12,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis.Modules;
 using osu.Game.Configuration;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
@@ -68,6 +71,13 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                     Origin = Anchor.Centre,
                     Masking = true,
                     CornerRadius = 5,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 1.5f,
+                        Colour = Color4.Black.Opacity(0.6f),
+                        Offset = new Vector2(0, 1.5f)
+                    },
                     Children = new Drawable[]
                     {
                         bgBox = new Box
@@ -107,12 +117,8 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                 content.AutoSizeAxes = AutoSizeAxes;
             }
 
-            content.BorderColour = ColourProvider.Content2;
-            content.BorderThickness = 1.5f;
-
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                content.BorderColour = ColourProvider.Content2;
                 bgBox.Colour = ColourProvider.Background3;
             });
         }
@@ -120,7 +126,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         protected override bool OnMouseDown(Framework.Input.Events.MouseDownEvent e)
         {
             content.ScaleTo(0.8f, 2000, Easing.OutQuint);
-            flashBox.FadeTo(0.8f, 2000, Easing.OutQuint);
+            flashBox.FadeTo(0.6f, 2000, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 
@@ -137,9 +143,20 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             return base.OnClick(e);
         }
 
+        protected override bool OnHover(HoverEvent e)
+        {
+            flashBox.FadeTo(0.2f, 300);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            flashBox.FadeTo(0f, 300);
+        }
+
         protected virtual void OnClickAnimation()
         {
-            flashBox.FadeTo(1).Then().FadeOut(300);
+            flashBox.FadeTo(0.6f).Then().FadeOut(300);
         }
     }
 }

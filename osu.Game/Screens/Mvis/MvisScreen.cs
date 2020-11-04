@@ -137,11 +137,6 @@ namespace osu.Game.Screens
             var iG = config.Get<float>(MfSetting.MvisInterfaceGreen);
             var iB = config.Get<float>(MfSetting.MvisInterfaceBlue);
             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
-            colourProvider.HueColour.BindValueChanged(v =>
-            {
-                sidebarBg.Colour = colourProvider.Background5;
-                sidebarBottomBox.Colour = colourProvider.Background4;
-            });
 
             InternalChildren = new Drawable[]
             {
@@ -283,7 +278,7 @@ namespace osu.Game.Screens
                                                                         lockChanges.Value = false;
                                                                         HideOverlays();
 
-                                                                        sidebar.Hide();
+                                                                        UpdateSidebarState(SidebarContentState.None);
 
                                                                         //防止手机端无法退出桌面背景模式
                                                                         if (RuntimeInfo.IsDesktop)
@@ -478,6 +473,11 @@ namespace osu.Game.Screens
 
         protected override void LoadComplete()
         {
+            colourProvider.HueColour.BindValueChanged(v =>
+            {
+                sidebarBg.Colour = colourProvider.Background5;
+                sidebarBottomBox.Colour = colourProvider.Background4;
+            }, true);
             BgBlur.BindValueChanged(v => updateBackground(Beatmap.Value));
             ContentAlpha.BindValueChanged(_ => UpdateIdleVisuals());
             IdleBgDim.BindValueChanged(_ => UpdateIdleVisuals());
@@ -589,7 +589,7 @@ namespace osu.Game.Screens
 
         private void UpdateSidebarState(SidebarContentState state)
         {
-                if ( state == oldSidebarState )
+                if ( state == oldSidebarState || state == SidebarContentState.None )
                 {
                     oldSidebarState = SidebarContentState.None;
                     sidebar.Hide();

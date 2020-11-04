@@ -10,11 +10,10 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
     {
         public BindableBool ToggleableValue = new BindableBool();
         public bool DefaultValue { get; set; }
-        private bool Clicked = false;
         protected override void LoadComplete()
         {
             ToggleableValue.Value = DefaultValue;
-            ToggleableValue.BindValueChanged(_ => UpdateVisuals());
+            ToggleableValue.BindValueChanged(_ => UpdateVisuals(true));
 
             UpdateVisuals();
 
@@ -25,7 +24,6 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
         protected override bool OnClick(Framework.Input.Events.ClickEvent e)
         {
-            Clicked = true;
             Toggle();
             return base.OnClick(e);
         }
@@ -33,15 +31,15 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         public void Toggle() =>
             ToggleableValue.Toggle();
 
-        private void UpdateVisuals()
+        private void UpdateVisuals(bool animate = false)
         {
-            var duration = Clicked ? 500 : 0;
+            var duration = animate ? 500 : 0;
             switch (ToggleableValue.Value)
             {
                 case true:
                     bgBox.FadeColour(ColourProvider.Highlight1, duration, Easing.OutQuint);
                     contentFillFlow.FadeColour(Colour4.Black, duration, Easing.OutQuint);
-                    if ( Clicked )
+                    if ( animate )
                         OnToggledOnAnimation();
                     break;
 
@@ -50,7 +48,6 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                     contentFillFlow.FadeColour(Colour4.White, duration, Easing.OutQuint);
                     break;
             }
-            Clicked = false;
         }
 
         protected virtual void OnToggledOnAnimation()

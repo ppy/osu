@@ -155,9 +155,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                bgBox.Colour =  colourProvider.Background3;
+                bgBox.Colour = colourProvider.Background3;
 
-                flashBox.Colour = isCurrentCollection.Value ? colourProvider.Highlight1 : colourProvider.Light1 ;
+                flashBox.Colour = isCurrentCollection.Value ? colourProvider.Highlight1 : colourProvider.Light1;
             }, true);
             collection.BindValueChanged(OnCollectionChanged);
         }
@@ -228,10 +228,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         public void UpdateCollection(BeatmapCollection collection, bool isCurrent)
         {
-            if (!isCurrent) flashBox.FadeColour(colourProvider.Light2, 300, Easing.OutQuint);
-            else flashBox.FadeColour(colourProvider.Highlight1, 300, Easing.OutQuint);
+            flashBox.FadeColour(isCurrent
+                                ? colourProvider.Highlight1
+                                : colourProvider.Light2, 300, Easing.OutQuint);
 
-            if ( collection != this.collection.Value && beatmapList != null )
+            if (collection != this.collection.Value && beatmapList != null)
             {
                 beatmapList.IsCurrent.UnbindAll();
                 beatmapList.IsCurrent.Value = false;
@@ -253,7 +254,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             collectionName.Text = "未选择收藏夹";
             collectionBeatmapCount.Text = "请先选择一个收藏夹!";
 
-            flashBox.FadeColour(Colour4.Gray);
+            flashBox.FadeColour(colourProvider.Light2);
         }
     }
 }

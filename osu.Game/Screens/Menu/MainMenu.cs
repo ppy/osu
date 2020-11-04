@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Menu
         public override bool AllowRateAdjustments => false;
 
         private Screen songSelect;
+        private Screen mvisPlayer;
 
         private MenuSideFlashes sideFlashes;
 
@@ -161,6 +162,9 @@ namespace osu.Game.Screens.Menu
         {
             if (songSelect == null)
                 LoadComponentAsync(songSelect = new PlaySongSelect());
+
+            if (mvisPlayer == null)
+                LoadComponentAsync(mvisPlayer = new MvisScreen());
         }
 
         public void LoadToSolo() => Schedule(onSolo);
@@ -180,7 +184,8 @@ namespace osu.Game.Screens.Menu
 
         private Screen consumeMvis()
         {
-            var s = new MvisScreen();
+            var s = mvisPlayer;
+            mvisPlayer = null;
             return s;
         }
 
