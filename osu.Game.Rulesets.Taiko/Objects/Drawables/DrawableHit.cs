@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             pressHandledThisFrame = false;
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
             Debug.Assert(HitObject.HitWindows != null);
 
