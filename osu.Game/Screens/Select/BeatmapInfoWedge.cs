@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Select
 
                 beatmapDifficulty?.UnbindAll();
                 beatmapDifficulty = difficultyManager.GetBindableDifficulty(beatmap.BeatmapInfo, cancellationSource.Token);
-                beatmapDifficulty.BindValueChanged(_ => Schedule(updateDisplay));
+                beatmapDifficulty.BindValueChanged(_ => updateDisplay());
 
                 updateDisplay();
             }
@@ -113,33 +113,38 @@ namespace osu.Game.Screens.Select
 
         private void updateDisplay()
         {
-            void removeOldInfo()
-            {
-                State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+            Scheduler.AddOnce(perform);
 
-                Info?.FadeOut(250);
-                Info?.Expire();
-                Info = null;
+            void perform()
+            {
+                void removeOldInfo()
+                {
+                    State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+
+                    Info?.FadeOut(250);
+                    Info?.Expire();
+                    Info = null;
+                }
+
+                if (beatmap == null)
+                {
+                    removeOldInfo();
+                    return;
+                }
+
+                LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, beatmapDifficulty.Value)
+                {
+                    Shear = -Shear,
+                    Depth = Info?.Depth + 1 ?? 0
+                }, loaded =>
+                {
+                    // ensure we are the most recent loaded wedge.
+                    if (loaded != loadingInfo) return;
+
+                    removeOldInfo();
+                    Add(Info = loaded);
+                });
             }
-
-            if (beatmap == null)
-            {
-                removeOldInfo();
-                return;
-            }
-
-            LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, beatmapDifficulty.Value)
-            {
-                Shear = -Shear,
-                Depth = Info?.Depth + 1 ?? 0
-            }, loaded =>
-            {
-                // ensure we are the most recent loaded wedge.
-                if (loaded != loadingInfo) return;
-
-                removeOldInfo();
-                Add(Info = loaded);
-            });
         }
 
         protected override void Dispose(bool isDisposing)
