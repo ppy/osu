@@ -9,20 +9,26 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Overlays.Settings;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 using osuTK;
 
@@ -63,6 +69,12 @@ namespace osu.Game.Screens.Play
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
+        private TriangleButton watchButton;
+
+        private SettingsCheckbox automaticDownload;
+
+        private BeatmapSetInfo onlineBeatmap;
+
         /// <summary>
         /// Becomes true if a new state is waiting to be loaded (while this screen was not active).
         /// </summary>
@@ -74,47 +86,91 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours, OsuConfigManager config)
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new Container
             {
-                new FillFlowContainer
+                Masking = true,
+                CornerRadius = 20,
+                AutoSizeAxes = Axes.Both,
+                AutoSizeDuration = 500,
+                AutoSizeEasing = Easing.OutQuint,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Spacing = new Vector2(15),
-                    Children = new Drawable[]
+                    new Box
                     {
-                        new OsuSpriteText
+                        Colour = colours.GreySeafoamDark,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new FillFlowContainer
+                    {
+                        Margin = new MarginPadding(20),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Spacing = new Vector2(15),
+                        Children = new Drawable[]
                         {
-                            Text = "Currently spectating",
-                            Font = OsuFont.Default.With(size: 30),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        new UserGridPanel(targetUser)
-                        {
-                            Width = 290,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = "playing",
-                            Font = OsuFont.Default.With(size: 30),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        beatmapPanelContainer = new Container
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
+                            new OsuSpriteText
+                            {
+                                Text = "Spectator Mode",
+                                Font = OsuFont.Default.With(size: 30),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            new FillFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Spacing = new Vector2(15),
+                                Children = new Drawable[]
+                                {
+                                    new UserGridPanel(targetUser)
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Height = 145,
+                                        Width = 290,
+                                    },
+                                    new SpriteIcon
+                                    {
+                                        Size = new Vector2(40),
+                                        Icon = FontAwesome.Solid.ArrowRight,
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                    },
+                                    beatmapPanelContainer = new Container
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                    },
+                                }
+                            },
+                            automaticDownload = new SettingsCheckbox
+                            {
+                                LabelText = "Automatically download beatmaps",
+                                Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            watchButton = new PurpleTriangleButton
+                            {
+                                Text = "Start Watching",
+                                Width = 250,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Action = attemptStart,
+                                Enabled = { Value = false }
+                            }
+                        }
                     }
-                },
+                }
             };
         }
 
@@ -130,12 +186,14 @@ namespace osu.Game.Screens.Play
 
             managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
+
+            automaticDownload.Current.BindValueChanged(_ => checkForAutomaticDownload());
         }
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> beatmap)
         {
             if (beatmap.NewValue.TryGetTarget(out var beatmapSet) && beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID == state.BeatmapID))
-                attemptStart();
+                Schedule(attemptStart);
         }
 
         private void userSentFrames(int userId, FrameDataBundle data)
@@ -189,14 +247,26 @@ namespace osu.Game.Screens.Play
             if (userId != targetUser.Id)
                 return;
 
-            if (replay == null) return;
+            if (replay != null)
+            {
+                replay.HasReceivedAllFrames = true;
+                replay = null;
+            }
 
-            replay.HasReceivedAllFrames = true;
-            replay = null;
+            Schedule(clearDisplay);
+        }
+
+        private void clearDisplay()
+        {
+            watchButton.Enabled.Value = false;
+            beatmapPanelContainer.Clear();
         }
 
         private void attemptStart()
         {
+            clearDisplay();
+            showBeatmapPanel(state);
+
             var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == state.RulesetID)?.CreateInstance();
 
             // ruleset not available
@@ -210,7 +280,6 @@ namespace osu.Game.Screens.Play
 
             if (resolvedBeatmap == null)
             {
-                showBeatmapPanel(state.BeatmapID.Value);
                 return;
             }
 
@@ -228,6 +297,7 @@ namespace osu.Game.Screens.Play
             rulesetInstance = resolvedRuleset;
 
             beatmap.Value = beatmaps.GetWorkingBeatmap(resolvedBeatmap);
+            watchButton.Enabled.Value = true;
 
             this.Push(new SpectatorPlayerLoader(new Score
             {
@@ -236,15 +306,41 @@ namespace osu.Game.Screens.Play
             }));
         }
 
-        private void showBeatmapPanel(int beatmapId)
+        private void showBeatmapPanel(SpectatorState state)
         {
-            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
+            if (state?.BeatmapID == null)
+            {
+                beatmapPanelContainer.Clear();
+                onlineBeatmap = null;
+                return;
+            }
+
+            var req = new GetBeatmapSetRequest(state.BeatmapID.Value, BeatmapSetLookupType.BeatmapId);
             req.Success += res => Schedule(() =>
             {
-                beatmapPanelContainer.Child = new GridBeatmapPanel(res.ToBeatmapSet(rulesets));
+                if (state != this.state)
+                    return;
+
+                onlineBeatmap = res.ToBeatmapSet(rulesets);
+                beatmapPanelContainer.Child = new GridBeatmapPanel(onlineBeatmap);
+                checkForAutomaticDownload();
             });
 
             api.Queue(req);
+        }
+
+        private void checkForAutomaticDownload()
+        {
+            if (onlineBeatmap == null)
+                return;
+
+            if (!automaticDownload.Current.Value)
+                return;
+
+            if (beatmaps.IsAvailableLocally(onlineBeatmap))
+                return;
+
+            beatmaps.Download(onlineBeatmap);
         }
 
         protected override void Dispose(bool isDisposing)

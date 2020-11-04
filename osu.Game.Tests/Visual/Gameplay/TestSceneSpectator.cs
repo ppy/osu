@@ -3,8 +3,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -227,11 +229,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded);
         }
 
-        internal class TestSpectatorStreamingClient : SpectatorStreamingClient
+        public class TestSpectatorStreamingClient : SpectatorStreamingClient
         {
             public readonly User StreamingUser = new User { Id = 1234, Username = "Test user" };
 
+            public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
+
             private int beatmapId;
+
+            protected override Task Connect()
+            {
+                return Task.CompletedTask;
+            }
 
             public void StartPlay(int beatmapId)
             {
