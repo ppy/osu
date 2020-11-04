@@ -99,10 +99,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted = OnOperationBegan,
                 OperationEnded = OnOperationEnded,
 
-                OnRotation = angle => HandleRotation(angle),
-                OnScale = (amount, anchor) => HandleScale(amount, anchor),
-                OnFlip = direction => HandleFlip(direction),
-                OnReverse = () => HandleReverse(),
+                OnRotation = HandleRotation,
+                OnScale = HandleScale,
+                OnFlip = HandleFlip,
+                OnReverse = HandleReverse,
             };
 
         /// <summary>
@@ -419,11 +419,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
 
             // bring in updates from selection changes
-            EditorBeatmap.HitObjectUpdated += _ => UpdateTernaryStates();
+            EditorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(UpdateTernaryStates);
             EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) =>
             {
                 Scheduler.AddOnce(updateVisibility);
-                UpdateTernaryStates();
+                Scheduler.AddOnce(UpdateTernaryStates);
             };
         }
 

@@ -266,8 +266,15 @@ namespace osu.Game.Screens.Edit
         {
             public override string TargetMember => nameof(currentTime);
 
-            protected override void Apply(EditorClock clock, double time) =>
-                clock.currentTime = Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            protected override void Apply(EditorClock clock, double time) => clock.currentTime = valueAt(time);
+
+            private double valueAt(double time)
+            {
+                if (time < StartTime) return StartValue;
+                if (time >= EndTime) return EndValue;
+
+                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            }
 
             protected override void ReadIntoStartValue(EditorClock clock) => StartValue = clock.currentTime;
         }
