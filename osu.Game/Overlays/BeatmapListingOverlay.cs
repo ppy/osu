@@ -20,11 +20,13 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapListingOverlay : FullscreenOverlay<BeatmapListingHeader>
+    public class BeatmapListingOverlay : FullscreenOverlay<BeatmapListingHeader>, IOnlineComponent
     {
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
@@ -36,6 +38,11 @@ namespace osu.Game.Overlays
         private NotFoundDrawable notFoundContent;
 
         private OverlayScrollContainer resultScrollContainer;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+        private Container placeholderContainer;
+        private Placeholder errorPlaceholder;
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue, new BeatmapListingHeader())
@@ -91,8 +98,17 @@ namespace osu.Game.Overlays
                                         {
                                             foundContent = new FillFlowContainer<BeatmapPanel>(),
                                             notFoundContent = new NotFoundDrawable(),
-                                            loadingLayer = new LoadingLayer(panelTarget)
+                                            loadingLayer = new LoadingLayer(panelTarget),
+                                            
                                         }
+                                    },
+                                    placeholderContainer = new Container
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        Margin = new MarginPadding { Bottom = 10, Top = 200}
                                     }
                                 }
                             },
@@ -100,6 +116,9 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+            api?.Register(this);
+            errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!");
+            checkIsLoggedIn();
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -253,6 +272,27 @@ namespace osu.Game.Overlays
 
             if (shouldShowMore)
                 filterControl.FetchNextPage();
+        }
+
+        private void checkIsLoggedIn()
+        {
+            //ask to log in if the user is not logged in
+            if (api?.IsLoggedIn != true)
+            {
+                errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!");
+                placeholderContainer.Child = errorPlaceholder;
+                placeholderContainer.Show();
+                panelTarget.Hide();
+            }
+            else
+            {
+                placeholderContainer.Hide();
+                panelTarget.Show();
+            }
+        }
+        public override void APIStateChanged(IAPIProvider api, APIState state)
+        {
+            checkIsLoggedIn();
         }
     }
 }
