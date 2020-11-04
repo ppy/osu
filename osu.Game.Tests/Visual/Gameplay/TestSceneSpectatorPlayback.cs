@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Replay replay;
 
-        private IBindableList<int> users;
+        private readonly IBindableList<int> users = new BindableList<int>();
 
         private TestReplayRecorder recorder;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             replay = new Replay();
 
-            users = streamingClient.PlayingUsers.GetBoundCopy();
+            users.BindTo(streamingClient.PlayingUsers);
             users.BindCollectionChanged((obj, args) =>
             {
                 switch (args.Action)

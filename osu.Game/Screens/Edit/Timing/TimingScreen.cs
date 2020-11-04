@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit.Timing
             private OsuButton deleteButton;
             private ControlPointTable table;
 
-            private IBindableList<ControlPointGroup> controlGroups;
+            private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
             [Resolved]
             private EditorClock clock { get; set; }
@@ -124,11 +124,10 @@ namespace osu.Game.Screens.Edit.Timing
 
                 selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
 
-                controlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
-
-                controlGroups.BindCollectionChanged((sender, args) =>
+                controlPointGroups.BindTo(Beatmap.Value.Beatmap.ControlPointInfo.Groups);
+                controlPointGroups.BindCollectionChanged((sender, args) =>
                 {
-                    table.ControlGroups = controlGroups;
+                    table.ControlGroups = controlPointGroups;
                     changeHandler.SaveState();
                 }, true);
             }
