@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddToggleStep("toggle y", state => selectionBox.CanScaleY = state);
         }
 
-        private void handleScale(Vector2 amount, Anchor reference)
+        private bool handleScale(Vector2 amount, Anchor reference)
         {
             if ((reference & Anchor.y1) == 0)
             {
@@ -58,12 +58,15 @@ namespace osu.Game.Tests.Visual.Editing
                     selectionArea.X += amount.X;
                 selectionArea.Width += directionX * amount.X;
             }
+
+            return true;
         }
 
-        private void handleRotation(float angle)
+        private bool handleRotation(float angle)
         {
             // kinda silly and wrong, but just showing that the drag handles work.
             selectionArea.Rotation += angle;
+            return true;
         }
     }
 }
