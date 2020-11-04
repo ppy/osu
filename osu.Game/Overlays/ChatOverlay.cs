@@ -29,7 +29,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, IOnlineComponent
     {
         public string IconTexture => "Icons/Hexacons/messaging";
         public string Title => "chat";
@@ -197,6 +197,8 @@ namespace osu.Game.Overlays
                 },
             };
 
+            api?.Register(this);
+
             errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
             placeholderContainer.Child = errorPlaceholder;
             
@@ -263,13 +265,11 @@ namespace osu.Game.Overlays
                 textbox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
                 ChannelSelectionOverlay.Show();
-                checkIsLoggedIn();
                 return;
             }
 
             if (e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel)
             {
-                checkIsLoggedIn();
                 return;
             }
 
@@ -291,7 +291,6 @@ namespace osu.Game.Overlays
                 {
                     if (currentChannel.Value != e.NewValue)
                     {
-                        checkIsLoggedIn();
                         return;
                     }
 
@@ -312,7 +311,6 @@ namespace osu.Game.Overlays
             if (e.NewValue.Messages.Any())
                 channelManager.MarkChannelAsRead(e.NewValue);
 
-            checkIsLoggedIn();
         }
 
         private float startDragChatHeight;
@@ -465,7 +463,6 @@ namespace osu.Game.Overlays
 
         private void postMessage(TextBox textbox, bool newText)
         {
-            checkIsLoggedIn();
             var text = textbox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
@@ -482,7 +479,7 @@ namespace osu.Game.Overlays
         public void checkIsLoggedIn()
         {
             //hide the chat and asks to log in if the user is not logged in
-            if (api?.IsLoggedIn != true)
+            if (this.api?.IsLoggedIn != true)
             {
                 this.errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
                 this.currentChannelContainer.Hide();
@@ -495,6 +492,11 @@ namespace osu.Game.Overlays
                 this.placeholderContainer.Hide();
                 this.textbox.Show();
             }
+        }
+
+        public void APIStateChanged(IAPIProvider api, APIState state)
+        {
+            checkIsLoggedIn();
         }
 
         private class TabsArea : Container
