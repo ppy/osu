@@ -265,11 +265,13 @@ namespace osu.Game.Overlays
                 textbox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
                 ChannelSelectionOverlay.Show();
+                checkIsLoggedIn();
                 return;
             }
 
             if (e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel)
             {
+                checkIsLoggedIn();
                 return;
             }
 
@@ -291,6 +293,7 @@ namespace osu.Game.Overlays
                 {
                     if (currentChannel.Value != e.NewValue)
                     {
+                        checkIsLoggedIn();
                         return;
                     }
 
@@ -310,6 +313,8 @@ namespace osu.Game.Overlays
             // mark channel as read when channel switched
             if (e.NewValue.Messages.Any())
                 channelManager.MarkChannelAsRead(e.NewValue);
+            
+            checkIsLoggedIn();
 
         }
 
