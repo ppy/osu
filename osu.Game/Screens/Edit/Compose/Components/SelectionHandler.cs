@@ -99,10 +99,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted = OnOperationBegan,
                 OperationEnded = OnOperationEnded,
 
-                OnRotation = angle => HandleRotation(angle),
-                OnScale = (amount, anchor) => HandleScale(amount, anchor),
-                OnFlip = direction => HandleFlip(direction),
-                OnReverse = () => HandleReverse(),
+                OnRotation = HandleRotation,
+                OnScale = HandleScale,
+                OnFlip = HandleFlip,
+                OnReverse = HandleReverse,
             };
 
         /// <summary>

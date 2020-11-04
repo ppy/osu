@@ -7,17 +7,19 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     public class SelectionBox : CompositeDrawable
     {
-        public Action<float> OnRotation;
-        public Action<Vector2, Anchor> OnScale;
-        public Action<Direction> OnFlip;
-        public Action OnReverse;
+        public Func<float, bool> OnRotation;
+        public Func<Vector2, Anchor, bool> OnScale;
+        public Func<Direction, bool> OnFlip;
+        public Func<bool> OnReverse;
 
         public Action OperationStarted;
         public Action OperationEnded;
@@ -105,6 +107,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
             recreate();
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat || !e.ControlPressed)
+                return false;
+
+            switch (e.Key)
+            {
+                case Key.G:
+                    return CanReverse && OnReverse?.Invoke() == true;
+
+                case Key.H:
+                    return CanScaleX && OnFlip?.Invoke(Direction.Horizontal) == true;
+
+                case Key.J:
+                    return CanScaleY && OnFlip?.Invoke(Direction.Vertical) == true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
         private void recreate()
         {
             if (LoadState < LoadState.Loading)
@@ -143,7 +165,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (CanScaleX && CanScaleY) addFullScaleComponents();
             if (CanScaleY) addYScaleComponents();
             if (CanRotate) addRotationComponents();
-            if (CanReverse) addButton(FontAwesome.Solid.Backward, "Reverse pattern", () => OnReverse?.Invoke());
+            if (CanReverse) addButton(FontAwesome.Solid.Backward, "Reverse pattern (Ctrl-G)", () => OnReverse?.Invoke());
         }
 
         private void addRotationComponents()
@@ -178,7 +200,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addYScaleComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical));
+            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically (Ctrl-J)", () => OnFlip?.Invoke(Direction.Vertical));
 
             addDragHandle(Anchor.TopCentre);
             addDragHandle(Anchor.BottomCentre);
@@ -194,7 +216,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addXScaleComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally", () => OnFlip?.Invoke(Direction.Horizontal));
+            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally (Ctrl-H)", () => OnFlip?.Invoke(Direction.Horizontal));
 
             addDragHandle(Anchor.CentreLeft);
             addDragHandle(Anchor.CentreRight);

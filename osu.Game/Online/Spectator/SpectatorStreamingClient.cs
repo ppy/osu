@@ -93,14 +93,14 @@ namespace osu.Game.Online.Spectator
                     break;
 
                 case APIState.Online:
-                    Task.Run(connect);
+                    Task.Run(Connect);
                     break;
             }
         }
 
         private const string endpoint = "https://spectator.ppy.sh/spectator";
 
-        private async Task connect()
+        protected virtual async Task Connect()
         {
             if (connection != null)
                 return;

@@ -130,6 +130,11 @@ namespace osu.Game.Overlays
                     loadDisplay(new FriendDisplay());
                     break;
 
+                case DashboardOverlayTabs.CurrentlyPlaying:
+                    //todo: enable once caching logic is better
+                    //loadDisplay(new CurrentlyPlayingDisplay());
+                    break;
+
                 default:
                     throw new NotImplementedException($"Display for {tab.NewValue} tab is not implemented");
             }
