@@ -10,7 +10,6 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -102,10 +101,6 @@ namespace osu.Game.Online.Spectator
 
         private async Task connect()
         {
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.iOS)
-                // disabled for now (see https://github.com/dotnet/runtime/issues/35988)
-                return;
-
             if (connection != null)
                 return;
 
