@@ -195,7 +195,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 l3.Colour = provider.Light3;
                 c2.Colour = provider.Content2;
 
-                tooltip = $"色相(Hue): {(provider.HueColour.Value * 100).ToString("#0.00")}";
+                tooltip = $"色相(Hue): {(provider.HueColour.Value * 360).ToString("#0.00")}";
             }
         }
     }
