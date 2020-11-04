@@ -255,17 +255,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.ClearTransformsAfter(double.MinValue, true);
 
             using (BeginAbsoluteSequence(transformTime, true))
-            {
                 UpdateInitialTransforms();
 
-                var judgementOffset = Result?.TimeOffset ?? 0;
+            using (BeginAbsoluteSequence(StateUpdateTime, true))
+                UpdateStateTransforms(newState);
 
-                using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
-                {
-                    UpdateStateTransforms(newState);
-                    state.Value = newState;
-                }
+            if (newState != ArmedState.Idle)
+            {
+                using (BeginAbsoluteSequence(HitStateUpdateTime, true))
+                    UpdateHitStateTransforms(newState);
             }
+
+            state.Value = newState;
 
             if (LifetimeEnd == double.MaxValue && (state.Value != ArmedState.Idle || HitObject.HitWindows == null))
                 Expire();
@@ -298,6 +299,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="state">The new armed state.</param>
         protected virtual void UpdateStateTransforms(ArmedState state)
+        {
+        }
+
+        /// <summary>
+        /// Apply transforms based on the current <see cref="ArmedState"/>. This call is offset by <see cref="HitStateUpdateTime"/> (HitObject.EndTime + Result.Offset), equivalent to when the user hit the object.
+        /// This method is only called on <see cref="ArmedState.Hit"/> or <see cref="ArmedState.Miss"/>.
+        /// Previous states are automatically cleared.
+        /// </summary>
+        /// <param name="state">The new armed state.</param>
+        protected virtual void UpdateHitStateTransforms(ArmedState state)
         {
         }
 
@@ -453,6 +464,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// A more accurate <see cref="LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
+
+        /// <summary>
+        /// The time at which state transforms should be applied that line up to <see cref="HitObject"/>'s StartTime.
+        /// This is used to offset calls to <see cref="UpdateStateTransforms"/>.
+        /// </summary>
+        public double StateUpdateTime => HitObject.StartTime;
+
+        /// <summary>
+        /// The time at which judgement dependent state transforms should be applied. This is equivalent of the (end) time of the object, in addition to any judgement offset.
+        /// This is used to offset calls to <see cref="UpdateHitStateTransforms"/>.
+        /// </summary>
+        public double HitStateUpdateTime => Result?.TimeAbsolute ?? HitObject.GetEndTime();
 
         /// <summary>
         /// Will be called at least once after this <see cref="DrawableHitObject"/> has become not alive.
