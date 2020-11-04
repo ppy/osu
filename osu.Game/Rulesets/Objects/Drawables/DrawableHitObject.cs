@@ -257,13 +257,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             using (BeginAbsoluteSequence(transformTime, true))
                 UpdateInitialTransforms();
 
+            using (BeginAbsoluteSequence(StateUpdateTime, true))
+                UpdateStartTimeStateTransforms();
+
 #pragma warning disable 618
             using (BeginAbsoluteSequence(StateUpdateTime + (Result?.TimeOffset ?? 0), true))
                 UpdateStateTransforms(newState);
 #pragma warning restore 618
-
-            using (BeginAbsoluteSequence(StateUpdateTime, true))
-                UpdateStartTimeStateTransforms();
 
             using (BeginAbsoluteSequence(HitStateUpdateTime, true))
                 UpdateHitStateTransforms(newState);
