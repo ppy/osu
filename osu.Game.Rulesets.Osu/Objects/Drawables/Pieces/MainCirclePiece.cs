@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private void updateState(ValueChangedEvent<ArmedState> state)
         {
-            using (BeginAbsoluteSequence(drawableObject.HitObject.StartTime + (drawableObject.Result?.TimeOffset ?? 0), true))
+            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime, true))
             {
                 glow.FadeOut(400);
 
