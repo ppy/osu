@@ -265,11 +265,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             using (BeginAbsoluteSequence(StateUpdateTime, true))
                 UpdateStartTimeStateTransforms();
 
-            if (newState != ArmedState.Idle)
-            {
-                using (BeginAbsoluteSequence(HitStateUpdateTime, true))
-                    UpdateHitStateTransforms(newState);
-            }
+            using (BeginAbsoluteSequence(HitStateUpdateTime, true))
+                UpdateHitStateTransforms(newState);
 
             state.Value = newState;
 
@@ -319,7 +316,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Apply transforms based on the current <see cref="ArmedState"/>. This call is offset by <see cref="HitStateUpdateTime"/> (HitObject.EndTime + Result.Offset), equivalent to when the user hit the object.
-        /// This method is only called on <see cref="ArmedState.Hit"/> or <see cref="ArmedState.Miss"/>. If <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
+        /// If <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
         /// Previous states are automatically cleared.
         /// </summary>
         /// <param name="state">The new armed state.</param>
