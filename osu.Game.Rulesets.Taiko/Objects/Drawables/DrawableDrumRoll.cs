@@ -135,13 +135,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r => r.Type = r.Judgement.MinResult);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
             switch (state)
             {
                 case ArmedState.Hit:
                 case ArmedState.Miss:
-                    this.Delay(HitObject.Duration).FadeOut(100);
+                    this.FadeOut(100);
                     break;
             }
         }
