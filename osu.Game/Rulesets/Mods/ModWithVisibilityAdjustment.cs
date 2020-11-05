@@ -34,18 +34,18 @@ namespace osu.Game.Rulesets.Mods
         protected virtual bool IsFirstAdjustableObject(HitObject hitObject) => true;
 
         /// <summary>
-        /// Apply a special increased-visibility state to the first adjustable object..
+        /// Apply a special increased-visibility state to the first adjustable object.
         /// Only applicable if the user chooses to turn on the "increase first object visibility" setting.
         /// </summary>
         /// <param name="hitObject">The hit object to apply the state change to.</param>
-        /// <param name="state">The state of the hit object.</param>
+        /// <param name="state">The state of the hitobject.</param>
         protected abstract void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state);
 
         /// <summary>
         /// Apply a normal visibility state adjustment to an object.
         /// </summary>
         /// <param name="hitObject">The hit object to apply the state change to.</param>
-        /// <param name="state">The state of the hit object.</param>
+        /// <param name="state">The state of the hitobject.</param>
         protected abstract void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state);
 
         public virtual void ReadFromConfig(OsuConfigManager config)
