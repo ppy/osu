@@ -18,9 +18,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
     /// <summary>
     /// Legacy skinned spinner with one main spinning layer and a background layer.
     /// </summary>
-    public class LegacyOldStyleSpinner : CompositeDrawable
+    public class LegacyOldStyleSpinner : LegacySpinner
     {
-        private DrawableSpinner drawableSpinner;
         private Sprite disc;
         private Sprite metreSprite;
         private Container metre;
@@ -31,13 +30,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private const float final_metre_height = 692 * sprite_scale;
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource source, DrawableHitObject drawableObject)
+        private void load(ISkinSource source)
         {
             spinnerBlink = source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value != true;
-
-            drawableSpinner = (DrawableSpinner)drawableObject;
-
-            RelativeSizeAxes = Axes.Both;
 
             InternalChild = new Container
             {
@@ -85,16 +80,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
             };
         }
 
-        protected override void LoadComplete()
+        protected override void UpdateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            base.LoadComplete();
+            base.UpdateStateTransforms(drawableHitObject, state);
 
-            drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
-            updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
-        }
-
-        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
-        {
             if (!(drawableHitObject is DrawableSpinner d))
                 return;
 
@@ -110,11 +99,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected override void Update()
         {
             base.Update();
-            disc.Rotation = drawableSpinner.RotationTracker.Rotation;
+            disc.Rotation = DrawableSpinner.RotationTracker.Rotation;
 
             // careful: need to call this exactly once for all calculations in a frame
             // as the function has a random factor in it
-            var metreHeight = getMetreHeight(drawableSpinner.Progress);
+            var metreHeight = getMetreHeight(DrawableSpinner.Progress);
 
             // hack to make the metre blink up from below than down from above.
             // move down the container to be able to apply masking for the metre,
@@ -139,14 +128,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 barCount++;
 
             return (float)barCount / total_bars * final_metre_height;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (drawableSpinner != null)
-                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
