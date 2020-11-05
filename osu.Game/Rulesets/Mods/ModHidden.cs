@@ -49,7 +49,6 @@ namespace osu.Game.Rulesets.Mods
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            base.ApplyIncreasedVisibilityState(hitObject, state);
 #pragma warning disable 618
             ApplyFirstObjectIncreaseVisibilityState(hitObject, state);
 #pragma warning restore 618
@@ -57,7 +56,6 @@ namespace osu.Game.Rulesets.Mods
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            base.ApplyNormalVisibilityState(hitObject, state);
 #pragma warning disable 618
             ApplyHiddenState(hitObject, state);
 #pragma warning restore 618

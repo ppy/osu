@@ -39,18 +39,14 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <param name="hitObject">The hit object to apply the state change to.</param>
         /// <param name="state">The state of the hit object.</param>
-        protected virtual void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
-        {
-        }
+        protected abstract void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state);
 
         /// <summary>
         /// Apply a normal visibility state adjustment to an object.
         /// </summary>
         /// <param name="hitObject">The hit object to apply the state change to.</param>
         /// <param name="state">The state of the hit object.</param>
-        protected virtual void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
-        {
-        }
+        protected abstract void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state);
 
         public virtual void ReadFromConfig(OsuConfigManager config)
         {
