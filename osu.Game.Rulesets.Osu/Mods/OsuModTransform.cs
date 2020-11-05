@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
@@ -13,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModTransform : Mod, IApplicableToDrawableHitObjects
+    internal class OsuModTransform : ModWithVisibilityAdjustment
     {
         public override string Name => "Transform";
         public override string Acronym => "TR";
@@ -25,11 +24,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private float theta;
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
-        {
-            foreach (var drawable in drawables)
-                drawable.ApplyCustomUpdateState += applyTransform;
-        }
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject, state);
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject, state);
 
         private void applyTransform(DrawableHitObject drawable, ArmedState state)
         {
