@@ -18,7 +18,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
@@ -115,9 +114,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public void OnReleased(PlatformAction action)
         {
         }
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos));
 
         private void selectPiece(PathControlPointPiece piece, MouseButtonEvent e)
         {
