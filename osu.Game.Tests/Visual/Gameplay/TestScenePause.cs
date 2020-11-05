@@ -59,11 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             confirmClockRunning(false);
             confirmPauseOverlayShown(false);
 
-            AddStep("click to resume", () =>
-            {
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
-            });
+            AddStep("click to resume", () => InputManager.Click(MouseButton.Left));
 
             confirmClockRunning(true);
         }
