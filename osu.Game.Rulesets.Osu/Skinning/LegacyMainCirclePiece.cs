@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
         {
-            OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
+            var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
 
             bool allowFallback = false;
 
@@ -111,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             state.BindTo(drawableObject.State);
             accentColour.BindTo(drawableObject.AccentColour);
-            indexInCurrentCombo.BindTo(osuObject.IndexInCurrentComboBindable);
+            indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
 
             Texture getTextureWithFallback(string name)
             {

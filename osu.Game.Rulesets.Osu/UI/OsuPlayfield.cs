@@ -4,12 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -17,9 +20,6 @@ using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Game.Rulesets.Osu.Configuration;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -95,6 +95,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void Add(DrawableHitObject h)
         {
+            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
+
             h.OnNewResult += onNewResult;
             h.OnLoadComplete += d =>
             {
@@ -107,18 +109,19 @@ namespace osu.Game.Rulesets.Osu.UI
 
             base.Add(h);
 
-            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
             osuHitObject.CheckHittable = hitPolicy.IsHittable;
 
-            followPoints.AddFollowPoints(osuHitObject);
+            followPoints.AddFollowPoints(osuHitObject.HitObject);
         }
 
         public override bool Remove(DrawableHitObject h)
         {
+            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
+
             bool result = base.Remove(h);
 
             if (result)
-                followPoints.RemoveFollowPoints((DrawableOsuHitObject)h);
+                followPoints.RemoveFollowPoints(osuHitObject.HitObject);
 
             return result;
         }
