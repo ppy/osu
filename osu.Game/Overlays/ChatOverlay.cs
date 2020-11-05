@@ -399,6 +399,7 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
+            checkIsLoggedIn();
             this.MoveToY(0, transition_length, Easing.OutQuint);
             this.FadeIn(transition_length, Easing.OutQuint);
 
@@ -409,6 +410,7 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
+            checkIsLoggedIn();
             this.MoveToY(Height, transition_length, Easing.InSine);
             this.FadeOut(transition_length, Easing.InSine);
 
@@ -447,6 +449,7 @@ namespace osu.Game.Overlays
 
                     break;
             }
+            checkIsLoggedIn();
         }
 
         private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)

@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Overlays.Dashboard.Friends;
 
@@ -22,6 +23,12 @@ namespace osu.Game.Overlays
         private Container content;
         private LoadingLayer loading;
         private OverlayScrollContainer scrollFlow;
+        
+        [Resolved]
+        private IAPIProvider api {get; set;}
+
+        private Container placeholderContainer;
+        private Placeholder errorPlaceholder;
 
         public DashboardOverlay()
             : base(OverlayColourScheme.Purple, new DashboardOverlayHeader
@@ -64,7 +71,18 @@ namespace osu.Game.Overlays
                     }
                 },
                 loading = new LoadingLayer(content),
+                placeholderContainer = new Container
+                {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Margin = new MarginPadding { Bottom = 10, Top = 200}
+            }
             };
+            api?.Register(this);
+            errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
+            placeholderContainer.Child = errorPlaceholder; 
         }
 
         protected override void LoadComplete()
@@ -98,7 +116,6 @@ namespace osu.Game.Overlays
         private void loadDisplay(Drawable display)
         {
             scrollFlow.ScrollToStart();
-
             LoadComponentAsync(display, loaded =>
             {
                 if (API.IsLoggedIn)
@@ -116,6 +133,7 @@ namespace osu.Game.Overlays
             if (!API.IsLoggedIn)
             {
                 loadDisplay(Empty());
+                loading.Hide();
                 return;
             }
 
@@ -132,6 +150,7 @@ namespace osu.Game.Overlays
 
         public override void APIStateChanged(IAPIProvider api, APIState state)
         {
+            checkIsLoggedIn();
             if (State.Value == Visibility.Hidden)
                 return;
 
@@ -142,6 +161,21 @@ namespace osu.Game.Overlays
         {
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
+        }
+
+        private void checkIsLoggedIn()
+        {
+            //ask to log in if the user is not logged in
+            if (api?.IsLoggedIn != true)
+            {
+                errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
+                placeholderContainer.Child = errorPlaceholder;
+                placeholderContainer.Show();
+            }
+            else
+            {
+                placeholderContainer.Hide();
+            }
         }
     }
 }
