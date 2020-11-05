@@ -209,8 +209,8 @@ namespace osu.Game.Screens
                                                                 new BottomBarButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Regular.QuestionCircle,
-                                                                    Action = () => game?.picture.UpdateImage("https://i0.hdslb.com/bfs/article/91cdfbdf623775b2bb9e93b6c0842cf5740ef912.png", true, false, "食用指南"),
-                                                                    TooltipText = "Mvis播放器食用指南(需要网络连接)",
+                                                                    Action = () => game?.OpenUrlExternally("https://matrix-feather.github.io/%E6%97%A5%E5%B8%B8/mfosu_mp_manual/"),
+                                                                    TooltipText = "在浏览器中打开食用手册"
                                                                 },
                                                             }
                                                         },
