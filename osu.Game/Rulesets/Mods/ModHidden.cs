@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
         /// Can be used to skip spinners, for instance.
         /// </summary>
         /// <param name="hitObject">The hitobject to check.</param>
-        [Obsolete("Use IsFirstAdjustableObject() instead.")]
+        [Obsolete("Use IsFirstAdjustableObject() instead.")] // Can be removed 20210506
         protected virtual bool IsFirstHideableObject(DrawableHitObject hitObject) => true;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <param name="hitObject">The hit object to apply the state change to.</param>
         /// <param name="state">The state of the hit object.</param>
-        [Obsolete("Use ApplyIncreasedVisibilityState() instead.")]
+        [Obsolete("Use ApplyIncreasedVisibilityState() instead.")] // Can be removed 20210506
         protected virtual void ApplyFirstObjectIncreaseVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
         }
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <param name="hitObject">The hit object to apply the state change to.</param>
         /// <param name="state">The state of the hit object.</param>
-        [Obsolete("Use ApplyNormalVisibilityState() instead.")]
+        [Obsolete("Use ApplyNormalVisibilityState() instead.")] // Can be removed 20210506
         protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state)
         {
         }
