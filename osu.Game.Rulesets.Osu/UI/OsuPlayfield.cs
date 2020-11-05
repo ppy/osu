@@ -20,6 +20,7 @@ using osu.Game.Skinning;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -110,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.UI
             DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
             osuHitObject.CheckHittable = hitPolicy.IsHittable;
 
-            followPoints.AddFollowPoints(osuHitObject);
+            followPoints.AddFollowPoints((OsuHitObject)h.HitObject);
         }
 
         public override bool Remove(DrawableHitObject h)
@@ -118,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.UI
             bool result = base.Remove(h);
 
             if (result)
-                followPoints.RemoveFollowPoints((DrawableOsuHitObject)h);
+                followPoints.RemoveFollowPoints((OsuHitObject)h.HitObject);
 
             return result;
         }
