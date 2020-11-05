@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
@@ -75,21 +76,23 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            if (!(drawableHitObject is DrawableSpinner spinner))
+            if (!(drawableHitObject is DrawableSpinner d))
                 return;
 
-            using (BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt, true))
+            Spinner spinner = d.HitObject;
+
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
                 this.FadeOut();
 
-            using (BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimeFadeIn / 2, true))
-                this.FadeInFromZero(spinner.HitObject.TimeFadeIn / 2);
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
+                this.FadeInFromZero(spinner.TimeFadeIn / 2);
 
-            using (BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt, true))
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
             {
                 fixedMiddle.FadeColour(Color4.White);
 
-                using (BeginDelayedSequence(spinner.HitObject.TimePreempt, true))
-                    fixedMiddle.FadeColour(Color4.Red, spinner.HitObject.Duration);
+                using (BeginDelayedSequence(spinner.TimePreempt, true))
+                    fixedMiddle.FadeColour(Color4.Red, spinner.Duration);
             }
         }
 
