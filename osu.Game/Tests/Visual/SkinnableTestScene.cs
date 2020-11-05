@@ -65,17 +65,15 @@ namespace osu.Game.Tests.Visual
         private Drawable createProvider(Skin skin, Func<Drawable> creationFunction, IBeatmap beatmap)
         {
             var created = creationFunction();
+
             createdDrawables.Add(created);
 
-            var autoSize = created.RelativeSizeAxes == Axes.None;
+            SkinProvidingContainer mainProvider;
+            Container childContainer;
+            OutlineBox outlineBox;
+            SkinProvidingContainer skinProvider;
 
-            var mainProvider = new SkinProvidingContainer(skin)
-            {
-                RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
-                AutoSizeAxes = autoSize ? Axes.Both : Axes.None,
-            };
-
-            return new Container
+            var children = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 BorderColour = Color4.White,
@@ -96,27 +94,47 @@ namespace osu.Game.Tests.Visual
                         Scale = new Vector2(1.5f),
                         Padding = new MarginPadding(5),
                     },
-                    new Container
+                    childContainer = new Container
                     {
-                        RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
-                        AutoSizeAxes = autoSize ? Axes.Both : Axes.None,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
                         {
-                            new OutlineBox { Alpha = autoSize ? 1 : 0 },
-                            mainProvider.WithChild(
-                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
+                            outlineBox = new OutlineBox(),
+                            (mainProvider = new SkinProvidingContainer(skin)).WithChild(
+                                skinProvider = new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
                                 {
                                     Child = created,
-                                    RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
-                                    AutoSizeAxes = autoSize ? Axes.Both : Axes.None,
                                 }
                             )
                         }
                     },
                 }
             };
+
+            // run this once initially to bring things into a sane state as early as possible.
+            updateSizing();
+
+            // run this once after construction to handle the case the changes are made in a BDL/LoadComplete call.
+            Schedule(updateSizing);
+
+            return children;
+
+            void updateSizing()
+            {
+                var autoSize = created.RelativeSizeAxes == Axes.None;
+
+                foreach (var c in new[] { mainProvider, childContainer, skinProvider })
+                {
+                    c.RelativeSizeAxes = Axes.None;
+                    c.AutoSizeAxes = Axes.None;
+
+                    c.RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None;
+                    c.AutoSizeAxes = autoSize ? Axes.Both : Axes.None;
+                }
+
+                outlineBox.Alpha = autoSize ? 1 : 0;
+            }
         }
 
         /// <summary>
