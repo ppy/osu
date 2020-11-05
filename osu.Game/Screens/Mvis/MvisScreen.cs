@@ -80,7 +80,7 @@ namespace osu.Game.Screens
         private Container gameplayContent;
         private SidebarContainer sidebar;
         private BeatmapLogo beatmapLogo;
-        private HoverableProgressBarContainer progressBarContainer;
+        private SongProgressBar progressBar;
         private BottomBarButton soloButton;
         private BottomBarButton prevButton;
         private BottomBarButton nextButton;
@@ -316,7 +316,7 @@ namespace osu.Game.Screens
                                                         },
                                                     }
                                                 },
-                                                progressBarContainer = new HoverableProgressBarContainer
+                                                progressBar = new SongProgressBar
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                 },
@@ -561,7 +561,7 @@ namespace osu.Game.Screens
             sbLoader.storyboardReplacesBackground.BindValueChanged(_ => ApplyBackgroundBrightness());
             inputManager = GetContainingInputManager();
 
-            progressBarContainer.progressBar.OnSeek = SeekTo;
+            progressBar.OnSeek = SeekTo;
 
             songProgressButton.ToggleableValue.BindTo(TrackRunning);
 
@@ -620,8 +620,8 @@ namespace osu.Game.Screens
             base.Update();
 
             TrackRunning.Value = Track.IsRunning;
-            progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
-            progressBarContainer.progressBar.EndTime = Track.Length;
+            progressBar.CurrentTime = Track.CurrentTime;
+            progressBar.EndTime = Track.Length;
         }
 
         public override void OnEntering(IScreen last)
@@ -802,7 +802,7 @@ namespace osu.Game.Screens
             if (lockChanges.Value) return;
 
             buttonsContainer.MoveToY(bottomBar.Height, DURATION, Easing.OutQuint);
-            progressBarContainer.MoveToY(5, DURATION, Easing.OutQuint);
+            progressBar.MoveToY(5, DURATION, Easing.OutQuint);
             bottomBar.FadeOut(DURATION, Easing.OutQuint);
 
             AllowCursor = false;
@@ -817,7 +817,7 @@ namespace osu.Game.Screens
             gameplayContent.FadeTo(1, DURATION, Easing.OutQuint);
 
             buttonsContainer.MoveToY(0, DURATION, Easing.OutQuint);
-            progressBarContainer.MoveToY(0, DURATION, Easing.OutQuint);
+            progressBar.MoveToY(0, DURATION, Easing.OutQuint);
             bottomBar.FadeIn(DURATION, Easing.OutQuint);
 
             AllowCursor = true;

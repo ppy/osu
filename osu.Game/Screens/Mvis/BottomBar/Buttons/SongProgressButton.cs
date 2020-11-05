@@ -1,7 +1,6 @@
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
@@ -11,7 +10,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         private string timeTotal;
 
         [Resolved]
-        private IBindable<WorkingBeatmap> b { get; set; }
+        private MusicController musicController { get; set; }
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
 
@@ -25,20 +24,18 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         {
             base.Update();
 
-            var Track = b.Value?.TrackLoaded ?? false ? b.Value.Track : null;
-            if (Track?.IsDummyDevice == false)
+            var Track = musicController.CurrentTrack;
+            if (!Track.IsDummyDevice)
             {
                 int currentSecond = (int)Math.Floor(Track.CurrentTime / 1000.0);
                 timeCurrent = formatTime(TimeSpan.FromSeconds(currentSecond));
-                timeTotal = formatTime(TimeSpan.FromMilliseconds(b.Value.Track.Length));
+                timeTotal = formatTime(TimeSpan.FromMilliseconds(Track.Length));
+                Text = $"{timeCurrent} / {timeTotal}";
             }
             else
             {
-                timeCurrent = "???";
-                timeTotal = "???";
+                Text = "请检查当前正在播放的内容";
             }
-
-            Text = $"{timeCurrent} / {timeTotal}";
         }
     }
 }

@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
-        protected CustomColourProvider ColourProvider;
+        protected CustomColourProvider ColourProvider => colourProvider;
         protected FillFlowContainer contentFillFlow;
         protected Box bgBox;
         private Box flashBox;
@@ -32,7 +32,6 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             get => spriteIcon.Icon;
             set => spriteIcon.Icon = value;
         }
-        public Drawable ExtraDrawable;
         public string Text
         {
             get => spriteText.Text;
@@ -60,8 +59,6 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)
         {
-            ColourProvider = colourProvider;
-
             Children = new Drawable[]
             {
                 content = new Container

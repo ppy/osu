@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         public Action<double> OnSeek;
 
-        private readonly Box fill;
+        protected readonly Box fill;
         private readonly Box background;
 
         public Color4 FillColour
