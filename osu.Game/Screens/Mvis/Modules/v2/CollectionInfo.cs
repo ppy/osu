@@ -68,12 +68,13 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                 AutoSizeAxes = Axes.Y,
                                 AutoSizeDuration = 300,
                                 AutoSizeEasing = Easing.OutQuint,
+                                Masking = true,
                                 Children = new Drawable[]
                                 {
                                     cover = new BeatmapCover(null)
                                     {
                                         BackgroundBox = false,
-                                        UseBufferedBackground = true,
+                                        TimeBeforeWrapperLoad = 0,
                                         Colour = ColourInfo.GradientVertical(
                                             Colour4.LightGray,
                                             Colour4.LightGray.Opacity(0)

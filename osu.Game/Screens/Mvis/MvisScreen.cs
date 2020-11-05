@@ -39,7 +39,6 @@ using osu.Framework;
 using osu.Game.Users;
 using osu.Game.Screens.Mvis.Modules;
 using osu.Game.Screens.Mvis.Modules.v2;
-using osu.Game.Collections;
 using osu.Framework.Graphics.Effects;
 
 namespace osu.Game.Screens
@@ -111,7 +110,6 @@ namespace osu.Game.Screens
         private NightcoreBeatContainer nightcoreBeatContainer;
         private Container buttonsContainer;
         private CollectionHelper collectionHelper;
-        private Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
         private CollectionSelectPanel collectionPanel;
         private SidebarSettingsScrollContainer settingsScroll;
 
@@ -137,10 +135,12 @@ namespace osu.Game.Screens
             var iG = config.Get<float>(MfSetting.MvisInterfaceGreen);
             var iB = config.Get<float>(MfSetting.MvisInterfaceBlue);
             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
+            dependencies.Cache(collectionHelper = new CollectionHelper());
 
             InternalChildren = new Drawable[]
             {
                 colourProvider,
+                collectionHelper,
                 nightcoreBeatContainer = new NightcoreBeatContainer
                 {
                     Alpha = 0
@@ -151,7 +151,6 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        collectionHelper = new CollectionHelper(),
                         loadingSpinner = new LoadingSpinner(true, true)
                         {
                             Anchor = Anchor.BottomCentre,
@@ -427,9 +426,6 @@ namespace osu.Game.Screens
                                             },
                                         },
                                         collectionPanel = new CollectionSelectPanel()
-                                        {
-                                            CurrentCollection = { BindTarget = CurrentCollection },
-                                        },
                                     }
                                 },
                                 new Container
@@ -518,15 +514,12 @@ namespace osu.Game.Screens
                 }
             }, true);
 
-            CurrentCollection.BindValueChanged(v =>
-            {
-                collectionHelper.RefreshBeatmapList(v.NewValue);
-
-                if (PlayFromCollection.Value && !collectionHelper.currentCollectionContains(Beatmap.Value))
-                {
-                    collectionHelper.PlayFirstBeatmap();
-                }
-            });
+            //collectionHelper.CurrentCollection.BindValueChanged(_ =>
+            //{
+            //    if (PlayFromCollection.Value
+            //            && !collectionHelper.currentCollectionContains(Beatmap.Value))
+            //        collectionHelper.PlayFirstBeatmap();
+            //});
 
             IsIdle.BindValueChanged(v => { if (v.NewValue) TryHideOverlays(); });
             ShowParticles.BindValueChanged(v =>
@@ -686,8 +679,8 @@ namespace osu.Game.Screens
             base.OnResuming(last);
 
             musicController.TrackAdjustTakenOver = true;
-            collectionHelper.RefreshBeatmapList(CurrentCollection.Value);
-            collectionPanel.RefreshCollections();
+            collectionHelper.UpdateBeatmaps();
+            collectionPanel.RefreshCollectionList();
 
             this.FadeIn(DURATION);
             Track.ResetSpeedAdjustments();

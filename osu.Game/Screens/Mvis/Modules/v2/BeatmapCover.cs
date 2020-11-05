@@ -23,6 +23,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public bool BackgroundBox = true;
 
         public bool UseBufferedBackground = false;
+        public float TimeBeforeWrapperLoad = 500;
 
         public BeatmapCover(WorkingBeatmap beatmap)
         {
@@ -73,7 +74,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     c.OnLoadComplete += d => d.FadeIn(300);
 
                     return c;
-                }), newCover =>
+                }, TimeBeforeWrapperLoad), newCover =>
                 {
                     var oldCover = cover ?? null;
                     oldCover?.FadeOut(300);

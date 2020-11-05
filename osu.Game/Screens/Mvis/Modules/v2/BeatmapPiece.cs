@@ -61,7 +61,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 },
                 new BeatmapCover(beatmap)
                 {
-                    BackgroundBox = false
+                    BackgroundBox = false,
+                    TimeBeforeWrapperLoad = 100
                 },
                 maskBox = new Box
                 {

@@ -24,17 +24,14 @@ namespace osu.Game.Screens.Mvis.Modules
         private MusicController controller { get; set; }
 
         private List<BeatmapSetInfo> beatmapList = new List<BeatmapSetInfo>();
-
-        private BeatmapCollection currentCollection;
-
         private int currentPosition = 0;
         private int maxCount = 0;
+        public Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            RefreshBeatmapList();
+            CurrentCollection.BindValueChanged(OnCollectionChanged);
         }
 
         public void PlayNextBeatmap() => Schedule(NextTrack);
@@ -125,25 +122,14 @@ namespace osu.Game.Screens.Mvis.Modules
             }
         }
 
-        public void RefreshBeatmapList(BeatmapCollection collection = null)
+        public void UpdateBeatmaps() => updateBeatmaps(CurrentCollection.Value);
+
+        private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
-            if (collection == null)
-            {
-                currentCollection = null;
-                return;
-            }
-
-            currentCollection = collection;
-
-            updateBeatmaps(currentCollection);
+            updateBeatmaps(CurrentCollection.Value);
         }
 
-        public bool currentCollectionContains(WorkingBeatmap b)
-        {
-            if (beatmapList.Contains(b.BeatmapSetInfo))
-                return true;
-            else
-                return false;
-        }
+        public bool currentCollectionContains(WorkingBeatmap b) =>
+            beatmapList.Contains(b.BeatmapSetInfo);
     }
 }

@@ -74,23 +74,18 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             AddRangeInternal(new Drawable[]
             {
+                new BeatmapCover(targetBeatmap)
+                {
+                    BackgroundBox = false,
+                    TimeBeforeWrapperLoad = 0
+                },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(
-                        Color4Extensions.FromHex("#111").Opacity(0),
+                        Color4Extensions.FromHex("#111").Opacity(0.6f),
                         Color4Extensions.FromHex("#111")
                     ),
-                },
-                new BeatmapCover(targetBeatmap)
-                {
-                    Depth = float.MaxValue,
-                    BackgroundBox = false
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("#111").Opacity(0.6f),
                 },
                 new FillFlowContainer
                 {
@@ -182,7 +177,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private void OnStateChanged(ValueChangedEvent<ActiveState> v)
         {
             if ( v.NewValue >= ActiveState.Selected )
+            {
+                AutoSizeDuration = 400;
+                AutoSizeEasing = Easing.OutQuint;
                 thumbnailScroll.Show();
+            }
             else
                 thumbnailScroll.Hide();
 
@@ -251,9 +250,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             if (state.Value == ActiveState.Disabled)
                 return base.OnClick(e);
 
-            AutoSizeDuration = 400;
-            AutoSizeEasing = Easing.OutQuint;
-
             //如果已经被选中了，则触发双击
             if (state.Value == ActiveState.Selected)
             {
@@ -276,10 +272,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         /// <summary>
         /// 重置状态
         /// </summary>
-        public void Reset(bool makeInactive = false)
+        public void Reset(bool force = false)
         {
-            if (state.Value != ActiveState.Disabled && state.Value != ActiveState.Active ||
-                 state.Value != ActiveState.Disabled && makeInactive)
+            if (state.Value != ActiveState.Disabled && state.Value != ActiveState.Active
+                ||state.Value != ActiveState.Disabled && force)
             {
                 state.Value = ActiveState.Idle;
             }
