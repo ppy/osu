@@ -26,8 +26,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private bool spinnerBlink;
 
-        private const float sprite_scale = 1 / 1.6f;
-        private const float final_metre_height = 692 * sprite_scale;
+        private const float final_metre_height = 692 * SPRITE_SCALE;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
@@ -50,14 +49,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-background"),
-                        Scale = new Vector2(sprite_scale)
+                        Scale = new Vector2(SPRITE_SCALE)
                     },
                     disc = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-circle"),
-                        Scale = new Vector2(sprite_scale)
+                        Scale = new Vector2(SPRITE_SCALE)
                     },
                     metre = new Container
                     {
@@ -73,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             Texture = source.GetTexture("spinner-metre"),
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
-                            Scale = new Vector2(0.625f)
+                            Scale = new Vector2(SPRITE_SCALE)
                         }
                     }
                 }

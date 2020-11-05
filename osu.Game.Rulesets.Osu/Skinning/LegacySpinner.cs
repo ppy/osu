@@ -9,11 +9,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
     public abstract class LegacySpinner : CompositeDrawable
     {
+        protected const float SPRITE_SCALE = 0.625f;
+
         protected DrawableSpinner DrawableSpinner { get; private set; }
 
         private Sprite spin;
@@ -33,6 +36,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Origin = Anchor.Centre,
                     Depth = float.MinValue,
                     Texture = source.GetTexture("spinner-spin"),
+                    Scale = new Vector2(SPRITE_SCALE),
                     Y = 120 // todo: make match roughly?
                 },
             });
