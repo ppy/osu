@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Humanizer;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,6 +19,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
@@ -126,6 +128,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         public bool DeleteSelected()
         {
             List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.ControlPoint).ToList();
@@ -134,7 +139,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (toRemove.Count == 0)
                 return false;
 
+            changeHandler?.BeginChange();
             RemoveControlPointsRequested?.Invoke(toRemove);
+            changeHandler?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
