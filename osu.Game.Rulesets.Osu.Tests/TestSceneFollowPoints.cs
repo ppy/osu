@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     }
 
                     hitObjectContainer.Add(drawableObject);
-                    followPointRenderer.AddFollowPoints(drawableObject);
+                    followPointRenderer.AddFollowPoints(objects[i]);
                 }
             });
         }
@@ -180,10 +180,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("remove hitobject", () =>
             {
-                var drawableObject = getFunc?.Invoke();
+                var drawableObject = getFunc.Invoke();
 
                 hitObjectContainer.Remove(drawableObject);
-                followPointRenderer.RemoveFollowPoints(drawableObject);
+                followPointRenderer.RemoveFollowPoints(drawableObject.HitObject);
             });
         }
 
@@ -215,10 +215,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                     DrawableOsuHitObject expectedStart = getObject(i);
                     DrawableOsuHitObject expectedEnd = i < hitObjectContainer.Count - 1 ? getObject(i + 1) : null;
 
-                    if (getGroup(i).Start != expectedStart)
+                    if (getGroup(i).Start != expectedStart.HitObject)
                         throw new AssertionException($"Object {i} expected to be the start of group {i}.");
 
-                    if (getGroup(i).End != expectedEnd)
+                    if (getGroup(i).End != expectedEnd?.HitObject)
                         throw new AssertionException($"Object {(expectedEnd == null ? "null" : i.ToString())} expected to be the end of group {i}.");
                 }
 
