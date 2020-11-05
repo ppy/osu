@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -30,44 +31,51 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private readonly Color4 glowColour = new Color4(3, 151, 255, 255);
 
+        private Container scaleContainer;
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
-            Scale = new Vector2(final_scale);
-
-            AddRangeInternal(new Drawable[]
+            AddInternal(scaleContainer = new Container
             {
-                glow = new Sprite
+                Scale = new Vector2(final_scale),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-glow"),
-                    Blending = BlendingParameters.Additive,
-                    Colour = glowColour,
-                },
-                discBottom = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-bottom")
-                },
-                discTop = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-top")
-                },
-                fixedMiddle = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-middle")
-                },
-                spinningMiddle = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-middle2")
+                    glow = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-glow"),
+                        Blending = BlendingParameters.Additive,
+                        Colour = glowColour,
+                    },
+                    discBottom = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-bottom")
+                    },
+                    discTop = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-top")
+                    },
+                    fixedMiddle = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-middle")
+                    },
+                    spinningMiddle = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-middle2")
+                    }
                 }
             });
         }
@@ -119,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             glow.Alpha = DrawableSpinner.Progress;
 
-            Scale = new Vector2(final_scale * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, DrawableSpinner.Progress) * 0.2f));
+            scaleContainer.Scale = new Vector2(final_scale * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, DrawableSpinner.Progress) * 0.2f));
         }
     }
 }
