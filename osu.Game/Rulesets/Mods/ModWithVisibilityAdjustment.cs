@@ -10,6 +10,10 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mods
 {
+    /// <summary>
+    /// A <see cref="Mod"/> which applies visibility adjustments to <see cref="DrawableHitObject"/>s
+    /// with an optional increased visibility adjustment depending on the user's "increase first object visibility" setting.
+    /// </summary>
     public abstract class ModWithVisibilityAdjustment : Mod, IReadFromConfig, IApplicableToBeatmap, IApplicableToDrawableHitObjects
     {
         /// <summary>
