@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
     /// </summary>
     public class LegacyNewStyleSpinner : CompositeDrawable
     {
+        private Sprite glow;
         private Sprite discBottom;
         private Sprite discTop;
         private Sprite spinningMiddle;
@@ -29,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private DrawableSpinner drawableSpinner;
 
         private const float final_scale = 0.625f;
+
+        private readonly Color4 glowColour = new Color4(3, 151, 255, 255);
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource source, DrawableHitObject drawableObject)
@@ -39,6 +42,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             InternalChildren = new Drawable[]
             {
+                glow = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Texture = source.GetTexture("spinner-glow"),
+                    Blending = BlendingParameters.Additive,
+                    Colour = glowColour,
+                },
                 discBottom = new Sprite
                 {
                     Anchor = Anchor.Centre,
@@ -76,23 +87,38 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            if (!(drawableHitObject is DrawableSpinner d))
-                return;
-
-            Spinner spinner = d.HitObject;
-
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
-                this.FadeOut();
-
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
-                this.FadeInFromZero(spinner.TimeFadeIn / 2);
-
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            switch (drawableHitObject)
             {
-                fixedMiddle.FadeColour(Color4.White);
+                case DrawableSpinner d:
+                    Spinner spinner = d.HitObject;
 
-                using (BeginDelayedSequence(spinner.TimePreempt, true))
-                    fixedMiddle.FadeColour(Color4.Red, spinner.Duration);
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                        this.FadeOut();
+
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
+                        this.FadeInFromZero(spinner.TimeFadeIn / 2);
+
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                    {
+                        fixedMiddle.FadeColour(Color4.White);
+
+                        using (BeginDelayedSequence(spinner.TimePreempt, true))
+                            fixedMiddle.FadeColour(Color4.Red, spinner.Duration);
+                    }
+
+                    if (state == ArmedState.Hit)
+                    {
+                        using (BeginAbsoluteSequence(d.HitStateUpdateTime))
+                            glow.FadeOut(300);
+                    }
+
+                    break;
+
+                case DrawableSpinnerBonusTick _:
+                    if (state == ArmedState.Hit)
+                        glow.FlashColour(Color4.White, 200);
+
+                    break;
             }
         }
 
@@ -101,6 +127,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             base.Update();
             spinningMiddle.Rotation = discTop.Rotation = drawableSpinner.RotationTracker.Rotation;
             discBottom.Rotation = discTop.Rotation / 3;
+
+            glow.Alpha = drawableSpinner.Progress;
 
             Scale = new Vector2(final_scale * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, drawableSpinner.Progress) * 0.2f));
         }
