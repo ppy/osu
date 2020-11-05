@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Depth = float.MinValue,
                     Texture = source.GetTexture("spinner-spin"),
                     Scale = new Vector2(SPRITE_SCALE),
-                    Y = 120 // todo: make match roughly?
+                    Y = 120 - 45 // offset temporarily to avoid overlapping default spin counter
                 },
             });
         }
