@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         private DrawableSpinner drawableSpinner;
 
-        private Spinner spinner;
-
         private const float initial_scale = 1.3f;
         private const float idle_alpha = 0.2f;
         private const float tracking_alpha = 0.4f;
@@ -52,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private void load(OsuColour colours, DrawableHitObject drawableHitObject)
         {
             drawableSpinner = (DrawableSpinner)drawableHitObject;
-            spinner = drawableSpinner.HitObject;
 
             normalColour = colours.BlueDark;
             completeColour = colours.YellowLight;
@@ -130,18 +127,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             if (!(drawableHitObject is DrawableSpinner))
                 return;
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            using (BeginAbsoluteSequence(drawableSpinner.HitObject.StartTime - drawableSpinner.HitObject.TimePreempt, true))
             {
                 this.ScaleTo(initial_scale);
                 this.RotateTo(0);
 
-                using (BeginDelayedSequence(spinner.TimePreempt / 2, true))
+                using (BeginDelayedSequence(drawableSpinner.HitObject.TimePreempt / 2, true))
                 {
                     // constant ambient rotation to give the spinner "spinning" character.
-                    this.RotateTo((float)(25 * spinner.Duration / 2000), spinner.TimePreempt + spinner.Duration);
+                    this.RotateTo((float)(25 * drawableSpinner.HitObject.Duration / 2000), drawableSpinner.HitObject.TimePreempt + drawableSpinner.HitObject.Duration);
                 }
 
-                using (BeginDelayedSequence(spinner.TimePreempt + spinner.Duration + drawableHitObject.Result.TimeOffset, true))
+                using (BeginDelayedSequence(drawableSpinner.HitObject.TimePreempt + drawableSpinner.HitObject.Duration + drawableHitObject.Result.TimeOffset, true))
                 {
                     switch (state)
                     {
@@ -157,26 +154,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 }
             }
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            using (BeginAbsoluteSequence(drawableSpinner.HitObject.StartTime - drawableSpinner.HitObject.TimePreempt, true))
             {
                 centre.ScaleTo(0);
                 mainContainer.ScaleTo(0);
 
-                using (BeginDelayedSequence(spinner.TimePreempt / 2, true))
+                using (BeginDelayedSequence(drawableSpinner.HitObject.TimePreempt / 2, true))
                 {
-                    centre.ScaleTo(0.3f, spinner.TimePreempt / 4, Easing.OutQuint);
-                    mainContainer.ScaleTo(0.2f, spinner.TimePreempt / 4, Easing.OutQuint);
+                    centre.ScaleTo(0.3f, drawableSpinner.HitObject.TimePreempt / 4, Easing.OutQuint);
+                    mainContainer.ScaleTo(0.2f, drawableSpinner.HitObject.TimePreempt / 4, Easing.OutQuint);
 
-                    using (BeginDelayedSequence(spinner.TimePreempt / 2, true))
+                    using (BeginDelayedSequence(drawableSpinner.HitObject.TimePreempt / 2, true))
                     {
-                        centre.ScaleTo(0.5f, spinner.TimePreempt / 2, Easing.OutQuint);
-                        mainContainer.ScaleTo(1, spinner.TimePreempt / 2, Easing.OutQuint);
+                        centre.ScaleTo(0.5f, drawableSpinner.HitObject.TimePreempt / 2, Easing.OutQuint);
+                        mainContainer.ScaleTo(1, drawableSpinner.HitObject.TimePreempt / 2, Easing.OutQuint);
                     }
                 }
             }
 
             // transforms we have from completing the spinner will be rolled back, so reapply immediately.
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            using (BeginAbsoluteSequence(drawableSpinner.HitObject.StartTime - drawableSpinner.HitObject.TimePreempt, true))
                 updateComplete(state == ArmedState.Hit, 0);
         }
 

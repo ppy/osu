@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Children = new Drawable[]
                     {
                         new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinnerDisc()),
-                        RotationTracker = new SpinnerRotationTracker(HitObject)
+                        RotationTracker = new SpinnerRotationTracker(this)
                     }
                 },
                 SpmCounter = new SpinnerSpmCounter
