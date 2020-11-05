@@ -66,15 +66,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             if (drawableSlider == null)
                 return;
 
-            var span = drawableSlider.HitObject.SpanAt(completionProgress);
-            var spanProgress = drawableSlider.HitObject.ProgressAt(completionProgress);
+            Slider slider = drawableSlider.HitObject;
+
+            var span = slider.SpanAt(completionProgress);
+            var spanProgress = slider.ProgressAt(completionProgress);
 
             double start = 0;
-            double end = SnakingIn.Value ? Math.Clamp((Time.Current - (drawableSlider.HitObject.StartTime - drawableSlider.HitObject.TimePreempt)) / (drawableSlider.HitObject.TimePreempt / 3), 0, 1) : 1;
+            double end = SnakingIn.Value ? Math.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / (slider.TimePreempt / 3), 0, 1) : 1;
 
-            if (span >= drawableSlider.HitObject.SpanCount() - 1)
+            if (span >= slider.SpanCount() - 1)
             {
-                if (Math.Min(span, drawableSlider.HitObject.SpanCount() - 1) % 2 == 1)
+                if (Math.Min(span, slider.SpanCount() - 1) % 2 == 1)
                 {
                     start = 0;
                     end = SnakingOut.Value ? spanProgress : 1;
