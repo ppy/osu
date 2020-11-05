@@ -16,33 +16,32 @@ using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSpinner : DrawableOsuHitObject
     {
-        protected readonly Spinner Spinner;
+        public new Spinner HitObject => (Spinner)base.HitObject;
 
-        private readonly Container<DrawableSpinnerTick> ticks;
+        public SpinnerRotationTracker RotationTracker { get; private set; }
+        public SpinnerSpmCounter SpmCounter { get; private set; }
 
-        public readonly SpinnerRotationTracker RotationTracker;
-        public readonly SpinnerSpmCounter SpmCounter;
-        private readonly SpinnerBonusDisplay bonusDisplay;
+        private Container<DrawableSpinnerTick> ticks;
+        private SpinnerBonusDisplay bonusDisplay;
 
-        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
-
+        private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
 
         public DrawableSpinner(Spinner s)
             : base(s)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             Origin = Anchor.Centre;
-            Position = s.Position;
-
             RelativeSizeAxes = Axes.Both;
-
-            Spinner = s;
 
             InternalChildren = new Drawable[]
             {
@@ -55,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Children = new Drawable[]
                     {
                         new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinnerDisc()),
-                        RotationTracker = new SpinnerRotationTracker(Spinner)
+                        RotationTracker = new SpinnerRotationTracker(HitObject)
                     }
                 },
                 SpmCounter = new SpinnerSpmCounter
@@ -72,9 +71,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Y = -120,
                 }
             };
-        }
 
-        private Bindable<bool> isSpinning;
+            PositionBindable.BindValueChanged(pos => Position = pos.NewValue, true);
+        }
 
         protected override void LoadComplete()
         {
@@ -146,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateStateTransforms(state);
 
-            using (BeginDelayedSequence(Spinner.Duration, true))
+            using (BeginDelayedSequence(HitObject.Duration, true))
                 this.FadeOut(160);
 
             // skin change does a rewind of transforms, which will stop the spinning sound from playing if it's currently in playback.
@@ -173,13 +172,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             return base.CreateNestedHitObject(hitObject);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            positionBindable.BindValueChanged(pos => Position = pos.NewValue);
-            positionBindable.BindTo(HitObject.PositionBindable);
-        }
-
         protected override void ApplySkin(ISkinSource skin, bool allowFallback)
         {
             base.ApplySkin(skin, allowFallback);
@@ -193,12 +185,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             get
             {
-                if (Spinner.SpinsRequired == 0)
+                if (HitObject.SpinsRequired == 0)
                     // some spinners are so short they can't require an integer spin count.
                     // these become implicitly hit.
                     return 1;
 
-                return Math.Clamp(RotationTracker.RateAdjustedRotation / 360 / Spinner.SpinsRequired, 0, 1);
+                return Math.Clamp(RotationTracker.RateAdjustedRotation / 360 / HitObject.SpinsRequired, 0, 1);
             }
         }
 
@@ -208,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             RotationTracker.Complete.Value = Progress >= 1;
 
-            if (userTriggered || Time.Current < Spinner.EndTime)
+            if (userTriggered || Time.Current < HitObject.EndTime)
                 return;
 
             // Trigger a miss result for remaining ticks to avoid infinite gameplay.
@@ -223,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     r.Type = HitResult.Ok;
                 else if (Progress > .75)
                     r.Type = HitResult.Meh;
-                else if (Time.Current >= Spinner.EndTime)
+                else if (Time.Current >= HitObject.EndTime)
                     r.Type = r.Judgement.MinResult;
             });
         }
@@ -275,7 +267,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     tick.TriggerResult(true);
                     if (tick is DrawableSpinnerBonusTick)
-                        bonusDisplay.SetBonusCount(spins - Spinner.SpinsRequired);
+                        bonusDisplay.SetBonusCount(spins - HitObject.SpinsRequired);
                 }
 
                 wholeSpins++;

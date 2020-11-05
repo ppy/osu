@@ -125,13 +125,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Result = CreateResult(judgement);
             if (Result == null)
                 throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
-
-            LoadSamples();
         }
 
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
+
+            LoadSamples();
 
             HitObject.DefaultsApplied += onDefaultsApplied;
 
