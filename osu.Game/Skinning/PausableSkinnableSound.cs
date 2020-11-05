@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Screens.Play;
 
@@ -25,6 +26,8 @@ namespace osu.Game.Skinning
 
         private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
+        private ScheduledDelegate scheduledStart;
+
         [BackgroundDependencyLoader(true)]
         private void load(ISamplePlaybackDisabler samplePlaybackDisabler)
         {
@@ -39,12 +42,14 @@ namespace osu.Game.Skinning
                     // let non-looping samples that have already been started play out to completion (sounds better than abruptly cutting off).
                     if (!Looping) return;
 
+                    cancelPendingStart();
+
                     if (disabled.NewValue)
                         base.Stop();
                     else
                     {
                         // schedule so we don't start playing a sample which is no longer alive.
-                        Schedule(() =>
+                        scheduledStart = Schedule(() =>
                         {
                             if (RequestedPlaying)
                                 base.Play();
@@ -56,6 +61,7 @@ namespace osu.Game.Skinning
 
         public override void Play()
         {
+            cancelPendingStart();
             RequestedPlaying = true;
 
             if (samplePlaybackDisabled.Value)
@@ -66,8 +72,15 @@ namespace osu.Game.Skinning
 
         public override void Stop()
         {
+            cancelPendingStart();
             RequestedPlaying = false;
             base.Stop();
+        }
+
+        private void cancelPendingStart()
+        {
+            scheduledStart?.Cancel();
+            scheduledStart = null;
         }
     }
 }
