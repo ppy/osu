@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override void OnSelected()
         {
-            AddInternal(ControlPointVisualiser = new PathControlPointVisualiser((Slider)slider.HitObject, true)
+            AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(slider.HitObject, true)
             {
                 RemoveControlPointsRequested = removeControlPoints
             });
