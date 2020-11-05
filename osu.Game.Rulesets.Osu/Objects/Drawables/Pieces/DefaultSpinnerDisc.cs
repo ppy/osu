@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private void load(OsuColour colours, DrawableHitObject drawableHitObject)
         {
             drawableSpinner = (DrawableSpinner)drawableHitObject;
-            spinner = (Spinner)drawableSpinner.HitObject;
+            spinner = drawableSpinner.HitObject;
 
             normalColour = colours.BlueDark;
             completeColour = colours.YellowLight;
