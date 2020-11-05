@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private Sprite spinningMiddle;
         private Sprite fixedMiddle;
 
-        private const float final_scale = 0.625f;
-
         private readonly Color4 glowColour = new Color4(3, 151, 255, 255);
 
         private Container scaleContainer;
@@ -38,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             AddInternal(scaleContainer = new Container
             {
-                Scale = new Vector2(final_scale),
+                Scale = new Vector2(SPRITE_SCALE),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
@@ -127,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             glow.Alpha = DrawableSpinner.Progress;
 
-            scaleContainer.Scale = new Vector2(final_scale * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, DrawableSpinner.Progress) * 0.2f));
+            scaleContainer.Scale = new Vector2(SPRITE_SCALE * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, DrawableSpinner.Progress) * 0.2f));
         }
     }
 }
