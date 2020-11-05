@@ -71,8 +71,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             if (completed.NewValue)
             {
-                clear.FadeInFromZero(400, Easing.Out);
-                clear.ScaleTo(SPRITE_SCALE * 2).Then().ScaleTo(SPRITE_SCALE, 400, Easing.OutElastic);
+                double startTime = Math.Min(Time.Current, DrawableSpinner.HitStateUpdateTime - 400);
+
+                using (BeginAbsoluteSequence(startTime, true))
+                {
+                    clear.FadeInFromZero(400, Easing.Out);
+
+                    clear.ScaleTo(SPRITE_SCALE * 2)
+                         .Then().ScaleTo(SPRITE_SCALE * 0.8f, 240, Easing.Out)
+                         .Then().ScaleTo(SPRITE_SCALE, 160);
+                }
 
                 const double fade_out_duration = 50;
                 using (BeginAbsoluteSequence(DrawableSpinner.HitStateUpdateTime - fade_out_duration, true))
