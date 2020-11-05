@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
@@ -79,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             if (!(drawableHitObject is DrawableSpinner))
                 return;
 
-            var spinner = (Spinner)drawableSpinner.HitObject;
+            var spinner = drawableSpinner.HitObject;
 
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
                 this.FadeOut();
