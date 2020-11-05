@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Dashboard
 {
     internal class CurrentlyPlayingDisplay : CompositeDrawable
     {
-        private IBindableList<int> playingUsers;
+        private readonly IBindableList<int> playingUsers = new BindableList<int>();
 
         private FillFlowContainer<PlayingUserPanel> userFlow;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            playingUsers = spectatorStreaming.PlayingUsers.GetBoundCopy();
+            playingUsers.BindTo(spectatorStreaming.PlayingUsers);
             playingUsers.BindCollectionChanged((sender, e) => Schedule(() =>
             {
                 switch (e.Action)

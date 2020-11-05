@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -31,19 +32,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.
         /// </summary>
         [NotNull]
-        public readonly DrawableOsuHitObject Start;
+        public readonly OsuHitObject Start;
 
         /// <summary>
         /// Creates a new <see cref="FollowPointConnection"/>.
         /// </summary>
         /// <param name="start">The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.</param>
-        public FollowPointConnection([NotNull] DrawableOsuHitObject start)
+        public FollowPointConnection([NotNull] OsuHitObject start)
         {
             Start = start;
 
             RelativeSizeAxes = Axes.Both;
 
-            StartTime.BindTo(Start.HitObject.StartTimeBindable);
+            StartTime.BindTo(start.StartTimeBindable);
         }
 
         protected override void LoadComplete()
@@ -52,13 +53,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             bindEvents(Start);
         }
 
-        private DrawableOsuHitObject end;
+        private OsuHitObject end;
 
         /// <summary>
         /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will enter.
         /// </summary>
         [CanBeNull]
-        public DrawableOsuHitObject End
+        public OsuHitObject End
         {
             get => end;
             set
@@ -75,10 +76,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
         }
 
-        private void bindEvents(DrawableOsuHitObject drawableObject)
+        private void bindEvents(OsuHitObject obj)
         {
-            drawableObject.HitObject.PositionBindable.BindValueChanged(_ => scheduleRefresh());
-            drawableObject.HitObject.DefaultsApplied += _ => scheduleRefresh();
+            obj.PositionBindable.BindValueChanged(_ => scheduleRefresh());
+            obj.DefaultsApplied += _ => scheduleRefresh();
         }
 
         private void scheduleRefresh()
@@ -88,23 +89,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         private void refresh()
         {
-            OsuHitObject osuStart = Start.HitObject;
-            double startTime = osuStart.GetEndTime();
+            double startTime = Start.GetEndTime();
 
             LifetimeStart = startTime;
 
-            OsuHitObject osuEnd = End?.HitObject;
-
-            if (osuEnd == null || osuEnd.NewCombo || osuStart is Spinner || osuEnd is Spinner)
+            if (End == null || End.NewCombo || Start is Spinner || End is Spinner)
             {
                 // ensure we always set a lifetime for full LifetimeManagementContainer benefits
                 LifetimeEnd = LifetimeStart;
                 return;
             }
 
-            Vector2 startPosition = osuStart.StackedEndPosition;
-            Vector2 endPosition = osuEnd.StackedPosition;
-            double endTime = osuEnd.StartTime;
+            Vector2 startPosition = Start.StackedEndPosition;
+            Vector2 endPosition = End.StackedPosition;
+            double endTime = End.StartTime;
 
             Vector2 distanceVector = endPosition - startPosition;
             int distance = (int)distanceVector.Length;
@@ -130,10 +128,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                 AddInternal(fp = new FollowPoint());
 
+                Debug.Assert(End != null);
+
                 fp.Position = pointStartPosition;
                 fp.Rotation = rotation;
                 fp.Alpha = 0;
-                fp.Scale = new Vector2(1.5f * osuEnd.Scale);
+                fp.Scale = new Vector2(1.5f * End.Scale);
 
                 firstTransformStartTime ??= fadeInTime;
 
@@ -141,12 +141,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                 using (fp.BeginAbsoluteSequence(fadeInTime))
                 {
-                    fp.FadeIn(osuEnd.TimeFadeIn);
-                    fp.ScaleTo(osuEnd.Scale, osuEnd.TimeFadeIn, Easing.Out);
-                    fp.MoveTo(pointEndPosition, osuEnd.TimeFadeIn, Easing.Out);
-                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(osuEnd.TimeFadeIn);
+                    fp.FadeIn(End.TimeFadeIn);
+                    fp.ScaleTo(End.Scale, End.TimeFadeIn, Easing.Out);
+                    fp.MoveTo(pointEndPosition, End.TimeFadeIn, Easing.Out);
+                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(End.TimeFadeIn);
 
-                    finalTransformEndTime = fadeOutTime + osuEnd.TimeFadeIn;
+                    finalTransformEndTime = fadeOutTime + End.TimeFadeIn;
                 }
 
                 point++;

@@ -51,18 +51,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// </summary>
         private Vector2 snakedPathOffset;
 
-        private Slider slider;
+        private DrawableSlider drawableSlider;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
         {
-            slider = (Slider)drawableObject.HitObject;
+            drawableSlider = (DrawableSlider)drawableObject;
 
             Refresh();
         }
 
         public void UpdateProgress(double completionProgress)
         {
+            if (drawableSlider == null)
+                return;
+
+            Slider slider = drawableSlider.HitObject;
+
             var span = slider.SpanAt(completionProgress);
             var spanProgress = slider.ProgressAt(completionProgress);
 
@@ -87,8 +92,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public void Refresh()
         {
+            if (drawableSlider == null)
+                return;
+
             // Generate the entire curve
-            slider.Path.GetPathToProgress(CurrentCurve, 0, 1);
+            drawableSlider.HitObject.Path.GetPathToProgress(CurrentCurve, 0, 1);
             SetVertices(CurrentCurve);
 
             // Force the body to be the final path size to avoid excessive autosize computations
@@ -132,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             SnakedStart = p0;
             SnakedEnd = p1;
 
-            slider.Path.GetPathToProgress(CurrentCurve, p0, p1);
+            drawableSlider.HitObject.Path.GetPathToProgress(CurrentCurve, p0, p1);
 
             SetVertices(CurrentCurve);
 
