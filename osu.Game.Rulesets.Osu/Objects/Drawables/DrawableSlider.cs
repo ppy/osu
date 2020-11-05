@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
 
+        public readonly IBindable<int> PathVersion = new Bindable<int>();
+
         private Container<DrawableSliderHead> headContainer;
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
@@ -51,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
-                Ball = new SliderBall(HitObject, this)
+                Ball = new SliderBall(this)
                 {
                     GetInitialHitAction = () => HeadCircle.HitAction,
                     BypassAutoSizeAxes = Axes.Both,
@@ -60,6 +62,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
             };
+
+            PathVersion.BindTo(HitObject.Path.Version);
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);

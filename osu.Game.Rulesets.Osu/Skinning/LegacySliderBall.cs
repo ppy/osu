@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -26,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, DrawableHitObject drawableObject)
+        private void load(ISkinSource skin)
         {
             var ballColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
 
