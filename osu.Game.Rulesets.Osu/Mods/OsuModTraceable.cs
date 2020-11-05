@@ -21,11 +21,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween) };
 
-        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            base.ApplyNormalVisibilityState(hitObject, state);
-            applyTraceableState(hitObject, state);
         }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTraceableState(hitObject, state);
 
         private void applyTraceableState(DrawableHitObject drawable, ArmedState state)
         {

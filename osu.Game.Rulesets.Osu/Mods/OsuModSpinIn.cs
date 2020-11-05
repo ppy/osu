@@ -27,11 +27,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;
 
-        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            base.ApplyNormalVisibilityState(hitObject, state);
-            applyZoomState(hitObject, state);
         }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyZoomState(hitObject, state);
 
         private void applyZoomState(DrawableHitObject drawable, ArmedState state)
         {
