@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Rulesets.Objects.Drawables;
-
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
     /// <summary>
@@ -19,8 +17,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public void UpdateResult() => base.UpdateResult(true);
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateInitialTransforms()
         {
+            base.UpdateInitialTransforms();
+
             // This hitobject should never expire, so this is just a safe maximum.
             LifetimeEnd = LifetimeStart + 30000;
         }

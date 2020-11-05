@@ -245,29 +245,31 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 base.PlaySamples();
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateStartTimeStateTransforms()
         {
-            base.UpdateStateTransforms(state);
+            base.UpdateStartTimeStateTransforms();
 
             Ball.FadeIn();
             Ball.ScaleTo(HitObject.Scale);
+        }
 
-            using (BeginDelayedSequence(HitObject.Duration, true))
+        protected override void UpdateHitStateTransforms(ArmedState state)
+        {
+            base.UpdateHitStateTransforms(state);
+
+            const float fade_out_time = 450;
+
+            // intentionally pile on an extra FadeOut to make it happen much faster.
+            Ball.FadeOut(fade_out_time / 4, Easing.Out);
+
+            switch (state)
             {
-                const float fade_out_time = 450;
-
-                // intentionally pile on an extra FadeOut to make it happen much faster.
-                Ball.FadeOut(fade_out_time / 4, Easing.Out);
-
-                switch (state)
-                {
-                    case ArmedState.Hit:
-                        Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
-                        break;
-                }
-
-                this.FadeOut(fade_out_time, Easing.OutQuint);
+                case ArmedState.Hit:
+                    Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
+                    break;
             }
+
+            this.FadeOut(fade_out_time, Easing.OutQuint);
         }
 
         public Drawable ProxiedLayer => HeadCircle.ProxiedLayer;
