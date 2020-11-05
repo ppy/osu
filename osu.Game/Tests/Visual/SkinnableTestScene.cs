@@ -112,7 +112,15 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            Schedule(() =>
+            // run this once initially to bring things into a sane state as early as possible.
+            updateSizing();
+
+            // run this once after construction to handle the case the changes are made in a BDL/LoadComplete call.
+            Schedule(updateSizing);
+
+            return children;
+
+            void updateSizing()
             {
                 var autoSize = created.RelativeSizeAxes == Axes.None;
 
@@ -123,9 +131,7 @@ namespace osu.Game.Tests.Visual
                 }
 
                 outlineBox.Alpha = autoSize ? 1 : 0;
-            });
-
-            return children;
+            }
         }
 
         /// <summary>
