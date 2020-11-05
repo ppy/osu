@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             spinnerBlink = source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value != true;
 
-            InternalChild = new Container
+            AddInternal(new Container
             {
                 // the old-style spinner relied heavily on absolute screen-space coordinate values.
                 // wrap everything in a container simulating absolute coords to preserve alignment
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         }
                     }
                 }
-            };
+            });
         }
 
         protected override void UpdateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)

@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             Scale = new Vector2(final_scale);
 
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 glow = new Sprite
                 {
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Origin = Anchor.Centre,
                     Texture = source.GetTexture("spinner-middle2")
                 }
-            };
+            });
         }
 
         protected override void UpdateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
