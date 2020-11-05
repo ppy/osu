@@ -2,22 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osuTK;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Skinning;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuJudgement : DrawableJudgement
     {
-        protected SkinnableSprite Lighting;
-
-        private Bindable<Color4> lightingColour;
+        protected SkinnableLighting Lighting { get; private set; }
 
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -34,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(Lighting = new SkinnableSprite("lighting")
+            AddInternal(Lighting = new SkinnableLighting
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -59,19 +54,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.PrepareForUse();
 
-            lightingColour?.UnbindAll();
-
             Lighting.ResetAnimation();
-
-            if (JudgedObject != null)
-            {
-                lightingColour = JudgedObject.AccentColour.GetBoundCopy();
-                lightingColour.BindValueChanged(colour => Lighting.Colour = Result.IsHit ? colour.NewValue : Color4.Transparent, true);
-            }
-            else
-            {
-                Lighting.Colour = Color4.White;
-            }
+            Lighting.SetColourFrom(JudgedObject, Result);
         }
 
         private double fadeOutDelay;
