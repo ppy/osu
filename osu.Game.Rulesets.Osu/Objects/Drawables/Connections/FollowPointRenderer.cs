@@ -24,19 +24,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         public override bool RemoveCompletedTransforms => false;
 
         /// <summary>
-        /// Adds the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
+        /// Adds the <see cref="FollowPoint"/>s around an <see cref="OsuHitObject"/>.
         /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to add <see cref="FollowPoint"/>s for.</param>
-        public void AddFollowPoints(DrawableOsuHitObject hitObject)
+        /// <param name="hitObject">The <see cref="OsuHitObject"/> to add <see cref="FollowPoint"/>s for.</param>
+        public void AddFollowPoints(OsuHitObject hitObject)
             => addConnection(new FollowPointConnection(hitObject).With(g => g.StartTime.BindValueChanged(_ => onStartTimeChanged(g))));
 
         /// <summary>
-        /// Removes the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
+        /// Removes the <see cref="FollowPoint"/>s around an <see cref="OsuHitObject"/>.
         /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to remove <see cref="FollowPoint"/>s for.</param>
-        public void RemoveFollowPoints(DrawableOsuHitObject hitObject) => removeGroup(connections.Single(g => g.Start == hitObject));
+        /// <param name="hitObject">The <see cref="OsuHitObject"/> to remove <see cref="FollowPoint"/>s for.</param>
+        public void RemoveFollowPoints(OsuHitObject hitObject) => removeGroup(connections.Single(g => g.Start == hitObject));
 
         /// <summary>
         /// Adds a <see cref="FollowPointConnection"/> to this <see cref="FollowPointRenderer"/>.

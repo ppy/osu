@@ -76,10 +76,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            if (!(drawableHitObject is DrawableSpinner))
+            if (!(drawableHitObject is DrawableSpinner d))
                 return;
 
-            var spinner = (Spinner)drawableSpinner.HitObject;
+            Spinner spinner = d.HitObject;
 
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
                 this.FadeOut();

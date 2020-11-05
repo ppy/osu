@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         private DrawableSpinner drawableSpinner;
 
-        private Spinner spinner;
-
         private const float initial_scale = 1.3f;
         private const float idle_alpha = 0.2f;
         private const float tracking_alpha = 0.4f;
@@ -52,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private void load(OsuColour colours, DrawableHitObject drawableHitObject)
         {
             drawableSpinner = (DrawableSpinner)drawableHitObject;
-            spinner = (Spinner)drawableSpinner.HitObject;
 
             normalColour = colours.BlueDark;
             completeColour = colours.YellowLight;
@@ -129,6 +126,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             if (!(drawableHitObject is DrawableSpinner))
                 return;
+
+            Spinner spinner = drawableSpinner.HitObject;
 
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
             {
