@@ -126,6 +126,9 @@ namespace osu.Game.Tests.Visual
 
                 foreach (var c in new[] { mainProvider, childContainer, skinProvider })
                 {
+                    c.RelativeSizeAxes = Axes.None;
+                    c.AutoSizeAxes = Axes.None;
+
                     c.RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None;
                     c.AutoSizeAxes = autoSize ? Axes.Both : Axes.None;
                 }
