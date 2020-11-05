@@ -25,17 +25,10 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             base.Update();
 
             var Track = musicController.CurrentTrack;
-            if (!Track.IsDummyDevice)
-            {
-                int currentSecond = (int)Math.Floor(Track.CurrentTime / 1000.0);
-                timeCurrent = formatTime(TimeSpan.FromSeconds(currentSecond));
-                timeTotal = formatTime(TimeSpan.FromMilliseconds(Track.Length));
-                Text = $"{timeCurrent} / {timeTotal}";
-            }
-            else
-            {
-                Text = "请检查当前正在播放的内容";
-            }
+            int currentSecond = (int)Math.Floor(Track.CurrentTime / 1000.0);
+            timeCurrent = formatTime(TimeSpan.FromSeconds(currentSecond));
+            timeTotal = formatTime(TimeSpan.FromMilliseconds(Track.Length));
+            Text = $"{timeCurrent} / {timeTotal}";
         }
     }
 }
