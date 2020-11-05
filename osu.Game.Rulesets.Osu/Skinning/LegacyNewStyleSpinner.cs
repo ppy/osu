@@ -75,23 +75,21 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            if (!(drawableHitObject is DrawableSpinner))
+            if (!(drawableHitObject is DrawableSpinner spinner))
                 return;
 
-            var spinner = drawableSpinner.HitObject;
-
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            using (BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt, true))
                 this.FadeOut();
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
-                this.FadeInFromZero(spinner.TimeFadeIn / 2);
+            using (BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimeFadeIn / 2, true))
+                this.FadeInFromZero(spinner.HitObject.TimeFadeIn / 2);
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            using (BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt, true))
             {
                 fixedMiddle.FadeColour(Color4.White);
 
-                using (BeginDelayedSequence(spinner.TimePreempt, true))
-                    fixedMiddle.FadeColour(Color4.Red, spinner.Duration);
+                using (BeginDelayedSequence(spinner.HitObject.TimePreempt, true))
+                    fixedMiddle.FadeColour(Color4.Red, spinner.HitObject.Duration);
             }
         }
 
