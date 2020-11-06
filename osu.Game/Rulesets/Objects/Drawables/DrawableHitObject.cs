@@ -160,10 +160,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Applies a new <see cref="HitObject"/> to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to apply.</param>
-        public virtual void Apply(HitObject hitObject)
+        public void Apply(HitObject hitObject)
         {
-            if (hasHitObjectApplied)
-                Free();
+            free();
 
             HitObject = hitObject ?? throw new InvalidOperationException($"Cannot apply a null {nameof(HitObject)}.");
 
@@ -202,14 +201,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (IsLoaded)
                 Schedule(() => updateState(ArmedState.Idle, true));
 
+            OnApply(hitObject);
             hasHitObjectApplied = true;
         }
 
         /// <summary>
         /// Removes the currently applied <see cref="HitObject"/>
         /// </summary>
-        public virtual void Free()
+        private void free()
         {
+            if (!hasHitObjectApplied)
+                return;
+
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
@@ -234,8 +237,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             HitObject.DefaultsApplied -= onDefaultsApplied;
-            HitObject = null;
 
+            OnFree(HitObject);
+
+            HitObject = null;
             hasHitObjectApplied = false;
         }
 
@@ -243,10 +248,27 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.FreeAfterUse();
 
+            // Freeing while not in a pool would cause the DHO to not be usable elsewhere in the hierarchy without being re-applied.
             if (!IsInPool)
                 return;
 
-            Free();
+            free();
+        }
+
+        /// <summary>
+        /// Invoked for this <see cref="DrawableHitObject"/> to take on any values from a newly-applied <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> being applied.</param>
+        protected virtual void OnApply(HitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Invoked for this <see cref="DrawableHitObject"/> to revert any values previously taken on from the currently-applied <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The currently-applied <see cref="HitObject"/>.</param>
+        protected virtual void OnFree(HitObject hitObject)
+        {
         }
 
         /// <summary>
@@ -285,7 +307,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onDefaultsApplied(HitObject hitObject)
         {
-            Free();
             Apply(hitObject);
             DefaultsApplied?.Invoke(this);
         }

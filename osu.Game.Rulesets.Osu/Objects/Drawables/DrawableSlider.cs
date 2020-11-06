@@ -78,20 +78,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Tracking.BindValueChanged(updateSlidingSample);
         }
 
-        public override void Free()
+        protected override void OnApply(HitObject hitObject)
         {
-            PathVersion.UnbindFrom(HitObject.Path.Version);
-
-            base.Free();
-        }
-
-        public override void Apply(HitObject hitObject)
-        {
-            base.Apply(hitObject);
+            base.OnApply(hitObject);
 
             // Ensure that the version will change after the upcoming BindTo().
             pathVersion.Value = int.MaxValue;
             PathVersion.BindTo(HitObject.Path.Version);
+        }
+
+        protected override void OnFree(HitObject hitObject)
+        {
+            base.OnFree(hitObject);
+
+            PathVersion.UnbindFrom(HitObject.Path.Version);
         }
 
         private PausableSkinnableSound slidingSample;
