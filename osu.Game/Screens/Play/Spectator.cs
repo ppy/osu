@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Play
             spectatorStreaming.OnUserFinishedPlaying += userFinishedPlaying;
             spectatorStreaming.OnNewFrames += userSentFrames;
 
-            spectatorStreaming.WatchUser((int)targetUser.Id);
+            spectatorStreaming.WatchUser(targetUser.Id);
 
             managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
@@ -353,7 +353,7 @@ namespace osu.Game.Screens.Play
                 spectatorStreaming.OnUserFinishedPlaying -= userFinishedPlaying;
                 spectatorStreaming.OnNewFrames -= userSentFrames;
 
-                spectatorStreaming.StopWatchingUser((int)targetUser.Id);
+                spectatorStreaming.StopWatchingUser(targetUser.Id);
             }
 
             managerUpdated?.UnbindAll();
