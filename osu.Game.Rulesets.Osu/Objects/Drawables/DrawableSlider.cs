@@ -78,11 +78,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Tracking.BindValueChanged(updateSlidingSample);
         }
 
-        protected override void FreeAfterUse()
+        public override void Free()
         {
             PathVersion.UnbindFrom(HitObject.Path.Version);
 
-            base.FreeAfterUse();
+            base.Free();
         }
 
         public override void Apply(HitObject hitObject)

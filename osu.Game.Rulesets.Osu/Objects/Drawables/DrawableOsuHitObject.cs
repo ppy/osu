@@ -52,14 +52,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
-        protected override void FreeAfterUse()
+        public override void Free()
         {
             IndexInCurrentComboBindable.UnbindFrom(HitObject.IndexInCurrentComboBindable);
             PositionBindable.UnbindFrom(HitObject.PositionBindable);
             StackHeightBindable.UnbindFrom(HitObject.StackHeightBindable);
             ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
 
-            base.FreeAfterUse();
+            base.Free();
         }
 
         public override void Apply(HitObject hitObject)
