@@ -142,7 +142,7 @@ namespace osu.Game.Beatmaps.Drawables
             private CancellationTokenSource difficultyCancellation;
 
             [Resolved]
-            private BeatmapDifficultyManager difficultyManager { get; set; }
+            private BeatmapDifficultyCache difficultyCache { get; set; }
 
             public DifficultyRetriever(BeatmapInfo beatmap, RulesetInfo ruleset, IReadOnlyList<Mod> mods)
             {
@@ -158,8 +158,8 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 difficultyCancellation = new CancellationTokenSource();
                 localStarDifficulty = ruleset != null
-                    ? difficultyManager.GetBindableDifficulty(beatmap, ruleset, mods, difficultyCancellation.Token)
-                    : difficultyManager.GetBindableDifficulty(beatmap, difficultyCancellation.Token);
+                    ? difficultyCache.GetBindableDifficulty(beatmap, ruleset, mods, difficultyCancellation.Token)
+                    : difficultyCache.GetBindableDifficulty(beatmap, difficultyCancellation.Token);
                 localStarDifficulty.BindValueChanged(difficulty => StarDifficulty.Value = difficulty.NewValue);
             }
 

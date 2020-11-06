@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select.Details
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
-        private BeatmapDifficultyManager difficultyManager { get; set; }
+        private BeatmapDifficultyCache difficultyCache { get; set; }
 
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
@@ -161,8 +161,8 @@ namespace osu.Game.Screens.Select.Details
 
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            normalStarDifficulty = difficultyManager.GetBindableDifficulty(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
-            moddedStarDifficulty = difficultyManager.GetBindableDifficulty(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+            normalStarDifficulty = difficultyCache.GetBindableDifficulty(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            moddedStarDifficulty = difficultyCache.GetBindableDifficulty(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
 
             normalStarDifficulty.BindValueChanged(_ => updateDisplay());
             moddedStarDifficulty.BindValueChanged(_ => updateDisplay(), true);
