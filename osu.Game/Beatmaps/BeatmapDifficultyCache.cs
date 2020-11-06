@@ -113,19 +113,6 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Retrieves the difficulty of a <see cref="BeatmapInfo"/>.
-        /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
-        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to get the difficulty with.</param>
-        /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with.</param>
-        /// <returns>The <see cref="StarDifficulty"/>.</returns>
-        public StarDifficulty GetDifficulty([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IEnumerable<Mod> mods = null)
-        {
-            // this is safe in this usage because the only asynchronous part is handled by the local scheduler.
-            return GetDifficultyAsync(beatmapInfo, rulesetInfo, mods).Result;
-        }
-
-        /// <summary>
         /// Retrieves the <see cref="DifficultyRating"/> that describes a star rating.
         /// </summary>
         /// <remarks>
