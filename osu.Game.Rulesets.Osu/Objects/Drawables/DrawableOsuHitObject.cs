@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
@@ -49,6 +50,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ShakeDuration = 30,
                 RelativeSizeAxes = Axes.Both
             });
+        }
+
+        protected override void FreeAfterUse()
+        {
+            IndexInCurrentComboBindable.UnbindFrom(HitObject.IndexInCurrentComboBindable);
+            PositionBindable.UnbindFrom(HitObject.PositionBindable);
+            StackHeightBindable.UnbindFrom(HitObject.StackHeightBindable);
+            ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
+
+            base.FreeAfterUse();
+        }
+
+        public override void Apply(HitObject hitObject)
+        {
+            base.Apply(hitObject);
 
             IndexInCurrentComboBindable.BindTo(HitObject.IndexInCurrentComboBindable);
             PositionBindable.BindTo(HitObject.PositionBindable);
