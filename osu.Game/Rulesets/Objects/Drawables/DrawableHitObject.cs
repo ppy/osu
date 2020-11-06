@@ -671,12 +671,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
     public abstract class DrawableHitObject<TObject> : DrawableHitObject
         where TObject : HitObject
     {
-        public new readonly TObject HitObject;
+        public new TObject HitObject => (TObject)base.HitObject;
 
         protected DrawableHitObject(TObject hitObject)
             : base(hitObject)
         {
-            HitObject = hitObject;
         }
     }
 }
