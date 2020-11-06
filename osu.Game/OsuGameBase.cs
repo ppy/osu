@@ -229,7 +229,7 @@ namespace osu.Game
             dependencies.Cache(DifficultyCache = new BeatmapDifficultyCache());
             AddInternal(DifficultyCache);
 
-            var scorePerformanceManager = new ScorePerformanceManager();
+            var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
