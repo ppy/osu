@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.UI
         public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
         public IEnumerable<DrawableHitObject> AliveObjects => AliveInternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
-        private readonly Dictionary<DrawableHitObject, IBindable> startTimeMap = new Dictionary<DrawableHitObject, IBindable>();
+        private readonly Dictionary<DrawableHitObject, (IBindable<double> bindable, double timeAtAdd)> startTimeMap = new Dictionary<DrawableHitObject, (IBindable<double>, double)>();
 
         public HitObjectContainer()
         {
@@ -25,7 +25,10 @@ namespace osu.Game.Rulesets.UI
 
         public virtual void Add(DrawableHitObject hitObject)
         {
-            bindStartTime(hitObject);
+            // Added first for the comparer to remain ordered during AddInternal
+            startTimeMap[hitObject] = (hitObject.HitObject.StartTimeBindable.GetBoundCopy(), hitObject.HitObject.StartTime);
+            startTimeMap[hitObject].bindable.BindValueChanged(_ => onStartTimeChanged(hitObject));
+
             AddInternal(hitObject);
         }
 
@@ -34,18 +37,53 @@ namespace osu.Game.Rulesets.UI
             if (!RemoveInternal(hitObject))
                 return false;
 
-            unbindStartTime(hitObject);
+            // Removed last for the comparer to remain ordered during RemoveInternal
+            startTimeMap[hitObject].bindable.UnbindAll();
+            startTimeMap.Remove(hitObject);
 
             return true;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            unbindStartTimeMap();
         }
 
         public virtual void Clear(bool disposeChildren = true)
         {
             ClearInternal(disposeChildren);
-            unbindAllStartTimes();
+            unbindStartTimeMap();
+        }
+
+        private void unbindStartTimeMap()
+        {
+            foreach (var kvp in startTimeMap)
+                kvp.Value.bindable.UnbindAll();
+            startTimeMap.Clear();
         }
 
         public int IndexOf(DrawableHitObject hitObject) => IndexOfInternal(hitObject);
+
+        private void onStartTimeChanged(DrawableHitObject hitObject)
+        {
+            if (!RemoveInternal(hitObject))
+                return;
+
+            // Update the stored time, preserving the existing bindable
+            startTimeMap[hitObject] = (startTimeMap[hitObject].bindable, hitObject.HitObject.StartTime);
+            AddInternal(hitObject);
+        }
+
+        protected override int Compare(Drawable x, Drawable y)
+        {
+            if (!(x is DrawableHitObject xObj) || !(y is DrawableHitObject yObj))
+                return base.Compare(x, y);
+
+            // Put earlier hitobjects towards the end of the list, so they handle input first
+            int i = startTimeMap[yObj].timeAtAdd.CompareTo(startTimeMap[xObj].timeAtAdd);
+            return i == 0 ? CompareReverseChildID(x, y) : i;
+        }
 
         protected override void OnChildLifetimeBoundaryCrossed(LifetimeBoundaryCrossedEvent e)
         {
@@ -57,49 +95,6 @@ namespace osu.Game.Rulesets.UI
             {
                 hitObject.OnKilled();
             }
-        }
-
-        #region Comparator + StartTime tracking
-
-        private void bindStartTime(DrawableHitObject hitObject)
-        {
-            var bindable = hitObject.StartTimeBindable.GetBoundCopy();
-            bindable.BindValueChanged(_ => onStartTimeChanged(hitObject));
-
-            startTimeMap[hitObject] = bindable;
-        }
-
-        private void unbindStartTime(DrawableHitObject hitObject)
-        {
-            startTimeMap[hitObject].UnbindAll();
-            startTimeMap.Remove(hitObject);
-        }
-
-        private void unbindAllStartTimes()
-        {
-            foreach (var kvp in startTimeMap)
-                kvp.Value.UnbindAll();
-            startTimeMap.Clear();
-        }
-
-        private void onStartTimeChanged(DrawableHitObject hitObject) => SortInternal();
-
-        protected override int Compare(Drawable x, Drawable y)
-        {
-            if (!(x is DrawableHitObject xObj) || !(y is DrawableHitObject yObj))
-                return base.Compare(x, y);
-
-            // Put earlier hitobjects towards the end of the list, so they handle input first
-            int i = yObj.HitObject.StartTime.CompareTo(xObj.HitObject.StartTime);
-            return i == 0 ? CompareReverseChildID(x, y) : i;
-        }
-
-        #endregion
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            unbindAllStartTimes();
         }
     }
 }
