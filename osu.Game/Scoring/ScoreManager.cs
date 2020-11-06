@@ -37,13 +37,13 @@ namespace osu.Game.Scoring
         private readonly Func<BeatmapManager> beatmaps;
 
         [CanBeNull]
-        private readonly Func<BeatmapDifficultyManager> difficulties;
+        private readonly Func<BeatmapDifficultyCache> difficulties;
 
         [CanBeNull]
         private readonly OsuConfigManager configManager;
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
-                            Func<BeatmapDifficultyManager> difficulties = null, OsuConfigManager configManager = null)
+                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
@@ -121,14 +121,14 @@ namespace osu.Game.Scoring
             public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
 
             private readonly ScoreInfo score;
-            private readonly Func<BeatmapDifficultyManager> difficulties;
+            private readonly Func<BeatmapDifficultyCache> difficulties;
 
             /// <summary>
             /// Creates a new <see cref="TotalScoreBindable"/>.
             /// </summary>
             /// <param name="score">The <see cref="ScoreInfo"/> to provide the total score of.</param>
-            /// <param name="difficulties">A function to retrieve the <see cref="BeatmapDifficultyManager"/>.</param>
-            public TotalScoreBindable(ScoreInfo score, Func<BeatmapDifficultyManager> difficulties)
+            /// <param name="difficulties">A function to retrieve the <see cref="BeatmapDifficultyCache"/>.</param>
+            public TotalScoreBindable(ScoreInfo score, Func<BeatmapDifficultyCache> difficulties)
             {
                 this.score = score;
                 this.difficulties = difficulties;

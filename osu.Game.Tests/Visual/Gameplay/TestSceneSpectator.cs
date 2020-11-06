@@ -250,7 +250,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public void EndPlay(int beatmapId)
             {
-                ((ISpectatorClient)this).UserFinishedPlaying((int)StreamingUser.Id, new SpectatorState
+                ((ISpectatorClient)this).UserFinishedPlaying(StreamingUser.Id, new SpectatorState
                 {
                     BeatmapID = beatmapId,
                     RulesetID = 0,
@@ -273,7 +273,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
 
                 var bundle = new FrameDataBundle(frames);
-                ((ISpectatorClient)this).UserSentFrames((int)StreamingUser.Id, bundle);
+                ((ISpectatorClient)this).UserSentFrames(StreamingUser.Id, bundle);
 
                 if (!sentState)
                     sendState(beatmapId);
@@ -293,7 +293,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             private void sendState(int beatmapId)
             {
                 sentState = true;
-                ((ISpectatorClient)this).UserBeganPlaying((int)StreamingUser.Id, new SpectatorState
+                ((ISpectatorClient)this).UserBeganPlaying(StreamingUser.Id, new SpectatorState
                 {
                     BeatmapID = beatmapId,
                     RulesetID = 0,
