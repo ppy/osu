@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
@@ -17,28 +18,22 @@ namespace osu.Game.Rulesets.Osu.Skinning
     /// <summary>
     /// Legacy skinned spinner with one main spinning layer and a background layer.
     /// </summary>
-    public class LegacyOldStyleSpinner : CompositeDrawable
+    public class LegacyOldStyleSpinner : LegacySpinner
     {
-        private DrawableSpinner drawableSpinner;
         private Sprite disc;
         private Sprite metreSprite;
         private Container metre;
 
         private bool spinnerBlink;
 
-        private const float sprite_scale = 1 / 1.6f;
-        private const float final_metre_height = 692 * sprite_scale;
+        private const float final_metre_height = 692 * SPRITE_SCALE;
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource source, DrawableHitObject drawableObject)
+        private void load(ISkinSource source)
         {
             spinnerBlink = source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value != true;
 
-            drawableSpinner = (DrawableSpinner)drawableObject;
-
-            RelativeSizeAxes = Axes.Both;
-
-            InternalChild = new Container
+            AddInternal(new Container
             {
                 // the old-style spinner relied heavily on absolute screen-space coordinate values.
                 // wrap everything in a container simulating absolute coords to preserve alignment
@@ -54,14 +49,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-background"),
-                        Scale = new Vector2(sprite_scale)
+                        Scale = new Vector2(SPRITE_SCALE)
                     },
                     disc = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-circle"),
-                        Scale = new Vector2(sprite_scale)
+                        Scale = new Vector2(SPRITE_SCALE)
                     },
                     metre = new Container
                     {
@@ -77,27 +72,21 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             Texture = source.GetTexture("spinner-metre"),
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
-                            Scale = new Vector2(0.625f)
+                            Scale = new Vector2(SPRITE_SCALE)
                         }
                     }
                 }
-            };
+            });
         }
 
-        protected override void LoadComplete()
+        protected override void UpdateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            base.LoadComplete();
+            base.UpdateStateTransforms(drawableHitObject, state);
 
-            drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
-            updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
-        }
-
-        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
-        {
-            if (!(drawableHitObject is DrawableSpinner))
+            if (!(drawableHitObject is DrawableSpinner d))
                 return;
 
-            var spinner = drawableSpinner.HitObject;
+            Spinner spinner = d.HitObject;
 
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
                 this.FadeOut();
@@ -109,11 +98,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected override void Update()
         {
             base.Update();
-            disc.Rotation = drawableSpinner.RotationTracker.Rotation;
+            disc.Rotation = DrawableSpinner.RotationTracker.Rotation;
 
             // careful: need to call this exactly once for all calculations in a frame
             // as the function has a random factor in it
-            var metreHeight = getMetreHeight(drawableSpinner.Progress);
+            var metreHeight = getMetreHeight(DrawableSpinner.Progress);
 
             // hack to make the metre blink up from below than down from above.
             // move down the container to be able to apply masking for the metre,
@@ -138,14 +127,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 barCount++;
 
             return (float)barCount / total_bars * final_metre_height;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (drawableSpinner != null)
-                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

@@ -123,7 +123,7 @@ namespace osu.Game.Scoring
 
         [JsonIgnore]
         [Column("UserID")]
-        public long? UserID
+        public int? UserID
         {
             get => User?.Id ?? 1;
             set

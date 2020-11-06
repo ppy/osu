@@ -278,7 +278,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (long.TryParse(link.Argument, out long userId))
+                    if (int.TryParse(link.Argument, out int userId))
                         ShowUser(userId);
                     break;
 
@@ -321,7 +321,7 @@ namespace osu.Game
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="userId">The user to display.</param>
-        public void ShowUser(long userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
+        public void ShowUser(int userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.

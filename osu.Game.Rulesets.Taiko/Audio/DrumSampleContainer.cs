@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
         private readonly ControlPointInfo controlPoints;
         private readonly Dictionary<double, DrumSample> mappings = new Dictionary<double, DrumSample>();
 
-        private IBindableList<SampleControlPoint> samplePoints;
+        private readonly IBindableList<SampleControlPoint> samplePoints = new BindableList<SampleControlPoint>();
 
         public DrumSampleContainer(ControlPointInfo controlPoints)
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
         [BackgroundDependencyLoader]
         private void load()
         {
-            samplePoints = controlPoints.SamplePoints.GetBoundCopy();
+            samplePoints.BindTo(controlPoints.SamplePoints);
             samplePoints.BindCollectionChanged((_, __) => recreateMappings(), true);
         }
 
