@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -23,10 +23,14 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapDifficultyManager : CompositeDrawable
+    /// <summary>
+    /// A component which performs and acts as a central cache for difficulty calculations of beatmap/ruleset/mod combinations.
+    /// Currently not persisted between game sessions.
+    /// </summary>
+    public class BeatmapDifficultyCache : Component
     {
         // Too many simultaneous updates can lead to stutters. One thread seems to work fine for song select display purposes.
-        private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyManager));
+        private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyCache));
 
         // A permanent cache to prevent re-computations.
         private readonly ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty> difficultyCache = new ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty>();
@@ -387,6 +391,6 @@ namespace osu.Game.Beatmaps
             Attributes = null;
         }
 
-        public DifficultyRating DifficultyRating => BeatmapDifficultyManager.GetDifficultyRating(Stars);
+        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(Stars);
     }
 }
