@@ -151,19 +151,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ApproachCircle.Expire(true);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            base.UpdateStateTransforms(state);
-
             Debug.Assert(HitObject.HitWindows != null);
 
             switch (state)
             {
                 case ArmedState.Idle:
                     this.Delay(HitObject.TimePreempt).FadeOut(500);
-
-                    Expire(true);
-
                     HitArea.HitAction = null;
                     break;
 
