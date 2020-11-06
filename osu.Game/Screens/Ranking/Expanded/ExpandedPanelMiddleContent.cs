@@ -77,6 +77,8 @@ namespace osu.Game.Screens.Ranking.Expanded
             statisticDisplays.AddRange(topStatistics);
             statisticDisplays.AddRange(bottomStatistics);
 
+            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).Result;
+
             InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
@@ -143,7 +145,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     Spacing = new Vector2(5, 0),
                                     Children = new Drawable[]
                                     {
-                                        new StarRatingDisplay(beatmapDifficultyCache.GetDifficulty(beatmap, score.Ruleset, score.Mods))
+                                        new StarRatingDisplay(starDifficulty)
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft
