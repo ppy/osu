@@ -37,6 +37,7 @@ namespace osu.Game.Overlays.Dashboard
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
+                Padding = new MarginPadding(10),
                 Spacing = new Vector2(10),
             };
         }
