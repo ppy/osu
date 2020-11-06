@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container scaleContainer;
         private InputManager inputManager;
 
-        public DrawableHitCircle(HitCircle h)
+        public DrawableHitCircle([CanBeNull] HitCircle h = null)
             : base(h)
         {
         }

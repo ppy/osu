@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -32,14 +33,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
 
-        public readonly IBindable<int> PathVersion = new Bindable<int>();
+        public IBindable<int> PathVersion => pathVersion;
+        private readonly Bindable<int> pathVersion = new Bindable<int>();
 
         private Container<DrawableSliderHead> headContainer;
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
 
-        public DrawableSlider(Slider s)
+        public DrawableSlider([CanBeNull] Slider s = null)
             : base(s)
         {
         }
@@ -63,8 +65,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
             };
 
-            PathVersion.BindTo(HitObject.Path.Version);
-
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);
             ScaleBindable.BindValueChanged(scale => Ball.Scale = new Vector2(scale.NewValue), true);
@@ -76,6 +76,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }, true);
 
             Tracking.BindValueChanged(updateSlidingSample);
+        }
+
+        protected override void FreeAfterUse()
+        {
+            PathVersion.UnbindFrom(HitObject.Path.Version);
+
+            base.FreeAfterUse();
+        }
+
+        public override void Apply(HitObject hitObject)
+        {
+            base.Apply(hitObject);
+
+            // Ensure that the version will change after the upcoming BindTo().
+            pathVersion.Value = int.MaxValue;
+            PathVersion.BindTo(HitObject.Path.Version);
         }
 
         private PausableSkinnableSound slidingSample;
