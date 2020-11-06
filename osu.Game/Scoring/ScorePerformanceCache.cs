@@ -2,13 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 
 namespace osu.Game.Scoring
 {
@@ -16,12 +15,8 @@ namespace osu.Game.Scoring
     /// A component which performs and acts as a central cache for performance calculations of locally databased scores.
     /// Currently not persisted between game sessions.
     /// </summary>
-    public class ScorePerformanceCache : Component
+    public class ScorePerformanceCache : MemoryCachingComponent<ScorePerformanceCache.PerformanceCacheLookup, double>
     {
-        // this cache will grow indefinitely per session and should be considered temporary.
-        // this whole component should likely be replaced with database persistence.
-        private readonly ConcurrentDictionary<PerformanceCacheLookup, double> performanceCache = new ConcurrentDictionary<PerformanceCacheLookup, double>();
-
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
@@ -34,7 +29,7 @@ namespace osu.Game.Scoring
         {
             var lookupKey = new PerformanceCacheLookup(score);
 
-            if (performanceCache.TryGetValue(lookupKey, out double performance))
+            if (Cache.TryGetValue(lookupKey, out double performance))
                 return Task.FromResult((double?)performance);
 
             return computePerformanceAsync(score, lookupKey, token);
@@ -54,7 +49,7 @@ namespace osu.Game.Scoring
             var total = calculator?.Calculate();
 
             if (total.HasValue)
-                performanceCache[lookupKey] = total.Value;
+                Cache[lookupKey] = total.Value;
 
             return total;
         }

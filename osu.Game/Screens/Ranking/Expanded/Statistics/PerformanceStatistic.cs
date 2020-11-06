@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             else
             {
                 performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                                  .ContinueWith(t => Schedule(() => setPerformanceValue(t.Result)), cancellationTokenSource.Token);
+                                .ContinueWith(t => Schedule(() => setPerformanceValue(t.Result)), cancellationTokenSource.Token);
             }
         }
 
