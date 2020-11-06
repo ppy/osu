@@ -8,8 +8,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Play;
@@ -45,6 +45,9 @@ namespace osu.Game.Overlays.Dashboard
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private UserLookupCache users { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -55,18 +58,19 @@ namespace osu.Game.Overlays.Dashboard
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        var request = new GetUsersRequest(e.NewItems.OfType<int>().ToArray());
 
-                        request.Success += users => Schedule(() =>
+                        foreach (var id in e.NewItems.OfType<int>().ToArray())
                         {
-                            foreach (var user in users.Users)
+                            users.GetUser(id).ContinueWith(u =>
                             {
-                                if (playingUsers.Contains(user.Id))
-                                    userFlow.Add(createUserPanel(user));
-                            }
-                        });
+                                Schedule(() =>
+                                {
+                                    if (playingUsers.Contains(u.Result.Id))
+                                        userFlow.Add(createUserPanel(u.Result));
+                                });
+                            });
+                        }
 
-                        api.Queue(request);
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
