@@ -42,8 +42,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
 
+        [Resolved]
+        private DrawableHitObject drawableObject { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject)
+        private void load()
         {
             var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
 
@@ -64,32 +67,35 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private void updateState(ValueChangedEvent<ArmedState> state)
         {
-            glow.FadeOut(400);
-
-            switch (state.NewValue)
+            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime, true))
             {
-                case ArmedState.Hit:
-                    const double flash_in = 40;
-                    const double flash_out = 100;
+                glow.FadeOut(400);
 
-                    flash.FadeTo(0.8f, flash_in)
-                         .Then()
-                         .FadeOut(flash_out);
+                switch (state.NewValue)
+                {
+                    case ArmedState.Hit:
+                        const double flash_in = 40;
+                        const double flash_out = 100;
 
-                    explode.FadeIn(flash_in);
-                    this.ScaleTo(1.5f, 400, Easing.OutQuad);
+                        flash.FadeTo(0.8f, flash_in)
+                             .Then()
+                             .FadeOut(flash_out);
 
-                    using (BeginDelayedSequence(flash_in, true))
-                    {
-                        // after the flash, we can hide some elements that were behind it
-                        ring.FadeOut();
-                        circle.FadeOut();
-                        number.FadeOut();
+                        explode.FadeIn(flash_in);
+                        this.ScaleTo(1.5f, 400, Easing.OutQuad);
 
-                        this.FadeOut(800);
-                    }
+                        using (BeginDelayedSequence(flash_in, true))
+                        {
+                            // after the flash, we can hide some elements that were behind it
+                            ring.FadeOut();
+                            circle.FadeOut();
+                            number.FadeOut();
 
-                    break;
+                            this.FadeOut(800);
+                        }
+
+                        break;
+                }
             }
         }
     }
