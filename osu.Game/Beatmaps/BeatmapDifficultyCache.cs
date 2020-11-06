@@ -86,20 +86,30 @@ namespace osu.Game.Beatmaps
         /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops computing the star difficulty.</param>
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
-        public async Task<StarDifficulty> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IEnumerable<Mod> mods = null,
-                                                             CancellationToken cancellationToken = default)
+        public Task<StarDifficulty> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
         {
-            if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
-                return existing;
+            // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
+            rulesetInfo ??= beatmapInfo.Ruleset;
 
-            return await Task.Factory.StartNew(() =>
+            // Difficulty can only be computed if the beatmap and ruleset are locally available.
+            if (beatmapInfo.ID == 0 || rulesetInfo.ID == null)
             {
-                // Computation may have finished in a previous task.
-                if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out existing, out _))
+                // If not, fall back to the existing star difficulty (e.g. from an online source).
+                return Task.FromResult(new StarDifficulty(beatmapInfo.StarDifficulty, beatmapInfo.MaxCombo ?? 0));
+            }
+
+            return GetAsync(new DifficultyCacheLookup(beatmapInfo, rulesetInfo, mods), cancellationToken);
+        }
+
+        protected override Task<StarDifficulty> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken token = default)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                if (CheckExists(lookup, out var existing))
                     return existing;
 
-                return computeDifficulty(key, beatmapInfo, rulesetInfo);
-            }, cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+                return computeDifficulty(lookup);
+            }, token, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         /// <summary>
@@ -111,10 +121,8 @@ namespace osu.Game.Beatmaps
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
         public StarDifficulty GetDifficulty([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IEnumerable<Mod> mods = null)
         {
-            if (tryGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
-                return existing;
-
-            return computeDifficulty(key, beatmapInfo, rulesetInfo);
+            // this is safe in this usage because the only asynchronous part is handled by the local scheduler.
+            return GetDifficultyAsync(beatmapInfo, rulesetInfo, mods).Result;
         }
 
         /// <summary>
@@ -207,38 +215,38 @@ namespace osu.Game.Beatmaps
         /// <param name="cancellationToken">A token that may be used to cancel this update.</param>
         private void updateBindable([NotNull] BindableStarDifficulty bindable, [CanBeNull] RulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
-            GetDifficultyAsync(bindable.Beatmap, rulesetInfo, mods, cancellationToken).ContinueWith(t =>
-            {
-                // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
-                Schedule(() =>
+            GetAsync(new DifficultyCacheLookup(bindable.Beatmap, rulesetInfo, mods), cancellationToken)
+                .ContinueWith(t =>
                 {
-                    if (!cancellationToken.IsCancellationRequested)
-                        bindable.Value = t.Result;
-                });
-            }, cancellationToken);
+                    // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
+                    Schedule(() =>
+                    {
+                        if (!cancellationToken.IsCancellationRequested)
+                            bindable.Value = t.Result;
+                    });
+                }, cancellationToken);
         }
 
         /// <summary>
         /// Computes the difficulty defined by a <see cref="DifficultyCacheLookup"/> key, and stores it to the timed cache.
         /// </summary>
         /// <param name="key">The <see cref="DifficultyCacheLookup"/> that defines the computation parameters.</param>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to compute the difficulty of.</param>
-        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to compute the difficulty with.</param>
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
-        private StarDifficulty computeDifficulty(in DifficultyCacheLookup key, BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo)
+        private StarDifficulty computeDifficulty(in DifficultyCacheLookup key)
         {
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
-            rulesetInfo ??= beatmapInfo.Ruleset;
+            var beatmapInfo = key.Beatmap;
+            var rulesetInfo = key.Ruleset;
 
             try
             {
                 var ruleset = rulesetInfo.CreateInstance();
                 Debug.Assert(ruleset != null);
 
-                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(beatmapInfo));
-                var attributes = calculator.Calculate(key.Mods);
+                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(key.Beatmap));
+                var attributes = calculator.Calculate(key.OrderedMods);
 
-                return Cache[key] = new StarDifficulty(attributes);
+                return new StarDifficulty(attributes);
             }
             catch (BeatmapInvalidForRulesetException e)
             {
@@ -249,47 +257,15 @@ namespace osu.Game.Beatmaps
                 if (rulesetInfo.Equals(beatmapInfo.Ruleset))
                 {
                     Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineBeatmapID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
-                    return Cache[key] = new StarDifficulty();
+                    return new StarDifficulty();
                 }
 
-                // Check the cache first because this is now a different ruleset than the one previously guarded against.
-                if (tryGetExisting(beatmapInfo, beatmapInfo.Ruleset, Array.Empty<Mod>(), out var existingDefault, out var existingDefaultKey))
-                    return existingDefault;
-
-                return computeDifficulty(existingDefaultKey, beatmapInfo, beatmapInfo.Ruleset);
+                return GetAsync(new DifficultyCacheLookup(key.Beatmap, key.Beatmap.Ruleset, key.OrderedMods)).Result;
             }
             catch
             {
-                return Cache[key] = new StarDifficulty();
+                return new StarDifficulty();
             }
-        }
-
-        /// <summary>
-        /// Attempts to retrieve an existing difficulty for the combination.
-        /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/>.</param>
-        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/>.</param>
-        /// <param name="mods">The <see cref="Mod"/>s.</param>
-        /// <param name="existingDifficulty">The existing difficulty value, if present.</param>
-        /// <param name="key">The <see cref="DifficultyCacheLookup"/> key that was used to perform this lookup. This can be further used to query <see cref="computeDifficulty"/>.</param>
-        /// <returns>Whether an existing difficulty was found.</returns>
-        private bool tryGetExisting(BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo, IEnumerable<Mod> mods, out StarDifficulty existingDifficulty, out DifficultyCacheLookup key)
-        {
-            // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
-            rulesetInfo ??= beatmapInfo.Ruleset;
-
-            // Difficulty can only be computed if the beatmap and ruleset are locally available.
-            if (beatmapInfo.ID == 0 || rulesetInfo.ID == null)
-            {
-                // If not, fall back to the existing star difficulty (e.g. from an online source).
-                existingDifficulty = new StarDifficulty(beatmapInfo.StarDifficulty, beatmapInfo.MaxCombo ?? 0);
-                key = default;
-
-                return true;
-            }
-
-            key = new DifficultyCacheLookup(beatmapInfo.ID, rulesetInfo.ID.Value, mods);
-            return Cache.TryGetValue(key, out existingDifficulty);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -302,29 +278,31 @@ namespace osu.Game.Beatmaps
 
         public readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
         {
-            public readonly int BeatmapId;
-            public readonly int RulesetId;
-            public readonly Mod[] Mods;
+            public readonly BeatmapInfo Beatmap;
+            public readonly RulesetInfo Ruleset;
 
-            public DifficultyCacheLookup(int beatmapId, int rulesetId, IEnumerable<Mod> mods)
+            public readonly Mod[] OrderedMods;
+
+            public DifficultyCacheLookup([NotNull] BeatmapInfo beatmap, [NotNull] RulesetInfo ruleset, IEnumerable<Mod> mods)
             {
-                BeatmapId = beatmapId;
-                RulesetId = rulesetId;
-                Mods = mods?.OrderBy(m => m.Acronym).ToArray() ?? Array.Empty<Mod>();
+                Beatmap = beatmap;
+                Ruleset = ruleset;
+                OrderedMods = mods?.OrderBy(m => m.Acronym).ToArray() ?? Array.Empty<Mod>();
             }
 
             public bool Equals(DifficultyCacheLookup other)
-                => BeatmapId == other.BeatmapId
-                   && RulesetId == other.RulesetId
-                   && Mods.Select(m => m.Acronym).SequenceEqual(other.Mods.Select(m => m.Acronym));
+                => Beatmap.ID == other.Beatmap.ID
+                   && Ruleset.ID == other.Ruleset.ID
+                   && OrderedMods.Select(m => m.Acronym).SequenceEqual(other.OrderedMods.Select(m => m.Acronym));
 
             public override int GetHashCode()
             {
                 var hashCode = new HashCode();
 
-                hashCode.Add(BeatmapId);
-                hashCode.Add(RulesetId);
-                foreach (var mod in Mods)
+                hashCode.Add(Beatmap.ID);
+                hashCode.Add(Ruleset.ID);
+
+                foreach (var mod in OrderedMods)
                     hashCode.Add(mod.Acronym);
 
                 return hashCode.ToHashCode();
