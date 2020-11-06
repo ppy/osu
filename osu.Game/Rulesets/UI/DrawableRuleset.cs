@@ -15,7 +15,9 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -92,11 +94,8 @@ namespace osu.Game.Rulesets.UI
 
         protected IRulesetConfigManager Config { get; private set; }
 
-        /// <summary>
-        /// The mods which are to be applied.
-        /// </summary>
         [Cached(typeof(IReadOnlyList<Mod>))]
-        protected readonly IReadOnlyList<Mod> Mods;
+        protected override IReadOnlyList<Mod> Mods { get; }
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -284,12 +283,15 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
+        public sealed override DrawableHitObject GetDrawableRepresentation(HitObject hitObject)
+            => base.GetDrawableRepresentation(hitObject) ?? CreateDrawableRepresentation((TObject)hitObject);
+
         /// <summary>
         /// Creates a DrawableHitObject from a HitObject.
         /// </summary>
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
-        public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
+        public virtual DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h) => null;
 
         public void Attach(KeyCounterDisplay keyCounter) =>
             (KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(keyCounter);
@@ -406,6 +408,11 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public abstract IFrameStableClock FrameStableClock { get; }
 
+        /// <summary>
+        /// The mods which are to be applied.
+        /// </summary>
+        protected abstract IReadOnlyList<Mod> Mods { get; }
+
         /// <summary>~
         /// The associated ruleset.
         /// </summary>
@@ -500,6 +507,66 @@ namespace osu.Game.Rulesets.UI
         /// Invoked when the user requests to pause while the resume overlay is active.
         /// </summary>
         public abstract void CancelResume();
+
+        /// <summary>
+        /// Whether this <see cref="DrawableRuleset"/> should retrieve pooled <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        /// <remarks>
+        /// Pools must be registered with this <see cref="DrawableRuleset"/> via <see cref="RegisterPool{TObject,TDrawable}"/> in order for <see cref="DrawableHitObject"/>s to be retrieved.
+        /// <para>
+        /// If <c>true</c>, hitobjects will be added to the <see cref="Playfield"/> via <see cref="osu.Game.Rulesets.UI.Playfield.Add(HitObject)"/>.
+        /// If <c>false</c>, <see cref="osu.Game.Rulesets.UI.Playfield.Add(DrawableHitObject)"/> will be used instead.
+        /// </para>
+        /// </remarks>
+        protected virtual bool PoolHitObjects => false;
+
+        private readonly Dictionary<Type, IDrawablePool> pools = new Dictionary<Type, IDrawablePool>();
+
+        protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
+            where TObject : HitObject
+            where TDrawable : DrawableHitObject, new()
+        {
+            var pool = CreatePool<TDrawable>(initialSize, maximumSize);
+            pools[typeof(TObject)] = pool;
+            AddInternal(pool);
+        }
+
+        /// <summary>
+        /// Creates the <see cref="DrawablePool{T}"/> to retrieve <see cref="DrawableHitObject"/>s of the given type from.
+        /// </summary>
+        /// <param name="initialSize">The number of hitobject to be prepared for initial consumption.</param>
+        /// <param name="maximumSize">An optional maximum size after which the pool will no longer be expanded.</param>
+        /// <typeparam name="TDrawable">The type of <see cref="DrawableHitObject"/> retrievable from this pool.</typeparam>
+        /// <returns>The <see cref="DrawablePool{T}"/>.</returns>
+        protected virtual DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
+            where TDrawable : DrawableHitObject, new()
+            => new DrawablePool<TDrawable>(initialSize, maximumSize);
+
+        /// <summary>
+        /// Retrieves the drawable representation of a <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to retrieve the drawable representation of.</param>
+        /// <returns>The <see cref="DrawableHitObject"/> representing <see cref="HitObject"/>.</returns>
+        public virtual DrawableHitObject GetDrawableRepresentation(HitObject hitObject)
+        {
+            if (!pools.TryGetValue(hitObject.GetType(), out var pool))
+                return null;
+
+            return (DrawableHitObject)pool.Get(d =>
+            {
+                var dho = (DrawableHitObject)d;
+
+                // If this is the first time this DHO is being used (not loaded), then apply the DHO mods.
+                // This is done before Apply() so that the state is updated once when the hitobject is applied.
+                if (!dho.IsLoaded)
+                {
+                    foreach (var m in Mods.OfType<IApplicableToDrawableHitObjects>())
+                        m.ApplyToDrawableHitObjects(dho.Yield());
+                }
+
+                dho.Apply(hitObject);
+            });
+        }
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException
