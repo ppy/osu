@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
@@ -25,16 +24,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Position = new Vector2(256, 192),
                 IndexInCurrentCombo = 0,
+                StartTime = Time.Current,
                 Path = new SliderPath(PathType.Linear, new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 100),
                     new Vector2(300, 0),
                 })
-            }))
-            {
-                Clock = new FramedClock(new StopwatchClock(true))
-            });
+            })));
 
             AddWaitStep("wait for progression", 1);
 
@@ -42,6 +39,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Position = new Vector2(256, 192),
                 ComboIndex = 1,
+                StartTime = dho.HitObject.StartTime,
                 Path = new SliderPath(PathType.Bezier, new[]
                 {
                     Vector2.Zero,
