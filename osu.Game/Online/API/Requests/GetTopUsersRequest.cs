@@ -3,7 +3,7 @@
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUsersRequest : APIRequest<GetUsersResponse>
+    public class GetTopUsersRequest : APIRequest<GetTopUsersResponse>
     {
         protected override string Target => @"rankings/osu/performance";
     }

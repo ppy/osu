@@ -7,7 +7,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUsersResponse : ResponseWithCursor
+    public class GetTopUsersResponse : ResponseWithCursor
     {
         [JsonProperty("ranking")]
         public List<UserStatistics> Users;
