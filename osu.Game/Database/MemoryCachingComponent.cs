@@ -26,7 +26,7 @@ namespace osu.Game.Database
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
         protected async Task<TValue> GetAsync([NotNull] TLookup lookup, CancellationToken token = default)
         {
-            if (cache.TryGetValue(lookup, out TValue performance))
+            if (CheckExists(lookup, out TValue performance))
                 return performance;
 
             var computed = await ComputeValueAsync(lookup, token);
