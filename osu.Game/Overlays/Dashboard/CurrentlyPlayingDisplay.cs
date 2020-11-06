@@ -63,6 +63,9 @@ namespace osu.Game.Overlays.Dashboard
                         {
                             users.GetUser(id).ContinueWith(u =>
                             {
+                                if (u.Result == null)
+                                    return;
+
                                 Schedule(() =>
                                 {
                                     if (playingUsers.Contains(u.Result.Id))
