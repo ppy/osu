@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -27,13 +27,10 @@ namespace osu.Game.Beatmaps
     /// A component which performs and acts as a central cache for difficulty calculations of beatmap/ruleset/mod combinations.
     /// Currently not persisted between game sessions.
     /// </summary>
-    public class BeatmapDifficultyCache : Component
+    public class BeatmapDifficultyCache : MemoryCachingComponent<BeatmapDifficultyCache.DifficultyCacheLookup, StarDifficulty>
     {
         // Too many simultaneous updates can lead to stutters. One thread seems to work fine for song select display purposes.
         private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyCache));
-
-        // A permanent cache to prevent re-computations.
-        private readonly ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty> difficultyCache = new ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty>();
 
         // All bindables that should be updated along with the current ruleset + mods.
         private readonly LockedWeakList<BindableStarDifficulty> trackedBindables = new LockedWeakList<BindableStarDifficulty>();
@@ -243,7 +240,7 @@ namespace osu.Game.Beatmaps
                 var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(beatmapInfo));
                 var attributes = calculator.Calculate(key.Mods);
 
-                return difficultyCache[key] = new StarDifficulty(attributes);
+                return Cache[key] = new StarDifficulty(attributes);
             }
             catch (BeatmapInvalidForRulesetException e)
             {
@@ -254,7 +251,7 @@ namespace osu.Game.Beatmaps
                 if (rulesetInfo.Equals(beatmapInfo.Ruleset))
                 {
                     Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineBeatmapID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
-                    return difficultyCache[key] = new StarDifficulty();
+                    return Cache[key] = new StarDifficulty();
                 }
 
                 // Check the cache first because this is now a different ruleset than the one previously guarded against.
@@ -265,7 +262,7 @@ namespace osu.Game.Beatmaps
             }
             catch
             {
-                return difficultyCache[key] = new StarDifficulty();
+                return Cache[key] = new StarDifficulty();
             }
         }
 
@@ -294,7 +291,7 @@ namespace osu.Game.Beatmaps
             }
 
             key = new DifficultyCacheLookup(beatmapInfo.ID, rulesetInfo.ID.Value, mods);
-            return difficultyCache.TryGetValue(key, out existingDifficulty);
+            return Cache.TryGetValue(key, out existingDifficulty);
         }
 
         protected override void Dispose(bool isDisposing)
