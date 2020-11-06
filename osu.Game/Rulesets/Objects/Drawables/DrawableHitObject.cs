@@ -125,13 +125,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Result = CreateResult(judgement);
             if (Result == null)
                 throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
-
-            LoadSamples();
         }
 
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
+
+            LoadSamples();
 
             HitObject.DefaultsApplied += onDefaultsApplied;
 
@@ -546,7 +546,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = HitObject.GetEndTime();
 
-            Result.TimeOffset = Math.Min(HitObject.HitWindows.WindowFor(HitResult.Miss), Time.Current - endTime);
+            Result.TimeOffset = Time.Current - endTime;
+
+            double missWindow = HitObject.HitWindows.WindowFor(HitResult.Miss);
+            if (missWindow > 0)
+                Result.TimeOffset = Math.Min(Result.TimeOffset, missWindow);
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
