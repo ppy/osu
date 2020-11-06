@@ -308,7 +308,6 @@ namespace osu.Game.Overlays
             if (disabled)
                 playlist.Hide();
 
-            playButton.Enabled.Value = !disabled;
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;

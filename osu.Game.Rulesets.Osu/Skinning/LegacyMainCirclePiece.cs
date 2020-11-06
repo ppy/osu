@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -42,12 +43,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
 
         [Resolved]
+        private DrawableHitObject drawableObject { get; set; }
+
+        [Resolved]
         private ISkinSource skin { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject)
+        private void load()
         {
-            OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
+            var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
 
             bool allowFallback = false;
 
@@ -111,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             state.BindTo(drawableObject.State);
             accentColour.BindTo(drawableObject.AccentColour);
-            indexInCurrentCombo.BindTo(osuObject.IndexInCurrentComboBindable);
+            indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
 
             Texture getTextureWithFallback(string name)
             {
@@ -143,28 +147,31 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             const double legacy_fade_duration = 240;
 
-            switch (state.NewValue)
+            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime, true))
             {
-                case ArmedState.Hit:
-                    circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
-                    circleSprites.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                switch (state.NewValue)
+                {
+                    case ArmedState.Hit:
+                        circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
+                        circleSprites.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                    if (hasNumber)
-                    {
-                        var legacyVersion = skin.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value;
-
-                        if (legacyVersion >= 2.0m)
-                            // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
-                            hitCircleText.FadeOut(legacy_fade_duration / 4, Easing.Out);
-                        else
+                        if (hasNumber)
                         {
-                            // old skins scale and fade it normally along other pieces.
-                            hitCircleText.FadeOut(legacy_fade_duration, Easing.Out);
-                            hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
-                        }
-                    }
+                            var legacyVersion = skin.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value;
 
-                    break;
+                            if (legacyVersion >= 2.0m)
+                                // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
+                                hitCircleText.FadeOut(legacy_fade_duration / 4, Easing.Out);
+                            else
+                            {
+                                // old skins scale and fade it normally along other pieces.
+                                hitCircleText.FadeOut(legacy_fade_duration, Easing.Out);
+                                hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                            }
+                        }
+
+                        break;
+                }
             }
         }
     }

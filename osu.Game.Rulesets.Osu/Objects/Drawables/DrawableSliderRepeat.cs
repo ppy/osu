@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -22,9 +21,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private double animDuration;
 
-        private readonly Drawable scaleContainer;
-
-        public readonly Drawable CirclePiece;
+        public Drawable CirclePiece { get; private set; }
+        private Drawable scaleContainer;
+        private ReverseArrowPiece arrow;
 
         public override bool DisplayResult => false;
 
@@ -33,10 +32,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             this.sliderRepeat = sliderRepeat;
             this.drawableSlider = drawableSlider;
+        }
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
-
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Origin = Anchor.Centre;
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             InternalChild = scaleContainer = new Container
             {
@@ -50,15 +52,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     arrow = new ReverseArrowPiece(),
                 }
             };
-        }
 
-        private readonly IBindable<float> scaleBindable = new BindableFloat();
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
-            scaleBindable.BindTo(HitObject.ScaleBindable);
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -77,9 +72,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             );
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            base.UpdateStateTransforms(state);
+            base.UpdateHitStateTransforms(state);
 
             switch (state)
             {
@@ -99,8 +94,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         private bool hasRotation;
-
-        private readonly ReverseArrowPiece arrow;
 
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {

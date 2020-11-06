@@ -12,7 +12,7 @@ namespace osu.Game.Users
     public class User : IEquatable<User>
     {
         [JsonProperty(@"id")]
-        public long Id = 1;
+        public int Id = 1;
 
         [JsonProperty(@"join_date")]
         public DateTimeOffset JoinDate;
