@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 }
             };
 
-            PositionBindable.BindValueChanged(pos => Position = pos.NewValue, true);
+            PositionBindable.BindValueChanged(pos => Position = pos.NewValue);
         }
 
         protected override void LoadComplete()
