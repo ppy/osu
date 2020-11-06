@@ -65,9 +65,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
             };
 
-            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);
-            StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);
-            ScaleBindable.BindValueChanged(scale => Ball.Scale = new Vector2(scale.NewValue), true);
+            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            ScaleBindable.BindValueChanged(scale => Ball.Scale = new Vector2(scale.NewValue));
 
             AccentColour.BindValueChanged(colour =>
             {
