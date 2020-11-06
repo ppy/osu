@@ -15,28 +15,25 @@ namespace osu.Game.Scoring
     /// A component which performs and acts as a central cache for performance calculations of locally databased scores.
     /// Currently not persisted between game sessions.
     /// </summary>
-    public class ScorePerformanceCache : MemoryCachingComponent<ScorePerformanceCache.PerformanceCacheLookup, double>
+    public class ScorePerformanceCache : MemoryCachingComponent<ScorePerformanceCache.PerformanceCacheLookup, double?>
     {
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
+
+        protected override bool CacheNullValues => false;
 
         /// <summary>
         /// Calculates performance for the given <see cref="ScoreInfo"/>.
         /// </summary>
         /// <param name="score">The score to do the calculation on. </param>
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
-        public Task<double?> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default)
+        public Task<double?> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default) =>
+            GetAsync(new PerformanceCacheLookup(score), token);
+
+        protected override async Task<double?> ComputeValueAsync(PerformanceCacheLookup lookup, CancellationToken token = default)
         {
-            var lookupKey = new PerformanceCacheLookup(score);
+            var score = lookup.ScoreInfo;
 
-            if (Cache.TryGetValue(lookupKey, out double performance))
-                return Task.FromResult((double?)performance);
-
-            return computePerformanceAsync(score, lookupKey, token);
-        }
-
-        private async Task<double?> computePerformanceAsync(ScoreInfo score, PerformanceCacheLookup lookupKey, CancellationToken token = default)
-        {
             var attributes = await difficultyCache.GetDifficultyAsync(score.Beatmap, score.Ruleset, score.Mods, token);
 
             // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
@@ -46,31 +43,25 @@ namespace osu.Game.Scoring
             token.ThrowIfCancellationRequested();
 
             var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(attributes.Attributes, score);
-            var total = calculator?.Calculate();
 
-            if (total.HasValue)
-                Cache[lookupKey] = total.Value;
-
-            return total;
+            return calculator?.Calculate();
         }
 
         public readonly struct PerformanceCacheLookup
         {
-            public readonly string ScoreHash;
-            public readonly int LocalScoreID;
+            public readonly ScoreInfo ScoreInfo;
 
             public PerformanceCacheLookup(ScoreInfo info)
             {
-                ScoreHash = info.Hash;
-                LocalScoreID = info.ID;
+                ScoreInfo = info;
             }
 
             public override int GetHashCode()
             {
                 var hash = new HashCode();
 
-                hash.Add(ScoreHash);
-                hash.Add(LocalScoreID);
+                hash.Add(ScoreInfo.Hash);
+                hash.Add(ScoreInfo.ID);
 
                 return hash.ToHashCode();
             }
