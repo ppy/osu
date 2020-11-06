@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, BeatmapDifficultyManager difficultyManager)
+        private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache)
         {
             AutoSizeAxes = Axes.Both;
 

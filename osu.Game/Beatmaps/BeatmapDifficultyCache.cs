@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,25 +10,25 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Database;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapDifficultyManager : CompositeDrawable
+    /// <summary>
+    /// A component which performs and acts as a central cache for difficulty calculations of beatmap/ruleset/mod combinations.
+    /// Currently not persisted between game sessions.
+    /// </summary>
+    public class BeatmapDifficultyCache : MemoryCachingComponent<BeatmapDifficultyCache.DifficultyCacheLookup, StarDifficulty>
     {
         // Too many simultaneous updates can lead to stutters. One thread seems to work fine for song select display purposes.
-        private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyManager));
-
-        // A permanent cache to prevent re-computations.
-        private readonly ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty> difficultyCache = new ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty>();
+        private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyCache));
 
         // All bindables that should be updated along with the current ruleset + mods.
         private readonly LockedWeakList<BindableStarDifficulty> trackedBindables = new LockedWeakList<BindableStarDifficulty>();
@@ -239,7 +238,7 @@ namespace osu.Game.Beatmaps
                 var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(beatmapInfo));
                 var attributes = calculator.Calculate(key.Mods);
 
-                return difficultyCache[key] = new StarDifficulty(attributes);
+                return Cache[key] = new StarDifficulty(attributes);
             }
             catch (BeatmapInvalidForRulesetException e)
             {
@@ -250,7 +249,7 @@ namespace osu.Game.Beatmaps
                 if (rulesetInfo.Equals(beatmapInfo.Ruleset))
                 {
                     Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineBeatmapID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
-                    return difficultyCache[key] = new StarDifficulty();
+                    return Cache[key] = new StarDifficulty();
                 }
 
                 // Check the cache first because this is now a different ruleset than the one previously guarded against.
@@ -261,7 +260,7 @@ namespace osu.Game.Beatmaps
             }
             catch
             {
-                return difficultyCache[key] = new StarDifficulty();
+                return Cache[key] = new StarDifficulty();
             }
         }
 
@@ -290,7 +289,7 @@ namespace osu.Game.Beatmaps
             }
 
             key = new DifficultyCacheLookup(beatmapInfo.ID, rulesetInfo.ID.Value, mods);
-            return difficultyCache.TryGetValue(key, out existingDifficulty);
+            return Cache.TryGetValue(key, out existingDifficulty);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -343,50 +342,5 @@ namespace osu.Game.Beatmaps
                 CancellationToken = cancellationToken;
             }
         }
-    }
-
-    public readonly struct StarDifficulty
-    {
-        /// <summary>
-        /// The star difficulty rating for the given beatmap.
-        /// </summary>
-        public readonly double Stars;
-
-        /// <summary>
-        /// The maximum combo achievable on the given beatmap.
-        /// </summary>
-        public readonly int MaxCombo;
-
-        /// <summary>
-        /// The difficulty attributes computed for the given beatmap.
-        /// Might not be available if the star difficulty is associated with a beatmap that's not locally available.
-        /// </summary>
-        [CanBeNull]
-        public readonly DifficultyAttributes Attributes;
-
-        /// <summary>
-        /// Creates a <see cref="StarDifficulty"/> structure based on <see cref="DifficultyAttributes"/> computed
-        /// by a <see cref="DifficultyCalculator"/>.
-        /// </summary>
-        public StarDifficulty([NotNull] DifficultyAttributes attributes)
-        {
-            Stars = attributes.StarRating;
-            MaxCombo = attributes.MaxCombo;
-            Attributes = attributes;
-            // Todo: Add more members (BeatmapInfo.DifficultyRating? Attributes? Etc...)
-        }
-
-        /// <summary>
-        /// Creates a <see cref="StarDifficulty"/> structure with a pre-populated star difficulty and max combo
-        /// in scenarios where computing <see cref="DifficultyAttributes"/> is not feasible (i.e. when working with online sources).
-        /// </summary>
-        public StarDifficulty(double starDifficulty, int maxCombo)
-        {
-            Stars = starDifficulty;
-            MaxCombo = maxCombo;
-            Attributes = null;
-        }
-
-        public DifficultyRating DifficultyRating => BeatmapDifficultyManager.GetDifficultyRating(Stars);
     }
 }
