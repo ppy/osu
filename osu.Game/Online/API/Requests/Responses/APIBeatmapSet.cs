@@ -61,7 +61,7 @@ namespace osu.Game.Online.API.Requests.Responses
         private int[] ratings { get; set; }
 
         [JsonProperty(@"user_id")]
-        private long creatorId
+        private int creatorId
         {
             set => Author.Id = value;
         }
