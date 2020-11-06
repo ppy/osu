@@ -125,13 +125,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Result = CreateResult(judgement);
             if (Result == null)
                 throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
-
-            LoadSamples();
         }
 
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
+
+            LoadSamples();
 
             HitObject.DefaultsApplied += onDefaultsApplied;
 
@@ -255,17 +255,20 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.ClearTransformsAfter(double.MinValue, true);
 
             using (BeginAbsoluteSequence(transformTime, true))
-            {
                 UpdateInitialTransforms();
 
-                var judgementOffset = Result?.TimeOffset ?? 0;
+            using (BeginAbsoluteSequence(StateUpdateTime, true))
+                UpdateStartTimeStateTransforms();
 
-                using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
-                {
-                    UpdateStateTransforms(newState);
-                    state.Value = newState;
-                }
-            }
+#pragma warning disable 618
+            using (BeginAbsoluteSequence(StateUpdateTime + (Result?.TimeOffset ?? 0), true))
+                UpdateStateTransforms(newState);
+#pragma warning restore 618
+
+            using (BeginAbsoluteSequence(HitStateUpdateTime, true))
+                UpdateHitStateTransforms(newState);
+
+            state.Value = newState;
 
             if (LifetimeEnd == double.MaxValue && (state.Value != ArmedState.Idle || HitObject.HitWindows == null))
                 Expire();
@@ -297,7 +300,27 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// In the case of a non-idle <see cref="ArmedState"/>, and if <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
         /// </summary>
         /// <param name="state">The new armed state.</param>
+        [Obsolete("Use UpdateStartTimeStateTransforms and UpdateHitStateTransforms instead")] // Can be removed 20210504
         protected virtual void UpdateStateTransforms(ArmedState state)
+        {
+        }
+
+        /// <summary>
+        /// Apply passive transforms at the <see cref="HitObject"/>'s StartTime.
+        /// This is called each time <see cref="State"/> changes.
+        /// Previous states are automatically cleared.
+        /// </summary>
+        protected virtual void UpdateStartTimeStateTransforms()
+        {
+        }
+
+        /// <summary>
+        /// Apply transforms based on the current <see cref="ArmedState"/>. This call is offset by <see cref="HitStateUpdateTime"/> (HitObject.EndTime + Result.Offset), equivalent to when the user hit the object.
+        /// If <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
+        /// Previous states are automatically cleared.
+        /// </summary>
+        /// <param name="state">The new armed state.</param>
+        protected virtual void UpdateHitStateTransforms(ArmedState state)
         {
         }
 
@@ -455,6 +478,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual double InitialLifetimeOffset => 10000;
 
         /// <summary>
+        /// The time at which state transforms should be applied that line up to <see cref="HitObject"/>'s StartTime.
+        /// This is used to offset calls to <see cref="UpdateStateTransforms"/>.
+        /// </summary>
+        public double StateUpdateTime => HitObject.StartTime;
+
+        /// <summary>
+        /// The time at which judgement dependent state transforms should be applied. This is equivalent of the (end) time of the object, in addition to any judgement offset.
+        /// This is used to offset calls to <see cref="UpdateHitStateTransforms"/>.
+        /// </summary>
+        public double HitStateUpdateTime => Result?.TimeAbsolute ?? HitObject.GetEndTime();
+
+        /// <summary>
         /// Will be called at least once after this <see cref="DrawableHitObject"/> has become not alive.
         /// </summary>
         public virtual void OnKilled()
@@ -511,7 +546,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = HitObject.GetEndTime();
 
-            Result.TimeOffset = Math.Min(HitObject.HitWindows.WindowFor(HitResult.Miss), Time.Current - endTime);
+            Result.TimeOffset = Time.Current - endTime;
+
+            double missWindow = HitObject.HitWindows.WindowFor(HitResult.Miss);
+            if (missWindow > 0)
+                Result.TimeOffset = Math.Min(Result.TimeOffset, missWindow);
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);

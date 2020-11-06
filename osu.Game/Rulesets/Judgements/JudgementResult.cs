@@ -37,6 +37,12 @@ namespace osu.Game.Rulesets.Judgements
         public double TimeOffset { get; internal set; }
 
         /// <summary>
+        /// The absolute time at which this <see cref="JudgementResult"/> occurred.
+        /// Equal to the (end) time of the <see cref="HitObject"/> + <see cref="TimeOffset"/>.
+        /// </summary>
+        public double TimeAbsolute => HitObject.GetEndTime() + TimeOffset;
+
+        /// <summary>
         /// The combo prior to this <see cref="JudgementResult"/> occurring.
         /// </summary>
         public int ComboAtJudgement { get; internal set; }

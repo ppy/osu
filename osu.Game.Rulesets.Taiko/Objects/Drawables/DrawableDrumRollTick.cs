@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             ApplyResult(r => r.Type = r.Judgement.MaxResult);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
             switch (state)
             {

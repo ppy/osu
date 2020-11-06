@@ -2,11 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -17,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// <summary>
     /// Adjusts the size of hit objects during their fade in animation.
     /// </summary>
-    public abstract class OsuModObjectScaleTween : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
+    public abstract class OsuModObjectScaleTween : ModWithVisibilityAdjustment
     {
         public override ModType Type => ModType.Fun;
 
@@ -27,33 +24,19 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected virtual float EndScale => 1;
 
-        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
-
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpinIn), typeof(OsuModTraceable) };
 
-        public void ReadFromConfig(OsuConfigManager config)
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
         }
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
-        {
-            foreach (var drawable in drawables.Skip(increaseFirstObjectVisibility.Value ? 1 : 0))
-            {
-                switch (drawable)
-                {
-                    case DrawableSpinner _:
-                        continue;
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyCustomState(hitObject, state);
 
-                    default:
-                        drawable.ApplyCustomUpdateState += ApplyCustomState;
-                        break;
-                }
-            }
-        }
-
-        protected virtual void ApplyCustomState(DrawableHitObject drawable, ArmedState state)
+        private void applyCustomState(DrawableHitObject drawable, ArmedState state)
         {
+            if (drawable is DrawableSpinner)
+                return;
+
             var h = (OsuHitObject)drawable.HitObject;
 
             // apply grow effect
