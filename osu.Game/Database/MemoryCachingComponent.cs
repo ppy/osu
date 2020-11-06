@@ -20,7 +20,7 @@ namespace osu.Game.Database
         protected virtual bool CacheNullValues => true;
 
         /// <summary>
-        /// Retrieve the cached value for the given <see cref="TLookup"/>.
+        /// Retrieve the cached value for the given lookup.
         /// </summary>
         /// <param name="lookup">The lookup to retrieve.</param>
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
@@ -36,6 +36,9 @@ namespace osu.Game.Database
 
             return computed;
         }
+
+        protected bool CheckExists([NotNull] TLookup lookup, out TValue value) =>
+            cache.TryGetValue(lookup, out value);
 
         /// <summary>
         /// Called on cache miss to compute the value for the specified lookup.
