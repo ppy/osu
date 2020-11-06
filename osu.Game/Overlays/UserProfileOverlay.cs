@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
         {
         }
 
-        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
+        public void ShowUser(int userId) => ShowUser(new User { Id = userId });
 
         public void ShowUser(User user, bool fetchOnline = true)
         {

@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Select
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         [Resolved]
-        private BeatmapDifficultyManager difficultyManager { get; set; }
+        private BeatmapDifficultyCache difficultyCache { get; set; }
 
         private IBindable<StarDifficulty> beatmapDifficulty;
 
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Select
                 cancellationSource = new CancellationTokenSource();
 
                 beatmapDifficulty?.UnbindAll();
-                beatmapDifficulty = difficultyManager.GetBindableDifficulty(beatmap.BeatmapInfo, cancellationSource.Token);
+                beatmapDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo, cancellationSource.Token);
                 beatmapDifficulty.BindValueChanged(_ => updateDisplay());
 
                 updateDisplay();

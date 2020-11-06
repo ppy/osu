@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyManager beatmapDifficultyManager)
+        private void load(BeatmapDifficultyCache beatmapDifficultyCache)
         {
             var beatmap = score.Beatmap;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     Spacing = new Vector2(5, 0),
                                     Children = new Drawable[]
                                     {
-                                        new StarRatingDisplay(beatmapDifficultyManager.GetDifficulty(beatmap, score.Ruleset, score.Mods))
+                                        new StarRatingDisplay(beatmapDifficultyCache.GetDifficulty(beatmap, score.Ruleset, score.Mods))
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft
