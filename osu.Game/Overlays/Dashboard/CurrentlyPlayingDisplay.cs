@@ -54,17 +54,18 @@ namespace osu.Game.Overlays.Dashboard
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        foreach (var u in e.NewItems.OfType<int>())
+                        var request = new GetUsersRequest(e.NewItems.OfType<int>().ToArray());
+
+                        request.Success += users => Schedule(() =>
                         {
-                            var request = new GetUserRequest(u);
-                            request.Success += user => Schedule(() =>
+                            foreach (var user in users.Users)
                             {
                                 if (playingUsers.Contains(user.Id))
                                     userFlow.Add(createUserPanel(user));
-                            });
-                            api.Queue(request);
-                        }
+                            }
+                        });
 
+                        api.Queue(request);
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
