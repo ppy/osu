@@ -191,6 +191,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="hitObject"></param>
         public virtual void Apply(HitObject hitObject)
         {
+            if (HitObject != null)
+                FreeAfterUse();
+
             HitObject = hitObject;
 
             // Copy any existing result from the hitobject (required for rewind / judgement revert).
