@@ -13,9 +13,10 @@ using osu.Game.Beatmaps;
 namespace osu.Game.Scoring
 {
     /// <summary>
-    /// A global component which calculates and caches results of performance calculations for locally databased scores.
+    /// A component which performs and acts as a central cache for performance calculations of locally databased scores.
+    /// Currently not persisted between game sessions.
     /// </summary>
-    public class ScorePerformanceManager : Component
+    public class ScorePerformanceCache : Component
     {
         // this cache will grow indefinitely per session and should be considered temporary.
         // this whole component should likely be replaced with database persistence.
