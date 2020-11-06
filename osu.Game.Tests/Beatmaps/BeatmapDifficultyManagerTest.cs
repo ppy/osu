@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 
@@ -14,8 +15,8 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestKeyEqualsWithDifferentModInstances()
         {
-            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(1234, 0, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
-            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(1234, 0, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
+            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
+            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
 
             Assert.That(key1, Is.EqualTo(key2));
         }
@@ -23,8 +24,8 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestKeyEqualsWithDifferentModOrder()
         {
-            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(1234, 0, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
-            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(1234, 0, new Mod[] { new OsuModHidden(), new OsuModHardRock() });
+            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModHardRock(), new OsuModHidden() });
+            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = 1234 }, new RulesetInfo { ID = 0 }, new Mod[] { new OsuModHidden(), new OsuModHardRock() });
 
             Assert.That(key1, Is.EqualTo(key2));
         }
