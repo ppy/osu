@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
     /// Legacy skinned spinner with two main spinning layers, one fixed overlay and one final spinning overlay.
     /// No background layer.
     /// </summary>
-    public class LegacyNewStyleSpinner : CompositeDrawable
+    public class LegacyNewStyleSpinner : LegacySpinner
     {
         private Sprite glow;
         private Sprite discBottom;
@@ -27,66 +27,61 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private Sprite spinningMiddle;
         private Sprite fixedMiddle;
 
-        private DrawableSpinner drawableSpinner;
-
-        private const float final_scale = 0.625f;
-
         private readonly Color4 glowColour = new Color4(3, 151, 255, 255);
 
+        private Container scaleContainer;
+
         [BackgroundDependencyLoader]
-        private void load(ISkinSource source, DrawableHitObject drawableObject)
+        private void load(ISkinSource source)
         {
-            drawableSpinner = (DrawableSpinner)drawableObject;
-
-            Scale = new Vector2(final_scale);
-
-            InternalChildren = new Drawable[]
+            AddInternal(scaleContainer = new Container
             {
-                glow = new Sprite
+                Scale = new Vector2(SPRITE_SCALE),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-glow"),
-                    Blending = BlendingParameters.Additive,
-                    Colour = glowColour,
-                },
-                discBottom = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-bottom")
-                },
-                discTop = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-top")
-                },
-                fixedMiddle = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-middle")
-                },
-                spinningMiddle = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = source.GetTexture("spinner-middle2")
+                    glow = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-glow"),
+                        Blending = BlendingParameters.Additive,
+                        Colour = glowColour,
+                    },
+                    discBottom = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-bottom")
+                    },
+                    discTop = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-top")
+                    },
+                    fixedMiddle = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-middle")
+                    },
+                    spinningMiddle = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-middle2")
+                    }
                 }
-            };
+            });
         }
 
-        protected override void LoadComplete()
+        protected override void UpdateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            base.LoadComplete();
+            base.UpdateStateTransforms(drawableHitObject, state);
 
-            drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
-            updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
-        }
-
-        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
-        {
             switch (drawableHitObject)
             {
                 case DrawableSpinner d:
@@ -125,20 +120,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected override void Update()
         {
             base.Update();
-            spinningMiddle.Rotation = discTop.Rotation = drawableSpinner.RotationTracker.Rotation;
+            spinningMiddle.Rotation = discTop.Rotation = DrawableSpinner.RotationTracker.Rotation;
             discBottom.Rotation = discTop.Rotation / 3;
 
-            glow.Alpha = drawableSpinner.Progress;
+            glow.Alpha = DrawableSpinner.Progress;
 
-            Scale = new Vector2(final_scale * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, drawableSpinner.Progress) * 0.2f));
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (drawableSpinner != null)
-                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
+            scaleContainer.Scale = new Vector2(SPRITE_SCALE * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, DrawableSpinner.Progress) * 0.2f));
         }
     }
 }
