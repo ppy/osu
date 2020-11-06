@@ -270,7 +270,7 @@ namespace osu.Game.Beatmaps
 
             public readonly Mod[] OrderedMods;
 
-            public DifficultyCacheLookup([NotNull] BeatmapInfo beatmap, [NotNull] RulesetInfo ruleset, IEnumerable<Mod> mods)
+            public DifficultyCacheLookup([NotNull] BeatmapInfo beatmap, [CanBeNull] RulesetInfo ruleset, IEnumerable<Mod> mods)
             {
                 Beatmap = beatmap;
                 // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
