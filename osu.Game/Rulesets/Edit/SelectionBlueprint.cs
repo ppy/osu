@@ -143,5 +143,11 @@ namespace osu.Game.Rulesets.Edit
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
 
         public virtual Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Parent.ToLocalSpace(screenSpacePosition) - Position;
+
+        /// <summary>
+        /// Handle to perform a partial deletion when the user requests a quick delete (Shift+Right Click).
+        /// </summary>
+        /// <returns>True if the deletion operation was handled by this blueprint. Returning false will delete the full blueprint.</returns>
+        public virtual bool HandleQuickDeletion() => false;
     }
 }
