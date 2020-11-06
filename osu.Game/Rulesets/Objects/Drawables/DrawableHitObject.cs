@@ -116,6 +116,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public IBindable<ArmedState> State => state;
 
         /// <summary>
+        /// Whether <see cref="HitObject"/> is currently applied.
+        /// </summary>
+        private bool hasHitObjectApplied;
+
+        /// <summary>
         /// Creates a new <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="initialHitObject">
@@ -152,49 +157,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Removes the <see cref="HitObject"/> currently applied to this <see cref="DrawableHitObject"/>,
-        /// </summary>
-        protected override void FreeAfterUse()
-        {
-            StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
-            if (HitObject is IHasComboInformation combo)
-                comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
-
-            samplesBindable.UnbindFrom(HitObject.SamplesBindable);
-
-            // When a new hitobject is applied, the samples will be cleared before re-populating.
-            // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
-            samplesBindable.CollectionChanged -= onSamplesChanged;
-
-            if (nestedHitObjects.IsValueCreated)
-            {
-                foreach (var obj in nestedHitObjects.Value)
-                {
-                    obj.OnNewResult -= onNewResult;
-                    obj.OnRevertResult -= onRevertResult;
-                    obj.ApplyCustomUpdateState -= onApplyCustomUpdateState;
-                }
-
-                nestedHitObjects.Value.Clear();
-                ClearNestedHitObjects();
-            }
-
-            HitObject.DefaultsApplied -= onDefaultsApplied;
-            HitObject = null;
-
-            base.FreeAfterUse();
-        }
-
-        /// <summary>
         /// Applies a new <see cref="HitObject"/> to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        /// <param name="hitObject"></param>
+        /// <param name="hitObject">The <see cref="HitObject"/> to apply.</param>
         public virtual void Apply(HitObject hitObject)
         {
-            if (HitObject != null)
-                FreeAfterUse();
+            if (hasHitObjectApplied)
+                Free();
 
-            HitObject = hitObject;
+            HitObject = hitObject ?? throw new InvalidOperationException($"Cannot apply a null {nameof(HitObject)}.");
 
             // Copy any existing result from the hitobject (required for rewind / judgement revert).
             Result = HitObject.Result;
@@ -230,6 +201,52 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // If not loaded, the state update happens in LoadComplete(). Otherwise, the update is scheduled to allow for lifetime updates.
             if (IsLoaded)
                 Schedule(() => updateState(ArmedState.Idle, true));
+
+            hasHitObjectApplied = true;
+        }
+
+        /// <summary>
+        /// Removes the currently applied <see cref="HitObject"/>
+        /// </summary>
+        public virtual void Free()
+        {
+            StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
+            if (HitObject is IHasComboInformation combo)
+                comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
+
+            samplesBindable.UnbindFrom(HitObject.SamplesBindable);
+
+            // When a new hitobject is applied, the samples will be cleared before re-populating.
+            // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
+            samplesBindable.CollectionChanged -= onSamplesChanged;
+
+            if (nestedHitObjects.IsValueCreated)
+            {
+                foreach (var obj in nestedHitObjects.Value)
+                {
+                    obj.OnNewResult -= onNewResult;
+                    obj.OnRevertResult -= onRevertResult;
+                    obj.ApplyCustomUpdateState -= onApplyCustomUpdateState;
+                }
+
+                nestedHitObjects.Value.Clear();
+                ClearNestedHitObjects();
+            }
+
+            HitObject.DefaultsApplied -= onDefaultsApplied;
+            HitObject = null;
+
+            hasHitObjectApplied = false;
+        }
+
+        protected sealed override void FreeAfterUse()
+        {
+            base.FreeAfterUse();
+
+            if (!IsInPool)
+                return;
+
+            Free();
         }
 
         /// <summary>
@@ -268,7 +285,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onDefaultsApplied(HitObject hitObject)
         {
-            FreeAfterUse();
+            Free();
             Apply(hitObject);
             DefaultsApplied?.Invoke(this);
         }
