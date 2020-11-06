@@ -62,9 +62,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circlePiece.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            base.UpdateStateTransforms(state);
+            base.UpdateHitStateTransforms(state);
 
             Debug.Assert(HitObject.HitWindows != null);
 
@@ -72,8 +72,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Idle:
                     this.Delay(HitObject.TimePreempt).FadeOut(500);
-
-                    Expire(true);
                     break;
 
                 case ArmedState.Miss:
