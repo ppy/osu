@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Dashboard
                             var request = new GetUserRequest(u);
                             request.Success += user => Schedule(() =>
                             {
-                                if (playingUsers.Contains((int)user.Id))
+                                if (playingUsers.Contains(user.Id))
                                     userFlow.Add(createUserPanel(user));
                             });
                             api.Queue(request);
