@@ -79,7 +79,7 @@ namespace osu.Game.Database
                 // rather than queueing, we maintain our own single-threaded request stream.
                 request.Perform(api);
 
-                return request.Result.Users;
+                return request.Result?.Users;
             }
         }
 
