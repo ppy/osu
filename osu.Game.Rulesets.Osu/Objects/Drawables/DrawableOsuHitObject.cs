@@ -52,24 +52,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
-        public override void Free()
+        protected override void OnApply(HitObject hitObject)
         {
-            IndexInCurrentComboBindable.UnbindFrom(HitObject.IndexInCurrentComboBindable);
-            PositionBindable.UnbindFrom(HitObject.PositionBindable);
-            StackHeightBindable.UnbindFrom(HitObject.StackHeightBindable);
-            ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
-
-            base.Free();
-        }
-
-        public override void Apply(HitObject hitObject)
-        {
-            base.Apply(hitObject);
+            base.OnApply(hitObject);
 
             IndexInCurrentComboBindable.BindTo(HitObject.IndexInCurrentComboBindable);
             PositionBindable.BindTo(HitObject.PositionBindable);
             StackHeightBindable.BindTo(HitObject.StackHeightBindable);
             ScaleBindable.BindTo(HitObject.ScaleBindable);
+        }
+
+        protected override void OnFree(HitObject hitObject)
+        {
+            base.OnFree(hitObject);
+
+            IndexInCurrentComboBindable.UnbindFrom(HitObject.IndexInCurrentComboBindable);
+            PositionBindable.UnbindFrom(HitObject.PositionBindable);
+            StackHeightBindable.UnbindFrom(HitObject.StackHeightBindable);
+            ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
         }
 
         // Forward all internal management to shakeContainer.
