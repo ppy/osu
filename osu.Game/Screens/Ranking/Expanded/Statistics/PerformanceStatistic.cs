@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load(ScorePerformanceManager performanceManager)
+        private void load(ScorePerformanceCache performanceCache)
         {
             if (score.PP.HasValue)
             {
@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             }
             else
             {
-                performanceManager.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                                  .ContinueWith(t => Schedule(() => setPerformanceValue(t.Result)), cancellationTokenSource.Token);
+                performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
+                                .ContinueWith(t => Schedule(() => setPerformanceValue(t.Result)), cancellationTokenSource.Token);
             }
         }
 
