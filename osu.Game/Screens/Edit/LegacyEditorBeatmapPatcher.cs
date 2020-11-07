@@ -41,7 +41,8 @@ namespace osu.Game.Screens.Edit
             foreach (var block in result.DiffBlocks)
             {
                 // Removed hitobjects
-                if (oldHitObjectsIndex != -1)
+                if (oldHitObjectsIndex > 0)
+                {
                     for (int i = 0; i < block.DeleteCountA; i++)
                     {
                         int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
@@ -51,9 +52,11 @@ namespace osu.Game.Screens.Edit
 
                         toRemove.Add(hoIndex);
                     }
+                }
 
                 // Added hitobjects
-                if (newHitObjectsIndex != -1)
+                if (newHitObjectsIndex > 0)
+                {
                     for (int i = 0; i < block.InsertCountB; i++)
                     {
                         int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
@@ -63,6 +66,7 @@ namespace osu.Game.Screens.Edit
 
                         toAdd.Add(hoIndex);
                     }
+                }
             }
 
             // Sort the indices to ensure that removal + insertion indices don't get jumbled up post-removal or post-insertion.
