@@ -36,30 +36,6 @@ namespace osu.Game.Screens.Edit
             int oldHitObjectsIndex = Array.IndexOf(result.PiecesOld, "[HitObjects]");
             int newHitObjectsIndex = Array.IndexOf(result.PiecesNew, "[HitObjects]");
 
-            bool removeObjects = false;
-            bool addObjects = false;
-
-            if (oldHitObjectsIndex == -1 && newHitObjectsIndex == -1)
-            {
-                // If neither beatmap has hitobjects nothing needs to be done
-            }
-            else if (oldHitObjectsIndex == -1)
-            {
-                // If only the new beatmap has hitobjects we need to add all of them
-                addObjects = true;
-            }
-            else if (newHitObjectsIndex == -1)
-            {
-                // If only the old beatmap has hitobjects we need to remove all of them
-                removeObjects = true;
-            }
-            else
-            {
-                // If both beatmaps have objects we have to remove and add
-                addObjects = true;
-                removeObjects = true;
-            }
-
             var toRemove = new List<int>();
             var toAdd = new List<int>();
 
@@ -71,7 +47,7 @@ namespace osu.Game.Screens.Edit
             foreach (var block in result.DiffBlocks)
                 {
                     // Removed hitobjects
-                    if (removeObjects)
+                    if (oldHitObjectsIndex != -1)
                         for (int i = 0; i < block.DeleteCountA; i++)
                         {
                             int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
@@ -83,7 +59,7 @@ namespace osu.Game.Screens.Edit
                         }
 
                     // Added hitobjects
-                    if (addObjects)
+                    if (newHitObjectsIndex != -1)
                         for (int i = 0; i < block.InsertCountB; i++)
                         {
                             int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
