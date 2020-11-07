@@ -8,7 +8,6 @@ using System.Text;
 using DiffPlex;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
@@ -65,7 +64,7 @@ namespace osu.Game.Screens.Edit
                         toAdd.Add(hoIndex);
                     }
             }
-            
+
             // Sort the indices to ensure that removal + insertion indices don't get jumbled up post-removal or post-insertion.
             // This isn't strictly required, but the differ makes no guarantees about order.
             toRemove.Sort();
