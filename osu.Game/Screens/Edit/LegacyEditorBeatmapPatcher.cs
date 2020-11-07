@@ -39,37 +39,37 @@ namespace osu.Game.Screens.Edit
             var toRemove = new List<int>();
             var toAdd = new List<int>();
 
+            foreach (var block in result.DiffBlocks)
+            {
+                // Removed hitobjects
+                if (oldHitObjectsIndex != -1)
+                    for (int i = 0; i < block.DeleteCountA; i++)
+                    {
+                        int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
+
+                        if (hoIndex < 0)
+                            continue;
+
+                        toRemove.Add(hoIndex);
+                    }
+
+                // Added hitobjects
+                if (newHitObjectsIndex != -1)
+                    for (int i = 0; i < block.InsertCountB; i++)
+                    {
+                        int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
+
+                        if (hoIndex < 0)
+                            continue;
+
+                        toAdd.Add(hoIndex);
+                    }
+            }
+            
             // Sort the indices to ensure that removal + insertion indices don't get jumbled up post-removal or post-insertion.
             // This isn't strictly required, but the differ makes no guarantees about order.
             toRemove.Sort();
             toAdd.Sort();
-
-            foreach (var block in result.DiffBlocks)
-                {
-                    // Removed hitobjects
-                    if (oldHitObjectsIndex != -1)
-                        for (int i = 0; i < block.DeleteCountA; i++)
-                        {
-                            int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
-
-                            if (hoIndex < 0)
-                                continue;
-
-                            toRemove.Add(hoIndex);
-                        }
-
-                    // Added hitobjects
-                    if (newHitObjectsIndex != -1)
-                        for (int i = 0; i < block.InsertCountB; i++)
-                        {
-                            int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
-
-                            if (hoIndex < 0)
-                                continue;
-
-                            toAdd.Add(hoIndex);
-                        }
-                }
 
             editorBeatmap.BeginChange();
 
