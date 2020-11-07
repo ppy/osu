@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
-using osu.Framework.Audio;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -102,7 +101,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private BindableList<HitSampleInfo> samplesBindable;
         private Bindable<double> startTimeBindable;
         private Bindable<bool> userPositionalHitSounds;
-        private Bindable<float> PositionGain;
+        private Bindable<float> positionGain;
         private Bindable<int> comboIndexBindable;
 
         public override bool RemoveWhenNotAlive => false;
@@ -124,7 +123,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config, MfConfigManager mfConfig)
         {
             userPositionalHitSounds = config.GetBindable<bool>(OsuSetting.PositionalHitSounds);
-            PositionGain = mfConfig.GetBindable<float>(MfSetting.SamplePlaybackGain);
+            positionGain = mfConfig.GetBindable<float>(MfSetting.SamplePlaybackGain);
             var judgement = HitObject.CreateJudgement();
 
             Result = CreateResult(judgement);
@@ -373,7 +372,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             const float balance_adjust_amount = 0.4f;
 
-            return balance_adjust_amount * (userPositionalHitSounds.Value ? position - 0.5f : 0) * PositionGain.Value;
+            return balance_adjust_amount * (userPositionalHitSounds.Value ? position - 0.5f : 0) * positionGain.Value;
         }
 
         /// <summary>

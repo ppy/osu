@@ -5,18 +5,20 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Screens.Mvis.UI
+namespace osu.Game.Screens.Mvis.BottomBar
 {
-    public class BottomBar : Container
+    public class BottomBarContainer : Container
     {
         public readonly Bindable<bool> Hovered = new Bindable<bool>();
-        public BottomBar()
+
+        public BottomBarContainer()
         {
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             RelativeSizeAxes = Axes.X;
             Height = 50;
         }
+
         protected override bool OnHover(Framework.Input.Events.HoverEvent e)
         {
             this.Hovered.Value = true;

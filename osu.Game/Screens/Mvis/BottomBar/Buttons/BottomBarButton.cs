@@ -22,27 +22,32 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
+
         protected CustomColourProvider ColourProvider => colourProvider;
-        protected FillFlowContainer contentFillFlow;
-        protected Box bgBox;
+        protected FillFlowContainer ContentFillFlow;
+        protected Box BgBox;
         private Box flashBox;
         private Container content;
+
         public IconUsage ButtonIcon
         {
-            get => spriteIcon.Icon;
-            set => spriteIcon.Icon = value;
+            get => SpriteIcon.Icon;
+            set => SpriteIcon.Icon = value;
         }
+
         public string Text
         {
             get => spriteText.Text;
             set => spriteText.Text = value;
         }
-        private OsuSpriteText spriteText = new OsuSpriteText
+
+        private readonly OsuSpriteText spriteText = new OsuSpriteText
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
         };
-        protected SpriteIcon spriteIcon = new SpriteIcon
+
+        protected SpriteIcon SpriteIcon = new SpriteIcon
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -77,14 +82,14 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                     },
                     Children = new Drawable[]
                     {
-                        bgBox = new Box
+                        BgBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourProvider.Background3
                         },
-                        contentFillFlow = new FillFlowContainer
+                        ContentFillFlow = new FillFlowContainer
                         {
-                            Margin = new MarginPadding{ Left = 15, Right = 15 },
+                            Margin = new MarginPadding { Left = 15, Right = 15 },
                             AutoSizeAxes = Axes.X,
                             RelativeSizeAxes = Axes.Y,
                             Anchor = Anchor.Centre,
@@ -102,10 +107,10 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             };
 
             if (!NoIcon)
-                contentFillFlow.Add(spriteIcon);
+                ContentFillFlow.Add(SpriteIcon);
 
             if (Text != null)
-                contentFillFlow.Add(spriteText);
+                ContentFillFlow.Add(spriteText);
 
             // From OsuAnimatedButton
             if (AutoSizeAxes != Axes.None)
@@ -116,24 +121,24 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                bgBox.Colour = ColourProvider.Background3;
+                BgBox.Colour = ColourProvider.Background3;
             });
         }
 
-        protected override bool OnMouseDown(Framework.Input.Events.MouseDownEvent e)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             content.ScaleTo(0.9f, 2000, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 
-        protected override void OnMouseUp(Framework.Input.Events.MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             content.ScaleTo(1f, 1000, Easing.OutElastic);
             flashBox.FadeOut(1000, Easing.OutQuint);
             base.OnMouseUp(e);
         }
 
-        protected override bool OnClick(Framework.Input.Events.ClickEvent e)
+        protected override bool OnClick(ClickEvent e)
         {
             OnClickAnimation();
             return base.OnClick(e);

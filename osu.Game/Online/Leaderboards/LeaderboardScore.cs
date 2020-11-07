@@ -26,7 +26,6 @@ using osuTK;
 using osuTK.Graphics;
 using Humanizer;
 using osu.Game.Online.API;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Configuration;
 using osu.Framework.Bindables;
 
@@ -58,8 +57,8 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        private readonly Bindable<bool> Optui = new Bindable<bool>();
-        private bool isSongSelect;
+        private readonly Bindable<bool> optui = new Bindable<bool>();
+        private readonly bool isSongSelect;
 
         [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
@@ -83,10 +82,10 @@ namespace osu.Game.Online.Leaderboards
         {
             var user = score.User;
 
-            config.BindWith(MfSetting.OptUI, Optui);
+            config.BindWith(MfSetting.OptUI, optui);
 
-            Optui.ValueChanged += _ => UpdateTooltip();
-            UpdateTooltip();
+            optui.ValueChanged += _ => updateTooltip();
+            updateTooltip();
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -112,7 +111,7 @@ namespace osu.Game.Online.Leaderboards
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                new MfBgTriangles(0.65f, (user.Id == api.LocalUser.Value.Id && allowHighlight ? true : false) ),
+                                new MfBgTriangles(0.65f, user.Id == api.LocalUser.Value.Id && allowHighlight),
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -243,19 +242,15 @@ namespace osu.Game.Online.Leaderboards
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }
 
-        private void UpdateTooltip()
+        private void updateTooltip()
         {
-            switch (Optui.Value)
+            if (optui.Value && isSongSelect)
             {
-                case true:
-                    if ( isSongSelect )
-                        TooltipText = $"于 {score.Date.ToLocalTime():g} 游玩";
-                    break;
+                TooltipText = $"于 {score.Date.ToLocalTime():g} 游玩";
+                return;
+            }
 
-                case false:
-                    TooltipText = "";
-                    break;
-            };
+            TooltipText = "";
         }
 
         public override void Show()

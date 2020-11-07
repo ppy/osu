@@ -24,10 +24,10 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         {
             base.Update();
 
-            var Track = musicController.CurrentTrack;
-            int currentSecond = (int)Math.Floor(Track.CurrentTime / 1000.0);
+            var track = musicController.CurrentTrack;
+            int currentSecond = (int)Math.Floor(track.CurrentTime / 1000.0);
             timeCurrent = formatTime(TimeSpan.FromSeconds(currentSecond));
-            timeTotal = formatTime(TimeSpan.FromMilliseconds(Track.Length));
+            timeTotal = formatTime(TimeSpan.FromMilliseconds(track.Length));
             Text = $"{timeCurrent} / {timeTotal}";
         }
     }

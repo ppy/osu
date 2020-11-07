@@ -5,13 +5,14 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis.Modules;
 
-namespace osu.Game.Screens.Mvis.UI
+namespace osu.Game.Screens.Mvis.BottomBar
 {
     public class SongProgressBar : ProgressBar
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
-        private float idleAlpha = 0.5f;
+
+        private const float idle_alpha = 0.5f;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -20,7 +21,7 @@ namespace osu.Game.Screens.Mvis.UI
             Anchor = Anchor.BottomCentre;
             RelativeSizeAxes = Axes.X;
             Height = 5;
-            Alpha = idleAlpha;
+            Alpha = idle_alpha;
 
             FillColour = colourProvider.Highlight1;
             BackgroundColour = colourProvider.Light4.Opacity(0.5f);
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.Mvis.UI
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.ResizeHeightTo(5, 300, Easing.OutQuint).FadeTo(idleAlpha, 300, Easing.OutQuint);
+            this.ResizeHeightTo(5, 300, Easing.OutQuint).FadeTo(idle_alpha, 300, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 

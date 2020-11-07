@@ -10,19 +10,19 @@ namespace osu.Game.Screens.Mvis
 {
     public class BgTrianglesContainer : VisibilityContainer
     {
-        private const float TRIANGLES_ALPHA = 0.65f;
-        private Bindable<bool> EnableBgTriangles = new Bindable<bool>();
+        private const float triangles_alpha = 0.65f;
+        private readonly Bindable<bool> enableBgTriangles = new Bindable<bool>();
         private Container trianglesContainer;
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)
         {
             RelativeSizeAxes = Axes.Both;
-            Child = trianglesContainer = new Container()
+            Child = trianglesContainer = new Container
             {
-                Alpha = TRIANGLES_ALPHA,
+                Alpha = triangles_alpha,
                 RelativeSizeAxes = Axes.Both,
-                Child = new Triangles()
+                Child = new Triangles
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
@@ -32,22 +32,22 @@ namespace osu.Game.Screens.Mvis
                     Colour = OsuColour.Gray(0.2f),
                 }
             };
-            config.BindWith(MfSetting.MvisEnableBgTriangles, EnableBgTriangles);
+            config.BindWith(MfSetting.MvisEnableBgTriangles, enableBgTriangles);
         }
 
         protected override void LoadComplete()
         {
-            EnableBgTriangles.BindValueChanged(UpdateVisuals, true);
+            enableBgTriangles.BindValueChanged(updateVisuals, true);
 
             base.LoadComplete();
         }
 
-        private void UpdateVisuals(ValueChangedEvent<bool> value)
+        private void updateVisuals(ValueChangedEvent<bool> value)
         {
-            switch ( value.NewValue )
+            switch (value.NewValue)
             {
                 case true:
-                    trianglesContainer.FadeTo(TRIANGLES_ALPHA, 250);
+                    trianglesContainer.FadeTo(triangles_alpha, 250);
                     break;
 
                 case false:

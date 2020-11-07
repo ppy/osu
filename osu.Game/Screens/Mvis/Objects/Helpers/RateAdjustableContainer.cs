@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 
-namespace osu.Game.Screens.Mvis.UI.Objects.Helpers
+namespace osu.Game.Screens.Mvis.Objects.Helpers
 {
     public class RateAdjustableContainer : Container
     {

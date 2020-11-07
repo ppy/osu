@@ -7,7 +7,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Profile;
 using osuTK;
 
-namespace osu.Game.Overlays.MfMenu
+namespace osu.Game.Overlays.Mf.Sections
 {
     public abstract class MfMenuSection : Container
     {
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.MfMenu
                 },
                 contentFillFlow = new FillFlowContainer
                 {
-                    Padding = new MarginPadding{ Top = 20, Bottom = 20, Left = 50, Right = 50},
+                    Padding = new MarginPadding { Top = 20, Bottom = 20, Left = 50, Right = 50 },
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
@@ -64,20 +64,20 @@ namespace osu.Game.Overlays.MfMenu
 
         protected override void UpdateAfterChildren()
         {
-            bgTriangle.Height = this.DrawHeight * 0.3f;
+            bgTriangle.Height = DrawHeight * 0.3f;
             base.UpdateAfterChildren();
         }
 
         protected override void LoadComplete()
         {
-            if ( ChildDrawable != null )
+            if (ChildDrawable != null)
                 contentFillFlow.Add(ChildDrawable);
         }
 
         public override void Show() =>
             this.FadeIn(300, Easing.OutQuint);
 
-        public override void Hide()=>
+        public override void Hide() =>
             this.FadeOut(300, Easing.OutQuint);
     }
 }

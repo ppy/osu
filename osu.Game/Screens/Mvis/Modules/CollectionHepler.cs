@@ -23,9 +23,9 @@ namespace osu.Game.Screens.Mvis.Modules
         [Resolved]
         private MusicController controller { get; set; }
 
-        private List<BeatmapSetInfo> beatmapList = new List<BeatmapSetInfo>();
-        private int currentPosition = 0;
-        private int maxCount = 0;
+        private readonly List<BeatmapSetInfo> beatmapList = new List<BeatmapSetInfo>();
+        private int currentPosition;
+        private int maxCount;
         public Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
 
         protected override void LoadComplete()
@@ -38,13 +38,13 @@ namespace osu.Game.Screens.Mvis.Modules
 
         public void NextTrack()
         {
-            b.Value = GetBeatmap(beatmapList, b.Value, true);
+            b.Value = getBeatmap(beatmapList, b.Value, true);
             controller.Play();
         }
 
         public void PrevTrack()
         {
-            b.Value = GetBeatmap(beatmapList, b.Value, true, -1);
+            b.Value = getBeatmap(beatmapList, b.Value, true, -1);
             controller.Play();
         }
 
@@ -56,21 +56,19 @@ namespace osu.Game.Screens.Mvis.Modules
         /// <param name="prevBeatmap">上一张图</param>
         /// <param name="updateCurrentPosition">是否更新当前位置</param>
         /// <param name="displace">位移数值，默认为1.</param>
-        private WorkingBeatmap GetBeatmap(List<BeatmapSetInfo> list, WorkingBeatmap prevBeatmap, bool updateCurrentPosition = false, int displace = 1)
+        private WorkingBeatmap getBeatmap(List<BeatmapSetInfo> list, WorkingBeatmap prevBeatmap, bool updateCurrentPosition = false, int displace = 1)
         {
-            var info = prevBeatmap.BeatmapInfo;
             var prevSet = prevBeatmap.BeatmapSetInfo;
-            WorkingBeatmap NewBeatmap = null;
 
             //更新当前位置和最大位置
             if (updateCurrentPosition)
-            {
                 currentPosition = list.IndexOf(prevSet);
-            }
+
             maxCount = list.Count;
 
             //当前位置往指定位置移动
             currentPosition += displace;
+
             //如果当前位置超过了最大位置或者不在范围内，那么回到第一个
             if (currentPosition >= maxCount || currentPosition < 0)
             {
@@ -80,22 +78,19 @@ namespace osu.Game.Screens.Mvis.Modules
 
             //从list获取当前位置所在的BeatmapSetInfo, 然后选择该BeatmapSetInfo下的第一个WorkingBeatmap
             //最终赋值给NewBeatmap
-            if (list.Count > 0)
-                NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First());
-            else
-                NewBeatmap = b.Value;
-            return NewBeatmap;
+            var newBeatmap = list.Count > 0
+                ? beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First())
+                : b.Value;
+            return newBeatmap;
         }
 
         private void playFirstBeatmap(List<BeatmapSetInfo> list)
         {
-            WorkingBeatmap NewBeatmap;
-
             if (list.Count == 0) return;
 
-            NewBeatmap = beatmaps.GetWorkingBeatmap(list.ElementAt(0).Beatmaps.First());
+            var newBeatmap = beatmaps.GetWorkingBeatmap(list.FirstOrDefault()?.Beatmaps.First());
 
-            b.Value = NewBeatmap;
+            b.Value = newBeatmap;
             controller.Play();
         }
 
@@ -129,7 +124,7 @@ namespace osu.Game.Screens.Mvis.Modules
             updateBeatmaps(CurrentCollection.Value);
         }
 
-        public bool currentCollectionContains(WorkingBeatmap b) =>
+        public bool CurrentCollectionContains(WorkingBeatmap b) =>
             beatmapList.Contains(b.BeatmapSetInfo);
     }
 }

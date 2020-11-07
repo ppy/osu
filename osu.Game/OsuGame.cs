@@ -75,7 +75,7 @@ namespace osu.Game
 
         private MfMenuOverlay mfmenu;
         private TimeOverlay time;
-        
+
         public OnlinePictureOverlay picture;
         private NewsOverlay news;
 

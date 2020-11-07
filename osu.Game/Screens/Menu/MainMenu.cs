@@ -20,6 +20,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Import;
+using osu.Game.Screens.Mvis;
 
 namespace osu.Game.Screens.Menu
 {
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(MfMenuOverlay mfoverlay,BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
+        private void load(MfMenuOverlay mfoverlay, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);

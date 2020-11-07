@@ -3,13 +3,10 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
-using osuTK;
 using osu.Game.Screens.Play.PlayerSettings;
-using osuTK.Input;
-using osu.Framework.Bindables;
+using osuTK;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Screens.Play.Break
 {
     public class BreakSettingsOverlay : VisibilityContainer
     {

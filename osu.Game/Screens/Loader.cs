@@ -76,7 +76,7 @@ namespace osu.Game.Screens
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
         private TextureStore textures;
-        private LoaderStorage LoaderStorage;
+        private LoaderStorage loaderStorage;
 
         public override void OnEntering(IScreen last)
         {
@@ -112,7 +112,7 @@ namespace osu.Game.Screens
                         Texture = textures.Get("avatarlogo"),
                     }
                 }
-            }, _ => 
+            }, _ =>
             {
                 AddInternal(logoContainer);
                 logoContainer.FadeInFromZero(300);
@@ -148,6 +148,7 @@ namespace osu.Game.Screens
         }
 
         private DependencyContainer dependencies;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -157,8 +158,8 @@ namespace osu.Game.Screens
         private void load(OsuGameBase game, OsuConfigManager config, TextureStore textures, Storage storage)
         {
             this.textures = textures;
-            dependencies.CacheAs(LoaderStorage = new LoaderStorage(storage));
-            textures.AddStore(new TextureLoaderStore(LoaderStorage));
+            dependencies.CacheAs(loaderStorage = new LoaderStorage(storage));
+            textures.AddStore(new TextureLoaderStore(loaderStorage));
             showDisclaimer = game.IsDeployedBuild;
             introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
         }

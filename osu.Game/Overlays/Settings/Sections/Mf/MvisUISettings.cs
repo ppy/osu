@@ -9,16 +9,15 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
 using osu.Game.Screens.Mvis.Modules;
-using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Settings.Sections.General
+namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisUISettings : SettingsSubsection
     {
         protected override string Header => "界面";
-        private BindableFloat iR = new BindableFloat();
-        private BindableFloat iG = new BindableFloat();
-        private BindableFloat iB = new BindableFloat();
+        private readonly BindableFloat iR = new BindableFloat();
+        private readonly BindableFloat iG = new BindableFloat();
+        private readonly BindableFloat iB = new BindableFloat();
         private ColourPreviewer preview;
 
         [BackgroundDependencyLoader]
@@ -78,16 +77,16 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         protected override void LoadComplete()
         {
-            iR.BindValueChanged(_ => UpdateColor());
-            iG.BindValueChanged(_ => UpdateColor());
-            iB.BindValueChanged(_ => UpdateColor(), true);
+            iR.BindValueChanged(_ => updateColor());
+            iG.BindValueChanged(_ => updateColor());
+            iB.BindValueChanged(_ => updateColor(), true);
         }
 
-        private void UpdateColor() => preview.UpdateColor(iR.Value, iG.Value, iB.Value);
+        private void updateColor() => preview.UpdateColor(iR.Value, iG.Value, iB.Value);
 
         private class ColourPreviewer : Container, IHasTooltip
         {
-            private CustomColourProvider provider = new CustomColourProvider(0,0,0);
+            private readonly CustomColourProvider provider = new CustomColourProvider(0, 0, 0);
             private Box bg6;
             private Box bg5;
             private Box bg4;
@@ -99,15 +98,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private Box l3;
             private Box c2;
 
-            public string TooltipText => tooltip;
-            private string tooltip;
+            public string TooltipText { get; private set; }
 
             [BackgroundDependencyLoader]
             private void load()
             {
                 Height = 50;
                 RelativeSizeAxes = Axes.X;
-                Padding = new MarginPadding{ Horizontal = 15 };
+                Padding = new MarginPadding { Horizontal = 15 };
                 InternalChildren = new Drawable[]
                 {
                     new FillFlowContainer
@@ -147,7 +145,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         RelativeSizeAxes = Axes.Both,
                         Height = 0.5f,
-                        Margin = new MarginPadding{Top = 25},
+                        Margin = new MarginPadding { Top = 25 },
                         Children = new Drawable[]
                         {
                             bg6 = new Box
@@ -182,21 +180,21 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             public void UpdateColor(float r, float g, float b)
             {
-                provider.UpdateHueColor(r,g,b);
+                provider.UpdateHueColor(r, g, b);
 
                 bg5.Colour = provider.Background5;
                 bg4.Colour = provider.Background4;
                 bg3.Colour = provider.Background3;
                 bg2.Colour = provider.Background2;
                 bg1.Colour = provider.Background1;
-                
+
                 bg6.Colour = provider.Background6;
                 hl.Colour = provider.Highlight1;
                 l4.Colour = provider.Light4;
                 l3.Colour = provider.Light3;
                 c2.Colour = provider.Content2;
 
-                tooltip = $"色相(Hue): {(provider.HueColour.Value * 360).ToString("#0.00")}";
+                TooltipText = $"色相(Hue): {(provider.HueColour.Value * 360):#0.00}";
             }
         }
     }

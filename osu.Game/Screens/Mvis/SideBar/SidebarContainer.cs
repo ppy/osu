@@ -12,9 +12,10 @@ namespace osu.Game.Screens.Mvis.SideBar
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
-        private List<Drawable> components = new List<Drawable>();
+
+        private readonly List<Drawable> components = new List<Drawable>();
         public bool IsHidden = true;
-        private readonly float DURATION = 400;
+        private const float duration = 400;
         private Drawable currentDisplay;
 
         private readonly WaveContainer waveContainer;
@@ -37,10 +38,10 @@ namespace osu.Game.Screens.Mvis.SideBar
         [BackgroundDependencyLoader]
         private void load()
         {
-            colourProvider.HueColour.BindValueChanged(_ => UpdateWaves(), true);
+            colourProvider.HueColour.BindValueChanged(_ => updateWaves(), true);
         }
 
-        private void UpdateWaves()
+        private void updateWaves()
         {
             //与其他Overlay保持一致
             waveContainer.FirstWaveColour = colourProvider.Light4;
@@ -49,29 +50,29 @@ namespace osu.Game.Screens.Mvis.SideBar
             waveContainer.FourthWaveColour = colourProvider.Dark3;
         }
 
-        public void resizeFor(Drawable d)
+        public void ResizeFor(Drawable d)
         {
-            if ( ! (d is ISidebarContent isc) || !components.Contains(d) ) return;
+            if (!(d is ISidebarContent) || !components.Contains(d)) return;
 
-            var c = d as ISidebarContent;
+            var c = (ISidebarContent)d;
             Show();
 
             //如果要显示的是当前正在显示的内容，则中断
-            if ( currentDisplay == d )
+            if (currentDisplay == d)
             {
                 IsHidden = false;
                 return;
             }
 
-            var duration = IsHidden ? 0 : DURATION;
+            var resizeDuration = IsHidden ? 0 : SidebarContainer.duration;
 
-            currentDisplay?.FadeOut(duration / 2, Easing.OutQuint);
+            currentDisplay?.FadeOut(resizeDuration / 2, Easing.OutQuint);
 
             currentDisplay = d;
 
-            d.Delay(duration / 2).FadeIn(duration / 2);
+            d.Delay(resizeDuration / 2).FadeIn(resizeDuration / 2);
 
-            this.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), duration, Easing.OutQuint);
+            this.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), resizeDuration, Easing.OutQuint);
             IsHidden = false;
         }
 

@@ -42,7 +42,8 @@ namespace osu.Game.Screens.Menu
                 }, 0);
 
                 logo.ScaleTo(0).FadeOut();
-                if ( !LoadDirectToSongSelect.Value )
+
+                if (!LoadDirectToSongSelect.Value)
                 {
                     logo.ScaleTo(1, 300, Easing.OutQuint);
                     logo.FadeIn(300);
@@ -60,7 +61,7 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadMenu();
 
-            if ( LoadDirectToSongSelect.Value )
+            if (LoadDirectToSongSelect.Value)
             {
                 RandomBeatmaps();
                 game?.PresentBeatmap(setInfo);

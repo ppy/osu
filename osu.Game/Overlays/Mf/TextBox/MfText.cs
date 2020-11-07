@@ -2,7 +2,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
-namespace osu.Game.Overlays.MfMenu
+namespace osu.Game.Overlays.Mf.TextBox
 {
     public class MfText : LinkFlowContainer
     {

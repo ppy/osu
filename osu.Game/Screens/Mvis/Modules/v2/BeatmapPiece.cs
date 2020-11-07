@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public readonly BindableBool Active = new BindableBool();
         public bool IsCurrent;
 
-        public readonly WorkingBeatmap beatmap;
+        public readonly WorkingBeatmap Beatmap;
         private Flash flash;
         private Box maskBox;
         private Box hover;
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             RelativeSizeAxes = Axes.X;
             Height = 80;
 
-            beatmap = b;
+            Beatmap = b;
         }
 
         [BackgroundDependencyLoader]
@@ -56,10 +56,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 bgBox = new Box
                 {
-                    RelativeSizeAxes= Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background4
                 },
-                new BeatmapCover(beatmap)
+                new BeatmapCover(Beatmap)
                 {
                     BackgroundBox = false,
                     TimeBeforeWrapperLoad = 100
@@ -117,17 +117,17 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding{Left = 15},
+                    Padding = new MarginPadding { Left = 15 },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
-                            Text = beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title,
+                            Text = Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold)
                         },
                         new OsuSpriteText
                         {
-                            Text = beatmap.Metadata.ArtistUnicode ?? beatmap.Metadata.Artist,
+                            Text = Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold)
                         }
                     }
@@ -149,12 +149,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 maskBox.Colour = colourProvider.Background3.Opacity(0.65f);
                 maskFillFlow.Colour = bgBox.Colour = colourProvider.Background4;
-                if ( Active.Value )
+
+                if (Active.Value)
                 {
-                    if ( IsCurrent )
-                        BorderColour = colourProvider.Highlight1;
-                    else
-                        BorderColour = colourProvider.Light2;
+                    BorderColour = IsCurrent
+                        ? colourProvider.Highlight1
+                        : colourProvider.Light2;
                 }
                 else
                     BorderColour = colourProvider.Background1;
@@ -163,7 +163,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         private class Flash : BeatSyncedContainer
         {
-            private Box flashBox;
+            private readonly Box flashBox;
+
             public Flash()
             {
                 Child = flashBox = new Box
@@ -178,15 +179,15 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                switch(timingPoint.TimeSignature)
+                switch (timingPoint.TimeSignature)
                 {
                     case TimeSignatures.SimpleQuadruple:
-                        if ( beatIndex % 4 == 0 || effectPoint.KiaiMode )
+                        if (beatIndex % 4 == 0 || effectPoint.KiaiMode)
                             flashBox.FadeOutFromOne(1000);
                         break;
 
                     case TimeSignatures.SimpleTriple:
-                        if ( beatIndex % 3 == 0 || effectPoint.KiaiMode )
+                        if (beatIndex % 3 == 0 || effectPoint.KiaiMode)
                             flashBox.FadeOutFromOne(1000);
                         break;
                 }
@@ -198,10 +199,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             switch (v.NewValue)
             {
                 case true:
-                    if ( IsCurrent )
-                        BorderColour = colourProvider.Highlight1;
-                    else
-                        BorderColour = colourProvider.Light2;
+                    BorderColour = IsCurrent
+                        ? colourProvider.Highlight1
+                        : colourProvider.Light2;
                     maskBox.FadeOut(500);
                     flash.Show();
                     break;
@@ -220,11 +220,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (IsCurrent && b.Value != beatmap )
+            if (IsCurrent && b.Value != Beatmap)
             {
-                b.Value = beatmap;
+                b.Value = Beatmap;
                 controller.Play();
             }
+
             return base.OnClick(e);
         }
 

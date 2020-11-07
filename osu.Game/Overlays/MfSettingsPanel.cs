@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections.Mf;
 
 namespace osu.Game.Overlays
 {

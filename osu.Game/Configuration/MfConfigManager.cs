@@ -4,7 +4,6 @@
 using System.ComponentModel;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
-using osu.Game.Overlays;
 
 namespace osu.Game.Configuration
 {

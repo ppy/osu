@@ -9,7 +9,8 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
     public class BottomBarOverlayLockSwitchButton : BottomBarSwitchButton
     {
-        private float DURATION = 100;
+        private readonly float DURATION = 100;
+
         public BottomBarOverlayLockSwitchButton()
         {
             ButtonIcon = FontAwesome.Solid.Lock;
@@ -25,7 +26,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         {
             base.OnToggledOnAnimation();
 
-            spriteIcon.RotateTo(15, DURATION).Then()
+            SpriteIcon.RotateTo(15, DURATION).Then()
                       .RotateTo(-15, DURATION).Loop(0, 2).Then()
                       .RotateTo(0, DURATION);
         }

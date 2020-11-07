@@ -345,11 +345,9 @@ namespace osu.Game
             // may be non-null for certain tests
             Storage ??= host.Storage;
 
-            if (LocalConfig == null)
-                LocalConfig = new OsuConfigManager(Storage);
+            LocalConfig ??= new OsuConfigManager(Storage);
 
-            if (MfConfig == null)
-                MfConfig = new MfConfigManager(Storage);
+            MfConfig ??= new MfConfigManager(Storage);
         }
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);

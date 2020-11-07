@@ -1,4 +1,5 @@
-﻿using osu.Framework.Allocation;
+﻿using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -6,9 +7,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
 using osuTK;
 using osuTK.Graphics;
-using System.Collections.Generic;
 
-namespace osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers.Bars
+namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars
 {
     public class BasicBar : Container
     {

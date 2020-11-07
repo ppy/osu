@@ -12,7 +12,7 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.MfMenu
+namespace osu.Game.Overlays.Mf.TextBox
 {
     public class MfMenuTextBoxContainer : Container
     {
@@ -26,74 +26,73 @@ namespace osu.Game.Overlays.MfMenu
         protected BindableBool AllowTransformBasicEffects = new BindableBool();
         protected BindableFloat borderThickness = new BindableFloat();
         protected float cornerRadius = 12.5f;
-        protected float DURATION = 500;
-        protected Easing EASING = Easing.OutQuint;
+        protected float Duration = 500;
+        protected Easing Easing = Easing.OutQuint;
 
-        protected EdgeEffectParameters edgeEffectNormal = new EdgeEffectParameters
+        protected EdgeEffectParameters EdgeEffectNormal = new EdgeEffectParameters
         {
             Type = EdgeEffectType.Shadow,
             Radius = 0,
             Colour = Color4.Black.Opacity(0),
         };
-        protected EdgeEffectParameters edgeEffectHover = new EdgeEffectParameters
+
+        protected EdgeEffectParameters EdgeEffectHover = new EdgeEffectParameters
         {
             Type = EdgeEffectType.Shadow,
             Radius = 7,
             Offset = new Vector2(0, 3.5f),
             Colour = Color4.Black.Opacity(0.35f),
         };
-        private OsuSpriteText titleText;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
             Masking = true;
-            EdgeEffect = edgeEffectNormal;
+            EdgeEffect = EdgeEffectNormal;
             BorderColour = colourProvider.Light1;
             CornerRadius = cornerRadius;
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Children = new Drawable[]
+            Children = new[]
             {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background5,
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.3f,
-                            Colour = Colour4.Black,
-                        },
-                        contentFillFlow = new FillFlowContainer
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5,
+                },
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.3f,
+                    Colour = Colour4.Black,
+                },
+                contentFillFlow = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding(25),
+                    Spacing = new Vector2(15),
+                    Masking = true,
+                    LayoutEasing = Easing,
+                    LayoutDuration = Duration + 250,
+                    Children = new Drawable[]
+                    {
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding(25),
-                            Spacing = new Vector2(15),
-                            Masking = true,
-                            LayoutEasing = EASING,
-                            LayoutDuration = DURATION + 250,
-                            Children = new Drawable[]
+                            Child = new OsuSpriteText
                             {
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Child = titleText = new OsuSpriteText
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        Text = Title,
-                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold)
-                                    }
-                                }
-                                
+                                RelativeSizeAxes = Axes.X,
+                                Text = Title,
+                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold)
                             }
-                        },
-                        SelectSounds()
+                        }
+                    }
+                },
+                selectSounds()
             };
 
             AllowTransformBasicEffects.Value = true;
@@ -103,38 +102,33 @@ namespace osu.Game.Overlays.MfMenu
         {
             borderThickness.BindValueChanged(OnborderThicknessChanged);
 
-            if ( d != null )
+            if (d != null)
                 contentFillFlow.Add(d);
 
-                contentFillFlow.UpdateSubTree();
+            contentFillFlow.UpdateSubTree();
 
             base.LoadComplete();
         }
 
-        private Drawable SelectSounds()
+        private Drawable selectSounds()
         {
-            Drawable s;
-
-            if ( Clickable )
-                s = new HoverClickSounds();
-            else
-                s = new HoverSounds();
+            Drawable s = Clickable ? new HoverClickSounds() : new HoverSounds();
 
             return s;
         }
 
         private void OnborderThicknessChanged(ValueChangedEvent<float> v)
         {
-            this.BorderThickness = v.NewValue;
+            BorderThickness = v.NewValue;
         }
 
         //我已经不知道要怎么处理光标悬浮时的动画了就这样吧
         protected override bool OnHover(HoverEvent e)
         {
-            if ( AllowTransformBasicEffects.Value )
+            if (AllowTransformBasicEffects.Value)
             {
                 this.TransformBindableTo(borderThickness, 2);
-                this.TweenEdgeEffectTo(edgeEffectHover, DURATION, EASING);
+                TweenEdgeEffectTo(EdgeEffectHover, Duration, Easing);
             }
 
             return base.OnHover(e);
@@ -142,10 +136,10 @@ namespace osu.Game.Overlays.MfMenu
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if ( AllowTransformBasicEffects.Value )
+            if (AllowTransformBasicEffects.Value)
             {
                 this.TransformBindableTo(borderThickness, 0);
-                this.TweenEdgeEffectTo(edgeEffectNormal, DURATION, EASING);
+                TweenEdgeEffectTo(EdgeEffectNormal, Duration, Easing);
             }
 
             base.OnHoverLost(e);

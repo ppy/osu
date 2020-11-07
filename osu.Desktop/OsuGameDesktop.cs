@@ -10,7 +10,6 @@ using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;
-using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Logging;
 using osu.Framework.Screens;

@@ -11,7 +11,6 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.Break;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.Play
 {

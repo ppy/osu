@@ -22,14 +22,14 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private readonly List<BeatmapSetInfo> beatmapSets;
         private BeatmapPiece currentPiece;
         public BindableBool IsCurrent = new BindableBool();
-        private OsuScrollContainer beatmapScroll;
-        private FillFlowContainer fillFlow;
-        private Cached scrollCache = new Cached();
+        private readonly OsuScrollContainer beatmapScroll;
+        private readonly FillFlowContainer fillFlow;
+        private readonly Cached scrollCache = new Cached();
         private bool firstScroll = true;
 
         public BeatmapList(List<BeatmapSetInfo> set)
         {
-            Padding = new MarginPadding{Vertical = 20};
+            Padding = new MarginPadding { Vertical = 20 };
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     RightMouseScrollbar = true,
                     Child = fillFlow = new FillFlowContainer
                     {
-                        Padding = new MarginPadding{Horizontal = 35},
+                        Padding = new MarginPadding { Horizontal = 35 },
                         Spacing = new Vector2(5),
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -55,14 +55,16 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddBeatmapSets();
+            addBeatmapSets();
 
             working.BindValueChanged(OnBeatmapChanged);
             IsCurrent.BindValueChanged(v =>
             {
                 foreach (var d in fillFlow)
-                    if ( d is BeatmapPiece piece )
+                {
+                    if (d is BeatmapPiece piece)
                         piece.IsCurrent = v.NewValue;
+                }
 
                 currentPiece?.TriggerActiveChange();
             });
@@ -72,8 +74,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             base.UpdateAfterChildren();
 
-            if ( !scrollCache.IsValid )
-                ScrollToCurrent();
+            if (!scrollCache.IsValid) scrollToCurrent();
         }
 
         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
@@ -82,26 +83,25 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             foreach (var d in fillFlow)
             {
-                if (d is BeatmapPiece piece)
-                    if (piece.beatmap.BeatmapSetInfo.Hash == v.NewValue.BeatmapSetInfo.Hash)
-                    {
-                        currentPiece = piece;
-                        piece.MakeActive();
-                        break;
-                    }
+                if (!(d is BeatmapPiece piece)
+                    || piece.Beatmap.BeatmapSetInfo.Hash != v.NewValue.BeatmapSetInfo.Hash) continue;
+
+                currentPiece = piece;
+                piece.MakeActive();
+                break;
             }
 
             scrollCache.Invalidate();
         }
 
-        private void AddBeatmapSets()
+        private void addBeatmapSets()
         {
             fillFlow.AddRange(beatmapSets.Select(s => new BeatmapPiece(beatmaps.GetWorkingBeatmap(s.Beatmaps.First()))));
 
             scrollCache.Invalidate();
         }
 
-        private void ScrollToCurrent()
+        private void scrollToCurrent()
         {
             if (!IsCurrent.Value)
             {
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 return;
             }
 
-            float distance = 0;
+            float distance;
             var index = fillFlow.IndexOf(currentPiece);
 
             //如果是第一个，那么滚动到头

@@ -7,7 +7,6 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Bindables;
-using Humanizer;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments

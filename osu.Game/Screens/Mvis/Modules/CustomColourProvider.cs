@@ -41,12 +41,12 @@ namespace osu.Game.Screens.Mvis.Modules
 
         public CustomColourProvider(float r, float g, float b)
         {
-            HueColour.Value = Color4.ToHsl(new Color4(r,g,b,1)).X;
+            HueColour.Value = Color4.ToHsl(new Color4(r, g, b, 1)).X;
         }
 
-        private BindableFloat iR = new BindableFloat();
-        private BindableFloat iG = new BindableFloat();
-        private BindableFloat iB = new BindableFloat();
+        private readonly BindableFloat iR = new BindableFloat();
+        private readonly BindableFloat iG = new BindableFloat();
+        private readonly BindableFloat iB = new BindableFloat();
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)
@@ -55,16 +55,16 @@ namespace osu.Game.Screens.Mvis.Modules
             config.BindWith(MfSetting.MvisInterfaceGreen, iG);
             config.BindWith(MfSetting.MvisInterfaceBlue, iB);
 
-            iR.BindValueChanged(_ => UpdateColor());
-            iG.BindValueChanged(_ => UpdateColor());
-            iB.BindValueChanged(_ => UpdateColor());
+            iR.BindValueChanged(_ => updateColor());
+            iG.BindValueChanged(_ => updateColor());
+            iB.BindValueChanged(_ => updateColor());
         }
 
-        private void UpdateColor() => UpdateHueColor(iR.Value, iG.Value, iB.Value);
+        private void updateColor() => UpdateHueColor(iR.Value, iG.Value, iB.Value);
 
         public void UpdateHueColor(float r, float g, float b)
         {
-            HueColour.Value = Color4.ToHsl(new Color4(r,g,b,1)).X;
+            HueColour.Value = Color4.ToHsl(new Color4(r, g, b, 1)).X;
         }
     }
 }

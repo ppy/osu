@@ -1,8 +1,8 @@
-﻿using osuTK;
+﻿using System;
 using osu.Framework.Graphics;
-using System;
+using osuTK;
 
-namespace osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers
+namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers
 {
     public class MusicCircularVisualizer : MusicBarsVisualizer
     {

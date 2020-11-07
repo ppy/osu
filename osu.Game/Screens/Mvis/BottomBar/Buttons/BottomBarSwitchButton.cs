@@ -10,14 +10,15 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
     {
         public BindableBool ToggleableValue = new BindableBool();
         public bool DefaultValue { get; set; }
+
         protected override void LoadComplete()
         {
             ToggleableValue.Value = DefaultValue;
-            ToggleableValue.BindValueChanged(_ => UpdateVisuals(true));
+            ToggleableValue.BindValueChanged(_ => updateVisuals(true));
 
-            UpdateVisuals();
+            updateVisuals();
 
-            ColourProvider.HueColour.BindValueChanged(_ => UpdateVisuals());
+            ColourProvider.HueColour.BindValueChanged(_ => updateVisuals());
 
             base.LoadComplete();
         }
@@ -31,21 +32,22 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         public void Toggle() =>
             ToggleableValue.Toggle();
 
-        private void UpdateVisuals(bool animate = false)
+        private void updateVisuals(bool animate = false)
         {
             var duration = animate ? 500 : 0;
+
             switch (ToggleableValue.Value)
             {
                 case true:
-                    bgBox.FadeColour(ColourProvider.Highlight1, duration, Easing.OutQuint);
-                    contentFillFlow.FadeColour(Colour4.Black, duration, Easing.OutQuint);
-                    if ( animate )
+                    BgBox.FadeColour(ColourProvider.Highlight1, duration, Easing.OutQuint);
+                    ContentFillFlow.FadeColour(Colour4.Black, duration, Easing.OutQuint);
+                    if (animate)
                         OnToggledOnAnimation();
                     break;
 
                 case false:
-                    bgBox.FadeColour(ColourProvider.Background3, duration, Easing.OutQuint);
-                    contentFillFlow.FadeColour(Colour4.White, duration, Easing.OutQuint);
+                    BgBox.FadeColour(ColourProvider.Background3, duration, Easing.OutQuint);
+                    ContentFillFlow.FadeColour(Colour4.White, duration, Easing.OutQuint);
                     break;
             }
         }

@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.Profile.Header
         private LinkFlowContainer bottomLinkContainer;
 
         private Color4 iconColour;
+
         public BottomHeaderContainer()
         {
             AutoSizeAxes = Axes.Y;

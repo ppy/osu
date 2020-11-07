@@ -1,14 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Settings.Sections.General
+namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MfSettings : SettingsSubsection
     {
@@ -23,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     LabelText = "启用Mf自定义UI",
                     TooltipText = "启用以获得mfosu提供的默认界面体验, "
-                                + "禁用以获得接近原版lazer提供的界面体验",
+                                  + "禁用以获得接近原版lazer提供的界面体验",
                     Current = config.GetBindable<bool>(MfSetting.OptUI)
                 },
                 new SettingsCheckbox

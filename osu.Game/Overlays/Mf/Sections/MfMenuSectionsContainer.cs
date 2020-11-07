@@ -3,7 +3,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
-namespace osu.Game.Overlays.MfMenu.Sections
+namespace osu.Game.Overlays.Mf.Sections
 {
     public class MfMenuSectionsContainer : SectionsContainer<MfMenuSection>
     {
@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.MfMenu.Sections
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
             Spacing = new Vector2(0, 20),
-            Margin = new MarginPadding{Bottom = 50},
+            Margin = new MarginPadding { Bottom = 50 },
         };
     }
 }

@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Masking = masking;
             CornerRadius = cornerRadius;
 
-            this.Add(new Box
+            Add(new Box
             {
                 Depth = float.MaxValue,
                 Colour = colourProvider.Background4,

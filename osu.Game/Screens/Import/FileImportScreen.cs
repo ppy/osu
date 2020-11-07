@@ -27,12 +27,12 @@ namespace osu.Game.Screens.Import
 
         public override bool HideOverlaysOnEnter => true;
 
-        private string[] FileExtensions = { ".foo" };
+        private string[] fileExtensions = { ".foo" };
         private string defaultPath;
 
         private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
         private readonly IBindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
-        private Bindable<FileFilterType> FilterType = new Bindable<FileFilterType>();
+        private readonly Bindable<FileFilterType> filterType = new Bindable<FileFilterType>();
         private TextFlowContainer currentFileText;
         private OsuScrollContainer fileNameScroll;
         private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
@@ -43,13 +43,9 @@ namespace osu.Game.Screens.Import
         [Resolved]
         private DialogOverlay dialogOverlay { get; set; }
 
-        private Storage storage { get; set; }
-
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, MfConfigManager config)
         {
-            this.storage = storage;
-
             storage.GetStorageForDirectory("imports");
             var originalPath = storage.GetFullPath("imports", true);
 
@@ -90,9 +86,9 @@ namespace osu.Game.Screens.Import
                             new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RowDimensions = new Dimension[]
+                                RowDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Distributed),
+                                    new Dimension(),
                                     new Dimension(GridSizeMode.AutoSize),
                                 },
                                 Content = new[]
@@ -153,7 +149,7 @@ namespace osu.Game.Screens.Import
                                                             Origin = Anchor.BottomCentre,
                                                             LabelText = "文件类型",
                                                             Current = config.GetBindable<FileFilterType>(MfSetting.FileFilter),
-                                                            Margin = new MarginPadding{ Bottom = 15 }
+                                                            Margin = new MarginPadding { Bottom = 15 }
                                                         },
                                                         new GridContainer
                                                         {
@@ -161,12 +157,12 @@ namespace osu.Game.Screens.Import
                                                             Origin = Anchor.BottomCentre,
                                                             AutoSizeAxes = Axes.Y,
                                                             RelativeSizeAxes = Axes.X,
-                                                            Margin = new MarginPadding{Top = 15},
-                                                            RowDimensions = new Dimension[]
+                                                            Margin = new MarginPadding { Top = 15 },
+                                                            RowDimensions = new[]
                                                             {
                                                                 new Dimension(GridSizeMode.AutoSize)
                                                             },
-                                                            Content = new []
+                                                            Content = new[]
                                                             {
                                                                 new Drawable[]
                                                                 {
@@ -178,9 +174,9 @@ namespace osu.Game.Screens.Import
                                                                         Height = 50,
                                                                         Width = 0.9f,
                                                                         Text = "刷新文件列表",
-                                                                        Action = Refresh
+                                                                        Action = refresh
                                                                     },
-                                                                    new TriangleButton()
+                                                                    new TriangleButton
                                                                     {
                                                                         Text = "导入该文件",
                                                                         Anchor = Anchor.BottomCentre,
@@ -191,9 +187,8 @@ namespace osu.Game.Screens.Import
                                                                         Action = () =>
                                                                         {
                                                                             var d = currentFile.Value?.FullName;
-                                                                            var n = currentFile.Value?.Name;
-                                                                            if ( d != null )
-                                                                                StartImport(d);
+                                                                            if (d != null)
+                                                                                startImport(d);
                                                                             else
                                                                                 currentFileText.FlashColour(Color4.Red, 500);
                                                                         },
@@ -216,7 +211,7 @@ namespace osu.Game.Screens.Import
             fileNameScroll.ScrollContent.Anchor = Anchor.Centre;
             fileNameScroll.ScrollContent.Origin = Anchor.Centre;
 
-            config.BindWith(MfSetting.FileFilter, FilterType);
+            config.BindWith(MfSetting.FileFilter, filterType);
 
             currentFile.BindValueChanged(updateFileSelectionText, true);
             currentDirectory.BindValueChanged(_ =>
@@ -224,7 +219,7 @@ namespace osu.Game.Screens.Import
                 currentFile.Value = null;
             });
 
-            FilterType.BindValueChanged(OnFilterTypeChanged, true);
+            filterType.BindValueChanged(OnFilterTypeChanged, true);
         }
 
         private void OnFilterTypeChanged(ValueChangedEvent<FileFilterType> v)
@@ -232,27 +227,27 @@ namespace osu.Game.Screens.Import
             switch (v.NewValue)
             {
                 case FileFilterType.Beatmap:
-                    FileExtensions = new string[] { ".osz" };
+                    fileExtensions = new string[] { ".osz" };
                     break;
 
                 case FileFilterType.Skin:
-                    FileExtensions = new string[] { ".osk" };
+                    fileExtensions = new string[] { ".osk" };
                     break;
 
                 case FileFilterType.Replay:
-                    FileExtensions = new string[] { ".osr" };
+                    fileExtensions = new string[] { ".osr" };
                     break;
 
                 default:
                 case FileFilterType.All:
-                    FileExtensions = new string[] { ".osk", ".osr", ".osz" };
+                    fileExtensions = new string[] { ".osk", ".osr", ".osz" };
                     break;
             }
 
-            Refresh();
+            refresh();
         }
 
-        private void Refresh()
+        private void refresh()
         {
             //解绑
             currentFile.UnbindBindings();
@@ -265,7 +260,7 @@ namespace osu.Game.Screens.Import
             var directory = currentDirectory.Value?.FullName ?? defaultPath;
 
             //设置文件选择器
-            fileSelector = new FileSelector(initialPath: directory, validFileExtensions: FileExtensions)
+            fileSelector = new FileSelector(initialPath: directory, validFileExtensions: fileExtensions)
             {
                 RelativeSizeAxes = Axes.Both
             };
@@ -303,7 +298,7 @@ namespace osu.Game.Screens.Import
             return base.OnExiting(next);
         }
 
-        private void StartImport(string path)
+        private void startImport(string path)
         {
             //在某些特殊情况下会这样...
             if (string.IsNullOrEmpty(path))
@@ -312,7 +307,7 @@ namespace osu.Game.Screens.Import
             //如果文件被移动或删除
             if (!File.Exists(path))
             {
-                Refresh();
+                refresh();
                 currentFileText.Text = "文件不存在";
                 currentFileText.FlashColour(Color4.Red, 500);
                 return;

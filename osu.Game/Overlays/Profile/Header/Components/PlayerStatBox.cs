@@ -12,16 +12,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
         protected override float cornerRadius => 0f;
         protected override bool masking => false;
 
-        private OsuSpriteText title;
-        private OsuSpriteText content;
-        private SpriteIcon icon;
-        private OsuSpriteText iconDescription;
-        public string ContentText{ set => content.Text = value; }
-        public string Title{ set => title.Text = value; }
-        public IconUsage Icon{ set => icon.Icon = value; }
-        public string IconDescription{ set => iconDescription.Text = value; }
+        private readonly OsuSpriteText title;
+        private readonly OsuSpriteText content;
+        private readonly SpriteIcon icon;
+        private readonly OsuSpriteText iconDescription;
+        public string ContentText { set => content.Text = value; }
+        public string Title { set => title.Text = value; }
+        public IconUsage Icon { set => icon.Icon = value; }
+        public string IconDescription { set => iconDescription.Text = value; }
 
-        public PlayerStatBox(float IconSize = 25)
+        public PlayerStatBox(float iconSize = 25)
         {
             Masking = true;
             Anchor = Anchor.Centre;
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 AutoSizeAxes = Axes.Y,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Padding = new MarginPadding{ Horizontal = 15 },
+                Padding = new MarginPadding { Horizontal = 15 },
                 Child = new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(IconSize)
+                            Size = new Vector2(iconSize)
                         },
                         iconDescription = new OsuSpriteText
                         {

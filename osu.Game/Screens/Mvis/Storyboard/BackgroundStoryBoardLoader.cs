@@ -17,29 +17,31 @@ namespace osu.Game.Screens.Mvis.Storyboard
     ///故事版会莫名奇妙地报个引用空对象错误
     ///故事版获取Overlay Proxy时会报错(???)
     ///</summary>
-    public class BackgroundStoryBoardLoader : Container
+    public class BackgroundStoryBoardLoader : Container<BackgroundStoryboard>
     {
-        private const float DURATION = 750;
-        private BindableBool EnableSB = new BindableBool();
+        private const float duration = 750;
+        private readonly BindableBool enableSb = new BindableBool();
+
         ///<summary>
         ///用于内部确定故事版是否已加载
         ///</summary>
-        private BindableBool SBLoaded = new BindableBool();
+        private readonly BindableBool sbLoaded = new BindableBool();
 
         ///<summary>
         ///用于对外提供该BindableBool用于检测故事版功能是否已经准备好了
         ///</summary>
         public readonly BindableBool IsReady = new BindableBool();
+
         public readonly BindableBool NeedToHideTriangles = new BindableBool();
-        public readonly BindableBool storyboardReplacesBackground = new BindableBool();
+        public readonly BindableBool StoryboardReplacesBackground = new BindableBool();
 
         /// <summary>
         /// 当准备的故事版加载完毕时要调用的Action
         /// </summary>
-        private Action OnComplete;
+        private Action onComplete;
 
-        private StoryboardClock StoryboardClock = new StoryboardClock();
-        private BackgroundStoryboard ClockContainer;
+        private StoryboardClock storyboardClock = new StoryboardClock();
+        private BackgroundStoryboard clockContainer;
         private Task<bool> loadTask;
 
         private CancellationTokenSource cancellationTokenSource;
@@ -56,32 +58,32 @@ namespace osu.Game.Screens.Mvis.Storyboard
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)
         {
-            config.BindWith(MfSetting.MvisEnableStoryboard, EnableSB);
+            config.BindWith(MfSetting.MvisEnableStoryboard, enableSb);
         }
 
         protected override void LoadComplete()
         {
-            EnableSB.BindValueChanged(OnEnableSBChanged);
+            enableSb.BindValueChanged(OnEnableSBChanged);
         }
 
         public void OnEnableSBChanged(ValueChangedEvent<bool> v)
         {
             if (v.NewValue)
             {
-                if (!SBLoaded.Value)
-                    UpdateStoryBoardAsync(this.OnComplete);
+                if (!sbLoaded.Value)
+                    UpdateStoryBoardAsync(onComplete);
                 else
                 {
-                    storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
+                    StoryboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
                     NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
                 }
 
-                ClockContainer?.FadeIn(DURATION, Easing.OutQuint);
+                clockContainer?.FadeIn(duration, Easing.OutQuint);
             }
             else
             {
-                ClockContainer?.FadeOut(DURATION / 2, Easing.OutQuint);
-                storyboardReplacesBackground.Value = false;
+                clockContainer?.FadeOut(duration / 2, Easing.OutQuint);
+                StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
                 IsReady.Value = true;
                 CancelAllTasks();
@@ -94,11 +96,11 @@ namespace osu.Game.Screens.Mvis.Storyboard
             {
                 LoadComponentAsync(nextStoryboard, newClockContainer =>
                 {
-                    StoryboardClock.ChangeSource(beatmap.Track);
+                    storyboardClock.ChangeSource(beatmap.Track);
                     Seek(beatmap.Track.CurrentTime);
 
-                    this.Add(newClockContainer);
-                    ClockContainer = newClockContainer;
+                    Add(newClockContainer);
+                    clockContainer = newClockContainer;
                 }, cancellationTokenSource.Token);
             }
             catch (Exception e)
@@ -111,30 +113,30 @@ namespace osu.Game.Screens.Mvis.Storyboard
         }
 
         public void Seek(double position) =>
-            StoryboardClock?.Seek(position);
+            storyboardClock?.Seek(position);
 
         public void CancelAllTasks() =>
             cancellationTokenSource?.Cancel();
 
-        public void UpdateStoryBoardAsync(Action OnComplete = null)
+        public void UpdateStoryBoardAsync(Action onComplete = null)
         {
             CancelAllTasks();
             IsReady.Value = false;
-            SBLoaded.Value = false;
+            sbLoaded.Value = false;
             NeedToHideTriangles.Value = false;
-            storyboardReplacesBackground.Value = false;
+            StoryboardReplacesBackground.Value = false;
             nextStoryboard = null;
-            this.OnComplete = OnComplete;
+            this.onComplete = onComplete;
 
             cancellationTokenSource = new CancellationTokenSource();
 
-            StoryboardClock.IsCoupled = false;
-            StoryboardClock.Stop();
+            storyboardClock.IsCoupled = false;
+            storyboardClock.Stop();
 
             foreach (var item in this)
-                (item as BackgroundStoryboard).Cleanup(DURATION);
+                item.Cleanup(duration);
 
-            if (!EnableSB.Value || b == null)
+            if (!enableSb.Value || b == null)
             {
                 IsReady.Value = true;
                 return;
@@ -145,17 +147,17 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 nextStoryboard = new BackgroundStoryboard(b.Value, b.Value.Skin)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RunningClock = StoryboardClock = new StoryboardClock(),
+                    RunningClock = storyboardClock = new StoryboardClock(),
                     Alpha = 0.1f,
-                    onStoryboardReadyAction = () =>
+                    OnStoryboardReadyAction = () =>
                     {
-                        SBLoaded.Value = true;
+                        sbLoaded.Value = true;
                         IsReady.Value = true;
                         NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
 
-                        EnableSB.TriggerChange();
-                        OnComplete?.Invoke();
-                        OnComplete = null;
+                        enableSb.TriggerChange();
+                        onComplete?.Invoke();
+                        onComplete = null;
                     }
                 };
 

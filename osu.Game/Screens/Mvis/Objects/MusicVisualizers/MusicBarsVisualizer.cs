@@ -1,12 +1,12 @@
-﻿using osu.Framework.Allocation;
+﻿using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Configuration;
-using osu.Game.Screens.Mvis.UI.Objects.Helpers;
-using osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers.Bars;
-using System;
+using osu.Game.Screens.Mvis.Objects.Helpers;
+using osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars;
 
-namespace osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers
+namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers
 {
     public abstract class MusicBarsVisualizer : MusicAmplitudesProvider
     {

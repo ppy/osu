@@ -25,14 +25,15 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private Container flashBox;
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;
-        private Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
-        private List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+        private readonly Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
+        private readonly List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
         private BeatmapCover cover;
 
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
+
         private BeatmapList beatmapList;
-        private BindableBool isCurrentCollection = new BindableBool();
+        private readonly BindableBool isCurrentCollection = new BindableBool();
 
         public CollectionInfo()
         {
@@ -52,12 +53,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new Dimension[]
+                    RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Distributed),
+                        new Dimension(),
                     },
-                    Content = new []
+                    Content = new[]
                     {
                         new Drawable[]
                         {
@@ -86,7 +87,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(12),
-                                        Padding = new MarginPadding{ Horizontal = 35, Vertical = 25 },
+                                        Padding = new MarginPadding { Horizontal = 35, Vertical = 25 },
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Children = new Drawable[]
@@ -169,11 +170,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             if (c == null)
             {
-                ClearInfo();
+                clearInfo();
                 return;
             }
 
             beatmapSets.Clear();
+
             //From CollectionHelper.cs
             foreach (var item in c.Beatmaps)
             {
@@ -188,10 +190,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             collectionName.Text = c.Name.Value;
             collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
-            cover.updateBackground(beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First()));
+            cover.UpdateBackground(beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First()));
             flashBox.FlashColour(Colour4.White, 1000, Easing.OutQuint);
 
-            RefreshBeatmapSetList();
+            refreshBeatmapSetList();
         }
 
         private CancellationTokenSource refreshTaskCancellationToken;
@@ -199,7 +201,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private LoadingSpinner loadingSpinner;
         private Box bgBox;
 
-        private void RefreshBeatmapSetList()
+        private void refreshBeatmapSetList()
         {
             Task refreshTask;
             refreshTaskCancellationToken?.Cancel();
@@ -230,8 +232,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public void UpdateCollection(BeatmapCollection collection, bool isCurrent)
         {
             flashBox.FadeColour(isCurrent
-                                ? colourProvider.Highlight1
-                                : colourProvider.Light2, 300, Easing.OutQuint);
+                ? colourProvider.Highlight1
+                : colourProvider.Light2, 300, Easing.OutQuint);
 
             if (collection != this.collection.Value && beatmapList != null)
             {
@@ -246,9 +248,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             this.collection.Value = collection;
         }
 
-        private void ClearInfo()
+        private void clearInfo()
         {
-            cover.updateBackground(null);
+            cover.UpdateBackground(null);
 
             beatmapSets.Clear();
             beatmapList.ClearList();

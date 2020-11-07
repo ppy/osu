@@ -6,12 +6,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
