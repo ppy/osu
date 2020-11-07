@@ -38,6 +38,12 @@ namespace osu.Game.Tests.Editing
         }
 
         [Test]
+        public void TestPatchNoObjectChanges()
+        {
+            runTest(new OsuBeatmap());
+        }
+
+        [Test]
         public void TestAddHitObject()
         {
             var patch = new OsuBeatmap
