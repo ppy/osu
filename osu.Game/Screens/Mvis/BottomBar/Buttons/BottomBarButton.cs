@@ -15,6 +15,7 @@ using osu.Game.Configuration;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Input.Events;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
@@ -25,6 +26,14 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
         protected CustomColourProvider ColourProvider => colourProvider;
         protected FillFlowContainer ContentFillFlow;
+        protected virtual string BackgroundTextureName => "MButtonSquare-background";
+
+        protected virtual Drawable CreateBackgroundTexture => new SkinnableSprite(BackgroundTextureName, confineMode: ConfineMode.ScaleToFit)
+        {
+            RelativeSizeAxes = Axes.Both,
+            CentreComponent = false
+        };
+
         protected Box BgBox;
         private Box flashBox;
         private Container content;
@@ -80,13 +89,14 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                         Colour = Color4.Black.Opacity(0.6f),
                         Offset = new Vector2(0, 1.5f)
                     },
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         BgBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourProvider.Background3
                         },
+                        CreateBackgroundTexture,
                         ContentFillFlow = new FillFlowContainer
                         {
                             Margin = new MarginPadding { Left = 15, Right = 15 },

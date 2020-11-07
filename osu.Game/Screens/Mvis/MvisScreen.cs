@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -39,6 +40,7 @@ using osu.Game.Screens.Mvis.Modules;
 using osu.Game.Screens.Mvis.Modules.v2;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Screens.Mvis.Objects;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis
 {
@@ -116,6 +118,7 @@ namespace osu.Game.Screens.Mvis
         private DependencyContainer dependencies;
         private Box sidebarBg;
         private Box sidebarBottomBox;
+        private SkinnableSprite skinnableForeground;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -144,6 +147,53 @@ namespace osu.Game.Screens.Mvis
                 },
                 new Container
                 {
+                    Name = "Content Container",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = 50 },
+                    Masking = true,
+                    Children = new Drawable[]
+                    {
+                        gameplayBackground = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Name = "Gameplay Background Elements Container",
+                            Children = new Drawable[]
+                            {
+                                bgTriangles = new BgTrianglesContainer(),
+                                sbLoader = new BackgroundStoryBoardLoader()
+                            }
+                        },
+                        gameplayContent = new Container
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Name = "Gameplay Foreground Elements Container",
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                particles = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both
+                                },
+                                new ParallaxContainer
+                                {
+                                    ParallaxAmount = -0.0025f,
+                                    Child = beatmapLogo = new BeatmapLogo
+                                    {
+                                        Anchor = Anchor.Centre,
+                                    }
+                                },
+                            }
+                        }
+                    }
+                },
+                skinnableForeground = new SkinnableSprite("MPlayer-foreground")
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0
+                },
+                new Container
+                {
                     Name = "Overlay Container",
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -153,6 +203,73 @@ namespace osu.Game.Screens.Mvis
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                             Margin = new MarginPadding(115)
+                        },
+                        sidebar = new SidebarContainer
+                        {
+                            Name = "Sidebar Container",
+                            Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING },
+                            Children = new Drawable[]
+                            {
+                                new Container
+                                {
+                                    Padding = new MarginPadding { Bottom = 50 },
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        sidebarBg = new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = colourProvider.Background5,
+                                            Alpha = 0.5f,
+                                        },
+                                        settingsScroll = new SidebarSettingsScrollContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Y,
+                                                RelativeSizeAxes = Axes.X,
+                                                Spacing = new Vector2(20),
+                                                Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
+                                                Margin = new MarginPadding { Bottom = 10 },
+                                                Direction = FillDirection.Vertical,
+                                                Children = new Drawable[]
+                                                {
+                                                    new MfMvisSection
+                                                    {
+                                                        Margin = new MarginPadding { Top = 0 },
+                                                    },
+                                                    new SettingsButton
+                                                    {
+                                                        Text = "歌曲选择",
+                                                        Action = () => this.Push(new MvisSongSelect())
+                                                    }
+                                                }
+                                            },
+                                        },
+                                        collectionPanel = new CollectionSelectPanel()
+                                    }
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Masking = true,
+                                    Height = 50,
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomCentre,
+                                    EdgeEffect = new EdgeEffectParameters
+                                    {
+                                        Type = EdgeEffectType.Shadow,
+                                        Colour = Colour4.Black.Opacity(0.6f),
+                                        Radius = 10,
+                                    },
+                                    Child = sidebarBottomBox = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = colourProvider.Background4,
+                                    }
+                                },
+                            }
                         },
                         bottomFillFlow = new FillFlowContainer
                         {
@@ -187,6 +304,13 @@ namespace osu.Game.Screens.Mvis
                                                     RelativeSizeAxes = Axes.Both,
                                                     Children = new Drawable[]
                                                     {
+                                                        new SkinnableSprite("MBottomBar-background")
+                                                        {
+                                                            Anchor = Anchor.BottomCentre,
+                                                            Origin = Anchor.BottomCentre,
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y
+                                                        },
                                                         new FillFlowContainer
                                                         {
                                                             Name = "Left Buttons FillFlow",
@@ -220,7 +344,7 @@ namespace osu.Game.Screens.Mvis
                                                             Spacing = new Vector2(5),
                                                             Children = new Drawable[]
                                                             {
-                                                                prevButton = new BottomBarButton
+                                                                prevButton = new NextPrevButton
                                                                 {
                                                                     Size = new Vector2(50, 30),
                                                                     Anchor = Anchor.Centre,
@@ -238,7 +362,7 @@ namespace osu.Game.Screens.Mvis
                                                                     Origin = Anchor.Centre,
                                                                     NoIcon = true,
                                                                 },
-                                                                nextButton = new BottomBarButton
+                                                                nextButton = new NextPrevButton
                                                                 {
                                                                     Size = new Vector2(50, 30),
                                                                     Anchor = Anchor.Centre,
@@ -335,115 +459,6 @@ namespace osu.Game.Screens.Mvis
                                         Origin = Anchor.BottomCentre,
                                     }
                                 }
-                            }
-                        }
-                    }
-                },
-                new Container
-                {
-                    Name = "Content Container",
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 50 },
-                    Depth = 1,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        gameplayBackground = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Name = "Gameplay Background Elements Container",
-                            Children = new Drawable[]
-                            {
-                                bgTriangles = new BgTrianglesContainer(),
-                                sbLoader = new BackgroundStoryBoardLoader()
-                            }
-                        },
-                        gameplayContent = new Container
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Name = "Gameplay Foreground Elements Container",
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                particles = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both
-                                },
-                                new ParallaxContainer
-                                {
-                                    ParallaxAmount = -0.0025f,
-                                    Child = beatmapLogo = new BeatmapLogo
-                                    {
-                                        Anchor = Anchor.Centre,
-                                    }
-                                },
-                            }
-                        },
-                        sidebar = new SidebarContainer
-                        {
-                            Name = "Sidebar Container",
-                            Children = new Drawable[]
-                            {
-                                new Container
-                                {
-                                    Padding = new MarginPadding { Bottom = 50 },
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        sidebarBg = new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = colourProvider.Background5,
-                                            Alpha = 0.5f,
-                                        },
-                                        settingsScroll = new SidebarSettingsScrollContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Child = new FillFlowContainer
-                                            {
-                                                AutoSizeAxes = Axes.Y,
-                                                RelativeSizeAxes = Axes.X,
-                                                Spacing = new Vector2(20),
-                                                Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
-                                                Margin = new MarginPadding { Bottom = 10 },
-                                                Direction = FillDirection.Vertical,
-                                                Children = new Drawable[]
-                                                {
-                                                    new MfMvisSection
-                                                    {
-                                                        Margin = new MarginPadding { Top = 0 },
-                                                    },
-                                                    new SettingsButton
-                                                    {
-                                                        Text = "歌曲选择",
-                                                        Action = () => this.Push(new MvisSongSelect())
-                                                    }
-                                                }
-                                            },
-                                        },
-                                        collectionPanel = new CollectionSelectPanel()
-                                    }
-                                },
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Masking = true,
-                                    Height = 50,
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
-                                    EdgeEffect = new EdgeEffectParameters
-                                    {
-                                        Type = EdgeEffectType.Shadow,
-                                        Colour = Colour4.Black.Opacity(0.6f),
-                                        Radius = 10,
-                                    },
-                                    Child = sidebarBottomBox = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = colourProvider.Background4,
-                                    }
-                                },
                             }
                         }
                     }
@@ -619,6 +634,7 @@ namespace osu.Game.Screens.Mvis
             //非背景层的动画
             gameplayContent.ScaleTo(0f).Then().ScaleTo(1f, duration, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, duration, Easing.OutQuint);
+            skinnableForeground.FadeIn(duration, Easing.OutQuint);
 
             playFromCollection.TriggerChange();
         }

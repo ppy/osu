@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Mvis.SideBar
             Origin = Anchor.BottomRight;
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(0.3f, 1f);
-            Depth = -float.MaxValue;
 
             AddInternal(waveContainer = new WaveContainer
             {

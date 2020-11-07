@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                 Margin = new MarginPadding { Bottom = 40 }
                             }
                         },
-                        new BottomBarButton
+                        new RefreshCollectionButton
                         {
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
@@ -174,6 +174,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private void makeCurrentSelected()
         {
             collectionHelper.CurrentCollection.Value = selectedCollection.Value;
+        }
+
+        private class RefreshCollectionButton : BottomBarButton
+        {
+            protected override string BackgroundTextureName => "MButtonRefreshCollection-background";
         }
     }
 }
