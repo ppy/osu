@@ -27,6 +27,12 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                     Keywords = new[] { "no-video" },
                     Current = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "旁观时自动下图",
+                    Keywords = new[] { "spectator" },
+                    Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
+                },
             };
         }
     }

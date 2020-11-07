@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
         private float ExtraY;
-        public bool IgnoreSettings = false;
+        public bool IgnoreSettings;
         public bool EnableBeatSync;
         private float alpha_orig = 1;
         private const float triangle_size = 100;

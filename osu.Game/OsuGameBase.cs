@@ -61,7 +61,7 @@ namespace osu.Game
 
         protected ScoreManager ScoreManager;
 
-        protected BeatmapDifficultyManager DifficultyManager;
+        protected BeatmapDifficultyCache DifficultyCache;
 
         protected SkinManager SkinManager;
 
@@ -205,7 +205,7 @@ namespace osu.Game
             dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => DifficultyManager, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => DifficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap, true));
 
             // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
@@ -229,8 +229,12 @@ namespace osu.Game
                     ScoreManager.Undelete(getBeatmapScores(item), true);
             });
 
-            dependencies.Cache(DifficultyManager = new BeatmapDifficultyManager());
-            AddInternal(DifficultyManager);
+            dependencies.Cache(DifficultyCache = new BeatmapDifficultyCache());
+            AddInternal(DifficultyCache);
+
+            var scorePerformanceManager = new ScorePerformanceCache();
+            dependencies.Cache(scorePerformanceManager);
+            AddInternal(scorePerformanceManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));

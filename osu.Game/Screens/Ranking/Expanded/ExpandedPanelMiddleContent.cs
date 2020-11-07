@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyManager beatmapDifficultyManager)
+        private void load(BeatmapDifficultyCache beatmapDifficultyCache)
         {
             var beatmap = score.Beatmap;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             {
                 new AccuracyStatistic(score.Accuracy),
                 new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out var missCount) || missCount == 0),
-                new CounterStatistic("pp", (int)(score.PP ?? 0)),
+                new PerformanceStatistic(score),
             };
 
             var bottomStatistics = new List<HitResultStatistic>();
@@ -76,6 +76,8 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             statisticDisplays.AddRange(topStatistics);
             statisticDisplays.AddRange(bottomStatistics);
+
+            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).Result;
 
             InternalChildren = new Drawable[]
             {
@@ -120,7 +122,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     Margin = new MarginPadding { Top = 30 },
                                     RelativeSizeAxes = Axes.X,
                                     Height = 230,
-                                    Child = new AccuracyCircle(score)
+                                    Child = new AccuracyCircle(score, withFlair)
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
@@ -143,7 +145,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     Spacing = new Vector2(5, 0),
                                     Children = new Drawable[]
                                     {
-                                        new StarRatingDisplay(beatmapDifficultyManager.GetDifficulty(beatmap, score.Ruleset, score.Mods))
+                                        new StarRatingDisplay(starDifficulty)
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft

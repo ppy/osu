@@ -20,6 +20,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -103,7 +104,7 @@ namespace osu.Game.Screens.Edit
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameHost host)
+        private void load(OsuColour colours, GameHost host, OsuConfigManager config)
         {
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
@@ -207,6 +208,13 @@ namespace osu.Game.Screens.Edit
                                         cutMenuItem = new EditorMenuItem("剪切", MenuItemType.Standard, Cut),
                                         copyMenuItem = new EditorMenuItem("复制", MenuItemType.Standard, Copy),
                                         pasteMenuItem = new EditorMenuItem("粘贴", MenuItemType.Standard, Paste),
+                                    }
+                                },
+                                new MenuItem("视图")
+                                {
+                                    Items = new[]
+                                    {
+                                        new WaveformOpacityMenu(config)
                                     }
                                 }
                             }

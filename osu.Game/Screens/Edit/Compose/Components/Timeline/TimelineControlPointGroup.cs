@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         public readonly ControlPointGroup Group;
 
-        private BindableList<ControlPoint> controlPoints;
+        private readonly IBindableList<ControlPoint> controlPoints = new BindableList<ControlPoint>();
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
-            controlPoints = (BindableList<ControlPoint>)Group.ControlPoints.GetBoundCopy();
+            controlPoints.BindTo(Group.ControlPoints);
             controlPoints.BindCollectionChanged((_, __) =>
             {
                 ClearInternal();

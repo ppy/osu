@@ -1,4 +1,5 @@
-﻿using osu.Framework.Allocation;
+﻿using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -198,7 +199,7 @@ namespace osu.Game.Screens.Mvis.Objects
                     }
                 }
 
-                if (newTitle.EndsWith(" "))
+                if (newTitle.EndsWith(" ", StringComparison.Ordinal))
                     newTitle = newTitle.Substring(0, newTitle.Length - 1);
 
                 return newTitle;

@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             Size = new Vector2(13),
         };
 
-        public bool NoIcon = false;
+        public bool NoIcon;
 
         public BottomBarButton()
         {

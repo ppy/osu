@@ -23,6 +23,9 @@ namespace osu.Game.Overlays.Dashboard
     public enum DashboardOverlayTabs
     {
         [Description("好友列表")]
-        Friends
+        Friends,
+
+        [Description("正在游玩")]
+        CurrentlyPlaying
     }
 }

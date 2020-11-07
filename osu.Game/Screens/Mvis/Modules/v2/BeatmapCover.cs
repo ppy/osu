@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         public bool BackgroundBox = true;
 
-        public bool UseBufferedBackground = false;
+        public bool UseBufferedBackground;
         public float TimeBeforeWrapperLoad = 500;
 
         public BeatmapCover(WorkingBeatmap beatmap)

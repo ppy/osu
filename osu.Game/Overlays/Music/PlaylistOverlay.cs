@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Music
 
         public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
         public bool TakeFocusOnPopIn = true;
-        public bool NoResizeOnPopIn = false;
+        public bool NoResizeOnPopIn;
 
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 

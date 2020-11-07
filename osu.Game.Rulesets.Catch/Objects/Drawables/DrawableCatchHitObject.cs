@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
@@ -62,6 +61,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
+        protected override double InitialLifetimeOffset => HitObject.TimePreempt;
+
         public virtual bool StaysOnPlate => HitObject.CanBePlated;
 
         public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
@@ -88,22 +89,17 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            var endTime = HitObject.GetEndTime();
-
-            using (BeginAbsoluteSequence(endTime, true))
+            switch (state)
             {
-                switch (state)
-                {
-                    case ArmedState.Miss:
-                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
-                        break;
+                case ArmedState.Miss:
+                    this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
+                    break;
 
-                    case ArmedState.Hit:
-                        this.FadeOut();
-                        break;
-                }
+                case ArmedState.Hit:
+                    this.FadeOut();
+                    break;
             }
         }
     }

@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Play
                 {
                     loading.Hide();
 
-                    if ( Optui.Value )
+                    if (optui.Value)
                     {
                         ruleseticon.Loaded = true;
                         ruleseticon.Delay(250).Then()
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Play
 
         private Container basePanel;
         private Container bg;
-        private readonly Bindable<bool> Optui = new Bindable<bool>();
+        private readonly Bindable<bool> optui = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)
@@ -219,24 +219,24 @@ namespace osu.Game.Screens.Play
                                 }
                             },
                         },
-                        }
+                    }
                 },
             };
 
             Loading = true;
 
-            config.BindWith(MfSetting.OptUI, Optui);
-            Optui.ValueChanged += _ => UpdateVisualEffects();
+            config.BindWith(MfSetting.OptUI, optui);
+            optui.ValueChanged += _ => updateVisualEffects();
 
-            EntryAnimation();
+            entryAnimation();
         }
 
-        private void UpdateVisualEffects()
+        private void updateVisualEffects()
         {
-            switch (Optui.Value)
+            switch (optui.Value)
             {
                 case true:
-                    ruleseticon.Delay(500).Schedule( () => ruleseticon.AddRulesetSprite() );
+                    ruleseticon.Delay(500).Schedule(() => ruleseticon.AddRulesetSprite());
                     ruleseticon.ScaleTo(1, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
                     bg.ScaleTo(1.2f, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
                     return;
@@ -248,9 +248,9 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private void EntryAnimation()
+        private void entryAnimation()
         {
-            switch (Optui.Value)
+            switch (optui.Value)
             {
                 case true:
                     bg.ScaleTo(1.2f);
@@ -266,11 +266,9 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        
-
         private class SelectedRulesetIcon : Container
         {
-            public FillFlowContainer contentFillFlow;
+            public FillFlowContainer ContentFillFlow;
             private OsuSpriteText rulesetSpriteText;
 
             [Resolved]
@@ -301,7 +299,7 @@ namespace osu.Game.Screens.Play
                             }
                         }
                     },
-                    contentFillFlow = new FillFlowContainer
+                    ContentFillFlow = new FillFlowContainer
                     {
                         Direction = FillDirection.Horizontal,
                         RelativeSizeAxes = Axes.Both,
@@ -322,38 +320,39 @@ namespace osu.Game.Screens.Play
                 Loaded = false;
             }
 
-            private bool LoadAnimationDone = false;
+            private bool loadAnimationDone;
+
             public bool Loaded
             {
                 set
                 {
-                    if ( value )
+                    if (value)
                     {
-                        this.Delay(750).Schedule( () => AddRulesetSprite() );
+                        this.Delay(750).Schedule(AddRulesetSprite);
                     }
                 }
             }
 
             public void AddRulesetSprite()
             {
-                if ( !LoadAnimationDone )
+                if (!loadAnimationDone)
                 {
-                    contentFillFlow.Add(
-                                new Container
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Child = rulesetSpriteText = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Text = $"{rulesetInfo.Value.CreateInstance().Description}",
-                                    }
-                                });
+                    ContentFillFlow.Add(
+                        new Container
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Child = rulesetSpriteText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Text = $"{rulesetInfo.Value.CreateInstance().Description}",
+                            }
+                        });
                     rulesetSpriteText.FadeOut().Then().FadeIn(500, Easing.OutQuint);
 
-                    LoadAnimationDone = true;
+                    loadAnimationDone = true;
                 }
             }
         };

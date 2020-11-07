@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Menu
 
         private MainMenu mainMenu;
 
-        protected BeatmapSetInfo setInfo = null;
+        protected BeatmapSetInfo setInfo;
 
         [Resolved]
         private AudioManager audio { get; set; }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.Select
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         [Resolved]
-        private BeatmapDifficultyManager difficultyManager { get; set; }
+        private BeatmapDifficultyCache difficultyCache { get; set; }
 
         private IBindable<StarDifficulty> beatmapDifficulty;
 
@@ -85,6 +86,8 @@ namespace osu.Game.Screens.Select
 
         private WorkingBeatmap beatmap;
 
+        private CancellationTokenSource cancellationSource;
+
         public WorkingBeatmap Beatmap
         {
             get => beatmap;
@@ -93,9 +96,11 @@ namespace osu.Game.Screens.Select
                 if (beatmap == value) return;
 
                 beatmap = value;
+                cancellationSource?.Cancel();
+                cancellationSource = new CancellationTokenSource();
 
                 beatmapDifficulty?.UnbindAll();
-                beatmapDifficulty = difficultyManager.GetBindableDifficulty(beatmap.BeatmapInfo);
+                beatmapDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo, cancellationSource.Token);
                 beatmapDifficulty.BindValueChanged(_ => updateDisplay());
 
                 updateDisplay();
@@ -108,33 +113,44 @@ namespace osu.Game.Screens.Select
 
         private void updateDisplay()
         {
-            void removeOldInfo()
-            {
-                State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+            Scheduler.AddOnce(perform);
 
-                Info?.FadeOut(250);
-                Info?.Expire();
-                Info = null;
+            void perform()
+            {
+                void removeOldInfo()
+                {
+                    State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+
+                    Info?.FadeOut(250);
+                    Info?.Expire();
+                    Info = null;
+                }
+
+                if (beatmap == null)
+                {
+                    removeOldInfo();
+                    return;
+                }
+
+                LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, beatmapDifficulty.Value)
+                {
+                    Shear = -Shear,
+                    Depth = Info?.Depth + 1 ?? 0
+                }, loaded =>
+                {
+                    // ensure we are the most recent loaded wedge.
+                    if (loaded != loadingInfo) return;
+
+                    removeOldInfo();
+                    Add(Info = loaded);
+                });
             }
+        }
 
-            if (beatmap == null)
-            {
-                removeOldInfo();
-                return;
-            }
-
-            LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, beatmapDifficulty.Value)
-            {
-                Shear = -Shear,
-                Depth = Info?.Depth + 1 ?? 0
-            }, loaded =>
-            {
-                // ensure we are the most recent loaded wedge.
-                if (loaded != loadingInfo) return;
-
-                removeOldInfo();
-                Add(Info = loaded);
-            });
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            cancellationSource?.Cancel();
         }
 
         public class BufferedWedgeInfo : BufferedContainer
