@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Edit
             int oldHitObjectsIndex = Array.IndexOf(result.PiecesOld, "[HitObjects]");
             int newHitObjectsIndex = Array.IndexOf(result.PiecesNew, "[HitObjects]");
 
-            var toRemove = new List<int>();
-            var toAdd = new List<int>();
+            bool removeObjects = false;
+            bool addObjects = false;
 
             if (oldHitObjectsIndex == -1 && newHitObjectsIndex == -1)
             {
@@ -46,69 +46,54 @@ namespace osu.Game.Screens.Edit
             else if (oldHitObjectsIndex == -1)
             {
                 // If only the new beatmap has hitobjects we need to add all of them
-                foreach (var block in result.DiffBlocks)
-                {
-                    // Added hitobjects
-                    for (int i = 0; i < block.InsertCountB; i++)
-                    {
-                        int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
-
-                        if (hoIndex < 0)
-                            continue;
-
-                        toAdd.Add(hoIndex);
-                    }
-                }
+                addObjects = true;
             }
             else if (newHitObjectsIndex == -1)
             {
                 // If only the old beatmap has hitobjects we need to remove all of them
-                foreach (var block in result.DiffBlocks)
-                {
-                    // Removed hitobjects
-                    for (int i = 0; i < block.DeleteCountA; i++)
-                    {
-                        int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
-
-                        if (hoIndex < 0)
-                            continue;
-
-                        toRemove.Add(hoIndex);
-                    }
-                }
+                removeObjects = true;
             }
             else
             {
-                foreach (var block in result.DiffBlocks)
-                {
-                    // Removed hitobjects
-                    for (int i = 0; i < block.DeleteCountA; i++)
-                    {
-                        int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
-
-                        if (hoIndex < 0)
-                            continue;
-
-                        toRemove.Add(hoIndex);
-                    }
-
-                    // Added hitobjects
-                    for (int i = 0; i < block.InsertCountB; i++)
-                    {
-                        int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
-
-                        if (hoIndex < 0)
-                            continue;
-
-                        toAdd.Add(hoIndex);
-                    }
-                }
+                // If both beatmaps have objects we have to remove and add
+                addObjects = true;
+                removeObjects = true;
             }
+
+            var toRemove = new List<int>();
+            var toAdd = new List<int>();
 
             // Sort the indices to ensure that removal + insertion indices don't get jumbled up post-removal or post-insertion.
             // This isn't strictly required, but the differ makes no guarantees about order.
             toRemove.Sort();
             toAdd.Sort();
+
+            foreach (var block in result.DiffBlocks)
+                {
+                    // Removed hitobjects
+                    if (removeObjects)
+                        for (int i = 0; i < block.DeleteCountA; i++)
+                        {
+                            int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
+
+                            if (hoIndex < 0)
+                                continue;
+
+                            toRemove.Add(hoIndex);
+                        }
+
+                    // Added hitobjects
+                    if (addObjects)
+                        for (int i = 0; i < block.InsertCountB; i++)
+                        {
+                            int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
+
+                            if (hoIndex < 0)
+                                continue;
+
+                            toAdd.Add(hoIndex);
+                        }
+                }
 
             editorBeatmap.BeginChange();
 
