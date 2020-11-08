@@ -304,7 +304,8 @@ namespace osu.Game.Screens.Mvis
                             RelativeSizeAxes = Axes.Both,
                             ChildAnchor = Anchor.BottomCentre,
                             ChildOrigin = Anchor.BottomCentre,
-                            Alpha = 0
+                            Alpha = 0,
+                            CentreComponent = false
                         },
                         bottomFillFlow = new FillFlowContainer
                         {
