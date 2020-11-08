@@ -56,9 +56,9 @@ namespace osu.Game.Screens
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         /// <summary>
-        /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered
-        /// <para>This <see cref="Activity"/> will be automatically set to <see cref="InitialActivity"/> for this screen on entering unless
-        /// <see cref="Activity"/> is manually set before.</para>
+        /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered.
+        /// <para>This <see cref="Activity"/> will be automatically set to <see cref="InitialActivity"/> for this screen on entering for the first time
+        /// unless <see cref="Activity"/> is manually set before.</para>
         /// </summary>
         protected virtual UserActivity InitialActivity => null;
 
