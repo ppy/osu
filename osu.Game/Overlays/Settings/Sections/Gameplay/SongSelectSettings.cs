@@ -56,7 +56,14 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Random selection algorithm",
                     Current = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
-                }
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "Menu background blur",
+                    Current = config.GetBindable<float>(OsuSetting.MenuBlurLevel),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
             };
         }
 

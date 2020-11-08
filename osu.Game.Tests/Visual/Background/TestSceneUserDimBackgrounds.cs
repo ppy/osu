@@ -307,7 +307,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundVisible() => ((FadeAccessibleBackground)Background).CurrentAlpha == 1;
 
-            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
+            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BackgroundBlur);
 
             /// <summary>
             /// Make sure every time a screen gets pushed, the background doesn't get replaced
