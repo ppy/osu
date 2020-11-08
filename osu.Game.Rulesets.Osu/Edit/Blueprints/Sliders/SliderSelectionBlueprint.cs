@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override bool HandleQuickDeletion()
         {
-            var hoveredControlPoint = ControlPointVisualiser.Pieces.FirstOrDefault(p => p.IsHovered);
+            var hoveredControlPoint = ControlPointVisualiser?.Pieces.FirstOrDefault(p => p.IsHovered);
 
             if (hoveredControlPoint == null)
                 return false;
