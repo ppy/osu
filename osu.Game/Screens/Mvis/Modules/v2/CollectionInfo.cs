@@ -13,6 +13,7 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
@@ -38,6 +39,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public CollectionInfo()
         {
             RelativeSizeAxes = Axes.Both;
+            Masking = true;
         }
 
         [BackgroundDependencyLoader]
@@ -49,6 +51,16 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 {
                     Colour = colourProvider.Background3,
                     RelativeSizeAxes = Axes.Both
+                },
+                new SkinnableSprite("MSidebar-Collection-background", confineMode: ConfineMode.ScaleToFill)
+                {
+                    Name = "收藏夹背景图",
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    ChildAnchor = Anchor.BottomRight,
+                    ChildOrigin = Anchor.BottomRight,
+                    RelativeSizeAxes = Axes.Both,
+                    CentreComponent = false,
                 },
                 new GridContainer
                 {

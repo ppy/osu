@@ -222,6 +222,21 @@ namespace osu.Game.Screens.Mvis
                                             Colour = colourProvider.Background5,
                                             Alpha = 0.5f,
                                         },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Masking = true,
+                                            Child = new SkinnableSprite("MSidebar-background", confineMode: ConfineMode.ScaleToFill)
+                                            {
+                                                Name = "侧边栏背景图",
+                                                Anchor = Anchor.BottomRight,
+                                                Origin = Anchor.BottomRight,
+                                                ChildAnchor = Anchor.BottomRight,
+                                                ChildOrigin = Anchor.BottomRight,
+                                                RelativeSizeAxes = Axes.Both,
+                                                CentreComponent = false
+                                            }
+                                        },
                                         settingsScroll = new SidebarSettingsScrollContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -260,10 +275,23 @@ namespace osu.Game.Screens.Mvis
                                         Colour = Colour4.Black.Opacity(0.6f),
                                         Radius = 10,
                                     },
-                                    Child = sidebarBottomBox = new Box
+                                    Children = new Drawable[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = colourProvider.Background4,
+                                        sidebarBottomBox = new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = colourProvider.Background4,
+                                        },
+                                        new SkinnableSprite("MSidebar-BottomBox", confineMode: ConfineMode.ScaleToFill)
+                                        {
+                                            Name = "侧边栏底部横条",
+                                            Anchor = Anchor.BottomRight,
+                                            Origin = Anchor.BottomRight,
+                                            ChildAnchor = Anchor.BottomRight,
+                                            ChildOrigin = Anchor.BottomRight,
+                                            RelativeSizeAxes = Axes.Both,
+                                            CentreComponent = false,
+                                        }
                                     }
                                 },
                             }
@@ -274,7 +302,8 @@ namespace osu.Game.Screens.Mvis
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.Both,
-                            ComponentBottomCentre = true,
+                            ChildAnchor = Anchor.BottomCentre,
+                            ChildOrigin = Anchor.BottomCentre,
                             Alpha = 0
                         },
                         bottomFillFlow = new FillFlowContainer
