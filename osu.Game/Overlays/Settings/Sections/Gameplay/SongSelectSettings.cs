@@ -52,6 +52,16 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Play from beginning on select",
+                    Current = config.GetBindable<bool>(OsuSetting.PlayBeginningSelect),
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Play from beginning on repeat",
+                    Current = config.GetBindable<bool>(OsuSetting.PlayBeginningRepeat),
+                },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
                     LabelText = "Random selection algorithm",

@@ -35,6 +35,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Collections;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 
@@ -46,6 +47,9 @@ namespace osu.Game.Screens.Select
 
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
+
+        private Bindable<bool> playBeginningSelect { get; set; }
+        private Bindable<bool> playBeginningRepeat { get; set; }
 
         public FilterControl FilterControl { get; private set; }
 
@@ -104,7 +108,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog)
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog, OsuConfigManager config)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -307,6 +311,9 @@ namespace osu.Game.Screens.Select
                     }
                 });
             }
+
+            playBeginningSelect = config.GetBindable<bool>(OsuSetting.PlayBeginningSelect);
+            playBeginningRepeat = config.GetBindable<bool>(OsuSetting.PlayBeginningRepeat);
         }
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
@@ -679,10 +686,20 @@ namespace osu.Game.Screens.Select
 
             bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
 
-            track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+            if (!playBeginningSelect.Value)
+            {
+                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+            }
 
             if (!track.IsRunning && (music.IsUserPaused != true || isNewTrack))
+            {
                 music.Play(true);
+            }
+
+            if (!playBeginningSelect.Value && playBeginningRepeat.Value)
+            {
+                track.RestartPoint = 0;
+            }
 
             lastTrack.SetTarget(track);
         }
