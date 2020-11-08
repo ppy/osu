@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -45,8 +44,7 @@ using osu.Game.Skinning;
 namespace osu.Game.Screens.Mvis
 {
     ///<summary>
-    ///bug:
-    ///故事版Overlay Proxy不消失(???)
+    /// 音乐播放器
     ///</summary>
     public class MvisScreen : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
@@ -119,6 +117,7 @@ namespace osu.Game.Screens.Mvis
         private Box sidebarBg;
         private Box sidebarBottomBox;
         private SkinnableSprite skinnableForeground;
+        private SkinnableSprite skinnableBbBackground;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -187,8 +186,9 @@ namespace osu.Game.Screens.Mvis
                         }
                     }
                 },
-                skinnableForeground = new SkinnableSprite("MPlayer-foreground")
+                skinnableForeground = new SkinnableSprite("MPlayer-foreground", confineMode: ConfineMode.ScaleToFit)
                 {
+                    Name = "前景图",
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0
                 },
@@ -235,10 +235,7 @@ namespace osu.Game.Screens.Mvis
                                                 Direction = FillDirection.Vertical,
                                                 Children = new Drawable[]
                                                 {
-                                                    new MfMvisSection
-                                                    {
-                                                        Margin = new MarginPadding { Top = 0 },
-                                                    },
+                                                    new MfMvisSection(),
                                                     new SettingsButton
                                                     {
                                                         Text = "歌曲选择",
@@ -270,6 +267,15 @@ namespace osu.Game.Screens.Mvis
                                     }
                                 },
                             }
+                        },
+                        skinnableBbBackground = new SkinnableSprite("MBottomBar-background", confineMode: ConfineMode.ScaleToFit)
+                        {
+                            Name = "底栏背景图",
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            RelativeSizeAxes = Axes.Both,
+                            ComponentBottomCentre = true,
+                            Alpha = 0
                         },
                         bottomFillFlow = new FillFlowContainer
                         {
@@ -304,13 +310,6 @@ namespace osu.Game.Screens.Mvis
                                                     RelativeSizeAxes = Axes.Both,
                                                     Children = new Drawable[]
                                                     {
-                                                        new SkinnableSprite("MBottomBar-background")
-                                                        {
-                                                            Anchor = Anchor.BottomCentre,
-                                                            Origin = Anchor.BottomCentre,
-                                                            RelativeSizeAxes = Axes.X,
-                                                            AutoSizeAxes = Axes.Y
-                                                        },
                                                         new FillFlowContainer
                                                         {
                                                             Name = "Left Buttons FillFlow",
@@ -800,6 +799,8 @@ namespace osu.Game.Screens.Mvis
         {
             if (lockChanges.Value) return;
 
+            skinnableBbBackground.MoveToY(bottomBar.Height, duration, Easing.OutQuint)
+                                 .FadeOut(duration, Easing.OutQuint);
             buttonsContainer.MoveToY(bottomBar.Height, duration, Easing.OutQuint);
             progressBar.MoveToY(5, duration, Easing.OutQuint);
             bottomBar.FadeOut(duration, Easing.OutQuint);
@@ -815,6 +816,8 @@ namespace osu.Game.Screens.Mvis
 
             gameplayContent.FadeTo(1, duration, Easing.OutQuint);
 
+            skinnableBbBackground.MoveToY(0, duration, Easing.OutQuint)
+                                 .FadeIn(duration, Easing.OutQuint);
             buttonsContainer.MoveToY(0, duration, Easing.OutQuint);
             progressBar.MoveToY(0, duration, Easing.OutQuint);
             bottomBar.FadeIn(duration, Easing.OutQuint);

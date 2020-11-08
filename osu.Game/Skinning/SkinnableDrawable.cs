@@ -25,6 +25,8 @@ namespace osu.Game.Skinning
         /// </summary>
         public bool CentreComponent { get; set; } = true;
 
+        public bool ComponentBottomCentre { get; set; }
+
         public new Axes AutoSizeAxes
         {
             get => base.AutoSizeAxes;
@@ -95,6 +97,12 @@ namespace osu.Game.Skinning
                 {
                     Drawable.Origin = Anchor.Centre;
                     Drawable.Anchor = Anchor.Centre;
+                }
+
+                if (ComponentBottomCentre)
+                {
+                    Drawable.Origin = Anchor.BottomCentre;
+                    Drawable.Anchor = Anchor.BottomCentre;
                 }
 
                 InternalChild = Drawable;
