@@ -35,6 +35,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Collections;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using System.Diagnostics;
@@ -45,8 +46,10 @@ namespace osu.Game.Screens.Select
     {
         public static readonly float WEDGE_HEIGHT = 245;
 
-        protected const float BACKGROUND_BLUR = 20;
+        protected float BackgroundBlur = 20;
         private const float left_area_padding = 20;
+
+        private Bindable<float> backgroundBlurBindable { get; set; }
 
         public FilterControl FilterControl { get; private set; }
 
@@ -105,7 +108,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog)
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog, OsuConfigManager config)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -307,6 +310,26 @@ namespace osu.Game.Screens.Select
                         }));
                     }
                 });
+            }
+
+            backgroundBlurBindable = config.GetBindable<float>(OsuSetting.MenuBlurLevel);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            backgroundBlurBindable.ValueChanged += _ => updateBackgroundBlur();
+            updateBackgroundBlur(); // for first time opening beatmap selection
+        }
+
+        private void updateBackgroundBlur()
+        {
+            BackgroundBlur = backgroundBlurBindable.Value * 25;
+
+            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
+            {
+                backgroundModeBeatmap.BlurAmount.Value = BackgroundBlur;
             }
         }
 
@@ -679,7 +702,7 @@ namespace osu.Game.Screens.Select
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
+                backgroundModeBeatmap.BlurAmount.Value = BackgroundBlur;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             }
 
