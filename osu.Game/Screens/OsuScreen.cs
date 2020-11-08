@@ -14,7 +14,6 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
 using osu.Game.Users;
-using osu.Game.Online.API;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
@@ -63,22 +62,12 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual UserActivity InitialActivity => null;
 
-        private UserActivity activity;
-
         /// <summary>
         /// The current <see cref="UserActivity"/> for this screen.
         /// </summary>
-        protected UserActivity Activity
-        {
-            get => activity;
-            set
-            {
-                if (value == activity) return;
+        protected readonly Bindable<UserActivity> Activity;
 
-                activity = value;
-                updateActivity();
-            }
-        }
+        IBindable<UserActivity> IOsuScreen.Activity => Activity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -135,15 +124,13 @@ namespace osu.Game.Screens
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private IAPIProvider api { get; set; }
-
         protected OsuScreen()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             OverlayActivationMode = new Bindable<OverlayActivation>(InitialOverlayActivationMode);
+            Activity = new Bindable<UserActivity>();
         }
 
         [BackgroundDependencyLoader(true)]
@@ -157,8 +144,6 @@ namespace osu.Game.Screens
             if (PlayResumeSound)
                 sampleExit?.Play();
             applyArrivingDefaults(true);
-
-            updateActivity();
 
             base.OnResuming(last);
         }
@@ -176,8 +161,8 @@ namespace osu.Game.Screens
 
             backgroundStack?.Push(localBackground = CreateBackground());
 
-            if (activity == null)
-                Activity = InitialActivity;
+            if (Activity.Value == null)
+                Activity.Value = InitialActivity;
 
             base.OnEntering(last);
         }
@@ -194,12 +179,6 @@ namespace osu.Game.Screens
                 backgroundStack?.Exit();
 
             return false;
-        }
-
-        private void updateActivity()
-        {
-            if (api != null)
-                api.Activity.Value = activity;
         }
 
         /// <summary>
