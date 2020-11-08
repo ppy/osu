@@ -307,8 +307,17 @@ namespace osu.Game.Screens.Edit
             // apply any set-level metadata changes.
             beatmapManager.Update(playableBeatmap.BeatmapInfo.BeatmapSet);
 
-            // save the loaded beatmap's data stream.
-            beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
+            try
+            {
+                // save the loaded beatmap's data stream.
+                beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap, editorBeatmap.BeatmapSkin);
+            }
+            catch
+            {
+                // this is a temporary measure to avoid hard crashes on saving identical beatmaps.
+                // should be replaced in the future once we aren't relying on the isNewBeatmap flag.
+                beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
+            }
 
             updateLastSavedHash();
         }
