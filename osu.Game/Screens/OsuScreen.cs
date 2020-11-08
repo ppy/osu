@@ -138,8 +138,7 @@ namespace osu.Game.Screens
         {
             sampleExit = audio.Samples.Get(@"UI/screen-back");
 
-            if (Activity.Value == null)
-                Activity.Value = InitialActivity;
+            Activity.Value ??= InitialActivity;
         }
 
         public override void OnResuming(IScreen last)
