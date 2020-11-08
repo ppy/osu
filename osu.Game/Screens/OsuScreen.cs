@@ -137,6 +137,9 @@ namespace osu.Game.Screens
         private void load(OsuGame osu, AudioManager audio)
         {
             sampleExit = audio.Samples.Get(@"UI/screen-back");
+
+            if (Activity.Value == null)
+                Activity.Value = InitialActivity;
         }
 
         public override void OnResuming(IScreen last)
@@ -160,9 +163,6 @@ namespace osu.Game.Screens
             applyArrivingDefaults(false);
 
             backgroundStack?.Push(localBackground = CreateBackground());
-
-            if (Activity.Value == null)
-                Activity.Value = InitialActivity;
 
             base.OnEntering(last);
         }
