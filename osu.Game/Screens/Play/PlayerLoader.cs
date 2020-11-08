@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
-        protected const float BACKGROUND_BLUR = 15;
+        protected float BackgroundBlur = 15;
 
         public override bool HideOverlaysOnEnter => hideOverlays;
 
@@ -102,6 +102,12 @@ namespace osu.Game.Screens.Play
         public PlayerLoader(Func<Player> createPlayer)
         {
             this.createPlayer = createPlayer;
+        }
+
+        public PlayerLoader(Func<Player> createPlayer, float backgroundBlur)
+        {
+            this.createPlayer = createPlayer;
+            this.BackgroundBlur = backgroundBlur;
         }
 
         [BackgroundDependencyLoader]
@@ -242,7 +248,7 @@ namespace osu.Game.Screens.Play
             {
                 // Returns background dim and blur to the values specified by PlayerLoader.
                 Background.EnableUserDim.Value = false;
-                Background.BlurAmount.Value = BACKGROUND_BLUR;
+                Background.BlurAmount.Value = BackgroundBlur;
 
                 BackgroundBrightnessReduction = true;
             }

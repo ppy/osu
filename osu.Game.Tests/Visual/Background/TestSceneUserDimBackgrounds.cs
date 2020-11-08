@@ -372,7 +372,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public void TriggerOnHover() => OnHover(new HoverEvent(new InputState()));
 
-            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
+            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BackgroundBlur);
 
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
         }
