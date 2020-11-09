@@ -15,10 +15,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
             this.dxLower = dxLower;
             this.dxUpper = dxUpper;
 
-            cubicInterps = new List<CubicInterp>(x.Length);
+            cubicInterps = new List<CubicInterpolator>(x.Length);
             for (int i = 0; i < x.Length; ++i)
             {
-                cubicInterps.Add(new CubicInterp(y, values[i], dyLower, dyUpper));
+                cubicInterps.Add(new CubicInterpolator(y, values[i], dyLower, dyUpper));
             }
         }
 
@@ -71,12 +71,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
             int xIndex = xArray.Length - 2;
             while (xIndex > 0 && xArray[xIndex] > x)
                 --xIndex;
-            return (xIndex, cubicInterps[0].SplineIndex(y));
+            return (xIndex, cubicInterps[0].SplineSegmentAt(y));
         }
 
         private double[] xArray;
         private double? dxLower;
         private double? dxUpper;
-        private List<CubicInterp> cubicInterps;
+        private List<CubicInterpolator> cubicInterps;
     }
 }

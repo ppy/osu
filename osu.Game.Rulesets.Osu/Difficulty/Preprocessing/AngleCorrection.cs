@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
-    public class AngleCorrection
+    internal class AngleCorrection
     {
         public double Evaluate(double distance1, double x, double y)
         {
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <param name="min">spline mapping d1 to minimum value (default 0)</param>
         /// <param name="max">spline mapping d1 to max value (default 1)</param>
         /// <param name="d2Scale">scale for distance to "other" note</param>
-        public AngleCorrection(double[] d1, double[] d2, double[] angles, double[,,] values, CubicInterp min = null, CubicInterp max = null,
+        public AngleCorrection(double[] d1, double[] d2, double[] angles, double[,,] values, CubicInterpolator min = null, CubicInterpolator max = null,
             Func<double, double> d2Scale = null)
         {
             this.d2Scale = d2Scale;
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         }
 
         private TricubicInterp interp;
-        private CubicInterp min, max;
+        private CubicInterpolator min, max;
         private Func<double, double> d2Scale;
 
         private const double angle = Math.PI / 4.0;
@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 },
             });
 
-        private static readonly CubicInterp snap_neg2_max = new CubicInterp(new double[] { 0, 1.5, 2.5, 4, 6, 6.01 }, new double[] { 1, 0.85, 0.6, 0.8, 1, 1 });
+        private static readonly CubicInterpolator snap_neg2_max = new CubicInterpolator(new double[] { 0, 1.5, 2.5, 4, 6, 6.01 }, new double[] { 1, 0.85, 0.6, 0.8, 1, 1 });
 
         public static readonly AngleCorrection SNAP_NEG2 = new AngleCorrection(
             d1: new double[] { 0.6, 1.5, 2.4, 3.5, 5, 6.5, 9 },
