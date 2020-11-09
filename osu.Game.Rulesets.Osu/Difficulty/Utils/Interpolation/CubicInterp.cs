@@ -11,30 +11,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
     /// </summary>
     public class CubicInterp
     {
-        public static double TwoPointDerivative(double x, double val, double xNext, double valNext)
-        {
-            return (valNext - val) / (xNext - x);
-        }
-
-        public static double ThreePointDerivative(double xPrev, double valPrev, double x, double val, double xNext, double valNext)
-        {
-            return (
-                (xNext - x) * TwoPointDerivative(xPrev, valPrev, x, val)
-                + (x - xPrev) * TwoPointDerivative(x, val, xNext, valNext)
-                ) / (xNext - xPrev);
-        }
-
         public CubicInterp(double[] x, double[] values, double? lowerBoundDerivative = null, double? upperBoundDerivative = null)
         {
             Debug.Assert(x.Length == values.Length);
             double[] derivatives = new double[values.Length];
             for (int i = 1; i < x.Length - 1; ++i)
             {
-                derivatives[i] = ThreePointDerivative(x[i - 1], values[i - 1], x[i], values[i], x[i + 1], values[i + 1]);
+                derivatives[i] = ApproximateDerivative.FromThreePoints(x[i - 1], values[i - 1], x[i], values[i], x[i + 1], values[i + 1]);
             }
             int last = x.Length - 1;
-            derivatives[0] = lowerBoundDerivative ?? TwoPointDerivative(x[0], values[0], x[1], values[1]);
-            derivatives[last] = upperBoundDerivative ?? TwoPointDerivative(x[last], values[last], x[last - 1], values[last - 1]);
+            derivatives[0] = lowerBoundDerivative ?? ApproximateDerivative.FromTwoPoints(x[0], values[0], x[1], values[1]);
+            derivatives[last] = upperBoundDerivative ?? ApproximateDerivative.FromTwoPoints(x[last], values[last], x[last - 1], values[last - 1]);
 
             splines = new List<HermiteSpline>(x.Length);
 

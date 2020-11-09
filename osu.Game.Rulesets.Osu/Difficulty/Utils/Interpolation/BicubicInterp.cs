@@ -41,24 +41,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
             double d0, d1;
             if (xIndex == 0)
             {
-                d0 = dxLower ?? CubicInterp.TwoPointDerivative(x0, val0, x1, val1);
+                d0 = dxLower ?? ApproximateDerivative.FromTwoPoints(x0, val0, x1, val1);
             }
             else
             {
                 double xPrev = xArray[xIndex - 1];
                 double valPrev = cubicInterps[xIndex - 1].Evaluate(yIndex, y);
-                d0 = CubicInterp.ThreePointDerivative(xPrev, valPrev, x0, val0, x1, val1);
+                d0 = ApproximateDerivative.FromThreePoints(xPrev, valPrev, x0, val0, x1, val1);
             }
             if (xIndex == cubicInterps.Count - 2)
             {
-                d1 = dxUpper ?? CubicInterp.TwoPointDerivative(x0, val0, x1, val1);
+                d1 = dxUpper ?? ApproximateDerivative.FromTwoPoints(x0, val0, x1, val1);
             }
             else
             {
                 double x2 = xArray[xIndex + 2];
                 double val2 = cubicInterps[xIndex + 2].Evaluate(yIndex, y);
 
-                d1 = CubicInterp.ThreePointDerivative(x0, val0, x1, val1, x2, val2);
+                d1 = ApproximateDerivative.FromThreePoints(x0, val0, x1, val1, x2, val2);
             }
 
             var spline = new HermiteSpline(x0, val0, d0, x1, val1, d1);
