@@ -94,13 +94,18 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
 
             graph.FadeTo(ranks.Length > 1 ? 1 : 0, fade_duration, Easing.Out);
+
+            if (IsHovered)
+                graph.UpdateBallPosition(lastHoverPosition);
         }
+
+        private float lastHoverPosition;
 
         protected override bool OnHover(HoverEvent e)
         {
             if (ranks?.Length > 1)
             {
-                graph.UpdateBallPosition(e.MousePosition.X);
+                graph.UpdateBallPosition(lastHoverPosition = e.MousePosition.X);
                 graph.ShowBar();
             }
 
@@ -117,11 +122,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (ranks?.Length > 1)
-            {
-                graph.HideBar();
-            }
-
+            graph.HideBar();
             base.OnHoverLost(e);
         }
 
