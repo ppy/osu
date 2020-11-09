@@ -197,11 +197,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             HitObject.DefaultsApplied += onDefaultsApplied;
 
+            OnApply(hitObject);
+
             // If not loaded, the state update happens in LoadComplete(). Otherwise, the update is scheduled to allow for lifetime updates.
             if (IsLoaded)
                 Schedule(() => updateState(ArmedState.Idle, true));
 
-            OnApply(hitObject);
             hasHitObjectApplied = true;
         }
 
