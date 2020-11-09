@@ -30,7 +30,7 @@ namespace osu.Game.Database
         /// </summary>
         private bool pendingRequestConsumedIDs;
 
-        public Task<User> GetUser(int userId, CancellationToken token = default) => GetAsync(userId, token);
+        public Task<User> GetUserAsync(int userId, CancellationToken token = default) => GetAsync(userId, token);
 
         protected override async Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
         {

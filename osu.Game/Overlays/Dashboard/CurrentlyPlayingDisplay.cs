@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Dashboard
 
                         foreach (var id in e.NewItems.OfType<int>().ToArray())
                         {
-                            users.GetUser(id).ContinueWith(u =>
+                            users.GetUserAsync(id).ContinueWith(u =>
                             {
                                 if (u.Result == null)
                                     return;
