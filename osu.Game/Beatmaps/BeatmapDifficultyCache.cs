@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps
         private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyCache));
 
         // All bindables that should be updated along with the current ruleset + mods.
-        private readonly LockedWeakList<BindableStarDifficulty> trackedBindables = new LockedWeakList<BindableStarDifficulty>();
+        private readonly WeakList<BindableStarDifficulty> trackedBindables = new WeakList<BindableStarDifficulty>();
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -59,7 +59,10 @@ namespace osu.Game.Beatmaps
         public IBindable<StarDifficulty> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
         {
             var bindable = createBindable(beatmapInfo, currentRuleset.Value, currentMods.Value, cancellationToken);
-            trackedBindables.Add(bindable);
+
+            lock (trackedBindables)
+                trackedBindables.Add(bindable);
+
             return bindable;
         }
 
@@ -86,7 +89,8 @@ namespace osu.Game.Beatmaps
         /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops computing the star difficulty.</param>
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
-        public Task<StarDifficulty> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
+        public Task<StarDifficulty> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IEnumerable<Mod> mods = null,
+                                                       CancellationToken cancellationToken = default)
         {
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
             rulesetInfo ??= beatmapInfo.Ruleset;
@@ -148,15 +152,18 @@ namespace osu.Game.Beatmaps
         /// </summary>
         private void updateTrackedBindables()
         {
-            cancelTrackedBindableUpdate();
-            trackedUpdateCancellationSource = new CancellationTokenSource();
-
-            foreach (var b in trackedBindables)
+            lock (trackedBindables)
             {
-                var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken);
-                linkedCancellationSources.Add(linkedSource);
+                cancelTrackedBindableUpdate();
+                trackedUpdateCancellationSource = new CancellationTokenSource();
 
-                updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
+                foreach (var b in trackedBindables)
+                {
+                    var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken);
+                    linkedCancellationSources.Add(linkedSource);
+
+                    updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
+                }
             }
         }
 
@@ -165,15 +172,18 @@ namespace osu.Game.Beatmaps
         /// </summary>
         private void cancelTrackedBindableUpdate()
         {
-            trackedUpdateCancellationSource?.Cancel();
-            trackedUpdateCancellationSource = null;
-
-            if (linkedCancellationSources != null)
+            lock (trackedBindables)
             {
-                foreach (var c in linkedCancellationSources)
-                    c.Dispose();
+                trackedUpdateCancellationSource?.Cancel();
+                trackedUpdateCancellationSource = null;
 
-                linkedCancellationSources.Clear();
+                if (linkedCancellationSources != null)
+                {
+                    foreach (var c in linkedCancellationSources)
+                        c.Dispose();
+
+                    linkedCancellationSources.Clear();
+                }
             }
         }
 
