@@ -23,6 +23,9 @@ namespace osu.Game.Overlays.Toolbar
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
 
+        /// <summary>
+        /// Whether the user hid this <see cref="Toolbar"/> with <see cref="GlobalAction.ToggleToolbar"/>.
+        /// </summary>
         public bool HiddenByUser;
 
         public Action OnHome;
