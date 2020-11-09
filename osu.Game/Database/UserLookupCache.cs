@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,7 +15,7 @@ namespace osu.Game.Database
 {
     public class UserLookupCache : MemoryCachingComponent<int, User>
     {
-        private readonly ConcurrentBag<int> nextTaskIDs = new ConcurrentBag<int>();
+        private readonly HashSet<int> nextTaskIDs = new HashSet<int>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
