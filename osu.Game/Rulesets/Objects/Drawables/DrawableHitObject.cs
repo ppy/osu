@@ -180,9 +180,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 var drawableNested = CreateNestedHitObject(h) ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
 
-                drawableNested.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
-                drawableNested.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
-                drawableNested.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
+                drawableNested.OnNewResult += onNewResult;
+                drawableNested.OnRevertResult += onRevertResult;
+                drawableNested.ApplyCustomUpdateState += onApplyCustomUpdateState;
 
                 nestedHitObjects.Value.Add(drawableNested);
                 AddNestedHitObject(drawableNested);
