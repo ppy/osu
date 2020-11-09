@@ -53,40 +53,43 @@ namespace osu.Game.Overlays.Dashboard
             base.LoadComplete();
 
             playingUsers.BindTo(spectatorStreaming.PlayingUsers);
-            playingUsers.BindCollectionChanged((sender, e) => Schedule(() =>
-            {
-                switch (e.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
+            playingUsers.BindCollectionChanged(onUsersChanged, true);
+        }
 
-                        foreach (var id in e.NewItems.OfType<int>().ToArray())
+        private void onUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (var id in e.NewItems.OfType<int>().ToArray())
+                    {
+                        users.GetUserAsync(id).ContinueWith(u =>
                         {
-                            users.GetUserAsync(id).ContinueWith(u =>
+                            if (u.Result == null) return;
+
+                            Schedule(() =>
                             {
-                                if (u.Result == null)
+                                // user may no longer be playing.
+                                if (!playingUsers.Contains(u.Result.Id))
                                     return;
 
-                                Schedule(() =>
-                                {
-                                    if (playingUsers.Contains(u.Result.Id))
-                                        userFlow.Add(createUserPanel(u.Result));
-                                });
+                                userFlow.Add(createUserPanel(u.Result));
                             });
-                        }
+                        });
+                    }
 
-                        break;
+                    break;
 
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var u in e.OldItems.OfType<int>())
-                            userFlow.FirstOrDefault(card => card.User.Id == u)?.Expire();
-                        break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var u in e.OldItems.OfType<int>())
+                        userFlow.FirstOrDefault(card => card.User.Id == u)?.Expire();
+                    break;
 
-                    case NotifyCollectionChangedAction.Reset:
-                        userFlow.Clear();
-                        break;
-                }
-            }), true);
-        }
+                case NotifyCollectionChangedAction.Reset:
+                    userFlow.Clear();
+                    break;
+            }
+        });
 
         private PlayingUserPanel createUserPanel(User user) =>
             new PlayingUserPanel(user).With(panel =>
