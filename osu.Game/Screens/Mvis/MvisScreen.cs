@@ -186,10 +186,12 @@ namespace osu.Game.Screens.Mvis
                         }
                     }
                 },
-                skinnableForeground = new SkinnableSprite("MPlayer-foreground", confineMode: ConfineMode.ScaleToFit)
+                skinnableForeground = new ModifiedSkinnableSprite("MPlayer-foreground", confineMode: ConfineMode.ScaleToFill)
                 {
                     Name = "前景图",
                     RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Alpha = 0
                 },
                 new Container
@@ -296,12 +298,13 @@ namespace osu.Game.Screens.Mvis
                                 },
                             }
                         },
-                        skinnableBbBackground = new SkinnableSprite("MBottomBar-background", confineMode: ConfineMode.ScaleToFit)
+                        skinnableBbBackground = new ModifiedSkinnableSprite("MBottomBar-background", confineMode: ConfineMode.ScaleToFill)
                         {
                             Name = "底栏背景图",
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 100,
                             ChildAnchor = Anchor.BottomCentre,
                             ChildOrigin = Anchor.BottomCentre,
                             Alpha = 0,
