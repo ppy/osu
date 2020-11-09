@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Mvis.Modules
         {
             Size = new Vector2(1366, 768);
             CentreComponent = false;
+            OverrideChildAnchor = true;
 
             ChildAnchor = Anchor.Centre;
             ChildOrigin = Anchor.Centre;

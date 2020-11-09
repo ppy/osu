@@ -192,7 +192,8 @@ namespace osu.Game.Screens.Mvis
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Alpha = 0
+                    Alpha = 0,
+                    OverrideChildAnchor = true
                 },
                 new Container
                 {
@@ -236,7 +237,8 @@ namespace osu.Game.Screens.Mvis
                                                 ChildAnchor = Anchor.BottomRight,
                                                 ChildOrigin = Anchor.BottomRight,
                                                 RelativeSizeAxes = Axes.Both,
-                                                CentreComponent = false
+                                                CentreComponent = false,
+                                                OverrideChildAnchor = true,
                                             }
                                         },
                                         settingsScroll = new SidebarSettingsScrollContainer
@@ -293,6 +295,7 @@ namespace osu.Game.Screens.Mvis
                                             ChildOrigin = Anchor.BottomRight,
                                             RelativeSizeAxes = Axes.Both,
                                             CentreComponent = false,
+                                            OverrideChildAnchor = true,
                                         }
                                     }
                                 },
@@ -308,7 +311,8 @@ namespace osu.Game.Screens.Mvis
                             ChildAnchor = Anchor.BottomCentre,
                             ChildOrigin = Anchor.BottomCentre,
                             Alpha = 0,
-                            CentreComponent = false
+                            CentreComponent = false,
+                            OverrideChildAnchor = true,
                         },
                         bottomFillFlow = new FillFlowContainer
                         {

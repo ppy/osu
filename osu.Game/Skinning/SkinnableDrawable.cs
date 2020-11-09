@@ -27,6 +27,7 @@ namespace osu.Game.Skinning
 
         public Anchor ChildAnchor = Anchor.TopLeft;
         public Anchor ChildOrigin = Anchor.TopLeft;
+        public bool OverrideChildAnchor;
 
         public new Axes AutoSizeAxes
         {
@@ -94,14 +95,20 @@ namespace osu.Game.Skinning
             {
                 scaling.Invalidate();
 
-                if (CentreComponent)
+                if (OverrideChildAnchor)
                 {
-                    ChildOrigin = Anchor.Centre;
-                    ChildAnchor = Anchor.Centre;
+                    ChildAnchor = CentreComponent ? Anchor.Centre : ChildAnchor;
+                    ChildOrigin = CentreComponent ? Anchor.Centre : ChildOrigin;
+
+                    Drawable.Anchor = ChildAnchor;
+                    Drawable.Origin = ChildOrigin;
                 }
 
-                Drawable.Origin = ChildOrigin;
-                Drawable.Anchor = ChildAnchor;
+                if (CentreComponent)
+                {
+                    Drawable.Origin = Anchor.Centre;
+                    Drawable.Anchor = Anchor.Centre;
+                }
 
                 InternalChild = Drawable;
             }

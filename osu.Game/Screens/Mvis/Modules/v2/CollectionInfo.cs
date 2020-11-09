@@ -61,6 +61,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     ChildOrigin = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.Both,
                     CentreComponent = false,
+                    OverrideChildAnchor = true,
                 },
                 new GridContainer
                 {
