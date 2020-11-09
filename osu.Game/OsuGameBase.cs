@@ -61,6 +61,8 @@ namespace osu.Game
 
         protected BeatmapDifficultyCache DifficultyCache;
 
+        protected UserLookupCache UserCache;
+
         protected SkinManager SkinManager;
 
         protected RulesetStore RulesetStore;
@@ -228,6 +230,9 @@ namespace osu.Game
 
             dependencies.Cache(DifficultyCache = new BeatmapDifficultyCache());
             AddInternal(DifficultyCache);
+
+            dependencies.Cache(UserCache = new UserLookupCache());
+            AddInternal(UserCache);
 
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
