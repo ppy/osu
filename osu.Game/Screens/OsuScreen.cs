@@ -65,7 +65,7 @@ namespace osu.Game.Screens
         /// <summary>
         /// The current <see cref="UserActivity"/> for this screen.
         /// </summary>
-        protected readonly Bindable<UserActivity> Activity;
+        protected readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         IBindable<UserActivity> IOsuScreen.Activity => Activity;
 
@@ -130,7 +130,6 @@ namespace osu.Game.Screens
             Origin = Anchor.Centre;
 
             OverlayActivationMode = new Bindable<OverlayActivation>(InitialOverlayActivationMode);
-            Activity = new Bindable<UserActivity>();
         }
 
         [BackgroundDependencyLoader(true)]
