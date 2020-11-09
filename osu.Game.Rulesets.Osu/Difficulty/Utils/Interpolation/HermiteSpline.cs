@@ -3,39 +3,104 @@
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
 {
-    public struct HermiteSpline
+    /// <summary>
+    /// Represents a segment of a cubic Hermite spline.
+    /// </summary>
+    /// <remarks>
+    /// On a single interval, the cubic Hermite spline segment is constructed using values of function being interpolated
+    /// on both ends of the interval, as well as the values of its derivative at said both ends.
+    /// </remarks>
+    internal readonly struct HermiteSpline
     {
-        public HermiteSpline(double x0, double val0, double d0, double x1, double val1, double d1)
+        /// <summary>
+        /// The left endpoint of this spline segment.
+        /// </summary>
+        public readonly double X0;
+
+        /// <summary>
+        /// The value of the interpolated function at <see cref="X0"/>.
+        /// </summary>
+        private readonly double y0;
+
+        /// <summary>
+        /// The value of the derivative of the interpolated function at <see cref="X0"/>.
+        /// </summary>
+        private readonly double d0;
+
+        /// <summary>
+        /// The right endpoint of this spline segment.
+        /// </summary>
+        public readonly double X1;
+
+        /// <summary>
+        /// The value of the interpolated function at <see cref="X1"/>.
+        /// </summary>
+        private readonly double y1;
+
+        /// <summary>
+        /// The value of the derivative of the interpolated function at <see cref="X1"/>.
+        /// </summary>
+        private readonly double d1;
+
+        /// <summary>
+        /// The coefficients of the Hermite cubic spline.
+        /// </summary>
+        private readonly double c0, c1, c2, c3;
+
+        /// <summary>
+        /// Constructs a segment of the Hermite spline over a single one-dimensional interval.
+        /// </summary>
+        /// <param name="x0">The left endpoint of the interpolation interval.</param>
+        /// <param name="y0">The value of the interpolated function at <paramref name="x0"/>.</param>
+        /// <param name="d0">The value of the derivative of the interpolated function at <paramref name="x0"/>.</param>
+        /// <param name="x1">The right endpoint of the interpolation interval.</param>
+        /// <param name="y1">The value of the interpolated function at <paramref name="x1"/>.</param>
+        /// <param name="d1">The value of the derivative of the interpolated function at <paramref name="x1"/>.</param>
+        public HermiteSpline(double x0, double y0, double d0, double x1, double y1, double d1)
         {
+            // scaling factor used to transform the [x0, x1] interval onto the unit interval [0, 1]
             double scale = 1 / (x1 - x0);
-            double scale2 = scale * scale;
+            double scaleSquared = scale * scale;
 
             X0 = x0;
+            this.y0 = y0;
+            this.d0 = d0;
+
             X1 = x1;
-            D1 = d1;
-            Val1 = val1;
+            this.y1 = y1;
+            this.d1 = d1;
 
-            C0 = val0;
-            C1 = d0;
-            C2 = 3 * (val1 - val0) * scale2 - (2 * d0 + d1) * scale;
-            C3 = (2 * (val0 - val1) * scale + d0 + d1) * scale2;
+            // xref: https://mathworld.wolfram.com/CubicSpline.html
+            // note that the coefficients are pre-scaled to avoid rescaling to the unit interval repeatedly in Evaluate()
+            // also note that the derivatives are purposefully scaled one degree less
+            c0 = y0;
+            c1 = d0;
+            c2 = (3 * (y1 - y0) * scale - (2 * d0 + d1)) * scale;
+            c3 = (2 * (y0 - y1) * scale + d0 + d1) * scaleSquared;
         }
-        public double C0, C1, C2, C3, X0, X1, D1, Val1;
 
+        /// <summary>
+        /// Evaluates this segment of the Hermite spline for the given argument <paramref name="x"/>.
+        /// </summary>
+        /// <remarks>
+        /// If a value outside of the range [<see cref="X0"/>, <see cref="X1"/>] is given, a linear extrapolation
+        /// using the marginal function and derivative values will be performed.
+        /// </remarks>
+        /// <param name="x">The argument to perform interpolation for.</param>
+        /// <returns>The value of the interpolated function at <paramref name="x"/>.</returns>
         public double Evaluate(double x)
         {
             if (x > X1)
-                return (x - X1) * D1 + Val1;
+                return (x - X1) * d1 + y1;
+
             if (x < X0)
-                return (x - X0) * C1 + C0;
+                return (x - X0) * d0 + y0;
 
-            double t = (x - X0);
-            double t2 = t * t;
-            double t3 = t2 * t;
+            double t = x - X0;
+            double tSquared = t * t;
+            double tCubed = tSquared * t;
 
-            //return C0 + t * (C1 + t * (C2 + t * C3));
-
-            return C0 + C1 * t + C2 * t2 + C3 * t3;
+            return c0 + c1 * t + c2 * tSquared + c3 * tCubed;
         }
     }
 }
