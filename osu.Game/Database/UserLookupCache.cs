@@ -76,7 +76,7 @@ namespace osu.Game.Database
                 var request = new GetUsersRequest(lookupItems);
 
                 // rather than queueing, we maintain our own single-threaded request stream.
-                request.Perform(api);
+                api.Perform(request);
 
                 return request.Result?.Users;
             }
