@@ -229,6 +229,35 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("settings displayed", () => Game.Settings.State.Value == Visibility.Visible);
         }
 
+        [Test]
+        public void TestToolbarHiddenByUser()
+        {
+            AddStep("Enter menu", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("Wait for toolbar to load", () => Game.Toolbar.IsLoaded);
+
+            AddStep("Hide toolbar", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.T);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            pushEscape();
+
+            AddStep("Enter menu", () => InputManager.Key(Key.Enter));
+
+            AddAssert("Toolbar is hidden", () => Game.Toolbar.State.Value == Visibility.Hidden);
+
+            AddStep("Enter song select", () =>
+            {
+                InputManager.Key(Key.Enter);
+                InputManager.Key(Key.Enter);
+            });
+
+            AddAssert("Toolbar is hidden", () => Game.Toolbar.State.Value == Visibility.Hidden);
+        }
+
         private void pushEscape() =>
             AddStep("Press escape", () => InputManager.Key(Key.Escape));
 
