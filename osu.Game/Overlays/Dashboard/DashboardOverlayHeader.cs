@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Dashboard
         [Description("好友列表")]
         Friends,
 
-        [Description("正在游玩(不可用)")]
+        [Description("正在游玩")]
         CurrentlyPlaying
     }
 }
