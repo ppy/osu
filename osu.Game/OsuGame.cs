@@ -983,7 +983,7 @@ namespace osu.Game
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
-                else
+                else if (!Toolbar.HiddenByUser)
                     Toolbar.Show();
 
                 if (newOsuScreen.AllowBackButton)

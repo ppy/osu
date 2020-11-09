@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Toolbar
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
 
+        public bool HiddenByUser;
+
         public Action OnHome;
 
         private ToolbarUserButton userButton;
@@ -169,10 +171,14 @@ namespace osu.Game.Overlays.Toolbar
 
         public bool OnPressed(GlobalAction action)
         {
+            if (OverlayActivationMode.Value == OverlayActivation.Disabled)
+                return false;
+
             switch (action)
             {
                 case GlobalAction.ToggleToolbar:
                     ToggleVisibility();
+                    HiddenByUser = State.Value == Visibility.Hidden;
                     return true;
             }
 
