@@ -41,10 +41,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.d2Scale = d2Scale;
             this.min = min;
             this.max = max;
-            interp = new TricubicInterp(d1, d2, angles, values, dzLower: 0, dzUpper: 0);
+            interp = new TricubicInterpolator(d1, d2, angles, values, dzLower: 0, dzUpper: 0);
         }
 
-        private TricubicInterp interp;
+        private TricubicInterpolator interp;
         private CubicInterpolator min, max;
         private Func<double, double> d2Scale;
 
