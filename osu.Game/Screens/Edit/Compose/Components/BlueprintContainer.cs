@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -23,15 +24,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
     /// A container which provides a "blueprint" display of hitobjects.
-    /// Includes selection and manipulation support via a <see cref="SelectionHandler"/>.
+    /// Includes selection and manipulation support via a <see cref="Components.SelectionHandler"/>.
     /// </summary>
     public abstract class BlueprintContainer : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
         protected DragBox DragBox { get; private set; }
 
-        protected Container<SelectionBlueprint> SelectionBlueprints { get; private set; }
+        public Container<SelectionBlueprint> SelectionBlueprints { get; private set; }
 
-        private SelectionHandler selectionHandler;
+        protected SelectionHandler SelectionHandler { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
@@ -40,11 +41,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private EditorClock editorClock { get; set; }
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        protected EditorBeatmap Beatmap { get; private set; }
 
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         [Resolved(canBeNull: true)]
         private IPositionSnapProvider snapProvider { get; set; }
@@ -57,21 +56,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            selectionHandler = CreateSelectionHandler();
-            selectionHandler.DeselectAll = deselectAll;
+            SelectionHandler = CreateSelectionHandler();
+            SelectionHandler.DeselectAll = deselectAll;
 
             AddRangeInternal(new[]
             {
-                DragBox = CreateDragBox(select),
-                selectionHandler,
+                DragBox = CreateDragBox(selectBlueprintsFromDragRectangle),
+                SelectionHandler,
                 SelectionBlueprints = CreateSelectionBlueprintContainer(),
+                SelectionHandler.CreateProxy(),
                 DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
 
-            foreach (var obj in beatmap.HitObjects)
+            foreach (var obj in Beatmap.HitObjects)
                 AddBlueprintFor(obj);
 
-            selectedHitObjects.BindTo(beatmap.SelectedHitObjects);
+            selectedHitObjects.BindTo(Beatmap.SelectedHitObjects);
             selectedHitObjects.CollectionChanged += (selectedObjects, args) =>
             {
                 switch (args.Action)
@@ -84,6 +84,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var o in args.OldItems)
                             SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
+
                         break;
                 }
             };
@@ -93,15 +94,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            beatmap.HitObjectAdded += AddBlueprintFor;
-            beatmap.HitObjectRemoved += removeBlueprintFor;
+            Beatmap.HitObjectAdded += AddBlueprintFor;
+            Beatmap.HitObjectRemoved += removeBlueprintFor;
         }
 
         protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() =>
             new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both };
 
         /// <summary>
-        /// Creates a <see cref="SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
+        /// Creates a <see cref="Components.SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
         /// </summary>
         protected virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
 
@@ -115,20 +116,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            beginClickSelection(e);
+            if (!beginClickSelection(e)) return true;
+
             prepareSelectionMovement();
 
             return e.Button == MouseButton.Left;
         }
+
+        private SelectionBlueprint clickedBlueprint;
 
         protected override bool OnClick(ClickEvent e)
         {
             if (e.Button == MouseButton.Right)
                 return false;
 
+            // store for double-click handling
+            clickedBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered);
+
             // Deselection should only occur if no selected blueprints are hovered
             // A special case for when a blueprint was selected via this click is added since OnClick() may occur outside the hitobject and should not trigger deselection
-            if (endClickSelection() || selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+            if (endClickSelection() || clickedBlueprint != null)
                 return true;
 
             deselectAll();
@@ -140,9 +147,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Button == MouseButton.Right)
                 return false;
 
-            SelectionBlueprint clickedBlueprint = selectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered);
-
-            if (clickedBlueprint == null)
+            // ensure the blueprint which was hovered for the first click is still the hovered blueprint.
+            if (clickedBlueprint == null || SelectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered) != clickedBlueprint)
                 return false;
 
             editorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
@@ -196,15 +202,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (isDraggingBlueprint)
             {
+                // handle positional change etc.
+                foreach (var obj in selectedHitObjects)
+                    Beatmap.Update(obj);
+
                 changeHandler?.EndChange();
                 isDraggingBlueprint = false;
             }
 
             if (DragBox.State == Visibility.Visible)
-            {
                 DragBox.Hide();
-                selectionHandler.UpdateVisibility();
-            }
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -212,7 +219,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Key)
             {
                 case Key.Escape:
-                    if (!selectionHandler.SelectedBlueprints.Any())
+                    if (!SelectionHandler.SelectedBlueprints.Any())
                         return false;
 
                     deselectAll();
@@ -252,6 +259,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Deselected -= onBlueprintDeselected;
 
             SelectionBlueprints.Remove(blueprint);
+
+            if (movementBlueprint == blueprint)
+                finishSelectionMovement();
         }
 
         protected virtual void AddBlueprintFor(HitObject hitObject)
@@ -262,6 +272,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             blueprint.Selected += onBlueprintSelected;
             blueprint.Deselected += onBlueprintDeselected;
+
+            if (Beatmap.SelectedHitObjects.Contains(hitObject))
+                blueprint.Select();
 
             SelectionBlueprints.Add(blueprint);
         }
@@ -279,26 +292,24 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Attempts to select any hovered blueprints.
         /// </summary>
         /// <param name="e">The input event that triggered this selection.</param>
-        private void beginClickSelection(MouseButtonEvent e)
+        /// <returns>Whether a selection was performed.</returns>
+        private bool beginClickSelection(MouseButtonEvent e)
         {
             Debug.Assert(!clickSelectionBegan);
 
-            // Deselections are only allowed for control + left clicks
-            bool allowDeselection = e.ControlPressed && e.Button == MouseButton.Left;
-
-            // Todo: This is probably incorrectly disallowing multiple selections on stacked objects
-            if (!allowDeselection && selectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
-                return;
+            bool selectedPerformed = true;
 
             foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren)
             {
                 if (blueprint.IsHovered)
                 {
-                    selectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
+                    selectedPerformed &= SelectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
                     clickSelectionBegan = true;
                     break;
                 }
             }
+
+            return selectedPerformed;
         }
 
         /// <summary>
@@ -318,43 +329,49 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Select all masks in a given rectangle selection area.
         /// </summary>
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
-        private void select(RectangleF rect)
+        private void selectBlueprintsFromDragRectangle(RectangleF rect)
         {
             foreach (var blueprint in SelectionBlueprints)
             {
-                if (blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.ScreenSpaceSelectionPoint))
-                    blueprint.Select();
-                else
-                    blueprint.Deselect();
+                // only run when utmost necessary to avoid unnecessary rect computations.
+                bool isValidForSelection() => blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.ScreenSpaceSelectionPoint);
+
+                switch (blueprint.State)
+                {
+                    case SelectionState.NotSelected:
+                        if (isValidForSelection())
+                            blueprint.Select();
+                        break;
+
+                    case SelectionState.Selected:
+                        // if the editor is playing, we generally don't want to deselect objects even if outside the selection area.
+                        if (!editorClock.IsRunning && !isValidForSelection())
+                            blueprint.Deselect();
+                        break;
+                }
             }
         }
 
         /// <summary>
         /// Selects all <see cref="SelectionBlueprint"/>s.
         /// </summary>
-        private void selectAll()
-        {
-            SelectionBlueprints.ToList().ForEach(m => m.Select());
-            selectionHandler.UpdateVisibility();
-        }
+        private void selectAll() => SelectionBlueprints.ToList().ForEach(m => m.Select());
 
         /// <summary>
         /// Deselects all selected <see cref="SelectionBlueprint"/>s.
         /// </summary>
-        private void deselectAll() => selectionHandler.SelectedBlueprints.ToList().ForEach(m => m.Deselect());
+        private void deselectAll() => SelectionHandler.SelectedBlueprints.ToList().ForEach(m => m.Deselect());
 
         private void onBlueprintSelected(SelectionBlueprint blueprint)
         {
-            selectionHandler.HandleSelected(blueprint);
+            SelectionHandler.HandleSelected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 1);
-            beatmap.SelectedHitObjects.Add(blueprint.HitObject);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
-            selectionHandler.HandleDeselected(blueprint);
+            SelectionHandler.HandleDeselected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 0);
-            beatmap.SelectedHitObjects.Remove(blueprint.HitObject);
         }
 
         #endregion
@@ -370,16 +387,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void prepareSelectionMovement()
         {
-            if (!selectionHandler.SelectedBlueprints.Any())
+            if (!SelectionHandler.SelectedBlueprints.Any())
                 return;
 
             // Any selected blueprint that is hovered can begin the movement of the group, however only the earliest hitobject is used for movement
             // A special case is added for when a click selection occurred before the drag
-            if (!clickSelectionBegan && !selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+            if (!clickSelectionBegan && !SelectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
                 return;
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
-            movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).First();
+            movementBlueprint = SelectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).First();
             movementBlueprintOriginalPosition = movementBlueprint.ScreenSpaceSelectionPoint; // todo: unsure if correct
         }
 
@@ -404,15 +421,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var result = snapProvider.SnapScreenSpacePositionToValidTime(movePosition);
 
             // Move the hitobjects.
-            if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, result.ScreenSpacePosition)))
+            if (!SelectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, result.ScreenSpacePosition)))
                 return true;
 
             if (result.Time.HasValue)
             {
                 // Apply the start time at the newly snapped-to position
                 double offset = result.Time.Value - draggedObject.StartTime;
-                foreach (HitObject obj in selectionHandler.SelectedHitObjects)
+
+                foreach (HitObject obj in Beatmap.SelectedHitObjects)
+                {
                     obj.StartTime += offset;
+                    Beatmap.Update(obj);
+                }
             }
 
             return true;
@@ -439,10 +460,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Dispose(isDisposing);
 
-            if (beatmap != null)
+            if (Beatmap != null)
             {
-                beatmap.HitObjectAdded -= AddBlueprintFor;
-                beatmap.HitObjectRemoved -= removeBlueprintFor;
+                Beatmap.HitObjectAdded -= AddBlueprintFor;
+                Beatmap.HitObjectRemoved -= removeBlueprintFor;
             }
         }
     }

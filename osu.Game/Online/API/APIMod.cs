@@ -53,5 +53,13 @@ namespace osu.Game.Online.API
         }
 
         public bool Equals(IMod other) => Acronym == other?.Acronym;
+
+        public override string ToString()
+        {
+            if (Settings.Count > 0)
+                return $"{Acronym} ({string.Join(',', Settings.Select(kvp => $"{kvp.Key}:{kvp.Value}"))})";
+
+            return $"{Acronym}";
+        }
     }
 }

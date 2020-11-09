@@ -33,13 +33,11 @@ namespace osu.Desktop
                     if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
                     {
                         var importer = new ArchiveImportIPCChannel(host);
-                        // Restore the cwd so relative paths given at the command line work correctly
-                        Directory.SetCurrentDirectory(cwd);
 
                         foreach (var file in args)
                         {
                             Console.WriteLine(@"Importing {0}", file);
-                            if (!importer.ImportAsync(Path.GetFullPath(file)).Wait(3000))
+                            if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
                                 throw new TimeoutException(@"IPC took too long to send");
                         }
 

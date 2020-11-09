@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -20,6 +22,9 @@ namespace osu.Game.Screens.Select
         private bool removeAutoModOnResume;
         private OsuScreen player;
 
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notifications { get; set; }
+
         public override bool AllowExternalScreenChange => true;
 
         protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
@@ -27,11 +32,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () =>
-            {
-                ValidForResume = false;
-                Edit();
-            }, Key.Number4);
+            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
             ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
@@ -49,8 +50,11 @@ namespace osu.Game.Screens.Select
 
             if (removeAutoModOnResume)
             {
-                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
-                ModSelect.DeselectTypes(new[] { autoType }, true);
+                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType();
+
+                if (autoType != null)
+                    ModSelect.DeselectTypes(new[] { autoType }, true);
+
                 removeAutoModOnResume = false;
             }
         }
@@ -78,9 +82,18 @@ namespace osu.Game.Screens.Select
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
                 var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                var autoType = auto.GetType();
+                var autoType = auto?.GetType();
 
                 var mods = Mods.Value;
+
+                if (autoType == null)
+                {
+                    notifications?.Post(new SimpleNotification
+                    {
+                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                    });
+                    return false;
+                }
 
                 if (mods.All(m => m.GetType() != autoType))
                 {

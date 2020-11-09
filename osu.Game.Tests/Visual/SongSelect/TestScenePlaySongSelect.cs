@@ -38,13 +38,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     public class TestScenePlaySongSelect : ScreenTestScene
     {
         private BeatmapManager manager;
-
         private RulesetStore rulesets;
-
         private MusicController music;
-
         private WorkingBeatmap defaultBeatmap;
-
         private TestSongSelect songSelect;
 
         [BackgroundDependencyLoader]
@@ -308,15 +304,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
-            var sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
-
-            AddStep(@"Sort by Artist", delegate { sortMode.Value = SortMode.Artist; });
-            AddStep(@"Sort by Title", delegate { sortMode.Value = SortMode.Title; });
-            AddStep(@"Sort by Author", delegate { sortMode.Value = SortMode.Author; });
-            AddStep(@"Sort by DateAdded", delegate { sortMode.Value = SortMode.DateAdded; });
-            AddStep(@"Sort by BPM", delegate { sortMode.Value = SortMode.BPM; });
-            AddStep(@"Sort by Length", delegate { sortMode.Value = SortMode.Length; });
-            AddStep(@"Sort by Difficulty", delegate { sortMode.Value = SortMode.Difficulty; });
+            AddStep(@"Sort by Artist", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Artist));
+            AddStep(@"Sort by Title", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Title));
+            AddStep(@"Sort by Author", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Author));
+            AddStep(@"Sort by DateAdded", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.DateAdded));
+            AddStep(@"Sort by BPM", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.BPM));
+            AddStep(@"Sort by Length", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Length));
+            AddStep(@"Sort by Difficulty", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Difficulty));
         }
 
         [Test]
@@ -513,7 +507,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var selectedPanel = songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First(s => s.Item.State.Value == CarouselItemState.Selected);
 
                 // special case for converts checked here.
-                return selectedPanel.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().All(i =>
+                return selectedPanel.ChildrenOfType<FilterableDifficultyIcon>().All(i =>
                     i.IsFiltered || i.Item.Beatmap.Ruleset.ID == targetRuleset || i.Item.Beatmap.Ruleset.ID == 0);
             });
 
@@ -612,10 +606,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 set = songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First();
             });
 
-            DrawableCarouselBeatmapSet.FilterableDifficultyIcon difficultyIcon = null;
+            FilterableDifficultyIcon difficultyIcon = null;
             AddStep("Find an icon", () =>
             {
-                difficultyIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>()
+                difficultyIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
                                     .First(icon => getDifficultyIconIndex(set, icon) != getCurrentBeatmapIndex());
             });
 
@@ -640,13 +634,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             }));
 
             BeatmapInfo filteredBeatmap = null;
-            DrawableCarouselBeatmapSet.FilterableDifficultyIcon filteredIcon = null;
+            FilterableDifficultyIcon filteredIcon = null;
 
             AddStep("Get filtered icon", () =>
             {
                 filteredBeatmap = songSelect.Carousel.SelectedBeatmapSet.Beatmaps.First(b => b.BPM < maxBPM);
                 int filteredBeatmapIndex = getBeatmapIndex(filteredBeatmap.BeatmapSet, filteredBeatmap);
-                filteredIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().ElementAt(filteredBeatmapIndex);
+                filteredIcon = set.ChildrenOfType<FilterableDifficultyIcon>().ElementAt(filteredBeatmapIndex);
             });
 
             AddStep("Click on a filtered difficulty", () =>
@@ -680,10 +674,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return set != null;
             });
 
-            DrawableCarouselBeatmapSet.FilterableDifficultyIcon difficultyIcon = null;
+            FilterableDifficultyIcon difficultyIcon = null;
             AddStep("Find an icon for different ruleset", () =>
             {
-                difficultyIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>()
+                difficultyIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
                                     .First(icon => icon.Item.Beatmap.Ruleset.ID == 3);
             });
 
@@ -731,10 +725,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return set != null;
             });
 
-            DrawableCarouselBeatmapSet.FilterableGroupedDifficultyIcon groupIcon = null;
+            FilterableGroupedDifficultyIcon groupIcon = null;
             AddStep("Find group icon for different ruleset", () =>
             {
-                groupIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableGroupedDifficultyIcon>()
+                groupIcon = set.ChildrenOfType<FilterableGroupedDifficultyIcon>()
                                .First(icon => icon.Items.First().Beatmap.Ruleset.ID == 3);
             });
 
@@ -827,9 +821,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private int getCurrentBeatmapIndex() => getBeatmapIndex(songSelect.Carousel.SelectedBeatmapSet, songSelect.Carousel.SelectedBeatmap);
 
-        private int getDifficultyIconIndex(DrawableCarouselBeatmapSet set, DrawableCarouselBeatmapSet.FilterableDifficultyIcon icon)
+        private int getDifficultyIconIndex(DrawableCarouselBeatmapSet set, FilterableDifficultyIcon icon)
         {
-            return set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().ToList().FindIndex(i => i == icon);
+            return set.ChildrenOfType<FilterableDifficultyIcon>().ToList().FindIndex(i => i == icon);
         }
 
         private void addRulesetImportStep(int id) => AddStep($"import test map for ruleset {id}", () => importForRuleset(id));
@@ -885,7 +879,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     Ruleset = getRuleset(),
                     OnlineBeatmapID = beatmapId,
-                    Path = "normal.osu",
                     Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                     Length = length,
                     BPM = bpm,

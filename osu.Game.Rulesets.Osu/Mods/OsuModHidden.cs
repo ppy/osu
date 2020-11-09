@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -23,23 +22,40 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
-        protected override bool IsFirstHideableObject(DrawableHitObject hitObject) => !(hitObject is DrawableSpinner);
+        protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner);
 
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            static void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
-
-            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
-            {
-                adjustFadeIn(d.HitObject);
-                foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
-                    adjustFadeIn(h);
-            }
+            foreach (var d in drawables)
+                d.ApplyCustomUpdateState += applyFadeInAdjustment;
 
             base.ApplyToDrawableHitObjects(drawables);
         }
 
-        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
+        private void applyFadeInAdjustment(DrawableHitObject hitObject, ArmedState state)
+        {
+            if (!(hitObject is DrawableOsuHitObject d))
+                return;
+
+            d.HitObject.TimeFadeIn = d.HitObject.TimePreempt * fade_in_duration_multiplier;
+        }
+
+        private double lastSliderHeadFadeOutStartTime;
+        private double lastSliderHeadFadeOutDuration;
+
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+            base.ApplyIncreasedVisibilityState(hitObject, state);
+            applyState(hitObject, true);
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+            base.ApplyNormalVisibilityState(hitObject, state);
+            applyState(hitObject, false);
+        }
+
+        private void applyState(DrawableHitObject drawable, bool increaseVisibility)
         {
             if (!(drawable is DrawableOsuHitObject d))
                 return;
@@ -54,15 +70,52 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             switch (drawable)
             {
+                case DrawableSliderTail sliderTail:
+                    // use stored values from head circle to achieve same fade sequence.
+                    fadeOutDuration = lastSliderHeadFadeOutDuration;
+                    fadeOutStartTime = lastSliderHeadFadeOutStartTime;
+
+                    using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
+                        sliderTail.FadeOut(fadeOutDuration);
+
+                    break;
+
+                case DrawableSliderRepeat sliderRepeat:
+                    // use stored values from head circle to achieve same fade sequence.
+                    fadeOutDuration = lastSliderHeadFadeOutDuration;
+                    fadeOutStartTime = lastSliderHeadFadeOutStartTime;
+
+                    using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
+                        // only apply to circle piece – reverse arrow is not affected by hidden.
+                        sliderRepeat.CirclePiece.FadeOut(fadeOutDuration);
+
+                    break;
+
                 case DrawableHitCircle circle:
-                    // we don't want to see the approach circle
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
-                        circle.ApproachCircle.Hide();
+
+                    if (circle is DrawableSliderHead)
+                    {
+                        lastSliderHeadFadeOutDuration = fadeOutDuration;
+                        lastSliderHeadFadeOutStartTime = fadeOutStartTime;
+                    }
+
+                    Drawable fadeTarget = circle;
+
+                    if (increaseVisibility)
+                    {
+                        // only fade the circle piece (not the approach circle) for the increased visibility object.
+                        fadeTarget = circle.CirclePiece;
+                    }
+                    else
+                    {
+                        // we don't want to see the approach circle
+                        using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                            circle.ApproachCircle.Hide();
+                    }
 
                     // fade out immediately after fade in.
                     using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
-                        circle.FadeOut(fadeOutDuration);
-
+                        fadeTarget.FadeOut(fadeOutDuration);
                     break;
 
                 case DrawableSlider slider:
@@ -82,9 +135,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
-                    spinner.Disc.Hide();
-                    spinner.Ticks.Hide();
-                    spinner.Background.Hide();
+                    // todo: hide background
 
                     using (spinner.BeginAbsoluteSequence(fadeOutStartTime + longFadeDuration, true))
                         spinner.FadeOut(fadeOutDuration);

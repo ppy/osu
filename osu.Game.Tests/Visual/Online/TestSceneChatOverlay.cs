@@ -246,7 +246,12 @@ namespace osu.Game.Tests.Visual.Online
             {
                 ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
 
-                Child = ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, };
+                InternalChildren = new Drawable[]
+                {
+                    ChannelManager,
+                    ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, },
+                };
+
                 ChatOverlay.Show();
             }
         }

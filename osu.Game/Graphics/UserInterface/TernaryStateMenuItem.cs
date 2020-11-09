@@ -16,18 +16,8 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         /// <param name="text">The text to display.</param>
         /// <param name="type">The type of action which this <see cref="TernaryStateMenuItem"/> performs.</param>
-        public TernaryStateMenuItem(string text, MenuItemType type = MenuItemType.Standard)
-            : this(text, type, null)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="TernaryStateMenuItem"/>.
-        /// </summary>
-        /// <param name="text">The text to display.</param>
-        /// <param name="type">The type of action which this <see cref="TernaryStateMenuItem"/> performs.</param>
         /// <param name="action">A delegate to be invoked when this <see cref="TernaryStateMenuItem"/> is pressed.</param>
-        public TernaryStateMenuItem(string text, MenuItemType type, Action<TernaryState> action)
+        public TernaryStateMenuItem(string text, MenuItemType type = MenuItemType.Standard, Action<TernaryState> action = null)
             : this(text, getNextState, type, action)
         {
         }

@@ -175,13 +175,13 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("Time = 50", () => Clock.CurrentTime == 50);
             AddStep("Seek(49.999)", () => Clock.Seek(49.999));
             AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
-            AddAssert("Time = 50", () => Clock.CurrentTime == 50);
+            AddAssert("Time = 100", () => Clock.CurrentTime == 100);
             AddStep("Seek(99)", () => Clock.Seek(99));
             AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
             AddAssert("Time = 100", () => Clock.CurrentTime == 100);
             AddStep("Seek(99.999)", () => Clock.Seek(99.999));
             AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
-            AddAssert("Time = 100", () => Clock.CurrentTime == 100);
+            AddAssert("Time = 100", () => Clock.CurrentTime == 150);
             AddStep("Seek(174)", () => Clock.Seek(174));
             AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
             AddAssert("Time = 175", () => Clock.CurrentTime == 175);

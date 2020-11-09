@@ -37,7 +37,21 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
         /// </summary>
-        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjectContainer?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
+        public IEnumerable<DrawableHitObject> AllHitObjects
+        {
+            get
+            {
+                if (HitObjectContainer == null)
+                    return Enumerable.Empty<DrawableHitObject>();
+
+                var enumerable = HitObjectContainer.Objects;
+
+                if (nestedPlayfields.IsValueCreated)
+                    enumerable = enumerable.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects));
+
+                return enumerable;
+            }
+        }
 
         /// <summary>
         /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.

@@ -17,14 +17,14 @@ namespace osu.Game.Tests.Resources
 
         public static string GetTestBeatmapForImport(bool virtualTrack = false)
         {
-            var temp = Path.GetTempFileName() + ".osz";
+            var tempPath = Path.GetTempFileName() + ".osz";
 
             using (var stream = GetTestBeatmapStream(virtualTrack))
-            using (var newFile = File.Create(temp))
+            using (var newFile = File.Create(tempPath))
                 stream.CopyTo(newFile);
 
-            Assert.IsTrue(File.Exists(temp));
-            return temp;
+            Assert.IsTrue(File.Exists(tempPath));
+            return tempPath;
         }
     }
 }

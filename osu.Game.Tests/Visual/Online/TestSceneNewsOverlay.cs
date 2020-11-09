@@ -2,65 +2,64 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Graphics;
+using NUnit.Framework;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Overlays.News;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneNewsOverlay : OsuTestScene
     {
-        private TestNewsOverlay news;
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        protected override void LoadComplete()
+        private NewsOverlay news;
+
+        [SetUp]
+        public void SetUp() => Schedule(() => Child = news = new NewsOverlay());
+
+        [Test]
+        public void TestRequest()
         {
-            base.LoadComplete();
-            Add(news = new TestNewsOverlay());
-            AddStep(@"Show", news.Show);
-            AddStep(@"Hide", news.Hide);
-
-            AddStep(@"Show front page", () => news.ShowFrontPage());
-            AddStep(@"Custom article", () => news.Current.Value = "Test Article 101");
-
-            AddStep(@"Article covers", () => news.LoadAndShowContent(new NewsCoverTest()));
+            setUpNewsResponse(responseExample);
+            AddStep("Show", () => news.Show());
+            AddStep("Show article", () => news.ShowArticle("article"));
         }
 
-        private class TestNewsOverlay : NewsOverlay
-        {
-            public new void LoadAndShowContent(NewsContent content) => base.LoadAndShowContent(content);
-        }
-
-        private class NewsCoverTest : NewsContent
-        {
-            public NewsCoverTest()
+        private void setUpNewsResponse(GetNewsResponse r)
+            => AddStep("set up response", () =>
             {
-                Spacing = new osuTK.Vector2(0, 10);
-
-                var article = new NewsArticleCover.ArticleInfo
+                dummyAPI.HandleRequest = request =>
                 {
-                    Author = "Ephemeral",
-                    CoverUrl = "https://assets.ppy.sh/artists/58/header.jpg",
-                    Time = new DateTime(2019, 12, 4),
-                    Title = "New Featured Artist: Kurokotei"
-                };
+                    if (!(request is GetNewsRequest getNewsRequest))
+                        return;
 
-                Children = new Drawable[]
-                {
-                    new NewsArticleCover(article)
-                    {
-                        Height = 200
-                    },
-                    new NewsArticleCover(article)
-                    {
-                        Height = 120
-                    },
-                    new NewsArticleCover(article)
-                    {
-                        RelativeSizeAxes = Axes.None,
-                        Size = new osuTK.Vector2(400, 200),
-                    }
+                    getNewsRequest.TriggerSuccess(r);
                 };
+            });
+
+        private GetNewsResponse responseExample => new GetNewsResponse
+        {
+            NewsPosts = new[]
+            {
+                new APINewsPost
+                {
+                    Title = "This post has an image which starts with \"/\" and has many authors!",
+                    Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                    Author = "someone, someone1, someone2, someone3, someone4",
+                    FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
+                    PublishedAt = DateTimeOffset.Now
+                },
+                new APINewsPost
+                {
+                    Title = "This post has a full-url image! (HTML entity: &amp;)",
+                    Preview = "boom (HTML entity: &amp;)",
+                    Author = "user (HTML entity: &amp;)",
+                    FirstImage = "https://assets.ppy.sh/artists/88/header.jpg",
+                    PublishedAt = DateTimeOffset.Now
+                }
             }
-        }
+        };
     }
 }

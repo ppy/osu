@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -19,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        public TaikoAction[] HitActions { get; }
+        public TaikoAction[] HitActions { get; private set; }
 
         /// <summary>
         /// The action that caused this <see cref="DrawableHit"/> to be hit.
@@ -34,11 +36,60 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool pressHandledThisFrame;
 
+        private readonly Bindable<HitType> type;
+
         public DrawableHit(Hit hit)
             : base(hit)
         {
+            type = HitObject.TypeBindable.GetBoundCopy();
             FillMode = FillMode.Fit;
 
+            updateActionsFromType();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            type.BindValueChanged(_ =>
+            {
+                updateActionsFromType();
+
+                // will overwrite samples, should only be called on change.
+                updateSamplesFromTypeChange();
+
+                RecreatePieces();
+            });
+        }
+
+        private HitSampleInfo[] getRimSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
+
+        protected override void LoadSamples()
+        {
+            base.LoadSamples();
+
+            type.Value = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
+        }
+
+        private void updateSamplesFromTypeChange()
+        {
+            var rimSamples = getRimSamples();
+
+            bool isRimType = HitObject.Type == HitType.Rim;
+
+            if (isRimType != rimSamples.Any())
+            {
+                if (isRimType)
+                    HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP });
+                else
+                {
+                    foreach (var sample in rimSamples)
+                        HitObject.Samples.Remove(sample);
+                }
+            }
+        }
+
+        private void updateActionsFromType()
+        {
             HitActions =
                 HitObject.Type == HitType.Centre
                     ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
@@ -92,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
                 return;
             }
 
@@ -101,7 +152,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             if (!validActionPressed)
-                ApplyResult(r => r.Type = HitResult.Miss);
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
             else
                 ApplyResult(r => r.Type = result);
         }
@@ -142,7 +193,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             pressHandledThisFrame = false;
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
             Debug.Assert(HitObject.HitWindows != null);
 
@@ -206,19 +257,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!MainObject.Result.IsHit)
                 {
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
                     return;
                 }
 
                 if (!userTriggered)
                 {
                     if (timeOffset - MainObject.Result.TimeOffset > second_hit_window)
-                        ApplyResult(r => r.Type = HitResult.Miss);
+                        ApplyResult(r => r.Type = r.Judgement.MinResult);
                     return;
                 }
 
                 if (Math.Abs(timeOffset - MainObject.Result.TimeOffset) <= second_hit_window)
-                    ApplyResult(r => r.Type = MainObject.Result.Type);
+                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
             }
 
             public override bool OnPressed(TaikoAction action)

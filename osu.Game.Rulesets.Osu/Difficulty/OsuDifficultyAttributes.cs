@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double Length;
         public double ApproachRate;
         public double OverallDifficulty;
-        public int MaxCombo;
+        public int TotalObjectCount;
+        public int HitCircleCount;
+        public int SliderCount;
     }
 }

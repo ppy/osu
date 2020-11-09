@@ -28,11 +28,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private GameHost host { get; set; }
 
         [Cached]
-        public readonly Bindable<DirectoryInfo> CurrentDirectory = new Bindable<DirectoryInfo>();
+        public readonly Bindable<DirectoryInfo> CurrentPath = new Bindable<DirectoryInfo>();
 
         public DirectorySelector(string initialPath = null)
         {
-            CurrentDirectory.Value = new DirectoryInfo(initialPath ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            CurrentPath.Value = new DirectoryInfo(initialPath ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
 
         [BackgroundDependencyLoader]
@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
             };
 
-            CurrentDirectory.BindValueChanged(updateDisplay, true);
+            CurrentPath.BindValueChanged(updateDisplay, true);
         }
 
         private void updateDisplay(ValueChangedEvent<DirectoryInfo> directory)
@@ -92,19 +92,24 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
                 else
                 {
-                    directoryFlow.Add(new ParentDirectoryPiece(CurrentDirectory.Value.Parent));
+                    directoryFlow.Add(new ParentDirectoryPiece(CurrentPath.Value.Parent));
 
-                    foreach (var dir in CurrentDirectory.Value.GetDirectories().OrderBy(d => d.Name))
-                    {
-                        if ((dir.Attributes & FileAttributes.Hidden) == 0)
-                            directoryFlow.Add(new DirectoryPiece(dir));
-                    }
+                    directoryFlow.AddRange(GetEntriesForPath(CurrentPath.Value));
                 }
             }
             catch (Exception)
             {
-                CurrentDirectory.Value = directory.OldValue;
+                CurrentPath.Value = directory.OldValue;
                 this.FlashColour(Color4.Red, 300);
+            }
+        }
+
+        protected virtual IEnumerable<DisplayPiece> GetEntriesForPath(DirectoryInfo path)
+        {
+            foreach (var dir in path.GetDirectories().OrderBy(d => d.Name))
+            {
+                if ((dir.Attributes & FileAttributes.Hidden) == 0)
+                    yield return new DirectoryPiece(dir);
             }
         }
 
@@ -126,7 +131,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.X,
                         Spacing = new Vector2(5),
-                        Height = DirectoryPiece.HEIGHT,
+                        Height = DisplayPiece.HEIGHT,
                         Direction = FillDirection.Horizontal,
                     },
                 };
@@ -150,7 +155,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 flow.ChildrenEnumerable = new Drawable[]
                 {
-                    new OsuSpriteText { Text = "Current Directory: ", Font = OsuFont.Default.With(size: DirectoryPiece.HEIGHT), },
+                    new OsuSpriteText { Text = "Current Directory: ", Font = OsuFont.Default.With(size: DisplayPiece.HEIGHT), },
                     new ComputerPiece(),
                 }.Concat(pathPieces);
             }
@@ -198,24 +203,44 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        private class DirectoryPiece : CompositeDrawable
+        protected class DirectoryPiece : DisplayPiece
         {
-            public const float HEIGHT = 20;
-
-            protected const float FONT_SIZE = 16;
-
             protected readonly DirectoryInfo Directory;
-
-            private readonly string displayName;
-
-            protected FillFlowContainer Flow;
 
             [Resolved]
             private Bindable<DirectoryInfo> currentDirectory { get; set; }
 
             public DirectoryPiece(DirectoryInfo directory, string displayName = null)
+                : base(displayName)
             {
                 Directory = directory;
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                currentDirectory.Value = Directory;
+                return true;
+            }
+
+            protected override string FallbackName => Directory.Name;
+
+            protected override IconUsage? Icon => Directory.Name.Contains(Path.DirectorySeparatorChar)
+                ? FontAwesome.Solid.Database
+                : FontAwesome.Regular.Folder;
+        }
+
+        protected abstract class DisplayPiece : CompositeDrawable
+        {
+            public const float HEIGHT = 20;
+
+            protected const float FONT_SIZE = 16;
+
+            private readonly string displayName;
+
+            protected FillFlowContainer Flow;
+
+            protected DisplayPiece(string displayName = null)
+            {
                 this.displayName = displayName;
             }
 
@@ -259,20 +284,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Text = displayName ?? Directory.Name,
+                    Text = displayName ?? FallbackName,
                     Font = OsuFont.Default.With(size: FONT_SIZE)
                 });
             }
 
-            protected override bool OnClick(ClickEvent e)
-            {
-                currentDirectory.Value = Directory;
-                return true;
-            }
+            protected abstract string FallbackName { get; }
 
-            protected virtual IconUsage? Icon => Directory.Name.Contains(Path.DirectorySeparatorChar)
-                ? FontAwesome.Solid.Database
-                : FontAwesome.Regular.Folder;
+            protected abstract IconUsage? Icon { get; }
         }
     }
 }

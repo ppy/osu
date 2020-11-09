@@ -7,11 +7,9 @@ using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.Interpolation;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
@@ -37,16 +35,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private const double miss_count_leniency = 0.5;
 
-        private readonly int countHitCircles;
-        private readonly int countSliders;
-        private readonly int beatmapMaxCombo;
-
         private Mod[] mods;
 
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
-        private int countGood;
+        private int countOk;
         private int countMeh;
         private int countMiss;
 
@@ -54,15 +48,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double effectiveMissCount;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
-            : base(ruleset, beatmap, score)
+        public OsuPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
+            : base(ruleset, attributes, score)
         {
-            countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
-            countSliders = Beatmap.HitObjects.Count(h => h is Slider);
-
-            beatmapMaxCombo = Beatmap.HitObjects.Count;
-            // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
-            beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
         }
 
         public override double Calculate(Dictionary<string, double> categoryRatings = null)
@@ -71,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
             countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
-            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
             countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
@@ -93,20 +81,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // guess the number of misses + slider breaks from combo
             double comboBasedMissCount;
 
-            if (countSliders == 0)
+            if (Attributes.SliderCount == 0)
             {
-                if (scoreMaxCombo < beatmapMaxCombo)
-                    comboBasedMissCount = (double)beatmapMaxCombo / scoreMaxCombo;
+                if (scoreMaxCombo < Attributes.MaxCombo)
+                    comboBasedMissCount = (double)Attributes.MaxCombo / scoreMaxCombo;
                 else
                     comboBasedMissCount = 0;
             }
             else
             {
-                double fullComboThreshold = beatmapMaxCombo - 0.1 * countSliders;
+                double fullComboThreshold = Attributes.MaxCombo - 0.1 * Attributes.SliderCount;
                 if (scoreMaxCombo < fullComboThreshold)
                     comboBasedMissCount = fullComboThreshold / scoreMaxCombo;
                 else
-                    comboBasedMissCount = Math.Pow((beatmapMaxCombo - scoreMaxCombo) / (0.1 * countSliders), 3);
+                    comboBasedMissCount = Math.Pow((Attributes.MaxCombo - scoreMaxCombo) / (0.1 * Attributes.SliderCount), 3);
             }
 
             effectiveMissCount = Math.Max(countMiss, comboBasedMissCount);
@@ -124,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 categoryRatings.Add("Accuracy", accuracyValue);
                 categoryRatings.Add("OD", Attributes.OverallDifficulty);
                 categoryRatings.Add("AR", Attributes.ApproachRate);
-                categoryRatings.Add("Max Combo", beatmapMaxCombo);
+                categoryRatings.Add("Max Combo", Attributes.MaxCombo);
             }
 
             return totalValue;
@@ -132,14 +120,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            if (Beatmap.HitObjects.Count <= 1)
+            if (Attributes.TotalObjectCount <= 1)
                 return 0;
 
             // Get player's throughput according to combo
             int comboTpCount = Attributes.ComboTps.Length;
             var comboPercentages = Generate.LinearSpaced(comboTpCount, 1.0 / comboTpCount, 1);
 
-            double scoreComboPercentage = ((double)scoreMaxCombo) / beatmapMaxCombo;
+            double scoreComboPercentage = ((double)scoreMaxCombo) / Attributes.MaxCombo;
             double comboTp = LinearSpline.InterpolateSorted(comboPercentages, Attributes.ComboTps)
                                          .Interpolate(scoreComboPercentage);
 
@@ -221,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeTapValue()
         {
-            if (Beatmap.HitObjects.Count <= 1)
+            if (Attributes.TotalObjectCount <= 1)
                 return 0;
 
             double modifiedAcc = getModifiedAcc();
@@ -303,8 +291,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Assume all 300s on sliders/spinners and exclude them from the calculation. In other words we're
             // estimating the scorev2 acc from scorev1 acc.
             // Add 2 to countHitCircles in the denominator so that later erfinv gives resonable result for ss scores
-            double modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
-                                 ((countHitCircles + 2) * 3);
+            double modifiedAcc = ((countGreat - (totalHits - Attributes.HitCircleCount)) * 3 + countOk * 2 + countMeh) /
+                                 ((Attributes.HitCircleCount + 2) * 3);
             return modifiedAcc;
         }
 
@@ -314,7 +302,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double fingerControlDiffToPP(double fingerControlDiff) => Math.Pow(fingerControlDiff, skill_to_pp_exponent);
 
-        private double totalHits => countGreat + countGood + countMeh + countMiss;
-        private double totalSuccessfulHits => countGreat + countGood + countMeh;
+        private double totalHits => countGreat + countOk + countMeh + countMiss;
+        private double totalSuccessfulHits => countGreat + countOk + countMeh;
     }
 }
