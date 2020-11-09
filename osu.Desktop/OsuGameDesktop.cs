@@ -130,7 +130,7 @@ namespace osu.Desktop
             switch (host.Window)
             {
                 // Legacy osuTK DesktopGameWindow
-                case DesktopGameWindow desktopGameWindow:
+                case OsuTKDesktopWindow desktopGameWindow:
                     desktopGameWindow.CursorState |= CursorState.Hidden;
                     desktopGameWindow.SetIconFromStream(iconStream);
                     desktopGameWindow.Title = Name;
