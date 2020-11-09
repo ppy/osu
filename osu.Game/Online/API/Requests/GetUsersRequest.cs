@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -20,6 +19,6 @@ namespace osu.Game.Online.API.Requests
             this.userIds = userIds;
         }
 
-        protected override string Target => $@"users/?{userIds.Select(u => $"ids[]={u}&").Aggregate((a, b) => a + b)}";
+        protected override string Target => "users/?ids[]=" + string.Join("&ids[]=", userIds);
     }
 }
