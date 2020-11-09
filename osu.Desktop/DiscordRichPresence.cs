@@ -137,7 +137,7 @@ namespace osu.Desktop
                     return edit.Beatmap.ToString();
 
                 case UserActivity.InLobby lobby:
-                    return lobby.Room.Name.ToString();
+                    return lobby.Room.Name.Value;
             }
 
             return string.Empty;
