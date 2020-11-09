@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
+using osu.Game.Database;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Tests.Visual.Gameplay;
@@ -22,32 +24,34 @@ namespace osu.Game.Tests.Visual.Online
 
         private CurrentlyPlayingDisplay currentlyPlaying;
 
-        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+        [Cached(typeof(UserLookupCache))]
+        private UserLookupCache lookupCache = new TestUserLookupCache();
+
+        private Container nestedContainer;
 
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("register request handling", () => dummyAPI.HandleRequest = req =>
-            {
-                switch (req)
-                {
-                    case GetUserRequest cRequest:
-                        cRequest.TriggerSuccess(new User { Username = "peppy", Id = 2 });
-                        break;
-                }
-            });
-
             AddStep("add streaming client", () =>
             {
-                Remove(testSpectatorStreamingClient);
+                nestedContainer?.Remove(testSpectatorStreamingClient);
+                Remove(lookupCache);
 
                 Children = new Drawable[]
                 {
-                    testSpectatorStreamingClient,
-                    currentlyPlaying = new CurrentlyPlayingDisplay
+                    lookupCache,
+                    nestedContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
+                        Children = new Drawable[]
+                        {
+                            testSpectatorStreamingClient,
+                            currentlyPlaying = new CurrentlyPlayingDisplay
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            }
+                        }
+                    },
                 };
             });
 
@@ -61,6 +65,12 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Panel loaded", () => currentlyPlaying.ChildrenOfType<UserGridPanel>()?.FirstOrDefault()?.User.Id == 2);
             AddStep("Remove playing user", () => testSpectatorStreamingClient.PlayingUsers.Remove(2));
             AddUntilStep("Panel no longer present", () => !currentlyPlaying.ChildrenOfType<UserGridPanel>().Any());
+        }
+
+        internal class TestUserLookupCache : UserLookupCache
+        {
+            protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
+                => Task.FromResult(new User { Username = "peppy", Id = 2 });
         }
     }
 }

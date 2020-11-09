@@ -131,8 +131,7 @@ namespace osu.Game.Overlays
                     break;
 
                 case DashboardOverlayTabs.CurrentlyPlaying:
-                    //todo: enable once caching logic is better
-                    //loadDisplay(new CurrentlyPlayingDisplay());
+                    loadDisplay(new CurrentlyPlayingDisplay());
                     break;
 
                 default:

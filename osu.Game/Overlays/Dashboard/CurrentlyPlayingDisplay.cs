@@ -8,8 +8,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Play;
@@ -37,6 +37,7 @@ namespace osu.Game.Overlays.Dashboard
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
+                Padding = new MarginPadding(10),
                 Spacing = new Vector2(10),
             };
         }
@@ -44,40 +45,51 @@ namespace osu.Game.Overlays.Dashboard
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private UserLookupCache users { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             playingUsers.BindTo(spectatorStreaming.PlayingUsers);
-            playingUsers.BindCollectionChanged((sender, e) => Schedule(() =>
-            {
-                switch (e.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (var u in e.NewItems.OfType<int>())
-                        {
-                            var request = new GetUserRequest(u);
-                            request.Success += user => Schedule(() =>
-                            {
-                                if (playingUsers.Contains(user.Id))
-                                    userFlow.Add(createUserPanel(user));
-                            });
-                            api.Queue(request);
-                        }
-
-                        break;
-
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var u in e.OldItems.OfType<int>())
-                            userFlow.FirstOrDefault(card => card.User.Id == u)?.Expire();
-                        break;
-
-                    case NotifyCollectionChangedAction.Reset:
-                        userFlow.Clear();
-                        break;
-                }
-            }), true);
+            playingUsers.BindCollectionChanged(onUsersChanged, true);
         }
+
+        private void onUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (var id in e.NewItems.OfType<int>().ToArray())
+                    {
+                        users.GetUserAsync(id).ContinueWith(u =>
+                        {
+                            if (u.Result == null) return;
+
+                            Schedule(() =>
+                            {
+                                // user may no longer be playing.
+                                if (!playingUsers.Contains(u.Result.Id))
+                                    return;
+
+                                userFlow.Add(createUserPanel(u.Result));
+                            });
+                        });
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var u in e.OldItems.OfType<int>())
+                        userFlow.FirstOrDefault(card => card.User.Id == u)?.Expire();
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    userFlow.Clear();
+                    break;
+            }
+        });
 
         private PlayingUserPanel createUserPanel(User user) =>
             new PlayingUserPanel(user).With(panel =>
