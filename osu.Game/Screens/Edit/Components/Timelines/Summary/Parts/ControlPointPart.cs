@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             base.LoadBeatmap(beatmap);
 
+            controlPointGroups.UnbindAll();
             controlPointGroups.BindTo(beatmap.Beatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((sender, args) =>
             {

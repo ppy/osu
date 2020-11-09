@@ -202,7 +202,9 @@ namespace osu.Game.Beatmaps
         /// <param name="cancellationToken">A token that may be used to cancel this update.</param>
         private void updateBindable([NotNull] BindableStarDifficulty bindable, [CanBeNull] RulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
-            GetAsync(new DifficultyCacheLookup(bindable.Beatmap, rulesetInfo, mods), cancellationToken)
+            // GetDifficultyAsync will fall back to existing data from BeatmapInfo if not locally available
+            // (contrary to GetAsync)
+            GetDifficultyAsync(bindable.Beatmap, rulesetInfo, mods, cancellationToken)
                 .ContinueWith(t =>
                 {
                     // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.

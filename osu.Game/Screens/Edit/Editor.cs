@@ -499,6 +499,9 @@ namespace osu.Game.Screens.Edit
                 // confirming exit without save means we should delete the new beatmap completely.
                 beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
 
+                // eagerly clear contents before restoring default beatmap to prevent value change callbacks from firing.
+                ClearInternal();
+
                 // in theory this shouldn't be required but due to EF core not sharing instance states 100%
                 // MusicController is unaware of the changed DeletePending state.
                 Beatmap.SetDefault();
