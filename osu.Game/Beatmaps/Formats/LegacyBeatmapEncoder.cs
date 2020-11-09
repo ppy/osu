@@ -235,10 +235,10 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleHitObjects(TextWriter writer)
         {
+            writer.WriteLine("[HitObjects]");
+
             if (beatmap.HitObjects.Count == 0)
                 return;
-
-            writer.WriteLine("[HitObjects]");
 
             foreach (var h in beatmap.HitObjects)
                 handleHitObject(writer, h);
