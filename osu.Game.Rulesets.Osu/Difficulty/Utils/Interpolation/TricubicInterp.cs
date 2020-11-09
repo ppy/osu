@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
                 d1 = ApproximateDerivative.FromThreePoints(x0, val0, x1, val1, x2, val2);
             }
 
-            var spline = new HermiteSpline(x0, val0, d0, x1, val1, d1);
+            var spline = new HermiteSplineSegment(x0, val0, d0, x1, val1, d1);
             return spline.Evaluate(x);
         }
 

@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
     /// On a single interval, the cubic Hermite spline segment is constructed using values of function being interpolated
     /// on both ends of the interval, as well as the values of its derivative at said both ends.
     /// </remarks>
-    internal readonly struct HermiteSpline
+    internal readonly struct HermiteSplineSegment
     {
         /// <summary>
         /// The left endpoint of this spline segment.
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         /// <param name="x1">The right endpoint of the interpolation interval.</param>
         /// <param name="y1">The value of the interpolated function at <paramref name="x1"/>.</param>
         /// <param name="d1">The value of the derivative of the interpolated function at <paramref name="x1"/>.</param>
-        public HermiteSpline(double x0, double y0, double d0, double x1, double y1, double d1)
+        public HermiteSplineSegment(double x0, double y0, double d0, double x1, double y1, double d1)
         {
             // scaling factor used to transform the [x0, x1] interval onto the unit interval [0, 1]
             double scale = 1 / (x1 - x0);

@@ -23,11 +23,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
             derivatives[0] = lowerBoundDerivative ?? ApproximateDerivative.FromTwoPoints(x[0], values[0], x[1], values[1]);
             derivatives[last] = upperBoundDerivative ?? ApproximateDerivative.FromTwoPoints(x[last], values[last], x[last - 1], values[last - 1]);
 
-            splines = new List<HermiteSpline>(x.Length);
+            splines = new List<HermiteSplineSegment>(x.Length);
 
             for (int i = 0; i < x.Length - 1; ++i)
             {
-                splines.Add(new HermiteSpline(x[i], values[i], derivatives[i], x[i + 1], values[i + 1], derivatives[i + 1]));
+                splines.Add(new HermiteSplineSegment(x[i], values[i], derivatives[i], x[i + 1], values[i + 1], derivatives[i + 1]));
             }
         }
 
@@ -50,6 +50,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
             return splines[index].Evaluate(x);
         }
 
-        private List<HermiteSpline> splines;
+        private List<HermiteSplineSegment> splines;
     }
 }
