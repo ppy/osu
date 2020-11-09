@@ -7,7 +7,7 @@ using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Interpolation;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {

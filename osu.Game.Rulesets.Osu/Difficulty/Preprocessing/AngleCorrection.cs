@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Osu.Difficulty.Interp;
+using osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {

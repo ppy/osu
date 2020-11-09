@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using MathNet.Numerics.Distributions;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
+namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 {
     /// <summary>
     /// approximate poisson binomial CDF defined by miss probabilities

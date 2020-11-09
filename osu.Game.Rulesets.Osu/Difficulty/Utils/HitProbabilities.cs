@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
+namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 {
     public class HitProbabilities
     {

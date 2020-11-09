@@ -4,7 +4,7 @@
 using System;
 using MathNet.Numerics;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
+namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 {
     public static class FittsLaw
     {

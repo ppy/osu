@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
+namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 {
     public static class Mean
     {

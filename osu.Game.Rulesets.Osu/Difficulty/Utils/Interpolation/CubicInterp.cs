@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Interp
+namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
 {
     /// <summary>
     /// Finite difference cubic hermite interpolation

@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Interp
+namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
 {
     public class TricubicInterp
     {

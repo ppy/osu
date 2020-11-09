@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {

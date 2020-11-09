@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
-using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills

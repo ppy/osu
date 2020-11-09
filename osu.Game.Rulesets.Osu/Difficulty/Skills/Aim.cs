@@ -9,7 +9,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.RootFinding;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
