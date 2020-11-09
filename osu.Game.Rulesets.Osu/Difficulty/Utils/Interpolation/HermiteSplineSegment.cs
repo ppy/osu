@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         /// <summary>
         /// The value of the interpolated function at <see cref="X0"/>.
         /// </summary>
-        private readonly double y0;
+        private readonly double v0;
 
         /// <summary>
         /// The value of the derivative of the interpolated function at <see cref="X0"/>.
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         /// <summary>
         /// The value of the interpolated function at <see cref="X1"/>.
         /// </summary>
-        private readonly double y1;
+        private readonly double v1;
 
         /// <summary>
         /// The value of the derivative of the interpolated function at <see cref="X1"/>.
@@ -51,32 +51,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         /// Constructs a segment of the Hermite spline over a single one-dimensional interval.
         /// </summary>
         /// <param name="x0">The left endpoint of the interpolation interval.</param>
-        /// <param name="y0">The value of the interpolated function at <paramref name="x0"/>.</param>
+        /// <param name="v0">The value of the interpolated function at <paramref name="x0"/>.</param>
         /// <param name="d0">The value of the derivative of the interpolated function at <paramref name="x0"/>.</param>
         /// <param name="x1">The right endpoint of the interpolation interval.</param>
-        /// <param name="y1">The value of the interpolated function at <paramref name="x1"/>.</param>
+        /// <param name="v1">The value of the interpolated function at <paramref name="x1"/>.</param>
         /// <param name="d1">The value of the derivative of the interpolated function at <paramref name="x1"/>.</param>
-        public HermiteSplineSegment(double x0, double y0, double d0, double x1, double y1, double d1)
+        public HermiteSplineSegment(double x0, double v0, double d0, double x1, double v1, double d1)
         {
             // scaling factor used to transform the [x0, x1] interval onto the unit interval [0, 1]
             double scale = 1 / (x1 - x0);
             double scaleSquared = scale * scale;
 
             X0 = x0;
-            this.y0 = y0;
+            this.v0 = v0;
             this.d0 = d0;
 
             X1 = x1;
-            this.y1 = y1;
+            this.v1 = v1;
             this.d1 = d1;
 
             // xref: https://mathworld.wolfram.com/CubicSpline.html
             // note that the coefficients are pre-scaled to avoid rescaling to the unit interval repeatedly in Evaluate()
             // also note that the derivatives are purposefully scaled one degree less
-            c0 = y0;
+            c0 = v0;
             c1 = d0;
-            c2 = (3 * (y1 - y0) * scale - (2 * d0 + d1)) * scale;
-            c3 = (2 * (y0 - y1) * scale + d0 + d1) * scaleSquared;
+            c2 = (3 * (v1 - v0) * scale - (2 * d0 + d1)) * scale;
+            c3 = (2 * (v0 - v1) * scale + d0 + d1) * scaleSquared;
         }
 
         /// <summary>
@@ -91,10 +91,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         public double Evaluate(double x)
         {
             if (x > X1)
-                return (x - X1) * d1 + y1;
+                return (x - X1) * d1 + v1;
 
             if (x < X0)
-                return (x - X0) * d0 + y0;
+                return (x - X0) * d0 + v0;
 
             double t = x - X0;
             double tSquared = t * t;

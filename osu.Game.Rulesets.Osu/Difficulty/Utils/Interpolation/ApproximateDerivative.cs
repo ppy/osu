@@ -25,17 +25,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         /// </para>
         /// </remarks>
         /// <param name="x0">The <c>x</c> coordinate of the first point to base the approximation on.</param>
-        /// <param name="y0">The value of the function to approximate the derivative for at <paramref name="x0"/>.</param>
+        /// <param name="v0">The value of the function to approximate the derivative for at <paramref name="x0"/>.</param>
         /// <param name="x1">The <c>x</c> coordinate of the second point to base the approximation on.</param>
-        /// <param name="y1">The value of the function to approximate the derivative for at <paramref name="x1"/>.</param>
+        /// <param name="v1">The value of the function to approximate the derivative for at <paramref name="x1"/>.</param>
         /// <returns>
         /// The approximation of the derivative at the interval [<paramref name="x0"/>, <paramref name="x1"/>]
-        /// calculated as the secant of the function graph passing through points (<paramref name="x0"/>, <paramref name="y0"/>)
-        /// and (<paramref name="x1"/>, <paramref name="y1"/>).
+        /// calculated as the secant of the function graph passing through points (<paramref name="x0"/>, <paramref name="v0"/>)
+        /// and (<paramref name="x1"/>, <paramref name="v1"/>).
         /// </returns>
-        public static double FromTwoPoints(double x0, double y0, double x1, double y1)
+        public static double FromTwoPoints(double x0, double v0, double x1, double v1)
         {
-            return (y1 - y0) / (x1 - x0);
+            return (v1 - v0) / (x1 - x0);
         }
 
         /// <summary>
@@ -49,18 +49,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         /// Over a uniform grid, however, just taking <see cref="FromTwoPoints"/> over the marginal points is preferable.
         /// </remarks>
         /// <param name="x0">The <c>x</c> coordinate of the leftmost point to base the approximation on.</param>
-        /// <param name="y0">The value of the function to approximate the derivative for at <paramref name="x0"/>.</param>
+        /// <param name="v0">The value of the function to approximate the derivative for at <paramref name="x0"/>.</param>
         /// <param name="x1">The <c>x</c> coordinate of the midpoint to calculate the approximation for.</param>
-        /// <param name="y1">The value of the function to approximate the derivative for at <paramref name="x1"/>.</param>
+        /// <param name="v1">The value of the function to approximate the derivative for at <paramref name="x1"/>.</param>
         /// <param name="x2">The <c>x</c> coordinate of the rightmost point to base the approximation on.</param>
-        /// <param name="y2">The value of the function to approximate the derivative for at <paramref name="x2"/>.</param>
+        /// <param name="v2">The value of the function to approximate the derivative for at <paramref name="x2"/>.</param>
         /// <returns>
         /// The approximation of the derivative at <paramref name="x1"/>, calculated as the weighted average of two-point approximations
         /// using the marginal points.
         /// </returns>
-        public static double FromThreePoints(double x0, double y0, double x1, double y1, double x2, double y2)
+        /// <returns></returns>
+        public static double FromThreePoints(double x0, double v0, double x1, double v1, double x2, double v2)
         {
-            return ((x2 - x1) * FromTwoPoints(x0, y0, x1, y1) + (x1 - x0) * FromTwoPoints(x1, y1, x2, y2)) / (x2 - x0);
+            return ((x2 - x1) * FromTwoPoints(x0, v0, x1, v1) + (x1 - x0) * FromTwoPoints(x1, v1, x2, v2)) / (x2 - x0);
         }
     }
 }

@@ -19,34 +19,34 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         /// Creates a new <see cref="CubicInterpolator"/> using the supplied data.
         /// </summary>
         /// <param name="xs">The arguments of the function being interpolated.</param>
-        /// <param name="ys">The values of the function being interpolated. Must match <paramref name="xs"/> in length.</param>
+        /// <param name="vs">The values of the function being interpolated. Must match <paramref name="xs"/> in length.</param>
         /// <param name="lowerBoundDerivative">
         /// The derivative of the function at the first point from <paramref name="xs"/>.
-        /// Will be approximated using the first and second points from <paramref name="xs"/> and <paramref name="ys"/> if not given.
+        /// Will be approximated using the first and second points from <paramref name="xs"/> and <paramref name="vs"/> if not given.
         /// </param>
         /// <param name="upperBoundDerivative">
         /// The derivative of the function at the last point from <paramref name="xs"/>.
-        /// Will be approximated using the second-to-last and last points from <paramref name="xs"/> and <paramref name="ys"/> if not given.
+        /// Will be approximated using the second-to-last and last points from <paramref name="xs"/> and <paramref name="vs"/> if not given.
         /// </param>
-        public CubicInterpolator(double[] xs, double[] ys, double? lowerBoundDerivative = null, double? upperBoundDerivative = null)
+        public CubicInterpolator(double[] xs, double[] vs, double? lowerBoundDerivative = null, double? upperBoundDerivative = null)
         {
-            Debug.Assert(xs.Length == ys.Length);
-            double[] derivatives = new double[ys.Length];
+            Debug.Assert(xs.Length == vs.Length);
+            double[] derivatives = new double[vs.Length];
 
             for (int i = 1; i < xs.Length - 1; ++i)
             {
-                derivatives[i] = ApproximateDerivative.FromThreePoints(xs[i - 1], ys[i - 1], xs[i], ys[i], xs[i + 1], ys[i + 1]);
+                derivatives[i] = ApproximateDerivative.FromThreePoints(xs[i - 1], vs[i - 1], xs[i], vs[i], xs[i + 1], vs[i + 1]);
             }
 
             int last = xs.Length - 1;
-            derivatives[0] = lowerBoundDerivative ?? ApproximateDerivative.FromTwoPoints(xs[0], ys[0], xs[1], ys[1]);
-            derivatives[last] = upperBoundDerivative ?? ApproximateDerivative.FromTwoPoints(xs[last], ys[last], xs[last - 1], ys[last - 1]);
+            derivatives[0] = lowerBoundDerivative ?? ApproximateDerivative.FromTwoPoints(xs[0], vs[0], xs[1], vs[1]);
+            derivatives[last] = upperBoundDerivative ?? ApproximateDerivative.FromTwoPoints(xs[last], vs[last], xs[last - 1], vs[last - 1]);
 
             splineSegments = new HermiteSplineSegment[xs.Length - 1];
 
             for (int i = 0; i < xs.Length - 1; ++i)
             {
-                splineSegments[i] = new HermiteSplineSegment(xs[i], ys[i], derivatives[i], xs[i + 1], ys[i + 1], derivatives[i + 1]);
+                splineSegments[i] = new HermiteSplineSegment(xs[i], vs[i], derivatives[i], xs[i + 1], vs[i + 1], derivatives[i + 1]);
             }
         }
 
