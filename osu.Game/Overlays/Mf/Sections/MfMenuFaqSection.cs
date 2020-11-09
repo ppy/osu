@@ -6,9 +6,10 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
+using osu.Game.Overlays.Mf.TextBox;
 using osuTK;
 
-namespace osu.Game.Overlays.MfMenu
+namespace osu.Game.Overlays.Mf.Sections
 {
     public class MfMenuFaqSection : MfMenuSection
     {
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.MfMenu
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private OsuSpriteText faqCannotUseOnlineFunctionText = new OsuSpriteText();
+        private readonly OsuSpriteText faqCannotUseOnlineFunctionText = new OsuSpriteText();
 
         public static void AnswerTitleFont(SpriteText t) => t.Font = OsuFont.GetFont(weight: FontWeight.SemiBold);
 
@@ -46,7 +47,7 @@ namespace osu.Game.Overlays.MfMenu
                         {
                             LayoutDuration = 300,
                             LayoutEasing = Easing.OutQuint,
-                            Padding = new MarginPadding{ Right = 25f },
+                            Padding = new MarginPadding { Right = 25f },
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
@@ -77,7 +78,7 @@ namespace osu.Game.Overlays.MfMenu
                             Direction = FillDirection.Vertical,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Padding = new MarginPadding{ Left = 25f },
+                            Padding = new MarginPadding { Left = 25f },
                             Spacing = new Vector2(0, 15),
                             Children = new Drawable[]
                             {
@@ -122,7 +123,7 @@ namespace osu.Game.Overlays.MfMenu
             var t = new MfText();
 
             t.AddParagraph("这可能是因为小夜那边出了点状况, 尝试访问一下", AnswerTitleFont);
-            t.AddLink("镜像站官网","https://osu.sayobot.cn/", AnswerTitleFont);
+            t.AddLink("镜像站官网", "https://osu.sayobot.cn/", AnswerTitleFont);
             t.AddText(", 如果页面空白, 请通过右上角的 更多>帮助 进行反馈； 如果官网正常, 而游戏内无法下图, 请通过邮件联系", AnswerTitleFont);
             t.AddLink("MATRIX-feather", "mailto:midnightcarnival@outlook.com", AnswerTitleFont);
             t.AddText("并附上日志文件", AnswerTitleFont);
@@ -144,12 +145,12 @@ namespace osu.Game.Overlays.MfMenu
             t.AddParagraph(" ", AnswerTitleFont);
             t.AddParagraph("相关资料：", AnswerTitleFont);
             t.AddParagraph("", AnswerTitleFont);
-            t.AddLink("#9818: Improve messaging when timeshift token retrieval fails","https://github.com/ppy/osu/pull/9818", AnswerTitleFont);
-            t.AddLink("#9709: Include executable hash when submitting multiplayer scores","https://github.com/ppy/osu/pull/9709", AnswerTitleFont);
+            t.AddLink("#9818: Improve messaging when timeshift token retrieval fails", "https://github.com/ppy/osu/pull/9818", AnswerTitleFont);
+            t.AddLink("#9709: Include executable hash when submitting multiplayer scores", "https://github.com/ppy/osu/pull/9709", AnswerTitleFont);
 
             t.AddParagraph(" ", AnswerTitleFont);
-            t.AddParagraph("另一个主要原因是我没足够的时间和精力去保证汉化版的4个游戏模式和上游完全一致。",t => t.Font = OsuFont.GetFont(size: 14) );
-            t.AddParagraph("如果哪次合并出了问题导致不公平的多人游戏环境那不是得被查水表。",t => t.Font = OsuFont.GetFont(size: 14) );
+            t.AddParagraph("另一个主要原因是我没足够的时间和精力去保证汉化版的4个游戏模式和上游完全一致。", text => text.Font = OsuFont.GetFont(size: 14));
+            t.AddParagraph("如果哪次合并出了问题导致不公平的多人游戏环境那不是得被查水表。", text => text.Font = OsuFont.GetFont(size: 14));
             return t;
         }
 
@@ -171,6 +172,7 @@ namespace osu.Game.Overlays.MfMenu
         #endregion faq
 
         #region 功能函数
+
         private void onApiStateChanged(ValueChangedEvent<APIState> v)
         {
             switch (v.NewValue)

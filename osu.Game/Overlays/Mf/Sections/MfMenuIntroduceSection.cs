@@ -1,10 +1,11 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays.Mf.TextBox;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Overlays.MfMenu
+namespace osu.Game.Overlays.Mf.Sections
 {
     public class MfMenuIntroduceSection : MfMenuSection
     {
@@ -33,7 +34,7 @@ namespace osu.Game.Overlays.MfMenu
                         {
                             LayoutDuration = 300,
                             LayoutEasing = Easing.OutQuint,
-                            Padding = new MarginPadding{ Right = 25f },
+                            Padding = new MarginPadding { Right = 25f },
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
@@ -42,21 +43,21 @@ namespace osu.Game.Overlays.MfMenu
                             Spacing = new Vector2(0, 15),
                             Children = new Drawable[]
                             {
-                                    new MfMenuTextBoxContainer
-                                    {
-                                        Title = "关于Mf-osu",
-                                        d = introduceText()
-                                    },
-                                    new MfMenuTextBoxContainer
-                                    {
-                                        Title = "Bug反馈/提出建议",
-                                        d = reportIssuesText()
-                                    },
-                                    new MfMenuTextBoxContainer
-                                    {
-                                        Title = "项目引用",
-                                        d = projectRefsText(),
-                                    }
+                                new MfMenuTextBoxContainer
+                                {
+                                    Title = "关于Mf-osu",
+                                    d = introduceText()
+                                },
+                                new MfMenuTextBoxContainer
+                                {
+                                    Title = "Bug反馈/提出建议",
+                                    d = reportIssuesText()
+                                },
+                                new MfMenuTextBoxContainer
+                                {
+                                    Title = "项目引用",
+                                    d = projectRefsText(),
+                                }
                             }
                         },
                         //Right
@@ -69,7 +70,7 @@ namespace osu.Game.Overlays.MfMenu
                             Direction = FillDirection.Vertical,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Padding = new MarginPadding{ Left = 25f },
+                            Padding = new MarginPadding { Left = 25f },
                             Spacing = new Vector2(0, 15),
                             Children = new Drawable[]
                             {
@@ -101,7 +102,7 @@ namespace osu.Game.Overlays.MfMenu
         {
             var t = new MfText();
 
-            t.AddLink("Mf-osu","https://github.com/MATRIX-feather/osu");
+            t.AddLink("Mf-osu", "https://github.com/MATRIX-feather/osu");
             t.AddText("是一个基于osu!lazer(ppy/osu)的分支版本");
 
             return t;
@@ -112,22 +113,22 @@ namespace osu.Game.Overlays.MfMenu
             var t = new MfText();
 
             t.AddUserLink(new User
-                        {
-                            Username = "A M D (比赛端、游戏内翻译修正)",
-                            Id = 5321112
-                        });
+            {
+                Username = "A M D (比赛端、游戏内翻译修正)",
+                Id = 5321112
+            });
             t.NewParagraph();
             t.AddUserLink(new User
-                        {
-                            Username = "MATRIX-feather (主要翻译, 项目发起和维护等)",
-                            Id = 13870362
-                        });
+            {
+                Username = "MATRIX-feather (主要翻译, 项目发起和维护等)",
+                Id = 13870362
+            });
             t.NewParagraph();
             t.AddUserLink(new User
-                        {
-                            Username = "pedajilao (游戏内翻译修正)",
-                            Id = 13851970
-                        });
+            {
+                Username = "pedajilao (游戏内翻译修正)",
+                Id = 13851970
+            });
 
             return t;
         }
@@ -137,14 +138,14 @@ namespace osu.Game.Overlays.MfMenu
             var t = new MfText();
 
             t.AddText("任何与翻译文本、字体大小等有关的问题, 请前往");
-            t.AddLink("Mf-osu的issue页面","https://github.com/MATRIX-feather/osu/issues");
+            t.AddLink("Mf-osu的issue页面", "https://github.com/MATRIX-feather/osu/issues");
             t.AddText("提交新的issue来讨论。");
             t.AddParagraph("如果您在使用时发现了一个bug, 请先");
-            t.AddLink("下载最新官方版本","https://github.com/ppy/osu/releases/latest");
+            t.AddLink("下载最新官方版本", "https://github.com/ppy/osu/releases/latest");
             t.AddText(", 如果该问题仍然存在, 请前往");
-            t.AddLink("osu!lazer的issue页面","https://github.com/ppy/osu/issues");
+            t.AddLink("osu!lazer的issue页面", "https://github.com/ppy/osu/issues");
             t.AddText("提交新的issue, 反之则前往");
-            t.AddLink("Mf-osu的issue页面","https://github.com/MATRIX-feather/osu/issues");
+            t.AddLink("Mf-osu的issue页面", "https://github.com/MATRIX-feather/osu/issues");
             t.AddText("来提交新的issue。");
 
             return t;
@@ -163,7 +164,7 @@ namespace osu.Game.Overlays.MfMenu
             t.NewParagraph();
 
             t.AddParagraph("与本项目有关的问题, 请发送邮件至");
-            t.AddLink("midnightcarnival@outlook.com","mailto:midnightcarnival@outlook.com");
+            t.AddLink("midnightcarnival@outlook.com", "mailto:midnightcarnival@outlook.com");
             t.AddText(", 一般情况下, 本人将会在一周内给予回应");
 
             t.AddParagraph("与本项目二进制发行版有关的问题, 请联系您的二进制发行方。");
@@ -181,17 +182,17 @@ namespace osu.Game.Overlays.MfMenu
             t.AddParagraph("如果您觉得下面的某个功能很赞, 您可以前往");
             t.AddParagraph("该项目的主页点个Star以支持原作者, 或者帮助其完善和发展。");
             t.NewParagraph();
-            t.AddLink("osu!下物件的高潮闪光(Kiai Flash) → pr7316[Open]","https://github.com/ppy/osu/pull/7316");
+            t.AddLink("osu!下物件的高潮闪光(Kiai Flash) → pr7316[Open]", "https://github.com/ppy/osu/pull/7316");
             t.NewParagraph();
-            t.AddLink("osu!下的Mirror Mod → pr7334[Open]","https://github.com/ppy/osu/pull/7334");
+            t.AddLink("osu!下的Mirror Mod → pr7334[Open]", "https://github.com/ppy/osu/pull/7334");
             t.NewParagraph();
-            t.AddLink("谱面在线列表 → pr7912[Merged]","https://github.com/ppy/osu/pull/7912");
+            t.AddLink("谱面在线列表 → pr7912[Merged]", "https://github.com/ppy/osu/pull/7912");
             t.NewParagraph();
-            t.AddLink("看板 → pr8771[Merged]","https://github.com/ppy/osu/pull/8771");
+            t.AddLink("看板 → pr8771[Merged]", "https://github.com/ppy/osu/pull/8771");
             t.NewParagraph();
-            t.AddLink("从osu/rulesets目录读取自定义游戏模式 → pr8607[Merged]","https://github.com/ppy/osu/pull/8607");
+            t.AddLink("从osu/rulesets目录读取自定义游戏模式 → pr8607[Merged]", "https://github.com/ppy/osu/pull/8607");
             t.NewParagraph();
-            t.AddLink("Mvis播放器 → 基于EVAST9919/lazer-m-vis","https://github.com/EVAST9919/lazer-m-vis");
+            t.AddLink("Mvis播放器 → 基于EVAST9919/lazer-m-vis", "https://github.com/EVAST9919/lazer-m-vis");
 
             return t;
         }
@@ -213,6 +214,5 @@ namespace osu.Game.Overlays.MfMenu
         }
 
         #endregion 介绍
-
     }
 }

@@ -9,11 +9,13 @@ namespace osu.Game.Configuration
     {
         [Description("关")]
         Off,
+
         [Description("所有元素")]
         Everything,
 
         [Description("Overlay除外")]
         ExcludeOverlays,
+
         [Description("仅游戏内界面")]
         Gameplay,
     }

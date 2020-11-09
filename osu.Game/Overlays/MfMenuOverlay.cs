@@ -5,16 +5,15 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Overlays.MfMenu;
-using osu.Game.Overlays.MfMenu.Header;
-using osu.Game.Overlays.MfMenu.Sections;
+using osu.Game.Overlays.Mf.Header;
+using osu.Game.Overlays.Mf.Sections;
 
 namespace osu.Game.Overlays
 {
     public class MfMenuOverlay : FullscreenOverlay<MfMenuHeader>
     {
-        private MfMenuSectionsContainer sectionContainer;
-        private MfMenuHeaderTabControl tabControl;
+        private readonly MfMenuSectionsContainer sectionContainer;
+        private readonly MfMenuHeaderTabControl tabControl;
 
         public MfMenuOverlay()
             : base(OverlayColourScheme.Blue1, new MfMenuHeader())
@@ -60,7 +59,7 @@ namespace osu.Game.Overlays
             foreach (var o in SectionsOrder)
             {
                 var sec = Sections.FirstOrDefault(s => s.SectionId == o);
-                this.Schedule(() =>
+                Schedule(() =>
                 {
                     tabControl.AddItem(sec);
                     sectionContainer.Add(sec);
@@ -76,7 +75,7 @@ namespace osu.Game.Overlays
 
         private void OnSelectedTabTypeChanged(ValueChangedEvent<MfMenuSection> tab)
         {
-            if ( last != tab.NewValue )
+            if (last != tab.NewValue)
             {
                 last = tab.NewValue;
                 sectionContainer.ScrollTo(tab.NewValue);

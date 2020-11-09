@@ -99,10 +99,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OperationStarted = OnOperationBegan,
                 OperationEnded = OnOperationEnded,
 
-                OnRotation = angle => HandleRotation(angle),
-                OnScale = (amount, anchor) => HandleScale(amount, anchor),
-                OnFlip = direction => HandleFlip(direction),
-                OnReverse = () => HandleReverse(),
+                OnRotation = HandleRotation,
+                OnScale = HandleScale,
+                OnFlip = HandleFlip,
+                OnReverse = HandleReverse,
             };
 
         /// <summary>
@@ -201,8 +201,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // there are potentially multiple SelectionHandlers active, but we only want to add hitobjects to the selected list once.
             if (!EditorBeatmap.SelectedHitObjects.Contains(blueprint.HitObject))
                 EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
-
-            UpdateVisibility();
         }
 
         /// <summary>
@@ -214,8 +212,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectedBlueprints.Remove(blueprint);
 
             EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
-
-            UpdateVisibility();
         }
 
         /// <summary>
@@ -223,14 +219,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
         /// <param name="state">The input state at the point of selection.</param>
-        internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
+        /// <returns>Whether a selection was performed.</returns>
+        internal bool HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ShiftPressed && state.Mouse.IsPressed(MouseButton.Right))
-                EditorBeatmap.Remove(blueprint.HitObject);
-            else if (state.Keyboard.ControlPressed && state.Mouse.IsPressed(MouseButton.Left))
+            {
+                handleQuickDeletion(blueprint);
+                return false;
+            }
+
+            if (state.Keyboard.ControlPressed && state.Mouse.IsPressed(MouseButton.Left))
                 blueprint.ToggleSelection();
             else
                 ensureSelected(blueprint);
+
+            return true;
+        }
+
+        private void handleQuickDeletion(SelectionBlueprint blueprint)
+        {
+            if (blueprint.HandleQuickDeletion())
+                return;
+
+            if (!blueprint.IsSelected)
+                EditorBeatmap.Remove(blueprint.HitObject);
+            else
+                deleteSelected();
         }
 
         private void ensureSelected(SelectionBlueprint blueprint)
@@ -254,23 +268,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Updates whether this <see cref="SelectionHandler"/> is visible.
         /// </summary>
-        internal void UpdateVisibility()
+        private void updateVisibility()
         {
             int count = selectedBlueprints.Count;
 
             selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
 
-            if (count > 0)
-            {
-                Show();
-                OnSelectionChanged();
-            }
-            else
-                Hide();
+            this.FadeTo(count > 0 ? 1 : 0);
+            OnSelectionChanged();
         }
 
         /// <summary>
-        /// Triggered whenever more than one object is selected, on each change.
+        /// Triggered whenever the set of selected objects changes.
         /// Should update the selection box's state to match supported operations.
         /// </summary>
         protected virtual void OnSelectionChanged()
@@ -421,8 +430,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
 
             // bring in updates from selection changes
-            EditorBeatmap.HitObjectUpdated += _ => UpdateTernaryStates();
-            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) => UpdateTernaryStates();
+            EditorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(UpdateTernaryStates);
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) =>
+            {
+                Scheduler.AddOnce(updateVisibility);
+                Scheduler.AddOnce(UpdateTernaryStates);
+            };
         }
 
         /// <summary>

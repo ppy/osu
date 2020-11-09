@@ -149,17 +149,13 @@ namespace osu.Game.Tests.Visual.Background
             => AddStep($"set seasonal mode to {mode}", () => config.Set(OsuSetting.SeasonalBackgroundMode, mode));
 
         private void createLoader()
-        {
-            AddStep("create loader", () =>
+            => AddStep("create loader", () =>
             {
                 if (backgroundLoader != null)
                     Remove(backgroundLoader);
 
-                LoadComponentAsync(backgroundLoader = new SeasonalBackgroundLoader(), Add);
+                Add(backgroundLoader = new SeasonalBackgroundLoader());
             });
-
-            AddUntilStep("wait for loaded", () => backgroundLoader.IsLoaded);
-        }
 
         private void loadNextBackground()
         {

@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select.Carousel
                 var terms = Beatmap.SearchableTerms;
 
                 foreach (var criteriaTerm in criteria.SearchTerms)
-                    match &= terms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0);
+                    match &= terms.Any(term => term.Contains(criteriaTerm, StringComparison.InvariantCultureIgnoreCase));
 
                 // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
                 // this should be done after text matching so we can prioritise matching numbers in metadata.

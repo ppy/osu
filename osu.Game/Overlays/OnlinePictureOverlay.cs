@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -19,26 +18,24 @@ namespace osu.Game.Overlays
 {
     public class OnlinePictureOverlay : OsuFocusedOverlayContainer
     {
-
         [Resolved]
         private OsuGame game { get; set; }
 
-        private const float DURATION = 1000;
+        private const float duration = 1000;
 
-        private string Target;
+        private string target;
 
         private OnlinePictureContentContainer contentContainer;
         private Container topbarContainer;
         private Container bottomContainer;
         private LoadingSpinner loadingSpinner;
         private TriangleButton openInBrowserButton;
-        private TriangleButton closeButton;
         private OsuSpriteText infoText;
-        private bool CanOpenInBrowser;
+        private bool canOpenInBrowser;
 
         private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
 
-        private BindableBool OptUI = new BindableBool();
+        private readonly BindableBool optUI = new BindableBool();
 
         public float BottomContainerHeight => bottomContainer.Position.Y + bottomContainer.DrawHeight;
         public float TopBarHeight => topbarContainer.DrawHeight;
@@ -107,9 +104,9 @@ namespace osu.Game.Overlays
                                     Text = "在浏览器中打开",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Action = () => OpenLink(Target),
+                                    Action = () => openLink(target),
                                 },
-                                closeButton = new TriangleButton
+                                new TriangleButton
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.2f,
@@ -117,7 +114,7 @@ namespace osu.Game.Overlays
                                     Text = "关闭",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Action = () => this.Hide(),
+                                    Action = Hide,
                                 },
                             }
                         }
@@ -147,27 +144,27 @@ namespace osu.Game.Overlays
                 }
             };
 
-            config.BindWith(MfSetting.OptUI, OptUI);
+            config.BindWith(MfSetting.OptUI, optUI);
 
-            OptUI.BindValueChanged(OnOptUIChanged);
+            optUI.BindValueChanged(OnOptUIChanged);
         }
 
         protected override void PopIn()
         {
             base.PopIn();
 
-            this.FadeIn(DURATION, Easing.OutQuint);
-            this.ScaleTo(1, DURATION, Easing.OutElastic);
+            this.FadeIn(duration, Easing.OutQuint);
+            this.ScaleTo(1, duration, Easing.OutElastic);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            delayedLoadWrapper?.FadeOut(DURATION / 2, Easing.OutQuint);
+            delayedLoadWrapper?.FadeOut(duration / 2, Easing.OutQuint);
             delayedLoadWrapper?.Expire();
-            this.FadeOut(DURATION, Easing.OutQuint);
-            this.ScaleTo(0.9f, DURATION, Easing.OutQuint);
+            this.FadeOut(duration, Easing.OutQuint);
+            this.ScaleTo(0.9f, duration, Easing.OutQuint);
         }
 
         DelayedLoadWrapper delayedLoadWrapper;
@@ -175,51 +172,46 @@ namespace osu.Game.Overlays
 
         private void OnOptUIChanged(ValueChangedEvent<bool> v)
         {
-            if ( this.Alpha != 0 && v.NewValue == false )
-                if (OpenLink(Target))
-                    this.Hide();
+            if (Alpha != 0 && v.NewValue == false && openLink(target))
+                Hide();
         }
 
-        private bool OpenLink(string link)
+        private bool openLink(string link)
         {
-            if ( CanOpenInBrowser )
+            if (canOpenInBrowser)
             {
-                game?.OpenUrlExternally(Target);
+                game?.OpenUrlExternally(target);
                 return true;
             }
             else
                 return false;
         }
 
-        public void UpdateImage(string NewUri, bool popIn, bool CanOpenInBrowser = true, string Title = null)
+        public void UpdateImage(string newUri, bool popIn, bool canOpenInBrowser = true, string title = null)
         {
-            Target = NewUri;
-            this.CanOpenInBrowser = CanOpenInBrowser;
+            target = newUri;
+            this.canOpenInBrowser = canOpenInBrowser;
 
-            if ( OptUI.Value != true && CanOpenInBrowser )
+            if (optUI.Value != true && canOpenInBrowser)
             {
-                OpenLink(Target);
+                openLink(target);
                 return;
             }
 
-            if (popIn)
-                this.Show();
+            if (popIn) Show();
 
             loadingSpinner.Show();
 
             if (delayedLoadWrapper != null)
             {
-                delayedLoadWrapper.FadeOut(DURATION / 2, Easing.OutQuint);
+                delayedLoadWrapper.FadeOut(duration / 2, Easing.OutQuint);
                 delayedLoadWrapper.Expire();
             }
 
-            if ( Title != null )
-                infoText.Text = Title;
-            else
-                infoText.Text = Target;
+            infoText.Text = title ?? target;
 
-            if ( CanOpenInBrowser )
-                openInBrowserButton.Action = () => OpenLink(Target);
+            if (canOpenInBrowser)
+                openInBrowserButton.Action = () => openLink(target);
             else
                 openInBrowserButton.Action = null;
 
@@ -230,7 +222,7 @@ namespace osu.Game.Overlays
             }
 
             contentContainer.Add(delayedLoadWrapper = new DelayedLoadWrapper(
-                pict = new UpdateableOnlinePicture(Target)
+                pict = new UpdateableOnlinePicture(target)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -242,7 +234,7 @@ namespace osu.Game.Overlays
             pict.OnLoadComplete += d =>
             {
                 d.Hide();
-                d.FadeInFromZero(DURATION / 2, Easing.Out);
+                d.FadeInFromZero(duration / 2, Easing.Out);
                 loadingSpinner.Hide();
             };
         }

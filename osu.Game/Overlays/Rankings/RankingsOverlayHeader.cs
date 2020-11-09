@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using System.ComponentModel;
-using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays.Rankings
 {

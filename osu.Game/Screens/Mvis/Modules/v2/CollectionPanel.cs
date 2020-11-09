@@ -23,25 +23,29 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         ///<summary>
         ///判断该panel所显示的BeatmapCollection
         ///</summary>
-        public readonly BeatmapCollection collection;
+        public readonly BeatmapCollection Collection;
 
         ///<summary>
         ///用于触发<see cref="CollectionSelectPanel"/>的SelectedCollection变更
         ///</summary>
         public Bindable<BeatmapCollection> SelectedCollection = new Bindable<BeatmapCollection>();
+
         public Bindable<CollectionPanel> SelectedPanel = new Bindable<CollectionPanel>();
 
-        private List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+        private readonly List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved]
+        private CustomColourProvider colourProvider { get; set; }
+
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;
         private OsuScrollContainer thumbnailScroll;
-        private Action doubleClick;
+        private readonly Action doubleClick;
 
-        public Bindable<ActiveState> state = new Bindable<ActiveState>();
+        public Bindable<ActiveState> State = new Bindable<ActiveState>();
         private Box stateBox;
 
         /// <summary>
@@ -56,38 +60,33 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 12.5f;
+            Alpha = 0;
 
-            collection = c;
+            Collection = c;
             doubleClick = doubleClickAction;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            SortBeatmapCollection();
+            sortBeatmapCollection();
 
-            WorkingBeatmap targetBeatmap;
-            targetBeatmap = beatmapSets.Count > 0 ? beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()) : null;
+            WorkingBeatmap targetBeatmap = beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First());
 
             AddRangeInternal(new Drawable[]
             {
+                new BeatmapCover(targetBeatmap)
+                {
+                    BackgroundBox = false,
+                    TimeBeforeWrapperLoad = 0
+                },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(
-                        Color4Extensions.FromHex("#111").Opacity(0),
+                        Color4Extensions.FromHex("#111").Opacity(0.6f),
                         Color4Extensions.FromHex("#111")
                     ),
-                },
-                new BeatmapCover(targetBeatmap)
-                {
-                    Depth = float.MaxValue,
-                    BackgroundBox = false
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("#111").Opacity(0.6f),
                 },
                 new FillFlowContainer
                 {
@@ -123,7 +122,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
                                     Spacing = new Vector2(4),
-                                    Padding = new MarginPadding{Left = 15},
+                                    Padding = new MarginPadding { Left = 15 },
                                     Children = new Drawable[]
                                     {
                                         collectionName = new OsuSpriteText
@@ -155,25 +154,43 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             thumbnailScroll.ScrollContent.RelativeSizeAxes = Axes.None;
             thumbnailScroll.ScrollContent.AutoSizeAxes = Axes.Both;
 
-            if (beatmapSets.Count > 0)
-                state.Value = ActiveState.Idle;
-            else
-                state.Value = ActiveState.Disabled;
+            State.Value = beatmapSets.Count > 0
+                ? ActiveState.Idle
+                : ActiveState.Disabled;
 
-            collectionName.Text = collection.Name.Value;
+            collectionName.Text = Collection.Name.Value;
             collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
-            state.BindValueChanged(OnStateChanged, true);
+            State.BindValueChanged(OnStateChanged, true);
+
+            if (State.Value != ActiveState.Disabled)
+                colourProvider.HueColour.BindValueChanged(_ => State.TriggerChange());
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            this.FadeIn(300);
         }
 
         private void OnStateChanged(ValueChangedEvent<ActiveState> v)
         {
+            if (v.NewValue >= ActiveState.Selected)
+            {
+                AutoSizeDuration = 400;
+                AutoSizeEasing = Easing.OutQuint;
+                thumbnailScroll.Show();
+            }
+            else
+                thumbnailScroll.Hide();
+
             switch (v.NewValue)
             {
                 case ActiveState.Active:
                     BorderThickness = 3f;
-                    BorderColour = Color4Extensions.FromHex(@"88b300");
-                    stateBox.FadeColour(Color4Extensions.FromHex("#88b300"), 300, Easing.OutQuint);
+                    BorderColour = colourProvider.Highlight1;
+                    stateBox.FadeColour(colourProvider.Highlight1, 300, Easing.OutQuint);
                     break;
 
                 case ActiveState.Disabled:
@@ -185,8 +202,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
                 case ActiveState.Selected:
                     BorderThickness = 3f;
-                    BorderColour = Colour4.Gold;
-                    stateBox.FadeColour(Colour4.Gold, 300, Easing.OutQuint);
+                    BorderColour = colourProvider.Light2;
+                    stateBox.FadeColour(colourProvider.Light2, 300, Easing.OutQuint);
                     break;
 
                 default:
@@ -198,10 +215,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
         }
 
-        private void SortBeatmapCollection()
+        private void sortBeatmapCollection()
         {
             //From CollectionHelper.cs
-            foreach (var item in collection.Beatmaps)
+            foreach (var item in Collection.Beatmaps)
             {
                 //获取当前BeatmapSet
                 var currentSet = item.BeatmapSet;
@@ -214,7 +231,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (state.Value == ActiveState.Idle)
+            if (State.Value == ActiveState.Idle)
                 BorderThickness = 1.5f;
 
             return base.OnHover(e);
@@ -222,7 +239,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (state.Value == ActiveState.Idle)
+            if (State.Value == ActiveState.Idle)
                 BorderThickness = 0f;
 
             base.OnHoverLost(e);
@@ -230,24 +247,24 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (state.Value == ActiveState.Disabled)
+            if (State.Value == ActiveState.Disabled)
                 return base.OnClick(e);
 
             //如果已经被选中了，则触发双击
-            if (state.Value == ActiveState.Selected)
+            if (State.Value == ActiveState.Selected)
             {
                 doubleClick?.Invoke();
-                state.Value = ActiveState.Active;
+                State.Value = ActiveState.Active;
 
                 return base.OnClick(e);
             }
 
             //使SelectedCollection的值变为collection, 从而出触发CollectionSelectPanel的UpdateSelection
-            SelectedCollection.Value = collection;
+            SelectedCollection.Value = Collection;
             SelectedPanel.Value = this;
 
-            if (state.Value != ActiveState.Active)
-                state.Value = ActiveState.Selected;
+            if (State.Value != ActiveState.Active)
+                State.Value = ActiveState.Selected;
 
             return base.OnClick(e);
         }
@@ -255,22 +272,21 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         /// <summary>
         /// 重置状态
         /// </summary>
-        public void Reset(bool makeInactive = false)
+        public void Reset(bool force = false)
         {
-            if (state.Value != ActiveState.Disabled && state.Value != ActiveState.Active ||
-                 state.Value != ActiveState.Disabled && makeInactive)
+            if (State.Value != ActiveState.Disabled && State.Value != ActiveState.Active
+                || State.Value != ActiveState.Disabled && force)
             {
-                state.Value = ActiveState.Idle;
+                State.Value = ActiveState.Idle;
             }
         }
 
         private class BeatmapThumbnailFlow : FillFlowContainer
         {
-
             [Resolved]
             private BeatmapManager beatmaps { get; set; }
 
-            private List<BeatmapSetInfo> beatmapSetList;
+            private readonly List<BeatmapSetInfo> beatmapSetList;
 
             public BeatmapThumbnailFlow(List<BeatmapSetInfo> list)
             {
@@ -283,16 +299,13 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                AddBeatmapThumbnails();
+                addBeatmapThumbnails();
             }
 
-            private void AddBeatmapThumbnails()
+            private void addBeatmapThumbnails()
             {
                 short collections = 0;
-                short limit = 32767;
-
-                if (beatmapSetList.Count > 10)
-                    limit = 15;
+                const short limit = 10;
 
                 foreach (var c in beatmapSetList)
                 {
@@ -300,8 +313,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
                     var b = beatmaps.GetWorkingBeatmap(c.Beatmaps.First());
                     string tooltip = $"{b.Metadata.ArtistUnicode ?? b.Metadata.Artist}"
-                                   + " - "
-                                   + $"{b.Metadata.TitleUnicode ?? b.Metadata.Title}";
+                                     + " - "
+                                     + $"{b.Metadata.TitleUnicode ?? b.Metadata.Title}";
 
                     if (collections <= limit)
                     {
@@ -316,10 +329,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         continue;
                     }
 
-                    TooltipContainer t = this.Children.Last() as TooltipContainer;
+                    TooltipContainer t = Children.Last() as TooltipContainer;
                     int remaining = beatmapSetList.Count - limit;
 
-                    t.TooltipText+=$" 等{remaining}首歌曲";
+                    t.TooltipText += $" 等{remaining}首歌曲";
                     t.AddRange(new Drawable[]
                     {
                         new Box
@@ -335,7 +348,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         }
                     });
                     break;
-                };
+                }
             }
         }
 

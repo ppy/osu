@@ -2,11 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 
-namespace osu.Game.Overlays.Settings.Sections.General
+namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisAudioSettings : SettingsSubsection
     {

@@ -20,6 +20,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -103,7 +104,7 @@ namespace osu.Game.Screens.Edit
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameHost host)
+        private void load(OsuColour colours, GameHost host, OsuConfigManager config)
         {
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
@@ -207,6 +208,13 @@ namespace osu.Game.Screens.Edit
                                         cutMenuItem = new EditorMenuItem("剪切", MenuItemType.Standard, Cut),
                                         copyMenuItem = new EditorMenuItem("复制", MenuItemType.Standard, Copy),
                                         pasteMenuItem = new EditorMenuItem("粘贴", MenuItemType.Standard, Paste),
+                                    }
+                                },
+                                new MenuItem("视图")
+                                {
+                                    Items = new[]
+                                    {
+                                        new WaveformOpacityMenu(config)
                                     }
                                 }
                             }
@@ -490,6 +498,9 @@ namespace osu.Game.Screens.Edit
             {
                 // confirming exit without save means we should delete the new beatmap completely.
                 beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
+
+                // eagerly clear contents before restoring default beatmap to prevent value change callbacks from firing.
+                ClearInternal();
 
                 // in theory this shouldn't be required but due to EF core not sharing instance states 100%
                 // MusicController is unaware of the changed DeletePending state.

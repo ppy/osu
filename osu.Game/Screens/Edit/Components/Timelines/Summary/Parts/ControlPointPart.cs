@@ -14,13 +14,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     public class ControlPointPart : TimelinePart<GroupVisualisation>
     {
-        private IBindableList<ControlPointGroup> controlPointGroups;
+        private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
         protected override void LoadBeatmap(WorkingBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
 
-            controlPointGroups = beatmap.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
+            controlPointGroups.UnbindAll();
+            controlPointGroups.BindTo(beatmap.Beatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((sender, args) =>
             {
                 switch (args.Action)

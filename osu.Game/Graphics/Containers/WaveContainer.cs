@@ -166,7 +166,7 @@ namespace osu.Game.Graphics.Containers
                 double duration = IsLoaded ? DISAPPEAR_DURATION : 0;
 
                 // scheduling is required as parent may not be present at the time this is called.
-                Schedule(() => this.MoveToY(Parent.Parent.DrawSize.Y, duration, easing_hide));
+                Schedule(() => this.MoveToY(Parent.Parent.DrawSize.Y + 10, duration, easing_hide));
             }
         }
     }

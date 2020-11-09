@@ -283,41 +283,41 @@ namespace osu.Game.Overlays
 
                 LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
                 {
-                        if (optUI.Value)
-                        { 
-                            switch (direction)
-                            {
-                                case TrackChangeDirection.Next:
-                                    newBackground.Position = new Vector2(-400, 0);
-                                    newBackground.MoveToX(0, 500, Easing.OutCubic);
-                                    background.MoveToY(0, 500, Easing.OutCubic);
-                                    break;
-
-                                case TrackChangeDirection.Prev:
-                                    newBackground.Position = new Vector2(400, 0);
-                                    newBackground.MoveToX(0, 500, Easing.OutCubic);
-                                    background.MoveToY(0, 500, Easing.OutCubic);
-                                    break;
-                            }
-                        }
-
-                        if (!optUI.Value)
+                    if (optUI.Value)
+                    {
+                        switch (direction)
                         {
-                                switch (direction)
-                                {
-                                    case TrackChangeDirection.Next:
-                                        newBackground.Position = new Vector2(400, 0);
-                                        newBackground.MoveToX(0, 500, Easing.OutCubic);
-                                        background.MoveToX(-400, 500, Easing.OutCubic);
-                                        break;
+                            case TrackChangeDirection.Next:
+                                newBackground.Position = new Vector2(-400, 0);
+                                newBackground.MoveToX(0, 500, Easing.OutCubic);
+                                background.MoveToY(0, 500, Easing.OutCubic);
+                                break;
 
-                                    case TrackChangeDirection.Prev:
-                                        newBackground.Position = new Vector2(-400, 0);
-                                        newBackground.MoveToX(0, 500, Easing.OutCubic);
-                                        background.MoveToX(400, 500, Easing.OutCubic);
-                                        break;
-                                } 
+                            case TrackChangeDirection.Prev:
+                                newBackground.Position = new Vector2(400, 0);
+                                newBackground.MoveToX(0, 500, Easing.OutCubic);
+                                background.MoveToY(0, 500, Easing.OutCubic);
+                                break;
                         }
+                    }
+
+                    if (!optUI.Value)
+                    {
+                        switch (direction)
+                        {
+                            case TrackChangeDirection.Next:
+                                newBackground.Position = new Vector2(400, 0);
+                                newBackground.MoveToX(0, 500, Easing.OutCubic);
+                                background.MoveToX(-400, 500, Easing.OutCubic);
+                                break;
+
+                            case TrackChangeDirection.Prev:
+                                newBackground.Position = new Vector2(-400, 0);
+                                newBackground.MoveToX(0, 500, Easing.OutCubic);
+                                background.MoveToX(400, 500, Easing.OutCubic);
+                                break;
+                        }
+                    }
 
                     background.Expire();
                     background = newBackground;
@@ -332,7 +332,6 @@ namespace osu.Game.Overlays
             if (disabled)
                 playlist.Hide();
 
-            playButton.Enabled.Value = !disabled;
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;

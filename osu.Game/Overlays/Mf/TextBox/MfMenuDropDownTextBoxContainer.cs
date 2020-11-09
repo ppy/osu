@@ -7,19 +7,19 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osuTK;
 
-namespace osu.Game.Overlays.MfMenu
+namespace osu.Game.Overlays.Mf.TextBox
 {
     public class MfMenuDropDownTextBoxContainer : MfMenuTextBoxContainer
     {
-        private float UnExpandedBarWidth;
+        private float unExpandedBarWidth;
 
         public Drawable D;
 
         private Container content;
         private FillFlowContainer drawableContentContainer;
         private Circle dropDownBar;
-        private BindableBool IsExpanded = new BindableBool();
-        private BindableFloat ContentWidth = new BindableFloat();
+        private readonly BindableBool isExpanded = new BindableBool();
+        private readonly BindableFloat contentWidth = new BindableFloat();
         protected override bool Clickable => true;
 
         [BackgroundDependencyLoader]
@@ -59,53 +59,53 @@ namespace osu.Game.Overlays.MfMenu
                 }
             };
 
-            if ( D != null )
+            if (D != null)
                 content.Add(D);
 
-            if ( d != null )
+            if (d != null)
                 throw new InvalidOperationException("\"d\" should not be used here, use \"D\" instead");
 
             d = drawableContentContainer;
 
-            IsExpanded.Value = false;
-            IsExpanded.BindValueChanged(OnIsExpandedChanged, true);
+            isExpanded.Value = false;
+            isExpanded.BindValueChanged(OnIsExpandedChanged, true);
 
-            ContentWidth.BindValueChanged(OnContentWidthChanged, true);
+            contentWidth.BindValueChanged(OnContentWidthChanged, true);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            IsExpanded.Toggle();
+            isExpanded.Toggle();
             return base.OnClick(e);
         }
 
         private void OnIsExpandedChanged(ValueChangedEvent<bool> value)
         {
             var v = value.NewValue;
-            switch ( v )
+
+            switch (v)
             {
                 //点击时
                 case true:
                     AllowTransformBasicEffects.Value = false;
-                    this.TransformBindableTo(borderThickness, 4, DURATION, EASING);
-                    dropDownBar.ResizeTo(new Vector2(drawableContentContainer.DrawWidth, 3), DURATION, Easing.OutQuint);
-                    content.FadeIn(DURATION, Easing.OutQuint);
+                    this.TransformBindableTo(borderThickness, 4, Duration, Easing);
+                    dropDownBar.ResizeTo(new Vector2(drawableContentContainer.DrawWidth, 3), Duration, Easing.OutQuint);
+                    content.FadeIn(Duration, Easing.OutQuint);
                     break;
 
                 //其他情况
                 case false:
                     AllowTransformBasicEffects.Value = true;
 
-                    if ( this.BorderThickness != 0 )
-                        this.TransformBindableTo(borderThickness, 2, DURATION, EASING);
+                    if (BorderThickness != 0)
+                        this.TransformBindableTo(borderThickness, 2, Duration, Easing);
 
-                    dropDownBar.ResizeTo(new Vector2(ContentWidth.Value * 0.1f, 7), DURATION, Easing.OutQuint);
-                    content.FadeOut(DURATION, Easing.OutQuint);
+                    dropDownBar.ResizeTo(new Vector2(contentWidth.Value * 0.1f, 7), Duration, Easing.OutQuint);
+                    content.FadeOut(Duration, Easing.OutQuint);
 
-                    if ( IsHovered )
-                        this.TweenEdgeEffectTo(edgeEffectHover, DURATION, EASING);
-                    else
-                        this.TweenEdgeEffectTo(edgeEffectNormal, DURATION, EASING);
+                    TweenEdgeEffectTo(IsHovered
+                        ? EdgeEffectHover
+                        : EdgeEffectNormal, Duration, Easing);
 
                     break;
             }
@@ -113,37 +113,36 @@ namespace osu.Game.Overlays.MfMenu
 
         private void OnContentWidthChanged(ValueChangedEvent<float> w)
         {
-            UnExpandedBarWidth = w.NewValue * 0.1f;
+            unExpandedBarWidth = w.NewValue * 0.1f;
 
-            if ( IsExpanded.Value )
-                dropDownBar.ResizeWidthTo(w.NewValue);
-            else
-                dropDownBar.ResizeWidthTo(UnExpandedBarWidth);
+            dropDownBar.ResizeWidthTo(isExpanded.Value
+                ? w.NewValue
+                : unExpandedBarWidth);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            UnExpandedBarWidth *= 1.5f;
+            unExpandedBarWidth *= 1.5f;
 
-            if ( !IsExpanded.Value )
-                dropDownBar.ResizeWidthTo(UnExpandedBarWidth, 500, Easing.OutElastic);
+            if (!isExpanded.Value)
+                dropDownBar.ResizeWidthTo(unExpandedBarWidth, 500, Easing.OutElastic);
 
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            UnExpandedBarWidth = ContentWidth.Value * 0.1f;
+            unExpandedBarWidth = contentWidth.Value * 0.1f;
 
-            if ( !IsExpanded.Value )
-                dropDownBar.ResizeWidthTo(UnExpandedBarWidth, 500, Easing.OutQuint);
+            if (!isExpanded.Value)
+                dropDownBar.ResizeWidthTo(unExpandedBarWidth, 500, Easing.OutQuint);
 
             base.OnHoverLost(e);
         }
 
         protected override void Update()
         {
-            ContentWidth.Value = drawableContentContainer?.DrawWidth ?? this.DrawWidth;
+            contentWidth.Value = drawableContentContainer?.DrawWidth ?? this.DrawWidth;
             base.Update();
         }
     }

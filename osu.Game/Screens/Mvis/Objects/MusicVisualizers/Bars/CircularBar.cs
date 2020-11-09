@@ -1,4 +1,4 @@
-﻿namespace osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers.Bars
+﻿namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars
 {
     public class CircularBar : BasicBar
     {

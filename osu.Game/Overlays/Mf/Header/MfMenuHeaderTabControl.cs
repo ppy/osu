@@ -4,21 +4,22 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Mf.Sections;
 
-namespace osu.Game.Overlays.MfMenu.Header
+namespace osu.Game.Overlays.Mf.Header
 {
     public class MfMenuHeaderTabControl : OverlayTabControl<MfMenuSection>
     {
         public Func<float> GetHeaderDrawHeight;
-        public const float height = 47;
-        private const float barHeight = 2;
+        public const float HEIGHT = 47;
+        private const float bar_height = 2;
 
         public MfMenuHeaderTabControl()
         {
             RelativeSizeAxes = Axes.X;
 
-            Height = height;
-            BarHeight = barHeight;
+            Height = HEIGHT;
+            BarHeight = bar_height;
         }
 
         [BackgroundDependencyLoader]
@@ -50,7 +51,7 @@ namespace osu.Game.Overlays.MfMenu.Header
                 Text.Font = OsuFont.GetFont(size: 20);
                 Text.Margin = new MarginPadding { Vertical = 15.5f }; // 15px padding + 1.5px line-height difference compensation
                 Bar.ExpandedSize = 10;
-                Bar.Margin = new MarginPadding { Bottom = barHeight };
+                Bar.Margin = new MarginPadding { Bottom = bar_height };
             }
         }
     }

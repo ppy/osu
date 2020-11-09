@@ -47,6 +47,9 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisMusicSpeed, 1.0, 0.1, 2.0);
             Set(MfSetting.MvisEnableNightcoreBeat, false);
             Set(MfSetting.MvisPlayFromCollection, false);
+            Set(MfSetting.MvisInterfaceRed, value: 0, 0, 255f);
+            Set(MfSetting.MvisInterfaceGreen, value: 119f, 0, 255f);
+            Set(MfSetting.MvisInterfaceBlue, value: 255f, 0, 255f);
 
             //Mvis Settings(Upstream)
             Set(MfSetting.MvisShowParticles, true);
@@ -92,10 +95,13 @@ namespace osu.Game.Configuration
         MvisAdjustMusicWithFreq,
         MvisEnableNightcoreBeat,
         MvisPlayFromCollection,
+        MvisInterfaceRed,
+        MvisInterfaceGreen,
+        MvisInterfaceBlue,
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect,
-        FileFilter
+        FileFilter,
     }
 
     public enum MvisBarType

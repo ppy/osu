@@ -17,23 +17,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private IBindable<int> pathVersion;
         private IBindable<Color4> accentColour;
 
-        [Resolved]
-        private DrawableHitObject drawableObject { get; set; }
-
         [Resolved(CanBeNull = true)]
         private OsuRulesetConfigManager config { get; set; }
 
-        private Slider slider;
-
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load(ISkinSource skin, DrawableHitObject drawableObject)
         {
-            slider = (Slider)drawableObject.HitObject;
+            var drawableSlider = (DrawableSlider)drawableObject;
 
-            scaleBindable = slider.ScaleBindable.GetBoundCopy();
+            scaleBindable = drawableSlider.ScaleBindable.GetBoundCopy();
             scaleBindable.BindValueChanged(scale => PathRadius = OsuHitObject.OBJECT_RADIUS * scale.NewValue, true);
 
-            pathVersion = slider.Path.Version.GetBoundCopy();
+            pathVersion = drawableSlider.PathVersion.GetBoundCopy();
             pathVersion.BindValueChanged(_ => Refresh());
 
             accentColour = drawableObject.AccentColour.GetBoundCopy();

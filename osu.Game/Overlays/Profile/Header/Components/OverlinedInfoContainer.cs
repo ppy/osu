@@ -12,6 +12,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         private readonly OsuSpriteText title;
         private readonly OsuSpriteText content;
+
         public string Title
         {
             set => title.Text = value;

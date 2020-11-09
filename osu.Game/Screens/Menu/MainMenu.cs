@@ -20,6 +20,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Import;
+using osu.Game.Screens.Mvis;
 
 namespace osu.Game.Screens.Menu
 {
@@ -38,8 +39,7 @@ namespace osu.Game.Screens.Menu
         public override bool AllowRateAdjustments => false;
 
         private Screen songSelect;
-
-        private Screen mvisScreen;
+        private Screen mvisPlayer;
 
         private MenuSideFlashes sideFlashes;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(MfMenuOverlay mfoverlay,BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
+        private void load(MfMenuOverlay mfoverlay, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -145,7 +145,6 @@ namespace osu.Game.Screens.Menu
             buttons.OnMfMenuButton = () => mfoverlay?.ToggleVisibility();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
-            LoadComponentAsync(mvisScreen = new MvisScreen());
             preloadScreens();
         }
 
@@ -165,8 +164,8 @@ namespace osu.Game.Screens.Menu
             if (songSelect == null)
                 LoadComponentAsync(songSelect = new PlaySongSelect());
 
-            if (mvisScreen == null)
-                LoadComponentAsync(mvisScreen = new MvisScreen());
+            if (mvisPlayer == null)
+                LoadComponentAsync(mvisPlayer = new MvisScreen());
         }
 
         public void LoadToSolo() => Schedule(onSolo);
@@ -186,8 +185,8 @@ namespace osu.Game.Screens.Menu
 
         private Screen consumeMvis()
         {
-            var s = mvisScreen;
-            mvisScreen = null;
+            var s = mvisPlayer;
+            mvisPlayer = null;
             return s;
         }
 

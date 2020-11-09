@@ -4,8 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
@@ -13,7 +13,7 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
@@ -23,21 +23,23 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        private Box flashBox;
+        private Container flashBox;
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;
-        private Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
-        private List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+        private readonly Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
+        private readonly List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
         private BeatmapCover cover;
 
-        [Cached]
-        public readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
+        [Resolved]
+        private CustomColourProvider colourProvider { get; set; }
+
         private BeatmapList beatmapList;
-        private BindableBool isCurrentCollection = new BindableBool();
+        private readonly BindableBool isCurrentCollection = new BindableBool();
 
         public CollectionInfo()
         {
             RelativeSizeAxes = Axes.Both;
+            Masking = true;
         }
 
         [BackgroundDependencyLoader]
@@ -45,30 +47,31 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             InternalChildren = new Drawable[]
             {
-                new Box
+                bgBox = new Box
                 {
                     Colour = colourProvider.Background3,
                     RelativeSizeAxes = Axes.Both
                 },
-                cover = new BeatmapCover(null)
+                new SkinnableSprite("MSidebar-Collection-background", confineMode: ConfineMode.ScaleToFill)
                 {
-                    BackgroundBox = false,
-                    UseBufferedBackground = true
-                },
-                new Box
-                {
+                    Name = "收藏夹背景图",
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    ChildAnchor = Anchor.BottomRight,
+                    ChildOrigin = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3.Opacity(0.5f)
+                    CentreComponent = false,
+                    OverrideChildAnchor = true,
                 },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new Dimension[]
+                    RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Distributed),
+                        new Dimension(),
                     },
-                    Content = new []
+                    Content = new[]
                     {
                         new Drawable[]
                         {
@@ -79,12 +82,17 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                 AutoSizeAxes = Axes.Y,
                                 AutoSizeDuration = 300,
                                 AutoSizeEasing = Easing.OutQuint,
+                                Masking = true,
                                 Children = new Drawable[]
                                 {
-                                    new Box
+                                    cover = new BeatmapCover(null)
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = colourProvider.Background3.Opacity(0.5f)
+                                        BackgroundBox = false,
+                                        TimeBeforeWrapperLoad = 0,
+                                        Colour = ColourInfo.GradientVertical(
+                                            Colour4.LightGray,
+                                            Colour4.LightGray.Opacity(0)
+                                        )
                                     },
                                     new FillFlowContainer
                                     {
@@ -92,7 +100,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(12),
-                                        Padding = new MarginPadding{ Horizontal = 35, Vertical = 25 },
+                                        Padding = new MarginPadding { Horizontal = 35, Vertical = 25 },
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Children = new Drawable[]
@@ -111,12 +119,24 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                             }
                                         }
                                     },
-                                    flashBox = new Box
+                                    flashBox = new Container
                                     {
-                                        Height = 3,
+                                        AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Colour = Colour4.Gold,
-                                        Anchor = Anchor.BottomLeft,
+                                        Children = new Drawable[]
+                                        {
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 8 + 5,
+                                                Alpha = 0.6f
+                                            },
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 8
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -131,7 +151,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                     listContainer = new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding{Left = 35, Vertical = 20},
                                     },
                                     loadingSpinner = new LoadingSpinner(true)
                                     {
@@ -149,6 +168,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             base.LoadComplete();
 
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                bgBox.Colour = colourProvider.Background3;
+
+                flashBox.Colour = isCurrentCollection.Value ? colourProvider.Highlight1 : colourProvider.Light1;
+            }, true);
             collection.BindValueChanged(OnCollectionChanged);
         }
 
@@ -158,11 +183,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             if (c == null)
             {
-                ClearInfo();
+                clearInfo();
                 return;
             }
 
             beatmapSets.Clear();
+
             //From CollectionHelper.cs
             foreach (var item in c.Beatmaps)
             {
@@ -177,17 +203,18 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             collectionName.Text = c.Name.Value;
             collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
-            cover.updateBackground(beatmaps.GetWorkingBeatmap(beatmapSets.ElementAt(0).Beatmaps.First()));
+            cover.UpdateBackground(beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First()));
             flashBox.FlashColour(Colour4.White, 1000, Easing.OutQuint);
 
-            RefreshBeatmapSetList();
+            refreshBeatmapSetList();
         }
 
         private CancellationTokenSource refreshTaskCancellationToken;
         private Container listContainer;
         private LoadingSpinner loadingSpinner;
+        private Box bgBox;
 
-        private void RefreshBeatmapSetList()
+        private void refreshBeatmapSetList()
         {
             Task refreshTask;
             refreshTaskCancellationToken?.Cancel();
@@ -217,10 +244,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         public void UpdateCollection(BeatmapCollection collection, bool isCurrent)
         {
-            if (!isCurrent) flashBox.FadeColour(Colour4.Gold, 300, Easing.OutQuint);
-            else flashBox.FadeColour(Color4Extensions.FromHex("#88b300"), 300, Easing.OutQuint);
+            flashBox.FadeColour(isCurrent
+                ? colourProvider.Highlight1
+                : colourProvider.Light2, 300, Easing.OutQuint);
 
-            if ( collection != this.collection.Value && beatmapList != null )
+            if (collection != this.collection.Value && beatmapList != null)
             {
                 beatmapList.IsCurrent.UnbindAll();
                 beatmapList.IsCurrent.Value = false;
@@ -233,16 +261,16 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             this.collection.Value = collection;
         }
 
-        private void ClearInfo()
+        private void clearInfo()
         {
-            cover.updateBackground(null);
+            cover.UpdateBackground(null);
 
             beatmapSets.Clear();
             beatmapList.ClearList();
             collectionName.Text = "未选择收藏夹";
             collectionBeatmapCount.Text = "请先选择一个收藏夹!";
 
-            flashBox.FadeColour(Colour4.Gold);
+            flashBox.FadeColour(colourProvider.Light2);
         }
     }
 }

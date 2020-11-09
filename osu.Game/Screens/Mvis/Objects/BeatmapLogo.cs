@@ -1,4 +1,6 @@
-﻿using osu.Framework.Allocation;
+﻿using System.Collections.Generic;
+using System.Threading;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -6,14 +8,12 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Mvis.UI.Objects.Helpers;
-using osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers;
+using osu.Game.Screens.Mvis.Objects.Helpers;
+using osu.Game.Screens.Mvis.Objects.MusicVisualizers;
 using osuTK;
 using osuTK.Graphics;
-using System.Collections.Generic;
-using System.Threading;
 
-namespace osu.Game.Screens.Mvis.UI.Objects
+namespace osu.Game.Screens.Mvis.Objects
 {
     public class BeatmapLogo : CurrentBeatmapProvider
     {
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         [Resolved(canBeNull: true)]
         private MfConfigManager config { get; set; }
 
-        private Bindable<bool> UseOsuLogoVisuals = new Bindable<bool>();
+        private readonly Bindable<bool> useOsuLogoVisuals = new Bindable<bool>();
         private readonly Bindable<int> visuals = new Bindable<int>(3);
         private readonly Bindable<double> barWidth = new Bindable<double>(3.0);
         private readonly Bindable<int> barCount = new Bindable<int>(120);
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                 }),
             };
 
-            config.BindWith(MfSetting.MvisUseOsuLogoVisualisation, UseOsuLogoVisuals);
+            config.BindWith(MfSetting.MvisUseOsuLogoVisualisation, useOsuLogoVisuals);
             config?.BindWith(MfSetting.MvisVisualizerAmount, visuals);
             config?.BindWith(MfSetting.MvisBarWidth, barWidth);
             config?.BindWith(MfSetting.MvisBarsPerVisual, barCount);
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
             config?.BindWith(MfSetting.MvisBlue, blue);
             config?.BindWith(MfSetting.MvisUseCustomColour, useCustomColour);
 
-            UseOsuLogoVisuals.ValueChanged += _ => updateVisuals();
+            useOsuLogoVisuals.ValueChanged += _ => updateVisuals();
             barCount.BindValueChanged(_ => updateVisuals());
             visuals.BindValueChanged(_ => updateVisuals(), true);
             rotation.BindValueChanged(e => placeholder.Rotation = e.NewValue, true);
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
             var degree = 360f / visuals.Value;
 
-            switch ( UseOsuLogoVisuals.Value )
+            switch (useOsuLogoVisuals.Value)
             {
                 case true:
                     placeholder.FadeOut(500, Easing.OutQuint);
@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                     placeholder.FadeIn(500, Easing.OutQuint);
                     visualisation.FadeOut(500, Easing.OutQuint);
                     break;
-            };
+            }
 
             for (int i = 0; i < visuals.Value; i++)
             {
@@ -173,10 +173,9 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
             var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
             float progress = (track == null || track.IsDummyDevice) ? 0 : (float)(track.CurrentTime / track.Length);
-            if(float.IsNaN(progress))
-            {
+
+            if (float.IsNaN(progress))
                 progress = 0;
-            }
 
             progressGlow.Current.Value = progress;
         }

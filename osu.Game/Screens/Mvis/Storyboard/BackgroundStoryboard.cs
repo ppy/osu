@@ -13,10 +13,10 @@ namespace osu.Game.Screens.Mvis.Storyboard
     {
         private readonly WorkingBeatmap beatmap;
         private bool storyboardLoaded;
-        public Storyboards.Storyboard storyboard;
+        public Storyboards.Storyboard Storyboard;
         private DrawableStoryboard currentLoading;
-        private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        public Action onStoryboardReadyAction;
+        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        public Action OnStoryboardReadyAction;
         public StoryboardClock RunningClock;
 
         [Resolved]
@@ -26,18 +26,18 @@ namespace osu.Game.Screens.Mvis.Storyboard
             : base(skin)
         {
             this.beatmap = beatmap;
-            storyboard = beatmap.Storyboard;
+            Storyboard = beatmap.Storyboard;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            currentLoading = storyboard.CreateDrawable();
+            currentLoading = Storyboard.CreateDrawable();
             currentLoading.Clock = RunningClock;
 
             b.BindValueChanged(v =>
             {
-                if ( v.NewValue != beatmap && !storyboardLoaded )
+                if (v.NewValue != beatmap && !storyboardLoaded)
                 {
                     Expire();
                 }
@@ -45,10 +45,10 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
             LoadComponentAsync(currentLoading, _ =>
             {
-                if ( b.Value == beatmap )
+                if (b.Value == beatmap)
                 {
                     AddInternal(currentLoading);
-                    onStoryboardReadyAction?.Invoke();
+                    OnStoryboardReadyAction?.Invoke();
 
                     storyboardLoaded = true;
                 }

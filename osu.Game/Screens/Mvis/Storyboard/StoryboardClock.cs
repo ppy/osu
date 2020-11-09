@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             if (source == null) return;
 
-            Seek( (source as IAdjustableClock).CurrentTime );
+            Seek(((IAdjustableClock)source).CurrentTime);
 
             base.ChangeSource(source);
         }

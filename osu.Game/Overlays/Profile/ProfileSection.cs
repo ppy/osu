@@ -100,7 +100,6 @@ namespace osu.Game.Overlays.Profile
             background.Colour = colourProvider.Background5;
             underscore.Colour = colourProvider.Highlight1;
         }
-
     }
 
     public class SectionTriangles : Container

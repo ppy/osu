@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private TestDrawableSpinner drawableSpinner;
 
-        [TestCase(false)]
         [TestCase(true)]
+        [TestCase(false)]
         public void TestVariousSpinners(bool autoplay)
         {
             string term = autoplay ? "Hit" : "Miss";

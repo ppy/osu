@@ -1,56 +1,45 @@
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class CollectionSelectPanel : VisibilityContainer
+    public class CollectionSelectPanel : Container, ISidebarContent
     {
         [Resolved]
         private CollectionManager collectionManager { get; set; }
 
-        public readonly Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
+        [Resolved]
+        private CollectionHelper collectionHelper { get; set; }
 
-        private Bindable<BeatmapCollection> SelectedCollection = new Bindable<BeatmapCollection>();
-        private Bindable<CollectionPanel> SelectedPanel = new Bindable<CollectionPanel>();
+        private readonly Bindable<BeatmapCollection> selectedCollection = new Bindable<BeatmapCollection>();
+        private readonly Bindable<CollectionPanel> selectedPanel = new Bindable<CollectionPanel>();
 
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
-        private FillFlowContainer collectionsFillFlow;
+        private readonly FillFlowContainer<CollectionPanel> collectionsFillFlow;
         private CollectionPanel selectedpanel;
-        private OsuScrollContainer collectionScroll;
-        private CollectionInfo info;
+        private CollectionPanel prevPanel;
+        private readonly OsuScrollContainer collectionScroll;
+        private readonly CollectionInfo info;
+
+        public float ResizeWidth => 0.85f;
 
         public CollectionSelectPanel()
         {
             RelativeSizeAxes = Axes.Both;
-            Masking = true;
-            CornerRadius = 25f;
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-            Size = new Vector2(0.9f, 0.8f);
-            RelativeSizeAxes = Axes.Both;
+
             Children = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
                 new Container
                 {
                     Name = "收藏夹选择界面",
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.45f,
+                    Width = 0.3f,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     Children = new Drawable[]
@@ -58,52 +47,34 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         collectionScroll = new OsuScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = collectionsFillFlow = new FillFlowContainer
+                            Child = collectionsFillFlow = new FillFlowContainer<CollectionPanel>
                             {
                                 AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
                                 Spacing = new Vector2(10),
                                 Padding = new MarginPadding(25),
-                                Margin = new MarginPadding{Bottom = 40}
+                                Margin = new MarginPadding { Bottom = 40 }
                             }
                         },
-                        new BottomBarButton()
+                        new RefreshCollectionButton
                         {
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            Size = new Vector2(60, 40),
+                            Size = new Vector2(90, 30),
+                            Text = "刷新列表",
                             NoIcon = true,
-                            ExtraDrawable = new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Text = "刷新列表"
-                            },
-                            Action = () => RefreshCollections(),
+                            Action = RefreshCollectionList,
                             Margin = new MarginPadding(5),
                         }
                     }
                 },
-                new Container
+                info = new CollectionInfo
                 {
                     Name = "收藏夹信息界面",
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.55f,
+                    Width = 0.7f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Children = new Drawable[]
-                    {
-                        info = new CollectionInfo()
-                    }
-                },
-                new IconButton()
-                {
-                    Icon = FontAwesome.Solid.Times,
-                    Margin = new MarginPadding(25),
-                    Size = new Vector2(30),
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Action = Hide
                 }
             };
         }
@@ -112,11 +83,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             base.LoadComplete();
 
-            CurrentCollection.BindValueChanged(OnCurrentCollectionChanged);
-            SelectedCollection.BindValueChanged(UpdateSelection);
-            SelectedPanel.BindValueChanged(UpdateSelectedPanel);
+            collectionHelper.CurrentCollection.BindValueChanged(OnCurrentCollectionChanged);
+            selectedCollection.BindValueChanged(updateSelection);
+            selectedPanel.BindValueChanged(updateSelectedPanel);
 
-            RefreshCollections();
+            RefreshCollectionList();
         }
 
         private void OnCurrentCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
@@ -125,55 +96,53 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
             info.UpdateCollection(v.NewValue, true);
 
-            foreach (var d in collectionsFillFlow)
-                if (d is CollectionPanel panel)
-                    panel.Reset(true);
-
-            if (selectedpanel != null)
-                selectedpanel.state.Value = ActiveState.Active;
+            searchForCurrentSelection();
         }
 
         /// <summary>
         /// 当<see cref="CollectionPanel"/>被选中时执行
         /// </summary>
-        private void UpdateSelection(ValueChangedEvent<BeatmapCollection> v)
+        private void updateSelection(ValueChangedEvent<BeatmapCollection> v)
         {
             if (v.NewValue == null) return;
 
             //如果选择的收藏夹为正在播放的收藏夹，则更新isCurrent为true
-            if (v.NewValue == CurrentCollection.Value)
-                info.UpdateCollection(v.NewValue, true);
-            else
-                info.UpdateCollection(v.NewValue, false);
+            info.UpdateCollection(v.NewValue, v.NewValue == collectionHelper.CurrentCollection.Value);
         }
 
-        private void UpdateSelectedPanel(ValueChangedEvent<CollectionPanel> v)
+        private void updateSelectedPanel(ValueChangedEvent<CollectionPanel> v)
         {
             if (v.NewValue == null) return;
+
             selectedpanel?.Reset();
             selectedpanel = v.NewValue;
         }
 
-        private void SearchForCurrentSelection()
+        private void searchForCurrentSelection()
         {
-            foreach (var d in collectionsFillFlow)
+            prevPanel?.Reset(true);
+
+            foreach (var p in collectionsFillFlow)
             {
-                if (d is CollectionPanel panel)
-                    if (panel.collection == CurrentCollection.Value)
-                        selectedpanel = panel;
+                if (p.Collection == collectionHelper.CurrentCollection.Value)
+                    selectedpanel = prevPanel = p;
             }
+
+            if (selectedpanel != null
+                && collectionHelper.CurrentCollection.Value.Beatmaps.Count != 0)
+                selectedpanel.State.Value = ActiveState.Active;
         }
 
-        public void RefreshCollections()
+        public void RefreshCollectionList()
         {
-            var oldCollection = CurrentCollection.Value;
+            var oldCollection = collectionHelper.CurrentCollection.Value;
 
             //清空界面
             collectionsFillFlow.Clear();
             info.UpdateCollection(null, false);
             selectedpanel = null;
 
-            SelectedCollection.Value = null;
+            selectedCollection.Value = null;
 
             //如果收藏夹被删除，则留null
             if (!collectionManager.Collections.Contains(oldCollection))
@@ -187,47 +156,29 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
             else
             {
-                foreach (var collection in collectionManager.Collections)
+                collectionsFillFlow.AddRange(collectionManager.Collections.Select(c => new CollectionPanel(c, makeCurrentSelected)
                 {
-                    collectionsFillFlow.Add(new CollectionPanel(collection, MakeCurrentSelected)
-                    {
-                        SelectedCollection = { BindTarget = this.SelectedCollection },
-                        SelectedPanel = { BindTarget = this.SelectedPanel }
-                    });
-                };
+                    SelectedCollection = { BindTarget = selectedCollection },
+                    SelectedPanel = { BindTarget = selectedPanel }
+                }));
                 collectionScroll.FadeIn(300);
             }
 
             //重新赋值
-            CurrentCollection.Value = SelectedCollection.Value = oldCollection;
+            collectionHelper.CurrentCollection.Value = selectedCollection.Value = oldCollection;
 
             //根据选中的收藏夹寻找对应的BeatmapPanel
-            SearchForCurrentSelection();
-
-            //CurrentCollection需要手动触发因为它和MvisScreen中的CurrentCollection绑在一起
-            CurrentCollection.TriggerChange();
+            searchForCurrentSelection();
         }
 
-        private void MakeCurrentSelected()
+        private void makeCurrentSelected()
         {
-            if (CurrentCollection.Value == SelectedCollection.Value)
-                CurrentCollection.TriggerChange();
-            else
-                CurrentCollection.Value = SelectedCollection.Value;
+            collectionHelper.CurrentCollection.Value = selectedCollection.Value;
         }
 
-        protected override void PopIn()
+        private class RefreshCollectionButton : BottomBarButton
         {
-            this.FadeOut().Then().ScaleTo(0.8f)
-                            .Then()
-                            .ScaleTo(1, 1000, Easing.OutElastic)
-                            .FadeIn(500);
-        }
-
-        protected override void PopOut()
-        {
-            this.ScaleTo(0.8f, 500, Easing.OutExpo);
-            this.FadeOut(500, Easing.OutExpo);
+            protected override string BackgroundTextureName => "MButtonRefreshCollection-background";
         }
     }
 }

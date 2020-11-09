@@ -1,29 +1,52 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
     public class BottomBarSwitchButton : BottomBarButton
     {
         public BindableBool ToggleableValue = new BindableBool();
-
+        private SkinnableSprite off;
+        private SkinnableSprite on;
         public bool DefaultValue { get; set; }
 
-        [Resolved]
-        private OsuColour colour { get; set; }
+        protected override string BackgroundTextureName => "MButtonSwitchOff-background";
+        protected virtual string SwitchOnBgTextureName => "MButtonSwitchOn-background";
+        protected virtual ConfineMode TextureConfineMode => ConfineMode.ScaleToFit;
+
+        protected override Drawable CreateBackgroundTexture => new Container
+        {
+            RelativeSizeAxes = Axes.Both,
+            Children = new Drawable[]
+            {
+                off = new SkinnableSprite(BackgroundTextureName, confineMode: TextureConfineMode)
+                {
+                    CentreComponent = false,
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0
+                },
+                on = new SkinnableSprite(SwitchOnBgTextureName, confineMode: TextureConfineMode)
+                {
+                    CentreComponent = false,
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0
+                },
+            }
+        };
 
         protected override void LoadComplete()
         {
             ToggleableValue.Value = DefaultValue;
-            ToggleableValue.ValueChanged += _ => UpdateVisuals();
+            ToggleableValue.BindValueChanged(_ => updateVisuals(true));
 
-            UpdateVisuals();
+            updateVisuals();
+
+            ColourProvider.HueColour.BindValueChanged(_ => updateVisuals());
 
             base.LoadComplete();
         }
@@ -34,23 +57,35 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             return base.OnClick(e);
         }
 
-        public void Toggle()
-        {
+        public void Toggle() =>
             ToggleableValue.Toggle();
-        }
 
-        private void UpdateVisuals()
+        private void updateVisuals(bool animate = false)
         {
-            switch ( ToggleableValue.Value )
+            var duration = animate ? 500 : 0;
+
+            switch (ToggleableValue.Value)
             {
                 case true:
-                    bgBox.FadeColour( colour.Green, 500, Easing.OutQuint );
+                    BgBox.FadeColour(ColourProvider.Highlight1, duration, Easing.OutQuint);
+                    ContentFillFlow.FadeColour(Colour4.Black, duration, Easing.OutQuint);
+                    off?.FadeOut(duration, Easing.OutQuint);
+                    on?.FadeIn(duration, Easing.OutQuint);
+                    if (animate)
+                        OnToggledOnAnimation();
                     break;
 
                 case false:
-                    bgBox.FadeColour( Color4Extensions.FromHex("#5a5a5a"), 500, Easing.OutQuint );
+                    off?.FadeIn(duration, Easing.OutQuint);
+                    on?.FadeOut(duration, Easing.OutQuint);
+                    BgBox.FadeColour(ColourProvider.Background3, duration, Easing.OutQuint);
+                    ContentFillFlow.FadeColour(Colour4.White, duration, Easing.OutQuint);
                     break;
             }
+        }
+
+        protected virtual void OnToggledOnAnimation()
+        {
         }
     }
 }

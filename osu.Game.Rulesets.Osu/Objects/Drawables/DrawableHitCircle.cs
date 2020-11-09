@@ -4,7 +4,6 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -21,28 +20,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        public ApproachCircle ApproachCircle { get; }
-
-        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
-        private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
-        private readonly IBindable<float> scaleBindable = new BindableFloat();
-
         public OsuAction? HitAction => HitArea.HitAction;
-
-        public readonly HitReceptor HitArea;
-        public readonly SkinnableDrawable CirclePiece;
-        private readonly Container scaleContainer;
-
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
 
+        public ApproachCircle ApproachCircle { get; private set; }
+        public HitReceptor HitArea { get; private set; }
+        public SkinnableDrawable CirclePiece { get; private set; }
+
+        private Container scaleContainer;
         private InputManager inputManager;
 
         public DrawableHitCircle(HitCircle h)
             : base(h)
         {
-            Origin = Anchor.Centre;
+        }
 
-            Position = HitObject.StackedPosition;
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Origin = Anchor.Centre;
 
             InternalChildren = new Drawable[]
             {
@@ -75,19 +71,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
 
             Size = HitArea.DrawSize;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
-
-            positionBindable.BindTo(HitObject.PositionBindable);
-            stackHeightBindable.BindTo(HitObject.StackHeightBindable);
-            scaleBindable.BindTo(HitObject.ScaleBindable);
-
+            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);
+            StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
             AccentColour.BindValueChanged(accent => ApproachCircle.Colour = accent.NewValue, true);
         }
 
@@ -164,19 +151,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ApproachCircle.Expire(true);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            base.UpdateStateTransforms(state);
-
             Debug.Assert(HitObject.HitWindows != null);
 
             switch (state)
             {
                 case ArmedState.Idle:
                     this.Delay(HitObject.TimePreempt).FadeOut(500);
-
-                    Expire(true);
-
                     HitArea.HitAction = null;
                     break;
 

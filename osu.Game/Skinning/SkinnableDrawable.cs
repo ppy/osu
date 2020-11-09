@@ -25,6 +25,10 @@ namespace osu.Game.Skinning
         /// </summary>
         public bool CentreComponent { get; set; } = true;
 
+        public Anchor ChildAnchor = Anchor.TopLeft;
+        public Anchor ChildOrigin = Anchor.TopLeft;
+        public bool OverrideChildAnchor;
+
         public new Axes AutoSizeAxes
         {
             get => base.AutoSizeAxes;
@@ -91,6 +95,15 @@ namespace osu.Game.Skinning
             {
                 scaling.Invalidate();
 
+                if (OverrideChildAnchor)
+                {
+                    ChildAnchor = CentreComponent ? Anchor.Centre : ChildAnchor;
+                    ChildOrigin = CentreComponent ? Anchor.Centre : ChildOrigin;
+
+                    Drawable.Anchor = ChildAnchor;
+                    Drawable.Origin = ChildOrigin;
+                }
+
                 if (CentreComponent)
                 {
                     Drawable.Origin = Anchor.Centre;
@@ -121,6 +134,13 @@ namespace osu.Game.Skinning
                             Drawable.Scale = Vector2.One;
                             Drawable.FillMode = FillMode.Fit;
                             break;
+
+                        case ConfineMode.ScaleToFill:
+                            Drawable.RelativeSizeAxes = Axes.Both;
+                            Drawable.Size = Vector2.One;
+                            Drawable.Scale = Vector2.One;
+                            Drawable.FillMode = FillMode.Fill;
+                            break;
                     }
                 }
                 finally
@@ -138,5 +158,6 @@ namespace osu.Game.Skinning
         /// </summary>
         NoScaling,
         ScaleToFit,
+        ScaleToFill
     }
 }

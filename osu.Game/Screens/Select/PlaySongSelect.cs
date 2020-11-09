@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
+using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
@@ -32,21 +33,15 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"编辑", @"该谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () =>
-            {
-                ValidForResume = false;
-                Edit();
-            });
+            BeatmapOptions.AddButton(@"编辑", @"该谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
-            Footer.AddButton(new FooterButtonOpenInMvis(){ Action = OpenInMvis });
+            Footer.AddButton(new FooterButtonOpenInMvis { Action = openInMvis });
 
             ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
 
-        private void OpenInMvis()
-        {
+        private void openInMvis() =>
             this.Push(new MvisScreen());
-        }
 
         protected void PresentScore(ScoreInfo score) =>
             FinaliseSelection(score.Beatmap, score.Ruleset, () => this.Push(new SoloResultsScreen(score)));

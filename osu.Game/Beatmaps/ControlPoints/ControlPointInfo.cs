@@ -41,9 +41,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// All sound points.
         /// </summary>
         [JsonProperty]
-        public IReadOnlyList<SampleControlPoint> SamplePoints => samplePoints;
+        public IBindableList<SampleControlPoint> SamplePoints => samplePoints;
 
-        private readonly SortedList<SampleControlPoint> samplePoints = new SortedList<SampleControlPoint>(Comparer<SampleControlPoint>.Default);
+        private readonly BindableList<SampleControlPoint> samplePoints = new BindableList<SampleControlPoint>();
 
         /// <summary>
         /// All effect points.

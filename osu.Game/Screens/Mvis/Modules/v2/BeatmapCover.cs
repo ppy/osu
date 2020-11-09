@@ -8,21 +8,22 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Screens.Mvis.UI.Objects;
+using osu.Game.Screens.Mvis.Objects;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
     public class BeatmapCover : Container
     {
-        private WorkingBeatmap b;
+        private readonly WorkingBeatmap b;
 
         private Drawable cover;
 
-        private CancellationTokenSource ChangeCoverTask;
+        private CancellationTokenSource changeCoverTask;
 
         public bool BackgroundBox = true;
 
-        public bool UseBufferedBackground = false;
+        public bool UseBufferedBackground;
+        public float TimeBeforeWrapperLoad = 500;
 
         public BeatmapCover(WorkingBeatmap beatmap)
         {
@@ -34,34 +35,37 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             RelativeSizeAxes = Axes.Both;
 
-            if ( BackgroundBox )
+            if (BackgroundBox)
+            {
                 AddInternal(new Box
                 {
                     Depth = float.MaxValue,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),   
+                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),
                 });
+            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateBackground(b);
+            UpdateBackground(b);
         }
 
-        public void updateBackground(WorkingBeatmap beatmap)
+        public void UpdateBackground(WorkingBeatmap beatmap)
         {
-            ChangeCoverTask?.Cancel();
-            ChangeCoverTask = new CancellationTokenSource();
+            changeCoverTask?.Cancel();
+            changeCoverTask = new CancellationTokenSource();
 
-            if ( beatmap == null)
+            if (beatmap == null)
             {
-                 cover?.FadeOut(300);
-                 return;
+                cover?.FadeOut(300);
+                return;
             }
 
-            if ( !UseBufferedBackground )
-                LoadComponentAsync(new DelayedLoadUnloadWrapper( () =>
+            if (!UseBufferedBackground)
+            {
+                LoadComponentAsync(new DelayedLoadUnloadWrapper(() =>
                 {
                     var c = new Cover(beatmap)
                     {
@@ -73,18 +77,18 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     c.OnLoadComplete += d => d.FadeIn(300);
 
                     return c;
-                }), newCover =>
+                }, TimeBeforeWrapperLoad), newCover =>
                 {
-                    var oldCover = cover ?? null;
+                    var oldCover = cover;
                     oldCover?.FadeOut(300);
                     oldCover?.Expire();
 
                     cover = newCover;
                     Add(cover);
-
-                    oldCover = null;
-                }, ChangeCoverTask.Token);
+                }, changeCoverTask.Token);
+            }
             else
+            {
                 LoadComponentAsync(new BeatmapBackground(beatmap)
                 {
                     Anchor = Anchor.Centre,
@@ -92,7 +96,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     Alpha = 0,
                 }, newCover =>
                 {
-                    var oldCover = cover ?? null;
+                    var oldCover = cover;
                     oldCover?.FadeOut(300);
                     oldCover?.Expire();
 
@@ -100,13 +104,14 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     Add(cover);
 
                     Schedule(() => cover?.FadeIn(300));
-                    oldCover = null;
-                }, ChangeCoverTask.Token);
+                }, changeCoverTask.Token);
+            }
         }
 
         private class Cover : Sprite
         {
-            private WorkingBeatmap b;
+            private readonly WorkingBeatmap b;
+
             public Cover(WorkingBeatmap beatmap = null)
             {
                 RelativeSizeAxes = Axes.Both;
@@ -118,7 +123,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                Texture = b?.Background ?? null;
+                Texture = b?.Background;
             }
         }
     }

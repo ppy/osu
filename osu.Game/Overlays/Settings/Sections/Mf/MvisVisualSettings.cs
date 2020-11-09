@@ -2,13 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osuTK;
 
-namespace osu.Game.Overlays.Settings.Sections.General
+namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisVisualSettings : SettingsSubsection
     {

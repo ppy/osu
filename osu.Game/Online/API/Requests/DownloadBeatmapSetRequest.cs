@@ -1,59 +1,48 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 
 namespace osu.Game.Online.API.Requests
 {
     public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
     {
         private readonly bool noVideo;
-        private readonly bool IsMini;
+        private readonly bool isMini;
 
-        private bool UseSayobot;
+        private readonly bool useSayobot;
 
-        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool UseSayobot, bool noVideo, bool IsMini = false)
+        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool useSayobot, bool noVideo, bool isMini = false)
             : base(set)
         {
             this.noVideo = noVideo;
-            this.IsMini = IsMini;
-            this.UseSayobot = UseSayobot;
+            this.isMini = isMini;
+            this.useSayobot = useSayobot;
         }
 
-        private string CalcTarget()
+        private string calcTarget()
         {
-            switch ( UseSayobot )
+            if (useSayobot)
             {
-                case true:
-                    var IdFull = Model.OnlineBeatmapSetID.ToString();
+                var idFull = Model.OnlineBeatmapSetID.ToString();
 
-                    var Target = $@"{(IsMini? "mini" : ( noVideo? "novideo" : "full"))}/{IdFull}";
-                    return Target;
-                case false:
-                default:
-                    return $@"beatmapsets/{Model.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
+                var target = $@"{(isMini ? "mini" : (noVideo ? "novideo" : "full"))}/{idFull}";
+                return target;
             }
+
+            return $@"beatmapsets/{Model.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
         }
 
-        private string CalcUri()
+        private string selectUri()
         {
-            switch ( UseSayobot )
-            {
-                case true:
-                    return $@"https://txy1.sayobot.cn/beatmaps/download/{Target}";
+            if (useSayobot)
+                return $@"https://txy1.sayobot.cn/beatmaps/download/{Target}";
 
-                case false:
-                default:
-                    return $@"{API.Endpoint}/api/v2/{Target}";
-            }
+            return $@"{API.Endpoint}/api/v2/{Target}";
         }
-    
-        protected override string Target => $@"{CalcTarget()}";
 
-        protected override string Uri => $@"{CalcUri()}";
+        protected override string Target => $@"{calcTarget()}";
+
+        protected override string Uri => $@"{selectUri()}";
     }
 }

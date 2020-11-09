@@ -1,6 +1,6 @@
 ﻿using osu.Framework.Bindables;
 
-namespace osu.Game.Screens.Mvis.UI.Objects.Helpers
+namespace osu.Game.Screens.Mvis.Objects.Helpers
 {
     public abstract class MusicAmplitudesProvider : CurrentBeatmapProvider
     {

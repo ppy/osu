@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play
             AddButton("重试", colours.YellowDark, () => OnRetry?.Invoke());
             AddButton("退出", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
 
-            AddInternal(pauseLoop = new SkinnableSound(new SampleInfo("pause-loop"))
+            AddInternal(pauseLoop = new SkinnableSound(new SampleInfo("Gameplay/pause-loop"))
             {
                 Looping = true,
                 Volume = { Value = 0 }

@@ -1,11 +1,11 @@
-﻿using osu.Framework.Graphics;
+﻿using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osuTK.Graphics;
-using System.Collections.Generic;
 
-namespace osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers.Bars
+namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars
 {
     public class FallBar : BasicBar
     {

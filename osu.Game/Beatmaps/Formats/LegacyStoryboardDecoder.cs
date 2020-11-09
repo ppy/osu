@@ -347,7 +347,7 @@ namespace osu.Game.Beatmaps.Formats
         /// <param name="line">The line which may contains variables.</param>
         private void decodeVariables(ref string line)
         {
-            while (line.IndexOf('$') >= 0)
+            while (line.Contains('$'))
             {
                 string origLine = line;
 

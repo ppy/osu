@@ -1,19 +1,20 @@
-﻿using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
-using osuTK;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Effects;
-using osu.Game.Screens.Mvis.UI.Objects.Helpers;
-using osu.Framework.Localisation;
+﻿using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Mvis.Objects.Helpers;
+using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.UI.Objects
+namespace osu.Game.Screens.Mvis.Objects
 {
     public class UpdateableBeatmapBackground : CurrentBeatmapProvider
     {
@@ -117,12 +118,12 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
         private class BeatmapName : CompositeDrawable
         {
-            private OsuSpriteText titleText;
+            private readonly OsuSpriteText titleText;
             private ILocalisedBindableString title;
-            private WorkingBeatmap beatmap;
+            private readonly WorkingBeatmap beatmap;
 
             [Resolved]
-            private LocalisationManager localisation {get; set;}
+            private LocalisationManager localisation { get; set; }
 
             protected override void LoadComplete()
             {
@@ -142,7 +143,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
                 if (beatmap == null)
                     return;
-                
+
                 this.beatmap = beatmap;
 
                 AddInternal(new FillFlowContainer
@@ -198,7 +199,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                     }
                 }
 
-                if (newTitle.EndsWith(" "))
+                if (newTitle.EndsWith(" ", StringComparison.Ordinal))
                     newTitle = newTitle.Substring(0, newTitle.Length - 1);
 
                 return newTitle;

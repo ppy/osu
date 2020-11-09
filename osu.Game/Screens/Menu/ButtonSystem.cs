@@ -83,12 +83,11 @@ namespace osu.Game.Screens.Menu
         private readonly Button backButton;
         private readonly Button backButton1;
 
-        private readonly Bindable<bool> Optui = new Bindable<bool>();
+        private readonly Bindable<bool> optui = new Bindable<bool>();
         private readonly List<Button> buttonsTopLevel = new List<Button>();
         private readonly List<Button> buttonsPlay = new List<Button>();
         private readonly List<Button> buttonsP2C = new List<Button>();
         private readonly List<Button> buttonsCustom = new List<Button>();
-
 
         private SampleChannel sampleBack;
 
@@ -176,16 +175,16 @@ namespace osu.Game.Screens.Menu
 
             sampleBack = audio.Samples.Get(@"Menu/button-back-select");
 
-            config.BindWith(MfSetting.OptUI, Optui);
+            config.BindWith(MfSetting.OptUI, optui);
 
-            Optui.ValueChanged += _ => UpdateButtons();
-            StateChanged += _ => UpdateButtons();
-            UpdateButtons();
+            optui.ValueChanged += _ => updateButtons();
+            StateChanged += _ => updateButtons();
+            updateButtons();
         }
 
-        private void UpdateButtons()
+        private void updateButtons()
         {
-            switch (Optui.Value)
+            switch (optui.Value)
             {
                 case true:
                     if (state == ButtonSystemState.Play)

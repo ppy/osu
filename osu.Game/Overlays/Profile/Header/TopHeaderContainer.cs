@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Profile.Header
                 },
                 new Container
                 {
-                    Padding = new MarginPadding {Vertical = Height * 0.1f, Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Padding = new MarginPadding { Vertical = Height * 0.1f, Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
                     RelativeSizeAxes = Axes.Both,
                     Child = new GridContainer
                     {
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                 new Container
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Padding = new MarginPadding{ Bottom = 4.5f },
+                                                    Padding = new MarginPadding { Bottom = 4.5f },
                                                     Child = new GridContainer
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Profile.Header
                                 },
                                 new ComponentContainer
                                 {
-                                    Masking= true,
+                                    Masking = true,
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.9f,
                                     Anchor = Anchor.Centre,
@@ -189,7 +189,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         new FillFlowContainer
                                         {
                                             Direction = FillDirection.Vertical,
-                                            Padding = new MarginPadding{ Horizontal = 20, Top = 60 },//将Top设为60以临时对付对齐问题, 需要修复
+                                            Padding = new MarginPadding { Horizontal = 20, Top = 60 }, //将Top设为60以临时对付对齐问题, 需要修复
                                             Spacing = new Vector2(10),
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
@@ -330,8 +330,8 @@ namespace osu.Game.Overlays.Profile.Header
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.Both,
-                            Height = (float)2/3,
-                            Child =new GridContainer
+                            Height = (float)2 / 3,
+                            Child = new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 ColumnDimensions = new[]
@@ -390,7 +390,7 @@ namespace osu.Game.Overlays.Profile.Header
                         new PlayerStatBox
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Height = (float)1/3,
+                            Height = (float)1 / 3,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                             Icon = FontAwesome.Regular.Calendar,

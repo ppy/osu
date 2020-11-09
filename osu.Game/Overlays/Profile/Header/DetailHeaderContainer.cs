@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Header
                                 rankGraphContainer = new ComponentContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Child =  new Container
+                                    Child = new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Child = rankGraph = new RankGraph
@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             LayoutEasing = Easing.OutQuint,
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
-                                            Padding = new MarginPadding{Horizontal = 25, Vertical = 15},
+                                            Padding = new MarginPadding { Horizontal = 25, Vertical = 15 },
                                             Spacing = new Vector2(10),
                                             Children = new[]
                                             {
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Profile.Header
         {
             base.UpdateAfterChildren();
 
-            rankGraphContainer.Padding = new MarginPadding{ Left = 25, Right = rankInfoContainer.Width + 25 };
+            rankGraphContainer.Padding = new MarginPadding { Left = 25, Right = rankInfoContainer.Width + 25 };
         }
 
         public class ScoreRankInfo : CompositeDrawable

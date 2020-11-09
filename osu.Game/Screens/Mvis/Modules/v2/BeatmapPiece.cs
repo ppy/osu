@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -21,7 +20,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
     public class BeatmapPiece : OsuClickableContainer
     {
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private CustomColourProvider colourProvider { get; set; }
 
         [Resolved]
         private Bindable<WorkingBeatmap> b { get; set; }
@@ -32,10 +31,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public readonly BindableBool Active = new BindableBool();
         public bool IsCurrent;
 
-        public readonly WorkingBeatmap beatmap;
+        public readonly WorkingBeatmap Beatmap;
         private Flash flash;
         private Box maskBox;
         private Box hover;
+        private FillFlowContainer maskFillFlow;
+        private Box bgBox;
 
         public BeatmapPiece(WorkingBeatmap b)
         {
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             RelativeSizeAxes = Axes.X;
             Height = 80;
 
-            beatmap = b;
+            Beatmap = b;
         }
 
         [BackgroundDependencyLoader]
@@ -53,39 +54,40 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             AddRangeInternal(new Drawable[]
             {
-                new Box
+                bgBox = new Box
                 {
-                    RelativeSizeAxes= Axes.Both,
-                    Colour = Colour4.Gray
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background4
                 },
-                new BeatmapCover(beatmap)
+                new BeatmapCover(Beatmap)
                 {
-                    BackgroundBox = false
+                    BackgroundBox = false,
+                    TimeBeforeWrapperLoad = 100
                 },
                 maskBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background3.Opacity(0.65f)
                 },
-                new FillFlowContainer
+                maskFillFlow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.75f,
+                    Colour = colourProvider.Background4,
                     Children = new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.3f,
-                            Colour = colourProvider.Background3
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.2f,
                             Colour = ColourInfo.GradientHorizontal(
-                                colourProvider.Background3,
-                                colourProvider.Background3.Opacity(0.5f)
+                                Colour4.White,
+                                Colour4.White.Opacity(0.5f)
                             )
                         },
                         new Box
@@ -93,8 +95,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.1f,
                             Colour = ColourInfo.GradientHorizontal(
-                                colourProvider.Background3.Opacity(0.5f),
-                                colourProvider.Background3.Opacity(0.2f)
+                                Colour4.White.Opacity(0.5f),
+                                Colour4.White.Opacity(0.2f)
                             )
                         },
                         new Box
@@ -102,8 +104,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.1f,
                             Colour = ColourInfo.GradientHorizontal(
-                                colourProvider.Background3.Opacity(0.2f),
-                                colourProvider.Background3.Opacity(0)
+                                Colour4.White.Opacity(0.2f),
+                                Colour4.White.Opacity(0)
                             )
                         }
                     }
@@ -115,17 +117,17 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding{Left = 15},
+                    Padding = new MarginPadding { Left = 15 },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
-                            Text = beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title,
+                            Text = Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold)
                         },
                         new OsuSpriteText
                         {
-                            Text = beatmap.Metadata.ArtistUnicode ?? beatmap.Metadata.Artist,
+                            Text = Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold)
                         }
                     }
@@ -143,11 +145,26 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             });
 
             Active.BindValueChanged(OnActiveChanged, true);
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                maskBox.Colour = colourProvider.Background3.Opacity(0.65f);
+                maskFillFlow.Colour = bgBox.Colour = colourProvider.Background4;
+
+                if (Active.Value)
+                {
+                    BorderColour = IsCurrent
+                        ? colourProvider.Highlight1
+                        : colourProvider.Light2;
+                }
+                else
+                    BorderColour = colourProvider.Background1;
+            });
         }
 
         private class Flash : BeatSyncedContainer
         {
-            private Box flashBox;
+            private readonly Box flashBox;
+
             public Flash()
             {
                 Child = flashBox = new Box
@@ -162,15 +179,15 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                switch(timingPoint.TimeSignature)
+                switch (timingPoint.TimeSignature)
                 {
                     case TimeSignatures.SimpleQuadruple:
-                        if ( beatIndex % 4 == 0 || effectPoint.KiaiMode )
+                        if (beatIndex % 4 == 0 || effectPoint.KiaiMode)
                             flashBox.FadeOutFromOne(1000);
                         break;
 
                     case TimeSignatures.SimpleTriple:
-                        if ( beatIndex % 3 == 0 || effectPoint.KiaiMode )
+                        if (beatIndex % 3 == 0 || effectPoint.KiaiMode)
                             flashBox.FadeOutFromOne(1000);
                         break;
                 }
@@ -182,16 +199,15 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             switch (v.NewValue)
             {
                 case true:
-                    if ( IsCurrent )
-                            BorderColour = colourProvider.Highlight1;
-                    else
-                            BorderColour = Colour4.Gold;
+                    BorderColour = IsCurrent
+                        ? colourProvider.Highlight1
+                        : colourProvider.Light2;
                     maskBox.FadeOut(500);
                     flash.Show();
                     break;
 
                 case false:
-                    BorderColour = Colour4.Gray;
+                    BorderColour = colourProvider.Background1;
                     maskBox.FadeIn(500);
                     flash.Hide();
                     break;
@@ -204,11 +220,12 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (IsCurrent && b.Value != beatmap )
+            if (IsCurrent && b.Value != Beatmap)
             {
-                b.Value = beatmap;
+                b.Value = Beatmap;
                 controller.Play();
             }
+
             return base.OnClick(e);
         }
 
