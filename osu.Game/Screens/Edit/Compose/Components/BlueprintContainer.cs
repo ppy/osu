@@ -303,7 +303,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 if (blueprint.IsHovered)
                 {
-                    selectedPerformed &= SelectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
+                    selectedPerformed &= SelectionHandler.HandleSelectionRequested(blueprint, e);
                     clickSelectionBegan = true;
                     break;
                 }
