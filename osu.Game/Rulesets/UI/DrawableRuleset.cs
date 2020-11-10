@@ -383,6 +383,7 @@ namespace osu.Game.Rulesets.UI
     /// Once IDrawable is a thing, this can also become an interface.
     /// </remarks>
     /// </summary>
+    [Cached(typeof(DrawableRuleset))]
     public abstract class DrawableRuleset : CompositeDrawable
     {
         /// <summary>
