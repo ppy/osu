@@ -116,8 +116,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 case TaikoSkinComponents.TaikoExplosionKiai:
                     // suppress the default kiai explosion if the skin brings its own sprites.
+                    // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
                     if (hasExplosion.Value)
-                        return Drawable.Empty();
+                        return KiaiHitExplosion.EmptyExplosion();
 
                     return null;
 
