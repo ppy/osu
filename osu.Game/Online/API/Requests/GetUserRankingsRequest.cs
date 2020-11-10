@@ -6,7 +6,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserRankingsRequest : GetRankingsRequest<GetUsersResponse>
+    public class GetUserRankingsRequest : GetRankingsRequest<GetTopUsersResponse>
     {
         public readonly UserRankingsType Type;
 

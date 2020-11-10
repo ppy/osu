@@ -33,15 +33,15 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
             };
         }
 
-        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return new ConvertSpinner
             {
-                EndTime = endTime
+                Duration = duration
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return null;
         }

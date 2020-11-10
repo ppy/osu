@@ -11,7 +11,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -20,7 +19,7 @@ namespace osu.Game.Overlays.Settings
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
 
-        public abstract IconUsage Icon { get; }
+        public abstract Drawable CreateIcon();
         public abstract string Header { get; }
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();

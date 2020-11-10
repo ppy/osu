@@ -22,6 +22,8 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
+
         protected override void OnDrag(DragEvent e)
         {
             this.MoveTo(target += e.Delta, 1000, Easing.OutQuint);

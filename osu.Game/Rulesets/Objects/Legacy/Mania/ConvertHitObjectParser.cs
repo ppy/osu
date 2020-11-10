@@ -37,21 +37,21 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             };
         }
 
-        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return new ConvertSpinner
             {
                 X = position.X,
-                EndTime = endTime
+                Duration = duration
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return new ConvertHold
             {
                 X = position.X,
-                EndTime = endTime
+                Duration = duration
             };
         }
     }

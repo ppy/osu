@@ -5,18 +5,18 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderHead : DrawableHitCircle
     {
-        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
+
+        protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;
 
         private readonly Slider slider;
 
-        public DrawableSliderHead(Slider slider, HitCircle h)
+        public DrawableSliderHead(Slider slider, SliderHeadCircle h)
             : base(h)
         {
             this.slider = slider;
@@ -25,10 +25,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            positionBindable.BindTo(HitObject.PositionBindable);
             pathVersion.BindTo(slider.Path.Version);
 
-            positionBindable.BindValueChanged(_ => updatePosition());
+            PositionBindable.BindValueChanged(_ => updatePosition());
             pathVersion.BindValueChanged(_ => updatePosition(), true);
         }
 

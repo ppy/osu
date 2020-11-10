@@ -19,6 +19,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace osu.Game.Graphics
 {
@@ -119,7 +120,9 @@ namespace osu.Game.Graphics
                         break;
 
                     case ScreenshotFormat.Jpg:
-                        image.SaveAsJpeg(stream);
+                        const int jpeg_quality = 92;
+
+                        image.SaveAsJpeg(stream, new JpegEncoder { Quality = jpeg_quality });
                         break;
 
                     default:

@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
 
-        public bool AllowFail => true;
+        public bool PerformFail() => true;
+
         public bool RestartOnFail => true;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -28,6 +29,8 @@ namespace osu.Game.Rulesets.Mods
             healthProcessor.FailConditions += FailCondition;
         }
 
-        protected virtual bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => !result.IsHit && result.Judgement.AffectsCombo;
+        protected virtual bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+            => result.Type.AffectsCombo()
+               && !result.IsHit;
     }
 }

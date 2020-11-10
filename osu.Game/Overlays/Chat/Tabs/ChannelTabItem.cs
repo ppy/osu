@@ -211,7 +211,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             TweenEdgeEffectTo(deactivateEdgeEffect, TRANSITION_LENGTH);
 
-            box.FadeColour(BackgroundInactive, TRANSITION_LENGTH, Easing.OutQuint);
+            box.FadeColour(IsHovered ? backgroundHover : BackgroundInactive, TRANSITION_LENGTH, Easing.OutQuint);
             highlightBox.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
 
             Text.Font = Text.Font.With(weight: FontWeight.Medium);

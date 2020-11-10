@@ -28,10 +28,10 @@ namespace osu.Game.Overlays.Toolbar
 
         private const double transition_time = 500;
 
-        private const float alpha_hovering = 0.8f;
-        private const float alpha_normal = 0.6f;
+        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
-        private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+        // Toolbar components like RulesetSelector should receive keyboard input events even when the toolbar is hidden.
+        public override bool PropagateNonPositionalInputSubTree => true;
 
         public Toolbar()
         {
@@ -69,9 +69,10 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
+                        new ToolbarNewsButton(),
                         new ToolbarChangelogButton(),
                         new ToolbarRankingsButton(),
-                        new ToolbarDirectButton(),
+                        new ToolbarBeatmapListingButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
@@ -88,19 +89,12 @@ namespace osu.Game.Overlays.Toolbar
             // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
             rulesetSelector.Current.BindTo(parentRuleset);
 
-            State.ValueChanged += visibility =>
-            {
-                if (overlayActivationMode.Value == OverlayActivation.Disabled)
-                    Hide();
-            };
-
             if (osuGame != null)
-                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
         }
 
         public class ToolbarBackground : Container
         {
-            private readonly Box solidBackground;
             private readonly Box gradientBackground;
 
             public ToolbarBackground()
@@ -108,50 +102,58 @@ namespace osu.Game.Overlays.Toolbar
                 RelativeSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    solidBackground = new Box
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(0.1f),
-                        Alpha = alpha_normal,
                     },
                     gradientBackground = new Box
                     {
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.BottomLeft,
                         Alpha = 0,
-                        Height = 90,
+                        Height = 100,
                         Colour = ColourInfo.GradientVertical(
-                            OsuColour.Gray(0.1f).Opacity(0.5f), OsuColour.Gray(0.1f).Opacity(0)),
+                            OsuColour.Gray(0).Opacity(0.9f), OsuColour.Gray(0).Opacity(0)),
                     },
                 };
             }
 
             protected override bool OnHover(HoverEvent e)
             {
-                solidBackground.FadeTo(alpha_hovering, transition_time, Easing.OutQuint);
                 gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                solidBackground.FadeTo(alpha_normal, transition_time, Easing.OutQuint);
                 gradientBackground.FadeOut(transition_time, Easing.OutQuint);
             }
+        }
+
+        protected override void UpdateState(ValueChangedEvent<Visibility> state)
+        {
+            if (state.NewValue == Visibility.Visible && OverlayActivationMode.Value == OverlayActivation.Disabled)
+            {
+                State.Value = Visibility.Hidden;
+                return;
+            }
+
+            base.UpdateState(state);
         }
 
         protected override void PopIn()
         {
             this.MoveToY(0, transition_time, Easing.OutQuint);
-            this.FadeIn(transition_time / 2, Easing.OutQuint);
+            this.FadeIn(transition_time / 4, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            userButton?.StateContainer.Hide();
+            userButton.StateContainer?.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
-            this.FadeOut(transition_time);
+            this.FadeOut(transition_time, Easing.InQuint);
         }
     }
 }

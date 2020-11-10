@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Utils;
 using osu.Game.Screens.Menu;
-using osuTK;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
@@ -24,31 +26,12 @@ namespace osu.Game.Screens
             ValidForResume = false;
         }
 
-        protected override void LogoArriving(OsuLogo logo, bool resuming)
-        {
-            base.LogoArriving(logo, resuming);
-
-            logo.BeatMatching = false;
-            logo.Triangles = false;
-            logo.RelativePositionAxes = Axes.None;
-            logo.Origin = Anchor.BottomRight;
-            logo.Anchor = Anchor.BottomRight;
-            logo.Position = new Vector2(-40);
-            logo.Scale = new Vector2(0.2f);
-
-            logo.Delay(500).FadeInFromZero(1000, Easing.OutQuint);
-        }
-
-        protected override void LogoSuspending(OsuLogo logo)
-        {
-            base.LogoSuspending(logo);
-            logo.FadeOut(logo.Alpha * 400);
-        }
-
         private OsuScreen loadableScreen;
         private ShaderPrecompiler precompiler;
 
         private IntroSequence introSequence;
+        private LoadingSpinner spinner;
+        private ScheduledDelegate spinnerShow;
 
         protected virtual OsuScreen CreateLoadableScreen()
         {
@@ -68,6 +51,9 @@ namespace osu.Game.Screens
                 case IntroSequence.Circles:
                     return new IntroCircles();
 
+                case IntroSequence.Welcome:
+                    return new IntroWelcome();
+
                 default:
                     return new IntroTriangles();
             }
@@ -82,6 +68,17 @@ namespace osu.Game.Screens
             LoadComponentAsync(precompiler = CreateShaderPrecompiler(), AddInternal);
             LoadComponentAsync(loadableScreen = CreateLoadableScreen());
 
+            LoadComponentAsync(spinner = new LoadingSpinner(true, true)
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Margin = new MarginPadding(40),
+            }, _ =>
+            {
+                AddInternal(spinner);
+                spinnerShow = Scheduler.AddDelayed(spinner.Show, 200);
+            });
+
             checkIfLoaded();
         }
 
@@ -93,7 +90,15 @@ namespace osu.Game.Screens
                 return;
             }
 
-            this.Push(loadableScreen);
+            spinnerShow?.Cancel();
+
+            if (spinner.State.Value == Visibility.Visible)
+            {
+                spinner.Hide();
+                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION);
+            }
+            else
+                this.Push(loadableScreen);
         }
 
         [BackgroundDependencyLoader]

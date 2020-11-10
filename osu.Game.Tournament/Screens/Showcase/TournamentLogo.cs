@@ -28,7 +28,7 @@ namespace osu.Game.Tournament.Screens.Showcase
                 Origin = Anchor.TopCentre,
                 FillMode = FillMode.Fit,
                 RelativeSizeAxes = Axes.Both,
-                Texture = textures.Get("game-screen-logo"),
+                Texture = textures.Get("header-logo"),
             };
         }
     }

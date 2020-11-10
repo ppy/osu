@@ -8,12 +8,11 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableFruit : PalpableCatchHitObject<Fruit>
+    public class DrawableFruit : PalpableDrawableCatchHitObject<Fruit>
     {
         public DrawableFruit(Fruit h)
             : base(h)
         {
-            Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
 
         [BackgroundDependencyLoader]
@@ -21,6 +20,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             ScaleContainer.Child = new SkinnableDrawable(
                 new CatchSkinComponent(getComponent(HitObject.VisualRepresentation)), _ => new FruitPiece());
+
+            ScaleContainer.Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
 
         private CatchSkinComponents getComponent(FruitVisualRepresentation hitObjectVisualRepresentation)

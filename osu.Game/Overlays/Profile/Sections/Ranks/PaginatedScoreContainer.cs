@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
 using osu.Game.Online.API;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -17,24 +18,42 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing)
-            : base(user, header, missing)
+        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string headerText, CounterVisibilityState counterVisibilityState, string missingText = "")
+            : base(user, headerText, missingText, counterVisibilityState)
         {
             this.type = type;
 
             ItemsPerPage = 5;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             ItemsContainer.Direction = FillDirection.Vertical;
+        }
+
+        protected override int GetCount(User user)
+        {
+            switch (type)
+            {
+                case ScoreType.Firsts:
+                    return user.ScoresFirstCount;
+
+                default:
+                    return 0;
+            }
+        }
+
+        protected override void OnItemsReceived(List<APILegacyScoreInfo> items)
+        {
+            base.OnItemsReceived(items);
+
+            if (type == ScoreType.Recent)
+                SetCount(items.Count);
         }
 
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
             new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
-
-        protected override int GetCount(User user) => type switch
-        {
-            ScoreType.Firsts => user.ScoresFirstCount,
-            _ => 0
-        };
 
         protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
         {

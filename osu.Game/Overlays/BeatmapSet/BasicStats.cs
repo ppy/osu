@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -124,7 +125,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Icon = FontAwesome.Solid.Square,
                                 Size = new Vector2(12),
                                 Rotation = 45,
-                                Colour = OsuColour.FromHex(@"441288"),
+                                Colour = Color4Extensions.FromHex(@"441288"),
                             },
                             new SpriteIcon
                             {
@@ -132,7 +133,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Origin = Anchor.Centre,
                                 Icon = icon,
                                 Size = new Vector2(12),
-                                Colour = OsuColour.FromHex(@"f7dd55"),
+                                Colour = Color4Extensions.FromHex(@"f7dd55"),
                                 Scale = new Vector2(0.8f),
                             },
                             value = new OsuSpriteText

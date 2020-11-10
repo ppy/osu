@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// Hit objects are intentionally made to fade out at a constant slower rate than in gameplay.
         /// This allows a mapper to gain better historical context and use recent hitobjects as reference / snap points.
         /// </summary>
-        private const double editor_hit_object_fade_out_extension = 500;
+        private const double editor_hit_object_fade_out_extension = 700;
 
         public DrawableOsuEditRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
@@ -32,20 +33,37 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void updateState(DrawableHitObject hitObject, ArmedState state)
         {
-            switch (state)
+            if (state == ArmedState.Idle)
+                return;
+
+            // adjust the visuals of certain object types to make them stay on screen for longer than usual.
+            switch (hitObject)
             {
-                case ArmedState.Miss:
-                    // Get the existing fade out transform
-                    var existing = hitObject.Transforms.LastOrDefault(t => t.TargetMember == nameof(Alpha));
-                    if (existing == null)
-                        return;
+                default:
+                    // there are quite a few drawable hit types we don't want to extent (spinners, ticks etc.)
+                    return;
 
-                    hitObject.RemoveTransform(existing);
+                case DrawableSlider _:
+                    // no specifics to sliders but let them fade slower below.
+                    break;
 
-                    using (hitObject.BeginAbsoluteSequence(existing.StartTime))
-                        hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();
+                case DrawableHitCircle circle: // also handles slider heads
+                    circle.ApproachCircle
+                          .FadeOutFromOne(editor_hit_object_fade_out_extension)
+                          .Expire();
                     break;
             }
+
+            // Get the existing fade out transform
+            var existing = hitObject.Transforms.LastOrDefault(t => t.TargetMember == nameof(Alpha));
+
+            if (existing == null)
+                return;
+
+            hitObject.RemoveTransform(existing);
+
+            using (hitObject.BeginAbsoluteSequence(existing.StartTime))
+                hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();
         }
 
         protected override Playfield CreatePlayfield() => new OsuPlayfieldNoCursor();

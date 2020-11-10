@@ -19,25 +19,29 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class SeedingEditorScreen : TournamentEditorScreen<SeedingEditorScreen.SeeingResultRow, SeedingResult>
+    public class SeedingEditorScreen : TournamentEditorScreen<SeedingEditorScreen.SeedingResultRow, SeedingResult>
     {
         private readonly TournamentTeam team;
 
         protected override BindableList<SeedingResult> Storage => team.SeedingResults;
 
-        public SeedingEditorScreen(TournamentTeam team)
+        [Resolved(canBeNull: true)]
+        private TournamentSceneManager sceneManager { get; set; }
+
+        public SeedingEditorScreen(TournamentTeam team, TournamentScreen parentScreen)
+            : base(parentScreen)
         {
             this.team = team;
         }
 
-        public class SeeingResultRow : CompositeDrawable, IModelBacked<SeedingResult>
+        public class SeedingResultRow : CompositeDrawable, IModelBacked<SeedingResult>
         {
             public SeedingResult Model { get; }
 
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
 
-            public SeeingResultRow(TournamentTeam team, SeedingResult round)
+            public SeedingResultRow(TournamentTeam team, SeedingResult round)
             {
                 Model = round;
 
@@ -70,13 +74,13 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Mod",
                                 Width = 0.33f,
-                                Bindable = Model.Mod
+                                Current = Model.Mod
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Seed",
                                 Width = 0.33f,
-                                Bindable = Model.Seed
+                                Current = Model.Seed
                             },
                             new SettingsButton
                             {
@@ -183,21 +187,21 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "Beatmap ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = beatmapId,
+                                        Current = beatmapId,
                                     },
                                     new SettingsSlider<int>
                                     {
                                         LabelText = "Seed",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = beatmap.Seed
+                                        Current = beatmap.Seed
                                     },
                                     new SettingsTextBox
                                     {
                                         LabelText = "Score",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = score,
+                                        Current = score,
                                     },
                                     drawableContainer = new Container
                                     {
@@ -281,6 +285,6 @@ namespace osu.Game.Tournament.Screens.Editors
             }
         }
 
-        protected override SeeingResultRow CreateDrawable(SeedingResult model) => new SeeingResultRow(team, model);
+        protected override SeedingResultRow CreateDrawable(SeedingResult model) => new SeedingResultRow(team, model);
     }
 }

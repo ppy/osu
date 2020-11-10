@@ -12,12 +12,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
     {
         public EditNotePiece()
         {
-            Height = NotePiece.NOTE_HEIGHT;
+            Height = DefaultNotePiece.NOTE_HEIGHT;
 
             CornerRadius = 5;
             Masking = true;
 
-            InternalChild = new NotePiece();
+            InternalChild = new DefaultNotePiece();
         }
 
         [BackgroundDependencyLoader]

@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             var user = Value.Users.First();
 
-            BackgroundActive = user.Colour != null ? OsuColour.FromHex(user.Colour) : colours.BlueDark;
+            BackgroundActive = user.Colour != null ? Color4Extensions.FromHex(user.Colour) : colours.BlueDark;
             BackgroundInactive = BackgroundActive.Darken(0.5f);
         }
     }

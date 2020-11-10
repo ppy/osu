@@ -18,6 +18,6 @@ namespace osu.Game.Screens
 
         public override bool AllowRateAdjustments => false;
 
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
     }
 }

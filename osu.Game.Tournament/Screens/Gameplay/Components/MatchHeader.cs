@@ -2,18 +2,54 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
-using osu.Game.Tournament.Screens.Showcase;
-using osuTK.Input;
+using osuTK;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
     public class MatchHeader : Container
     {
+        private TeamScoreDisplay teamDisplay1;
+        private TeamScoreDisplay teamDisplay2;
+        private DrawableTournamentHeaderLogo logo;
+
+        private bool showScores = true;
+
+        public bool ShowScores
+        {
+            get => showScores;
+            set
+            {
+                if (value == showScores)
+                    return;
+
+                showScores = value;
+
+                if (IsLoaded)
+                    updateDisplay();
+            }
+        }
+
+        private bool showLogo = true;
+
+        public bool ShowLogo
+        {
+            get => showLogo;
+            set
+            {
+                if (value == showLogo)
+                    return;
+
+                showLogo = value;
+
+                if (IsLoaded)
+                    updateDisplay();
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -21,94 +57,54 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             Height = 95;
             Children = new Drawable[]
             {
-                new TournamentLogo(),
-                new RoundDisplay
+                new FillFlowContainer
                 {
-                    Y = 5,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding(20),
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        logo = new DrawableTournamentHeaderLogo
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Alpha = showLogo ? 1 : 0
+                        },
+                        new DrawableTournamentHeaderText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                        new MatchRoundDisplay
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Scale = new Vector2(0.4f)
+                        },
+                    }
                 },
-                new TeamScoreDisplay(TeamColour.Red)
+                teamDisplay1 = new TeamScoreDisplay(TeamColour.Red)
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                 },
-                new TeamScoreDisplay(TeamColour.Blue)
+                teamDisplay2 = new TeamScoreDisplay(TeamColour.Blue)
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                 },
             };
-        }
-    }
 
-    public class TeamScoreDisplay : CompositeDrawable
-    {
-        private readonly TeamColour teamColour;
-
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
-        private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
-        private readonly Bindable<int?> currentTeamScore = new Bindable<int?>();
-
-        public TeamScoreDisplay(TeamColour teamColour)
-        {
-            this.teamColour = teamColour;
-
-            RelativeSizeAxes = Axes.Y;
-            Width = 300;
+            updateDisplay();
         }
 
-        [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder)
+        private void updateDisplay()
         {
-            currentMatch.BindValueChanged(matchChanged);
-            currentMatch.BindTo(ladder.CurrentMatch);
-        }
+            teamDisplay1.ShowScore = showScores;
+            teamDisplay2.ShowScore = showScores;
 
-        private void matchChanged(ValueChangedEvent<TournamentMatch> match)
-        {
-            currentTeamScore.UnbindBindings();
-            currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1Score : match.NewValue.Team2Score);
-
-            currentTeam.UnbindBindings();
-            currentTeam.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1 : match.NewValue.Team2);
-
-            // team may change to same team, which means score is not in a good state.
-            // thus we handle this manually.
-            teamChanged(currentTeam.Value);
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            switch (e.Button)
-            {
-                case MouseButton.Left:
-                    if (currentTeamScore.Value < currentMatch.Value.PointsToWin)
-                        currentTeamScore.Value++;
-                    return true;
-
-                case MouseButton.Right:
-                    if (currentTeamScore.Value > 0)
-                        currentTeamScore.Value--;
-                    return true;
-            }
-
-            return base.OnMouseDown(e);
-        }
-
-        private void teamChanged(TournamentTeam team)
-        {
-            var colour = teamColour == TeamColour.Red ? TournamentGame.COLOUR_RED : TournamentGame.COLOUR_BLUE;
-            var flip = teamColour == TeamColour.Red;
-
-            InternalChildren = new Drawable[]
-            {
-                new TeamDisplay(team, colour, flip),
-                new TeamScore(currentTeamScore, flip, currentMatch.Value.PointsToWin)
-                {
-                    Colour = colour
-                }
-            };
+            logo.Alpha = showLogo ? 1 : 0;
         }
     }
 }
