@@ -118,24 +118,8 @@ namespace osu.Game.Storyboards.Drawables
             for (int frame = 0; frame < Animation.FrameCount; frame++)
             {
                 string framePath = Animation.Path.Replace(".", frame + ".");
-                Drawable sprite = storyboard.CreateSpriteFromResourcePath(framePath, textureStore);
-
-                if (sprite != null)
-                {
-                    AddFrame(sprite, Animation.FrameDelay);
-                    continue;
-                }
-
-                framePath = Animation.Path.Replace("0.", frame + ".");
-                sprite = storyboard.CreateSpriteFromResourcePath(framePath, textureStore);
-
-                if (sprite != null)
-                {
-                    AddFrame(sprite, Animation.FrameDelay);
-                }
-
-                // todo: handle animation intentionally declared with more frames than sprites to cause a blinking effect
-                // e.g. beatmap 5381's "spr\play-skip.png"
+                Drawable sprite = storyboard.CreateSpriteFromResourcePath(framePath, textureStore) ?? Drawable.Empty();
+                AddFrame(sprite, Animation.FrameDelay);
             }
 
             Animation.ApplyTransforms(this);
