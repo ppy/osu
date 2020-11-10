@@ -259,6 +259,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             OnFree(HitObject);
 
             HitObject = null;
+            lifetimeEntry = null;
+
             hasHitObjectApplied = false;
         }
 
