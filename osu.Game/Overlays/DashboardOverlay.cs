@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
         private OverlayScrollContainer scrollFlow;
         
         [Resolved]
-        private IAPIProvider api {get; set;}
+        private IAPIProvider api {get; set; }
 
         private Container placeholderContainer;
         private Placeholder errorPlaceholder;

@@ -98,8 +98,7 @@ namespace osu.Game.Overlays
                                         {
                                             foundContent = new FillFlowContainer<BeatmapPanel>(),
                                             notFoundContent = new NotFoundDrawable(),
-                                            loadingLayer = new LoadingLayer(panelTarget),
-                                            
+                                            loadingLayer = new LoadingLayer(panelTarget),  
                                         }
                                     },
                                     placeholderContainer = new Container

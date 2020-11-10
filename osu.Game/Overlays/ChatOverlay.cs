@@ -315,7 +315,6 @@ namespace osu.Game.Overlays
                 channelManager.MarkChannelAsRead(e.NewValue);
             
             checkIsLoggedIn();
-
         }
 
         private float startDragChatHeight;
