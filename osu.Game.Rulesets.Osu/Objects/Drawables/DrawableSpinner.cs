@@ -33,6 +33,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
 
+        public DrawableSpinner()
+            : this(null)
+        {
+        }
+
         public DrawableSpinner([CanBeNull] Spinner s = null)
             : base(s)
         {

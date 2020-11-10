@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -24,10 +26,27 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
+        public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
+
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
+
+        protected override bool PoolHitObjects => true;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            RegisterPool<HitCircle, DrawableHitCircle>(10, 100);
+            RegisterPool<Slider, DrawableSlider>(10, 100);
+            RegisterPool<Spinner, DrawableSpinner>(2, 20);
+        }
+
+        protected override DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
+            => new OsuDrawablePool<TDrawable>(Playfield.CheckHittable, Playfield.OnHitObjectLoaded, initialSize, maximumSize);
+
+        protected override HitObjectLifetimeEntry CreateLifetimeEntry(OsuHitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
 
@@ -38,23 +57,6 @@ namespace osu.Game.Rulesets.Osu.UI
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { AlignWithStoryboard = true };
 
         protected override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
-
-        public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h)
-        {
-            switch (h)
-            {
-                case HitCircle circle:
-                    return new DrawableHitCircle(circle);
-
-                case Slider slider:
-                    return new DrawableSlider(slider);
-
-                case Spinner spinner:
-                    return new DrawableSpinner(spinner);
-            }
-
-            return null;
-        }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 
@@ -69,6 +71,16 @@ namespace osu.Game.Rulesets.Osu.UI
 
                 return 0;
             }
+        }
+
+        private class OsuHitObjectLifetimeEntry : HitObjectLifetimeEntry
+        {
+            public OsuHitObjectLifetimeEntry(HitObject hitObject)
+                : base(hitObject)
+            {
+            }
+
+            protected override double InitialLifetimeOffset => ((OsuHitObject)HitObject).TimePreempt;
         }
     }
 }
