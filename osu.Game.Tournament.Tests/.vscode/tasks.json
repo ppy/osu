@@ -11,9 +11,9 @@
                 "build",
                 "--no-restore",
                 "osu.Game.Tournament.Tests.csproj",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
@@ -26,10 +26,10 @@
                 "build",
                 "--no-restore",
                 "osu.Game.Tournament.Tests.csproj",
-                "/p:Configuration=Release",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
