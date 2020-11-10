@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
                 perMovementCheeseLevel = 0.5 * cheeseLevel + 0.5;
 
             double cheeseMt = movement.MovementTime * (1 + perMovementCheeseLevel * movement.CheesableRatio);
-            return FittsLaw.CalculateHitProb(movement.Distance, cheeseMt, tp);
+            return FittsLaw.ProbabilityToHit(movement.Distance, cheeseMt, tp);
         }
 
         public double FcProbability(double tp)

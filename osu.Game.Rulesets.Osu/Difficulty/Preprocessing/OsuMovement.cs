@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             var posCurr = Vector<double>.Build.Dense(new[] { objCurr.StackedPosition.X, (double)objCurr.StackedPosition.Y });
             var sPrevCurr = (posCurr - posPrev) / (2 * objCurr.Radius);
             double dPrevCurr = sPrevCurr.L2Norm();
-            double ipPrevCurr = FittsLaw.CalculateIp(dPrevCurr, tPrevCurr);
+            double ipPrevCurr = FittsLaw.Throughput(dPrevCurr, tPrevCurr);
 
             movement.IndexOfPerformance = ipPrevCurr;
 
@@ -319,7 +319,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (objNeg2 != null)
                 {
                     tNeg2PrevReciprocal = 1 / (tNeg2Prev + 1e-10);
-                    ipNeg2Prev = FittsLaw.CalculateIp(dNeg2Prev, tNeg2Prev);
+                    ipNeg2Prev = FittsLaw.Throughput(dNeg2Prev, tNeg2Prev);
                 }
                 else
                 {
@@ -336,7 +336,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (objNext != null)
                 {
                     tCurrNextReciprocal = 1 / (tCurrNext + 1e-10);
-                    ipCurrNext = FittsLaw.CalculateIp(dCurrNext, tCurrNext);
+                    ipCurrNext = FittsLaw.Throughput(dCurrNext, tCurrNext);
                 }
                 else
                 {
