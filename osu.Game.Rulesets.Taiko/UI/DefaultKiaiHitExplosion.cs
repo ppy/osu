@@ -13,14 +13,14 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class KiaiHitExplosion : CircularContainer
+    public class DefaultKiaiHitExplosion : CircularContainer
     {
         public override bool RemoveWhenNotAlive => true;
 
         public readonly DrawableHitObject JudgedObject;
         private readonly HitType type;
 
-        public KiaiHitExplosion(DrawableHitObject judgedObject, HitType type)
+        public DefaultKiaiHitExplosion(DrawableHitObject judgedObject, HitType type)
         {
             JudgedObject = judgedObject;
             this.type = type;
