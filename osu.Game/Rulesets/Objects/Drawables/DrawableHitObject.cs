@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         protected virtual float SamplePlaybackPosition => 0.5f;
 
-        private readonly Bindable<double> startTimeBindable = new Bindable<double>();
+        public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
         private readonly BindableList<HitSampleInfo> samplesBindable = new BindableList<HitSampleInfo>();
         private readonly Bindable<bool> userPositionalHitSounds = new Bindable<bool>();
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            startTimeBindable.BindValueChanged(_ => updateState(State.Value, true));
+            StartTimeBindable.BindValueChanged(_ => updateState(State.Value, true));
             comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
 
             updateState(ArmedState.Idle, true);
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 AddNestedHitObject(drawableNested);
             }
 
-            startTimeBindable.BindTo(HitObject.StartTimeBindable);
+            StartTimeBindable.BindTo(HitObject.StartTimeBindable);
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.BindTo(combo.ComboIndexBindable);
 
@@ -231,7 +231,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!hasHitObjectApplied)
                 return;
 
-            startTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
+            StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
 
