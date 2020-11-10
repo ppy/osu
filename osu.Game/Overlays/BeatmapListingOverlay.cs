@@ -68,6 +68,7 @@ namespace osu.Game.Overlays
                             Header,
                             filterControl = new BeatmapListingFilterControl
                             {
+                                TypingStarted = onTypingStarted,
                                 SearchStarted = onSearchStarted,
                                 SearchFinished = onSearchFinished,
                             },
@@ -100,6 +101,12 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+        }
+
+        private void onTypingStarted()
+        {
+            // temporary until the textbox/header is updated to always stay on screen.
+            resultScrollContainer.ScrollToStart();
         }
 
         protected override void OnFocus(FocusEvent e)
