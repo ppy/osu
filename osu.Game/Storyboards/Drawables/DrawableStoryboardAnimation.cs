@@ -118,7 +118,7 @@ namespace osu.Game.Storyboards.Drawables
             for (int frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
             {
                 string framePath = Animation.Path.Replace(".", frameIndex + ".");
-                Drawable frame = storyboard.CreateSpriteFromResourcePath(framePath, textureStore) ?? Drawable.Empty();
+                Drawable frame = storyboard.CreateSpriteFromResourcePath(framePath, textureStore) ?? Empty();
                 AddFrame(frame, Animation.FrameDelay);
             }
 
