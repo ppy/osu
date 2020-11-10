@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         public const float DEFAULT_HEIGHT = 178;
 
         private Container<HitExplosion> hitExplosionContainer;
-        private Container<DefaultKiaiHitExplosion> kiaiExplosionContainer;
+        private Container<KiaiHitExplosion> kiaiExplosionContainer;
         private JudgementContainer<DrawableTaikoJudgement> judgementContainer;
         private ScrollingHitObjectContainer drumRollHitContainer;
         internal Drawable HitTarget;
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                         drumRollHitContainer = new DrumRollHitContainer()
                                     }
                                 },
-                                kiaiExplosionContainer = new Container<DefaultKiaiHitExplosion>
+                                kiaiExplosionContainer = new Container<KiaiHitExplosion>
                                 {
                                     Name = "Kiai hit explosions",
                                     RelativeSizeAxes = Axes.Both,
@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             hitExplosionContainer.Add(new HitExplosion(drawableObject, result));
             if (drawableObject.HitObject.Kiai)
-                kiaiExplosionContainer.Add(new DefaultKiaiHitExplosion(drawableObject, type));
+                kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }
 
         private class ProxyContainer : LifetimeManagementContainer
