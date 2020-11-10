@@ -110,7 +110,11 @@ namespace osu.Game.Overlays.Dashboard
                 User = user;
 
                 AutoSizeAxes = Axes.Both;
+            }
 
+            [BackgroundDependencyLoader]
+            private void load(IAPIProvider api)
+            {
                 InternalChildren = new Drawable[]
                 {
                     new FillFlowContainer
@@ -121,7 +125,7 @@ namespace osu.Game.Overlays.Dashboard
                         Width = 290,
                         Children = new Drawable[]
                         {
-                            new UserGridPanel(user)
+                            new UserGridPanel(User)
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Anchor = Anchor.TopCentre,
@@ -133,7 +137,8 @@ namespace osu.Game.Overlays.Dashboard
                                 Text = "Watch",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Action = () => game?.PerformFromScreen(s => s.Push(new Spectator(user)))
+                                Action = () => game?.PerformFromScreen(s => s.Push(new Spectator(User))),
+                                Enabled = { Value = User.Id != api.LocalUser.Value.Id }
                             }
                         }
                     },

@@ -280,8 +280,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void addClickStep(MouseButton button)
         {
-            AddStep($"press {button}", () => InputManager.PressButton(button));
-            AddStep($"release {button}", () => InputManager.ReleaseButton(button));
+            AddStep($"click {button}", () => InputManager.Click(button));
         }
 
         private void assertPlaced(bool expected) => AddAssert($"slider {(expected ? "placed" : "not placed")}", () => (getSlider() != null) == expected);
