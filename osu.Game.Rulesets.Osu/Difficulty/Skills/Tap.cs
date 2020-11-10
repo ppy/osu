@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strainResult[j] = singleStrainResult * (1 - k) * timescale_factors[j];
             }
 
-            double diff = Mean.PowerMean(strainResult, 2);
+            double diff = PowerMean.Of(strainResult, 2);
 
             return (strainHistory, diff);
         }

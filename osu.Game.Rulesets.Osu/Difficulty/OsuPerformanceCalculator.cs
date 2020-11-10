@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double tapValue = computeTapValue();
             double accuracyValue = computeAccuracyValue();
 
-            double totalValue = Mean.PowerMean(new[] { aimValue, tapValue, accuracyValue }, total_value_exponent) * multiplier;
+            double totalValue = PowerMean.Of(new[] { aimValue, tapValue, accuracyValue }, total_value_exponent) * multiplier;
 
             if (categoryRatings != null)
             {
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             missTp = Math.Max(missTp, 0);
 
             // Combine combo based throughput and miss count based throughput
-            double tp = Mean.PowerMean(comboTp, missTp, 20);
+            double tp = PowerMean.Of(comboTp, missTp, 20);
 
             // Hidden mod
             if (mods.Any(h => h is OsuModHidden))

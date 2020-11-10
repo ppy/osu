@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                     flowinessNeg2PrevCurr = SpecialFunctions.Logistic((correctionNeg2Snap - correctionNeg2Flow - 0.05) * 20);
 
-                    correctionNeg2 = Mean.PowerMean(new[] { correctionNeg2Flow, correctionNeg2Snap, correctionNeg2Stop }, -10) * 1.3;
+                    correctionNeg2 = PowerMean.Of(new[] { correctionNeg2Flow, correctionNeg2Snap, correctionNeg2Stop }, -10) * 1.3;
                 }
             }
 
@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                     flowinessPrevCurrNext = SpecialFunctions.Logistic((correctionNextSnap - correctionNextFlow - 0.05) * 20);
 
-                    correctionNext = Math.Max(Mean.PowerMean(correctionNextFlow, correctionNextSnap, -10) - 0.1, 0) * 0.5;
+                    correctionNext = Math.Max(PowerMean.Of(correctionNextFlow, correctionNextSnap, -10) - 0.1, 0) * 0.5;
                 }
             }
 
@@ -290,7 +290,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double gap = (sPrevCurr - sCurrNext / 2 - sNeg2Prev / 2).L2Norm() / (dPrevCurr + 0.1);
                 patternCorrection = (SpecialFunctions.Logistic((gap - 1) * 8) - SpecialFunctions.Logistic(-6)) *
                                     SpecialFunctions.Logistic((dNeg2Prev - 0.7) * 10) * SpecialFunctions.Logistic((dCurrNext - 0.7) * 10) *
-                                    Mean.PowerMean(flowinessNeg2PrevCurr, flowinessPrevCurrNext, 2) * 0.6;
+                                    PowerMean.Of(flowinessNeg2PrevCurr, flowinessPrevCurrNext, 2) * 0.6;
             }
 
             // Correction #4 - Tap Strain
@@ -299,7 +299,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (dPrevCurr > 0 && tapStrain != null)
             {
-                tapCorrection = SpecialFunctions.Logistic((Mean.PowerMean(tapStrain, 2) / ipPrevCurr - 1.34) / 0.1) * 0.15;
+                tapCorrection = SpecialFunctions.Logistic((PowerMean.Of(tapStrain, 2) / ipPrevCurr - 1.34) / 0.1) * 0.15;
             }
 
             // Correction #5 - Cheesing
