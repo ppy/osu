@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
@@ -14,9 +14,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineArea : Container
     {
-        private readonly Timeline timeline = new Timeline { RelativeSizeAxes = Axes.Both };
+        public readonly Timeline Timeline = new Timeline { RelativeSizeAxes = Axes.Both };
 
-        protected override Container<Drawable> Content => timeline;
+        protected override Container<Drawable> Content => Timeline;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -25,13 +25,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             CornerRadius = 5;
 
             OsuCheckbox waveformCheckbox;
+            OsuCheckbox controlPointsCheckbox;
+            OsuCheckbox ticksCheckbox;
 
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex("111")
+                    Colour = Color4Extensions.FromHex("111")
                 },
                 new GridContainer
                 {
@@ -49,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = OsuColour.FromHex("222")
+                                        Colour = Color4Extensions.FromHex("222")
                                     },
                                     new FillFlowContainer
                                     {
@@ -57,12 +59,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         Origin = Anchor.CentreLeft,
                                         AutoSizeAxes = Axes.Y,
                                         Width = 160,
-                                        Padding = new MarginPadding { Horizontal = 15 },
+                                        Padding = new MarginPadding { Horizontal = 10 },
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
                                         {
-                                            waveformCheckbox = new OsuCheckbox { LabelText = "Waveform" }
+                                            waveformCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "Waveform",
+                                                Current = { Value = true },
+                                            },
+                                            controlPointsCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "Control Points",
+                                                Current = { Value = true },
+                                            },
+                                            ticksCheckbox = new OsuCheckbox
+                                            {
+                                                LabelText = "Ticks",
+                                                Current = { Value = true },
+                                            }
                                         }
                                     }
                                 }
@@ -76,7 +92,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = OsuColour.FromHex("333")
+                                        Colour = Color4Extensions.FromHex("333")
                                     },
                                     new Container<TimelineButton>
                                     {
@@ -107,7 +123,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     }
                                 }
                             },
-                            timeline
+                            Timeline
                         },
                     },
                     ColumnDimensions = new[]
@@ -119,11 +135,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             };
 
-            waveformCheckbox.Current.Value = true;
-
-            timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
+            Timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
+            Timeline.ControlPointsVisible.BindTo(controlPointsCheckbox.Current);
+            Timeline.TicksVisible.BindTo(ticksCheckbox.Current);
         }
 
-        private void changeZoom(float change) => timeline.Zoom += change;
+        private void changeZoom(float change) => Timeline.Zoom += change;
     }
 }

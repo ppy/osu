@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
     {
         protected new T HitObject => (T)DrawableObject.HitObject;
 
+        protected override bool AlwaysShowWhenSelected => true;
+
         protected OsuSelectionBlueprint(DrawableHitObject drawableObject)
             : base(drawableObject)
         {

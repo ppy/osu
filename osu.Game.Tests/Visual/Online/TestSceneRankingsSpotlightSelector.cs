@@ -15,11 +15,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneRankingsSpotlightSelector : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(SpotlightSelector),
-        };
-
         protected override bool UseOnlineAPI => true;
 
         [Cached]
@@ -33,12 +28,6 @@ namespace osu.Game.Tests.Visual.Online
         public TestSceneRankingsSpotlightSelector()
         {
             Add(selector = new SpotlightSelector());
-        }
-
-        [Test]
-        public void TestVisibility()
-        {
-            AddStep("Toggle Visibility", selector.ToggleVisibility);
         }
 
         [Test]

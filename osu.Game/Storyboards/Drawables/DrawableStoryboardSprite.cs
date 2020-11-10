@@ -2,18 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
+using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
+    public class DrawableStoryboardSprite : CompositeDrawable, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 
@@ -111,16 +109,18 @@ namespace osu.Game.Storyboards.Drawables
 
             LifetimeStart = sprite.StartTime;
             LifetimeEnd = sprite.EndTime;
+
+            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            var path = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
-            if (path == null)
-                return;
+            var drawable = storyboard.CreateSpriteFromResourcePath(Sprite.Path, textureStore);
 
-            Texture = textureStore.Get(path);
+            if (drawable != null)
+                InternalChild = drawable;
+
             Sprite.ApplyTransforms(this);
         }
     }

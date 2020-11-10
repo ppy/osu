@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private const double release_window_lenience = 1.5;
 
+        protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteTail;
+
         private readonly DrawableHoldNote holdNote;
 
         public DrawableHoldNoteTail(DrawableHoldNote holdNote)
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
 
                 return;
             }

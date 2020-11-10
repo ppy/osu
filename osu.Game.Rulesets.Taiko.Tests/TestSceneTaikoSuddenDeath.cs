@@ -11,13 +11,8 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneTaikoSuddenDeath : PlayerTestScene
+    public class TestSceneTaikoSuddenDeath : TestSceneTaikoPlayer
     {
-        public TestSceneTaikoSuddenDeath()
-            : base(new TaikoRuleset())
-        {
-        }
-
         protected override bool AllowFail => true;
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset)
@@ -41,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             };
 
         [Test]
-        public void TestSpinnerDoesNotFail()
+        public void TestSpinnerDoesFail()
         {
             bool judged = false;
             AddStep("Setup judgements", () =>
@@ -50,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Player.ScoreProcessor.NewJudgement += b => judged = true;
             });
             AddUntilStep("swell judged", () => judged);
-            AddAssert("not failed", () => !Player.HasFailed);
+            AddAssert("failed", () => Player.HasFailed);
         }
     }
 }

@@ -14,11 +14,13 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
+    [Timeout(10000)]
     public class ManiaBeatmapConversionTest : BeatmapConversionTest<ManiaConvertMapping, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
         [TestCase("basic")]
+        [TestCase("zero-length-slider")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
@@ -81,11 +83,17 @@ namespace osu.Game.Rulesets.Mania.Tests
             RandomZ = snapshot.RandomZ;
         }
 
+        public override void PostProcess()
+        {
+            base.PostProcess();
+            Objects.Sort();
+        }
+
         public bool Equals(ManiaConvertMapping other) => other != null && RandomW == other.RandomW && RandomX == other.RandomX && RandomY == other.RandomY && RandomZ == other.RandomZ;
         public override bool Equals(ConvertMapping<ConvertValue> other) => base.Equals(other) && Equals(other as ManiaConvertMapping);
     }
 
-    public struct ConvertValue : IEquatable<ConvertValue>
+    public struct ConvertValue : IEquatable<ConvertValue>, IComparable<ConvertValue>
     {
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.
@@ -100,5 +108,15 @@ namespace osu.Game.Rulesets.Mania.Tests
             => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
                && Column == other.Column;
+
+        public int CompareTo(ConvertValue other)
+        {
+            var result = StartTime.CompareTo(other.StartTime);
+
+            if (result != 0)
+                return result;
+
+            return Column.CompareTo(other.Column);
+        }
     }
 }

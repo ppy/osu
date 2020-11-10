@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer();
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { AlignWithStoryboard = true };
 
         protected override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
 
@@ -57,6 +57,8 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
+
+        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new OsuReplayRecorder(replay);
 
         public override double GameplayStartTime
         {

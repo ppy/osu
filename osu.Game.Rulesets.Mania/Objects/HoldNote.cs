@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -12,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// <summary>
     /// Represents a hit object which requires pressing, holding, and releasing a key.
     /// </summary>
-    public class HoldNote : ManiaHitObject, IHasEndTime
+    public class HoldNote : ManiaHitObject, IHasDuration
     {
         public double EndTime
         {
@@ -28,7 +31,9 @@ namespace osu.Game.Rulesets.Mania.Objects
             set
             {
                 duration = value;
-                Tail.StartTime = EndTime;
+
+                if (Tail != null)
+                    Tail.StartTime = EndTime;
             }
         }
 
@@ -38,8 +43,12 @@ namespace osu.Game.Rulesets.Mania.Objects
             set
             {
                 base.StartTime = value;
-                Head.StartTime = value;
-                Tail.StartTime = EndTime;
+
+                if (Head != null)
+                    Head.StartTime = value;
+
+                if (Tail != null)
+                    Tail.StartTime = EndTime;
             }
         }
 
@@ -49,20 +58,26 @@ namespace osu.Game.Rulesets.Mania.Objects
             set
             {
                 base.Column = value;
-                Head.Column = value;
-                Tail.Column = value;
+
+                if (Head != null)
+                    Head.Column = value;
+
+                if (Tail != null)
+                    Tail.Column = value;
             }
         }
+
+        public List<IList<HitSampleInfo>> NodeSamples { get; set; }
 
         /// <summary>
         /// The head note of the hold.
         /// </summary>
-        public readonly Note Head = new Note();
+        public Note Head { get; private set; }
 
         /// <summary>
         /// The tail note of the hold.
         /// </summary>
-        public readonly TailNote Tail = new TailNote();
+        public TailNote Tail { get; private set; }
 
         /// <summary>
         /// The time between ticks of this hold.
@@ -77,23 +92,36 @@ namespace osu.Game.Rulesets.Mania.Objects
             tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
 
-            createTicks();
+            createTicks(cancellationToken);
 
-            AddNested(Head);
-            AddNested(Tail);
+            AddNested(Head = new Note
+            {
+                StartTime = StartTime,
+                Column = Column,
+                Samples = GetNodeSamples(0),
+            });
+
+            AddNested(Tail = new TailNote
+            {
+                StartTime = EndTime,
+                Column = Column,
+                Samples = GetNodeSamples((NodeSamples?.Count - 1) ?? 1),
+            });
         }
 
-        private void createTicks()
+        private void createTicks(CancellationToken cancellationToken)
         {
             if (tickSpacing == 0)
                 return;
 
             for (double t = StartTime + tickSpacing; t <= EndTime - tickSpacing; t += tickSpacing)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 AddNested(new HoldNoteTick
                 {
                     StartTime = t,
@@ -105,5 +133,8 @@ namespace osu.Game.Rulesets.Mania.Objects
         public override Judgement CreateJudgement() => new IgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        public IList<HitSampleInfo> GetNodeSamples(int nodeIndex) =>
+            nodeIndex < NodeSamples?.Count ? NodeSamples[nodeIndex] : Samples;
     }
 }

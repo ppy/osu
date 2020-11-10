@@ -15,7 +15,6 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
@@ -62,7 +61,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
                             LabelText = "Show specific team",
-                            Bindable = currentTeam,
+                            Current = currentTeam,
                         }
                     }
                 }
@@ -140,9 +139,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                new TournamentSpriteText { Text = beatmap.BeatmapInfo.Metadata.Title, Colour = Color4.Black, },
-                                new TournamentSpriteText { Text = "by", Colour = Color4.Black, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
-                                new TournamentSpriteText { Text = beatmap.BeatmapInfo.Metadata.Artist, Colour = Color4.Black, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
+                                new TournamentSpriteText { Text = beatmap.BeatmapInfo.Metadata.Title, Colour = TournamentGame.TEXT_COLOUR, },
+                                new TournamentSpriteText { Text = "by", Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
+                                new TournamentSpriteText { Text = beatmap.BeatmapInfo.Metadata.Artist, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                             }
                         },
                         new FillFlowContainer
@@ -154,8 +153,8 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Spacing = new Vector2(40),
                             Children = new Drawable[]
                             {
-                                new TournamentSpriteText { Text = beatmap.Score.ToString("#,0"), Colour = Color4.Black, Width = 80 },
-                                new TournamentSpriteText { Text = "#" + beatmap.Seed.Value.ToString("#,0"), Colour = Color4.Black, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
+                                new TournamentSpriteText { Text = beatmap.Score.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Width = 80 },
+                                new TournamentSpriteText { Text = "#" + beatmap.Seed.Value.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                             }
                         },
                     };
@@ -204,13 +203,14 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4.Black,
+                                            Colour = TournamentGame.ELEMENT_BACKGROUND_COLOUR,
                                         },
                                         new TournamentSpriteText
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Text = seeding.ToString("#,0"),
+                                            Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR
                                         },
                                     }
                                 },
@@ -260,20 +260,18 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     AutoSizeAxes = Axes.Y;
                     RelativeSizeAxes = Axes.X;
 
-                    var colour = OsuColour.Gray(0.3f);
-
                     InternalChildren = new Drawable[]
                     {
                         new TournamentSpriteText
                         {
                             Text = left,
-                            Colour = colour,
-                            Font = OsuFont.Torus.With(size: 22),
+                            Colour = TournamentGame.TEXT_COLOUR,
+                            Font = OsuFont.Torus.With(size: 22, weight: FontWeight.SemiBold),
                         },
                         new TournamentSpriteText
                         {
                             Text = right,
-                            Colour = colour,
+                            Colour = TournamentGame.TEXT_COLOUR,
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopLeft,
                             Font = OsuFont.Torus.With(size: 22, weight: FontWeight.Regular),
@@ -290,8 +288,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     AutoSizeAxes = Axes.Both;
 
                     Flag.RelativeSizeAxes = Axes.None;
-                    Flag.Size = new Vector2(300, 200);
-                    Flag.Scale = new Vector2(0.3f);
+                    Flag.Scale = new Vector2(1.2f);
 
                     InternalChild = new FillFlowContainer
                     {
@@ -305,7 +302,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             {
                                 Text = team?.FullName.Value ?? "???",
                                 Font = OsuFont.Torus.With(size: 32, weight: FontWeight.SemiBold),
-                                Colour = Color4.Black,
+                                Colour = TournamentGame.TEXT_COLOUR,
                             },
                         }
                     };

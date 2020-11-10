@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
 using osu.Framework.Utils;
 using osu.Framework.Graphics;
@@ -22,17 +20,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHitErrorMeter : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(HitErrorMeter),
-            typeof(BarHitErrorMeter),
-            typeof(ColourHitErrorMeter)
-        };
-
         private BarHitErrorMeter barMeter;
         private BarHitErrorMeter barMeter2;
+        private BarHitErrorMeter barMeter3;
         private ColourHitErrorMeter colourMeter;
         private ColourHitErrorMeter colourMeter2;
+        private ColourHitErrorMeter colourMeter3;
         private HitWindows hitWindows;
 
         public TestSceneHitErrorMeter()
@@ -107,7 +100,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Children = new[]
                 {
                     new OsuSpriteText { Text = $@"Great: {hitWindows?.WindowFor(HitResult.Great)}" },
-                    new OsuSpriteText { Text = $@"Good: {hitWindows?.WindowFor(HitResult.Good)}" },
+                    new OsuSpriteText { Text = $@"Good: {hitWindows?.WindowFor(HitResult.Ok)}" },
                     new OsuSpriteText { Text = $@"Meh: {hitWindows?.WindowFor(HitResult.Meh)}" },
                 }
             });
@@ -124,6 +117,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Origin = Anchor.CentreLeft,
             });
 
+            Add(barMeter3 = new BarHitErrorMeter(hitWindows, true)
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.CentreLeft,
+                Rotation = 270,
+            });
+
             Add(colourMeter = new ColourHitErrorMeter(hitWindows)
             {
                 Anchor = Anchor.CentreRight,
@@ -135,6 +135,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
+                Margin = new MarginPadding { Left = 50 }
+            });
+
+            Add(colourMeter3 = new ColourHitErrorMeter(hitWindows)
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.CentreLeft,
+                Rotation = 270,
                 Margin = new MarginPadding { Left = 50 }
             });
         }
@@ -149,8 +157,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             barMeter.OnNewJudgement(judgement);
             barMeter2.OnNewJudgement(judgement);
+            barMeter3.OnNewJudgement(judgement);
             colourMeter.OnNewJudgement(judgement);
             colourMeter2.OnNewJudgement(judgement);
+            colourMeter3.OnNewJudgement(judgement);
         }
     }
 }

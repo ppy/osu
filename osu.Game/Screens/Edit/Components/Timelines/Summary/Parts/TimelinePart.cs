@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
@@ -22,6 +23,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     {
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
+        protected readonly IBindable<Track> Track = new Bindable<Track>();
+
         private readonly Container<T> content;
 
         protected override Container<T> Content => content;
@@ -35,12 +38,15 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 updateRelativeChildSize();
                 LoadBeatmap(b.NewValue);
             };
+
+            Track.ValueChanged += _ => updateRelativeChildSize();
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap, EditorClock clock)
         {
             Beatmap.BindTo(beatmap);
+            Track.BindTo(clock.Track);
         }
 
         private void updateRelativeChildSize()

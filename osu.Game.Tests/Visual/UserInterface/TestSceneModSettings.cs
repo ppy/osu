@@ -8,6 +8,8 @@ using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -15,11 +17,13 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneModSettings : OsuTestScene
+    public class TestSceneModSettings : OsuManualInputManagerTestScene
     {
         private TestModSelectOverlay modSelect;
 
@@ -75,6 +79,59 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.Alpha == 0);
         }
 
+        [Test]
+        public void TestModSettingsUnboundWhenCopied()
+        {
+            OsuModDoubleTime original = null;
+            OsuModDoubleTime copy = null;
+
+            AddStep("create mods", () =>
+            {
+                original = new OsuModDoubleTime();
+                copy = (OsuModDoubleTime)original.CreateCopy();
+            });
+
+            AddStep("change property", () => original.SpeedChange.Value = 2);
+
+            AddAssert("original has new value", () => Precision.AlmostEquals(2.0, original.SpeedChange.Value));
+            AddAssert("copy has original value", () => Precision.AlmostEquals(1.5, copy.SpeedChange.Value));
+        }
+
+        [Test]
+        public void TestMultiModSettingsUnboundWhenCopied()
+        {
+            MultiMod original = null;
+            MultiMod copy = null;
+
+            AddStep("create mods", () =>
+            {
+                original = new MultiMod(new OsuModDoubleTime());
+                copy = (MultiMod)original.CreateCopy();
+            });
+
+            AddStep("change property", () => ((OsuModDoubleTime)original.Mods[0]).SpeedChange.Value = 2);
+
+            AddAssert("original has new value", () => Precision.AlmostEquals(2.0, ((OsuModDoubleTime)original.Mods[0]).SpeedChange.Value));
+            AddAssert("copy has original value", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)copy.Mods[0]).SpeedChange.Value));
+        }
+
+        [Test]
+        public void TestCustomisationMenuNoClickthrough()
+        {
+            createModSelect();
+            openModSelect();
+
+            AddStep("change mod settings menu width to full screen", () => modSelect.SetModSettingsWidth(1.0f));
+            AddStep("select cm2", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
+            AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
+            AddStep("hover over mod behind settings menu", () => InputManager.MoveMouseTo(modSelect.GetModButton(testCustomisableMod)));
+            AddAssert("Mod is not considered hovered over", () => !modSelect.GetModButton(testCustomisableMod).IsHovered);
+            AddStep("left click mod", () => InputManager.Click(MouseButton.Left));
+            AddAssert("only cm2 is active", () => SelectedMods.Value.Count == 1);
+            AddStep("right click mod", () => InputManager.Click(MouseButton.Right));
+            AddAssert("only cm2 is active", () => SelectedMods.Value.Count == 1);
+        }
+
         private void createModSelect()
         {
             AddStep("create mod select", () =>
@@ -101,9 +158,16 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public bool ButtonsLoaded => ModSectionsContainer.Children.All(c => c.ModIconsLoaded);
 
+            public ModButton GetModButton(Mod mod)
+            {
+                return ModSectionsContainer.ChildrenOfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType()));
+            }
+
             public void SelectMod(Mod mod) =>
-                ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
-                                    .ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType())).SelectNext(1);
+                GetModButton(mod).SelectNext(1);
+
+            public void SetModSettingsWidth(float newWidth) =>
+                ModSettingsContainer.Width = newWidth;
         }
 
         public class TestRulesetInfo : RulesetInfo

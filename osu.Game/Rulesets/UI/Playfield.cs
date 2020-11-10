@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
@@ -31,9 +30,28 @@ namespace osu.Game.Rulesets.UI
         public Func<Vector2, Vector2> GamefieldToScreenSpace => HitObjectContainer.ToScreenSpace;
 
         /// <summary>
+        /// A function that converts screen space coordinates to gamefield.
+        /// </summary>
+        public Func<Vector2, Vector2> ScreenSpaceToGamefield => HitObjectContainer.ToLocalSpace;
+
+        /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
         /// </summary>
-        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjectContainer?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
+        public IEnumerable<DrawableHitObject> AllHitObjects
+        {
+            get
+            {
+                if (HitObjectContainer == null)
+                    return Enumerable.Empty<DrawableHitObject>();
+
+                var enumerable = HitObjectContainer.Objects;
+
+                if (nestedPlayfields.IsValueCreated)
+                    enumerable = enumerable.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects));
+
+                return enumerable;
+            }
+        }
 
         /// <summary>
         /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.
@@ -57,10 +75,7 @@ namespace osu.Game.Rulesets.UI
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IReadOnlyList<Mod> mods { get; set; }
 
         [BackgroundDependencyLoader]
@@ -132,7 +147,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            if (beatmap != null)
+            if (mods != null)
             {
                 foreach (var mod in mods)
                 {

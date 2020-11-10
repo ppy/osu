@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             };
         }
 
-        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             // Convert spinners don't create the new combo themselves, but force the next non-spinner hitobject to create a new combo
             // Their combo offset is still added to that next hitobject's combo index
@@ -66,11 +66,11 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             return new ConvertSpinner
             {
                 Position = position,
-                EndTime = endTime
+                Duration = duration
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return null;
         }

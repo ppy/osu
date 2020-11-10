@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.UI
@@ -41,6 +42,25 @@ namespace osu.Game.Rulesets.UI
             startTimeMap.Remove(hitObject);
 
             return true;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            unbindStartTimeMap();
+        }
+
+        public virtual void Clear(bool disposeChildren = true)
+        {
+            ClearInternal(disposeChildren);
+            unbindStartTimeMap();
+        }
+
+        private void unbindStartTimeMap()
+        {
+            foreach (var kvp in startTimeMap)
+                kvp.Value.bindable.UnbindAll();
+            startTimeMap.Clear();
         }
 
         public int IndexOf(DrawableHitObject hitObject) => IndexOfInternal(hitObject);

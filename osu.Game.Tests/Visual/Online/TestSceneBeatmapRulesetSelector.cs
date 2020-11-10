@@ -8,7 +8,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,12 +15,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneBeatmapRulesetSelector : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(BeatmapRulesetSelector),
-            typeof(BeatmapRulesetTabItem),
-        };
-
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 

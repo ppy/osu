@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -25,16 +25,6 @@ namespace osu.Game.Beatmaps
         /// Retrieves the background for this <see cref="WorkingBeatmap"/>.
         /// </summary>
         Texture Background { get; }
-
-        /// <summary>
-        /// Retrieves the video background file for this <see cref="WorkingBeatmap"/>.
-        /// </summary>
-        VideoSprite Video { get; }
-
-        /// <summary>
-        /// Retrieves the audio track for this <see cref="WorkingBeatmap"/>.
-        /// </summary>
-        Track Track { get; }
 
         /// <summary>
         /// Retrieves the <see cref="Waveform"/> for the <see cref="Track"/> of this <see cref="WorkingBeatmap"/>.
@@ -60,8 +50,22 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply to the <see cref="IBeatmap"/>.</param>
+        /// <param name="timeout">The maximum length in milliseconds to wait for load to complete. Defaults to 10,000ms.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
-        IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null);
+        IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null);
+
+        /// <summary>
+        /// Load a new audio track instance for this beatmap. This should be called once before accessing <see cref="Track"/>.
+        /// The caller of this method is responsible for the lifetime of the track.
+        /// </summary>
+        /// <remarks>
+        /// In a standard game context, the loading of the track is managed solely by MusicController, which will
+        /// automatically load the track of the current global IBindable WorkingBeatmap.
+        /// As such, this method should only be called in very special scenarios, such as external tests or apps which are
+        /// outside of the game context.
+        /// </remarks>
+        /// <returns>A fresh track instance, which will also be available via <see cref="Track"/>.</returns>
+        Track LoadTrack();
     }
 }

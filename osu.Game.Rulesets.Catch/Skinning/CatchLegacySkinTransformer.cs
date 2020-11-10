@@ -2,27 +2,39 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Humanizer;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
-using osu.Game.Audio;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
-    public class CatchLegacySkinTransformer : ISkin
+    public class CatchLegacySkinTransformer : LegacySkinTransformer
     {
-        private readonly ISkin source;
+        /// <summary>
+        /// For simplicity, let's use legacy combo font texture existence as a way to identify legacy skins from default.
+        /// </summary>
+        private bool providesComboCounter => this.HasFont(GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score");
 
         public CatchLegacySkinTransformer(ISkinSource source)
+            : base(source)
         {
-            this.source = source;
         }
 
-        public Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable GetDrawableComponent(ISkinComponent component)
         {
+            if (component is HUDSkinComponent hudComponent)
+            {
+                switch (hudComponent.Component)
+                {
+                    case HUDSkinComponents.ComboCounter:
+                        // catch may provide its own combo counter; hide the default.
+                        return providesComboCounter ? Drawable.Empty() : null;
+                }
+            }
+
             if (!(component is CatchSkinComponent catchSkinComponent))
                 return null;
 
@@ -44,15 +56,44 @@ namespace osu.Game.Rulesets.Catch.Skinning
                         return new LegacyFruitPiece("fruit-drop") { Scale = new Vector2(0.8f) };
 
                     break;
+
+                case CatchSkinComponents.CatcherIdle:
+                    return this.GetAnimation("fruit-catcher-idle", true, true, true) ??
+                           this.GetAnimation("fruit-ryuuta", true, true, true);
+
+                case CatchSkinComponents.CatcherFail:
+                    return this.GetAnimation("fruit-catcher-fail", true, true, true) ??
+                           this.GetAnimation("fruit-ryuuta", true, true, true);
+
+                case CatchSkinComponents.CatcherKiai:
+                    return this.GetAnimation("fruit-catcher-kiai", true, true, true) ??
+                           this.GetAnimation("fruit-ryuuta", true, true, true);
+
+                case CatchSkinComponents.CatchComboCounter:
+
+                    if (providesComboCounter)
+                        return new LegacyCatchComboCounter(Source);
+
+                    break;
             }
 
             return null;
         }
 
-        public Texture GetTexture(string componentName) => source.GetTexture(componentName);
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        {
+            switch (lookup)
+            {
+                case CatchSkinColour colour:
+                    var result = (Bindable<Color4>)Source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    if (result == null)
+                        return null;
 
-        public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
+                    result.Value = LegacyColourCompatibility.DisallowZeroAlpha(result.Value);
+                    return (IBindable<TValue>)result;
+            }
 
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source.GetConfig<TLookup, TValue>(lookup);
+            return Source.GetConfig<TLookup, TValue>(lookup);
+        }
     }
 }

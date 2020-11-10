@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
@@ -13,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModTransform : Mod, IApplicableToDrawableHitObjects
+    internal class OsuModTransform : ModWithVisibilityAdjustment
     {
         public override string Name => "Transform";
         public override string Acronym => "TR";
@@ -25,11 +24,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private float theta;
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
-        {
-            foreach (var drawable in drawables)
-                drawable.ApplyCustomUpdateState += applyTransform;
-        }
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject, state);
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject, state);
 
         private void applyTransform(DrawableHitObject drawable, ArmedState state)
         {
@@ -38,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSliderHead _:
                 case DrawableSliderTail _:
                 case DrawableSliderTick _:
-                case DrawableRepeatPoint _:
+                case DrawableSliderRepeat _:
                     return;
 
                 default:
@@ -49,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     Vector2 originalPosition = drawable.Position;
                     Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
 
-                    //the - 1 and + 1 prevents the hit objects to appear in the wrong position.
+                    // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
                     double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
                     double moveDuration = hitObject.TimePreempt + 1;
 

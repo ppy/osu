@@ -5,21 +5,15 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneSwellJudgements : PlayerTestScene
+    public class TestSceneSwellJudgements : TestSceneTaikoPlayer
     {
-        public TestSceneSwellJudgements()
-            : base(new TaikoRuleset())
-        {
-        }
-
         [Test]
         public void TestZeroTickTimeOffsets()
         {
-            AddUntilStep("gameplay finished", () => Player.ScoreProcessor.HasCompleted);
+            AddUntilStep("gameplay finished", () => Player.ScoreProcessor.HasCompleted.Value);
             AddAssert("all tick offsets are 0", () => Player.Results.Where(r => r.HitObject is SwellTick).All(r => r.TimeOffset == 0));
         }
 

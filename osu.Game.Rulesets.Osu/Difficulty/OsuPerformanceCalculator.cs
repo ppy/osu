@@ -4,11 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps;
+using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -18,26 +17,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
 
-        private readonly int countHitCircles;
-        private readonly int beatmapMaxCombo;
-
         private Mod[] mods;
 
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
-        private int countGood;
+        private int countOk;
         private int countMeh;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
-            : base(ruleset, beatmap, score)
+        public OsuPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
+            : base(ruleset, attributes, score)
         {
-            countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
-
-            beatmapMaxCombo = Beatmap.HitObjects.Count;
-            // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
-            beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
         }
 
         public override double Calculate(Dictionary<string, double> categoryRatings = null)
@@ -45,10 +36,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             mods = Score.Mods;
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
-            countGreat = Score.Statistics[HitResult.Great];
-            countGood = Score.Statistics[HitResult.Good];
-            countMeh = Score.Statistics[HitResult.Meh];
-            countMiss = Score.Statistics[HitResult.Miss];
+            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
+            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
+            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
+            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
@@ -80,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 categoryRatings.Add("Accuracy", accuracyValue);
                 categoryRatings.Add("OD", Attributes.OverallDifficulty);
                 categoryRatings.Add("AR", Attributes.ApproachRate);
-                categoryRatings.Add("Max Combo", beatmapMaxCombo);
+                categoryRatings.Add("Max Combo", Attributes.MaxCombo);
             }
 
             return totalValue;
@@ -105,8 +96,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= Math.Pow(0.97, countMiss);
 
             // Combo scaling
-            if (beatmapMaxCombo > 0)
-                aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(beatmapMaxCombo, 0.8), 1.0);
+            if (Attributes.MaxCombo > 0)
+                aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
             double approachRateFactor = 1.0;
 
@@ -153,8 +144,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= Math.Pow(0.97, countMiss);
 
             // Combo scaling
-            if (beatmapMaxCombo > 0)
-                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(beatmapMaxCombo, 0.8), 1.0);
+            if (Attributes.MaxCombo > 0)
+                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
             double approachRateFactor = 1.0;
             if (Attributes.ApproachRate > 10.33)
@@ -177,10 +168,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window
             double betterAccuracyPercentage;
-            int amountHitObjectsWithAccuracy = countHitCircles;
+            int amountHitObjectsWithAccuracy = Attributes.HitCircleCount;
 
             if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countGood * 2 + countMeh) / (amountHitObjectsWithAccuracy * 6);
+                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
             else
                 betterAccuracyPercentage = 0;
 
@@ -203,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return accuracyValue;
         }
 
-        private double totalHits => countGreat + countGood + countMeh + countMiss;
-        private double totalSuccessfulHits => countGreat + countGood + countMeh;
+        private int totalHits => countGreat + countOk + countMeh + countMiss;
+        private int totalSuccessfulHits => countGreat + countOk + countMeh;
     }
 }

@@ -4,13 +4,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace osu.Game.Rulesets.Objects
 {
     public static class SliderEventGenerator
     {
+        [Obsolete("Use the overload with cancellation support instead.")] // can be removed 20201115
+        // ReSharper disable once RedundantOverload.Global
         public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount,
                                                                   double? legacyLastTickOffset)
+        {
+            return Generate(startTime, spanDuration, velocity, tickDistance, totalDistance, spanCount, legacyLastTickOffset, default);
+        }
+
+        // ReSharper disable once MethodOverloadWithOptionalParameter
+        public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount,
+                                                                  double? legacyLastTickOffset, CancellationToken cancellationToken = default)
         {
             // A very lenient maximum length of a slider for ticks to be generated.
             // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
@@ -37,7 +47,7 @@ namespace osu.Game.Rulesets.Objects
                     var spanStartTime = startTime + span * spanDuration;
                     var reversed = span % 2 == 1;
 
-                    var ticks = generateTicks(span, spanStartTime, spanDuration, reversed, length, tickDistance, minDistanceFromEnd);
+                    var ticks = generateTicks(span, spanStartTime, spanDuration, reversed, length, tickDistance, minDistanceFromEnd, cancellationToken);
 
                     if (reversed)
                     {
@@ -108,12 +118,15 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="length">The length of the path.</param>
         /// <param name="tickDistance">The distance between each tick.</param>
         /// <param name="minDistanceFromEnd">The distance from the end of the path at which ticks are not allowed to be added.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="SliderEventDescriptor"/> for each tick. If <paramref name="reversed"/> is true, the ticks will be returned in reverse-StartTime order.</returns>
         private static IEnumerable<SliderEventDescriptor> generateTicks(int spanIndex, double spanStartTime, double spanDuration, bool reversed, double length, double tickDistance,
-                                                                        double minDistanceFromEnd)
+                                                                        double minDistanceFromEnd, CancellationToken cancellationToken = default)
         {
             for (var d = tickDistance; d <= length; d += tickDistance)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (d >= length - minDistanceFromEnd)
                     break;
 

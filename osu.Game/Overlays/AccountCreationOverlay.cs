@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class AccountCreationOverlay : OsuFocusedOverlayContainer, IOnlineComponent
+    public class AccountCreationOverlay : OsuFocusedOverlayContainer
     {
         private const float transition_time = 400;
 
@@ -30,10 +31,13 @@ namespace osu.Game.Overlays
             Origin = Anchor.Centre;
         }
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, IAPIProvider api)
         {
-            api.Register(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(apiStateChanged, true);
 
             Children = new Drawable[]
             {
@@ -97,9 +101,9 @@ namespace osu.Game.Overlays
             this.FadeOut(100);
         }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        private void apiStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            switch (state)
+            switch (state.NewValue)
             {
                 case APIState.Offline:
                 case APIState.Failing:
@@ -112,6 +116,6 @@ namespace osu.Game.Overlays
                     Hide();
                     break;
             }
-        }
+        });
     }
 }

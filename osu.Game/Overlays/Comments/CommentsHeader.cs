@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: 12),
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                             Text = @"Show deleted"
                         }
                     },
