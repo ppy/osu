@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestGenericActivity()
         {
-            AddStep("Set activity", () => API.Activity.Value = new UserActivity.InLobby());
+            AddStep("Set activity", () => API.Activity.Value = new UserActivity.InLobby(null));
 
             AddStep("Run command", () => Add(new NowPlayingCommand()));
 
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Online
         [TestCase(false)]
         public void TestLinkPresence(bool hasOnlineId)
         {
-            AddStep("Set activity", () => API.Activity.Value = new UserActivity.InLobby());
+            AddStep("Set activity", () => API.Activity.Value = new UserActivity.InLobby(null));
 
             AddStep("Set beatmap", () => Beatmap.Value = new DummyWorkingBeatmap(Audio, null)
             {
