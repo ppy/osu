@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 };
             }
 
-            var mapHitProbs = new HitProbabilities(movements, default_cheese_level, difficultyCount: comboSectionAmount);
+            var mapHitProbs = new HitProbabilities(movements, default_cheese_level, sectionCount: comboSectionAmount);
             double fcProbTp = calculateFcProbTp(movements);
             double fcProbTpHidden = calculateFcProbTp(movementsHidden);
 
@@ -188,17 +188,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // there exists a submap of length sectionCount that can be FC'd in timeThresholdBase seconds.
         private static double calculateFcTimeTp(HitProbabilities mapHitProbs, int sectionCount)
         {
-            double maxFcTime = mapHitProbs.MinExpectedTimeForSectionCount(tp_min, sectionCount);
+            double maxFcTime = mapHitProbs.MinimumTimeForFullComboOnSubmap(tp_min, sectionCount);
 
             if (maxFcTime <= time_threshold_base)
                 return tp_min;
 
-            double minFcTime = mapHitProbs.MinExpectedTimeForSectionCount(tp_max, sectionCount);
+            double minFcTime = mapHitProbs.MinimumTimeForFullComboOnSubmap(tp_max, sectionCount);
 
             if (minFcTime >= time_threshold_base)
                 return tp_max;
 
-            double fcTimeMinusThreshold(double tp) => mapHitProbs.MinExpectedTimeForSectionCount(tp, sectionCount) - time_threshold_base;
+            double fcTimeMinusThreshold(double tp) => mapHitProbs.MinimumTimeForFullComboOnSubmap(tp, sectionCount) - time_threshold_base;
             return Bisection.FindRoot(fcTimeMinusThreshold, tp_min, tp_max, time_precision, max_iterations);
         }
 
@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < movements.Count; ++i)
             {
                 var movement = movements[i];
-                missProbs[i] = 1 - HitProbabilities.CalculateCheeseHitProb(movement, tp, default_cheese_level);
+                missProbs[i] = 1 - HitProbabilities.GetHitProbabilityAdjustedForCheese(movement, tp, default_cheese_level);
             }
 
             return missProbs;
@@ -314,7 +314,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             foreach (OsuMovement movement in movements)
             {
-                double hitProb = HitProbabilities.CalculateCheeseHitProb(movement, tp, cheeseLevel);
+                double hitProb = HitProbabilities.GetHitProbabilityAdjustedForCheese(movement, tp, cheeseLevel);
                 fcProb *= hitProb;
             }
 
