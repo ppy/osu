@@ -115,11 +115,11 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            for (int frame = 0; frame < Animation.FrameCount; frame++)
+            for (int frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
             {
-                string framePath = Animation.Path.Replace(".", frame + ".");
-                Drawable sprite = storyboard.CreateSpriteFromResourcePath(framePath, textureStore) ?? Drawable.Empty();
-                AddFrame(sprite, Animation.FrameDelay);
+                string framePath = Animation.Path.Replace(".", frameIndex + ".");
+                Drawable frame = storyboard.CreateSpriteFromResourcePath(framePath, textureStore) ?? Drawable.Empty();
+                AddFrame(frame, Animation.FrameDelay);
             }
 
             Animation.ApplyTransforms(this);
