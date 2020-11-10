@@ -18,7 +18,7 @@ using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays
 {
-    public class RankingsOverlay : FullscreenOverlay<RankingsOverlayHeader>, IOnlineComponent
+    public class RankingsOverlay : FullscreenOverlay<RankingsOverlayHeader>
     {
         protected Bindable<Country> Country => Header.Country;
 

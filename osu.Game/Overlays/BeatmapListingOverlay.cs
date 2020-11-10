@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapListingOverlay : FullscreenOverlay<BeatmapListingHeader>, IOnlineComponent
+    public class BeatmapListingOverlay : FullscreenOverlay<BeatmapListingHeader>
     {
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
