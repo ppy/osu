@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -17,19 +16,13 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public override bool RemoveWhenNotAlive => true;
 
-        public readonly DrawableHitObject JudgedObject;
         private readonly HitType type;
 
-        public DefaultKiaiHitExplosion(DrawableHitObject judgedObject, HitType type)
+        public DefaultKiaiHitExplosion(HitType type)
         {
-            JudgedObject = judgedObject;
             this.type = type;
 
-            Anchor = Anchor.CentreLeft;
-            Origin = Anchor.Centre;
-
             RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(TaikoHitObject.DEFAULT_SIZE, 1);
 
             Blending = BlendingParameters.Additive;
 
