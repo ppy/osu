@@ -249,7 +249,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var distribution = new PoissonBinomial(missProbabilities);
 
-            double cdfMinusProb(double missCount) => distribution.Cdf(missCount) - p;
+            double cdfMinusProb(double missCount) => distribution.CDF(missCount) - p;
             return Brent.FindRootExpand(cdfMinusProb, -100, 1000);
         }
 
