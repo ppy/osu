@@ -160,8 +160,11 @@ namespace osu.Game.Overlays.BeatmapListing
 
             protected override bool OnKeyDown(KeyDownEvent e)
             {
+                if (!base.OnKeyDown(e))
+                    return false;
+
                 TypingStarted?.Invoke();
-                return base.OnKeyDown(e);
+                return true;
             }
         }
     }
