@@ -85,6 +85,8 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed) return false;
+
             if (ToggleKeys != null)
             {
                 var index = Array.IndexOf(ToggleKeys, e.Key);

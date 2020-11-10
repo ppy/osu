@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Overlays.Profile.Sections.Historical;
-using osu.Game.Overlays.Profile;
 using osu.Framework.Graphics;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
@@ -14,12 +12,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneUserHistoryGraph : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(UserHistoryGraph),
-            typeof(UserGraph<,>),
-        };
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 

@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Profile
 
         private readonly UserLineGraph graph;
         private KeyValuePair<TKey, TValue>[] data;
-        private int dataIndex;
+        private int hoveredIndex = -1;
 
         protected UserGraph()
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Profile
                 Alpha = 0
             });
 
-            graph.OnBallMove += i => dataIndex = i;
+            graph.OnBallMove += i => hoveredIndex = i;
         }
 
         [BackgroundDependencyLoader]
@@ -48,11 +48,13 @@ namespace osu.Game.Overlays.Profile
             graph.LineColour = colours.Yellow;
         }
 
+        private float lastHoverPosition;
+
         protected override bool OnHover(HoverEvent e)
         {
             if (data?.Length > 1)
             {
-                graph.UpdateBallPosition(e.MousePosition.X);
+                graph.UpdateBallPosition(lastHoverPosition = e.MousePosition.X);
                 graph.ShowBar();
 
                 return true;
@@ -71,9 +73,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (data?.Length > 1)
-                graph.HideBar();
-
+            graph.HideBar();
             base.OnHoverLost(e);
         }
 
@@ -92,11 +92,16 @@ namespace osu.Game.Overlays.Profile
 
         private void redrawGraph()
         {
+            hoveredIndex = -1;
+
             if (data?.Length > 1)
             {
                 graph.DefaultValueCount = data.Length;
                 graph.Values = data.Select(pair => GetDataPointHeight(pair.Value)).ToArray();
                 ShowGraph();
+
+                if (IsHovered)
+                    graph.UpdateBallPosition(lastHoverPosition);
                 return;
             }
 
@@ -120,13 +125,11 @@ namespace osu.Game.Overlays.Profile
         {
             get
             {
-                if (data?.Length > 1)
-                {
-                    var (key, value) = data[dataIndex];
-                    return GetTooltipContent(key, value);
-                }
+                if (data == null || hoveredIndex == -1)
+                    return null;
 
-                return null;
+                var (key, value) = data[hoveredIndex];
+                return GetTooltipContent(key, value);
             }
         }
 
@@ -194,7 +197,7 @@ namespace osu.Game.Overlays.Profile
 
             public void HideBar() => bar.FadeOut(FADE_DURATION);
 
-            private int calculateIndex(float mouseXPosition) => (int)MathF.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
+            private int calculateIndex(float mouseXPosition) => (int)Math.Clamp(MathF.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1)), 0, DefaultValueCount - 1);
 
             private Vector2 calculateBallPosition(int index)
             {
