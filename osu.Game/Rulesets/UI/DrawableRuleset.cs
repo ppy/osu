@@ -41,9 +41,8 @@ namespace osu.Game.Rulesets.UI
     public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
         where TObject : HitObject
     {
-        public override event Action<JudgementResult> OnNewResult;
-
-        public override event Action<JudgementResult> OnRevertResult;
+        public override event Action<JudgementResult> NewResult;
+        public override event Action<JudgementResult> RevertResult;
 
         /// <summary>
         /// The selected variant.
@@ -125,7 +124,11 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             KeyBindingInputManager = CreateInputManager();
-            playfield = new Lazy<Playfield>(CreatePlayfield);
+            playfield = new Lazy<Playfield>(() => CreatePlayfield().With(p =>
+            {
+                p.NewResult += (_, r) => NewResult?.Invoke(r);
+                p.RevertResult += (_, r) => RevertResult?.Invoke(r);
+            }));
 
             IsPaused.ValueChanged += paused =>
             {
@@ -183,7 +186,7 @@ namespace osu.Game.Rulesets.UI
 
             RegenerateAutoplay();
 
-            loadObjects(cancellationToken);
+            loadObjects(cancellationToken ?? default);
         }
 
         public void RegenerateAutoplay()
@@ -196,15 +199,15 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Creates and adds drawable representations of hit objects to the play field.
         /// </summary>
-        private void loadObjects(CancellationToken? cancellationToken)
+        private void loadObjects(CancellationToken cancellationToken)
         {
             foreach (TObject h in Beatmap.HitObjects)
             {
-                cancellationToken?.ThrowIfCancellationRequested();
-                addHitObject(h);
+                cancellationToken.ThrowIfCancellationRequested();
+                AddHitObject(h);
             }
 
-            cancellationToken?.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
             Playfield.PostProcess();
 
@@ -230,21 +233,24 @@ namespace osu.Game.Rulesets.UI
             ResumeOverlay?.Hide();
         }
 
-        /// <summary>
-        /// Creates and adds the visual representation of a <typeparamref name="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
-        /// </summary>
-        /// <param name="hitObject">The <typeparamref name="TObject"/> to add the visual representation for.</param>
-        private void addHitObject(TObject hitObject)
+        public void AddHitObject(TObject hitObject)
         {
-            var drawableObject = CreateDrawableRepresentation(hitObject);
+            if (PoolHitObjects)
+                Playfield.Add(GetLifetimeEntry(hitObject));
+            else
+                Playfield.Add(CreateDrawableRepresentation(hitObject));
+        }
 
-            if (drawableObject == null)
-                return;
-
-            drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
-            drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
-
-            Playfield.Add(drawableObject);
+        public void RemoveHitObject(TObject hitObject)
+        {
+            if (PoolHitObjects)
+                Playfield.Remove(GetLifetimeEntry(hitObject));
+            else
+            {
+                var drawableObject = Playfield.AllHitObjects.SingleOrDefault(d => d.HitObject == hitObject);
+                if (drawableObject != null)
+                    Playfield.Remove(drawableObject);
+            }
         }
 
         protected sealed override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject)
@@ -382,12 +388,12 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
         /// </summary>
-        public abstract event Action<JudgementResult> OnNewResult;
+        public abstract event Action<JudgementResult> NewResult;
 
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
         /// </summary>
-        public abstract event Action<JudgementResult> OnRevertResult;
+        public abstract event Action<JudgementResult> RevertResult;
 
         /// <summary>
         /// Whether a replay is currently loaded.
@@ -524,10 +530,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <remarks>
         /// Pools must be registered with this <see cref="DrawableRuleset"/> via <see cref="RegisterPool{TObject,TDrawable}"/> in order for <see cref="DrawableHitObject"/>s to be retrieved.
-        /// <para>
-        /// If <c>true</c>, hitobjects will be added to the <see cref="Playfield"/> via <see cref="osu.Game.Rulesets.UI.Playfield.Add(HitObject)"/>.
-        /// If <c>false</c>, <see cref="osu.Game.Rulesets.UI.Playfield.Add(DrawableHitObject)"/> will be used instead.
-        /// </para>
         /// </remarks>
         protected virtual bool PoolHitObjects => false;
 

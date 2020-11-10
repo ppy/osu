@@ -31,7 +31,14 @@ namespace osu.Game.Rulesets.UI
         /// </remarks>
         public IEnumerable<DrawableHitObject> AliveObjects => AliveInternalChildren.OfType<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> is judged.
+        /// </summary>
         public event Action<DrawableHitObject, JudgementResult> NewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> judgement is reverted.
+        /// </summary>
         public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
@@ -79,7 +86,7 @@ namespace osu.Game.Rulesets.UI
 
         public void Add(HitObjectLifetimeEntry entry) => lifetimeManager.AddEntry(entry);
 
-        public void Remove(HitObjectLifetimeEntry entry) => lifetimeManager.RemoveEntry(entry);
+        public bool Remove(HitObjectLifetimeEntry entry) => lifetimeManager.RemoveEntry(entry);
 
         private void entryBecameAlive(LifetimeEntry entry) => addDrawable((HitObjectLifetimeEntry)entry);
 
