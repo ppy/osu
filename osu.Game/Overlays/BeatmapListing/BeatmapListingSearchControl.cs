@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -19,6 +21,11 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public class BeatmapListingSearchControl : CompositeDrawable
     {
+        /// <summary>
+        /// Any time the text box receives key events (even while masked).
+        /// </summary>
+        public Action TypingStarted;
+
         public Bindable<string> Query => textBox.Current;
 
         public Bindable<RulesetInfo> Ruleset => modeFilter.Current;
@@ -102,6 +109,7 @@ namespace osu.Game.Overlays.BeatmapListing
                             textBox = new BeatmapSearchTextBox
                             {
                                 RelativeSizeAxes = Axes.X,
+                                TypingStarted = () => TypingStarted?.Invoke(),
                             },
                             new ReverseChildIDFillFlowContainer<Drawable>
                             {
@@ -138,11 +146,25 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private class BeatmapSearchTextBox : SearchTextBox
         {
+            /// <summary>
+            /// Any time the text box receives key events (even while masked).
+            /// </summary>
+            public Action TypingStarted;
+
             protected override Color4 SelectionColour => Color4.Gray;
 
             public BeatmapSearchTextBox()
             {
                 PlaceholderText = @"type in keywords...";
+            }
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                if (!base.OnKeyDown(e))
+                    return false;
+
+                TypingStarted?.Invoke();
+                return true;
             }
         }
     }
