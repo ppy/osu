@@ -24,6 +24,7 @@ using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
 using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.Multi
@@ -140,10 +141,10 @@ namespace osu.Game.Screens.Multi
                 }
             };
 
-            screenStack.Push(loungeSubScreen = new LoungeSubScreen());
-
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
+
+            screenStack.Push(loungeSubScreen = new LoungeSubScreen());
         }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
@@ -311,18 +312,18 @@ namespace osu.Game.Screens.Multi
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen)
         {
-            subScreenChanged(newScreen);
+            subScreenChanged(lastScreen, newScreen);
         }
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
-            subScreenChanged(newScreen);
+            subScreenChanged(lastScreen, newScreen);
 
             if (screenStack.CurrentScreen == null && this.IsCurrentScreen())
                 this.Exit();
         }
 
-        private void subScreenChanged(IScreen newScreen)
+        private void subScreenChanged(IScreen lastScreen, IScreen newScreen)
         {
             switch (newScreen)
             {
@@ -336,6 +337,12 @@ namespace osu.Game.Screens.Multi
                     headerBackground.MoveToX(-MultiplayerSubScreen.X_SHIFT, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
                     break;
             }
+
+            if (lastScreen is IOsuScreen lastOsuScreen)
+                Activity.UnbindFrom(lastOsuScreen.Activity);
+
+            if (newScreen is IOsuScreen newOsuScreen)
+                ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
 
             updatePollingRate(isIdle.Value);
             createButton.FadeTo(newScreen is LoungeSubScreen ? 1 : 0, 200);

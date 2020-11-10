@@ -80,7 +80,7 @@ namespace osu.Game.Skinning
                 Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
                 fill.Width, (float)Current.Value * maxFillWidth, 0, 200, Easing.OutQuint);
 
-            marker.Position = fill.Position + new Vector2(fill.DrawWidth, fill.DrawHeight / 2);
+            marker.Position = fill.Position + new Vector2(fill.DrawWidth, isNewStyle ? fill.DrawHeight / 2 : 0);
         }
 
         public void Flash(JudgementResult result) => marker.Flash(result);

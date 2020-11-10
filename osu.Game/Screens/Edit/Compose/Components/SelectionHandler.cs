@@ -14,7 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -218,17 +218,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handle a blueprint requesting selection.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        /// <param name="state">The input state at the point of selection.</param>
+        /// <param name="e">The mouse event responsible for selection.</param>
         /// <returns>Whether a selection was performed.</returns>
-        internal bool HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
+        internal bool HandleSelectionRequested(SelectionBlueprint blueprint, MouseButtonEvent e)
         {
-            if (state.Keyboard.ShiftPressed && state.Mouse.IsPressed(MouseButton.Right))
+            if (e.ShiftPressed && e.Button == MouseButton.Right)
             {
                 handleQuickDeletion(blueprint);
                 return false;
             }
 
-            if (state.Keyboard.ControlPressed && state.Mouse.IsPressed(MouseButton.Left))
+            if (e.ControlPressed && e.Button == MouseButton.Left)
                 blueprint.ToggleSelection();
             else
                 ensureSelected(blueprint);
