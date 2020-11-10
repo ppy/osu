@@ -613,13 +613,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// The time at which state transforms should be applied that line up to <see cref="HitObject"/>'s StartTime.
         /// This is used to offset calls to <see cref="UpdateStateTransforms"/>.
         /// </summary>
-        public double StateUpdateTime => HitObject.StartTime;
+        public double StateUpdateTime => HitObject?.StartTime ?? 0;
 
         /// <summary>
         /// The time at which judgement dependent state transforms should be applied. This is equivalent of the (end) time of the object, in addition to any judgement offset.
         /// This is used to offset calls to <see cref="UpdateHitStateTransforms"/>.
         /// </summary>
-        public double HitStateUpdateTime => Result?.TimeAbsolute ?? HitObject.GetEndTime();
+        public double HitStateUpdateTime => Result?.TimeAbsolute ?? HitObject?.GetEndTime() ?? 0;
 
         /// <summary>
         /// Will be called at least once after this <see cref="DrawableHitObject"/> has become not alive.
