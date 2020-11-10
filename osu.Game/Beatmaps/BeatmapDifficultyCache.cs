@@ -30,8 +30,22 @@ namespace osu.Game.Beatmaps
         // Too many simultaneous updates can lead to stutters. One thread seems to work fine for song select display purposes.
         private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyCache));
 
-        // All bindables that should be updated along with the current ruleset + mods.
+        /// <summary>
+        /// All bindables that should be updated along with the current ruleset + mods.
+        /// </summary>
         private readonly WeakList<BindableStarDifficulty> trackedBindables = new WeakList<BindableStarDifficulty>();
+
+        /// <summary>
+        /// Cancellation sources used by tracked bindables.
+        /// </summary>
+        private readonly List<CancellationTokenSource> linkedCancellationSources = new List<CancellationTokenSource>();
+
+        /// <summary>
+        /// Lock to be held when operating on <see cref="trackedBindables"/> or <see cref="linkedCancellationSources"/>.
+        /// </summary>
+        private readonly object bindableUpdateLock = new object();
+
+        private CancellationTokenSource trackedUpdateCancellationSource;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -60,7 +74,7 @@ namespace osu.Game.Beatmaps
         {
             var bindable = createBindable(beatmapInfo, currentRuleset.Value, currentMods.Value, cancellationToken);
 
-            lock (trackedBindables)
+            lock (bindableUpdateLock)
                 trackedBindables.Add(bindable);
 
             return bindable;
@@ -144,15 +158,12 @@ namespace osu.Game.Beatmaps
             return DifficultyRating.Easy;
         }
 
-        private CancellationTokenSource trackedUpdateCancellationSource;
-        private readonly List<CancellationTokenSource> linkedCancellationSources = new List<CancellationTokenSource>();
-
         /// <summary>
         /// Updates all tracked <see cref="BindableStarDifficulty"/> using the current ruleset and mods.
         /// </summary>
         private void updateTrackedBindables()
         {
-            lock (trackedBindables)
+            lock (bindableUpdateLock)
             {
                 cancelTrackedBindableUpdate();
                 trackedUpdateCancellationSource = new CancellationTokenSource();
@@ -172,7 +183,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         private void cancelTrackedBindableUpdate()
         {
-            lock (trackedBindables)
+            lock (bindableUpdateLock)
             {
                 trackedUpdateCancellationSource?.Cancel();
                 trackedUpdateCancellationSource = null;
