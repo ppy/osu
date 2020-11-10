@@ -102,6 +102,8 @@ namespace osu.Game.Overlays.Dashboard
         {
             public readonly User User;
 
+            private PurpleTriangleButton watchButton;
+
             [Resolved(canBeNull: true)]
             private OsuGame game { get; set; }
 
@@ -127,7 +129,7 @@ namespace osu.Game.Overlays.Dashboard
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                             },
-                            new PurpleTriangleButton
+                            watchButton = new PurpleTriangleButton
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Text = "Watch",
@@ -138,6 +140,12 @@ namespace osu.Game.Overlays.Dashboard
                         }
                     },
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(IAPIProvider api)
+            {
+                watchButton.Enabled.Value = User.Id != api.LocalUser.Value.Id;
             }
         }
     }
