@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private class ControlGroupAttributes : CompositeDrawable
         {
-            private readonly IBindableList<ControlPoint> controlPoints;
+            private readonly IBindableList<ControlPoint> controlPoints = new BindableList<ControlPoint>();
 
             private readonly FillFlowContainer fill;
 
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Edit.Timing
                     Spacing = new Vector2(2)
                 };
 
-                controlPoints = group.ControlPoints.GetBoundCopy();
+                controlPoints.BindTo(group.ControlPoints);
             }
 
             [Resolved]
@@ -178,6 +178,9 @@ namespace osu.Game.Screens.Edit.Timing
             private readonly Box hoveredBackground;
 
             [Resolved]
+            private EditorClock clock { get; set; }
+
+            [Resolved]
             private Bindable<ControlPointGroup> selectedGroup { get; set; }
 
             public RowBackground(ControlPointGroup controlGroup)
@@ -200,7 +203,11 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                 };
 
-                Action = () => selectedGroup.Value = controlGroup;
+                Action = () =>
+                {
+                    selectedGroup.Value = controlGroup;
+                    clock.SeekTo(controlGroup.Time);
+                };
             }
 
             private Color4 colourHover;

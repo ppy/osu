@@ -163,30 +163,27 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
             protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
 
-            protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableSubMenuItem(item);
-
-            private class DrawableSubMenuItem : DrawableOsuMenuItem
+            protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item)
             {
-                public DrawableSubMenuItem(MenuItem item)
+                switch (item)
+                {
+                    case EditorMenuItemSpacer spacer:
+                        return new DrawableSpacer(spacer);
+                }
+
+                return base.CreateDrawableMenuItem(item);
+            }
+
+            private class DrawableSpacer : DrawableOsuMenuItem
+            {
+                public DrawableSpacer(MenuItem item)
                     : base(item)
                 {
                 }
 
-                protected override bool OnHover(HoverEvent e)
-                {
-                    if (Item is EditorMenuItemSpacer)
-                        return true;
+                protected override bool OnHover(HoverEvent e) => true;
 
-                    return base.OnHover(e);
-                }
-
-                protected override bool OnClick(ClickEvent e)
-                {
-                    if (Item is EditorMenuItemSpacer)
-                        return true;
-
-                    return base.OnClick(e);
-                }
+                protected override bool OnClick(ClickEvent e) => true;
             }
         }
     }

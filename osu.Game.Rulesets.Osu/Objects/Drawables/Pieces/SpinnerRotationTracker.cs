@@ -15,13 +15,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class SpinnerRotationTracker : CircularContainer
     {
-        private readonly Spinner spinner;
-
         public override bool IsPresent => true; // handle input when hidden
 
-        public SpinnerRotationTracker(Spinner s)
+        private readonly DrawableSpinner drawableSpinner;
+
+        public SpinnerRotationTracker(DrawableSpinner drawableSpinner)
         {
-            spinner = s;
+            this.drawableSpinner = drawableSpinner;
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// <summary>
         /// Whether currently in the correct time range to allow spinning.
         /// </summary>
-        private bool isSpinnableTime => spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
+        private bool isSpinnableTime => drawableSpinner.HitObject.StartTime <= Time.Current && drawableSpinner.HitObject.EndTime > Time.Current;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {

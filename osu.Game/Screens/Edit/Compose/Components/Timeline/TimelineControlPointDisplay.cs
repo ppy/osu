@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     /// </summary>
     public class TimelineControlPointDisplay : TimelinePart<TimelineControlPointGroup>
     {
-        private IBindableList<ControlPointGroup> controlPointGroups;
+        private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
         public TimelineControlPointDisplay()
         {
@@ -27,7 +27,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadBeatmap(beatmap);
 
-            controlPointGroups = beatmap.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
+            controlPointGroups.UnbindAll();
+            controlPointGroups.BindTo(beatmap.Beatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((sender, args) =>
             {
                 switch (args.Action)

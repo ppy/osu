@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly OsuSpriteText placeholder;
 
         private KeyValuePair<int, int>[] ranks;
-        private int dayIndex;
+        private int hoveredIndex = -1;
         public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         public RankGraph()
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             };
 
-            graph.OnBallMove += i => dayIndex = i;
+            graph.OnBallMove += i => hoveredIndex = i;
         }
 
         [BackgroundDependencyLoader]
@@ -74,6 +74,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateStatistics(UserStatistics statistics)
         {
             placeholder.FadeIn(fade_duration, Easing.Out);
+            hoveredIndex = -1;
 
             if (statistics?.Ranks.Global == null)
             {
@@ -94,13 +95,18 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
 
             graph.FadeTo(ranks.Length > 1 ? 1 : 0, fade_duration, Easing.Out);
+
+            if (IsHovered)
+                graph.UpdateBallPosition(lastHoverPosition);
         }
+
+        private float lastHoverPosition;
 
         protected override bool OnHover(HoverEvent e)
         {
             if (ranks?.Length > 1)
             {
-                graph.UpdateBallPosition(e.MousePosition.X);
+                graph.UpdateBallPosition(lastHoverPosition = e.MousePosition.X);
                 graph.ShowBar();
             }
 
@@ -117,11 +123,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (ranks?.Length > 1)
-            {
-                graph.HideBar();
-            }
-
+            graph.HideBar();
             base.OnHoverLost(e);
         }
 
@@ -187,7 +189,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             public void HideBar() => bar.FadeOut(fade_duration);
 
-            private int calculateIndex(float mouseXPosition) => (int)MathF.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
+            private int calculateIndex(float mouseXPosition) => (int)Math.Clamp(MathF.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1)), 0, DefaultValueCount - 1);
 
             private Vector2 calculateBallPosition(int index)
             {
@@ -200,14 +202,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             get
             {
-                if (Statistics.Value?.Ranks.Global == null)
+                if (ranks == null || hoveredIndex == -1)
                     return null;
 
-                var days = ranked_days - ranks[dayIndex].Key + 1;
+                var days = ranked_days - ranks[hoveredIndex].Key + 1;
 
                 return new TooltipDisplayContent
                 {
-                    Rank = $"#{ranks[dayIndex].Value:#,##0}",
+                    Rank = $"#{ranks[hoveredIndex].Value:#,##0}",
                     Time = days == 0 ? "now" : $"{days} days ago"
                 };
             }

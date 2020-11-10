@@ -22,9 +22,9 @@ namespace osu.Game.Tests.Visual.Menus
         {
             AddStep("ensure playing something", () => Game.MusicController.EnsurePlayingSomething());
             AddStep("toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
-            AddAssert("music paused", () => !Game.MusicController.IsPlaying && Game.MusicController.IsUserPaused);
+            AddAssert("music paused", () => !Game.MusicController.IsPlaying && Game.MusicController.UserPauseRequested);
             AddStep("toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
-            AddAssert("music resumed", () => Game.MusicController.IsPlaying && !Game.MusicController.IsUserPaused);
+            AddAssert("music resumed", () => Game.MusicController.IsPlaying && !Game.MusicController.UserPauseRequested);
         }
 
         [Test]

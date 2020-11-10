@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osuTK;
@@ -67,8 +68,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private TimelineControlPointDisplay controlPoints;
 
+        private Bindable<float> waveformOpacity;
+
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
         {
             AddRange(new Drawable[]
             {
@@ -95,7 +98,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // We don't want the centre marker to scroll
             AddInternal(new CentreMarker { Depth = float.MaxValue });
 
-            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+            waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
+
+            WaveformVisible.ValueChanged += _ => updateWaveformOpacity();
             ControlPointsVisible.ValueChanged += visible => controlPoints.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
@@ -114,6 +120,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }, true);
         }
+
+        private void updateWaveformOpacity() =>
+            waveform.FadeTo(WaveformVisible.Value ? waveformOpacity.Value : 0, 200, Easing.OutQuint);
 
         private float getZoomLevelForVisibleMilliseconds(double milliseconds) => Math.Max(1, (float)(track.Length / milliseconds));
 
@@ -164,6 +173,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             if (!track.IsLoaded || track.Length == 0)
                 return;
+
+            // covers the case where the user starts playback after a drag is in progress.
+            // we want to ensure the clock is always stopped during drags to avoid weird audio playback.
+            if (handlingDragInput)
+                editorClock.Stop();
 
             ScrollTo((float)(editorClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
