@@ -43,5 +43,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoExplosionKiai), _ => new DefaultKiaiHitExplosion(hitType));
         }
+
+        /// <summary>
+        /// Helper function to use when an explosion is not desired.
+        /// Lifetime is set to avoid accumulating empty drawables in the parent container.
+        /// </summary>
+        public static Drawable EmptyExplosion() => Empty().With(d => d.LifetimeEnd = double.MinValue);
     }
 }
