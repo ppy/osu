@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Dashboard
         {
             public readonly User User;
 
-            private PurpleTriangleButton watchButton;
+            private readonly PurpleTriangleButton watchButton;
 
             [Resolved(canBeNull: true)]
             private OsuGame game { get; set; }
