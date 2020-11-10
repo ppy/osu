@@ -12,7 +12,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
@@ -169,11 +168,6 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
-
-        /// <summary>
-        /// The result this <see cref="HitObject"/> was judged with. Used internally for rewinding within <see cref="DrawableHitObject"/>.
-        /// </summary>
-        internal JudgementResult Result;
     }
 
     public static class HitObjectExtensions

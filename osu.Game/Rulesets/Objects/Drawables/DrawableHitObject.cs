@@ -166,15 +166,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             HitObject = hitObject ?? throw new InvalidOperationException($"Cannot apply a null {nameof(HitObject)}.");
 
-            // Copy any existing result from the hitobject (required for rewind / judgement revert).
-            Result = HitObject.Result;
-
             // Ensure this DHO has a result.
             Result ??= CreateResult(HitObject.CreateJudgement())
                        ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
-
-            // Ensure the hitobject has a result.
-            HitObject.Result = Result;
 
             foreach (var h in HitObject.NestedHitObjects)
             {
