@@ -186,7 +186,7 @@ namespace osu.Game.Users
             }
         }
 
-        [JsonProperty(@"rankHistory")]
+        [JsonProperty(@"rank_history")]
         private RankHistoryData rankHistory
         {
             set => statistics.RankHistory = value;
