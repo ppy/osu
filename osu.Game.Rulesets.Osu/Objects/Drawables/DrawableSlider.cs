@@ -41,6 +41,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
 
+        public DrawableSlider()
+            : this(null)
+        {
+        }
+
         public DrawableSlider([CanBeNull] Slider s = null)
             : base(s)
         {

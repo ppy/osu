@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -26,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
+        public readonly Func<DrawableHitObject, double, bool> CheckHittable;
+
         private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
@@ -78,6 +81,7 @@ namespace osu.Game.Rulesets.Osu.UI
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+            CheckHittable = hitPolicy.IsHittable;
 
             var hitWindows = new OsuHitWindows();
 
@@ -85,6 +89,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 poolDictionary.Add(result, new DrawableJudgementPool(result));
 
             AddRangeInternal(poolDictionary.Values);
+
+            NewResult += onNewResult;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -93,37 +99,37 @@ namespace osu.Game.Rulesets.Osu.UI
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
         }
 
-        public override void Add(DrawableHitObject h)
+        protected override void OnHitObjectAdded(HitObject hitObject)
         {
-            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
-
-            h.OnNewResult += onNewResult;
-            h.OnLoadComplete += d =>
-            {
-                if (d is DrawableSpinner)
-                    spinnerProxies.Add(d.CreateProxy());
-
-                if (d is IDrawableHitObjectWithProxiedApproach c)
-                    approachCircles.Add(c.ProxiedLayer.CreateProxy());
-            };
-
-            base.Add(h);
-
-            osuHitObject.CheckHittable = hitPolicy.IsHittable;
-
-            followPoints.AddFollowPoints(osuHitObject.HitObject);
+            base.OnHitObjectAdded(hitObject);
+            followPoints.AddFollowPoints((OsuHitObject)hitObject);
         }
 
-        public override bool Remove(DrawableHitObject h)
+        protected override void OnHitObjectRemoved(HitObject hitObject)
         {
-            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
+            base.OnHitObjectRemoved(hitObject);
+            followPoints.RemoveFollowPoints((OsuHitObject)hitObject);
+        }
 
-            bool result = base.Remove(h);
+        public void OnHitObjectLoaded(Drawable drawable)
+        {
+            switch (drawable)
+            {
+                case DrawableSliderHead _:
+                case DrawableSliderTail _:
+                case DrawableSliderTick _:
+                case DrawableSliderRepeat _:
+                case DrawableSpinnerTick _:
+                    break;
 
-            if (result)
-                followPoints.RemoveFollowPoints(osuHitObject.HitObject);
+                case DrawableSpinner _:
+                    spinnerProxies.Add(drawable.CreateProxy());
+                    break;
 
-            return result;
+                case IDrawableHitObjectWithProxiedApproach approach:
+                    approachCircles.Add(approach.ProxiedLayer.CreateProxy());
+                    break;
+            }
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
