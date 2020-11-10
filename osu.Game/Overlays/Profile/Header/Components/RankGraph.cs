@@ -41,7 +41,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateStatistics(UserStatistics statistics)
         {
             int[] userRanks = statistics?.RankHistory?.Data;
-
             Data = userRanks?.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
         }
 

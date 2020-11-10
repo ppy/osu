@@ -33,6 +33,11 @@ namespace osu.Game.Overlays.BeatmapListing
         public Action SearchStarted;
 
         /// <summary>
+        /// Any time the search text box receives key events (even while masked).
+        /// </summary>
+        public Action TypingStarted;
+
+        /// <summary>
         /// True when pagination has reached the end of available results.
         /// </summary>
         private bool noMoreResults;
@@ -82,7 +87,10 @@ namespace osu.Game.Overlays.BeatmapListing
                             Radius = 3,
                             Offset = new Vector2(0f, 1f),
                         },
-                        Child = searchControl = new BeatmapListingSearchControl(),
+                        Child = searchControl = new BeatmapListingSearchControl
+                        {
+                            TypingStarted = () => TypingStarted?.Invoke()
+                        }
                     },
                     new Container
                     {
