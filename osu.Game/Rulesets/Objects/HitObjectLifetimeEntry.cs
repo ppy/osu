@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Objects
@@ -17,13 +19,23 @@ namespace osu.Game.Rulesets.Objects
         public readonly HitObject HitObject;
 
         /// <summary>
+        /// The result that <see cref="HitObject"/> was judged with.
+        /// This is set by the accompanying <see cref="DrawableHitObject"/>, and reused when required for rewinding.
+        /// </summary>
+        internal JudgementResult Result;
+
+        private readonly IBindable<double> startTimeBindable = new BindableDouble();
+
+        /// <summary>
         /// Creates a new <see cref="HitObjectLifetimeEntry"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to store the lifetime of.</param>
         public HitObjectLifetimeEntry(HitObject hitObject)
         {
             HitObject = hitObject;
-            ResetLifetimeStart();
+
+            startTimeBindable.BindTo(HitObject.StartTimeBindable);
+            startTimeBindable.BindValueChanged(onStartTimeChanged, true);
         }
 
         // The lifetime start, as set by the hitobject.
@@ -91,8 +103,8 @@ namespace osu.Game.Rulesets.Objects
         protected virtual double InitialLifetimeOffset => 10000;
 
         /// <summary>
-        /// Resets <see cref="LifetimeStart"/> according to the start time of the <see cref="HitObject"/>.
+        /// Resets <see cref="LifetimeStart"/> according to the change in start time of the <see cref="HitObject"/>.
         /// </summary>
-        internal void ResetLifetimeStart() => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
+        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
     }
 }
