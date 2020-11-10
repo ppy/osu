@@ -235,10 +235,10 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleHitObjects(TextWriter writer)
         {
+            writer.WriteLine("[HitObjects]");
+
             if (beatmap.HitObjects.Count == 0)
                 return;
-
-            writer.WriteLine("[HitObjects]");
 
             foreach (var h in beatmap.HitObjects)
                 handleHitObject(writer, h);
@@ -417,7 +417,7 @@ namespace osu.Game.Beatmaps.Formats
                 string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
-                sb.Append(":");
+                sb.Append(':');
                 sb.Append(FormattableString.Invariant($"{customSampleBank}:"));
                 sb.Append(FormattableString.Invariant($"{volume}:"));
                 sb.Append(FormattableString.Invariant($"{sampleFilename}"));

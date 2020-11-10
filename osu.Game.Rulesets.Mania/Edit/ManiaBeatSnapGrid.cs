@@ -204,10 +204,6 @@ namespace osu.Game.Rulesets.Mania.Edit
             protected override void UpdateInitialTransforms()
             {
                 // don't perform any fading – we are handling that ourselves.
-            }
-
-            protected override void UpdateStateTransforms(ArmedState state)
-            {
                 LifetimeEnd = HitObject.StartTime + visible_range;
             }
         }

@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Origin = Anchor.Centre,
                     Texture = textures.Get(@"Gameplay/osu/disc"),
                 },
-                new TrianglesPiece((int)drawableHitObject.HitObject.StartTime)
+                new TrianglesPiece(drawableHitObject.GetHashCode())
                 {
                     RelativeSizeAxes = Axes.Both,
                     Blending = BlendingParameters.Additive,

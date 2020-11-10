@@ -42,6 +42,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Username, string.Empty);
             Set(OsuSetting.Token, string.Empty);
 
+            Set(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
+
             Set(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
                 if (enabled.NewValue) Set(OsuSetting.SaveUsername, true);
@@ -131,6 +133,9 @@ namespace osu.Game.Configuration
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
+            Set(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
+
+            Set(OsuSetting.EditorWaveformOpacity, 1f);
         }
 
         public OsuConfigManager(Storage storage)
@@ -170,6 +175,7 @@ namespace osu.Game.Configuration
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
             new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled")),
+            new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription())),
             new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
         };
     }
@@ -239,5 +245,8 @@ namespace osu.Game.Configuration
         HitLighting,
         MenuBackgroundSource,
         GameplayDisableWinKey,
+        SeasonalBackgroundMode,
+        EditorWaveformOpacity,
+        AutomaticallyDownloadWhenSpectating,
     }
 }

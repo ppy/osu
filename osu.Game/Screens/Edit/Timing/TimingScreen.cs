@@ -22,9 +22,6 @@ namespace osu.Game.Screens.Edit.Timing
         [Cached]
         private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
 
-        [Resolved]
-        private EditorClock clock { get; set; }
-
         public TimingScreen()
             : base(EditorScreenMode.Timing)
         {
@@ -48,17 +45,6 @@ namespace osu.Game.Screens.Edit.Timing
             }
         };
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            selectedGroup.BindValueChanged(selected =>
-            {
-                if (selected.NewValue != null)
-                    clock.SeekTo(selected.NewValue.Time);
-            });
-        }
-
         protected override void OnTimelineLoaded(TimelineArea timelineArea)
         {
             base.OnTimelineLoaded(timelineArea);
@@ -70,7 +56,7 @@ namespace osu.Game.Screens.Edit.Timing
             private OsuButton deleteButton;
             private ControlPointTable table;
 
-            private IBindableList<ControlPointGroup> controlGroups;
+            private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
             [Resolved]
             private EditorClock clock { get; set; }
@@ -138,11 +124,10 @@ namespace osu.Game.Screens.Edit.Timing
 
                 selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
 
-                controlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
-
-                controlGroups.BindCollectionChanged((sender, args) =>
+                controlPointGroups.BindTo(Beatmap.Value.Beatmap.ControlPointInfo.Groups);
+                controlPointGroups.BindCollectionChanged((sender, args) =>
                 {
-                    table.ControlGroups = controlGroups;
+                    table.ControlGroups = controlPointGroups;
                     changeHandler.SaveState();
                 }, true);
             }

@@ -69,10 +69,10 @@ namespace osu.Game.Rulesets.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    hatSample = new PausableSkinnableSound(new SampleInfo("nightcore-hat")),
-                    clapSample = new PausableSkinnableSound(new SampleInfo("nightcore-clap")),
-                    kickSample = new PausableSkinnableSound(new SampleInfo("nightcore-kick")),
-                    finishSample = new PausableSkinnableSound(new SampleInfo("nightcore-finish")),
+                    hatSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")),
+                    clapSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-clap")),
+                    kickSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-kick")),
+                    finishSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-finish")),
                 };
             }
 

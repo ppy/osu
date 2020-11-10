@@ -37,6 +37,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
+using System.Diagnostics;
 
 namespace osu.Game.Screens.Select
 {
@@ -519,7 +520,7 @@ namespace osu.Game.Screens.Select
 
             ModSelect.SelectedMods.BindTo(selectedMods);
 
-            music.TrackChanged += ensureTrackLooping;
+            beginLooping();
         }
 
         private const double logo_transition = 250;
@@ -570,8 +571,7 @@ namespace osu.Game.Screens.Select
 
             BeatmapDetails.Refresh();
 
-            music.CurrentTrack.Looping = true;
-            music.TrackChanged += ensureTrackLooping;
+            beginLooping();
             music.ResetTrackAdjustments();
 
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
@@ -579,7 +579,8 @@ namespace osu.Game.Screens.Select
                 updateComponentFromBeatmap(Beatmap.Value);
 
                 // restart playback on returning to song select, regardless.
-                music.Play();
+                // not sure this should be a permanent thing (we may want to leave a user pause paused even on returning)
+                music.Play(requestedByUser: true);
             }
 
             this.FadeIn(250);
@@ -596,8 +597,7 @@ namespace osu.Game.Screens.Select
 
             BeatmapOptions.Hide();
 
-            music.CurrentTrack.Looping = false;
-            music.TrackChanged -= ensureTrackLooping;
+            endLooping();
 
             this.ScaleTo(1.1f, 250, Easing.InSine);
 
@@ -618,10 +618,31 @@ namespace osu.Game.Screens.Select
 
             FilterControl.Deactivate();
 
-            music.CurrentTrack.Looping = false;
-            music.TrackChanged -= ensureTrackLooping;
+            endLooping();
 
             return false;
+        }
+
+        private bool isHandlingLooping;
+
+        private void beginLooping()
+        {
+            Debug.Assert(!isHandlingLooping);
+
+            music.CurrentTrack.Looping = isHandlingLooping = true;
+
+            music.TrackChanged += ensureTrackLooping;
+        }
+
+        private void endLooping()
+        {
+            // may be called multiple times during screen exit process.
+            if (!isHandlingLooping)
+                return;
+
+            music.CurrentTrack.Looping = isHandlingLooping = false;
+
+            music.TrackChanged -= ensureTrackLooping;
         }
 
         private void ensureTrackLooping(WorkingBeatmap beatmap, TrackChangeDirection changeDirection)
@@ -681,7 +702,7 @@ namespace osu.Game.Screens.Select
 
             track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
 
-            if (!track.IsRunning && (music.IsUserPaused != true || isNewTrack))
+            if (!track.IsRunning && (music.UserPauseRequested != true || isNewTrack))
                 music.Play(true);
 
             lastTrack.SetTarget(track);

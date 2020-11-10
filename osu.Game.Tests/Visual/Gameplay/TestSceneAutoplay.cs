@@ -41,11 +41,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("store time", () => time = Player.GameplayClockContainer.GameplayClock.CurrentTime);
 
             // test seek via keyboard
-            AddStep("seek with right arrow key", () => press(Key.Right));
+            AddStep("seek with right arrow key", () => InputManager.Key(Key.Right));
             AddAssert("time seeked forward", () => Player.GameplayClockContainer.GameplayClock.CurrentTime > time + 2000);
 
             AddStep("store time", () => time = Player.GameplayClockContainer.GameplayClock.CurrentTime);
-            AddStep("seek with left arrow key", () => press(Key.Left));
+            AddStep("seek with left arrow key", () => InputManager.Key(Key.Left));
             AddAssert("time seeked backward", () => Player.GameplayClockContainer.GameplayClock.CurrentTime < time);
 
             seekToBreak(0);
@@ -66,12 +66,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for seek to complete", () => Player.HUDOverlay.Progress.ReferenceClock.CurrentTime >= destBreak().StartTime);
 
             BreakPeriod destBreak() => Beatmap.Value.Beatmap.Breaks.ElementAt(breakIndex);
-        }
-
-        private void press(Key key)
-        {
-            InputManager.PressKey(key);
-            InputManager.ReleaseKey(key);
         }
     }
 }

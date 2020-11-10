@@ -75,6 +75,7 @@ namespace osu.Game.Overlays
                             Header,
                             filterControl = new BeatmapListingFilterControl
                             {
+                                TypingStarted = onTypingStarted,
                                 SearchStarted = onSearchStarted,
                                 SearchFinished = onSearchFinished,
                             },
@@ -118,6 +119,12 @@ namespace osu.Game.Overlays
             api?.Register(this);
             errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!");
             checkIsLoggedIn();
+        }
+
+        private void onTypingStarted()
+        {
+            // temporary until the textbox/header is updated to always stay on screen.
+            resultScrollContainer.ScrollToStart();
         }
 
         protected override void OnFocus(FocusEvent e)

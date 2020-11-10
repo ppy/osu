@@ -40,9 +40,14 @@ namespace osu.Game.Overlays
         {
         }
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
+
             Children = new Drawable[]
             {
                 new Box
@@ -143,19 +148,23 @@ namespace osu.Game.Overlays
                     loadDisplay(new FriendDisplay());
                     break;
 
+                case DashboardOverlayTabs.CurrentlyPlaying:
+                    loadDisplay(new CurrentlyPlayingDisplay());
+                    break;
+
                 default:
                     throw new NotImplementedException($"Display for {tab.NewValue} tab is not implemented");
             }
         }
 
-        public override void APIStateChanged(IAPIProvider api, APIState state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             checkIsLoggedIn();
             if (State.Value == Visibility.Hidden)
                 return;
 
             Header.Current.TriggerChange();
-        }
+        });
 
         protected override void Dispose(bool isDisposing)
         {

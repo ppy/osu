@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -72,6 +73,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             BodyPiece.UpdateFrom(HitObject);
         }
 
+        public override bool HandleQuickDeletion()
+        {
+            var hoveredControlPoint = ControlPointVisualiser?.Pieces.FirstOrDefault(p => p.IsHovered);
+
+            if (hoveredControlPoint == null)
+                return false;
+
+            hoveredControlPoint.IsSelected.Value = true;
+            ControlPointVisualiser.DeleteSelected();
+            return true;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -82,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override void OnSelected()
         {
-            AddInternal(ControlPointVisualiser = new PathControlPointVisualiser((Slider)slider.HitObject, true)
+            AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(slider.HitObject, true)
             {
                 RemoveControlPointsRequested = removeControlPoints
             });
@@ -109,9 +122,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     rightClickPosition = e.MouseDownPosition;
                     return false; // Allow right click to be handled by context menu
 
-                case MouseButton.Left when e.ControlPressed && IsSelected:
-                    placementControlPointIndex = addControlPoint(e.MousePosition);
-                    return true; // Stop input from being handled and modifying the selection
+                case MouseButton.Left:
+                    if (e.ControlPressed && IsSelected)
+                    {
+                        placementControlPointIndex = addControlPoint(e.MousePosition);
+                        return true; // Stop input from being handled and modifying the selection
+                    }
+
+                    break;
             }
 
             return false;
@@ -216,7 +234,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override Vector2 ScreenSpaceSelectionPoint => BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => BodyPiece.ReceivePositionalInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos)) == true;
 
         protected virtual SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position) => new SliderCircleSelectionBlueprint(slider, position);
     }

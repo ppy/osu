@@ -265,6 +265,26 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
             AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<EpilepsyWarning>().Any() == warning);
+
+            if (warning)
+            {
+                AddUntilStep("sound volume decreased", () => Beatmap.Value.Track.AggregateVolume.Value == 0.25);
+                AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
+            }
+        }
+
+        [Test]
+        public void TestEpilepsyWarningEarlyExit()
+        {
+            AddStep("set epilepsy warning", () => epilepsyWarning = true);
+            AddStep("load dummy beatmap", () => ResetPlayer(false));
+
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddUntilStep("wait for epilepsy warning", () => loader.ChildrenOfType<EpilepsyWarning>().Single().Alpha > 0);
+            AddStep("exit early", () => loader.Exit());
+
+            AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
         }
 
         private class TestPlayerLoaderContainer : Container

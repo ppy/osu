@@ -71,11 +71,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void press(Key down)
         {
-            AddStep($"press {down}", () =>
-            {
-                InputManager.PressKey(down);
-                InputManager.ReleaseKey(down);
-            });
+            AddStep($"press {down}", () => InputManager.Key(down));
         }
 
         [Test]
