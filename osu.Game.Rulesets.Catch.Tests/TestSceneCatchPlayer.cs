@@ -9,9 +9,6 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class TestSceneCatchPlayer : PlayerTestScene
     {
-        public TestSceneCatchPlayer()
-            : base(new CatchRuleset())
-        {
-        }
+        protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
     }
 }

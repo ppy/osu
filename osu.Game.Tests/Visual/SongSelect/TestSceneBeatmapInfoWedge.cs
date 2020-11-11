@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
@@ -75,7 +76,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 testBeatmapLabels(instance);
 
-                // TODO: adjust cases once more info is shown for other gamemodes
                 switch (instance)
                 {
                     case OsuRuleset _:
@@ -99,8 +99,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                         break;
                 }
             }
-
-            testNullBeatmap();
         }
 
         private void testBeatmapLabels(Ruleset ruleset)
@@ -117,7 +115,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check info labels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
         }
 
-        private void testNullBeatmap()
+        [Test]
+        public void TestNullBeatmap()
         {
             selectBeatmap(null);
             AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
@@ -125,6 +124,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
             AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
+        }
+
+        [Test]
+        public void TestTruncation()
+        {
+            selectBeatmap(createLongMetadata());
         }
 
         private void selectBeatmap([CanBeNull] IBeatmap b)
@@ -166,15 +171,34 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
+        private IBeatmap createLongMetadata()
+        {
+            return new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        AuthorString = "WWWWWWWWWWWWWWW",
+                        Artist = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Artist",
+                        Source = "Verrrrry long Source",
+                        Title = "Verrrrry long Title"
+                    },
+                    Version = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
+                    Status = BeatmapSetOnlineStatus.Graveyard,
+                },
+            };
+        }
+
         private class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
             public new BufferedWedgeInfo Info => base.Info;
         }
 
-        private class TestHitObject : HitObject, IHasPosition
+        private class TestHitObject : ConvertHitObject, IHasPosition
         {
-            public float X { get; } = 0;
-            public float Y { get; } = 0;
+            public float X => 0;
+            public float Y => 0;
             public Vector2 Position { get; } = Vector2.Zero;
         }
     }

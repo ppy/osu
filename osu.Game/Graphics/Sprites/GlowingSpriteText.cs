@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -43,6 +44,24 @@ namespace osu.Game.Graphics.Sprites
             set => blurredText.Colour = value;
         }
 
+        public Vector2 Spacing
+        {
+            get => spriteText.Spacing;
+            set => spriteText.Spacing = blurredText.Spacing = value;
+        }
+
+        public bool UseFullGlyphHeight
+        {
+            get => spriteText.UseFullGlyphHeight;
+            set => spriteText.UseFullGlyphHeight = blurredText.UseFullGlyphHeight = value;
+        }
+
+        public Bindable<string> Current
+        {
+            get => spriteText.Current;
+            set => spriteText.Current = value;
+        }
+
         public GlowingSpriteText()
         {
             AutoSizeAxes = Axes.Both;
@@ -55,8 +74,9 @@ namespace osu.Game.Graphics.Sprites
                     Origin = Anchor.Centre,
                     BlurSigma = new Vector2(4),
                     CacheDrawnFrameBuffer = true,
+                    RedrawOnScale = false,
                     RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Size = new Vector2(3f),
                     Children = new[]
                     {

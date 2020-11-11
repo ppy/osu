@@ -9,8 +9,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.Overlays;
+using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
+using osu.Game.Tests.Resources;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -18,37 +22,12 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneStoryboard : OsuTestScene
     {
-        private readonly Container<DrawableStoryboard> storyboardContainer;
+        private Container<DrawableStoryboard> storyboardContainer;
         private DrawableStoryboard storyboard;
 
-        public TestSceneStoryboard()
+        [Test]
+        public void TestStoryboard()
         {
-            Clock = new FramedClock();
-
-            Add(new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
-                    storyboardContainer = new Container<DrawableStoryboard>
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                },
-            });
-
-            Add(new MusicController
-            {
-                Origin = Anchor.TopRight,
-                Anchor = Anchor.TopRight,
-                State = { Value = Visibility.Visible },
-            });
-
             AddStep("Restart", restart);
             AddToggleStep("Passing", passing =>
             {
@@ -56,14 +35,47 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
+        [Test]
+        public void TestStoryboardMissingVideo()
+        {
+            AddStep("Load storyboard with missing video", loadStoryboardNoVideo);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.ValueChanged += beatmapChanged;
+            Clock = new FramedClock();
+
+            AddRange(new Drawable[]
+            {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                        },
+                        storyboardContainer = new Container<DrawableStoryboard>
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    },
+                },
+                new NowPlayingOverlay
+                {
+                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopRight,
+                    State = { Value = Visibility.Visible },
+                }
+            });
+
+            Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
-            => loadStoryboard(e.NewValue);
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e) => loadStoryboard(e.NewValue);
 
         private void restart()
         {
@@ -87,6 +99,29 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             storyboardContainer.Add(storyboard);
             decoupledClock.ChangeSource(working.Track);
+        }
+
+        private void loadStoryboardNoVideo()
+        {
+            if (storyboard != null)
+                storyboardContainer.Remove(storyboard);
+
+            var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
+            storyboardContainer.Clock = decoupledClock;
+
+            Storyboard sb;
+
+            using (var str = TestResources.OpenResource("storyboard_no_video.osu"))
+            using (var bfr = new LineBufferedReader(str))
+            {
+                var decoder = new LegacyStoryboardDecoder();
+                sb = decoder.Decode(bfr);
+            }
+
+            storyboard = sb.CreateDrawable(Beatmap.Value);
+
+            storyboardContainer.Add(storyboard);
+            decoupledClock.ChangeSource(Beatmap.Value.Track);
         }
     }
 }

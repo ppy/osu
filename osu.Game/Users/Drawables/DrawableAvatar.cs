@@ -13,6 +13,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Users.Drawables
 {
+    [LongRunningLoad]
     public class DrawableAvatar : Container
     {
         /// <summary>
@@ -42,7 +43,7 @@ namespace osu.Game.Users.Drawables
 
             Texture texture = null;
             if (user != null && user.Id > 1) texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
-            if (texture == null) texture = textures.Get(@"Online/avatar-guest");
+            texture ??= textures.Get(@"Online/avatar-guest");
 
             ClickableArea clickableArea;
             Add(clickableArea = new ClickableArea
@@ -67,13 +68,13 @@ namespace osu.Game.Users.Drawables
             if (!OpenOnClick.Value)
                 return;
 
-            if (user != null)
+            if (user?.Id > 1)
                 game?.ShowUser(user.Id);
         }
 
         private class ClickableArea : OsuClickableContainer
         {
-            public override string TooltipText => Enabled.Value ? @"View Profile" : null;
+            public override string TooltipText => Enabled.Value ? @"view profile" : null;
 
             protected override bool OnClick(ClickEvent e)
             {

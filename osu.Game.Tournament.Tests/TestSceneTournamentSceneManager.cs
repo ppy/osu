@@ -3,11 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TestSceneTournamentSceneManager : OsuTestScene
+    public class TestSceneTournamentSceneManager : TournamentTestScene
     {
         [BackgroundDependencyLoader]
         private void load(Storage storage)

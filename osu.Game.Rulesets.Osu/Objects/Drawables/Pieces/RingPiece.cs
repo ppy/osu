@@ -6,11 +6,10 @@ using osu.Framework.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class RingPiece : Container
+    public class RingPiece : CircularContainer
     {
         public RingPiece()
         {
@@ -19,23 +18,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            InternalChild = new SkinnableDrawable("Play/osu/hitcircleoverlay", _ => new Container
+            Masking = true;
+            BorderThickness = 9; // roughly matches slider borders and makes stacked circles distinctly visible from each other.
+            BorderColour = Color4.White;
+
+            Child = new Box
             {
-                Masking = true,
-                CornerRadius = Size.X / 2,
-                BorderThickness = 10,
-                BorderColour = Color4.White,
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        AlwaysPresent = true,
-                        Alpha = 0,
-                        RelativeSizeAxes = Axes.Both
-                    }
-                }
-            });
+                AlwaysPresent = true,
+                Alpha = 0,
+                RelativeSizeAxes = Axes.Both
+            };
         }
     }
 }

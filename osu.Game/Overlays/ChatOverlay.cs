@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -21,21 +22,28 @@ using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/messaging";
+        public string Title => "chat";
+        public string Description => "join the real-time discussion";
+
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
-        private ChannelManager channelManager;
+        [Resolved]
+        private ChannelManager channelManager { get; set; }
 
         private Container<DrawableChannel> currentChannelContainer;
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
-        private LoadingAnimation loading;
+        private LoadingSpinner loading;
 
         private FocusedTextBox textbox;
 
@@ -54,7 +62,7 @@ namespace osu.Game.Overlays
         private Box chatBackground;
         private Box tabBackground;
 
-        public Bindable<double> ChatHeight { get; set; }
+        public Bindable<float> ChatHeight { get; set; }
 
         private Container channelSelectionContainer;
         protected ChannelSelectionOverlay ChannelSelectionOverlay;
@@ -71,7 +79,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
+        private void load(OsuConfigManager config, OsuColour colours, TextureStore textures)
         {
             const float padding = 5;
 
@@ -138,14 +146,12 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
                                             PlaceholderText = "type your message",
-                                            Exit = Hide,
-                                            OnCommit = postMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
                                         }
                                     }
                                 },
-                                loading = new LoadingAnimation(),
+                                loading = new LoadingSpinner(),
                             }
                         },
                         tabsArea = new TabsArea
@@ -157,18 +163,29 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black,
                                 },
+                                new Sprite
+                                {
+                                    Texture = textures.Get(IconTexture),
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Size = new Vector2(OverlayTitle.ICON_SIZE),
+                                    Margin = new MarginPadding { Left = 10 },
+                                },
                                 ChannelTabControl = CreateChannelTabControl().With(d =>
                                 {
                                     d.Anchor = Anchor.BottomLeft;
                                     d.Origin = Anchor.BottomLeft;
                                     d.RelativeSizeAxes = Axes.Both;
                                     d.OnRequestLeave = channelManager.LeaveChannel;
+                                    d.IsSwitchable = true;
                                 }),
                             }
                         },
                     },
                 },
             };
+
+            textbox.OnCommit += postMessage;
 
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
             ChannelTabControl.ChannelSelectorActive.ValueChanged += active => ChannelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
@@ -190,18 +207,15 @@ namespace osu.Game.Overlays
             ChannelSelectionOverlay.OnRequestJoin = channel => channelManager.JoinChannel(channel);
             ChannelSelectionOverlay.OnRequestLeave = channelManager.LeaveChannel;
 
-            ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
-            ChatHeight.ValueChanged += height =>
+            ChatHeight = config.GetBindable<float>(OsuSetting.ChatDisplayHeight);
+            ChatHeight.BindValueChanged(height =>
             {
-                chatContainer.Height = (float)height.NewValue;
-                channelSelectionContainer.Height = 1f - (float)height.NewValue;
-                tabBackground.FadeTo(height.NewValue == 1 ? 1 : 0.8f, 200);
-            };
-            ChatHeight.TriggerChange();
+                chatContainer.Height = height.NewValue;
+                channelSelectionContainer.Height = 1f - height.NewValue;
+                tabBackground.FadeTo(height.NewValue == 1f ? 1f : 0.8f, 200);
+            }, true);
 
             chatBackground.Colour = colours.ChatBlue;
-
-            this.channelManager = channelManager;
 
             loading.Show();
 
@@ -211,14 +225,13 @@ namespace osu.Game.Overlays
             Schedule(() =>
             {
                 // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
-                channelManager.JoinedChannels.ItemsAdded += onChannelAddedToJoinedChannels;
-                channelManager.JoinedChannels.ItemsRemoved += onChannelRemovedFromJoinedChannels;
+                channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
+
                 foreach (Channel channel in channelManager.JoinedChannels)
                     ChannelTabControl.AddChannel(channel);
 
-                channelManager.AvailableChannels.ItemsAdded += availableChannelsChanged;
-                channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
-                ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+                channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
+                availableChannelsChanged(null, null);
 
                 currentChannel = channelManager.CurrentChannel.GetBoundCopy();
                 currentChannel.BindValueChanged(currentChannelChanged, true);
@@ -256,6 +269,9 @@ namespace osu.Game.Overlays
                 loadedChannels.Add(loaded);
                 LoadComponentAsync(loaded, l =>
                 {
+                    if (currentChannel.Value != e.NewValue)
+                        return;
+
                     loading.Hide();
 
                     currentChannelContainer.Clear(false);
@@ -268,9 +284,13 @@ namespace osu.Game.Overlays
                 currentChannelContainer.Clear(false);
                 currentChannelContainer.Add(loaded);
             }
+
+            // mark channel as read when channel switched
+            if (e.NewValue.Messages.Any())
+                channelManager.MarkChannelAsRead(e.NewValue);
         }
 
-        private double startDragChatHeight;
+        private float startDragChatHeight;
         private bool isDragging;
 
         protected override bool OnDragStart(DragStartEvent e)
@@ -284,11 +304,11 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (isDragging)
             {
-                double targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
+                float targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
                 if (ChannelSelectionOverlay.State.Value == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
@@ -296,20 +316,20 @@ namespace osu.Game.Overlays
 
                 ChatHeight.Value = targetChatHeight;
             }
-
-            return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             isDragging = false;
-            return base.OnDragEnd(e);
+            base.OnDragEnd(e);
         }
 
         private void selectTab(int index)
         {
-            var channel = ChannelTabControl.Items.Skip(index).FirstOrDefault();
-            if (channel != null && !(channel is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+            var channel = ChannelTabControl.Items
+                                           .Where(tab => !(tab is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+                                           .ElementAtOrDefault(index);
+            if (channel != null)
                 ChannelTabControl.Current.Value = channel;
         }
 
@@ -344,7 +364,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(FocusEvent e)
         {
-            //this is necessary as textbox is masked away and therefore can't get focus :(
+            // this is necessary as textbox is masked away and therefore can't get focus :(
             textbox.TakeFocus();
             base.OnFocus(e);
         }
@@ -370,23 +390,41 @@ namespace osu.Game.Overlays
             base.PopOut();
         }
 
-        private void onChannelAddedToJoinedChannels(IEnumerable<Channel> channels)
+        private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            foreach (Channel channel in channels)
-                ChannelTabControl.AddChannel(channel);
-        }
-
-        private void onChannelRemovedFromJoinedChannels(IEnumerable<Channel> channels)
-        {
-            foreach (Channel channel in channels)
+            switch (args.Action)
             {
-                ChannelTabControl.RemoveChannel(channel);
-                loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
+                case NotifyCollectionChangedAction.Add:
+                    foreach (Channel channel in args.NewItems.Cast<Channel>())
+                        ChannelTabControl.AddChannel(channel);
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (Channel channel in args.OldItems.Cast<Channel>())
+                    {
+                        ChannelTabControl.RemoveChannel(channel);
+
+                        var loaded = loadedChannels.Find(c => c.Channel == channel);
+
+                        if (loaded != null)
+                        {
+                            loadedChannels.Remove(loaded);
+
+                            // Because the container is only cleared in the async load callback of a new channel, it is forcefully cleared
+                            // to ensure that the previous channel doesn't get updated after it's disposed
+                            currentChannelContainer.Remove(loaded);
+                            loaded.Dispose();
+                        }
+                    }
+
+                    break;
             }
         }
 
-        private void availableChannelsChanged(IEnumerable<Channel> channels)
-            => ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+        private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -395,10 +433,8 @@ namespace osu.Game.Overlays
             if (channelManager != null)
             {
                 channelManager.CurrentChannel.ValueChanged -= currentChannelChanged;
-                channelManager.JoinedChannels.ItemsAdded -= onChannelAddedToJoinedChannels;
-                channelManager.JoinedChannels.ItemsRemoved -= onChannelRemovedFromJoinedChannels;
-                channelManager.AvailableChannels.ItemsAdded -= availableChannelsChanged;
-                channelManager.AvailableChannels.ItemsRemoved -= availableChannelsChanged;
+                channelManager.JoinedChannels.CollectionChanged -= joinedChannelsChanged;
+                channelManager.AvailableChannels.CollectionChanged -= availableChannelsChanged;
             }
         }
 

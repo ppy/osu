@@ -5,7 +5,7 @@ using UIKit;
 
 namespace osu.Game.Rulesets.Catch.Tests.iOS
 {
-    public class Application
+    public static class Application
     {
         public static void Main(string[] args)
         {

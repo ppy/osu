@@ -9,20 +9,22 @@ namespace osu.Game.Tests.Resources
 {
     public static class TestResources
     {
-        public static Stream OpenResource(string name) => new DllResourceStore("osu.Game.Tests.dll").GetStream($"Resources/{name}");
+        public static DllResourceStore GetStore() => new DllResourceStore(typeof(TestResources).Assembly);
 
-        public static Stream GetTestBeatmapStream() => new DllResourceStore("osu.Game.Resources.dll").GetStream("Beatmaps/241526 Soleily - Renatus.osz");
+        public static Stream OpenResource(string name) => GetStore().GetStream($"Resources/{name}");
 
-        public static string GetTestBeatmapForImport()
+        public static Stream GetTestBeatmapStream(bool virtualTrack = false) => OpenResource($"Archives/241526 Soleily - Renatus{(virtualTrack ? "_virtual" : "")}.osz");
+
+        public static string GetTestBeatmapForImport(bool virtualTrack = false)
         {
-            var temp = Path.GetTempFileName() + ".osz";
+            var tempPath = Path.GetTempFileName() + ".osz";
 
-            using (var stream = GetTestBeatmapStream())
-            using (var newFile = File.Create(temp))
+            using (var stream = GetTestBeatmapStream(virtualTrack))
+            using (var newFile = File.Create(tempPath))
                 stream.CopyTo(newFile);
 
-            Assert.IsTrue(File.Exists(temp));
-            return temp;
+            Assert.IsTrue(File.Exists(tempPath));
+            return tempPath;
         }
     }
 }

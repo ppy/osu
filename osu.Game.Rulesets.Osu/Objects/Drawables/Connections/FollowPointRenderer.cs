@@ -1,121 +1,123 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using osuTK;
+using System.Linq;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
-    public class FollowPointRenderer : ConnectionRenderer<OsuHitObject>
+    /// <summary>
+    /// Visualises connections between <see cref="DrawableOsuHitObject"/>s.
+    /// </summary>
+    public class FollowPointRenderer : LifetimeManagementContainer
     {
-        private int pointDistance = 32;
-
         /// <summary>
-        /// Determines how much space there is between points.
+        /// All the <see cref="FollowPointConnection"/>s contained by this <see cref="FollowPointRenderer"/>.
         /// </summary>
-        public int PointDistance
-        {
-            get => pointDistance;
-            set
-            {
-                if (pointDistance == value) return;
+        internal IReadOnlyList<FollowPointConnection> Connections => connections;
 
-                pointDistance = value;
-                update();
-            }
-        }
-
-        private int preEmpt = 800;
-
-        /// <summary>
-        /// Follow points to the next hitobject start appearing for this many milliseconds before an hitobject's end time.
-        /// </summary>
-        public int PreEmpt
-        {
-            get => preEmpt;
-            set
-            {
-                if (preEmpt == value) return;
-
-                preEmpt = value;
-                update();
-            }
-        }
-
-        private IEnumerable<OsuHitObject> hitObjects;
-
-        public override IEnumerable<OsuHitObject> HitObjects
-        {
-            get => hitObjects;
-            set
-            {
-                hitObjects = value;
-                update();
-            }
-        }
+        private readonly List<FollowPointConnection> connections = new List<FollowPointConnection>();
 
         public override bool RemoveCompletedTransforms => false;
 
-        private void update()
+        /// <summary>
+        /// Adds the <see cref="FollowPoint"/>s around an <see cref="OsuHitObject"/>.
+        /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="OsuHitObject"/> to add <see cref="FollowPoint"/>s for.</param>
+        public void AddFollowPoints(OsuHitObject hitObject)
+            => addConnection(new FollowPointConnection(hitObject).With(g => g.StartTime.BindValueChanged(_ => onStartTimeChanged(g))));
+
+        /// <summary>
+        /// Removes the <see cref="FollowPoint"/>s around an <see cref="OsuHitObject"/>.
+        /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="OsuHitObject"/> to remove <see cref="FollowPoint"/>s for.</param>
+        public void RemoveFollowPoints(OsuHitObject hitObject) => removeGroup(connections.Single(g => g.Start == hitObject));
+
+        /// <summary>
+        /// Adds a <see cref="FollowPointConnection"/> to this <see cref="FollowPointRenderer"/>.
+        /// </summary>
+        /// <param name="connection">The <see cref="FollowPointConnection"/> to add.</param>
+        /// <returns>The index of <paramref name="connection"/> in <see cref="connections"/>.</returns>
+        private void addConnection(FollowPointConnection connection)
         {
-            ClearInternal();
-
-            if (hitObjects == null)
-                return;
-
-            OsuHitObject prevHitObject = null;
-
-            foreach (var currHitObject in hitObjects)
+            // Groups are sorted by their start time when added such that the index can be used to post-process other surrounding connections
+            int index = connections.AddInPlace(connection, Comparer<FollowPointConnection>.Create((g1, g2) =>
             {
-                if (prevHitObject != null && !currHitObject.NewCombo && !(prevHitObject is Spinner) && !(currHitObject is Spinner))
-                {
-                    Vector2 startPosition = prevHitObject.EndPosition;
-                    Vector2 endPosition = currHitObject.Position;
-                    double startTime = (prevHitObject as IHasEndTime)?.EndTime ?? prevHitObject.StartTime;
-                    double endTime = currHitObject.StartTime;
+                int comp = g1.StartTime.Value.CompareTo(g2.StartTime.Value);
 
-                    Vector2 distanceVector = endPosition - startPosition;
-                    int distance = (int)distanceVector.Length;
-                    float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
-                    double duration = endTime - startTime;
+                if (comp != 0)
+                    return comp;
 
-                    for (int d = (int)(PointDistance * 1.5); d < distance - PointDistance; d += PointDistance)
-                    {
-                        float fraction = (float)d / distance;
-                        Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
-                        Vector2 pointEndPosition = startPosition + fraction * distanceVector;
-                        double fadeOutTime = startTime + fraction * duration;
-                        double fadeInTime = fadeOutTime - PreEmpt;
+                // we always want to insert the new item after equal ones.
+                // this is important for beatmaps with multiple hitobjects at the same point in time.
+                // if we use standard comparison insert order, there will be a churn of connections getting re-updated to
+                // the next object at the point-in-time, adding a construction/disposal overhead (see FollowPointConnection.End implementation's ClearInternal).
+                // this is easily visible on https://osu.ppy.sh/beatmapsets/150945#osu/372245
+                return -1;
+            }));
 
-                        FollowPoint fp;
+            if (index < connections.Count - 1)
+            {
+                // Update the connection's end point to the next connection's start point
+                //     h1 -> -> -> h2
+                //    connection    nextGroup
 
-                        AddInternal(fp = new FollowPoint
-                        {
-                            Position = pointStartPosition,
-                            Rotation = rotation,
-                            Alpha = 0,
-                            Scale = new Vector2(1.5f),
-                        });
-
-                        using (fp.BeginAbsoluteSequence(fadeInTime))
-                        {
-                            fp.FadeIn(currHitObject.TimeFadeIn);
-                            fp.ScaleTo(1, currHitObject.TimeFadeIn, Easing.Out);
-
-                            fp.MoveTo(pointEndPosition, currHitObject.TimeFadeIn, Easing.Out);
-
-                            fp.Delay(fadeOutTime - fadeInTime).FadeOut(currHitObject.TimeFadeIn);
-                        }
-
-                        fp.Expire(true);
-                    }
-                }
-
-                prevHitObject = currHitObject;
+                FollowPointConnection nextConnection = connections[index + 1];
+                connection.End = nextConnection.Start;
             }
+            else
+            {
+                // The end point may be non-null during re-ordering
+                connection.End = null;
+            }
+
+            if (index > 0)
+            {
+                // Update the previous connection's end point to the current connection's start point
+                //     h1 -> -> -> h2
+                //  prevGroup    connection
+
+                FollowPointConnection previousConnection = connections[index - 1];
+                previousConnection.End = connection.Start;
+            }
+
+            AddInternal(connection);
+        }
+
+        /// <summary>
+        /// Removes a <see cref="FollowPointConnection"/> from this <see cref="FollowPointRenderer"/>.
+        /// </summary>
+        /// <param name="connection">The <see cref="FollowPointConnection"/> to remove.</param>
+        /// <returns>Whether <paramref name="connection"/> was removed.</returns>
+        private void removeGroup(FollowPointConnection connection)
+        {
+            RemoveInternal(connection);
+
+            int index = connections.IndexOf(connection);
+
+            if (index > 0)
+            {
+                // Update the previous connection's end point to the next connection's start point
+                //     h1 -> -> -> h2 -> -> -> h3
+                //  prevGroup    connection       nextGroup
+                // The current connection's end point is used since there may not be a next connection
+                FollowPointConnection previousConnection = connections[index - 1];
+                previousConnection.End = connection.End;
+            }
+
+            connections.Remove(connection);
+        }
+
+        private void onStartTimeChanged(FollowPointConnection connection)
+        {
+            // Naive but can be improved if performance becomes an issue
+            removeGroup(connection);
+            addConnection(connection);
         }
     }
 }

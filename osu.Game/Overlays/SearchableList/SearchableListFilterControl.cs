@@ -13,36 +13,38 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.SearchableList
 {
-    public abstract class SearchableListFilterControl<T, U> : Container
+    public abstract class SearchableListFilterControl<TTab, TCategory> : Container
+        where TTab : struct, Enum
+        where TCategory : struct, Enum
     {
         private const float padding = 10;
 
-        private readonly Container filterContainer;
+        private readonly Drawable filterContainer;
+        private readonly Drawable rightFilterContainer;
         private readonly Box tabStrip;
 
         public readonly SearchTextBox Search;
-        public readonly PageTabControl<T> Tabs;
-        public readonly DisplayStyleControl<U> DisplayStyleControl;
+        public readonly PageTabControl<TTab> Tabs;
+        public readonly SlimEnumDropdown<TCategory> Dropdown;
+        public readonly DisplayStyleControl DisplayStyleControl;
 
         protected abstract Color4 BackgroundColour { get; }
-        protected abstract T DefaultTab { get; }
+        protected abstract TTab DefaultTab { get; }
+        protected abstract TCategory DefaultCategory { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
         /// <summary>
         /// The amount of padding added to content (does not affect background or tab control strip).
         /// </summary>
-        protected virtual float ContentHorizontalPadding => SearchableListOverlay.WIDTH_PADDING;
+        protected virtual float ContentHorizontalPadding => WaveOverlayContainer.WIDTH_PADDING;
 
         protected SearchableListFilterControl()
         {
-            if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("SearchableListFilterControl's sort tabs only support enums as the generic type argument");
-
             RelativeSizeAxes = Axes.X;
 
             var controls = CreateSupplementaryControls();
             Container controlsContainer;
-            Children = new Drawable[]
+            Children = new[]
             {
                 filterContainer = new Container
                 {
@@ -84,11 +86,17 @@ namespace osu.Game.Overlays.SearchableList
                                     AutoSizeAxes = Axes.Y,
                                     Margin = new MarginPadding { Top = controls != null ? padding : 0 },
                                 },
-                                Tabs = new PageTabControl<T>
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding { Right = 225 },
+                                    Child = Tabs = new PageTabControl<TTab>
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                    },
                                 },
-                                new Box //keep the tab strip part of autosize, but don't put it in the flow container
+                                new Box // keep the tab strip part of autosize, but don't put it in the flow container
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Height = 1,
@@ -98,17 +106,36 @@ namespace osu.Game.Overlays.SearchableList
                         },
                     },
                 },
-                DisplayStyleControl = new DisplayStyleControl<U>
+                rightFilterContainer = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                },
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        Dropdown = new SlimEnumDropdown<TCategory>
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 160f,
+                        },
+                        DisplayStyleControl = new DisplayStyleControl
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                        },
+                    }
+                }
             };
 
             if (controls != null) controlsContainer.Children = new[] { controls };
 
             Tabs.Current.Value = DefaultTab;
             Tabs.Current.TriggerChange();
+
+            Dropdown.Current.Value = DefaultCategory;
+            Dropdown.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
@@ -122,13 +149,11 @@ namespace osu.Game.Overlays.SearchableList
             base.Update();
 
             Height = filterContainer.Height;
-            DisplayStyleControl.Margin = new MarginPadding { Top = filterContainer.Height - 35, Right = SearchableListOverlay.WIDTH_PADDING };
+            rightFilterContainer.Margin = new MarginPadding { Top = filterContainer.Height - 30, Right = ContentHorizontalPadding };
         }
 
         private class FilterSearchTextBox : SearchTextBox
         {
-            protected override bool AllowCommit => true;
-
             [BackgroundDependencyLoader]
             private void load()
             {

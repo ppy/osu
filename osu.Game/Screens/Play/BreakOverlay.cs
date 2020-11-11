@@ -1,8 +1,7 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,7 +14,11 @@ namespace osu.Game.Screens.Play
 {
     public class BreakOverlay : Container
     {
-        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
+        /// <summary>
+        /// The duration of the break overlay fading.
+        /// </summary>
+        public const double BREAK_FADE_DURATION = BreakPeriod.MIN_BREAK_DURATION / 2;
+
         private const float remaining_time_container_max_size = 0.3f;
         private const int vertical_margin = 25;
 
@@ -29,7 +32,9 @@ namespace osu.Game.Screens.Play
             set
             {
                 breaks = value;
-                initializeBreaks();
+
+                if (IsLoaded)
+                    initializeBreaks();
             }
         }
 
@@ -38,12 +43,14 @@ namespace osu.Game.Screens.Play
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
         private readonly RemainingTimeCounter remainingTimeCounter;
-        private readonly BreakInfo info;
         private readonly BreakArrows breakArrows;
 
-        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor = null)
+        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
         {
             RelativeSizeAxes = Axes.Both;
+
+            BreakInfo info;
+
             Child = fadeContainer = new Container
             {
                 Alpha = 0,
@@ -94,13 +101,11 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            if (scoreProcessor != null) bindProcessor(scoreProcessor);
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock)
-        {
-            if (clock != null) Clock = clock;
+            if (scoreProcessor != null)
+            {
+                info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
+                info.GradeDisplay.Current.BindTo(scoreProcessor.Rank);
+            }
         }
 
         protected override void LoadComplete()
@@ -111,12 +116,10 @@ namespace osu.Game.Screens.Play
 
         private void initializeBreaks()
         {
-            if (!IsLoaded) return; // we need a clock.
-
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
 
-            if (breaks == null) return; //we need breaks.
+            if (breaks == null) return; // we need breaks.
 
             foreach (var b in breaks)
             {
@@ -125,34 +128,28 @@ namespace osu.Game.Screens.Play
 
                 using (BeginAbsoluteSequence(b.StartTime, true))
                 {
-                    fadeContainer.FadeIn(fade_duration);
-                    breakArrows.Show(fade_duration);
+                    fadeContainer.FadeIn(BREAK_FADE_DURATION);
+                    breakArrows.Show(BREAK_FADE_DURATION);
 
                     remainingTimeAdjustmentBox
-                        .ResizeWidthTo(remaining_time_container_max_size, fade_duration, Easing.OutQuint)
-                        .Delay(b.Duration - fade_duration)
+                        .ResizeWidthTo(remaining_time_container_max_size, BREAK_FADE_DURATION, Easing.OutQuint)
+                        .Delay(b.Duration - BREAK_FADE_DURATION)
                         .ResizeWidthTo(0);
 
                     remainingTimeBox
-                        .ResizeWidthTo(0, b.Duration - fade_duration)
+                        .ResizeWidthTo(0, b.Duration - BREAK_FADE_DURATION)
                         .Then()
                         .ResizeWidthTo(1);
 
                     remainingTimeCounter.CountTo(b.Duration).CountTo(0, b.Duration);
 
-                    using (BeginDelayedSequence(b.Duration - fade_duration, true))
+                    using (BeginDelayedSequence(b.Duration - BREAK_FADE_DURATION, true))
                     {
-                        fadeContainer.FadeOut(fade_duration);
-                        breakArrows.Hide(fade_duration);
+                        fadeContainer.FadeOut(BREAK_FADE_DURATION);
+                        breakArrows.Hide(BREAK_FADE_DURATION);
                     }
                 }
             }
-        }
-
-        private void bindProcessor(ScoreProcessor processor)
-        {
-            info.AccuracyDisplay.Current.BindTo(processor.Accuracy);
-            info.GradeDisplay.Current.BindTo(processor.Rank);
         }
     }
 }

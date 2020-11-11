@@ -1,0 +1,150 @@
+{
+    "Mappings": [{
+        "StartTime": 369,
+        "Objects": [{
+                "StartTime": 369,
+                "Position": 177
+            },
+            {
+                "StartTime": 450,
+                "Position": 216.539276
+            },
+            {
+                "StartTime": 532,
+                "Position": 256.5667
+            },
+            {
+                "StartTime": 614,
+                "Position": 296.594116
+            },
+            {
+                "StartTime": 696,
+                "Position": 336.621521
+            },
+            {
+                "StartTime": 778,
+                "Position": 376.99762
+            },
+            {
+                "StartTime": 860,
+                "Position": 337.318878
+            },
+            {
+                "StartTime": 942,
+                "Position": 297.291443
+            },
+            {
+                "StartTime": 1024,
+                "Position": 257.264038
+            },
+            {
+                "StartTime": 1106,
+                "Position": 217.2366
+            },
+            {
+                "StartTime": 1188,
+                "Position": 177
+            },
+            {
+                "StartTime": 1270,
+                "Position": 216.818192
+            },
+            {
+                "StartTime": 1352,
+                "Position": 256.8456
+            },
+            {
+                "StartTime": 1434,
+                "Position": 296.873047
+            },
+            {
+                "StartTime": 1516,
+                "Position": 336.900452
+            },
+            {
+                "StartTime": 1598,
+                "Position": 376.99762
+            },
+            {
+                "StartTime": 1680,
+                "Position": 337.039948
+            },
+            {
+                "StartTime": 1762,
+                "Position": 297.0125
+            },
+            {
+                "StartTime": 1844,
+                "Position": 256.9851
+            },
+            {
+                "StartTime": 1926,
+                "Position": 216.957672
+            },
+            {
+                "StartTime": 2008,
+                "Position": 177
+            },
+            {
+                "StartTime": 2090,
+                "Position": 217.097137
+            },
+            {
+                "StartTime": 2172,
+                "Position": 257.124573
+            },
+            {
+                "StartTime": 2254,
+                "Position": 297.152
+            },
+            {
+                "StartTime": 2336,
+                "Position": 337.179443
+            },
+            {
+                "StartTime": 2418,
+                "Position": 376.99762
+            },
+            {
+                "StartTime": 2500,
+                "Position": 336.760956
+            },
+            {
+                "StartTime": 2582,
+                "Position": 296.733643
+            },
+            {
+                "StartTime": 2664,
+                "Position": 256.7062
+            },
+            {
+                "StartTime": 2746,
+                "Position": 216.678772
+            },
+            {
+                "StartTime": 2828,
+                "Position": 177
+            },
+            {
+                "StartTime": 2909,
+                "Position": 216.887909
+            },
+            {
+                "StartTime": 2991,
+                "Position": 256.915344
+            },
+            {
+                "StartTime": 3073,
+                "Position": 296.942749
+            },
+            {
+                "StartTime": 3155,
+                "Position": 336.970184
+            },
+            {
+                "StartTime": 3237,
+                "Position": 376.99762
+            }
+        ]
+    }]
+}

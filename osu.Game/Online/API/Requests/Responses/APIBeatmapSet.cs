@@ -61,13 +61,19 @@ namespace osu.Game.Online.API.Requests.Responses
         private int[] ratings { get; set; }
 
         [JsonProperty(@"user_id")]
-        private long creatorId
+        private int creatorId
         {
             set => Author.Id = value;
         }
 
         [JsonProperty(@"availability")]
         private BeatmapSetOnlineAvailability availability { get; set; }
+
+        [JsonProperty(@"genre")]
+        private BeatmapSetOnlineGenre genre { get; set; }
+
+        [JsonProperty(@"language")]
+        private BeatmapSetOnlineLanguage language { get; set; }
 
         [JsonProperty(@"beatmaps")]
         private IEnumerable<APIBeatmap> beatmaps { get; set; }
@@ -95,6 +101,8 @@ namespace osu.Game.Online.API.Requests.Responses
                     LastUpdated = lastUpdated,
                     Availability = availability,
                     HasFavourited = hasFavourited,
+                    Genre = genre,
+                    Language = language
                 },
                 Beatmaps = beatmaps?.Select(b => b.ToBeatmap(rulesets)).ToList(),
             };

@@ -1,16 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using osuTK;
-using System.Linq;
-using osu.Game.Audio;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input.Bindings;
+using osu.Game.Audio;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -44,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         /// <summary>
         /// Moves <see cref="Content"/> to a layer proxied above the playfield.
-        /// Does nothing is content is already proxied.
+        /// Does nothing if content is already proxied.
         /// </summary>
         protected void ProxyContent()
         {
@@ -76,59 +79,146 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
         public abstract bool OnPressed(TaikoAction action);
-        public virtual bool OnReleased(TaikoAction action) => false;
+
+        public virtual void OnReleased(TaikoAction action)
+        {
+        }
+
+        public override double LifetimeStart
+        {
+            get => base.LifetimeStart;
+            set
+            {
+                base.LifetimeStart = value;
+                proxiedContent.LifetimeStart = value;
+            }
+        }
+
+        public override double LifetimeEnd
+        {
+            get => base.LifetimeEnd;
+            set
+            {
+                base.LifetimeEnd = value;
+                proxiedContent.LifetimeEnd = value;
+            }
+        }
 
         private class ProxiedContentContainer : Container
         {
-            public override double LifetimeStart => Parent?.LifetimeStart ?? base.LifetimeStart;
-            public override double LifetimeEnd => Parent?.LifetimeEnd ?? base.LifetimeEnd;
+            public override bool RemoveWhenNotAlive => false;
         }
     }
 
-    public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableTaikoHitObject
-        where TaikoHitType : TaikoHitObject
+    public abstract class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
+        where TObject : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
-        protected readonly Vector2 BaseSize;
+        public new TObject HitObject;
 
-        protected readonly TaikoPiece MainPiece;
+        protected Vector2 BaseSize;
+        protected SkinnableDrawable MainPiece;
 
-        public new TaikoHitType HitObject;
+        private readonly Bindable<bool> isStrong;
 
-        protected DrawableTaikoHitObject(TaikoHitType hitObject)
+        private readonly Container<DrawableStrongNestedHit> strongHitContainer;
+
+        protected DrawableTaikoHitObject(TObject hitObject)
             : base(hitObject)
         {
             HitObject = hitObject;
+            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
 
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Custom;
 
             RelativeSizeAxes = Axes.Both;
-            Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
-            Content.Add(MainPiece = CreateMainPiece());
-            MainPiece.KiaiMode = HitObject.Kiai;
+            AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
+        }
 
-            var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
-
-            if (strongObject != null)
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            isStrong.BindValueChanged(_ =>
             {
-                var strongHit = CreateStrongHit(strongObject);
+                // will overwrite samples, should only be called on change.
+                updateSamplesFromStrong();
 
-                AddNested(strongHit);
-                AddInternal(strongHit);
+                RecreatePieces();
+            });
+
+            RecreatePieces();
+        }
+
+        private HitSampleInfo[] getStrongSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
+
+        protected override void LoadSamples()
+        {
+            base.LoadSamples();
+
+            if (HitObject.CanBeStrong)
+                isStrong.Value = getStrongSamples().Any();
+        }
+
+        private void updateSamplesFromStrong()
+        {
+            var strongSamples = getStrongSamples();
+
+            if (isStrong.Value != strongSamples.Any())
+            {
+                if (isStrong.Value)
+                    HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH });
+                else
+                {
+                    foreach (var sample in strongSamples)
+                        HitObject.Samples.Remove(sample);
+                }
             }
         }
 
-        protected override bool UseTransformStateManagement => false;
+        protected virtual void RecreatePieces()
+        {
+            Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
-        // Normal and clap samples are handled by the drum
-        protected override IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
+            MainPiece?.Expire();
+            Content.Add(MainPiece = CreateMainPiece());
+        }
 
-        protected override string SampleNamespace => "Taiko";
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
 
-        protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
+            switch (hitObject)
+            {
+                case DrawableStrongNestedHit strong:
+                    strongHitContainer.Add(strong);
+                    break;
+            }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            strongHitContainer.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case StrongHitObject strong:
+                    return CreateStrongHit(strong);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
+        }
+
+        // Most osu!taiko hitsounds are managed by the drum (see DrumSampleMapping).
+        public override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
+
+        protected abstract SkinnableDrawable CreateMainPiece();
 
         /// <summary>
         /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongHitObject"/>.

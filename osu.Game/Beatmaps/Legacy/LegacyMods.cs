@@ -9,7 +9,7 @@ namespace osu.Game.Beatmaps.Legacy
     public enum LegacyMods
     {
         None = 0,
-        NoFail = 1 << 0,
+        NoFail = 1,
         Easy = 1 << 1,
         TouchDevice = 1 << 2,
         Hidden = 1 << 3,
@@ -38,5 +38,6 @@ namespace osu.Game.Beatmaps.Legacy
         Key1 = 1 << 26,
         Key3 = 1 << 27,
         Key2 = 1 << 28,
+        Mirror = 1 << 30,
     }
 }

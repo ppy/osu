@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 using osuTK;
@@ -18,11 +17,8 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneRankGraph : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(RankGraph),
-            typeof(LineGraph)
-        };
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         public TestSceneRankGraph()
         {
@@ -69,28 +65,22 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddStep("null user", () => graph.User.Value = null);
+            AddStep("null user", () => graph.Statistics.Value = null);
             AddStep("rank only", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 123456 },
-                        PP = 12345,
-                    }
+                    Ranks = new UserStatistics.UserRanks { Global = 123456 },
+                    PP = 12345,
                 };
             });
 
             AddStep("with rank history", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 89000 },
-                        PP = 12345,
-                    },
+                    Ranks = new UserStatistics.UserRanks { Global = 89000 },
+                    PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
                         Data = data,
@@ -100,13 +90,10 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("with zero values", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 89000 },
-                        PP = 12345,
-                    },
+                    Ranks = new UserStatistics.UserRanks { Global = 89000 },
+                    PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
                         Data = dataWithZeros,
@@ -116,13 +103,10 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("small amount of data", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 12000 },
-                        PP = 12345,
-                    },
+                    Ranks = new UserStatistics.UserRanks { Global = 12000 },
+                    PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
                         Data = smallData,
@@ -132,13 +116,10 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("graph with edges", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 12000 },
-                        PP = 12345,
-                    },
+                    Ranks = new UserStatistics.UserRanks { Global = 12000 },
+                    PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
                         Data = edgyData,

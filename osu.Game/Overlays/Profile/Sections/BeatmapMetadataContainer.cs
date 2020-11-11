@@ -10,7 +10,7 @@ using osu.Game.Graphics.Containers;
 namespace osu.Game.Overlays.Profile.Sections
 {
     /// <summary>
-    /// Display artist/title/mapper information, commonly used as the left portion of a profile or score display row (see <see cref="DrawableProfileRow"/>).
+    /// Display artist/title/mapper information, commonly used as the left portion of a profile or score display row.
     /// </summary>
     public abstract class BeatmapMetadataContainer : OsuHoverContainer
     {

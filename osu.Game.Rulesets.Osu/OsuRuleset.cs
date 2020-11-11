@@ -14,7 +14,6 @@ using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -24,15 +23,30 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
+using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.Skinning;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
+using System;
+using System.Linq;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuRuleset : Ruleset
+    public class OsuRuleset : Ruleset, ILegacyRuleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableOsuRuleset(this, beatmap, mods);
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
+
+        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
+
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
+
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
+
+        public const string SHORT_NAME = "osu";
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -42,17 +56,24 @@ namespace osu.Game.Rulesets.Osu
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new OsuModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new OsuModDoubleTime();
 
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new OsuModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new OsuModSuddenDeath();
+
             if (mods.HasFlag(LegacyMods.Autopilot))
                 yield return new OsuModAutopilot();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlag(LegacyMods.Cinema))
+                yield return new OsuModCinema();
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new OsuModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -73,17 +94,11 @@ namespace osu.Game.Rulesets.Osu
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new OsuModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new OsuModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new OsuModRelax();
 
             if (mods.HasFlag(LegacyMods.SpunOut))
                 yield return new OsuModSpunOut();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new OsuModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
@@ -102,7 +117,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModEasy(),
                         new OsuModNoFail(),
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
-                        new OsuModSpunOut(),
                     };
 
                 case ModType.DifficultyIncrease:
@@ -119,14 +133,16 @@ namespace osu.Game.Rulesets.Osu
                     return new Mod[]
                     {
                         new OsuModTarget(),
+                        new OsuModDifficultyAdjust(),
                     };
 
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new OsuModAutoplay(), new ModCinema()),
+                        new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
+                        new OsuModSpunOut(),
                     };
 
                 case ModType.Fun:
@@ -134,8 +150,10 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTransform(),
                         new OsuModWiggle(),
+                        new OsuModSpinIn(),
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),
-                        new MultiMod(new ModWindUp<OsuHitObject>(), new ModWindDown<OsuHitObject>()),
+                        new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new OsuModTraceable(),
                     };
 
                 case ModType.System:
@@ -145,7 +163,7 @@ namespace osu.Game.Rulesets.Osu
                     };
 
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
@@ -153,25 +171,101 @@ namespace osu.Game.Rulesets.Osu
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(this, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new OsuPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new OsuPerformanceCalculator(this, attributes, score);
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
         public override string Description => "osu!";
 
-        public override string ShortName => "osu";
+        public override string ShortName => SHORT_NAME;
+
+        public override string PlayingVerb => "Clicking circles";
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override int? LegacyID => 0;
+        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new OsuLegacySkinTransformer(source);
+
+        public int LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        public OsuRuleset(RulesetInfo rulesetInfo = null)
-            : base(rulesetInfo)
+        protected override IEnumerable<HitResult> GetValidHitResults()
         {
+            return new[]
+            {
+                HitResult.Great,
+                HitResult.Ok,
+                HitResult.Meh,
+
+                HitResult.LargeTickHit,
+                HitResult.SmallTickHit,
+                HitResult.SmallBonus,
+                HitResult.LargeBonus,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LargeTickHit:
+                    return "slider tick";
+
+                case HitResult.SmallTickHit:
+                    return "slider end";
+
+                case HitResult.SmallBonus:
+                    return "spinner spin";
+
+                case HitResult.LargeBonus:
+                    return "spinner bonus";
+            }
+
+            return base.GetDisplayNameForHitResult(result);
+        }
+
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        {
+            var timedHitEvents = score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
+
+            return new[]
+            {
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem("Timing Distribution",
+                            new HitEventTimingDistributionGraph(timedHitEvents)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 250
+                            }),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        {
+                            new UnstableRate(timedHitEvents)
+                        }))
+                    }
+                }
+            };
         }
     }
 }

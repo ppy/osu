@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -22,14 +21,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            Child = new SkinnableDrawable("Play/osu/ring-glow", name => new Sprite
+            Child = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Texture = textures.Get(name),
-                Blending = BlendingMode.Additive,
+                Texture = textures.Get("Gameplay/osu/ring-glow"),
+                Blending = BlendingParameters.Additive,
                 Alpha = 0.5f
-            }, s => s.GetTexture("Play/osu/hitcircle") == null);
+            };
         }
     }
 }

@@ -8,9 +8,9 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardLayer : LifetimeManagementContainer
+    public class DrawableStoryboardLayer : CompositeDrawable
     {
-        public StoryboardLayer Layer { get; private set; }
+        public StoryboardLayer Layer { get; }
         public bool Enabled;
 
         public override bool IsPresent => Enabled && base.IsPresent;
@@ -21,18 +21,36 @@ namespace osu.Game.Storyboards.Drawables
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            Enabled = layer.EnabledWhenPassing;
+            Enabled = layer.VisibleWhenPassing;
+            Masking = layer.Masking;
+
+            InternalChild = new LayerElementContainer(layer);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(CancellationToken? cancellationToken)
+        private class LayerElementContainer : LifetimeManagementContainer
         {
-            foreach (var element in Layer.Elements)
-            {
-                cancellationToken?.ThrowIfCancellationRequested();
+            private readonly StoryboardLayer storyboardLayer;
 
-                if (element.IsDrawable)
-                    AddInternal(element.CreateDrawable());
+            public LayerElementContainer(StoryboardLayer layer)
+            {
+                storyboardLayer = layer;
+
+                Width = 640;
+                Height = 480;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(CancellationToken? cancellationToken)
+            {
+                foreach (var element in storyboardLayer.Elements)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+
+                    if (element.IsDrawable)
+                        AddInternal(element.CreateDrawable());
+                }
             }
         }
     }

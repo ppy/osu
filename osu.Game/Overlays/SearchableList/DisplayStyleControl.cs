@@ -10,43 +10,23 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.SearchableList
 {
-    public class DisplayStyleControl<T> : Container
+    public class DisplayStyleControl : CompositeDrawable
     {
-        public readonly SlimEnumDropdown<T> Dropdown;
         public readonly Bindable<PanelDisplayStyle> DisplayStyle = new Bindable<PanelDisplayStyle>();
 
         public DisplayStyleControl()
         {
             AutoSizeAxes = Axes.Both;
 
-            Children = new[]
+            InternalChild = new FillFlowContainer
             {
-                new FillFlowContainer
+                AutoSizeAxes = Axes.Both,
+                Spacing = new Vector2(5f, 0f),
+                Direction = FillDirection.Horizontal,
+                Children = new[]
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Spacing = new Vector2(10f, 0f),
-                    Direction = FillDirection.Horizontal,
-                    Children = new Drawable[]
-                    {
-                        new FillFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(5f, 0f),
-                            Direction = FillDirection.Horizontal,
-                            Children = new[]
-                            {
-                                new DisplayStyleToggleButton(FontAwesome.Solid.ThLarge, PanelDisplayStyle.Grid, DisplayStyle),
-                                new DisplayStyleToggleButton(FontAwesome.Solid.ListUl, PanelDisplayStyle.List, DisplayStyle),
-                            },
-                        },
-                        Dropdown = new SlimEnumDropdown<T>
-                        {
-                            RelativeSizeAxes = Axes.None,
-                            Width = 160f,
-                        },
-                    },
+                    new DisplayStyleToggleButton(FontAwesome.Solid.ThLarge, PanelDisplayStyle.Grid, DisplayStyle),
+                    new DisplayStyleToggleButton(FontAwesome.Solid.ListUl, PanelDisplayStyle.List, DisplayStyle),
                 },
             };
 
@@ -89,6 +69,8 @@ namespace osu.Game.Overlays.SearchableList
 
             protected override void Dispose(bool isDisposing)
             {
+                base.Dispose(isDisposing);
+
                 bindable.ValueChanged -= Bindable_ValueChanged;
             }
         }

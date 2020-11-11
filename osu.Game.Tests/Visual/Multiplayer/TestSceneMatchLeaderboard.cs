@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 using osuTK;
@@ -14,9 +15,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchLeaderboard : MultiplayerTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         public TestSceneMatchLeaderboard()
         {
-            Room.RoomID.Value = 3;
+            Room = new Room { RoomID = { Value = 3 } };
 
             Add(new MatchLeaderboard
             {
@@ -27,11 +30,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
             var req = new GetRoomScoresRequest();
             req.Success += v => { };

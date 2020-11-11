@@ -7,8 +7,11 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ExceptionExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -20,6 +23,7 @@ namespace osu.Game.Online.API
     public class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
+
         private readonly OAuth authentication;
 
         public string Endpoint => @"https://osu.ppy.sh";
@@ -74,25 +78,7 @@ namespace osu.Game.Online.API
 
         private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
-        private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
-
         internal new void Schedule(Action action) => base.Schedule(action);
-
-        /// <summary>
-        /// Register a component to receive API events.
-        /// Fires <see cref="IOnlineComponent.APIStateChanged"/> once immediately to ensure a correct state.
-        /// </summary>
-        /// <param name="component"></param>
-        public void Register(IOnlineComponent component)
-        {
-            Schedule(() => components.Add(component));
-            component.APIStateChanged(this, state);
-        }
-
-        public void Unregister(IOnlineComponent component)
-        {
-            Schedule(() => components.Remove(component));
-        }
 
         public string AccessToken => authentication.RequestAccessToken();
 
@@ -105,7 +91,7 @@ namespace osu.Game.Online.API
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                switch (State)
+                switch (State.Value)
                 {
                     case APIState.Failing:
                         //todo: replace this with a ping request.
@@ -124,15 +110,15 @@ namespace osu.Game.Online.API
 
                     case APIState.Offline:
                     case APIState.Connecting:
-                        //work to restore a connection...
+                        // work to restore a connection...
                         if (!HasLogin)
                         {
-                            State = APIState.Offline;
+                            state.Value = APIState.Offline;
                             Thread.Sleep(50);
                             continue;
                         }
 
-                        State = APIState.Connecting;
+                        state.Value = APIState.Connecting;
 
                         // save the username at this point, if the user requested for it to be.
                         config.Set(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
@@ -151,29 +137,33 @@ namespace osu.Game.Online.API
                         userReq.Success += u =>
                         {
                             LocalUser.Value = u;
+
+                            // todo: save/pull from settings
+                            LocalUser.Value.Status.Value = new UserStatusOnline();
+
                             failureCount = 0;
 
                             //we're connected!
-                            State = APIState.Online;
+                            state.Value = APIState.Online;
                         };
 
                         if (!handleRequest(userReq))
                         {
-                            if (State == APIState.Connecting)
-                                State = APIState.Failing;
+                            if (State.Value == APIState.Connecting)
+                                state.Value = APIState.Failing;
                             continue;
                         }
 
                         // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
                         // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
                         // before actually going online.
-                        while (State > APIState.Offline && State < APIState.Online)
+                        while (State.Value > APIState.Offline && State.Value < APIState.Online)
                             Thread.Sleep(500);
 
                         break;
                 }
 
-                //hard bail if we can't get a valid access token.
+                // hard bail if we can't get a valid access token.
                 if (authentication.RequestAccessToken() == null)
                 {
                     Logout();
@@ -198,9 +188,25 @@ namespace osu.Game.Online.API
             }
         }
 
+        public void Perform(APIRequest request)
+        {
+            try
+            {
+                request.Perform(this);
+            }
+            catch (Exception e)
+            {
+                // todo: fix exception handling
+                request.Fail(e);
+            }
+        }
+
+        public Task PerformAsync(APIRequest request) =>
+            Task.Factory.StartNew(() => Perform(request), TaskCreationOptions.LongRunning);
+
         public void Login(string username, string password)
         {
-            Debug.Assert(State == APIState.Offline);
+            Debug.Assert(State.Value == APIState.Offline);
 
             ProvidedUsername = username;
             this.password = password;
@@ -208,7 +214,7 @@ namespace osu.Game.Online.API
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
-            Debug.Assert(State == APIState.Offline);
+            Debug.Assert(State.Value == APIState.Offline);
 
             var req = new RegistrationRequest
             {
@@ -227,12 +233,12 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.ResponseString).SelectToken("form_error", true).ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {
                     // if we couldn't deserialize the error message let's throw the original exception outwards.
-                    throw e;
+                    e.Rethrow();
                 }
             }
 
@@ -251,8 +257,8 @@ namespace osu.Game.Online.API
             {
                 req.Perform(this);
 
-                //we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (IsLoggedIn) State = APIState.Online;
+                // we could still be in initialisation, at which point we don't want to say we're Online yet.
+                if (IsLoggedIn) state.Value = APIState.Online;
 
                 failureCount = 0;
                 return true;
@@ -269,27 +275,12 @@ namespace osu.Game.Online.API
             }
         }
 
-        private APIState state;
+        private readonly Bindable<APIState> state = new Bindable<APIState>();
 
-        public APIState State
-        {
-            get => state;
-            private set
-            {
-                if (state == value)
-                    return;
-
-                APIState oldState = state;
-                state = value;
-
-                log.Add($@"We just went {state}!");
-                Schedule(() =>
-                {
-                    components.ForEach(c => c.APIStateChanged(this, state));
-                    OnStateChange?.Invoke(oldState, state);
-                });
-            }
-        }
+        /// <summary>
+        /// The current connectivity state of the API.
+        /// </summary>
+        public IBindable<APIState> State => state;
 
         private bool handleWebException(WebException we)
         {
@@ -316,12 +307,12 @@ namespace osu.Game.Online.API
                     log.Add($@"API failure count is now {failureCount}");
 
                     if (failureCount < 3)
-                        //we might try again at an api level.
+                        // we might try again at an api level.
                         return false;
 
-                    if (State == APIState.Online)
+                    if (State.Value == APIState.Online)
                     {
-                        State = APIState.Failing;
+                        state.Value = APIState.Failing;
                         flushQueue();
                     }
 
@@ -337,10 +328,6 @@ namespace osu.Game.Online.API
         {
             lock (queue) queue.Enqueue(request);
         }
-
-        public event StateChangeDelegate OnStateChange;
-
-        public delegate void StateChangeDelegate(APIState oldState, APIState newState);
 
         private void flushQueue(bool failOldRequests = true)
         {
@@ -368,7 +355,7 @@ namespace osu.Game.Online.API
             // Scheduled prior to state change such that the state changed event is invoked with the correct user present
             Schedule(() => LocalUser.Value = createGuestUser());
 
-            State = APIState.Offline;
+            state.Value = APIState.Offline;
         }
 
         private static User createGuestUser() => new GuestUser();

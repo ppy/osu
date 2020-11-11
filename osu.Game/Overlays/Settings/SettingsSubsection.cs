@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings
         protected abstract string Header { get; }
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
-        public IEnumerable<string> FilterTerms => new[] { Header };
+        public virtual IEnumerable<string> FilterTerms => new[] { Header };
 
         public bool MatchingFilter
         {
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     Text = Header.ToUpperInvariant(),
                     Margin = new MarginPadding { Bottom = 10, Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS },
-                    Font = OsuFont.GetFont(weight: FontWeight.Black),
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                 },
                 FlowContent
             });

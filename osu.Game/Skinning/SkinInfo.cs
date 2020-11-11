@@ -24,12 +24,18 @@ namespace osu.Game.Skinning
 
         public bool DeletePending { get; set; }
 
-        public string FullName => $"\"{Name}\" by {Creator}";
-
-        public static SkinInfo Default { get; } = new SkinInfo { Name = "osu!lazer", Creator = "team osu!" };
+        public static SkinInfo Default { get; } = new SkinInfo
+        {
+            Name = "osu!lazer",
+            Creator = "team osu!"
+        };
 
         public bool Equals(SkinInfo other) => other != null && ID == other.ID;
 
-        public override string ToString() => FullName;
+        public override string ToString()
+        {
+            string author = Creator == null ? string.Empty : $"({Creator})";
+            return $"{Name} {author}".Trim();
+        }
     }
 }
