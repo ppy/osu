@@ -158,8 +158,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("much move with press", () => moveFunction = Scheduler.AddDelayed(() =>
             {
                 InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0));
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
             }, 10, true));
             AddWaitStep("move", 10);
             AddStep("stop move", () => moveFunction.Cancel());

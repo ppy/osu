@@ -65,10 +65,8 @@ namespace osu.Game.Tests.Visual.Menus
                 AddStep($"switch to ruleset {i} via shortcut", () =>
                 {
                     InputManager.PressKey(Key.ControlLeft);
-                    InputManager.PressKey(numberKey);
-
+                    InputManager.Key(numberKey);
                     InputManager.ReleaseKey(Key.ControlLeft);
-                    InputManager.ReleaseKey(numberKey);
                 });
 
                 AddUntilStep("ruleset switched", () => rulesetSelector.Current.Value.Equals(expected));

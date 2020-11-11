@@ -51,8 +51,7 @@ namespace osu.Game.Tests.Visual.Settings
 
                 clickDelegate = Scheduler.AddDelayed(() =>
                 {
-                    InputManager.PressButton(MouseButton.Left);
-                    InputManager.ReleaseButton(MouseButton.Left);
+                    InputManager.Click(MouseButton.Left);
 
                     if (++buttonClicks == 2)
                     {
