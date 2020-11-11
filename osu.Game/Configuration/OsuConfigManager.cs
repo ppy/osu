@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
@@ -177,7 +178,14 @@ namespace osu.Game.Configuration
             new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled")),
             new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription())),
             new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
+            new TrackedSetting<int>(OsuSetting.Skin, m =>
+            {
+                string skinName = LookupSkinName?.Invoke(m) ?? string.Empty;
+                return new SettingDescription(skinName, "skin", skinName);
+            })
         };
+
+        public Func<int, string> LookupSkinName { get; set; }
     }
 
     public enum OsuSetting
