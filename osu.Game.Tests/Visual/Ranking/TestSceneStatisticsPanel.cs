@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
-                HitEvents = CreatePositionDistributedHitEvents()
+                HitEvents = createPositionDistributedHitEvents()
             };
 
             loadPanel(score);
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Ranking
             };
         });
 
-        public static List<HitEvent> CreatePositionDistributedHitEvents()
+        private static List<HitEvent> createPositionDistributedHitEvents()
         {
             var hitEvents = new List<HitEvent>();
             // Use constant seed for reproducibility
