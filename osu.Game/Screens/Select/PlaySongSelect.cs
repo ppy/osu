@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Select
 
             SampleConfirm?.Play();
 
-            this.Push(player = new PlayerLoader(() => new Player(), BackgroundBlur * 0.75f));
+            this.Push(player = new PlayerLoader(() => new Player()));
 
             return true;
         }

@@ -88,7 +88,7 @@ namespace osu.Game.Configuration
             // Gameplay
             Set(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
-            Set(OsuSetting.MenuBlurLevel, 0.8f, 0f, 1f, 0.01f);
+            Set(OsuSetting.MenuBlurLevel, 0.8, 0, 1, 0.01);
             Set(OsuSetting.LightenDuringBreaks, true);
 
             Set(OsuSetting.HitLighting, true);

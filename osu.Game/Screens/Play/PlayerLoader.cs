@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
-        protected float BackgroundBlur = 15;
-
         public override bool HideOverlaysOnEnter => hideOverlays;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -109,12 +107,6 @@ namespace osu.Game.Screens.Play
         public PlayerLoader(Func<Player> createPlayer)
         {
             this.createPlayer = createPlayer;
-        }
-
-        public PlayerLoader(Func<Player> createPlayer, float backgroundBlur)
-        {
-            this.createPlayer = createPlayer;
-            this.BackgroundBlur = backgroundBlur;
         }
 
         [BackgroundDependencyLoader]
@@ -220,7 +212,7 @@ namespace osu.Game.Screens.Play
             content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
 
-            Background.EnableUserDim.Value = false;
+            Background.EnableGameplayDim.Value = false;
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
@@ -265,7 +257,8 @@ namespace osu.Game.Screens.Play
             if (inputManager.HoveredDrawables.Contains(VisualSettings))
             {
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
-                Background.EnableUserDim.Value = true;
+                Background.EnableGameplayDim.Value = true;
+                Background.EnableUIBlur.Value = false;
                 Background.BlurAmount.Value = 0;
 
                 BackgroundBrightnessReduction = false;
@@ -273,8 +266,9 @@ namespace osu.Game.Screens.Play
             else
             {
                 // Returns background dim and blur to the values specified by PlayerLoader.
-                Background.EnableUserDim.Value = false;
-                Background.BlurAmount.Value = BackgroundBlur;
+                Background.EnableGameplayDim.Value = false;
+                Background.EnableUIBlur.Value = true;
+                Background.BlurAmount.Value = 0.5f;
 
                 BackgroundBrightnessReduction = true;
             }

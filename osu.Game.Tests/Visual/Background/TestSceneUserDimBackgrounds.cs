@@ -160,10 +160,10 @@ namespace osu.Game.Tests.Visual.Background
                 player.ReplacesBackground.Value = true;
                 player.StoryboardEnabled.Value = true;
             });
-            AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
+            AddStep("Enable user dim", () => player.DimmableStoryboard.EnableGameplayDim.Value = true);
             AddStep("Set dim level to 1", () => songSelect.DimLevel.Value = 1f);
             AddUntilStep("Storyboard is invisible", () => !player.IsStoryboardVisible);
-            AddStep("Disable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = false);
+            AddStep("Disable user dim", () => player.DimmableStoryboard.EnableGameplayDim.Value = false);
             AddUntilStep("Storyboard is visible", () => player.IsStoryboardVisible);
         }
 
@@ -277,7 +277,7 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground()
             {
                 FadeAccessibleBackground background = new FadeAccessibleBackground(Beatmap.Value);
-                DimEnabled.BindTo(background.EnableUserDim);
+                DimEnabled.BindTo(background.EnableGameplayDim);
                 return background;
             }
 
@@ -298,7 +298,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
 
-            public bool IsUserBlurApplied() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR);
+            public bool IsUserBlurApplied() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.GAMEPLAY_BLUR_FACTOR);
 
             public bool IsUserBlurDisabled() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(0);
 
@@ -306,7 +306,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundVisible() => ((FadeAccessibleBackground)Background).CurrentAlpha == 1;
 
-            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BackgroundBlur);
+            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
 
             /// <summary>
             /// Make sure every time a screen gets pushed, the background doesn't get replaced

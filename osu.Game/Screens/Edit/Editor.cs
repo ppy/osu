@@ -444,7 +444,7 @@ namespace osu.Game.Screens.Edit
             // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
             Background.FadeColour(Color4.DarkGray, 500);
 
-            Background.EnableUserDim.Value = false;
+            Background.EnableGameplayDim.Value = false;
             Background.BlurAmount.Value = 0;
 
             resetTrack(true);

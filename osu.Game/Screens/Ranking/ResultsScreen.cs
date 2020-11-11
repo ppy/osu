@@ -228,7 +228,8 @@ namespace osu.Game.Screens.Ranking
         {
             base.OnEntering(last);
 
-            ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
+            ((BackgroundScreenBeatmap)Background).EnableUIBlur.Value = true;
+            ((BackgroundScreenBeatmap)Background).BlurAmount.Value = 1;
 
             Background.FadeTo(0.5f, 250);
             bottomPanel.FadeTo(1, 250);

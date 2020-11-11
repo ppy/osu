@@ -46,10 +46,8 @@ namespace osu.Game.Screens.Select
     {
         public static readonly float WEDGE_HEIGHT = 245;
 
-        protected float BackgroundBlur = 20;
+        protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
-
-        private Bindable<float> backgroundBlurBindable { get; set; }
 
         public FilterControl FilterControl { get; private set; }
 
@@ -310,26 +308,6 @@ namespace osu.Game.Screens.Select
                         }));
                     }
                 });
-            }
-
-            backgroundBlurBindable = config.GetBindable<float>(OsuSetting.MenuBlurLevel);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            backgroundBlurBindable.ValueChanged += _ => updateBackgroundBlur();
-            updateBackgroundBlur(); // for first time opening beatmap selection
-        }
-
-        private void updateBackgroundBlur()
-        {
-            BackgroundBlur = backgroundBlurBindable.Value * 25;
-
-            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
-            {
-                backgroundModeBeatmap.BlurAmount.Value = BackgroundBlur;
             }
         }
 
@@ -702,7 +680,8 @@ namespace osu.Game.Screens.Select
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurAmount.Value = BackgroundBlur;
+                backgroundModeBeatmap.BlurAmount.Value = 1;
+                backgroundModeBeatmap.EnableUIBlur.Value = true;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             }
 
