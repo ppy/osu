@@ -548,6 +548,10 @@ namespace osu.Game
             ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
+            // make config aware of how to lookup skins for on-screen display purposes.
+            // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
+            LocalConfig.LookupSkinName = id => SkinManager.GetAllUsableSkins().FirstOrDefault(s => s.ID == id)?.ToString() ?? "Unknown";
+
             Container logoContainer;
             BackButton.Receptor receptor;
 
