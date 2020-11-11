@@ -31,9 +31,13 @@ namespace osu.Game.Overlays.Settings.Sections
         private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
-        private static readonly SkinInfo random_skin_info = new RandomSkinInfo();
+        private static readonly SkinInfo random_skin_info = new SkinInfo
+        {
+            ID = SkinInfo.RANDOM_SKIN,
+            Name = "<Random Skin>",
+        };
 
-        private List<SkinInfo> usableSkins;
+        private List<SkinInfo> skinItems;
 
         [Resolved]
         private SkinManager skins { get; set; }
@@ -98,29 +102,37 @@ namespace osu.Game.Overlays.Settings.Sections
             dropdownBindable.BindValueChanged(skin =>
             {
                 if (skin.NewValue == random_skin_info)
+                {
                     randomizeSkin();
-                else
-                    configBindable.Value = skin.NewValue.ID;
+                    return;
+                }
+
+                configBindable.Value = skin.NewValue.ID;
             });
         }
 
         private void randomizeSkin()
         {
-            int n = usableSkins.Count;
-            if (n > 1)
-                configBindable.Value = (configBindable.Value + RNG.Next(n - 1) + 1) % n; // make sure it's always a different one
-            else
-                configBindable.Value = 0;
+            int count = skinItems.Count - 1; // exclude "random" item.
+
+            if (count <= 1)
+            {
+                configBindable.Value = SkinInfo.Default.ID;
+                return;
+            }
+
+            // ensure the random selection is never the same as the previous.
+            configBindable.Value = skinItems.Where(s => s.ID != configBindable.Value).ElementAt(RNG.Next(0, count)).ID;
         }
 
         private void updateItems()
         {
-            usableSkins = skins.GetAllUsableSkins();
+            skinItems = skins.GetAllUsableSkins();
 
-            if (usableSkins.Count > 1)
-                usableSkins.Add(random_skin_info);
+            if (skinItems.Count > 1)
+                skinItems.Add(random_skin_info);
 
-            skinDropdown.Items = usableSkins;
+            skinDropdown.Items = skinItems;
         }
 
         private void itemUpdated(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
@@ -148,17 +160,6 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 protected override string GenerateItemText(SkinInfo item) => item.ToString();
             }
-        }
-
-        private class RandomSkinInfo : SkinInfo
-        {
-            public RandomSkinInfo()
-            {
-                Name = "<Random Skin>";
-                ID = -1;
-            }
-
-            public override string ToString() => Name;
         }
 
         private class ExportSkinButton : SettingsButton
