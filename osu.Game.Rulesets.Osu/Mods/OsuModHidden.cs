@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -23,28 +22,38 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
-        protected override bool IsFirstHideableObject(DrawableHitObject hitObject) => !(hitObject is DrawableSpinner);
+        protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner);
 
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            static void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
-
-            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
-            {
-                adjustFadeIn(d.HitObject);
-                foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
-                    adjustFadeIn(h);
-            }
+            foreach (var d in drawables)
+                d.ApplyCustomUpdateState += applyFadeInAdjustment;
 
             base.ApplyToDrawableHitObjects(drawables);
+        }
+
+        private void applyFadeInAdjustment(DrawableHitObject hitObject, ArmedState state)
+        {
+            if (!(hitObject is DrawableOsuHitObject d))
+                return;
+
+            d.HitObject.TimeFadeIn = d.HitObject.TimePreempt * fade_in_duration_multiplier;
         }
 
         private double lastSliderHeadFadeOutStartTime;
         private double lastSliderHeadFadeOutDuration;
 
-        protected override void ApplyFirstObjectIncreaseVisibilityState(DrawableHitObject drawable, ArmedState state) => applyState(drawable, true);
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+            base.ApplyIncreasedVisibilityState(hitObject, state);
+            applyState(hitObject, true);
+        }
 
-        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state) => applyState(drawable, false);
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+            base.ApplyNormalVisibilityState(hitObject, state);
+            applyState(hitObject, false);
+        }
 
         private void applyState(DrawableHitObject drawable, bool increaseVisibility)
         {

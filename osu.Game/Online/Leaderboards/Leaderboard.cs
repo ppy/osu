@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -21,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public abstract class Leaderboard<TScope, TScoreInfo> : Container, IOnlineComponent
+    public abstract class Leaderboard<TScope, TScoreInfo> : Container
     {
         private const double fade_duration = 300;
 
@@ -150,9 +152,9 @@ namespace osu.Game.Online.Leaderboards
                 switch (placeholderState = value)
                 {
                     case PlaceholderState.NetworkFailure:
-                        replacePlaceholder(new RetrievalFailurePlaceholder
+                        replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
                         {
-                            OnRetry = UpdateScores,
+                            Action = UpdateScores,
                         });
                         break;
 
@@ -241,16 +243,13 @@ namespace osu.Game.Online.Leaderboards
 
         private ScheduledDelegate pendingUpdateScores;
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            api?.Register(this);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            api?.Unregister(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
         }
 
         public void RefreshScores() => UpdateScores();
@@ -259,9 +258,9 @@ namespace osu.Game.Online.Leaderboards
 
         protected abstract bool IsOnlineScope { get; }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            switch (state)
+            switch (state.NewValue)
             {
                 case APIState.Online:
                 case APIState.Offline:
@@ -270,7 +269,7 @@ namespace osu.Game.Online.Leaderboards
 
                     break;
             }
-        }
+        });
 
         protected void UpdateScores()
         {

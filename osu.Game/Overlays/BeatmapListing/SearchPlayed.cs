@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-namespace osu.Game.Online.API
+namespace osu.Game.Overlays.BeatmapListing
 {
-    public interface IOnlineComponent
+    public enum SearchPlayed
     {
-        void APIStateChanged(IAPIProvider api, APIState state);
+        Any,
+        Played,
+        Unplayed
     }
 }

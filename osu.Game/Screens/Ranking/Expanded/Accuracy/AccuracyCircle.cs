@@ -4,14 +4,17 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
@@ -73,18 +76,23 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
         private readonly ScoreInfo score;
 
+        private readonly bool withFlair;
+
         private SmoothCircularProgress accuracyCircle;
         private SmoothCircularProgress innerMask;
         private Container<RankBadge> badges;
         private RankText rankText;
 
-        public AccuracyCircle(ScoreInfo score)
+        private SkinnableSound applauseSound;
+
+        public AccuracyCircle(ScoreInfo score, bool withFlair)
         {
             this.score = score;
+            this.withFlair = withFlair;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             InternalChildren = new Drawable[]
             {
@@ -203,6 +211,13 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 },
                 rankText = new RankText(score.Rank)
             };
+
+            if (withFlair)
+            {
+                AddInternal(applauseSound = score.Rank >= ScoreRank.A
+                    ? new SkinnableSound(new SampleInfo("Results/rankpass", "applause"))
+                    : new SkinnableSound(new SampleInfo("Results/rankfail")));
+            }
         }
 
         private ScoreRank getRank(ScoreRank rank)
@@ -234,11 +249,16 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         continue;
 
                     using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(1 - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION, true))
+                    {
                         badge.Appear();
+                    }
                 }
 
                 using (BeginDelayedSequence(TEXT_APPEAR_DELAY, true))
+                {
+                    this.Delay(-1440).Schedule(() => applauseSound?.Play());
                     rankText.Appear();
+                }
             }
         }
 

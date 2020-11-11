@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -38,6 +39,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
+
+        [Test]
+        public void TestManyPanels()
+        {
+            loadBeatmaps(count: 5000, randomDifficulties: true);
         }
 
         [Test]
@@ -707,21 +714,22 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null)
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null, int? count = null, bool randomDifficulties = false)
         {
-            createCarousel(carouselAdjust);
-
-            if (beatmapSets == null)
-            {
-                beatmapSets = new List<BeatmapSetInfo>();
-
-                for (int i = 1; i <= set_count; i++)
-                    beatmapSets.Add(createTestBeatmapSet(i));
-            }
-
             bool changed = false;
-            AddStep($"Load {(beatmapSets.Count > 0 ? beatmapSets.Count.ToString() : "some")} beatmaps", () =>
+
+            createCarousel(c =>
             {
+                carouselAdjust?.Invoke(c);
+
+                if (beatmapSets == null)
+                {
+                    beatmapSets = new List<BeatmapSetInfo>();
+
+                    for (int i = 1; i <= (count ?? set_count); i++)
+                        beatmapSets.Add(createTestBeatmapSet(i, randomDifficulties));
+                }
+
                 carousel.Filter(initialCriteria?.Invoke() ?? new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
                 carousel.BeatmapSets = beatmapSets;
@@ -807,7 +815,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private bool selectedBeatmapVisible()
         {
-            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
+            var currentlySelected = carousel.Items.FirstOrDefault(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
             if (currentlySelected == null)
                 return true;
 
@@ -820,7 +828,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selection is visible", selectedBeatmapVisible);
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int id)
+        private BeatmapSetInfo createTestBeatmapSet(int id, bool randomDifficultyCount = false)
         {
             return new BeatmapSetInfo
             {
@@ -834,40 +842,35 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Title = $"test set #{id}!",
                     AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
                 },
-                Beatmaps = new List<BeatmapInfo>(new[]
-                {
-                    new BeatmapInfo
-                    {
-                        OnlineBeatmapID = id * 10,
-                        Version = "Normal",
-                        StarDifficulty = 2,
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            OverallDifficulty = 3.5f,
-                        }
-                    },
-                    new BeatmapInfo
-                    {
-                        OnlineBeatmapID = id * 10 + 1,
-                        Version = "Hard",
-                        StarDifficulty = 5,
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            OverallDifficulty = 5,
-                        }
-                    },
-                    new BeatmapInfo
-                    {
-                        OnlineBeatmapID = id * 10 + 2,
-                        Version = "Insane",
-                        StarDifficulty = 6,
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            OverallDifficulty = 7,
-                        }
-                    },
-                }),
+                Beatmaps = getBeatmaps(randomDifficultyCount ? RNG.Next(1, 20) : 3).ToList()
             };
+        }
+
+        private IEnumerable<BeatmapInfo> getBeatmaps(int count)
+        {
+            int id = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                float diff = (float)i / count * 10;
+
+                string version = "Normal";
+                if (diff > 6.6)
+                    version = "Insane";
+                else if (diff > 3.3)
+                    version = "Hard";
+
+                yield return new BeatmapInfo
+                {
+                    OnlineBeatmapID = id++ * 10,
+                    Version = version,
+                    StarDifficulty = diff,
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        OverallDifficulty = diff,
+                    }
+                };
+            }
         }
 
         private BeatmapSetInfo createTestBeatmapSetWithManyDifficulties(int id)
@@ -908,9 +911,24 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestBeatmapCarousel : BeatmapCarousel
         {
-            public new List<DrawableCarouselItem> Items => base.Items;
-
             public bool PendingFilterTask => PendingFilter != null;
+
+            public IEnumerable<DrawableCarouselItem> Items
+            {
+                get
+                {
+                    foreach (var item in ScrollableContent)
+                    {
+                        yield return item;
+
+                        if (item is DrawableCarouselBeatmapSet set)
+                        {
+                            foreach (var difficulty in set.DrawableBeatmaps)
+                                yield return difficulty;
+                        }
+                    }
+                }
+            }
 
             protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();
         }

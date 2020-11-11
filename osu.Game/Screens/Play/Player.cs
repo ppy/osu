@@ -152,7 +152,9 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            PrepareReplay();
+            // replays should never be recorded or played back when autoplay is enabled
+            if (!Mods.Value.Any(m => m is ModAutoplay))
+                PrepareReplay();
         }
 
         private Replay recordingReplay;
@@ -197,7 +199,7 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
             AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
@@ -236,11 +238,22 @@ namespace osu.Game.Screens.Play
                 skipOverlay.Hide();
             }
 
+            DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
+            {
+                if (waiting.NewValue)
+                    GameplayClockContainer.Stop();
+                else
+                    GameplayClockContainer.Start();
+            });
+
             DrawableRuleset.IsPaused.BindValueChanged(paused =>
             {
                 updateGameplayState();
-                samplePlaybackDisabled.Value = paused.NewValue;
+                updateSampleDisabledState();
             });
+
+            DrawableRuleset.FrameStableClock.IsCatchingUp.BindValueChanged(_ => updateSampleDisabledState());
+
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
@@ -274,6 +287,8 @@ namespace osu.Game.Screens.Play
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
+
+        protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new GameplayClockContainer(beatmap, gameplayStart);
 
         private Drawable createUnderlayComponents() =>
             DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
@@ -380,6 +395,11 @@ namespace osu.Game.Screens.Play
             bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value;
             OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
             LocalUserPlaying.Value = inGameplay;
+        }
+
+        private void updateSampleDisabledState()
+        {
+            samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.IsCatchingUp.Value || GameplayClockContainer.GameplayClock.IsPaused.Value;
         }
 
         private void updatePauseOnFocusLostState() =>
@@ -657,6 +677,7 @@ namespace osu.Game.Screens.Play
 
             // bind component bindables.
             Background.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+            HUDOverlay.IsBreakTime.BindTo(breakTracker.IsBreakTime);
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);

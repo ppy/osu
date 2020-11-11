@@ -4,12 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -23,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
+        private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
@@ -33,12 +37,19 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
 
+        private readonly Bindable<bool> playfieldBorderStyle = new BindableBool();
+
         private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
 
         public OsuPlayfield()
         {
             InternalChildren = new Drawable[]
             {
+                playfieldBorder = new PlayfieldBorder
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = 3
+                },
                 spinnerProxies = new ProxyContainer
                 {
                     RelativeSizeAxes = Axes.Both
@@ -76,8 +87,16 @@ namespace osu.Game.Rulesets.Osu.UI
             AddRangeInternal(poolDictionary.Values);
         }
 
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuRulesetConfigManager config)
+        {
+            config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
+        }
+
         public override void Add(DrawableHitObject h)
         {
+            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
+
             h.OnNewResult += onNewResult;
             h.OnLoadComplete += d =>
             {
@@ -90,18 +109,19 @@ namespace osu.Game.Rulesets.Osu.UI
 
             base.Add(h);
 
-            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
             osuHitObject.CheckHittable = hitPolicy.IsHittable;
 
-            followPoints.AddFollowPoints(osuHitObject);
+            followPoints.AddFollowPoints(osuHitObject.HitObject);
         }
 
         public override bool Remove(DrawableHitObject h)
         {
+            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
+
             bool result = base.Remove(h);
 
             if (result)
-                followPoints.RemoveFollowPoints((DrawableOsuHitObject)h);
+                followPoints.RemoveFollowPoints(osuHitObject.HitObject);
 
             return result;
         }

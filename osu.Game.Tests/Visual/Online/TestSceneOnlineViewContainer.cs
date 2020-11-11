@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOnlineStateVisibility()
         {
-            AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
+            AddStep("set status to online", () => ((DummyAPIAccess)API).SetState(APIState.Online));
 
             AddUntilStep("children are visible", () => onlineView.ViewTarget.IsPresent);
             AddUntilStep("loading animation is not visible", () => !onlineView.LoadingSpinner.IsPresent);
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOfflineStateVisibility()
         {
-            AddStep("set status to offline", () => ((DummyAPIAccess)API).State = APIState.Offline);
+            AddStep("set status to offline", () => ((DummyAPIAccess)API).SetState(APIState.Offline));
 
             AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
             AddUntilStep("loading animation is not visible", () => !onlineView.LoadingSpinner.IsPresent);
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestConnectingStateVisibility()
         {
-            AddStep("set status to connecting", () => ((DummyAPIAccess)API).State = APIState.Connecting);
+            AddStep("set status to connecting", () => ((DummyAPIAccess)API).SetState(APIState.Connecting));
 
             AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
             AddUntilStep("loading animation is visible", () => onlineView.LoadingSpinner.IsPresent);
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestFailingStateVisibility()
         {
-            AddStep("set status to failing", () => ((DummyAPIAccess)API).State = APIState.Failing);
+            AddStep("set status to failing", () => ((DummyAPIAccess)API).SetState(APIState.Failing));
 
             AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
             AddUntilStep("loading animation is visible", () => onlineView.LoadingSpinner.IsPresent);

@@ -280,8 +280,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void addClickStep(MouseButton button)
         {
-            AddStep($"press {button}", () => InputManager.PressButton(button));
-            AddStep($"release {button}", () => InputManager.ReleaseButton(button));
+            AddStep($"click {button}", () => InputManager.Click(button));
         }
 
         private void assertPlaced(bool expected) => AddAssert($"slider {(expected ? "placed" : "not placed")}", () => (getSlider() != null) == expected);
@@ -295,7 +294,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private void assertControlPointPosition(int index, Vector2 position) =>
             AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, getSlider().Path.ControlPoints[index].Position.Value, 1));
 
-        private Slider getSlider() => HitObjectContainer.Count > 0 ? (Slider)((DrawableSlider)HitObjectContainer[0]).HitObject : null;
+        private Slider getSlider() => HitObjectContainer.Count > 0 ? ((DrawableSlider)HitObjectContainer[0]).HitObject : null;
 
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSlider((Slider)hitObject);
         protected override PlacementBlueprint CreateBlueprint() => new SliderPlacementBlueprint();

@@ -14,14 +14,18 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi.Lounge
 {
+    [Cached]
     public class LoungeSubScreen : MultiplayerSubScreen
     {
         public override string Title => "Lounge";
 
         protected FilterControl Filter;
+
+        protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
         private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
@@ -125,7 +129,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (selectedRoom.Value?.RoomID.Value == null)
                 selectedRoom.Value = new Room();
 
-            music.EnsurePlayingSomething();
+            music?.EnsurePlayingSomething();
 
             onReturning();
         }

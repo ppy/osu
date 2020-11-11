@@ -51,6 +51,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
+using osu.Game.Users;
 
 namespace osu.Game
 {
@@ -278,7 +279,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (long.TryParse(link.Argument, out long userId))
+                    if (int.TryParse(link.Argument, out int userId))
                         ShowUser(userId);
                     break;
 
@@ -321,7 +322,7 @@ namespace osu.Game
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="userId">The user to display.</param>
-        public void ShowUser(long userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
+        public void ShowUser(int userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.
@@ -961,11 +962,15 @@ namespace osu.Game
             LocalUserPlaying.Value = false;
 
             if (current is IOsuScreen currentOsuScreen)
+            {
                 OverlayActivationMode.UnbindFrom(currentOsuScreen.OverlayActivationMode);
+                API.Activity.UnbindFrom(currentOsuScreen.Activity);
+            }
 
             if (newScreen is IOsuScreen newOsuScreen)
             {
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
+                ((IBindable<UserActivity>)API.Activity).BindTo(newOsuScreen.Activity);
 
                 MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 

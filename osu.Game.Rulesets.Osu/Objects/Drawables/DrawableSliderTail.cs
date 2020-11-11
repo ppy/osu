@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -23,18 +22,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public bool Tracking { get; set; }
 
-        private readonly IBindable<float> scaleBindable = new BindableFloat();
+        private SkinnableDrawable circlePiece;
+        private Container scaleContainer;
 
-        private readonly SkinnableDrawable circlePiece;
-
-        private readonly Container scaleContainer;
-
-        public DrawableSliderTail(Slider slider, SliderTailCircle tailCircle)
+        public DrawableSliderTail(SliderTailCircle tailCircle)
             : base(tailCircle)
         {
             this.tailCircle = tailCircle;
-            Origin = Anchor.Centre;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Origin = Anchor.Centre;
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             InternalChildren = new Drawable[]
@@ -51,13 +51,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     }
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
-            scaleBindable.BindTo(HitObject.ScaleBindable);
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
         }
 
         protected override void UpdateInitialTransforms()
@@ -67,9 +62,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circlePiece.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            base.UpdateStateTransforms(state);
+            base.UpdateHitStateTransforms(state);
 
             Debug.Assert(HitObject.HitWindows != null);
 
@@ -77,8 +72,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Idle:
                     this.Delay(HitObject.TimePreempt).FadeOut(500);
-
-                    Expire(true);
                     break;
 
                 case ArmedState.Miss:
