@@ -33,8 +33,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
                 int sectionStartIndex = movements.Count * i / sectionCount;
                 int sectionEndIndex = movements.Count * (i + 1) / sectionCount - 1;
 
-                double sectionStartTime = movements[sectionStartIndex].Time;
-                double sectionEndTime = movements[sectionEndIndex].Time;
+                double sectionStartTime = movements[sectionStartIndex].StartTime;
+                double sectionEndTime = movements[sectionEndIndex].StartTime;
 
                 var sectionMovements = movements.GetRange(sectionStartIndex, sectionEndIndex - sectionStartIndex + 1);
                 sections[i] = new MapSectionProbabilities(sectionMovements, cheeseLevel, sectionStartTime, sectionEndTime);
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
                 perMovementCheeseLevel = 0.5 * cheeseLevel + 0.5;
 
             // if the movement can be cheesed, movement time is increased, resulting in a difficulty decrease
-            double adjustedMovementTime = movement.MovementTime * (1 + perMovementCheeseLevel * movement.CheesableRatio);
+            double adjustedMovementTime = movement.MovementTime * (1 + perMovementCheeseLevel * movement.CheeseWindow);
             return FittsLaw.ProbabilityToHit(movement.Distance, adjustedMovementTime, throughput);
         }
 

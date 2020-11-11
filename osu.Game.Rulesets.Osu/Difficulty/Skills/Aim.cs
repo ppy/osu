@@ -152,10 +152,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 if (hidden)
                 {
                     movements.AddRange(OsuMovement.ExtractMovement(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate,
-                        hidden: true, noteDensity: noteDensities[i], objNeg4: objNeg4));
+                        hidden: true, noteDensity: noteDensities[i], fourthLastObject: objNeg4));
                 }
                 else
-                    movements.AddRange(OsuMovement.ExtractMovement(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate, objNeg4: objNeg4));
+                    movements.AddRange(OsuMovement.ExtractMovement(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate, fourthLastObject: objNeg4));
             }
 
             return movements;
@@ -282,7 +282,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             foreach (var movement in movements)
             {
-                double cheeseness = SpecialFunctions.Logistic((movement.IndexOfPerformance / tp - 0.6) * 15) * movement.Cheesablility;
+                double cheeseness = SpecialFunctions.Logistic((movement.Throughput / tp - 0.6) * 15) * movement.Cheesablility;
                 count += cheeseness;
             }
 
