@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
@@ -103,26 +102,12 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 if (skin.NewValue == random_skin_info)
                 {
-                    randomizeSkin();
+                    skins.SelectRandomSkin();
                     return;
                 }
 
                 configBindable.Value = skin.NewValue.ID;
             });
-        }
-
-        private void randomizeSkin()
-        {
-            // choose from only user skins, removing the current selection to ensure a new one is chosen.
-            var randomChoices = skinItems.Where(s => s.ID > 0 && s.ID != configBindable.Value).ToArray();
-
-            if (randomChoices.Length == 0)
-            {
-                configBindable.Value = SkinInfo.Default.ID;
-                return;
-            }
-
-            configBindable.Value = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length)).ID;
         }
 
         private void updateItems()

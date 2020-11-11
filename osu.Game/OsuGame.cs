@@ -887,6 +887,10 @@ namespace osu.Game
                 case GlobalAction.ToggleGameplayMouseButtons:
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
+
+                case GlobalAction.RandomSkin:
+                    SkinManager.SelectRandomSkin();
+                    return true;
             }
 
             return false;
