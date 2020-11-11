@@ -627,7 +627,12 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new OnScreenDisplay(), Add, true);
+            var onScreenDisplay = new OnScreenDisplay();
+
+            onScreenDisplay.BeginTracking(this, frameworkConfig);
+            onScreenDisplay.BeginTracking(this, LocalConfig);
+
+            loadComponentSingleFile(onScreenDisplay, Add, true);
 
             loadComponentSingleFile(notifications.With(d =>
             {
