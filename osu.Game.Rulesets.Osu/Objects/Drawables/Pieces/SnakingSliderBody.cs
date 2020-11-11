@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public void UpdateProgress(double completionProgress)
         {
-            if (drawableSlider == null)
+            if (drawableSlider?.HitObject == null)
                 return;
 
             Slider slider = drawableSlider.HitObject;
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public void Refresh()
         {
-            if (drawableSlider == null)
+            if (drawableSlider?.HitObject == null)
                 return;
 
             // Generate the entire curve
