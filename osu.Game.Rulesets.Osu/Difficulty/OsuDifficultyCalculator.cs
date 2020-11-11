@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000 / clockRate;
 
             double preemptNoClockRate = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
-            var noteDensities = NoteDensity.CalculateNoteDensities(hitObjects, preemptNoClockRate);
+            var noteDensities = NoteDensity.Calculate(hitObjects, preemptNoClockRate);
 
             // Tap
             var tapAttributes = Tap.CalculateTapAttributes(hitObjects, clockRate);
