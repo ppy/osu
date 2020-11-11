@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
     internal class TricubicInterpolator
     {
         /// <summary>
-        /// The <c>x</c> values of the 3D grid points to perform bicubic interpolation over.
+        /// The <c>x</c> values of the 3D grid points to perform tricubic interpolation over.
         /// </summary>
         private readonly double[] xs;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         private readonly BicubicInterpolator[] bicubicInterpolators;
 
         /// <summary>
-        /// Creates a new <see cref="BicubicInterpolator"/> using the supplied data.
+        /// Creates a new <see cref="TricubicInterpolator"/> using the supplied data.
         /// </summary>
         /// <remarks>
         /// Marginal partial derivative values, if not supplied in
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils.Interpolation
         }
 
         /// <summary>
-        /// Evaluates the bicubic Hermite spline at the point (<paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>).
+        /// Evaluates the tricubic Hermite spline at the point (<paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>).
         /// </summary>
         /// <param name="x">The <c>x</c> coordinate of the point to get the interpolated value for.</param>
         /// <param name="y">The <c>y</c> coordinate of the point to get the interpolated value for.</param>
