@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Ranking
             for (int i = 0; i < 500; i++)
             {
                 float angle = (float)random.NextDouble() * 2 * (float)Math.PI;
-                float radius = (float)random.NextDouble() * 0.5f * HitCircle.OBJECT_RADIUS;
+                float radius = (float)random.NextDouble() * 0.5f * OsuHitObject.OBJECT_RADIUS;
 
                 Vector2 position = new Vector2(radius * (float)Math.Cos(angle), radius * (float)Math.Sin(angle));
 
