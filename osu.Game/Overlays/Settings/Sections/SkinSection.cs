@@ -113,24 +113,28 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void randomizeSkin()
         {
-            int count = skinItems.Count - 1; // exclude "random" item.
+            // choose from only user skins, removing the current selection to ensure a new one is chosen.
+            var randomChoices = skinItems.Where(s => s.ID > 0 && s.ID != configBindable.Value).ToArray();
 
-            if (count <= 1)
+            if (randomChoices.Length == 0)
             {
                 configBindable.Value = SkinInfo.Default.ID;
                 return;
             }
 
-            // ensure the random selection is never the same as the previous.
-            configBindable.Value = skinItems.Where(s => s.ID != configBindable.Value).ElementAt(RNG.Next(0, count)).ID;
+            configBindable.Value = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length)).ID;
         }
 
         private void updateItems()
         {
             skinItems = skins.GetAllUsableSkins();
 
-            if (skinItems.Count > 1)
-                skinItems.Add(random_skin_info);
+            // insert after lazer built-in skins
+            int firstNonDefault = skinItems.FindIndex(s => s.ID > 0);
+            if (firstNonDefault < 0)
+                firstNonDefault = skinItems.Count;
+
+            skinItems.Insert(firstNonDefault, random_skin_info);
 
             skinDropdown.Items = skinItems;
         }
