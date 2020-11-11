@@ -552,6 +552,16 @@ namespace osu.Game
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
             LocalConfig.LookupSkinName = id => SkinManager.GetAllUsableSkins().FirstOrDefault(s => s.ID == id)?.ToString() ?? "Unknown";
 
+            LocalConfig.LookupKeyBindings = l =>
+            {
+                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l).ToArray();
+
+                if (combinations.Length == 0)
+                    return "none";
+
+                return string.Join(" or ", combinations);
+            };
+
             Container logoContainer;
             BackButton.Receptor receptor;
 
@@ -617,7 +627,12 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new OnScreenDisplay(), Add, true);
+            var onScreenDisplay = new OnScreenDisplay();
+
+            onScreenDisplay.BeginTracking(this, frameworkConfig);
+            onScreenDisplay.BeginTracking(this, LocalConfig);
+
+            loadComponentSingleFile(onScreenDisplay, Add, true);
 
             loadComponentSingleFile(notifications.With(d =>
             {

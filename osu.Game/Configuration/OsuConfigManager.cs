@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
@@ -9,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
@@ -173,19 +175,28 @@ namespace osu.Game.Configuration
             }
         }
 
-        public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
+        public override TrackedSettings CreateTrackedSettings()
         {
-            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled")),
-            new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription())),
-            new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
-            new TrackedSetting<int>(OsuSetting.Skin, m =>
-            {
-                string skinName = LookupSkinName?.Invoke(m) ?? string.Empty;
-                return new SettingDescription(skinName, "skin", skinName);
-            })
-        };
+            // these need to be assigned in normal game startup scenarios.
+            Debug.Assert(LookupKeyBindings != null);
+            Debug.Assert(LookupSkinName != null);
 
-        public Func<int, string> LookupSkinName { get; set; }
+            return new TrackedSettings
+            {
+                new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled", LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))),
+                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription(), $"cycle: shift-tab quick view: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
+                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
+                new TrackedSetting<int>(OsuSetting.Skin, m =>
+                {
+                    string skinName = LookupSkinName(m) ?? string.Empty;
+                    return new SettingDescription(skinName, "skin", skinName);
+                })
+            };
+        }
+
+        public Func<int, string> LookupSkinName { private get; set; }
+
+        public Func<GlobalAction, string> LookupKeyBindings { private get; set; }
     }
 
     public enum OsuSetting
