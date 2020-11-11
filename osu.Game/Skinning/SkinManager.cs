@@ -19,6 +19,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
@@ -86,6 +87,20 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUserSkins() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+
+        public void SelectRandomSkin()
+        {
+            // choose from only user skins, removing the current selection to ensure a new one is chosen.
+            var randomChoices = GetAllUsableSkins().Where(s => s.ID > 0 && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+
+            if (randomChoices.Length == 0)
+            {
+                CurrentSkinInfo.Value = SkinInfo.Default;
+                return;
+            }
+
+            CurrentSkinInfo.Value = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
+        }
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 
