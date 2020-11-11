@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
 
-        public DrawableSpinner(Spinner s)
+        public DrawableSpinner([CanBeNull] Spinner s = null)
             : base(s)
         {
         }
@@ -72,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 }
             };
 
-            PositionBindable.BindValueChanged(pos => Position = pos.NewValue, true);
+            PositionBindable.BindValueChanged(pos => Position = pos.NewValue);
         }
 
         protected override void LoadComplete()
