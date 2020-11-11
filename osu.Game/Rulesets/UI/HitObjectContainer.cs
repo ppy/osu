@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// All currently in-use <see cref="DrawableHitObject"/>s.
         /// </summary>
-        public IEnumerable<DrawableHitObject> Objects => InternalChildren.OfType<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
+        public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
         /// <summary>
         /// All currently in-use <see cref="DrawableHitObject"/>s that are alive.
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.UI
         /// <remarks>
         /// If this <see cref="HitObjectContainer"/> uses pooled objects, this is equivalent to <see cref="Objects"/>.
         /// </remarks>
-        public IEnumerable<DrawableHitObject> AliveObjects => AliveInternalChildren.OfType<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
+        public IEnumerable<DrawableHitObject> AliveObjects => AliveInternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
