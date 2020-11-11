@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -55,19 +56,19 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         [Test]
-        public void TestMissAfterNextObjectStartTime()
+        public void TestHoldNoteMissAfterNextObjectStartTime()
         {
             var objects = new List<ManiaHitObject>
             {
                 new HoldNote
                 {
                     StartTime = 1000,
-                    EndTime = 1200,
+                    EndTime = 1010,
                 },
                 new HoldNote
                 {
-                    StartTime = 1220,
-                    EndTime = 1420
+                    StartTime = 1020,
+                    EndTime = 1030
                 }
             };
 
@@ -77,10 +78,52 @@ namespace osu.Game.Rulesets.Mania.Tests
             addJudgementAssert(objects[1], HitResult.IgnoreMiss);
         }
 
+        [Test]
+        public void TestHoldNoteReleasedHitAfterNextObjectStartTime()
+        {
+            var objects = new List<ManiaHitObject>
+            {
+                new HoldNote
+                {
+                    StartTime = 1000,
+                    EndTime = 1010,
+                },
+                new HoldNote
+                {
+                    StartTime = 1020,
+                    EndTime = 1030
+                }
+            };
+
+            var frames = new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(1000, ManiaAction.Key1),
+                new ManiaReplayFrame(1030),
+                new ManiaReplayFrame(1040, ManiaAction.Key1),
+                new ManiaReplayFrame(1050)
+            };
+
+            performTest(objects, frames);
+
+            addJudgementAssert(objects[0], HitResult.IgnoreHit);
+            addJudgementAssert("first head", () => ((HoldNote)objects[0]).Head, HitResult.Perfect);
+            addJudgementAssert("first tail", () => ((HoldNote)objects[0]).Tail, HitResult.Perfect);
+
+            addJudgementAssert(objects[1], HitResult.IgnoreHit);
+            addJudgementAssert("second head", () => ((HoldNote)objects[1]).Head, HitResult.Great);
+            addJudgementAssert("second tail", () => ((HoldNote)objects[1]).Tail, HitResult.Perfect);
+        }
+
         private void addJudgementAssert(ManiaHitObject hitObject, HitResult result)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
                 () => judgementResults.Single(r => r.HitObject == hitObject).Type == result);
+        }
+
+        private void addJudgementAssert(string name, Func<ManiaHitObject> hitObject, HitResult result)
+        {
+            AddAssert($"{name} judgement is {result}",
+                () => judgementResults.Single(r => r.HitObject == hitObject()).Type == result);
         }
 
         private void addJudgementOffsetAssert(ManiaHitObject hitObject, double offset)
