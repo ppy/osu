@@ -526,6 +526,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public abstract void CancelResume();
 
+        private readonly Dictionary<Type, IDrawablePool> pools = new Dictionary<Type, IDrawablePool>();
+        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntries = new Dictionary<HitObject, HitObjectLifetimeEntry>();
+
         /// <summary>
         /// Whether this <see cref="DrawableRuleset"/> should retrieve pooled <see cref="DrawableHitObject"/>s.
         /// </summary>
@@ -534,8 +537,14 @@ namespace osu.Game.Rulesets.UI
         /// </remarks>
         protected virtual bool PoolHitObjects => false;
 
-        private readonly Dictionary<Type, IDrawablePool> pools = new Dictionary<Type, IDrawablePool>();
-
+        /// <summary>
+        /// Registers a <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetDrawableRepresentation"/>).
+        /// </summary>
+        /// <param name="initialSize">The number of drawables to be prepared for initial consumption.</param>
+        /// <param name="maximumSize">An optional maximum size after which the pool will no longer be expanded.</param>
+        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
+        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
         protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
             where TObject : HitObject
             where TDrawable : DrawableHitObject, new()
@@ -582,10 +591,21 @@ namespace osu.Game.Rulesets.UI
             });
         }
 
+        /// <summary>
+        /// Creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// This may be overridden to provide custom lifetime control (e.g. via <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/>.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="HitObject"/> to create the entry for.</param>
+        /// <returns>The <see cref="HitObjectLifetimeEntry"/>.</returns>
         protected abstract HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject);
 
-        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntries = new Dictionary<HitObject, HitObjectLifetimeEntry>();
-
+        /// <summary>
+        /// Retrieves or creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to retrieve or create the <see cref="HitObjectLifetimeEntry"/> for.</param>
+        /// <returns>The <see cref="HitObjectLifetimeEntry"/> for <paramref name="hitObject"/>.</returns>
         protected HitObjectLifetimeEntry GetLifetimeEntry(HitObject hitObject)
         {
             if (lifetimeEntries.TryGetValue(hitObject, out var entry))
