@@ -189,7 +189,7 @@ namespace osu.Game.Configuration
                 new TrackedSetting<int>(OsuSetting.Skin, m =>
                 {
                     string skinName = LookupSkinName(m) ?? string.Empty;
-                    return new SettingDescription(skinName, "skin", skinName);
+                    return new SettingDescription(skinName, "skin", skinName, $"random: {LookupKeyBindings(GlobalAction.RandomSkin)}");
                 })
             };
         }
