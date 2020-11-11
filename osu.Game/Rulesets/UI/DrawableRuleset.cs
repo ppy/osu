@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.UI
             get => frameStablePlayback;
             set
             {
-                frameStablePlayback = false;
+                frameStablePlayback = value;
                 if (frameStabilityContainer != null)
                     frameStabilityContainer.FrameStablePlayback = value;
             }
