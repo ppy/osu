@@ -54,6 +54,29 @@ namespace osu.Game.Rulesets.Mania.Tests
             }
         }
 
+        [Test]
+        public void TestMissAfterNextObjectStartTime()
+        {
+            var objects = new List<ManiaHitObject>
+            {
+                new HoldNote
+                {
+                    StartTime = 1000,
+                    EndTime = 1200,
+                },
+                new HoldNote
+                {
+                    StartTime = 1220,
+                    EndTime = 1420
+                }
+            };
+
+            performTest(objects, new List<ReplayFrame>());
+
+            addJudgementAssert(objects[0], HitResult.IgnoreMiss);
+            addJudgementAssert(objects[1], HitResult.IgnoreMiss);
+        }
+
         private void addJudgementAssert(ManiaHitObject hitObject, HitResult result)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",

@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <param name="hitObject">The <see cref="HitObject"/> that was hit.</param>
         public void HandleHit(DrawableHitObject hitObject)
         {
-            if (!IsHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset))
+            if (hitObject.IsHit && !IsHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset))
                 throw new InvalidOperationException($"A {hitObject} was hit before it became hittable!");
 
             foreach (var obj in enumerateHitObjectsUpTo(hitObject.HitObject.StartTime))
