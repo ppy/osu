@@ -48,6 +48,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
+
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
         };
 
         public IEnumerable<KeyBinding> EditorKeyBindings => new[]
@@ -191,5 +193,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Hold for HUD")]
         HoldForHUD,
+
+        [Description("Random Skin")]
+        RandomSkin,
     }
 }

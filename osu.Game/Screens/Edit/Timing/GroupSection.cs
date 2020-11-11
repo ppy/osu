@@ -85,12 +85,13 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     textBox.Text = string.Empty;
 
-                    textBox.Current.Disabled = true;
+                    // cannot use textBox.Current.Disabled due to https://github.com/ppy/osu-framework/issues/3919
+                    textBox.ReadOnly = true;
                     button.Enabled.Value = false;
                     return;
                 }
 
-                textBox.Current.Disabled = false;
+                textBox.ReadOnly = false;
                 button.Enabled.Value = true;
 
                 textBox.Text = $"{group.NewValue.Time:n0}";
