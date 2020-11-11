@@ -1,55 +1,60 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.SearchableList;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi
 {
     public class Header : Container
     {
-        public const float HEIGHT = 121;
-
-        private readonly HeaderBreadcrumbControl breadcrumbs;
+        public const float HEIGHT = 80;
 
         public Header(ScreenStack stack)
         {
-            MultiHeaderTitle title;
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
+
+            HeaderBreadcrumbControl breadcrumbs;
+            MultiHeaderTitle title;
 
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex(@"2f2043"),
+                    Colour = Color4Extensions.FromHex(@"#1f1921"),
                 },
                 new Container
                 {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
+                    Padding = new MarginPadding { Left = WaveOverlayContainer.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
                         title = new MultiHeaderTitle
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
-                            X = -ScreenTitle.ICON_WIDTH,
                         },
                         breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
                             Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                        },
+                            Origin = Anchor.BottomLeft
+                        }
                     },
                 },
             };
@@ -63,25 +68,61 @@ namespace osu.Game.Screens.Multi
             breadcrumbs.Current.TriggerChange();
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private class MultiHeaderTitle : CompositeDrawable
         {
-            breadcrumbs.StripColour = colours.Green;
-        }
+            private const float spacing = 6;
 
-        private class MultiHeaderTitle : ScreenTitle
-        {
+            private readonly OsuSpriteText dot;
+            private readonly OsuSpriteText pageTitle;
+
             public IMultiplayerSubScreen Screen
             {
-                set => Section = value.ShortTitle.ToLowerInvariant();
+                set => pageTitle.Text = value.ShortTitle.Titleize();
+            }
+
+            public MultiHeaderTitle()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Spacing = new Vector2(spacing, 0),
+                        Direction = FillDirection.Horizontal,
+                        Children = new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(size: 24),
+                                Text = "Multiplayer"
+                            },
+                            dot = new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(size: 24),
+                                Text = "·"
+                            },
+                            pageTitle = new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(size: 24),
+                                Text = "Lounge"
+                            }
+                        }
+                    },
+                };
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Title = "multi";
-                Icon = OsuIcon.Multi;
-                AccentColour = colours.Yellow;
+                pageTitle.Colour = dot.Colour = colours.Yellow;
             }
         }
 
@@ -90,12 +131,28 @@ namespace osu.Game.Screens.Multi
             public HeaderBreadcrumbControl(ScreenStack stack)
                 : base(stack)
             {
+                RelativeSizeAxes = Axes.X;
+                StripColour = Color4.Transparent;
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                AccentColour = Color4.White;
+                AccentColour = Color4Extensions.FromHex("#e35c99");
+            }
+
+            protected override TabItem<IScreen> CreateTabItem(IScreen value) => new HeaderBreadcrumbTabItem(value)
+            {
+                AccentColour = AccentColour
+            };
+
+            private class HeaderBreadcrumbTabItem : BreadcrumbTabItem
+            {
+                public HeaderBreadcrumbTabItem(IScreen value)
+                    : base(value)
+                {
+                    Bar.Colour = Color4.Transparent;
+                }
             }
         }
     }

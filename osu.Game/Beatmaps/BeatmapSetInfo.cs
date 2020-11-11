@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using osu.Framework.Testing;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
+    [ExcludeFromDynamicCompile]
     public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>
     {
         public int ID { get; set; }
@@ -55,7 +57,7 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; }
 
-        public string StoryboardFile => Files?.Find(f => f.Filename.EndsWith(".osb"))?.Filename;
+        public string StoryboardFile => Files?.Find(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
 
         public List<BeatmapSetFileInfo> Files { get; set; }
 
@@ -63,6 +65,21 @@ namespace osu.Game.Beatmaps
 
         public bool Protected { get; set; }
 
-        public bool Equals(BeatmapSetInfo other) => OnlineBeatmapSetID == other?.OnlineBeatmapSetID;
+        public bool Equals(BeatmapSetInfo other)
+        {
+            if (other == null)
+                return false;
+
+            if (ID != 0 && other.ID != 0)
+                return ID == other.ID;
+
+            if (OnlineBeatmapSetID.HasValue && other.OnlineBeatmapSetID.HasValue)
+                return OnlineBeatmapSetID == other.OnlineBeatmapSetID;
+
+            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
+                return Hash == other.Hash;
+
+            return ReferenceEquals(this, other);
+        }
     }
 }

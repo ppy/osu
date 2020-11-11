@@ -1,32 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
-using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneBananaShower : PlayerTestScene
+    public class TestSceneBananaShower : TestSceneCatchPlayer
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        [Test]
+        public void TestBananaShower()
         {
-            typeof(BananaShower),
-            typeof(DrawableBananaShower),
-
-            typeof(CatchRuleset),
-            typeof(DrawableCatchRuleset),
-        };
-
-        public TestSceneBananaShower()
-            : base(new CatchRuleset())
-        {
+            AddUntilStep("player is done", () => !Player.ValidForResume);
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
@@ -40,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
 
-            beatmap.HitObjects.Add(new BananaShower { StartTime = 200, Duration = 5000, NewCombo = true });
+            beatmap.HitObjects.Add(new BananaShower { StartTime = 200, Duration = 3000, NewCombo = true });
 
             return beatmap;
         }

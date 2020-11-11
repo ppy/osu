@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Online.API.Requests.Responses;
@@ -13,37 +12,44 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneChangelogOverlay : OsuTestScene
     {
-        private ChangelogOverlay changelog;
+        private TestChangelogOverlay changelog;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        protected override bool UseOnlineAPI => true;
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            typeof(UpdateStreamBadgeArea),
-            typeof(UpdateStreamBadge),
-            typeof(ChangelogHeader),
-            typeof(ChangelogContent),
-            typeof(ChangelogListing),
-            typeof(ChangelogSingleBuild),
-            typeof(ChangelogBuild),
-            typeof(Comments),
-        };
+            Child = changelog = new TestChangelogOverlay();
+        });
 
-        protected override void LoadComplete()
+        [Test]
+        public void ShowWithNoFetch()
         {
-            base.LoadComplete();
+            AddStep(@"Show", () => changelog.Show());
+            AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
+            AddAssert(@"listing displayed", () => changelog.Current.Value == null);
+            AddAssert(@"no stream selected", () => changelog.Header.Streams.Current.Value == null);
+        }
 
-            Add(changelog = new ChangelogOverlay());
-            AddStep(@"Show", changelog.Show);
-            AddStep(@"Hide", changelog.Hide);
+        [Test]
+        public void ShowWithListing()
+        {
+            AddStep(@"Show with listing", () => changelog.ShowListing());
+            AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
+            AddAssert(@"listing displayed", () => changelog.Current.Value == null);
+            AddAssert(@"no stream selected", () => changelog.Header.Streams.Current.Value == null);
+        }
 
-            AddWaitStep("wait for hide", 3);
-
+        [Test]
+        public void ShowWithBuild()
+        {
             AddStep(@"Show with Lazer 2018.712.0", () =>
             {
                 changelog.ShowBuild(new APIChangelogBuild
                 {
                     Version = "2018.712.0",
                     DisplayVersion = "2018.712.0",
-                    UpdateStream = new APIUpdateStream { Name = OsuGameBase.CLIENT_STREAM_NAME },
+                    UpdateStream = new APIUpdateStream { Id = 7, Name = OsuGameBase.CLIENT_STREAM_NAME },
                     ChangelogEntries = new List<APIChangelogEntry>
                     {
                         new APIChangelogEntry
@@ -54,18 +60,50 @@ namespace osu.Game.Tests.Visual.Online
                         }
                     }
                 });
-                changelog.Show();
             });
 
-            AddWaitStep("wait for show", 3);
-            AddStep(@"Hide", changelog.Hide);
-            AddWaitStep("wait for hide", 3);
+            AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
+            AddAssert(@"correct build displayed", () => changelog.Current.Value.Version == "2018.712.0");
+            AddAssert(@"correct stream selected", () => changelog.Header.Streams.Current.Value.Id == 7);
+        }
 
-            AddStep(@"Show with listing", () =>
+        [Test]
+        public void TestHTMLUnescaping()
+        {
+            AddStep(@"Ensure HTML string unescaping", () =>
             {
-                changelog.ShowListing();
-                changelog.Show();
+                changelog.ShowBuild(new APIChangelogBuild
+                {
+                    Version = "2019.920.0",
+                    DisplayVersion = "2019.920.0",
+                    UpdateStream = new APIUpdateStream
+                    {
+                        Name = "Test",
+                        DisplayName = "Test"
+                    },
+                    ChangelogEntries = new List<APIChangelogEntry>
+                    {
+                        new APIChangelogEntry
+                        {
+                            Category = "Testing HTML strings unescaping",
+                            Title = "Ensuring HTML strings are being unescaped",
+                            MessageHtml = "&quot;&quot;&quot;This text should appear triple-quoted&quot;&quot;&quot;    &gt;_&lt;",
+                            GithubUser = new APIChangelogUser
+                            {
+                                DisplayName = "Dummy",
+                                OsuUsername = "Dummy",
+                            }
+                        },
+                    }
+                });
             });
+        }
+
+        private class TestChangelogOverlay : ChangelogOverlay
+        {
+            public new List<APIUpdateStream> Streams => base.Streams;
+
+            public new ChangelogHeader Header => base.Header;
         }
     }
 }

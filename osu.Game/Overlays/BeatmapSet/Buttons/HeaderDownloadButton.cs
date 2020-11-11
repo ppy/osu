@@ -13,7 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -22,9 +22,11 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class HeaderDownloadButton : BeatmapDownloadTrackingComposite, IHasTooltip
     {
+        private const int text_size = 12;
+
         private readonly bool noVideo;
 
-        public string TooltipText => button.Enabled.Value ? "Download this beatmap" : "Login to download";
+        public string TooltipText => button.Enabled.Value ? "download this beatmap" : "login to download";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
@@ -80,8 +82,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Icon = FontAwesome.Solid.Download,
-                                    Size = new Vector2(16),
-                                    Margin = new MarginPadding { Right = 5 },
+                                    Size = new Vector2(18),
                                 },
                             }
                         },
@@ -120,7 +121,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Downloading...",
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
                         break;
@@ -131,7 +132,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Importing...",
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
                         break;
@@ -146,12 +147,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Download",
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
                             {
-                                Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
-                                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold)
+                                Text = getVideoSuffixText(),
+                                Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
                             },
                         };
                         this.FadeIn(200);
@@ -163,5 +164,13 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private void userChanged(ValueChangedEvent<User> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
 
         private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+
+        private string getVideoSuffixText()
+        {
+            if (!BeatmapSet.Value.OnlineInfo.HasVideo)
+                return string.Empty;
+
+            return noVideo ? "without Video" : "with Video";
+        }
     }
 }

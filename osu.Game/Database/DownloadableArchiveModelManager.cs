@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Database
 {
@@ -21,11 +22,15 @@ namespace osu.Game.Database
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
     public abstract class DownloadableArchiveModelManager<TModel, TFileModel> : ArchiveModelManager<TModel, TFileModel>, IModelDownloader<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>
-        where TFileModel : INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, new()
     {
-        public event Action<ArchiveDownloadRequest<TModel>> DownloadBegan;
+        public IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadBegan => downloadBegan;
 
-        public event Action<ArchiveDownloadRequest<TModel>> DownloadFailed;
+        private readonly Bindable<WeakReference<ArchiveDownloadRequest<TModel>>> downloadBegan = new Bindable<WeakReference<ArchiveDownloadRequest<TModel>>>();
+
+        public IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadFailed => downloadFailed;
+
+        private readonly Bindable<WeakReference<ArchiveDownloadRequest<TModel>>> downloadFailed = new Bindable<WeakReference<ArchiveDownloadRequest<TModel>>>();
 
         private readonly IAPIProvider api;
 
@@ -33,7 +38,8 @@ namespace osu.Game.Database
 
         private readonly MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore;
 
-        protected DownloadableArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
+        protected DownloadableArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore,
+                                                  IIpcHost importHost = null)
             : base(storage, contextFactory, modelStore, importHost)
         {
             this.api = api;
@@ -41,17 +47,17 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Creates the download request for this <see cref="TModel"/>.
+        /// Creates the download request for this <typeparamref name="TModel"/>.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool minimiseDownloadSize);
 
         /// <summary>
-        /// Begin a download for the requested <see cref="TModel"/>.
+        /// Begin a download for the requested <typeparamref name="TModel"/>.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>Whether the download was started.</returns>
         public bool Download(TModel model, bool minimiseDownloadSize = false)
@@ -76,38 +82,43 @@ namespace osu.Game.Database
                 Task.Factory.StartNew(async () =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    await Import(notification, filename);
+                    var imported = await Import(notification, filename);
+
+                    // for now a failed import will be marked as a failed download for simplicity.
+                    if (!imported.Any())
+                        downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+
                     currentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
             };
 
-            request.Failure += error =>
-            {
-                DownloadFailed?.Invoke(request);
-
-                if (error is OperationCanceledException) return;
-
-                notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
-                currentDownloads.Remove(request);
-            };
+            request.Failure += triggerFailure;
 
             notification.CancelRequested += () =>
             {
                 request.Cancel();
-                currentDownloads.Remove(request);
-                notification.State = ProgressNotificationState.Cancelled;
                 return true;
             };
 
             currentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
-            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
+            api.PerformAsync(request);
 
-            DownloadBegan?.Invoke(request);
-
+            downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
             return true;
+
+            void triggerFailure(Exception error)
+            {
+                currentDownloads.Remove(request);
+
+                downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
+
+                notification.State = ProgressNotificationState.Cancelled;
+
+                if (!(error is OperationCanceledException))
+                    Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
+            }
         }
 
         public bool IsAvailableLocally(TModel model) => CheckLocalAvailability(model, modelStore.ConsumableItems.Where(m => !m.DeletePending));
@@ -115,10 +126,11 @@ namespace osu.Game.Database
         /// <summary>
         /// Performs implementation specific comparisons to determine whether a given model is present in the local store.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
         /// <param name="items">The usable items present in the store.</param>
-        /// <returns>Whether the <see cref="TModel"/> exists.</returns>
-        protected abstract bool CheckLocalAvailability(TModel model, IQueryable<TModel> items);
+        /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
+        protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
+            => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
 
         public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
 

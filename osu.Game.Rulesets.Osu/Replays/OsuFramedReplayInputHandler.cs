@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 using osuTK;
@@ -36,19 +36,10 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        public override List<IInput> GetPendingInputs()
+        public override void CollectPendingInputs(List<IInput> inputs)
         {
-            return new List<IInput>
-            {
-                new MousePositionAbsoluteInput
-                {
-                    Position = GamefieldToScreenSpace(Position ?? Vector2.Zero)
-                },
-                new ReplayState<OsuAction>
-                {
-                    PressedActions = CurrentFrame?.Actions ?? new List<OsuAction>()
-                }
-            };
+            inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(Position ?? Vector2.Zero) });
+            inputs.Add(new ReplayState<OsuAction> { PressedActions = CurrentFrame?.Actions ?? new List<OsuAction>() });
         }
     }
 }

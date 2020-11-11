@@ -30,8 +30,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly OsuSpriteText placeholder;
 
         private KeyValuePair<int, int>[] ranks;
-        private int dayIndex;
-        public Bindable<User> User = new Bindable<User>();
+        private int hoveredIndex = -1;
+        public readonly Bindable<UserStatistics> Statistics = new Bindable<UserStatistics>();
 
         public RankGraph()
         {
@@ -55,9 +55,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             };
 
-            graph.OnBallMove += i => dayIndex = i;
-
-            User.ValueChanged += userChanged;
+            graph.OnBallMove += i => hoveredIndex = i;
         }
 
         [BackgroundDependencyLoader]
@@ -66,18 +64,26 @@ namespace osu.Game.Overlays.Profile.Header.Components
             graph.LineColour = colours.Yellow;
         }
 
-        private void userChanged(ValueChangedEvent<User> e)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Statistics.BindValueChanged(statistics => updateStatistics(statistics.NewValue), true);
+        }
+
+        private void updateStatistics(UserStatistics statistics)
         {
             placeholder.FadeIn(fade_duration, Easing.Out);
+            hoveredIndex = -1;
 
-            if (e.NewValue?.Statistics?.Ranks.Global == null)
+            if (statistics?.Ranks.Global == null)
             {
                 graph.FadeOut(fade_duration, Easing.Out);
                 ranks = null;
                 return;
             }
 
-            int[] userRanks = e.NewValue.RankHistory?.Data ?? new[] { e.NewValue.Statistics.Ranks.Global.Value };
+            int[] userRanks = statistics.RankHistory?.Data ?? new[] { statistics.Ranks.Global.Value };
             ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)
@@ -85,17 +91,22 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 placeholder.FadeOut(fade_duration, Easing.Out);
 
                 graph.DefaultValueCount = ranks.Length;
-                graph.Values = ranks.Select(x => -(float)Math.Log(x.Value));
+                graph.Values = ranks.Select(x => -MathF.Log(x.Value));
             }
 
             graph.FadeTo(ranks.Length > 1 ? 1 : 0, fade_duration, Easing.Out);
+
+            if (IsHovered)
+                graph.UpdateBallPosition(lastHoverPosition);
         }
+
+        private float lastHoverPosition;
 
         protected override bool OnHover(HoverEvent e)
         {
             if (ranks?.Length > 1)
             {
-                graph.UpdateBallPosition(e.MousePosition.X);
+                graph.UpdateBallPosition(lastHoverPosition = e.MousePosition.X);
                 graph.ShowBar();
             }
 
@@ -112,11 +123,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (ranks?.Length > 1)
-            {
-                graph.HideBar();
-            }
-
+            graph.HideBar();
             base.OnHoverLost(e);
         }
 
@@ -162,9 +169,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
-                ballBg.Colour = colours.GreySeafoamDarker;
+                ballBg.Colour = colourProvider.Background5;
                 movingBall.BorderColour = line.Colour = colours.Yellow;
             }
 
@@ -182,7 +189,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             public void HideBar() => bar.FadeOut(fade_duration);
 
-            private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
+            private int calculateIndex(float mouseXPosition) => (int)Math.Clamp(MathF.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1)), 0, DefaultValueCount - 1);
 
             private Vector2 calculateBallPosition(int index)
             {
@@ -191,16 +198,29 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
-        public string TooltipText => User.Value?.Statistics?.Ranks.Global == null ? "" : $"#{ranks[dayIndex].Value:#,##0}|{ranked_days - ranks[dayIndex].Key + 1}";
+        public object TooltipContent
+        {
+            get
+            {
+                if (ranks == null || hoveredIndex == -1)
+                    return null;
+
+                var days = ranked_days - ranks[hoveredIndex].Key + 1;
+
+                return new TooltipDisplayContent
+                {
+                    Rank = $"#{ranks[hoveredIndex].Value:#,##0}",
+                    Time = days == 0 ? "now" : $"{days} days ago"
+                };
+            }
+        }
 
         public ITooltip GetCustomTooltip() => new RankGraphTooltip();
 
-        public class RankGraphTooltip : VisibilityContainer, ITooltip
+        private class RankGraphTooltip : VisibilityContainer, ITooltip
         {
             private readonly OsuSpriteText globalRankingText, timeText;
             private readonly Box background;
-
-            public string TooltipText { get; set; }
 
             public RankGraphTooltip()
             {
@@ -252,14 +272,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                background.Colour = colours.GreySeafoamDark;
+                // Temporary colour since it's currently impossible to change it without bugs (see https://github.com/ppy/osu-framework/issues/3231)
+                // If above is fixed, this should use OverlayColourProvider
+                background.Colour = colours.Gray1;
             }
 
-            public void Refresh()
+            public bool SetContent(object content)
             {
-                var info = TooltipText.Split('|');
-                globalRankingText.Text = info[0];
-                timeText.Text = info[1] == "0" ? "now" : $"{info[1]} days ago";
+                if (!(content is TooltipDisplayContent info))
+                    return false;
+
+                globalRankingText.Text = info.Rank;
+                timeText.Text = info.Time;
+                return true;
             }
 
             private bool instantMove = true;
@@ -275,9 +300,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     this.MoveTo(pos, 200, Easing.OutQuint);
             }
 
-            protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
+            protected override void PopIn()
+            {
+                instantMove |= !IsPresent;
+                this.FadeIn(200, Easing.OutQuint);
+            }
 
             protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
+        }
+
+        private class TooltipDisplayContent
+        {
+            public string Rank;
+            public string Time;
         }
     }
 }

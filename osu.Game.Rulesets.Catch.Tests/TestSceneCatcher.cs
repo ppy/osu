@@ -3,103 +3,24 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Tests.Visual;
-using System;
-using System.Collections.Generic;
-using osu.Game.Skinning;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osuTK.Graphics;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatcher : OsuTestScene
+    public class TestSceneCatcher : CatchSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CatcherSprite),
-        };
-
-        private readonly Container container;
-
-        public TestSceneCatcher()
-        {
-            Child = container = new Container
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            };
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("show default catcher implementation", () => { container.Child = new CatcherSprite(); });
-
-            AddStep("show custom catcher implementation", () =>
+            SetContents(() => new Catcher(new Container())
             {
-                container.Child = new CatchCustomSkinSourceContainer
-                {
-                    Child = new CatcherSprite()
-                };
+                RelativePositionAxes = Axes.None,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
             });
-        }
-
-        private class CatcherCustomSkin : Container
-        {
-            public CatcherCustomSkin()
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Blue
-                    },
-                    new SpriteText
-                    {
-                        Text = "custom"
-                    }
-                };
-            }
-        }
-
-        [Cached(typeof(ISkinSource))]
-        private class CatchCustomSkinSourceContainer : Container, ISkinSource
-        {
-            public event Action SourceChanged
-            {
-                add { }
-                remove { }
-            }
-
-            public Drawable GetDrawableComponent(string componentName)
-            {
-                switch (componentName)
-                {
-                    case "Play/Catch/fruit-catcher-idle":
-                        return new CatcherCustomSkin();
-                }
-
-                return null;
-            }
-
-            public SampleChannel GetSample(string sampleName) =>
-                throw new NotImplementedException();
-
-            public Texture GetTexture(string componentName) =>
-                throw new NotImplementedException();
-
-            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration =>
-                throw new NotImplementedException();
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
             get => length;
             set
             {
-                length = MathHelper.Clamp(value, 0, 1);
+                length = Math.Clamp(value, 0, 1);
                 updateBarLength();
             }
         }
@@ -110,7 +110,7 @@ namespace osu.Game.Graphics.UserInterface
     [Flags]
     public enum BarDirection
     {
-        LeftToRight = 1 << 0,
+        LeftToRight = 1,
         RightToLeft = 1 << 1,
         TopToBottom = 1 << 2,
         BottomToTop = 1 << 3,

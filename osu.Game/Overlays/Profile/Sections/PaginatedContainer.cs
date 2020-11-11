@@ -11,39 +11,56 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedContainer : FillFlowContainer
+    public abstract class PaginatedContainer<TModel> : FillFlowContainer
     {
-        protected readonly FillFlowContainer ItemsContainer;
-        protected readonly ShowMoreButton MoreButton;
-        protected readonly OsuSpriteText MissingText;
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         protected int VisiblePages;
         protected int ItemsPerPage;
 
         protected readonly Bindable<User> User = new Bindable<User>();
-
-        protected IAPIProvider Api;
-        protected APIRequest RetrievalRequest;
+        protected FillFlowContainer ItemsContainer;
         protected RulesetStore Rulesets;
 
-        protected PaginatedContainer(Bindable<User> user, string header, string missing)
-        {
-            User.BindTo(user);
+        private APIRequest<List<TModel>> retrievalRequest;
+        private CancellationTokenSource loadCancellation;
 
+        private readonly string missingText;
+        private ShowMoreButton moreButton;
+        private OsuSpriteText missing;
+        private PaginatedContainerHeader header;
+
+        private readonly string headerText;
+        private readonly CounterVisibilityState counterVisibilityState;
+
+        protected PaginatedContainer(Bindable<User> user, string headerText = "", string missingText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        {
+            this.headerText = headerText;
+            this.missingText = missingText;
+            this.counterVisibilityState = counterVisibilityState;
+            User.BindTo(user);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
+        {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
 
             Children = new Drawable[]
             {
-                new OsuSpriteText
+                header = new PaginatedContainerHeader(headerText, counterVisibilityState)
                 {
-                    Text = header,
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
-                    Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                    Alpha = string.IsNullOrEmpty(headerText) ? 0 : 1
                 },
                 ItemsContainer = new FillFlowContainer
                 {
@@ -51,27 +68,22 @@ namespace osu.Game.Overlays.Profile.Sections
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(0, 2),
                 },
-                MoreButton = new ShowMoreButton
+                moreButton = new ShowMoreButton
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Alpha = 0,
                     Margin = new MarginPadding { Top = 10 },
-                    Action = ShowMore,
+                    Action = showMore,
                 },
-                MissingText = new OsuSpriteText
+                missing = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 15),
-                    Text = missing,
+                    Text = missingText,
                     Alpha = 0,
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, RulesetStore rulesets)
-        {
-            Api = api;
             Rulesets = rulesets;
 
             User.ValueChanged += onUserChanged;
@@ -80,13 +92,70 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void onUserChanged(ValueChangedEvent<User> e)
         {
+            loadCancellation?.Cancel();
+            retrievalRequest?.Cancel();
+
             VisiblePages = 0;
             ItemsContainer.Clear();
 
             if (e.NewValue != null)
-                ShowMore();
+            {
+                showMore();
+                SetCount(GetCount(e.NewValue));
+            }
         }
 
-        protected abstract void ShowMore();
+        private void showMore()
+        {
+            loadCancellation = new CancellationTokenSource();
+
+            retrievalRequest = CreateRequest();
+            retrievalRequest.Success += UpdateItems;
+
+            api.Queue(retrievalRequest);
+        }
+
+        protected virtual void UpdateItems(List<TModel> items) => Schedule(() =>
+        {
+            OnItemsReceived(items);
+
+            if (!items.Any() && VisiblePages == 1)
+            {
+                moreButton.Hide();
+                moreButton.IsLoading = false;
+
+                if (!string.IsNullOrEmpty(missing.Text))
+                    missing.Show();
+
+                return;
+            }
+
+            LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
+            {
+                missing.Hide();
+                moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
+                moreButton.IsLoading = false;
+
+                ItemsContainer.AddRange(drawables);
+            }, loadCancellation.Token);
+        });
+
+        protected virtual int GetCount(User user) => 0;
+
+        protected void SetCount(int value) => header.Current.Value = value;
+
+        protected virtual void OnItemsReceived(List<TModel> items)
+        {
+        }
+
+        protected abstract APIRequest<List<TModel>> CreateRequest();
+
+        protected abstract Drawable CreateDrawableItem(TModel model);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            retrievalRequest?.Cancel();
+        }
     }
 }

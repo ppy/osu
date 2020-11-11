@@ -62,10 +62,9 @@ namespace osu.Game.Overlays.Chat.Tabs
             });
 
             avatar.OnLoadComplete += d => d.FadeInFromZero(300, Easing.OutQuint);
-
-            Text.X = ChatOverlay.TAB_AREA_HEIGHT;
-            TextBold.X = ChatOverlay.TAB_AREA_HEIGHT;
         }
+
+        protected override float LeftTextPadding => base.LeftTextPadding + ChatOverlay.TAB_AREA_HEIGHT;
 
         protected override bool ShowCloseOnHover => false;
 
@@ -90,7 +89,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             var user = Value.Users.First();
 
-            BackgroundActive = user.Colour != null ? OsuColour.FromHex(user.Colour) : colours.BlueDark;
+            BackgroundActive = user.Colour != null ? Color4Extensions.FromHex(user.Colour) : colours.BlueDark;
             BackgroundInactive = BackgroundActive.Darken(0.5f);
         }
     }

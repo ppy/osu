@@ -10,15 +10,15 @@ namespace osu.Game.Audio
     /// </summary>
     public class SampleInfo : ISampleInfo
     {
-        private readonly string sampleName;
+        private readonly string[] sampleNames;
 
-        public SampleInfo(string sampleName)
+        public SampleInfo(params string[] sampleNames)
         {
-            this.sampleName = sampleName;
+            this.sampleNames = sampleNames;
         }
 
-        public IEnumerable<string> LookupNames => new[] { sampleName };
+        public IEnumerable<string> LookupNames => sampleNames;
 
-        public int Volume { get; set; } = 100;
+        public int Volume { get; } = 100;
     }
 }

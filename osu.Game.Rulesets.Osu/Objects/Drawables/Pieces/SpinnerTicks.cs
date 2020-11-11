@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,10 +10,11 @@ using osu.Framework.Graphics.Effects;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerTicks : Container
+    public class SpinnerTicks : Container, IHasAccentColour
     {
         public SpinnerTicks()
         {
@@ -20,30 +22,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
-            const int count = 18;
+            const float count = 8;
 
-            for (int i = 0; i < count; i++)
+            for (float i = 0; i < count; i++)
             {
                 Add(new Container
                 {
-                    Colour = Color4.Black,
                     Alpha = 0.4f,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Radius = 10,
-                        Colour = Color4.Gray.Opacity(0.2f),
-                    },
+                    Blending = BlendingParameters.Additive,
                     RelativePositionAxes = Axes.Both,
                     Masking = true,
                     CornerRadius = 5,
                     Size = new Vector2(60, 10),
                     Origin = Anchor.Centre,
                     Position = new Vector2(
-                        0.5f + (float)Math.Sin((float)i / count * 2 * MathHelper.Pi) / 2 * 0.86f,
-                        0.5f + (float)Math.Cos((float)i / count * 2 * MathHelper.Pi) / 2 * 0.86f
+                        0.5f + MathF.Sin(i / count * 2 * MathF.PI) / 2 * 0.83f,
+                        0.5f + MathF.Cos(i / count * 2 * MathF.PI) / 2 * 0.83f
                     ),
-                    Rotation = -(float)i / count * 360 + 90,
+                    Rotation = -i / count * 360 + 90,
                     Children = new[]
                     {
                         new Box
@@ -52,6 +48,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                         }
                     }
                 });
+            }
+        }
+
+        public Color4 AccentColour
+        {
+            get => Colour;
+            set
+            {
+                Colour = value;
+
+                foreach (var c in Children.OfType<Container>())
+                {
+                    c.EdgeEffect =
+                        new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Glow,
+                            Radius = 20,
+                            Colour = value.Opacity(0.8f),
+                        };
+                }
             }
         }
     }

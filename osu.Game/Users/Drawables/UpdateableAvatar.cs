@@ -31,11 +31,19 @@ namespace osu.Game.Users.Drawables
             set => base.CornerRadius = value;
         }
 
+        public new float CornerExponent
+        {
+            get => base.CornerExponent;
+            set => base.CornerExponent = value;
+        }
+
         public new EdgeEffectParameters EdgeEffect
         {
             get => base.EdgeEffect;
             set => base.EdgeEffect = value;
         }
+
+        protected override double LoadDelay => 200;
 
         /// <summary>
         /// Whether to show a default guest representation on null user (as opposed to nothing).

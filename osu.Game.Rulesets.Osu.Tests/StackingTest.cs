@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.IO;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestStacking()
         {
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(beatmap_data)))
-            using (var reader = new StreamReader(stream))
+            using (var reader = new LineBufferedReader(stream))
             {
                 var beatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
                 var converted = new TestWorkingBeatmap(beatmap).GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>());

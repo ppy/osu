@@ -18,8 +18,8 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Mods.Sections;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
 using osuTK;
@@ -30,11 +30,13 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
+        public const float HEIGHT = 510;
+
         protected readonly TriangleButton DeselectAllButton;
+        protected readonly TriangleButton CustomiseButton;
         protected readonly TriangleButton CloseButton;
 
         protected readonly OsuSpriteText MultiplierLabel;
-        protected readonly OsuSpriteText UnrankedLabel;
 
         protected override bool BlockNonPositionalInput => false;
 
@@ -42,26 +44,31 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
-        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        protected readonly ModSettingsContainer ModSettingsContainer;
 
-        protected readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        private Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods;
 
         protected Color4 LowMultiplierColour;
         protected Color4 HighMultiplierColour;
 
         private const float content_width = 0.8f;
+        private const float footer_button_spacing = 20;
+
         private readonly FillFlowContainer footerContainer;
 
         private SampleChannel sampleOn, sampleOff;
 
         public ModSelectOverlay()
         {
-            Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
-            Waves.SecondWaveColour = OsuColour.FromHex(@"2280a2");
-            Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
-            Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
+            Waves.FirstWaveColour = Color4Extensions.FromHex(@"19b0e2");
+            Waves.SecondWaveColour = Color4Extensions.FromHex(@"2280a2");
+            Waves.ThirdWaveColour = Color4Extensions.FromHex(@"005774");
+            Waves.FourthWaveColour = Color4Extensions.FromHex(@"003a4e");
 
-            Height = 510;
+            RelativeSizeAxes = Axes.Both;
+
             Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
 
             Children = new Drawable[]
@@ -80,8 +87,7 @@ namespace osu.Game.Overlays.Mods
                         new Triangles
                         {
                             TriangleScale = 5,
-                            RelativeSizeAxes = Axes.X,
-                            Height = Height, //set the height from the start to ensure correct triangle density.
+                            RelativeSizeAxes = Axes.Both,
                             ColourLight = new Color4(53, 66, 82, 255),
                             ColourDark = new Color4(41, 54, 70, 255),
                         },
@@ -96,7 +102,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         new Dimension(GridSizeMode.Absolute, 90),
                         new Dimension(GridSizeMode.Distributed),
-                        new Dimension(GridSizeMode.Absolute, 70),
+                        new Dimension(GridSizeMode.AutoSize),
                     },
                     Content = new[]
                     {
@@ -190,7 +196,8 @@ namespace osu.Game.Overlays.Mods
                             // Footer
                             new Container
                             {
-                                RelativeSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                                 Children = new Drawable[]
@@ -208,7 +215,9 @@ namespace osu.Game.Overlays.Mods
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
                                         Width = content_width,
-                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(footer_button_spacing, footer_button_spacing / 2),
+                                        LayoutDuration = 100,
+                                        LayoutEasing = Easing.OutQuint,
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,
@@ -221,49 +230,50 @@ namespace osu.Game.Overlays.Mods
                                                 Width = 180,
                                                 Text = "Deselect All",
                                                 Action = DeselectAll,
-                                                Margin = new MarginPadding
-                                                {
-                                                    Right = 20
-                                                }
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
+                                            },
+                                            CustomiseButton = new TriangleButton
+                                            {
+                                                Width = 180,
+                                                Text = "Customisation",
+                                                Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
+                                                Enabled = { Value = false },
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
                                             },
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
                                                 Text = "Close",
                                                 Action = Hide,
-                                                Margin = new MarginPadding
-                                                {
-                                                    Right = 20
-                                                }
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
                                             },
-                                            new OsuSpriteText
+                                            new FillFlowContainer
                                             {
-                                                Text = @"Score Multiplier:",
-                                                Font = OsuFont.GetFont(size: 30),
-                                                Margin = new MarginPadding
+                                                AutoSizeAxes = Axes.Both,
+                                                Spacing = new Vector2(footer_button_spacing / 2, 0),
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
+                                                Children = new Drawable[]
                                                 {
-                                                    Top = 5,
-                                                    Right = 10
-                                                }
+                                                    new OsuSpriteText
+                                                    {
+                                                        Text = @"Score Multiplier:",
+                                                        Font = OsuFont.GetFont(size: 30),
+                                                        Origin = Anchor.CentreLeft,
+                                                        Anchor = Anchor.CentreLeft,
+                                                    },
+                                                    MultiplierLabel = new OsuSpriteText
+                                                    {
+                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
+                                                        Origin = Anchor.CentreLeft,
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Width = 70, // make width fixed so reflow doesn't occur when multiplier number changes.
+                                                    },
+                                                },
                                             },
-                                            MultiplierLabel = new OsuSpriteText
-                                            {
-                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                                                Margin = new MarginPadding
-                                                {
-                                                    Top = 5
-                                                }
-                                            },
-                                            UnrankedLabel = new OsuSpriteText
-                                            {
-                                                Text = @"(Unranked)",
-                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                                                Margin = new MarginPadding
-                                                {
-                                                    Top = 5,
-                                                    Left = 10
-                                                }
-                                            }
                                         }
                                     }
                                 },
@@ -271,18 +281,28 @@ namespace osu.Game.Overlays.Mods
                         },
                     },
                 },
+                ModSettingsContainer = new ModSettingsContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Width = 0.25f,
+                    Alpha = 0,
+                    X = -100,
+                    SelectedMods = { BindTarget = SelectedMods },
+                }
             };
+
+            ((IBindable<bool>)CustomiseButton.Enabled).BindTo(ModSettingsContainer.HasSettingsForSelection);
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio, Bindable<IReadOnlyList<Mod>> mods)
+        private void load(OsuColour colours, AudioManager audio, OsuGameBase osu)
         {
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
-            UnrankedLabel.Colour = colours.Blue;
 
-            Ruleset.BindTo(ruleset);
-            if (mods != null) SelectedMods.BindTo(mods);
+            availableMods = osu.AvailableMods.GetBoundCopy();
 
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
@@ -313,7 +333,7 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            Ruleset.BindValueChanged(rulesetChanged, true);
+            availableMods.BindValueChanged(availableModsChanged, true);
             SelectedMods.BindValueChanged(selectedModsChanged, true);
         }
 
@@ -349,6 +369,9 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            // don't absorb control as ToolbarRulesetSelector uses control + number to navigate
+            if (e.ControlPressed) return false;
+
             switch (e.Key)
             {
                 case Key.Number1:
@@ -363,28 +386,20 @@ namespace osu.Game.Overlays.Mods
             return base.OnKeyDown(e);
         }
 
-        private void rulesetChanged(ValueChangedEvent<RulesetInfo> e)
-        {
-            if (e.NewValue == null) return;
+        public override bool OnPressed(GlobalAction action) => false; // handled by back button
 
-            var instance = e.NewValue.CreateInstance();
+        private void availableModsChanged(ValueChangedEvent<Dictionary<ModType, IReadOnlyList<Mod>>> mods)
+        {
+            if (mods.NewValue == null) return;
 
             foreach (var section in ModSectionsContainer.Children)
-                section.Mods = instance.GetModsFor(section.ModType);
-
-            // attempt to re-select any already selected mods.
-            // this may be the first time we are receiving the ruleset, in which case they will still match.
-            selectedModsChanged(new ValueChangedEvent<IReadOnlyList<Mod>>(SelectedMods.Value, SelectedMods.Value));
-
-            // write the mods back to the SelectedMods bindable in the case a change was not applicable.
-            // this generally isn't required as the previous line will perform deselection; just here for safety.
-            refreshSelectedMods();
+                section.Mods = mods.NewValue[section.ModType];
         }
 
-        private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> e)
+        private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             foreach (var section in ModSectionsContainer.Children)
-                section.SelectTypes(e.NewValue.Select(m => m.GetType()).ToList());
+                section.SelectTypes(mods.NewValue.Select(m => m.GetType()).ToList());
 
             updateMods();
         }
@@ -392,12 +407,10 @@ namespace osu.Game.Overlays.Mods
         private void updateMods()
         {
             var multiplier = 1.0;
-            var ranked = true;
 
             foreach (var mod in SelectedMods.Value)
             {
                 multiplier *= mod.ScoreMultiplier;
-                ranked &= mod.Ranked;
             }
 
             MultiplierLabel.Text = $"{multiplier:N2}x";
@@ -407,8 +420,6 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(LowMultiplierColour, 200);
             else
                 MultiplierLabel.FadeColour(Color4.White, 200);
-
-            UnrankedLabel.FadeTo(ranked ? 0 : 1, 200);
         }
 
         private void modButtonPressed(Mod selectedMod)
@@ -416,7 +427,10 @@ namespace osu.Game.Overlays.Mods
             if (selectedMod != null)
             {
                 if (State.Value == Visibility.Visible) sampleOn?.Play();
+
                 DeselectTypes(selectedMod.IncompatibleMods, true);
+
+                if (selectedMod.RequiresConfiguration) ModSettingsContainer.Alpha = 1;
             }
             else
             {
@@ -434,8 +448,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.Dispose(isDisposing);
 
-            Ruleset.UnbindAll();
-            SelectedMods.UnbindAll();
+            availableMods?.UnbindAll();
+            SelectedMods?.UnbindAll();
         }
 
         #endregion

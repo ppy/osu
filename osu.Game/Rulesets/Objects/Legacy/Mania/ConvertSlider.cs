@@ -11,7 +11,5 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
     internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasXPosition
     {
         public float X { get; set; }
-
-        protected override HitWindows CreateHitWindows() => null;
     }
 }

@@ -21,10 +21,12 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable
+    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu
     {
         public const float SELECTION_BORDER_WIDTH = 4;
         private const float corner_radius = 5;
@@ -38,6 +40,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private readonly Box selectionBox;
         private CachedModelDependencyContainer<Room> dependencies;
+
+        [Resolved(canBeNull: true)]
+        private Multiplayer multiplayer { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -74,7 +79,14 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             set
             {
                 matchingFilter = value;
-                this.FadeTo(MatchingFilter ? 1 : 0, 200);
+
+                if (!IsLoaded)
+                    return;
+
+                if (matchingFilter)
+                    this.FadeIn(200);
+                else
+                    Hide();
             }
         }
 
@@ -100,6 +112,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            float stripWidth = side_strip_width * (Room.Category.Value == RoomCategory.Spotlight ? 2 : 1);
+
             Children = new Drawable[]
             {
                 new StatusColouredContainer(transition_duration)
@@ -127,12 +141,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"212121"),
+                                Colour = Color4Extensions.FromHex(@"212121"),
                             },
                             new StatusColouredContainer(transition_duration)
                             {
                                 RelativeSizeAxes = Axes.Y,
-                                Width = side_strip_width,
+                                Width = stripWidth,
                                 Child = new Box { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
@@ -140,7 +154,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 RelativeSizeAxes = Axes.Y,
                                 Width = cover_width,
                                 Masking = true,
-                                Margin = new MarginPadding { Left = side_strip_width },
+                                Margin = new MarginPadding { Left = stripWidth },
                                 Child = new MultiplayerBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
@@ -149,7 +163,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 Padding = new MarginPadding
                                 {
                                     Vertical = content_padding,
-                                    Left = side_strip_width + cover_width + content_padding,
+                                    Left = stripWidth + cover_width + content_padding,
                                     Right = content_padding,
                                 },
                                 Children = new Drawable[]
@@ -203,8 +217,14 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            this.FadeInFromZero(transition_duration);
+
+            if (matchingFilter)
+                this.FadeInFromZero(transition_duration);
+            else
+                Alpha = 0;
         }
+
+        protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
 
         private class RoomName : OsuSpriteText
         {
@@ -217,5 +237,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 Current = name;
             }
         }
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+            {
+                multiplayer?.CreateRoom(Room.CreateCopy());
+            })
+        };
     }
 }

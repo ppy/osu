@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -6,86 +6,138 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.UI;
+using osu.Game.Screens;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
-using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
+    [ExcludeFromDynamicCompile]
     public abstract class OsuTestScene : TestScene
     {
-        [Cached(typeof(Bindable<WorkingBeatmap>))]
-        [Cached(typeof(IBindable<WorkingBeatmap>))]
-        private OsuTestBeatmap beatmap;
+        protected Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
-        protected BindableBeatmap Beatmap => beatmap;
+        protected Bindable<RulesetInfo> Ruleset;
 
-        [Cached]
-        [Cached(typeof(IBindable<RulesetInfo>))]
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        protected Bindable<IReadOnlyList<Mod>> SelectedMods;
 
-        [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        protected new OsuScreenDependencies Dependencies { get; private set; }
 
-        protected new DependencyContainer Dependencies { get; private set; }
+        private DrawableRulesetDependencies rulesetDependencies;
 
-        private readonly Lazy<Storage> localStorage;
+        private Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
+
+        private Lazy<DatabaseContextFactory> contextFactory;
+
+        protected IAPIProvider API
+        {
+            get
+            {
+                if (UseOnlineAPI)
+                    throw new InvalidOperationException($"Using the {nameof(OsuTestScene)} dummy API is not supported when {nameof(UseOnlineAPI)} is true");
+
+                return dummyAPI;
+            }
+        }
+
+        private DummyAPIAccess dummyAPI;
+
+        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
+
+        /// <summary>
+        /// Whether this test scene requires real-world API access.
+        /// If true, this will bypass the local <see cref="DummyAPIAccess"/> and use the <see cref="OsuGameBase"/> provided one.
+        /// </summary>
+        protected virtual bool UseOnlineAPI => false;
+
+        /// <summary>
+        /// When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
+        /// This is because the host is recycled per TestScene execution in headless at an nunit level.
+        /// </summary>
+        private Storage isolatedHostStorage;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
-            var working = new DummyWorkingBeatmap(parent.Get<AudioManager>(), parent.Get<TextureStore>());
+            if (!UseFreshStoragePerRun)
+                isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
 
-            beatmap = new OsuTestBeatmap(working)
+            contextFactory = new Lazy<DatabaseContextFactory>(() =>
             {
-                Default = working
-            };
+                var factory = new DatabaseContextFactory(LocalStorage);
 
-            return Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+                // only reset the database if not using the host storage.
+                // if we reset the host storage, it will delete global key bindings.
+                if (isolatedHostStorage == null)
+                    factory.ResetDatabase();
+
+                using (var usage = factory.Get())
+                    usage.Migrate();
+                return factory;
+            });
+
+            RecycleLocalStorage();
+
+            var baseDependencies = base.CreateChildDependencies(parent);
+
+            var providedRuleset = CreateRuleset();
+            if (providedRuleset != null)
+                baseDependencies = rulesetDependencies = new DrawableRulesetDependencies(providedRuleset, baseDependencies);
+
+            Dependencies = new OsuScreenDependencies(false, baseDependencies);
+
+            Beatmap = Dependencies.Beatmap;
+            Beatmap.SetDefault();
+
+            Ruleset = Dependencies.Ruleset;
+            Ruleset.SetDefault();
+
+            SelectedMods = Dependencies.Mods;
+            SelectedMods.SetDefault();
+
+            if (!UseOnlineAPI)
+            {
+                dummyAPI = new DummyAPIAccess();
+                Dependencies.CacheAs<IAPIProvider>(dummyAPI);
+                Add(dummyAPI);
+            }
+
+            return Dependencies;
         }
+
+        protected override Container<Drawable> Content => content ?? base.Content;
+
+        private readonly Container content;
 
         protected OsuTestScene()
         {
-            localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
-        [Resolved]
-        private AudioManager audio { get; set; }
+        protected virtual bool UseFreshStoragePerRun => false;
 
-        protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
-
-        protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
-            CreateWorkingBeatmap(CreateBeatmap(ruleset));
-
-        protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap) =>
-            new ClockBackedTestWorkingBeatmap(beatmap, Clock, audio);
-
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        public virtual void RecycleLocalStorage()
         {
-            Ruleset.Value = rulesets.AvailableRulesets.First();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (beatmap?.Value.TrackLoaded == true)
-                beatmap.Value.Track.Stop();
-
-            if (localStorage.IsValueCreated)
+            if (localStorage?.IsValueCreated == true)
             {
                 try
                 {
@@ -96,6 +148,53 @@ namespace osu.Game.Tests.Visual
                     // we don't really care if this fails; it will just leave folders lying around from test runs.
                 }
             }
+
+            localStorage =
+                new Lazy<Storage>(() => isolatedHostStorage ?? new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
+        }
+
+        [Resolved]
+        protected AudioManager Audio { get; private set; }
+
+        [Resolved]
+        protected MusicController MusicController { get; private set; }
+
+        /// <summary>
+        /// Creates the ruleset to be used for this test scene.
+        /// </summary>
+        /// <remarks>
+        /// When testing against ruleset-specific components, this method must be overriden to their corresponding ruleset.
+        /// </remarks>
+        [CanBeNull]
+        protected virtual Ruleset CreateRuleset() => null;
+
+        protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
+
+        protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
+            CreateWorkingBeatmap(CreateBeatmap(ruleset), null);
+
+        protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
+            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, Audio);
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
+        {
+            Ruleset.Value = CreateRuleset()?.RulesetInfo ?? rulesets.AvailableRulesets.First();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            rulesetDependencies?.Dispose();
+
+            if (MusicController?.TrackLoaded == true)
+                MusicController.Stop();
+
+            if (contextFactory?.IsValueCreated == true)
+                contextFactory.Value.ResetDatabase();
+
+            RecycleLocalStorage();
         }
 
         protected override ITestSceneTestRunner CreateRunner() => new OsuTestSceneTestRunner();
@@ -113,7 +212,7 @@ namespace osu.Game.Tests.Visual
             /// <param name="referenceClock">A clock which should be used instead of a stopwatch for virtual time progression.</param>
             /// <param name="audio">Audio manager. Required if a reference clock isn't provided.</param>
             public ClockBackedTestWorkingBeatmap(RulesetInfo ruleset, IFrameBasedClock referenceClock, AudioManager audio)
-                : this(new TestBeatmap(ruleset), referenceClock, audio)
+                : this(new TestBeatmap(ruleset), null, referenceClock, audio)
             {
             }
 
@@ -121,29 +220,35 @@ namespace osu.Game.Tests.Visual
             /// Create an instance which provides the <see cref="IBeatmap"/> when requested.
             /// </summary>
             /// <param name="beatmap">The beatmap</param>
+            /// <param name="storyboard">The storyboard.</param>
             /// <param name="referenceClock">An optional clock which should be used instead of a stopwatch for virtual time progression.</param>
             /// <param name="audio">Audio manager. Required if a reference clock isn't provided.</param>
-            /// <param name="length">The length of the returned virtual track.</param>
-            public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, IFrameBasedClock referenceClock, AudioManager audio, double length = 60000)
-                : base(beatmap)
+            public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio)
+                : base(beatmap, storyboard, audio)
             {
+                double trackLength = 60000;
+
+                if (beatmap.HitObjects.Count > 0)
+                    // add buffer after last hitobject to allow for final replay frames etc.
+                    trackLength = Math.Max(trackLength, beatmap.HitObjects.Max(h => h.GetEndTime()) + 2000);
+
                 if (referenceClock != null)
                 {
                     store = new TrackVirtualStore(referenceClock);
                     audio.AddItem(store);
-                    track = store.GetVirtual(length);
+                    track = store.GetVirtual(trackLength);
                 }
                 else
-                    track = audio?.Tracks.GetVirtual(length);
+                    track = audio?.Tracks.GetVirtual(trackLength);
             }
 
-            protected override void Dispose(bool isDisposing)
+            ~ClockBackedTestWorkingBeatmap()
             {
-                base.Dispose(isDisposing);
+                // Remove the track store from the audio manager
                 store?.Dispose();
             }
 
-            protected override Track GetTrack() => track;
+            protected override Track GetBeatmapTrack() => track;
 
             public class TrackVirtualStore : AudioCollectionManager<Track>, ITrackStore
             {
@@ -162,7 +267,7 @@ namespace osu.Game.Tests.Visual
 
                 public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-                public Track GetVirtual(double length = Double.PositiveInfinity)
+                public Track GetVirtual(double length = double.PositiveInfinity)
                 {
                     var track = new TrackVirtualManual(referenceClock) { Length = length };
                     AddItem(track);
@@ -177,14 +282,7 @@ namespace osu.Game.Tests.Visual
             {
                 private readonly IFrameBasedClock referenceClock;
 
-                private readonly ManualClock clock = new ManualClock();
-
                 private bool running;
-
-                /// <summary>
-                /// Local offset added to the reference clock to resolve correct time.
-                /// </summary>
-                private double offset;
 
                 public TrackVirtualManual(IFrameBasedClock referenceClock)
                 {
@@ -194,10 +292,10 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    offset = MathHelper.Clamp(seek, 0, Length);
+                    accumulated = Math.Clamp(seek, 0, Length);
                     lastReferenceTime = null;
 
-                    return offset == seek;
+                    return accumulated == seek;
                 }
 
                 public override void Start()
@@ -216,9 +314,6 @@ namespace osu.Game.Tests.Visual
                     if (running)
                     {
                         running = false;
-                        // on stopping, the current value should be transferred out of the clock, as we can no longer rely on
-                        // the referenceClock (which will still be counting time).
-                        offset = clock.CurrentTime;
                         lastReferenceTime = null;
                     }
                 }
@@ -227,7 +322,9 @@ namespace osu.Game.Tests.Visual
 
                 private double? lastReferenceTime;
 
-                public override double CurrentTime => clock.CurrentTime;
+                private double accumulated;
+
+                public override double CurrentTime => Math.Min(accumulated, Length);
 
                 protected override void UpdateState()
                 {
@@ -237,17 +334,13 @@ namespace osu.Game.Tests.Visual
                     {
                         double refTime = referenceClock.CurrentTime;
 
-                        if (!lastReferenceTime.HasValue)
-                        {
-                            // if the clock just started running, the current value should be transferred to the offset
-                            // (to zero the progression of time).
-                            offset -= refTime;
-                        }
+                        double? lastRefTime = lastReferenceTime;
+
+                        if (lastRefTime != null)
+                            accumulated += (refTime - lastRefTime.Value) * Rate;
 
                         lastReferenceTime = refTime;
                     }
-
-                    clock.CurrentTime = Math.Min((lastReferenceTime ?? 0) + offset, Length);
 
                     if (CurrentTime >= Length)
                     {
@@ -271,14 +364,6 @@ namespace osu.Game.Tests.Visual
             }
 
             public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
-        }
-
-        private class OsuTestBeatmap : BindableBeatmap
-        {
-            public OsuTestBeatmap(WorkingBeatmap defaultValue)
-                : base(defaultValue)
-            {
-            }
         }
     }
 }

@@ -29,7 +29,6 @@ namespace osu.Game.Overlays.Chat.Tabs
         public override bool IsRemovable => !Pinned;
 
         protected readonly SpriteText Text;
-        protected readonly SpriteText TextBold;
         protected readonly ClickableContainer CloseButton;
         private readonly Box box;
         private readonly Box highlightBox;
@@ -88,20 +87,17 @@ namespace osu.Game.Overlays.Chat.Tabs
                         },
                         Text = new OsuSpriteText
                         {
-                            Margin = new MarginPadding(5),
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
-                            Font = OsuFont.GetFont(size: 18)
-                        },
-                        TextBold = new OsuSpriteText
-                        {
-                            Alpha = 0,
-                            Margin = new MarginPadding(5),
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.CentreLeft,
-                            Text = value.ToString(),
-                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 18),
+                            Padding = new MarginPadding(5)
+                            {
+                                Left = LeftTextPadding,
+                                Right = RightTextPadding,
+                            },
+                            RelativeSizeAxes = Axes.X,
+                            Truncate = true,
                         },
                         CloseButton = new TabCloseButton
                         {
@@ -119,9 +115,15 @@ namespace osu.Game.Overlays.Chat.Tabs
             };
         }
 
+        protected virtual float LeftTextPadding => 5;
+
+        protected virtual float RightTextPadding => IsRemovable ? 40 : 5;
+
         protected virtual IconUsage DisplayIcon => FontAwesome.Solid.Hashtag;
 
         protected virtual bool ShowCloseOnHover => true;
+
+        protected virtual bool IsBoldWhenActive => true;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -139,16 +141,13 @@ namespace osu.Game.Overlays.Chat.Tabs
             updateState();
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             switch (e.Button)
             {
                 case MouseButton.Middle:
                     CloseButton.Click();
-                    return true;
-
-                default:
-                    return false;
+                    break;
             }
         }
 
@@ -203,8 +202,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             box.FadeColour(BackgroundActive, TRANSITION_LENGTH, Easing.OutQuint);
             highlightBox.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
 
-            Text.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
-            TextBold.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
+            if (IsBoldWhenActive) Text.Font = Text.Font.With(weight: FontWeight.Bold);
         }
 
         protected virtual void FadeInactive()
@@ -213,11 +211,10 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             TweenEdgeEffectTo(deactivateEdgeEffect, TRANSITION_LENGTH);
 
-            box.FadeColour(BackgroundInactive, TRANSITION_LENGTH, Easing.OutQuint);
+            box.FadeColour(IsHovered ? backgroundHover : BackgroundInactive, TRANSITION_LENGTH, Easing.OutQuint);
             highlightBox.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
 
-            Text.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
-            TextBold.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
+            Text.Font = Text.Font.With(weight: FontWeight.Medium);
         }
 
         protected override void OnActivated() => updateState();

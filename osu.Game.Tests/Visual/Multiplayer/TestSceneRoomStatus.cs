@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
@@ -13,13 +11,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneRoomStatus : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(RoomStatusEnded),
-            typeof(RoomStatusOpen),
-            typeof(RoomStatusPlaying)
-        };
-
         public TestSceneRoomStatus()
         {
             Child = new FillFlowContainer
