@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
+        private Container<PausableSkinnableSound> samplesContainer;
 
         public DrawableSlider()
             : this(null)
@@ -68,6 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
+                samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both }
             };
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
@@ -105,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.LoadSamples();
 
-            slidingSample?.Expire();
+            samplesContainer.Clear();
             slidingSample = null;
 
             var firstSample = HitObject.Samples.FirstOrDefault();
@@ -115,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
                 clone.Name = "sliderslide";
 
-                AddInternal(slidingSample = new PausableSkinnableSound(clone)
+                samplesContainer.Add(slidingSample = new PausableSkinnableSound(clone)
                 {
                     Looping = true
                 });
