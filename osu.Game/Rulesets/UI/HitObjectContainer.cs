@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Performance;
@@ -71,6 +72,9 @@ namespace osu.Game.Rulesets.UI
             Debug.Assert(!drawableMap.ContainsKey(entry));
 
             var drawable = drawableRuleset.GetPooledDrawableRepresentation(entry.HitObject);
+            if (drawable == null)
+                throw new InvalidOperationException($"A drawable representation could not be retrieved for hitobject type: {entry.HitObject.GetType().ReadableName()}.");
+
             drawable.OnNewResult += onNewResult;
             drawable.OnRevertResult += onRevertResult;
 
