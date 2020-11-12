@@ -314,9 +314,6 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        public sealed override DrawableHitObject GetDrawableRepresentation(HitObject hitObject)
-            => base.GetDrawableRepresentation(hitObject) ?? CreateDrawableRepresentation((TObject)hitObject);
-
         /// <summary>
         /// Creates a DrawableHitObject from a HitObject.
         /// </summary>
@@ -552,7 +549,7 @@ namespace osu.Game.Rulesets.UI
 
         /// <summary>
         /// Registers a <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
-        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetDrawableRepresentation"/>).
+        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetPooledDrawableRepresentation"/>).
         /// </summary>
         /// <param name="initialSize">The number of drawables to be prepared for initial consumption.</param>
         /// <param name="maximumSize">An optional maximum size after which the pool will no longer be expanded.</param>
@@ -574,16 +571,18 @@ namespace osu.Game.Rulesets.UI
         /// <param name="maximumSize">An optional maximum size after which the pool will no longer be expanded.</param>
         /// <typeparam name="TDrawable">The type of <see cref="DrawableHitObject"/> retrievable from this pool.</typeparam>
         /// <returns>The <see cref="DrawablePool{T}"/>.</returns>
+        [NotNull]
         protected virtual DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
             where TDrawable : DrawableHitObject, new()
             => new DrawablePool<TDrawable>(initialSize, maximumSize);
 
         /// <summary>
-        /// Retrieves the drawable representation of a <see cref="HitObject"/>.
+        /// Attempts to retrieve the poolable <see cref="DrawableHitObject"/> representation of a <see cref="HitObject"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to retrieve the drawable representation of.</param>
-        /// <returns>The <see cref="DrawableHitObject"/> representing <see cref="HitObject"/>.</returns>
-        public virtual DrawableHitObject GetDrawableRepresentation(HitObject hitObject)
+        /// <param name="hitObject">The <see cref="HitObject"/> to retrieve the <see cref="DrawableHitObject"/> representation of.</param>
+        /// <returns>The <see cref="DrawableHitObject"/> representing <see cref="HitObject"/>, or <c>null</c> if no poolable representation exists.</returns>
+        [CanBeNull]
+        public DrawableHitObject GetPooledDrawableRepresentation([NotNull] HitObject hitObject)
         {
             if (!pools.TryGetValue(hitObject.GetType(), out var pool))
                 return null;
@@ -612,14 +611,16 @@ namespace osu.Game.Rulesets.UI
         /// </remarks>
         /// <param name="hitObject">The <see cref="HitObject"/> to create the entry for.</param>
         /// <returns>The <see cref="HitObjectLifetimeEntry"/>.</returns>
-        protected abstract HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject);
+        [NotNull]
+        protected abstract HitObjectLifetimeEntry CreateLifetimeEntry([NotNull] HitObject hitObject);
 
         /// <summary>
         /// Retrieves or creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to retrieve or create the <see cref="HitObjectLifetimeEntry"/> for.</param>
         /// <returns>The <see cref="HitObjectLifetimeEntry"/> for <paramref name="hitObject"/>.</returns>
-        protected HitObjectLifetimeEntry GetLifetimeEntry(HitObject hitObject)
+        [NotNull]
+        protected HitObjectLifetimeEntry GetLifetimeEntry([NotNull] HitObject hitObject)
         {
             if (lifetimeEntries.TryGetValue(hitObject, out var entry))
                 return entry;

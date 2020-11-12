@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.UI
         {
             Debug.Assert(!drawableMap.ContainsKey(entry));
 
-            var drawable = drawableRuleset.GetDrawableRepresentation(entry.HitObject);
+            var drawable = drawableRuleset.GetPooledDrawableRepresentation(entry.HitObject);
             drawable.OnNewResult += onNewResult;
             drawable.OnRevertResult += onRevertResult;
 
