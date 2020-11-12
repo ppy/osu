@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return movements;
 
             // the first object
-            movements.AddRange(OsuMovement.ExtractMovement(hitObjects[0]));
+            movements.AddRange(OsuMovementExtractor.ExtractFirst(hitObjects[0]));
 
             // the rest
             for (int i = 1; i < hitObjects.Count; i++)
@@ -151,11 +151,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 if (hidden)
                 {
-                    movements.AddRange(OsuMovement.ExtractMovement(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate,
+                    movements.AddRange(OsuMovementExtractor.Extract(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate,
                         hidden: true, noteDensity: noteDensities[i], fourthLastObject: objNeg4));
                 }
                 else
-                    movements.AddRange(OsuMovement.ExtractMovement(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate, fourthLastObject: objNeg4));
+                    movements.AddRange(OsuMovementExtractor.Extract(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate, fourthLastObject: objNeg4));
             }
 
             return movements;
