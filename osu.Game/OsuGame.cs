@@ -521,6 +521,20 @@ namespace osu.Game
             ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
+            // make config aware of how to lookup skins for on-screen display purposes.
+            // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
+            LocalConfig.LookupSkinName = id => SkinManager.GetAllUsableSkins().FirstOrDefault(s => s.ID == id)?.ToString() ?? "Unknown";
+
+            LocalConfig.LookupKeyBindings = l =>
+            {
+                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l).ToArray();
+
+                if (combinations.Length == 0)
+                    return "none";
+
+                return string.Join(" or ", combinations);
+            };
+
             Container logoContainer;
             BackButton.Receptor receptor;
 
@@ -586,7 +600,12 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new OnScreenDisplay(), Add, true);
+            var onScreenDisplay = new OnScreenDisplay();
+
+            onScreenDisplay.BeginTracking(this, frameworkConfig);
+            onScreenDisplay.BeginTracking(this, LocalConfig);
+
+            loadComponentSingleFile(onScreenDisplay, Add, true);
 
             loadComponentSingleFile(notifications.With(d =>
             {
@@ -635,7 +654,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
@@ -845,6 +863,10 @@ namespace osu.Game
 
                 case GlobalAction.ToggleGameplayMouseButtons:
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
+                    return true;
+
+                case GlobalAction.RandomSkin:
+                    SkinManager.SelectRandomSkin();
                     return true;
             }
 
