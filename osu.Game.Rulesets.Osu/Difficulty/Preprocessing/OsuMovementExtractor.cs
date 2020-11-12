@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using MathNet.Numerics;
 using MathNet.Numerics.Interpolation;
 using MathNet.Numerics.LinearAlgebra;
@@ -107,6 +108,71 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             bool previousTimeCenteredRelativeToNeighbours = false;
             bool currentTimeCenteredRelativeToNeighbours = false;
 
+            var correctionNeg2 = calculatePreviousObjectCorrection(secondLastToLast, lastToCurrent, ref previousTimeCenteredRelativeToNeighbours, ref flowinessNeg2PrevCurr);
+            var correctionNext = calculateNextObjectCorrection(currentToNext, lastToCurrent, ref currentTimeCenteredRelativeToNeighbours, ref flowinessPrevCurrNext);
+            double patternCorrection = calculateFourObjectPatternCorrection(previousTimeCenteredRelativeToNeighbours, currentTimeCenteredRelativeToNeighbours, lastToCurrent, currentToNext, secondLastToLast, flowinessNeg2PrevCurr, flowinessPrevCurrNext);
+
+            var tapCorrection = calculateTapStrainBuff(tapStrain, lastToCurrent, movementThroughput);
+            double timeEarly = calculateCheeseWindow(lastToCurrent, secondLastToLast, movementThroughput, currentToNext, out var timeLate, out var cheesabilityEarly, out var cheesabilityLate);
+
+            double effectiveBpm = 30 / (lastToCurrent.TimeDelta + 1e-10);
+
+            var highBpmJumpBuff = calculateHighBPMJumpBuff(effectiveBpm, lastToCurrent);
+            double smallCircleBonus = calculateSmallCircleBuff(currentObject, lastToCurrent);
+            double dPrevCurrStackedNerf = calculateStackedNoteNerf(lastToCurrent);
+            double smallJumpNerfFactor = calculateSmallJumpNerf(lastToCurrent, effectiveBpm);
+            double bigJumpBuffFactor = calculateBigJumpBuff(lastToCurrent, effectiveBpm);
+            double correctionHidden = calculateHiddenCorrection(hidden, noteDensity);
+
+            // Correction #12 - Stacked wiggle fix
+            if (secondLastObject != null && nextObject != null)
+            {
+                var dPrevNext = lastToNext.Value.RelativeLength;
+                var dNeg2Next = secondLastToNext.Value.RelativeLength;
+
+                if (secondLastToLast.Value.RelativeLength < 1
+                    && secondLastToCurrent.Value.RelativeLength < 1
+                    && dNeg2Next < 1
+                    && lastToCurrent.RelativeLength < 1
+                    && dPrevNext < 1
+                    && currentToNext.Value.RelativeLength < 1)
+                {
+                    correctionNeg2 = 0;
+                    correctionNext = 0;
+                    patternCorrection = 0;
+                    tapCorrection = 0;
+                }
+            }
+
+            double jumpOverlapCorrection = calculateJumpOverlapCorrection(secondLastToCurrent, fourthLastToCurrent, lastToCurrent);
+            double distanceIncreaseBuff = calculateDistanceIncreaseBuff(secondLastObject, secondLastToLast, lastToCurrent);
+
+            // Apply the corrections
+            double dPrevCurrWithCorrection = dPrevCurrStackedNerf * (1 + smallCircleBonus) * (1 + correctionNeg2 + correctionNext + patternCorrection) *
+                                             (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * bigJumpBuffFactor * (1 + correctionHidden) *
+                                             jumpOverlapCorrection * distanceIncreaseBuff;
+
+            movement.Distance = dPrevCurrWithCorrection;
+            movement.MovementTime = lastToCurrent.TimeDelta;
+            movement.Cheesablility = cheesabilityEarly + cheesabilityLate;
+            movement.CheeseWindow = (timeEarly + timeLate) / (lastToCurrent.TimeDelta + 1e-10);
+
+            var movementWithNested = new List<OsuMovement> { movement };
+
+            // add zero difficulty movements corresponding to slider ticks/slider ends so combo is reflected properly
+            int extraNestedCount = currentObject.NestedHitObjects.Count - 1;
+
+            for (int i = 0; i < extraNestedCount; i++)
+            {
+                movementWithNested.Add(OsuMovement.Empty(movement.StartTime));
+            }
+
+            return movementWithNested;
+        }
+
+        private static double calculatePreviousObjectCorrection(OsuObjectPair? secondLastToLast, OsuObjectPair lastToCurrent, ref bool previousTimeCenteredRelativeToNeighbours,
+                                                                ref double flowinessNeg2PrevCurr)
+        {
             // Correction #1 - The Previous Object
             // Estimate how objNeg2 affects the difficulty of hitting objCurr
             double correctionNeg2 = 0;
@@ -114,7 +180,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (secondLastToLast != null && lastToCurrent.RelativeLength != 0)
             {
                 double tRatioNeg2 = lastToCurrent.TimeDelta / secondLastToLast.Value.TimeDelta;
-                double cosNeg2PrevCurr = Math.Min(Math.Max(-secondLastToLast.Value.RelativeVector.DotProduct(lastToCurrent.RelativeVector) / secondLastToLast.Value.RelativeLength / lastToCurrent.RelativeLength, -1), 1);
+                double cosNeg2PrevCurr =
+                    Math.Min(Math.Max(-secondLastToLast.Value.RelativeVector.DotProduct(lastToCurrent.RelativeVector) / secondLastToLast.Value.RelativeLength / lastToCurrent.RelativeLength, -1), 1);
 
                 if (tRatioNeg2 > t_ratio_threshold)
                 {
@@ -159,6 +226,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
             }
 
+            return correctionNeg2;
+        }
+
+        private static double calculateNextObjectCorrection(OsuObjectPair? currentToNext, OsuObjectPair lastToCurrent, ref bool currentTimeCenteredRelativeToNeighbours, ref double flowinessPrevCurrNext)
+        {
             // Correction #2 - The Next Object
             // Estimate how objNext affects the difficulty of hitting objCurr
             double correctionNext = 0;
@@ -166,7 +238,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (currentToNext != null && lastToCurrent.RelativeLength != 0)
             {
                 double tRatioNext = lastToCurrent.TimeDelta / currentToNext.Value.TimeDelta;
-                double cosPrevCurrNext = Math.Min(Math.Max(-lastToCurrent.RelativeVector.DotProduct(currentToNext.Value.RelativeVector) / lastToCurrent.RelativeLength / currentToNext.Value.RelativeLength, -1), 1);
+                double cosPrevCurrNext =
+                    Math.Min(Math.Max(-lastToCurrent.RelativeVector.DotProduct(currentToNext.Value.RelativeVector) / lastToCurrent.RelativeLength / currentToNext.Value.RelativeLength, -1), 1);
 
                 if (tRatioNext > t_ratio_threshold)
                 {
@@ -210,6 +283,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
             }
 
+            return correctionNext;
+        }
+
+        private static double calculateFourObjectPatternCorrection(bool previousTimeCenteredRelativeToNeighbours, bool currentTimeCenteredRelativeToNeighbours, OsuObjectPair lastToCurrent,
+                                                                   OsuObjectPair? currentToNext, OsuObjectPair? secondLastToLast, double flowinessNeg2PrevCurr, double flowinessPrevCurrNext)
+        {
             // Correction #3 - 4-object pattern
             // Estimate how the whole pattern consisting of objNeg2 to objNext affects
             // the difficulty of hitting objCurr. This only takes effect when the pattern
@@ -218,12 +297,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (previousTimeCenteredRelativeToNeighbours && currentTimeCenteredRelativeToNeighbours)
             {
+                Debug.Assert(currentToNext != null);
+                Debug.Assert(secondLastToLast != null);
+
                 double gap = (lastToCurrent.RelativeVector - currentToNext.Value.RelativeVector / 2 - secondLastToLast.Value.RelativeVector / 2).L2Norm() / (lastToCurrent.RelativeLength + 0.1);
                 patternCorrection = (SpecialFunctions.Logistic((gap - 1) * 8) - SpecialFunctions.Logistic(-6)) *
                                     SpecialFunctions.Logistic((secondLastToLast.Value.RelativeLength - 0.7) * 10) * SpecialFunctions.Logistic((currentToNext.Value.RelativeLength - 0.7) * 10) *
                                     PowerMean.Of(flowinessNeg2PrevCurr, flowinessPrevCurrNext, 2) * 0.6;
             }
 
+            return patternCorrection;
+        }
+
+        private static double calculateTapStrainBuff(Vector<double> tapStrain, OsuObjectPair lastToCurrent, double movementThroughput)
+        {
             // Correction #4 - Tap Strain
             // Estimate how tap strain affects difficulty
             double tapCorrection = 0;
@@ -233,14 +320,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 tapCorrection = SpecialFunctions.Logistic((PowerMean.Of(tapStrain, 2) / movementThroughput - 1.34) / 0.1) * 0.15;
             }
 
+            return tapCorrection;
+        }
+
+        private static double calculateCheeseWindow(OsuObjectPair lastToCurrent, OsuObjectPair? secondLastToLast, double movementThroughput, OsuObjectPair? currentToNext, out double timeLate,
+                                                    out double cheesabilityEarly, out double cheesabilityLate)
+        {
             // Correction #5 - Cheesing
             // The player might make the movement of objPrev -> objCurr easier by
             // hitting objPrev early and objCurr late. Here we estimate the amount of
             // cheesing and update MT accordingly.
             double timeEarly = 0;
-            double timeLate = 0;
-            double cheesabilityEarly = 0;
-            double cheesabilityLate = 0;
+            timeLate = 0;
+            cheesabilityEarly = 0;
+            cheesabilityLate = 0;
 
             if (lastToCurrent.RelativeLength > 0)
             {
@@ -279,27 +372,51 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 timeLate = cheesabilityLate * (1 / (1 / (lastToCurrent.TimeDelta + 0.07) + tCurrNextReciprocal));
             }
 
+            return timeEarly;
+        }
+
+        private static double calculateHighBPMJumpBuff(double effectiveBpm, OsuObjectPair lastToCurrent)
+        {
             // Correction #6 - High bpm jump buff (alt buff)
-            double effectiveBpm = 30 / (lastToCurrent.TimeDelta + 1e-10);
             double highBpmJumpBuff = SpecialFunctions.Logistic((effectiveBpm - 354) / 16) *
                                      SpecialFunctions.Logistic((lastToCurrent.RelativeLength - 1.9) / 0.15) * 0.23;
+            return highBpmJumpBuff;
+        }
 
+        private static double calculateSmallCircleBuff(OsuHitObject currentObject, OsuObjectPair lastToCurrent)
+        {
             // Correction #7 - Small circle bonus
             double smallCircleBonus = ((SpecialFunctions.Logistic((55 - 2 * currentObject.Radius) / 3.0) * 0.3) +
                                        (Math.Pow(24.5 - Math.Min(currentObject.Radius, 24.5), 1.4) * 0.01315)) *
                                       Math.Max(SpecialFunctions.Logistic((lastToCurrent.RelativeLength - 0.5) / 0.1), 0.25);
+            return smallCircleBonus;
+        }
 
+        private static double calculateStackedNoteNerf(OsuObjectPair lastToCurrent)
+        {
             // Correction #8 - Stacked notes nerf
             double dPrevCurrStackedNerf = Math.Max(0, Math.Min(lastToCurrent.RelativeLength, Math.Min(1.2 * lastToCurrent.RelativeLength - 0.185, 1.4 * lastToCurrent.RelativeLength - 0.32)));
+            return dPrevCurrStackedNerf;
+        }
 
+        private static double calculateSmallJumpNerf(OsuObjectPair lastToCurrent, double effectiveBpm)
+        {
             // Correction #9 - Slow small jump nerf
             double smallJumpNerfFactor = 1 - 0.17 * Math.Exp(-Math.Pow((lastToCurrent.RelativeLength - 2.2) / 0.7, 2)) *
                 SpecialFunctions.Logistic((255 - effectiveBpm) / 10);
+            return smallJumpNerfFactor;
+        }
 
+        private static double calculateBigJumpBuff(OsuObjectPair lastToCurrent, double effectiveBpm)
+        {
             // Correction #10 - Slow big jump buff
             double bigJumpBuffFactor = 1 + 0.15 * SpecialFunctions.Logistic((lastToCurrent.RelativeLength - 6) / 0.5) *
                 SpecialFunctions.Logistic((210 - effectiveBpm) / 8);
+            return bigJumpBuffFactor;
+        }
 
+        private static double calculateHiddenCorrection(bool hidden, double noteDensity)
+        {
             // Correction #11 - Hidden Mod
             double correctionHidden = 0;
 
@@ -308,64 +425,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 correctionHidden = 0.05 + 0.008 * noteDensity;
             }
 
-            // Correction #12 - Stacked wiggle fix
-            if (secondLastObject != null && nextObject != null)
-            {
-                var dPrevNext = lastToNext.Value.RelativeLength;
-                var dNeg2Next = secondLastToNext.Value.RelativeLength;
+            return correctionHidden;
+        }
 
-                if (secondLastToLast.Value.RelativeLength < 1
-                    && secondLastToCurrent.Value.RelativeLength < 1
-                    && dNeg2Next < 1
-                    && lastToCurrent.RelativeLength < 1
-                    && dPrevNext < 1
-                    && currentToNext.Value.RelativeLength < 1)
-                {
-                    correctionNeg2 = 0;
-                    correctionNext = 0;
-                    patternCorrection = 0;
-                    tapCorrection = 0;
-                }
-            }
-
+        private static double calculateJumpOverlapCorrection(OsuObjectPair? secondLastToCurrent, OsuObjectPair? fourthLastToCurrent, OsuObjectPair lastToCurrent)
+        {
             // Correction #13 - Repetitive jump nerf
             // Nerf big jumps where objNeg2 and objCurr are close or where objNeg4 and objCurr are close
             double jumpOverlapCorrection = 1 - (Math.Max(0.15 - 0.1 * (secondLastToCurrent?.RelativeLength ?? 0), 0) + Math.Max(0.1125 - 0.075 * (fourthLastToCurrent?.RelativeLength ?? 0), 0)) *
                 SpecialFunctions.Logistic((lastToCurrent.RelativeLength - 3.3) / 0.25);
+            return jumpOverlapCorrection;
+        }
 
+        private static double calculateDistanceIncreaseBuff(OsuHitObject secondLastObject, OsuObjectPair? secondLastToLast, OsuObjectPair lastToCurrent)
+        {
             // Correction #14 - Sudden distance increase buff
             double distanceIncreaseBuff = 1;
 
             if (secondLastObject != null)
             {
                 double dNeg2PrevOverlapNerf = Math.Min(1, Math.Pow(secondLastToLast?.RelativeLength ?? 0, 3));
-                double timeDifferenceNerf = Math.Exp(-4 * Math.Pow(1 - Math.Max(lastToCurrent.TimeDelta / ((secondLastToLast?.TimeDelta ?? 0) + 1e-10), (secondLastToLast?.TimeDelta ?? 0) / (lastToCurrent.TimeDelta + 1e-10)), 2));
+                double timeDifferenceNerf = Math.Exp(-4
+                                                     * Math.Pow(
+                                                         1 - Math.Max(lastToCurrent.TimeDelta / ((secondLastToLast?.TimeDelta ?? 0) + 1e-10),
+                                                             (secondLastToLast?.TimeDelta ?? 0) / (lastToCurrent.TimeDelta + 1e-10)), 2));
                 double distanceRatio = lastToCurrent.RelativeLength / Math.Max(1, secondLastToLast?.RelativeLength ?? 0);
                 double bpmScaling = Math.Max(1, -16 * lastToCurrent.TimeDelta + 3.4);
                 distanceIncreaseBuff = 1 + 0.225 * bpmScaling * timeDifferenceNerf * dNeg2PrevOverlapNerf * Math.Max(0, distanceRatio - 2);
             }
 
-            // Apply the corrections
-            double dPrevCurrWithCorrection = dPrevCurrStackedNerf * (1 + smallCircleBonus) * (1 + correctionNeg2 + correctionNext + patternCorrection) *
-                                             (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * bigJumpBuffFactor * (1 + correctionHidden) *
-                                             jumpOverlapCorrection * distanceIncreaseBuff;
-
-            movement.Distance = dPrevCurrWithCorrection;
-            movement.MovementTime = lastToCurrent.TimeDelta;
-            movement.Cheesablility = cheesabilityEarly + cheesabilityLate;
-            movement.CheeseWindow = (timeEarly + timeLate) / (lastToCurrent.TimeDelta + 1e-10);
-
-            var movementWithNested = new List<OsuMovement> { movement };
-
-            // add zero difficulty movements corresponding to slider ticks/slider ends so combo is reflected properly
-            int extraNestedCount = currentObject.NestedHitObjects.Count - 1;
-
-            for (int i = 0; i < extraNestedCount; i++)
-            {
-                movementWithNested.Add(OsuMovement.Empty(movement.StartTime));
-            }
-
-            return movementWithNested;
+            return distanceIncreaseBuff;
         }
 
         private static double calcCorrection0Stop(double d, double x, double y)
