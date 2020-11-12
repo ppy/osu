@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, ITrackSnaking
     {
-        private readonly SliderTailCircle tailCircle;
+        public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
         /// <summary>
         /// The judgement text is provided by the <see cref="DrawableSlider"/>.
@@ -25,10 +25,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private SkinnableDrawable circlePiece;
         private Container scaleContainer;
 
+        public DrawableSliderTail()
+            : base(null)
+        {
+        }
+
         public DrawableSliderTail(SliderTailCircle tailCircle)
             : base(tailCircle)
         {
-            this.tailCircle = tailCircle;
         }
 
         [BackgroundDependencyLoader]
@@ -52,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
             };
 
-            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
 
         protected override void UpdateInitialTransforms()
@@ -92,6 +96,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         public void UpdateSnakingPosition(Vector2 start, Vector2 end) =>
-            Position = tailCircle.RepeatIndex % 2 == 0 ? end : start;
+            Position = HitObject.RepeatIndex % 2 == 0 ? end : start;
     }
 }
