@@ -57,6 +57,14 @@ namespace osu.Game.Rulesets.UI
             lifetimeManager.EntryBecameDead += entryBecameDead;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Application of hitobject during load() may have changed their start times, so ensure the correct sorting order.
+            SortInternal();
+        }
+
         #region Pooling support
 
         public void Add(HitObjectLifetimeEntry entry) => lifetimeManager.AddEntry(entry);
@@ -163,7 +171,12 @@ namespace osu.Game.Rulesets.UI
         private void bindStartTime(DrawableHitObject hitObject)
         {
             var bindable = hitObject.StartTimeBindable.GetBoundCopy();
-            bindable.BindValueChanged(_ => SortInternal());
+
+            bindable.BindValueChanged(_ =>
+            {
+                if (IsLoaded)
+                    SortInternal();
+            });
 
             startTimeMap[hitObject] = bindable;
         }
