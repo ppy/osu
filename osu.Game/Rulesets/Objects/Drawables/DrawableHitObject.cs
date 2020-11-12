@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -130,6 +131,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [Resolved(CanBeNull = true)]
         private DrawableRuleset drawableRuleset { get; set; }
 
+        private Container<PausableSkinnableSound> samplesContainer;
+
         /// <summary>
         /// Creates a new <see cref="DrawableHitObject"/>.
         /// </summary>
@@ -146,6 +149,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
+
+            // Explicit non-virtual function call.
+            base.AddInternal(samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both });
         }
 
         protected override void LoadAsyncComplete()
@@ -312,11 +318,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         protected virtual void LoadSamples()
         {
-            if (Samples != null)
-            {
-                RemoveInternal(Samples);
-                Samples = null;
-            }
+            samplesContainer.Clear();
+            Samples = null;
 
             var samples = GetSamples().ToArray();
 
@@ -329,8 +332,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                     + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
-            AddInternal(Samples);
+            samplesContainer.Add(Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s))));
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
