@@ -559,23 +559,22 @@ namespace osu.Game.Rulesets.UI
         protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
             where TObject : HitObject
             where TDrawable : DrawableHitObject, new()
+            => RegisterPool<TObject, TDrawable>(new DrawablePool<TDrawable>(initialSize, maximumSize));
+
+        /// <summary>
+        /// Registers a <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetPooledDrawableRepresentation"/>).
+        /// </summary>
+        /// <param name="pool">The <see cref="DrawablePool{T}"/> to register.</param>
+        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
+        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
+        protected void RegisterPool<TObject, TDrawable>([NotNull] DrawablePool<TDrawable> pool)
+            where TObject : HitObject
+            where TDrawable : DrawableHitObject, new()
         {
-            var pool = CreatePool<TDrawable>(initialSize, maximumSize);
             pools[typeof(TObject)] = pool;
             AddInternal(pool);
         }
-
-        /// <summary>
-        /// Creates the <see cref="DrawablePool{T}"/> to retrieve <see cref="DrawableHitObject"/>s of the given type from.
-        /// </summary>
-        /// <param name="initialSize">The number of hitobject to be prepared for initial consumption.</param>
-        /// <param name="maximumSize">An optional maximum size after which the pool will no longer be expanded.</param>
-        /// <typeparam name="TDrawable">The type of <see cref="DrawableHitObject"/> retrievable from this pool.</typeparam>
-        /// <returns>The <see cref="DrawablePool{T}"/>.</returns>
-        [NotNull]
-        protected virtual DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
-            where TDrawable : DrawableHitObject, new()
-            => new DrawablePool<TDrawable>(initialSize, maximumSize);
 
         /// <summary>
         /// Attempts to retrieve the poolable <see cref="DrawableHitObject"/> representation of a <see cref="HitObject"/>.
