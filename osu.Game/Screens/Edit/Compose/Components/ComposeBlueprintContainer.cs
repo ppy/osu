@@ -27,22 +27,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class ComposeBlueprintContainer : BlueprintContainer
     {
-        [Resolved]
-        private HitObjectComposer composer { get; set; }
-
-        private PlacementBlueprint currentPlacement;
-
-        private readonly Container<PlacementBlueprint> placementBlueprintContainer;
-
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
+        private readonly HitObjectComposer composer;
+        private readonly Container<PlacementBlueprint> placementBlueprintContainer;
+
+        private PlacementBlueprint currentPlacement;
         private InputManager inputManager;
 
-        private readonly IEnumerable<DrawableHitObject> drawableHitObjects;
-
-        public ComposeBlueprintContainer(IEnumerable<DrawableHitObject> drawableHitObjects)
+        public ComposeBlueprintContainer(HitObjectComposer composer)
+            : base(composer)
         {
-            this.drawableHitObjects = drawableHitObjects;
+            this.composer = composer;
 
             placementBlueprintContainer = new Container<PlacementBlueprint>
             {
@@ -186,7 +182,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
         {
-            var drawable = drawableHitObjects.FirstOrDefault(d => d.HitObject == hitObject);
+            var drawable = composer.HitObjects.FirstOrDefault(d => d.HitObject == hitObject);
 
             if (drawable == null)
                 return null;
@@ -196,11 +192,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public virtual OverlaySelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
 
-        protected override void AddBlueprintFor(HitObject hitObject)
+        protected override void OnBlueprintAdded(HitObject hitObject)
         {
-            refreshTool();
+            base.OnBlueprintAdded(hitObject);
 
-            base.AddBlueprintFor(hitObject);
+            refreshTool();
 
             // on successful placement, the new combo button should be reset as this is the most common user interaction.
             if (Beatmap.SelectedHitObjects.Count == 0)
