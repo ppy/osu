@@ -144,6 +144,9 @@ namespace osu.Game.Users
         [JsonProperty(@"scores_first_count")]
         public int ScoresFirstCount;
 
+        [JsonProperty(@"beatmap_playcounts_count")]
+        public int BeatmapPlaycountsCount;
+
         [JsonProperty]
         private string[] playstyle
         {
