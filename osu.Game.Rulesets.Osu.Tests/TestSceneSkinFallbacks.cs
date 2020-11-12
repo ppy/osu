@@ -125,6 +125,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (!enabled) return null;
 
+                if (component is OsuSkinComponent osuComponent && osuComponent.Component == OsuSkinComponents.SliderBody)
+                    return null;
+
                 return new OsuSpriteText
                 {
                     Text = identifier,
