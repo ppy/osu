@@ -233,6 +233,13 @@ namespace osu.Game.Rulesets.UI
             ResumeOverlay?.Hide();
         }
 
+        /// <summary>
+        /// Adds a <see cref="HitObject"/> to this <see cref="DrawableRuleset"/>.
+        /// </summary>
+        /// <remarks>
+        /// This does not add the <see cref="HitObject"/> to the beatmap.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void AddHitObject(TObject hitObject)
         {
             if (PoolHitObjects)
@@ -241,6 +248,13 @@ namespace osu.Game.Rulesets.UI
                 Playfield.Add(CreateDrawableRepresentation(hitObject));
         }
 
+        /// <summary>
+        /// Removes a <see cref="HitObject"/> from this <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// This does not remove the <see cref="HitObject"/> from the beatmap.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
         public void RemoveHitObject(TObject hitObject)
         {
             if (PoolHitObjects)
@@ -380,7 +394,6 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// <remarks>
     /// This type is required only for adding non-generic type to the draw hierarchy.
-    /// Once IDrawable is a thing, this can also become an interface.
     /// </remarks>
     /// </summary>
     [Cached(typeof(DrawableRuleset))]
