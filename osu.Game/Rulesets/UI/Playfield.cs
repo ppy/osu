@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.UI
         /// Adds a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> to this <see cref="Playfield"/>.
         /// </summary>
         /// <param name="entry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the <see cref="HitObject"/>.</param>
-        public void Add(HitObjectLifetimeEntry entry)
+        public virtual void Add(HitObjectLifetimeEntry entry)
         {
             HitObjectContainer.Add(entry);
             lifetimeEntryMap[entry.HitObject] = entry;
@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="entry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the <see cref="HitObject"/>.</param>
         /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
-        public bool Remove(HitObjectLifetimeEntry entry)
+        public virtual bool Remove(HitObjectLifetimeEntry entry)
         {
             if (lifetimeEntryMap.Remove(entry.HitObject))
             {
