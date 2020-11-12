@@ -30,6 +30,22 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
+        /// </remarks>
+        public event Action<HitObject> HitObjectUsageBegan;
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become dead.
+        /// </remarks>
+        public event Action<HitObject> HitObjectUsageFinished;
+
+        /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
         public HitObjectContainer HitObjectContainer => hitObjectContainerLazy.Value;
@@ -88,6 +104,8 @@ namespace osu.Game.Rulesets.UI
             {
                 h.NewResult += (d, r) => NewResult?.Invoke(d, r);
                 h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+                h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
+                h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
         }
 
@@ -247,6 +265,8 @@ namespace osu.Game.Rulesets.UI
 
             otherPlayfield.NewResult += (d, r) => NewResult?.Invoke(d, r);
             otherPlayfield.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+            otherPlayfield.HitObjectUsageBegan += h => HitObjectUsageBegan?.Invoke(h);
+            otherPlayfield.HitObjectUsageFinished += h => HitObjectUsageFinished?.Invoke(h);
 
             nestedPlayfields.Value.Add(otherPlayfield);
         }
