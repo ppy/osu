@@ -57,11 +57,11 @@ namespace osu.Game.Rulesets.UI
             lifetimeManager.EntryBecameDead += entryBecameDead;
         }
 
-        protected override void LoadComplete()
+        protected override void LoadAsyncComplete()
         {
-            base.LoadComplete();
+            base.LoadAsyncComplete();
 
-            // Application of hitobject during load() may have changed their start times, so ensure the correct sorting order.
+            // Application of hitobjects during load() may have changed their start times, so ensure the correct sorting order.
             SortInternal();
         }
 
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.UI
 
             bindable.BindValueChanged(_ =>
             {
-                if (IsLoaded)
+                if (LoadState >= LoadState.Ready)
                     SortInternal();
             });
 
