@@ -58,6 +58,16 @@ namespace osu.Game.Rulesets.UI
         /// </remarks>
         public event Action<HitObject> HitObjectUsageFinished;
 
+        /// <summary>
+        /// The amount of time prior to the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        public double PastLifetimeExtension { get; set; }
+
+        /// <summary>
+        /// The amount of time after the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        public double FutureLifetimeExtension { get; set; }
+
         private readonly Dictionary<DrawableHitObject, IBindable> startTimeMap = new Dictionary<DrawableHitObject, IBindable>();
         private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> drawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
@@ -179,7 +189,7 @@ namespace osu.Game.Rulesets.UI
         protected override bool CheckChildrenLife()
         {
             bool aliveChanged = base.CheckChildrenLife();
-            aliveChanged |= lifetimeManager.Update(Time.Current, Time.Current);
+            aliveChanged |= lifetimeManager.Update(Time.Current - PastLifetimeExtension, Time.Current + FutureLifetimeExtension);
             return aliveChanged;
         }
 
