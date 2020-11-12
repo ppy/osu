@@ -26,17 +26,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var d in drawables)
-                d.ApplyCustomUpdateState += applyFadeInAdjustment;
+            {
+                d.HitObjectApplied += applyFadeInAdjustment;
+                applyFadeInAdjustment(d);
+            }
 
             base.ApplyToDrawableHitObjects(drawables);
         }
 
-        private void applyFadeInAdjustment(DrawableHitObject hitObject, ArmedState state)
+        private void applyFadeInAdjustment(DrawableHitObject hitObject)
         {
             if (!(hitObject is DrawableOsuHitObject d))
                 return;
 
             d.HitObject.TimeFadeIn = d.HitObject.TimePreempt * fade_in_duration_multiplier;
+
+            foreach (var nested in d.NestedHitObjects)
+                applyFadeInAdjustment(nested);
         }
 
         private double lastSliderHeadFadeOutStartTime;

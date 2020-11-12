@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 
@@ -66,9 +67,21 @@ namespace osu.Game.Users
             public override string Status => @"正在旁观别人";
         }
 
+        public class SearchingForLobby : UserActivity
+        {
+            public override string Status => @"Looking for a lobby";
+        }
+
         public class InLobby : UserActivity
         {
             public override string Status => @"正在多人游戏大厅中";
+
+            public readonly Room Room;
+
+            public InLobby(Room room)
+            {
+                Room = room;
+            }
         }
     }
 }
