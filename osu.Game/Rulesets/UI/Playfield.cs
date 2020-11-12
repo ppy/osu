@@ -120,10 +120,6 @@ namespace osu.Game.Rulesets.UI
         public virtual void Add(DrawableHitObject h)
         {
             HitObjectContainer.Add(h);
-
-            h.OnNewResult += (d, r) => NewResult?.Invoke(d, r);
-            h.OnRevertResult += (d, r) => RevertResult?.Invoke(d, r);
-
             OnHitObjectAdded(h.HitObject);
         }
 
