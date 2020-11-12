@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.UI
         private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
 
         /// <summary>
-        /// Adds a <see cref="HitObject"/> to this <see cref="Playfield"/>.
+        /// Adds a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> to this <see cref="Playfield"/>.
         /// </summary>
         /// <param name="entry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the <see cref="HitObject"/>.</param>
         public void Add(HitObjectLifetimeEntry entry)
@@ -154,14 +154,24 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Removes a <see cref="HitObject"/> to this <see cref="Playfield"/>.
+        /// Removes a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> from this <see cref="Playfield"/>.
         /// </summary>
         /// <param name="entry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the <see cref="HitObject"/>.</param>
-        public void Remove(HitObjectLifetimeEntry entry)
+        /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
+        public bool Remove(HitObjectLifetimeEntry entry)
         {
-            if (HitObjectContainer.Remove(entry))
-                OnHitObjectRemoved(entry.HitObject);
-            lifetimeEntryMap.Remove(entry.HitObject);
+            if (lifetimeEntryMap.Remove(entry.HitObject))
+            {
+                HitObjectContainer.Remove(entry);
+                return true;
+            }
+
+            bool removedFromNested = false;
+
+            if (nestedPlayfields.IsValueCreated)
+                removedFromNested = nestedPlayfields.Value.Any(p => p.Remove(entry));
+
+            return removedFromNested;
         }
 
         /// <summary>

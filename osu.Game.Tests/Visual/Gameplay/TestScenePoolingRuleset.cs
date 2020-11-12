@@ -140,8 +140,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 RegisterPool<TestHitObject, DrawableTestHitObject>(PoolSize);
             }
 
-            protected override bool PoolHitObjects => true;
-
             protected override HitObjectLifetimeEntry CreateLifetimeEntry(TestHitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
 
             protected override PassThroughInputManager CreateInputManager() => new PassThroughInputManager();

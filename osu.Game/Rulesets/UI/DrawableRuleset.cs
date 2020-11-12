@@ -242,29 +242,38 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void AddHitObject(TObject hitObject)
         {
-            if (PoolHitObjects)
-                Playfield.Add(GetLifetimeEntry(hitObject));
+            var drawableRepresentation = CreateDrawableRepresentation(hitObject);
+
+            // If a drawable representation exists, use it, otherwise assume the hitobject is being pooled.
+            if (drawableRepresentation != null)
+                Playfield.Add(drawableRepresentation);
             else
-                Playfield.Add(CreateDrawableRepresentation(hitObject));
+                Playfield.Add(GetLifetimeEntry(hitObject));
         }
 
         /// <summary>
-        /// Removes a <see cref="HitObject"/> from this <see cref="HitObject"/>.
+        /// Removes a <see cref="HitObject"/> from this <see cref="DrawableRuleset"/>.
         /// </summary>
         /// <remarks>
         /// This does not remove the <see cref="HitObject"/> from the beatmap.
         /// </remarks>
         /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
-        public void RemoveHitObject(TObject hitObject)
+        public bool RemoveHitObject(TObject hitObject)
         {
-            if (PoolHitObjects)
-                Playfield.Remove(GetLifetimeEntry(hitObject));
-            else
-            {
-                var drawableObject = Playfield.AllHitObjects.SingleOrDefault(d => d.HitObject == hitObject);
-                if (drawableObject != null)
-                    Playfield.Remove(drawableObject);
-            }
+            var entry = GetLifetimeEntry(hitObject);
+
+            // May have been newly-created by the above call - remove it anyway.
+            RemoveLifetimeEntry(hitObject);
+
+            if (Playfield.Remove(entry))
+                return true;
+
+            // If the entry was not removed from the playfield, assume the hitobject is not being pooled and attempt a direct removal.
+            var drawableObject = Playfield.AllHitObjects.SingleOrDefault(d => d.HitObject == hitObject);
+            if (drawableObject != null)
+                return Playfield.Remove(drawableObject);
+
+            return false;
         }
 
         protected sealed override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject)
@@ -540,14 +549,6 @@ namespace osu.Game.Rulesets.UI
         private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntries = new Dictionary<HitObject, HitObjectLifetimeEntry>();
 
         /// <summary>
-        /// Whether this <see cref="DrawableRuleset"/> should retrieve pooled <see cref="DrawableHitObject"/>s.
-        /// </summary>
-        /// <remarks>
-        /// Pools must be registered with this <see cref="DrawableRuleset"/> via <see cref="RegisterPool{TObject,TDrawable}"/> in order for <see cref="DrawableHitObject"/>s to be retrieved.
-        /// </remarks>
-        protected virtual bool PoolHitObjects => false;
-
-        /// <summary>
         /// Registers a <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
         /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetPooledDrawableRepresentation"/>).
         /// </summary>
@@ -627,6 +628,12 @@ namespace osu.Game.Rulesets.UI
 
             return lifetimeEntries[hitObject] = CreateLifetimeEntry(hitObject);
         }
+
+        /// <summary>
+        /// Removes the <see cref="HitObjectLifetimeEntry"/> for a <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to remove the <see cref="HitObjectLifetimeEntry"/> for.</param>
+        internal void RemoveLifetimeEntry([NotNull] HitObject hitObject) => lifetimeEntries.Remove(hitObject);
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException
