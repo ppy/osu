@@ -100,10 +100,11 @@ namespace osu.Game.Rulesets.UI
         public virtual void Add(DrawableHitObject hitObject)
         {
             bindStartTime(hitObject);
-            AddInternal(hitObject);
 
             hitObject.OnNewResult += onNewResult;
             hitObject.OnRevertResult += onRevertResult;
+
+            AddInternal(hitObject);
         }
 
         public virtual bool Remove(DrawableHitObject hitObject)
@@ -143,7 +144,12 @@ namespace osu.Game.Rulesets.UI
             unbindAllStartTimes();
         }
 
-        protected override bool CheckChildrenLife() => base.CheckChildrenLife() | lifetimeManager.Update(Time.Current, Time.Current);
+        protected override bool CheckChildrenLife()
+        {
+            bool aliveChanged = base.CheckChildrenLife();
+            aliveChanged |= lifetimeManager.Update(Time.Current, Time.Current);
+            return aliveChanged;
+        }
 
         private void onNewResult(DrawableHitObject d, JudgementResult r) => NewResult?.Invoke(d, r);
         private void onRevertResult(DrawableHitObject d, JudgementResult r) => RevertResult?.Invoke(d, r);
