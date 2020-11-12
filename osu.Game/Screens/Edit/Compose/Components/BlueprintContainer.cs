@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -44,12 +45,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected EditorBeatmap Beatmap { get; private set; }
 
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
+        private readonly HitObjectComposer composer;
+        private readonly Dictionary<HitObject, SelectionBlueprint> blueprintMap = new Dictionary<HitObject, SelectionBlueprint>();
 
         [Resolved(canBeNull: true)]
         private IPositionSnapProvider snapProvider { get; set; }
 
-        protected BlueprintContainer()
+        protected BlueprintContainer(HitObjectComposer composer)
         {
+            this.composer = composer;
+
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -68,8 +73,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
 
-            foreach (var obj in Beatmap.HitObjects)
-                AddBlueprintFor(obj);
+            // For non-pooled rulesets, hitobjects are already present in the playfield which allows the blueprints to be loaded in the async context.
+            if (composer != null)
+            {
+                foreach (var obj in composer.HitObjects)
+                    addBlueprintFor(obj.HitObject);
+            }
 
             selectedHitObjects.BindTo(Beatmap.SelectedHitObjects);
             selectedHitObjects.CollectionChanged += (selectedObjects, args) =>
@@ -94,7 +103,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            Beatmap.HitObjectAdded += AddBlueprintFor;
+            Beatmap.HitObjectAdded += addBlueprintFor;
             Beatmap.HitObjectRemoved += removeBlueprintFor;
         }
 
@@ -247,28 +256,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Blueprint Addition/Removal
 
-        private void removeBlueprintFor(HitObject hitObject)
+        private void addBlueprintFor(HitObject hitObject)
         {
-            var blueprint = SelectionBlueprints.SingleOrDefault(m => m.HitObject == hitObject);
-            if (blueprint == null)
+            if (blueprintMap.ContainsKey(hitObject))
                 return;
 
-            blueprint.Deselect();
-
-            blueprint.Selected -= onBlueprintSelected;
-            blueprint.Deselected -= onBlueprintDeselected;
-
-            SelectionBlueprints.Remove(blueprint);
-
-            if (movementBlueprint == blueprint)
-                finishSelectionMovement();
-        }
-
-        protected virtual void AddBlueprintFor(HitObject hitObject)
-        {
             var blueprint = CreateBlueprintFor(hitObject);
             if (blueprint == null)
                 return;
+
+            blueprintMap[hitObject] = blueprint;
 
             blueprint.Selected += onBlueprintSelected;
             blueprint.Deselected += onBlueprintDeselected;
@@ -277,6 +274,41 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 blueprint.Select();
 
             SelectionBlueprints.Add(blueprint);
+
+            OnBlueprintAdded(hitObject);
+        }
+
+        private void removeBlueprintFor(HitObject hitObject)
+        {
+            if (!blueprintMap.Remove(hitObject, out var blueprint))
+                return;
+
+            blueprint.Deselect();
+            blueprint.Selected -= onBlueprintSelected;
+            blueprint.Deselected -= onBlueprintDeselected;
+
+            SelectionBlueprints.Remove(blueprint);
+
+            if (movementBlueprint == blueprint)
+                finishSelectionMovement();
+
+            OnBlueprintRemoved(hitObject);
+        }
+
+        /// <summary>
+        /// Called after a <see cref="HitObject"/> blueprint has been added.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> for which the blueprint has been added.</param>
+        protected virtual void OnBlueprintAdded(HitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Called after a <see cref="HitObject"/> blueprint has been removed.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> for which the blueprint has been removed.</param>
+        protected virtual void OnBlueprintRemoved(HitObject hitObject)
+        {
         }
 
         #endregion
@@ -456,7 +488,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (Beatmap != null)
             {
-                Beatmap.HitObjectAdded -= AddBlueprintFor;
+                Beatmap.HitObjectAdded -= addBlueprintFor;
                 Beatmap.HitObjectRemoved -= removeBlueprintFor;
             }
         }
