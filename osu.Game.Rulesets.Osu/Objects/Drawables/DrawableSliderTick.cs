@@ -24,6 +24,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private SkinnableDrawable scaleContainer;
 
+        public DrawableSliderTick()
+            : base(null)
+        {
+        }
+
         public DrawableSliderTick(SliderTick sliderTick)
             : base(sliderTick)
         {
@@ -54,7 +59,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Origin = Anchor.Centre,
             };
 
-            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
+        }
+
+        protected override void OnParentReceived(DrawableHitObject parent)
+        {
+            base.OnParentReceived(parent);
+
+            Position = HitObject.Position - ((DrawableSlider)parent).HitObject.Position;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

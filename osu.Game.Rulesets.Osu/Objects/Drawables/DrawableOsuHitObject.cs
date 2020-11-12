@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ??= GetContainingInputManager() as OsuInputManager;
 
-        protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
+        public virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
         protected override void UpdateInitialTransforms()
         {
