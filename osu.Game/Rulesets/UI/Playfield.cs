@@ -188,6 +188,41 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
+        /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to set.</param>
+        /// <param name="keepAlive">Whether to keep <paramref name="hitObject"/> always alive.</param>
+        public void SetKeepAlive(HitObject hitObject, bool keepAlive)
+        {
+            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+            {
+                entry.KeepAlive = keepAlive;
+                return;
+            }
+
+            if (!nestedPlayfields.IsValueCreated)
+                return;
+
+            foreach (var p in nestedPlayfields.Value)
+                p.SetKeepAlive(hitObject, keepAlive);
+        }
+
+        /// <summary>
+        /// Keeps all <see cref="HitObject"/>s alive within this and all nested <see cref="Playfield"/>s.
+        /// </summary>
+        public void KeepAllAlive()
+        {
+            foreach (var (_, entry) in lifetimeEntryMap)
+                entry.KeepAlive = true;
+
+            if (!nestedPlayfields.IsValueCreated)
+                return;
+
+            foreach (var p in nestedPlayfields.Value)
+                p.KeepAllAlive();
+        }
+
+        /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
         public GameplayCursorContainer Cursor { get; private set; }
