@@ -2,36 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
+using System.Globalization;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarTimeButton : ToolbarOverlayToggleButton
+    public class ToolbarTimeButton : ToolbarButton
     {
-        public string DateTimeString;
-
         public ToolbarTimeButton()
         {
             TooltipMain = "时间";
-        }
+            TooltipSub = "现在几点了?";
 
-        private DateTime GetTimeInfo()
-        {
-            var dt = DateTime.Now;
-            return dt;
+            Width = 1;
+            AutoSizeAxes = Axes.X;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            DateTimeString = TooltipSub = GetTimeInfo().ToString() ?? "未知";
-        }
-        
-        [BackgroundDependencyLoader(true)]
-        private void load(TimeOverlay time)
-        {
-            StateContainer = time;
+            DrawableText.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
         }
     }
 }

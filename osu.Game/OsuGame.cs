@@ -75,7 +75,6 @@ namespace osu.Game
         private DashboardOverlay dashboard;
 
         private MfMenuOverlay mfmenu;
-        private TimeOverlay time;
 
         public OnlinePictureOverlay picture;
         private NewsOverlay news;
@@ -665,7 +664,6 @@ namespace osu.Game
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(mfmenu = new MfMenuOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(time = new TimeOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
