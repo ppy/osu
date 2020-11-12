@@ -20,7 +20,7 @@ namespace osu.Game
     internal class PerformFromMenuRunner : Component
     {
         private readonly Action<IScreen> finalAction;
-        private readonly IEnumerable<Type> validScreens;
+        private readonly Type[] validScreens;
         private readonly Func<IScreen> getCurrentScreen;
 
         [Resolved]
@@ -53,7 +53,7 @@ namespace osu.Game
             validScreens = validScreens.Append(typeof(MainMenu));
 
             this.finalAction = finalAction;
-            this.validScreens = validScreens;
+            this.validScreens = validScreens.ToArray();
             this.getCurrentScreen = getCurrentScreen;
 
             Scheduler.Add(task = new ScheduledDelegate(checkCanComplete, 0, 200));
