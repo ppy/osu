@@ -159,6 +159,7 @@ namespace osu.Game.Rulesets.UI
             if (lifetimeEntryMap.Remove(entry.HitObject))
             {
                 HitObjectContainer.Remove(entry);
+                OnHitObjectRemoved(entry.HitObject);
                 return true;
             }
 
