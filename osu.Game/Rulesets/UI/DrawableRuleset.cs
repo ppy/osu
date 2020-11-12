@@ -549,11 +549,15 @@ namespace osu.Game.Rulesets.UI
         private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntries = new Dictionary<HitObject, HitObjectLifetimeEntry>();
 
         /// <summary>
-        /// Registers a <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// Registers a default <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
         /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetPooledDrawableRepresentation"/>).
         /// </summary>
-        /// <param name="initialSize">The number of drawables to be prepared for initial consumption.</param>
-        /// <param name="maximumSize">An optional maximum size after which the pool will no longer be expanded.</param>
+        /// <param name="initialSize">The number of <see cref="DrawableHitObject"/>s to be initially stored in the pool.</param>
+        /// <param name="maximumSize">
+        /// The maximum number of <see cref="DrawableHitObject"/>s that can be stored in the pool.
+        /// If this limit is exceeded, every subsequent <see cref="DrawableHitObject"/> will be created anew instead of being retrieved from the pool,
+        /// until some of the existing <see cref="DrawableHitObject"/>s are returned to the pool.
+        /// </param>
         /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
         /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
         protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
@@ -562,7 +566,7 @@ namespace osu.Game.Rulesets.UI
             => RegisterPool<TObject, TDrawable>(new DrawablePool<TDrawable>(initialSize, maximumSize));
 
         /// <summary>
-        /// Registers a <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// Registers a custom <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
         /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetPooledDrawableRepresentation"/>).
         /// </summary>
         /// <param name="pool">The <see cref="DrawablePool{T}"/> to register.</param>
