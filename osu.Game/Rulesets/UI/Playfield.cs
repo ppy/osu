@@ -241,6 +241,42 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
+        /// The amount of time prior to the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        public double PastLifetimeExtension
+        {
+            get => HitObjectContainer.PastLifetimeExtension;
+            set
+            {
+                HitObjectContainer.PastLifetimeExtension = value;
+
+                if (!nestedPlayfields.IsValueCreated)
+                    return;
+
+                foreach (var nested in nestedPlayfields.Value)
+                    nested.PastLifetimeExtension = value;
+            }
+        }
+
+        /// <summary>
+        /// The amount of time after the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        public double FutureLifetimeExtension
+        {
+            get => HitObjectContainer.FutureLifetimeExtension;
+            set
+            {
+                HitObjectContainer.FutureLifetimeExtension = value;
+
+                if (!nestedPlayfields.IsValueCreated)
+                    return;
+
+                foreach (var nested in nestedPlayfields.Value)
+                    nested.FutureLifetimeExtension = value;
+            }
+        }
+
+        /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
         public GameplayCursorContainer Cursor { get; private set; }
