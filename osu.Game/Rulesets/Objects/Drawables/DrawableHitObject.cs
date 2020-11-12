@@ -26,7 +26,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
     [Cached(typeof(DrawableHitObject))]
     public abstract class DrawableHitObject : SkinReloadableDrawable
     {
+        /// <summary>
+        /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
+        /// </summary>
         public event Action<DrawableHitObject> DefaultsApplied;
+
+        /// <summary>
+        /// Invoked after a <see cref="HitObject"/> has been applied to this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<DrawableHitObject> HitObjectApplied;
 
         /// <summary>
         /// The <see cref="HitObject"/> currently represented by this <see cref="DrawableHitObject"/>.
@@ -192,6 +200,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject.DefaultsApplied += onDefaultsApplied;
 
             OnApply(hitObject);
+            HitObjectApplied?.Invoke(this);
 
             // If not loaded, the state update happens in LoadComplete(). Otherwise, the update is scheduled to allow for lifetime updates.
             if (IsLoaded)
