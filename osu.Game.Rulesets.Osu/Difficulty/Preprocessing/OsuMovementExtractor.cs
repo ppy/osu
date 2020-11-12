@@ -108,12 +108,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             bool previousTimeCenteredRelativeToNeighbours = false;
             bool currentTimeCenteredRelativeToNeighbours = false;
 
-            var correctionNeg2 = calculatePreviousObjectCorrection(secondLastToLast, lastToCurrent, ref previousTimeCenteredRelativeToNeighbours, ref flowinessNeg2PrevCurr);
-            var correctionNext = calculateNextObjectCorrection(currentToNext, lastToCurrent, ref currentTimeCenteredRelativeToNeighbours, ref flowinessPrevCurrNext);
+            var correctionNeg2 = calculatePreviousObjectCorrection(secondLastObject, secondLastToLast, lastToCurrent, ref previousTimeCenteredRelativeToNeighbours, ref flowinessNeg2PrevCurr);
+            var correctionNext = calculateNextObjectCorrection(nextObject, currentToNext, lastToCurrent, ref currentTimeCenteredRelativeToNeighbours, ref flowinessPrevCurrNext);
             double patternCorrection = calculateFourObjectPatternCorrection(previousTimeCenteredRelativeToNeighbours, currentTimeCenteredRelativeToNeighbours, lastToCurrent, currentToNext, secondLastToLast, flowinessNeg2PrevCurr, flowinessPrevCurrNext);
 
             var tapCorrection = calculateTapStrainBuff(tapStrain, lastToCurrent, movementThroughput);
-            double timeEarly = calculateCheeseWindow(lastToCurrent, secondLastToLast, movementThroughput, currentToNext, out var timeLate, out var cheesabilityEarly, out var cheesabilityLate);
+            double timeEarly = calculateCheeseWindow(secondLastObject, nextObject, lastToCurrent, secondLastToLast, movementThroughput, currentToNext, out var timeLate, out var cheesabilityEarly, out var cheesabilityLate);
 
             double effectiveBpm = 30 / (lastToCurrent.TimeDelta + 1e-10);
 
@@ -170,15 +170,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return movementWithNested;
         }
 
-        private static double calculatePreviousObjectCorrection(OsuObjectPair? secondLastToLast, OsuObjectPair lastToCurrent, ref bool previousTimeCenteredRelativeToNeighbours,
+        private static double calculatePreviousObjectCorrection(OsuHitObject secondLastObject, OsuObjectPair? secondLastToLast, OsuObjectPair lastToCurrent,
+                                                                ref bool previousTimeCenteredRelativeToNeighbours,
                                                                 ref double flowinessNeg2PrevCurr)
         {
             // Correction #1 - The Previous Object
             // Estimate how objNeg2 affects the difficulty of hitting objCurr
             double correctionNeg2 = 0;
 
-            if (secondLastToLast != null && lastToCurrent.RelativeLength != 0)
+            if (secondLastObject != null && lastToCurrent.RelativeLength != 0)
             {
+                Debug.Assert(secondLastToLast != null);
+
                 double tRatioNeg2 = lastToCurrent.TimeDelta / secondLastToLast.Value.TimeDelta;
                 double cosNeg2PrevCurr =
                     Math.Min(Math.Max(-secondLastToLast.Value.RelativeVector.DotProduct(lastToCurrent.RelativeVector) / secondLastToLast.Value.RelativeLength / lastToCurrent.RelativeLength, -1), 1);
@@ -229,14 +232,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return correctionNeg2;
         }
 
-        private static double calculateNextObjectCorrection(OsuObjectPair? currentToNext, OsuObjectPair lastToCurrent, ref bool currentTimeCenteredRelativeToNeighbours, ref double flowinessPrevCurrNext)
+        private static double calculateNextObjectCorrection(OsuHitObject nextObject, OsuObjectPair? currentToNext, OsuObjectPair lastToCurrent, ref bool currentTimeCenteredRelativeToNeighbours,
+                                                            ref double flowinessPrevCurrNext)
         {
             // Correction #2 - The Next Object
             // Estimate how objNext affects the difficulty of hitting objCurr
             double correctionNext = 0;
 
-            if (currentToNext != null && lastToCurrent.RelativeLength != 0)
+            if (nextObject != null && lastToCurrent.RelativeLength != 0)
             {
+                Debug.Assert(currentToNext != null);
+
                 double tRatioNext = lastToCurrent.TimeDelta / currentToNext.Value.TimeDelta;
                 double cosPrevCurrNext =
                     Math.Min(Math.Max(-lastToCurrent.RelativeVector.DotProduct(currentToNext.Value.RelativeVector) / lastToCurrent.RelativeLength / currentToNext.Value.RelativeLength, -1), 1);
@@ -323,7 +329,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return tapCorrection;
         }
 
-        private static double calculateCheeseWindow(OsuObjectPair lastToCurrent, OsuObjectPair? secondLastToLast, double movementThroughput, OsuObjectPair? currentToNext, out double timeLate,
+        private static double calculateCheeseWindow(OsuHitObject secondLastObject, OsuHitObject nextObject, OsuObjectPair lastToCurrent, OsuObjectPair? secondLastToLast, double movementThroughput, OsuObjectPair? currentToNext, out double timeLate,
                                                     out double cheesabilityEarly, out double cheesabilityLate)
         {
             // Correction #5 - Cheesing
@@ -340,8 +346,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double tNeg2PrevReciprocal;
                 double ipNeg2Prev;
 
-                if (secondLastToLast != null)
+                if (secondLastObject != null)
                 {
+                    Debug.Assert(secondLastToLast != null);
+
                     tNeg2PrevReciprocal = 1 / (secondLastToLast.Value.TimeDelta + 1e-10);
                     ipNeg2Prev = FittsLaw.Throughput(secondLastToLast.Value.RelativeLength, secondLastToLast.Value.TimeDelta);
                 }
@@ -357,8 +365,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double tCurrNextReciprocal;
                 double ipCurrNext;
 
-                if (currentToNext != null)
+                if (nextObject != null)
                 {
+                    Debug.Assert(currentToNext != null);
+
                     tCurrNextReciprocal = 1 / (currentToNext.Value.TimeDelta + 1e-10);
                     ipCurrNext = FittsLaw.Throughput(currentToNext.Value.RelativeLength, currentToNext.Value.TimeDelta);
                 }
