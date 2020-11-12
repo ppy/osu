@@ -19,6 +19,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
@@ -72,7 +73,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
         /// </summary>
-        /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
+        /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUsableSkins()
         {
             var userSkins = GetAllUserSkins();
@@ -84,8 +85,22 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s that have been loaded by the user.
         /// </summary>
-        /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
+        /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUserSkins() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+
+        public void SelectRandomSkin()
+        {
+            // choose from only user skins, removing the current selection to ensure a new one is chosen.
+            var randomChoices = GetAllUsableSkins().Where(s => s.ID > 0 && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+
+            if (randomChoices.Length == 0)
+            {
+                CurrentSkinInfo.Value = SkinInfo.Default;
+                return;
+            }
+
+            CurrentSkinInfo.Value = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
+        }
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 
