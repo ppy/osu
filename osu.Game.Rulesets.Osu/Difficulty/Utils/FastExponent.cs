@@ -12,13 +12,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         /// The coefficients of the polynomial approximating the exponential function.
         /// </summary>
         /// <remarks>
-        /// The coefficients calculated are roughly equal to the first seven terms of the Taylor series for 2<sup>x</sup>,
-        /// given by the formula:
-        /// <code>
-        /// a_i = ln^i(2) / i!
-        /// </code>
-        /// wherein <c>ln</c> is the natural logarithm (base <em>e</em>),
-        /// and <c>n!</c> denotes the factorial function.
+        /// The coefficients below were fit using a least-squares approximation algorithm.
+        /// They are roughly equal to the first seven terms of the Taylor series expansion for 2<sup>x</sup> at x = 0,
+        /// but aren't exactly the same as the error of the Taylor expansion gets bigger further away from 0
+        /// (the perturbations below give better approximations over the [0,1] interval, within which this function
+        /// will be primarily used).
         /// </remarks>
         private static readonly double[] coefficients =
         {
