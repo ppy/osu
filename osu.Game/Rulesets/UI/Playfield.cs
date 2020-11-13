@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -17,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class Playfield : CompositeDrawable
+    public abstract class Playfield : HitObjectPoolProvider
     {
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
