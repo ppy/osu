@@ -8,10 +8,9 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
-using osu.Game.IO;
 using osu.Game.IO.Archives;
-using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 
@@ -25,8 +24,8 @@ namespace osu.Game.Tests
         private readonly Beatmap beatmap;
         private readonly ITrackStore trackStore;
 
-        public WaveformTestBeatmap(AudioManager audioManager)
-            : this(audioManager, new WaveformBeatmap())
+        public WaveformTestBeatmap(AudioManager audioManager, RulesetInfo rulesetInfo = null)
+            : this(audioManager, new TestBeatmap(rulesetInfo ?? new OsuRuleset().RulesetInfo))
         {
         }
 
@@ -61,22 +60,6 @@ namespace osu.Game.Tests
             {
                 using (var reader = getZipReader())
                     return reader.Filenames.First(f => f.EndsWith(".mp3", StringComparison.Ordinal));
-            }
-        }
-
-        private class WaveformBeatmap : TestBeatmap
-        {
-            public WaveformBeatmap()
-                : base(new CatchRuleset().RulesetInfo)
-            {
-            }
-
-            protected override Beatmap CreateBeatmap()
-            {
-                using (var reader = getZipReader())
-                using (var beatmapStream = reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu", StringComparison.Ordinal))))
-                using (var beatmapReader = new LineBufferedReader(beatmapStream))
-                    return Decoder.GetDecoder<Beatmap>(beatmapReader).Decode(beatmapReader);
             }
         }
     }

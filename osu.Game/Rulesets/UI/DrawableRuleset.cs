@@ -15,7 +15,10 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -38,9 +41,8 @@ namespace osu.Game.Rulesets.UI
     public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
         where TObject : HitObject
     {
-        public override event Action<JudgementResult> OnNewResult;
-
-        public override event Action<JudgementResult> OnRevertResult;
+        public override event Action<JudgementResult> NewResult;
+        public override event Action<JudgementResult> RevertResult;
 
         /// <summary>
         /// The selected variant.
@@ -92,11 +94,8 @@ namespace osu.Game.Rulesets.UI
 
         protected IRulesetConfigManager Config { get; private set; }
 
-        /// <summary>
-        /// The mods which are to be applied.
-        /// </summary>
         [Cached(typeof(IReadOnlyList<Mod>))]
-        protected readonly IReadOnlyList<Mod> Mods;
+        protected override IReadOnlyList<Mod> Mods { get; }
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -125,7 +124,11 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             KeyBindingInputManager = CreateInputManager();
-            playfield = new Lazy<Playfield>(CreatePlayfield);
+            playfield = new Lazy<Playfield>(() => CreatePlayfield().With(p =>
+            {
+                p.NewResult += (_, r) => NewResult?.Invoke(r);
+                p.RevertResult += (_, r) => RevertResult?.Invoke(r);
+            }));
 
             IsPaused.ValueChanged += paused =>
             {
@@ -183,7 +186,7 @@ namespace osu.Game.Rulesets.UI
 
             RegenerateAutoplay();
 
-            loadObjects(cancellationToken);
+            loadObjects(cancellationToken ?? default);
         }
 
         public void RegenerateAutoplay()
@@ -196,15 +199,15 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Creates and adds drawable representations of hit objects to the play field.
         /// </summary>
-        private void loadObjects(CancellationToken? cancellationToken)
+        private void loadObjects(CancellationToken cancellationToken)
         {
             foreach (TObject h in Beatmap.HitObjects)
             {
-                cancellationToken?.ThrowIfCancellationRequested();
-                addHitObject(h);
+                cancellationToken.ThrowIfCancellationRequested();
+                AddHitObject(h);
             }
 
-            cancellationToken?.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
             Playfield.PostProcess();
 
@@ -231,21 +234,57 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Creates and adds the visual representation of a <typeparamref name="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
+        /// Adds a <see cref="HitObject"/> to this <see cref="DrawableRuleset"/>.
         /// </summary>
-        /// <param name="hitObject">The <typeparamref name="TObject"/> to add the visual representation for.</param>
-        private void addHitObject(TObject hitObject)
+        /// <remarks>
+        /// This does not add the <see cref="HitObject"/> to the beatmap.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
+        public void AddHitObject(TObject hitObject)
         {
-            var drawableObject = CreateDrawableRepresentation(hitObject);
+            var drawableRepresentation = CreateDrawableRepresentation(hitObject);
 
-            if (drawableObject == null)
-                return;
-
-            drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
-            drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
-
-            Playfield.Add(drawableObject);
+            // If a drawable representation exists, use it, otherwise assume the hitobject is being pooled.
+            if (drawableRepresentation != null)
+                Playfield.Add(drawableRepresentation);
+            else
+                Playfield.Add(GetLifetimeEntry(hitObject));
         }
+
+        /// <summary>
+        /// Removes a <see cref="HitObject"/> from this <see cref="DrawableRuleset"/>.
+        /// </summary>
+        /// <remarks>
+        /// This does not remove the <see cref="HitObject"/> from the beatmap.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
+        public bool RemoveHitObject(TObject hitObject)
+        {
+            var entry = GetLifetimeEntry(hitObject);
+
+            // May have been newly-created by the above call - remove it anyway.
+            RemoveLifetimeEntry(hitObject);
+
+            if (Playfield.Remove(entry))
+                return true;
+
+            // If the entry was not removed from the playfield, assume the hitobject is not being pooled and attempt a direct removal.
+            var drawableObject = Playfield.AllHitObjects.SingleOrDefault(d => d.HitObject == hitObject);
+            if (drawableObject != null)
+                return Playfield.Remove(drawableObject);
+
+            return false;
+        }
+
+        protected sealed override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject)
+        {
+            if (!(hitObject is TObject tHitObject))
+                throw new InvalidOperationException($"Unexpected hitobject type: {hitObject.GetType().ReadableName()}");
+
+            return CreateLifetimeEntry(tHitObject);
+        }
+
+        protected virtual HitObjectLifetimeEntry CreateLifetimeEntry(TObject hitObject) => new HitObjectLifetimeEntry(hitObject);
 
         public override void SetRecordTarget(Replay recordingReplay)
         {
@@ -285,10 +324,15 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Creates a DrawableHitObject from a HitObject.
+        /// Creates a <see cref="DrawableHitObject{TObject}"/> to represent a <see cref="HitObject"/>.
         /// </summary>
-        /// <param name="h">The HitObject to make drawable.</param>
-        /// <returns>The DrawableHitObject.</returns>
+        /// <remarks>
+        /// If this method returns <c>null</c>, then this <see cref="DrawableRuleset"/> will assume the requested <see cref="HitObject"/> type is being pooled,
+        /// and will instead attempt to retrieve the <see cref="DrawableHitObject"/>s at the point they should become alive via pools registered through
+        /// <see cref="DrawableRuleset.RegisterPool{TObject, TDrawable}(int, int?)"/> or  <see cref="DrawableRuleset.RegisterPool{TObject, TDrawable}(DrawablePool{TDrawable})"/>.
+        /// </remarks>
+        /// <param name="h">The <see cref="HitObject"/> to represent.</param>
+        /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
         public void Attach(KeyCounterDisplay keyCounter) =>
@@ -361,20 +405,20 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// <remarks>
     /// This type is required only for adding non-generic type to the draw hierarchy.
-    /// Once IDrawable is a thing, this can also become an interface.
     /// </remarks>
     /// </summary>
+    [Cached(typeof(DrawableRuleset))]
     public abstract class DrawableRuleset : CompositeDrawable
     {
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
         /// </summary>
-        public abstract event Action<JudgementResult> OnNewResult;
+        public abstract event Action<JudgementResult> NewResult;
 
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
         /// </summary>
-        public abstract event Action<JudgementResult> OnRevertResult;
+        public abstract event Action<JudgementResult> RevertResult;
 
         /// <summary>
         /// Whether a replay is currently loaded.
@@ -405,6 +449,11 @@ namespace osu.Game.Rulesets.UI
         /// The frame-stable clock which is being used for playfield display.
         /// </summary>
         public abstract IFrameStableClock FrameStableClock { get; }
+
+        /// <summary>
+        /// The mods which are to be applied.
+        /// </summary>
+        protected abstract IReadOnlyList<Mod> Mods { get; }
 
         /// <summary>~
         /// The associated ruleset.
@@ -500,6 +549,99 @@ namespace osu.Game.Rulesets.UI
         /// Invoked when the user requests to pause while the resume overlay is active.
         /// </summary>
         public abstract void CancelResume();
+
+        private readonly Dictionary<Type, IDrawablePool> pools = new Dictionary<Type, IDrawablePool>();
+        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntries = new Dictionary<HitObject, HitObjectLifetimeEntry>();
+
+        /// <summary>
+        /// Registers a default <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetPooledDrawableRepresentation"/>).
+        /// </summary>
+        /// <param name="initialSize">The number of <see cref="DrawableHitObject"/>s to be initially stored in the pool.</param>
+        /// <param name="maximumSize">
+        /// The maximum number of <see cref="DrawableHitObject"/>s that can be stored in the pool.
+        /// If this limit is exceeded, every subsequent <see cref="DrawableHitObject"/> will be created anew instead of being retrieved from the pool,
+        /// until some of the existing <see cref="DrawableHitObject"/>s are returned to the pool.
+        /// </param>
+        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
+        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
+        protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
+            where TObject : HitObject
+            where TDrawable : DrawableHitObject, new()
+            => RegisterPool<TObject, TDrawable>(new DrawablePool<TDrawable>(initialSize, maximumSize));
+
+        /// <summary>
+        /// Registers a custom <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetPooledDrawableRepresentation"/>).
+        /// </summary>
+        /// <param name="pool">The <see cref="DrawablePool{T}"/> to register.</param>
+        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
+        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
+        protected void RegisterPool<TObject, TDrawable>([NotNull] DrawablePool<TDrawable> pool)
+            where TObject : HitObject
+            where TDrawable : DrawableHitObject, new()
+        {
+            pools[typeof(TObject)] = pool;
+            AddInternal(pool);
+        }
+
+        /// <summary>
+        /// Attempts to retrieve the poolable <see cref="DrawableHitObject"/> representation of a <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to retrieve the <see cref="DrawableHitObject"/> representation of.</param>
+        /// <returns>The <see cref="DrawableHitObject"/> representing <see cref="HitObject"/>, or <c>null</c> if no poolable representation exists.</returns>
+        [CanBeNull]
+        public DrawableHitObject GetPooledDrawableRepresentation([NotNull] HitObject hitObject)
+        {
+            if (!pools.TryGetValue(hitObject.GetType(), out var pool))
+                return null;
+
+            return (DrawableHitObject)pool.Get(d =>
+            {
+                var dho = (DrawableHitObject)d;
+
+                // If this is the first time this DHO is being used (not loaded), then apply the DHO mods.
+                // This is done before Apply() so that the state is updated once when the hitobject is applied.
+                if (!dho.IsLoaded)
+                {
+                    foreach (var m in Mods.OfType<IApplicableToDrawableHitObjects>())
+                        m.ApplyToDrawableHitObjects(dho.Yield());
+                }
+
+                dho.Apply(hitObject, GetLifetimeEntry(hitObject));
+            });
+        }
+
+        /// <summary>
+        /// Creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// This may be overridden to provide custom lifetime control (e.g. via <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/>.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="HitObject"/> to create the entry for.</param>
+        /// <returns>The <see cref="HitObjectLifetimeEntry"/>.</returns>
+        [NotNull]
+        protected abstract HitObjectLifetimeEntry CreateLifetimeEntry([NotNull] HitObject hitObject);
+
+        /// <summary>
+        /// Retrieves or creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to retrieve or create the <see cref="HitObjectLifetimeEntry"/> for.</param>
+        /// <returns>The <see cref="HitObjectLifetimeEntry"/> for <paramref name="hitObject"/>.</returns>
+        [NotNull]
+        protected HitObjectLifetimeEntry GetLifetimeEntry([NotNull] HitObject hitObject)
+        {
+            if (lifetimeEntries.TryGetValue(hitObject, out var entry))
+                return entry;
+
+            return lifetimeEntries[hitObject] = CreateLifetimeEntry(hitObject);
+        }
+
+        /// <summary>
+        /// Removes the <see cref="HitObjectLifetimeEntry"/> for a <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to remove the <see cref="HitObjectLifetimeEntry"/> for.</param>
+        internal void RemoveLifetimeEntry([NotNull] HitObject hitObject) => lifetimeEntries.Remove(hitObject);
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException
