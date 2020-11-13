@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
 {
     public class LegacyBodyPiece : LegacyManiaColumnElement
     {
+        private DrawableHoldNote holdNote;
+
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<bool> isHitting = new Bindable<bool>();
 
@@ -38,6 +40,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo, DrawableHitObject drawableObject)
         {
+            holdNote = (DrawableHoldNote)drawableObject;
+
             string imageName = GetColumnSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.HoldNoteBodyImage)?.Value
                                ?? $"mania-note{FallbackColumnIndex}L";
 
@@ -92,11 +96,44 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 InternalChild = bodySprite;
 
             direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(onDirectionChanged, true);
-
-            var holdNote = (DrawableHoldNote)drawableObject;
             isHitting.BindTo(holdNote.IsHitting);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            direction.BindValueChanged(onDirectionChanged, true);
             isHitting.BindValueChanged(onIsHittingChanged, true);
+
+            holdNote.ApplyCustomUpdateState += applyCustomUpdateState;
+            applyCustomUpdateState(holdNote, holdNote.State.Value);
+        }
+
+        /// <summary>
+        /// Stores the start time of the fade animation that plays when any of the nested
+        /// hitobjects of the hold note are missed.
+        /// </summary>
+        private double? missFadeTime;
+
+        private void applyCustomUpdateState(DrawableHitObject hitObject, ArmedState state)
+        {
+            switch (state)
+            {
+                case ArmedState.Miss:
+                    missFadeTime ??= hitObject.StateUpdateTime;
+
+                    using (BeginAbsoluteSequence(missFadeTime.Value))
+                    {
+                        // colour and duration matches stable
+                        // transforms not applied to entire hold note in order to not affect hit lighting
+                        holdNote.Head.FadeColour(Colour4.DarkGray, 60);
+                        bodySprite?.FadeColour(Colour4.DarkGray, 60);
+                        holdNote.Tail.FadeColour(Colour4.DarkGray, 60);
+                    }
+
+                    break;
+            }
         }
 
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
@@ -161,6 +198,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            if (holdNote != null)
+                holdNote.ApplyCustomUpdateState -= applyCustomUpdateState;
 
             lightContainer?.Expire();
         }
