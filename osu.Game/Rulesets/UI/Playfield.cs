@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to set.</param>
         /// <param name="keepAlive">Whether to keep <paramref name="hitObject"/> always alive.</param>
-        public void SetKeepAlive(HitObject hitObject, bool keepAlive)
+        internal void SetKeepAlive(HitObject hitObject, bool keepAlive)
         {
             if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
             {
@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Keeps all <see cref="HitObject"/>s alive within this and all nested <see cref="Playfield"/>s.
         /// </summary>
-        public void KeepAllAlive()
+        internal void KeepAllAlive()
         {
             foreach (var (_, entry) in lifetimeEntryMap)
                 entry.KeepAlive = true;
