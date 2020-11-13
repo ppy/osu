@@ -232,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <param name="points">The points to calculate a quad for.</param>
         private Quad getSurroundingQuad(IEnumerable<Vector2> points)
         {
-            if (!EditorBeatmap.SelectedHitObjects.Any())
+            if (!points.Any())
                 return new Quad();
 
             Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
@@ -255,7 +255,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         private OsuHitObject[] selectedMovableObjects => EditorBeatmap.SelectedHitObjects
                                                                       .OfType<OsuHitObject>()
-                                                                      .Where(h => !(h is Spinner))
+                                                                      .Where(h => h.Movable)
                                                                       .ToArray();
 
         /// <summary>

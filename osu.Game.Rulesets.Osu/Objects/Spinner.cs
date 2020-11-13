@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => Duration = value - StartTime;
         }
 
+        public override bool Movable => false;
+
         public double Duration { get; set; }
 
         /// <summary>

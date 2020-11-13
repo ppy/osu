@@ -297,10 +297,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
             var bottomRight = new Vector2(float.MinValue, float.MinValue);
 
+            bool noneMovable = selectedBlueprints.All(b => !b.HitObject.Movable);
+
             foreach (var blueprint in selectedBlueprints)
             {
-                topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(blueprint.SelectionQuad.TopLeft));
-                bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(blueprint.SelectionQuad.BottomRight));
+                if (noneMovable || blueprint.HitObject.Movable)
+                {
+                    topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(blueprint.SelectionQuad.TopLeft));
+                    bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(blueprint.SelectionQuad.BottomRight));
+                }
             }
 
             topLeft -= new Vector2(5);

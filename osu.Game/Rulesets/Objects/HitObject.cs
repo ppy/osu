@@ -46,6 +46,12 @@ namespace osu.Game.Rulesets.Objects
             set => StartTimeBindable.Value = value;
         }
 
+        /// <summary>
+        /// Whether the <see cref="HitObject"/> is movable in the play-space.
+        /// </summary>
+        /// <returns>True if the <see cref="HitObject"/> is movable, else false.</returns>
+        public virtual bool Movable => false;
+
         public readonly BindableList<HitSampleInfo> SamplesBindable = new BindableList<HitSampleInfo>();
 
         /// <summary>

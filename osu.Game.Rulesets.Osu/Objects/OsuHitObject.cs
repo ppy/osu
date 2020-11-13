@@ -99,6 +99,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => LastInComboBindable.Value = value;
         }
 
+        public override bool Movable => true;
+
         protected OsuHitObject()
         {
             StackHeightBindable.BindValueChanged(height =>

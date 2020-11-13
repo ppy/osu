@@ -434,16 +434,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void prepareSelectionMovement()
         {
-            if (!SelectionHandler.SelectedBlueprints.Any())
+            var blueprints = SelectionHandler.SelectedBlueprints.Where(b => b.HitObject.Movable);
+
+            if (!blueprints.Any())
                 return;
 
             // Any selected blueprint that is hovered can begin the movement of the group, however only the earliest hitobject is used for movement
             // A special case is added for when a click selection occurred before the drag
-            if (!clickSelectionBegan && !SelectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+            if (!clickSelectionBegan && !blueprints.Any(b => b.IsHovered))
                 return;
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
-            movementBlueprint = SelectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).First();
+            movementBlueprint = blueprints.OrderBy(b => b.HitObject.StartTime).First();
             movementBlueprintOriginalPosition = movementBlueprint.ScreenSpaceSelectionPoint; // todo: unsure if correct
         }
 
