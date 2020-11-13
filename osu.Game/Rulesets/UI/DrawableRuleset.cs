@@ -593,10 +593,24 @@ namespace osu.Game.Rulesets.UI
         [CanBeNull]
         public DrawableHitObject GetPooledDrawableRepresentation([NotNull] HitObject hitObject)
         {
-            if (!pools.TryGetValue(hitObject.GetType(), out var pool))
-                return null;
+            var lookupType = hitObject.GetType();
 
-            return (DrawableHitObject)pool.Get(d =>
+            IDrawablePool pool;
+
+            // Tests may add derived hitobject instances for which pools don't exist. Try to find any applicable pool and dynamically assign the type if the pool exists.
+            if (!pools.TryGetValue(lookupType, out pool))
+            {
+                foreach (var (t, p) in pools)
+                {
+                    if (!t.IsInstanceOfType(hitObject))
+                        continue;
+
+                    pools[lookupType] = pool = p;
+                    break;
+                }
+            }
+
+            return (DrawableHitObject)pool?.Get(d =>
             {
                 var dho = (DrawableHitObject)d;
 
