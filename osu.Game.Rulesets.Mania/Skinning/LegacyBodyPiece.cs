@@ -193,9 +193,11 @@ namespace osu.Game.Rulesets.Mania.Skinning
             {
                 // colour and duration matches stable
                 // transforms not applied to entire hold note in order to not affect hit lighting
-                holdNote.Head.FadeColour(Colour4.DarkGray, 60);
-                holdNote.Tail.FadeColour(Colour4.DarkGray, 60);
-                bodySprite?.FadeColour(Colour4.DarkGray, 60);
+                const double fade_duration = 60;
+
+                holdNote.Head.FadeColour(Colour4.DarkGray, fade_duration);
+                holdNote.Tail.FadeColour(Colour4.DarkGray, fade_duration);
+                bodySprite?.FadeColour(Colour4.DarkGray, fade_duration);
             }
         }
 
