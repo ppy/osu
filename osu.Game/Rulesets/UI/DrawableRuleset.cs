@@ -324,11 +324,16 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Creates a DrawableHitObject from a HitObject.
+        /// Creates a <see cref="DrawableHitObject{TObject}"/> to represent a <see cref="HitObject"/>.
         /// </summary>
-        /// <param name="h">The HitObject to make drawable.</param>
-        /// <returns>The DrawableHitObject.</returns>
-        public virtual DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h) => null;
+        /// <remarks>
+        /// If this method returns <c>null</c>, then this <see cref="DrawableRuleset"/> will assume the requested <see cref="HitObject"/> type is being pooled,
+        /// and will instead attempt to retrieve the <see cref="DrawableHitObject"/>s at the point they should become alive via pools registered through
+        /// <see cref="DrawableRuleset.RegisterPool{TObject, TDrawable}(int, int?)"/> or  <see cref="DrawableRuleset.RegisterPool{TObject, TDrawable}(DrawablePool{TDrawable})"/>.
+        /// </remarks>
+        /// <param name="h">The <see cref="HitObject"/> to represent.</param>
+        /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
+        public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
         public void Attach(KeyCounterDisplay keyCounter) =>
             (KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(keyCounter);

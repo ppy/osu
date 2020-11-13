@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -46,9 +47,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 applyFadeInAdjustment(nested);
         }
 
-        private double lastSliderHeadFadeOutStartTime;
-        private double lastSliderHeadFadeOutDuration;
-
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
             base.ApplyIncreasedVisibilityState(hitObject, state);
@@ -78,33 +76,24 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case DrawableSliderTail sliderTail:
                     // use stored values from head circle to achieve same fade sequence.
-                    fadeOutDuration = lastSliderHeadFadeOutDuration;
-                    fadeOutStartTime = lastSliderHeadFadeOutStartTime;
+                    var tailFadeOutParameters = getFadeOutParametersFromSliderHead(h);
 
-                    using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
-                        sliderTail.FadeOut(fadeOutDuration);
+                    using (drawable.BeginAbsoluteSequence(tailFadeOutParameters.startTime, true))
+                        sliderTail.FadeOut(tailFadeOutParameters.duration);
 
                     break;
 
                 case DrawableSliderRepeat sliderRepeat:
                     // use stored values from head circle to achieve same fade sequence.
-                    fadeOutDuration = lastSliderHeadFadeOutDuration;
-                    fadeOutStartTime = lastSliderHeadFadeOutStartTime;
+                    var repeatFadeOutParameters = getFadeOutParametersFromSliderHead(h);
 
-                    using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
+                    using (drawable.BeginAbsoluteSequence(repeatFadeOutParameters.startTime, true))
                         // only apply to circle piece – reverse arrow is not affected by hidden.
-                        sliderRepeat.CirclePiece.FadeOut(fadeOutDuration);
+                        sliderRepeat.CirclePiece.FadeOut(repeatFadeOutParameters.duration);
 
                     break;
 
                 case DrawableHitCircle circle:
-
-                    if (circle is DrawableSliderHead)
-                    {
-                        lastSliderHeadFadeOutDuration = fadeOutDuration;
-                        lastSliderHeadFadeOutStartTime = fadeOutStartTime;
-                    }
-
                     Drawable fadeTarget = circle;
 
                     if (increaseVisibility)
@@ -125,6 +114,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 case DrawableSlider slider:
+                    associateNestedSliderCirclesWithHead(slider.HitObject);
+
                     using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
                         slider.Body.FadeOut(longFadeDuration, Easing.Out);
 
@@ -148,6 +139,25 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     break;
             }
+        }
+
+        private readonly Dictionary<HitObject, SliderHeadCircle> correspondingSliderHeadForObject = new Dictionary<HitObject, SliderHeadCircle>();
+
+        private void associateNestedSliderCirclesWithHead(Slider slider)
+        {
+            var sliderHead = slider.NestedHitObjects.Single(obj => obj is SliderHeadCircle);
+
+            foreach (var nested in slider.NestedHitObjects)
+            {
+                if ((nested is SliderRepeat || nested is SliderEndCircle) && !correspondingSliderHeadForObject.ContainsKey(nested))
+                    correspondingSliderHeadForObject[nested] = (SliderHeadCircle)sliderHead;
+            }
+        }
+
+        private (double startTime, double duration) getFadeOutParametersFromSliderHead(OsuHitObject h)
+        {
+            var sliderHead = correspondingSliderHeadForObject[h];
+            return (sliderHead.StartTime - sliderHead.TimePreempt + sliderHead.TimeFadeIn, sliderHead.TimePreempt * fade_out_duration_multiplier);
         }
     }
 }
