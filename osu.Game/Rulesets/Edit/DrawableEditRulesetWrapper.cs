@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -65,17 +64,13 @@ namespace osu.Game.Rulesets.Edit
 
         private void addHitObject(HitObject hitObject)
         {
-            var drawableObject = drawableRuleset.CreateDrawableRepresentation((TObject)hitObject);
-
-            drawableRuleset.Playfield.Add(drawableObject);
+            drawableRuleset.AddHitObject((TObject)hitObject);
             drawableRuleset.Playfield.PostProcess();
         }
 
         private void removeHitObject(HitObject hitObject)
         {
-            var drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
-
-            drawableRuleset.Playfield.Remove(drawableObject);
+            drawableRuleset.RemoveHitObject((TObject)hitObject);
             drawableRuleset.Playfield.PostProcess();
         }
 
