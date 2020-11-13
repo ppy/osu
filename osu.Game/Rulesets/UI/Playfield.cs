@@ -154,8 +154,6 @@ namespace osu.Game.Rulesets.UI
             return false;
         }
 
-        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
-
         /// <summary>
         /// Adds a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> to this <see cref="Playfield"/>.
         /// </summary>
@@ -204,6 +202,10 @@ namespace osu.Game.Rulesets.UI
         protected virtual void OnHitObjectRemoved(HitObject hitObject)
         {
         }
+
+        #region Editor logic
+
+        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
 
         /// <summary>
         /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.
@@ -275,6 +277,8 @@ namespace osu.Game.Rulesets.UI
                     nested.FutureLifetimeExtension = value;
             }
         }
+
+        #endregion
 
         /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
