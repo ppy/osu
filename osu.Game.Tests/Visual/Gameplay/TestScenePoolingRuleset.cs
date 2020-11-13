@@ -134,39 +134,42 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                RegisterPool<TestHitObject, DrawableTestHitObject>(PoolSize);
-            }
-
-            protected override HitObjectLifetimeEntry CreateLifetimeEntry(TestHitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
-
             public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h) => null;
 
             protected override PassThroughInputManager CreateInputManager() => new PassThroughInputManager();
 
-            protected override Playfield CreatePlayfield() => new TestPlayfield();
-
-            private class TestHitObjectLifetimeEntry : HitObjectLifetimeEntry
-            {
-                public TestHitObjectLifetimeEntry(HitObject hitObject)
-                    : base(hitObject)
-                {
-                }
-
-                protected override double InitialLifetimeOffset => 0;
-            }
+            protected override Playfield CreatePlayfield() => new TestPlayfield(PoolSize);
         }
 
         private class TestPlayfield : Playfield
         {
-            public TestPlayfield()
+            private readonly int poolSize;
+
+            public TestPlayfield(int poolSize)
             {
+                this.poolSize = poolSize;
                 AddInternal(HitObjectContainer);
             }
 
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RegisterPool<TestHitObject, DrawableTestHitObject>(poolSize);
+            }
+
+            protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
+
             protected override GameplayCursorContainer CreateCursor() => null;
+        }
+
+        private class TestHitObjectLifetimeEntry : HitObjectLifetimeEntry
+        {
+            public TestHitObjectLifetimeEntry(HitObject hitObject)
+                : base(hitObject)
+            {
+            }
+
+            protected override double InitialLifetimeOffset => 0;
         }
 
         private class TestBeatmapConverter : BeatmapConverter<TestHitObject>
