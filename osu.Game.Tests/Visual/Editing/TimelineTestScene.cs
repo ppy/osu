@@ -21,21 +21,25 @@ namespace osu.Game.Tests.Visual.Editing
     {
         protected TimelineArea TimelineArea { get; private set; }
 
+        protected HitObjectComposer Composer { get; private set; }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             Beatmap.Value = new WaveformTestBeatmap(audio);
 
             var playable = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
-
             var editorBeatmap = new EditorBeatmap(playable);
 
             Dependencies.Cache(editorBeatmap);
             Dependencies.CacheAs<IBeatSnapProvider>(editorBeatmap);
 
+            Composer = playable.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer().With(d => d.Alpha = 0);
+
             AddRange(new Drawable[]
             {
                 editorBeatmap,
+                Composer,
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
