@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.UI;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -135,6 +136,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [CanBeNull]
         private HitObjectLifetimeEntry lifetimeEntry;
 
+        [Resolved(CanBeNull = true)]
+        private DrawableRuleset drawableRuleset { get; set; }
+
         private Container<PausableSkinnableSound> samplesContainer;
 
         /// <summary>
@@ -208,7 +212,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             foreach (var h in HitObject.NestedHitObjects)
             {
-                var drawableNested = CreateNestedHitObject(h) ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
+                var drawableNested = drawableRuleset?.GetPooledDrawableRepresentation(h)
+                                     ?? CreateNestedHitObject(h)
+                                     ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
 
                 drawableNested.OnNewResult += onNewResult;
                 drawableNested.OnRevertResult += onRevertResult;
@@ -216,6 +222,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                 nestedHitObjects.Value.Add(drawableNested);
                 AddNestedHitObject(drawableNested);
+
+                drawableNested.OnParentReceived(this);
             }
 
             StartTimeBindable.BindTo(HitObject.StartTimeBindable);
@@ -306,6 +314,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="hitObject">The currently-applied <see cref="HitObject"/>.</param>
         protected virtual void OnFree(HitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Invoked when this <see cref="DrawableHitObject"/> receives a new parenting <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="parent">The parenting <see cref="DrawableHitObject"/>.</param>
+        protected virtual void OnParentReceived(DrawableHitObject parent)
         {
         }
 
