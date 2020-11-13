@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
@@ -71,6 +74,22 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
             AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is MainMenu);
             AddAssert("did perform", () => actionPerformed);
+        }
+
+        [Test]
+        public void TestOverlaysAlwaysClosed()
+        {
+            ChatOverlay chat = null;
+            AddUntilStep("is at menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
+            AddUntilStep("wait for chat load", () => (chat = Game.ChildrenOfType<ChatOverlay>().SingleOrDefault()) != null);
+
+            AddStep("show chat", () => InputManager.Key(Key.F8));
+
+            AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
+
+            AddUntilStep("still at menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
+            AddAssert("did perform", () => actionPerformed);
+            AddAssert("chat closed", () => chat.State.Value == Visibility.Hidden);
         }
 
         [TestCase(true)]
