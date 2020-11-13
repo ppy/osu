@@ -10,13 +10,25 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
     public abstract class Playfield : CompositeDrawable
     {
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> is judged.
+        /// </summary>
+        public event Action<DrawableHitObject, JudgementResult> NewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> judgement is reverted.
+        /// </summary>
+        public event Action<DrawableHitObject, JudgementResult> RevertResult;
+
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
@@ -72,7 +84,11 @@ namespace osu.Game.Rulesets.UI
         {
             RelativeSizeAxes = Axes.Both;
 
-            hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
+            hitObjectContainerLazy = new Lazy<HitObjectContainer>(() => CreateHitObjectContainer().With(h =>
+            {
+                h.NewResult += (d, r) => NewResult?.Invoke(d, r);
+                h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+            }));
         }
 
         [Resolved(CanBeNull = true)]
@@ -101,13 +117,71 @@ namespace osu.Game.Rulesets.UI
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to add.</param>
-        public virtual void Add(DrawableHitObject h) => HitObjectContainer.Add(h);
+        public virtual void Add(DrawableHitObject h)
+        {
+            HitObjectContainer.Add(h);
+            OnHitObjectAdded(h.HitObject);
+        }
 
         /// <summary>
         /// Remove a DrawableHitObject from this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
-        public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
+        public virtual bool Remove(DrawableHitObject h)
+        {
+            if (!HitObjectContainer.Remove(h))
+                return false;
+
+            OnHitObjectRemoved(h.HitObject);
+            return false;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> to this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="entry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the <see cref="HitObject"/>.</param>
+        public virtual void Add(HitObjectLifetimeEntry entry)
+        {
+            HitObjectContainer.Add(entry);
+            OnHitObjectAdded(entry.HitObject);
+        }
+
+        /// <summary>
+        /// Removes a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> from this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="entry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the <see cref="HitObject"/>.</param>
+        /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
+        public virtual bool Remove(HitObjectLifetimeEntry entry)
+        {
+            if (HitObjectContainer.Remove(entry))
+            {
+                OnHitObjectRemoved(entry.HitObject);
+                return true;
+            }
+
+            bool removedFromNested = false;
+
+            if (nestedPlayfields.IsValueCreated)
+                removedFromNested = nestedPlayfields.Value.Any(p => p.Remove(entry));
+
+            return removedFromNested;
+        }
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> is added to this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject">The added <see cref="HitObject"/>.</param>
+        protected virtual void OnHitObjectAdded(HitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> is removed from this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject">The removed <see cref="HitObject"/>.</param>
+        protected virtual void OnHitObjectRemoved(HitObject hitObject)
+        {
+        }
 
         /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
@@ -131,6 +205,10 @@ namespace osu.Game.Rulesets.UI
         protected void AddNested(Playfield otherPlayfield)
         {
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
+
+            otherPlayfield.NewResult += (d, r) => NewResult?.Invoke(d, r);
+            otherPlayfield.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+
             nestedPlayfields.Value.Add(otherPlayfield);
         }
 
