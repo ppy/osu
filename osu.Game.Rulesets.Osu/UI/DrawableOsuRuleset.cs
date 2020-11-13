@@ -4,18 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
@@ -34,34 +30,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            registerPool<HitCircle, DrawableHitCircle>(10, 100);
-
-            registerPool<Slider, DrawableSlider>(10, 100);
-            registerPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
-            registerPool<SliderTailCircle, DrawableSliderTail>(10, 100);
-            registerPool<SliderTick, DrawableSliderTick>(10, 100);
-            registerPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
-
-            registerPool<Spinner, DrawableSpinner>(2, 20);
-            registerPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
-            registerPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
-        }
-
-        private void registerPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
-            where TObject : HitObject
-            where TDrawable : DrawableHitObject, new()
-            => RegisterPool<TObject, TDrawable>(CreatePool<TDrawable>(initialSize, maximumSize));
-
-        protected virtual DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
-            where TDrawable : DrawableHitObject, new()
-            => new OsuDrawablePool<TDrawable>(Playfield.CheckHittable, Playfield.OnHitObjectLoaded, initialSize, maximumSize);
-
         public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h) => null;
-
-        protected override HitObjectLifetimeEntry CreateLifetimeEntry(OsuHitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
 
@@ -86,16 +55,6 @@ namespace osu.Game.Rulesets.Osu.UI
 
                 return 0;
             }
-        }
-
-        private class OsuHitObjectLifetimeEntry : HitObjectLifetimeEntry
-        {
-            public OsuHitObjectLifetimeEntry(HitObject hitObject)
-                : base(hitObject)
-            {
-            }
-
-            protected override double InitialLifetimeOffset => ((OsuHitObject)HitObject).TimePreempt;
         }
     }
 }
