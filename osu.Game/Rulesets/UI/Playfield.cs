@@ -30,22 +30,6 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
-        /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <remarks>
-        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
-        /// </remarks>
-        public event Action<HitObject> HitObjectUsageBegan;
-
-        /// <summary>
-        /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <remarks>
-        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become dead.
-        /// </remarks>
-        public event Action<HitObject> HitObjectUsageFinished;
-
-        /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
         public HitObjectContainer HitObjectContainer => hitObjectContainerLazy.Value;
@@ -203,83 +187,6 @@ namespace osu.Game.Rulesets.UI
         {
         }
 
-        #region Editor logic
-
-        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
-
-        /// <summary>
-        /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to set.</param>
-        /// <param name="keepAlive">Whether to keep <paramref name="hitObject"/> always alive.</param>
-        internal void SetKeepAlive(HitObject hitObject, bool keepAlive)
-        {
-            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
-            {
-                entry.KeepAlive = keepAlive;
-                return;
-            }
-
-            if (!nestedPlayfields.IsValueCreated)
-                return;
-
-            foreach (var p in nestedPlayfields.Value)
-                p.SetKeepAlive(hitObject, keepAlive);
-        }
-
-        /// <summary>
-        /// Keeps all <see cref="HitObject"/>s alive within this and all nested <see cref="Playfield"/>s.
-        /// </summary>
-        internal void KeepAllAlive()
-        {
-            foreach (var (_, entry) in lifetimeEntryMap)
-                entry.KeepAlive = true;
-
-            if (!nestedPlayfields.IsValueCreated)
-                return;
-
-            foreach (var p in nestedPlayfields.Value)
-                p.KeepAllAlive();
-        }
-
-        /// <summary>
-        /// The amount of time prior to the current time within which <see cref="HitObject"/>s should be considered alive.
-        /// </summary>
-        public double PastLifetimeExtension
-        {
-            get => HitObjectContainer.PastLifetimeExtension;
-            set
-            {
-                HitObjectContainer.PastLifetimeExtension = value;
-
-                if (!nestedPlayfields.IsValueCreated)
-                    return;
-
-                foreach (var nested in nestedPlayfields.Value)
-                    nested.PastLifetimeExtension = value;
-            }
-        }
-
-        /// <summary>
-        /// The amount of time after the current time within which <see cref="HitObject"/>s should be considered alive.
-        /// </summary>
-        public double FutureLifetimeExtension
-        {
-            get => HitObjectContainer.FutureLifetimeExtension;
-            set
-            {
-                HitObjectContainer.FutureLifetimeExtension = value;
-
-                if (!nestedPlayfields.IsValueCreated)
-                    return;
-
-                foreach (var nested in nestedPlayfields.Value)
-                    nested.FutureLifetimeExtension = value;
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
@@ -338,6 +245,99 @@ namespace osu.Game.Rulesets.UI
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
+
+        #region Editor logic
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
+        /// </remarks>
+        internal event Action<HitObject> HitObjectUsageBegan;
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become dead.
+        /// </remarks>
+        internal event Action<HitObject> HitObjectUsageFinished;
+
+        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
+
+        /// <summary>
+        /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to set.</param>
+        /// <param name="keepAlive">Whether to keep <paramref name="hitObject"/> always alive.</param>
+        internal void SetKeepAlive(HitObject hitObject, bool keepAlive)
+        {
+            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+            {
+                entry.KeepAlive = keepAlive;
+                return;
+            }
+
+            if (!nestedPlayfields.IsValueCreated)
+                return;
+
+            foreach (var p in nestedPlayfields.Value)
+                p.SetKeepAlive(hitObject, keepAlive);
+        }
+
+        /// <summary>
+        /// Keeps all <see cref="HitObject"/>s alive within this and all nested <see cref="Playfield"/>s.
+        /// </summary>
+        internal void KeepAllAlive()
+        {
+            foreach (var (_, entry) in lifetimeEntryMap)
+                entry.KeepAlive = true;
+
+            if (!nestedPlayfields.IsValueCreated)
+                return;
+
+            foreach (var p in nestedPlayfields.Value)
+                p.KeepAllAlive();
+        }
+
+        /// <summary>
+        /// The amount of time prior to the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        internal double PastLifetimeExtension
+        {
+            get => HitObjectContainer.PastLifetimeExtension;
+            set
+            {
+                HitObjectContainer.PastLifetimeExtension = value;
+
+                if (!nestedPlayfields.IsValueCreated)
+                    return;
+
+                foreach (var nested in nestedPlayfields.Value)
+                    nested.PastLifetimeExtension = value;
+            }
+        }
+
+        /// <summary>
+        /// The amount of time after the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        internal double FutureLifetimeExtension
+        {
+            get => HitObjectContainer.FutureLifetimeExtension;
+            set
+            {
+                HitObjectContainer.FutureLifetimeExtension = value;
+
+                if (!nestedPlayfields.IsValueCreated)
+                    return;
+
+                foreach (var nested in nestedPlayfields.Value)
+                    nested.FutureLifetimeExtension = value;
+            }
+        }
+
+        #endregion
 
         public class InvisibleCursorContainer : GameplayCursorContainer
         {
