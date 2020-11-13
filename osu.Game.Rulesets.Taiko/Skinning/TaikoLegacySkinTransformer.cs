@@ -114,6 +114,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     return null;
 
+                case TaikoSkinComponents.TaikoExplosionKiai:
+                    // suppress the default kiai explosion if the skin brings its own sprites.
+                    // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
+                    if (hasExplosion.Value)
+                        return Drawable.Empty().With(d => d.LifetimeEnd = double.MinValue);
+
+                    return null;
+
                 case TaikoSkinComponents.Scroller:
                     if (GetTexture("taiko-slider") != null)
                         return new LegacyTaikoScroller();

@@ -142,6 +142,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             protected override HitObjectLifetimeEntry CreateLifetimeEntry(TestHitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
 
+            public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h) => null;
+
             protected override PassThroughInputManager CreateInputManager() => new PassThroughInputManager();
 
             protected override Playfield CreatePlayfield() => new TestPlayfield();
