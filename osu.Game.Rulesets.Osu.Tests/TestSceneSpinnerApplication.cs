@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Position = new Vector2(256, 192),
                 ComboIndex = 1,
                 Duration = 1000,
-            })));
+            }), null));
         }
 
         private Spinner prepareObject(Spinner circle)
