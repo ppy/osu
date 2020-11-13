@@ -97,7 +97,30 @@ namespace osu.Game.Rulesets.Osu.UI
         private void load(OsuRulesetConfigManager config)
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
+
+            registerPool<HitCircle, DrawableHitCircle>(10, 100);
+
+            registerPool<Slider, DrawableSlider>(10, 100);
+            registerPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
+            registerPool<SliderTailCircle, DrawableSliderTail>(10, 100);
+            registerPool<SliderTick, DrawableSliderTick>(10, 100);
+            registerPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
+
+            registerPool<Spinner, DrawableSpinner>(2, 20);
+            registerPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
+            registerPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
         }
+
+        private void registerPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
+            where TObject : HitObject
+            where TDrawable : DrawableHitObject, new()
+            => RegisterPool<TObject, TDrawable>(CreatePool<TDrawable>(initialSize, maximumSize));
+
+        protected virtual DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
+            where TDrawable : DrawableHitObject, new()
+            => new OsuDrawablePool<TDrawable>(CheckHittable, OnHitObjectLoaded, initialSize, maximumSize);
+
+        protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
 
         protected override void OnHitObjectAdded(HitObject hitObject)
         {
@@ -171,6 +194,16 @@ namespace osu.Game.Rulesets.Osu.UI
 
                 return judgement;
             }
+        }
+
+        private class OsuHitObjectLifetimeEntry : HitObjectLifetimeEntry
+        {
+            public OsuHitObjectLifetimeEntry(HitObject hitObject)
+                : base(hitObject)
+            {
+            }
+
+            protected override double InitialLifetimeOffset => ((OsuHitObject)HitObject).TimePreempt;
         }
     }
 }

@@ -18,16 +18,16 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
-            => new OsuEditDrawablePool<TDrawable>(Playfield.CheckHittable, Playfield.OnHitObjectLoaded, initialSize, maximumSize);
-
-        protected override Playfield CreatePlayfield() => new OsuPlayfieldNoCursor();
+        protected override Playfield CreatePlayfield() => new OsuEditPlayfield();
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { Size = Vector2.One };
 
-        private class OsuPlayfieldNoCursor : OsuPlayfield
+        private class OsuEditPlayfield : OsuPlayfield
         {
             protected override GameplayCursorContainer CreateCursor() => null;
+
+            protected override DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
+                => new OsuEditDrawablePool<TDrawable>(CheckHittable, OnHitObjectLoaded, initialSize, maximumSize);
         }
     }
 }
