@@ -118,21 +118,22 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         private void applyCustomUpdateState(DrawableHitObject hitObject, ArmedState state)
         {
-            switch (state)
+            if (state == ArmedState.Miss)
+                missFadeTime = hitObject.StateUpdateTime;
+
+            if (missFadeTime == null)
+                return;
+
+            // this state update could come from any nested object of the hold note.
+            // make sure the transforms are consistent across all affected parts
+            // even if they're idle.
+            using (BeginAbsoluteSequence(missFadeTime.Value))
             {
-                case ArmedState.Miss:
-                    missFadeTime ??= hitObject.StateUpdateTime;
-
-                    using (BeginAbsoluteSequence(missFadeTime.Value))
-                    {
-                        // colour and duration matches stable
-                        // transforms not applied to entire hold note in order to not affect hit lighting
-                        holdNote.Head.FadeColour(Colour4.DarkGray, 60);
-                        bodySprite?.FadeColour(Colour4.DarkGray, 60);
-                        holdNote.Tail.FadeColour(Colour4.DarkGray, 60);
-                    }
-
-                    break;
+                // colour and duration matches stable
+                // transforms not applied to entire hold note in order to not affect hit lighting
+                holdNote.Head.FadeColour(Colour4.DarkGray, 60);
+                bodySprite?.FadeColour(Colour4.DarkGray, 60);
+                holdNote.Tail.FadeColour(Colour4.DarkGray, 60);
             }
         }
 
