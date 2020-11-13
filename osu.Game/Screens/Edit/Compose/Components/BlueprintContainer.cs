@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected SelectionHandler SelectionHandler { get; private set; }
 
+        protected readonly HitObjectComposer Composer;
+
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
 
@@ -45,7 +47,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected EditorBeatmap Beatmap { get; private set; }
 
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
-        private readonly HitObjectComposer composer;
         private readonly Dictionary<HitObject, SelectionBlueprint> blueprintMap = new Dictionary<HitObject, SelectionBlueprint>();
 
         [Resolved(canBeNull: true)]
@@ -53,7 +54,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected BlueprintContainer(HitObjectComposer composer)
         {
-            this.composer = composer;
+            Composer = composer;
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -74,9 +75,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
 
             // For non-pooled rulesets, hitobjects are already present in the playfield which allows the blueprints to be loaded in the async context.
-            if (composer != null)
+            if (Composer != null)
             {
-                foreach (var obj in composer.HitObjects)
+                foreach (var obj in Composer.HitObjects)
                     addBlueprintFor(obj.HitObject);
             }
 
@@ -106,14 +107,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Beatmap.HitObjectAdded += addBlueprintFor;
             Beatmap.HitObjectRemoved += removeBlueprintFor;
 
-            if (composer != null)
+            if (Composer != null)
             {
                 // For pooled rulesets, blueprints must be added for hitobjects already "current" as they would've not been "current" during the async load addition process above.
-                foreach (var obj in composer.HitObjects)
+                foreach (var obj in Composer.HitObjects)
                     addBlueprintFor(obj.HitObject);
 
-                composer.Playfield.HitObjectUsageBegan += addBlueprintFor;
-                composer.Playfield.HitObjectUsageFinished += removeBlueprintFor;
+                Composer.Playfield.HitObjectUsageBegan += addBlueprintFor;
+                Composer.Playfield.HitObjectUsageFinished += removeBlueprintFor;
             }
         }
 
@@ -393,7 +394,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void selectAll()
         {
-            composer.Playfield.KeepAllAlive();
+            Composer.Playfield.KeepAllAlive();
 
             // Scheduled to allow the change in lifetime to take place.
             Schedule(() => SelectionBlueprints.ToList().ForEach(m => m.Select()));
@@ -409,7 +410,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectionHandler.HandleSelected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 1);
 
-            composer.Playfield.SetKeepAlive(blueprint.HitObject, true);
+            Composer.Playfield.SetKeepAlive(blueprint.HitObject, true);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
@@ -417,7 +418,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectionHandler.HandleDeselected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 0);
 
-            composer.Playfield.SetKeepAlive(blueprint.HitObject, false);
+            Composer.Playfield.SetKeepAlive(blueprint.HitObject, false);
         }
 
         #endregion
@@ -512,10 +513,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Beatmap.HitObjectRemoved -= removeBlueprintFor;
             }
 
-            if (composer != null)
+            if (Composer != null)
             {
-                composer.Playfield.HitObjectUsageBegan -= addBlueprintFor;
-                composer.Playfield.HitObjectUsageFinished -= removeBlueprintFor;
+                Composer.Playfield.HitObjectUsageBegan -= addBlueprintFor;
+                Composer.Playfield.HitObjectUsageFinished -= removeBlueprintFor;
             }
         }
     }

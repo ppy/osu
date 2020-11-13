@@ -219,6 +219,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
+        /// <summary>
+        /// The total amount of time visible on the timeline.
+        /// </summary>
+        public double VisibleRange => track.Length / Zoom;
+
         public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(screenSpacePosition))));
 

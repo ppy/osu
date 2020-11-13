@@ -26,9 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private EditorBeatmap beatmap { get; set; }
 
         private DragEvent lastDragEvent;
-
         private Bindable<HitObject> placement;
-
         private SelectionBlueprint placementBlueprint;
 
         public TimelineBlueprintContainer(HitObjectComposer composer)
@@ -97,6 +95,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // trigger every frame so drags continue to update selection while playback is scrolling the timeline.
             if (lastDragEvent != null)
                 OnDrag(lastDragEvent);
+
+            if (Composer != null)
+            {
+                Composer.Playfield.PastLifetimeExtension = timeline.VisibleRange / 2;
+                Composer.Playfield.FutureLifetimeExtension = timeline.VisibleRange / 2;
+            }
 
             base.Update();
         }

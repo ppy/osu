@@ -29,7 +29,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        private readonly HitObjectComposer composer;
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
         private PlacementBlueprint currentPlacement;
@@ -38,8 +37,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public ComposeBlueprintContainer(HitObjectComposer composer)
             : base(composer)
         {
-            this.composer = composer;
-
             placementBlueprintContainer = new Container<PlacementBlueprint>
             {
                 RelativeSizeAxes = Axes.Both
@@ -158,7 +155,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementPosition()
         {
-            var snapResult = composer.SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
+            var snapResult = Composer.SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
 
             currentPlacement.UpdatePosition(snapResult);
         }
@@ -169,7 +166,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Update();
 
-            if (composer.CursorInPlacementArea)
+            if (Composer.CursorInPlacementArea)
                 createPlacement();
             else if (currentPlacement?.PlacementActive == false)
                 removePlacement();
@@ -182,7 +179,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
         {
-            var drawable = composer.HitObjects.FirstOrDefault(d => d.HitObject == hitObject);
+            var drawable = Composer.HitObjects.FirstOrDefault(d => d.HitObject == hitObject);
 
             if (drawable == null)
                 return null;
