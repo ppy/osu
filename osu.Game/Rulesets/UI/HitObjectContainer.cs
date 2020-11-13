@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.UI
         /// <remarks>
         /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
         /// </remarks>
-        public event Action<HitObject> HitObjectUsageBegan;
+        internal event Action<HitObject> HitObjectUsageBegan;
 
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
@@ -56,17 +56,17 @@ namespace osu.Game.Rulesets.UI
         /// <remarks>
         /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become dead.
         /// </remarks>
-        public event Action<HitObject> HitObjectUsageFinished;
+        internal event Action<HitObject> HitObjectUsageFinished;
 
         /// <summary>
         /// The amount of time prior to the current time within which <see cref="HitObject"/>s should be considered alive.
         /// </summary>
-        public double PastLifetimeExtension { get; set; }
+        internal double PastLifetimeExtension { get; set; }
 
         /// <summary>
         /// The amount of time after the current time within which <see cref="HitObject"/>s should be considered alive.
         /// </summary>
-        public double FutureLifetimeExtension { get; set; }
+        internal double FutureLifetimeExtension { get; set; }
 
         private readonly Dictionary<DrawableHitObject, IBindable> startTimeMap = new Dictionary<DrawableHitObject, IBindable>();
         private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> drawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
