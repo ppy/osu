@@ -154,6 +154,8 @@ namespace osu.Game.Rulesets.UI
             return false;
         }
 
+        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
+
         /// <summary>
         /// Adds a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> to this <see cref="Playfield"/>.
         /// </summary>
@@ -161,6 +163,7 @@ namespace osu.Game.Rulesets.UI
         public virtual void Add(HitObjectLifetimeEntry entry)
         {
             HitObjectContainer.Add(entry);
+            lifetimeEntryMap[entry.HitObject] = entry;
             OnHitObjectAdded(entry.HitObject);
         }
 
@@ -173,6 +176,7 @@ namespace osu.Game.Rulesets.UI
         {
             if (HitObjectContainer.Remove(entry))
             {
+                lifetimeEntryMap.Remove(entry.HitObject);
                 OnHitObjectRemoved(entry.HitObject);
                 return true;
             }
