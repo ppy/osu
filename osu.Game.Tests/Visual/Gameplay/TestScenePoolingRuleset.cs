@@ -134,23 +134,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            protected override HitObjectLifetimeEntry CreateLifetimeEntry(TestHitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
-
             public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h) => null;
 
             protected override PassThroughInputManager CreateInputManager() => new PassThroughInputManager();
 
             protected override Playfield CreatePlayfield() => new TestPlayfield(PoolSize);
-
-            private class TestHitObjectLifetimeEntry : HitObjectLifetimeEntry
-            {
-                public TestHitObjectLifetimeEntry(HitObject hitObject)
-                    : base(hitObject)
-                {
-                }
-
-                protected override double InitialLifetimeOffset => 0;
-            }
         }
 
         private class TestPlayfield : Playfield
@@ -169,7 +157,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                 RegisterPool<TestHitObject, DrawableTestHitObject>(poolSize);
             }
 
+            protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
+
             protected override GameplayCursorContainer CreateCursor() => null;
+        }
+
+        private class TestHitObjectLifetimeEntry : HitObjectLifetimeEntry
+        {
+            public TestHitObjectLifetimeEntry(HitObject hitObject)
+                : base(hitObject)
+            {
+            }
+
+            protected override double InitialLifetimeOffset => 0;
         }
 
         private class TestBeatmapConverter : BeatmapConverter<TestHitObject>
