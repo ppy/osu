@@ -105,6 +105,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             Beatmap.HitObjectAdded += addBlueprintFor;
             Beatmap.HitObjectRemoved += removeBlueprintFor;
+
+            if (composer != null)
+            {
+                // For pooled rulesets, blueprints must be added for hitobjects already "current" as they would've not been "current" during the async load addition process above.
+                foreach (var obj in composer.HitObjects)
+                    addBlueprintFor(obj.HitObject);
+
+                composer.Playfield.HitObjectUsageBegan += addBlueprintFor;
+                composer.Playfield.HitObjectUsageFinished += removeBlueprintFor;
+            }
         }
 
         protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() =>
@@ -381,7 +391,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Selects all <see cref="SelectionBlueprint"/>s.
         /// </summary>
-        private void selectAll() => SelectionBlueprints.ToList().ForEach(m => m.Select());
+        private void selectAll()
+        {
+            composer.Playfield.KeepAllAlive();
+
+            // Scheduled to allow the change in lifetime to take place.
+            Schedule(() => SelectionBlueprints.ToList().ForEach(m => m.Select()));
+        }
 
         /// <summary>
         /// Deselects all selected <see cref="SelectionBlueprint"/>s.
@@ -392,12 +408,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             SelectionHandler.HandleSelected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 1);
+
+            composer.Playfield.SetKeepAlive(blueprint.HitObject, true);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
             SelectionHandler.HandleDeselected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 0);
+
+            composer.Playfield.SetKeepAlive(blueprint.HitObject, false);
         }
 
         #endregion
@@ -490,6 +510,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Beatmap.HitObjectAdded -= addBlueprintFor;
                 Beatmap.HitObjectRemoved -= removeBlueprintFor;
+            }
+
+            if (composer != null)
+            {
+                composer.Playfield.HitObjectUsageBegan -= addBlueprintFor;
+                composer.Playfield.HitObjectUsageFinished -= removeBlueprintFor;
             }
         }
     }
