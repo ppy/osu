@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -24,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
             new SwellCompositionTool()
         };
 
-        protected override ComposeBlueprintContainer CreateBlueprintContainer(IEnumerable<DrawableHitObject> hitObjects)
-            => new TaikoBlueprintContainer(hitObjects);
+        protected override ComposeBlueprintContainer CreateBlueprintContainer()
+            => new TaikoBlueprintContainer(this);
     }
 }

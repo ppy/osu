@@ -42,6 +42,32 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
+        /// </remarks>
+        public event Action<HitObject> HitObjectUsageBegan;
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become dead.
+        /// </remarks>
+        public event Action<HitObject> HitObjectUsageFinished;
+
+        /// <summary>
+        /// The amount of time prior to the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        public double PastLifetimeExtension { get; set; }
+
+        /// <summary>
+        /// The amount of time after the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        public double FutureLifetimeExtension { get; set; }
+
         private readonly Dictionary<DrawableHitObject, IBindable> startTimeMap = new Dictionary<DrawableHitObject, IBindable>();
         private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> drawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
@@ -88,6 +114,8 @@ namespace osu.Game.Rulesets.UI
 
             bindStartTime(drawable);
             AddInternal(drawableMap[entry] = drawable, false);
+
+            HitObjectUsageBegan?.Invoke(entry.HitObject);
         }
 
         private void removeDrawable(HitObjectLifetimeEntry entry)
@@ -103,6 +131,8 @@ namespace osu.Game.Rulesets.UI
 
             unbindStartTime(drawable);
             RemoveInternal(drawable);
+
+            HitObjectUsageFinished?.Invoke(entry.HitObject);
         }
 
         #endregion
@@ -159,7 +189,7 @@ namespace osu.Game.Rulesets.UI
         protected override bool CheckChildrenLife()
         {
             bool aliveChanged = base.CheckChildrenLife();
-            aliveChanged |= lifetimeManager.Update(Time.Current, Time.Current);
+            aliveChanged |= lifetimeManager.Update(Time.Current - PastLifetimeExtension, Time.Current + FutureLifetimeExtension);
             return aliveChanged;
         }
 
