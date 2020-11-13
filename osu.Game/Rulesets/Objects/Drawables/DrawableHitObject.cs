@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -27,7 +28,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
     [Cached(typeof(DrawableHitObject))]
     public abstract class DrawableHitObject : SkinReloadableDrawable
     {
+        /// <summary>
+        /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
+        /// </summary>
         public event Action<DrawableHitObject> DefaultsApplied;
+
+        /// <summary>
+        /// Invoked after a <see cref="HitObject"/> has been applied to this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<DrawableHitObject> HitObjectApplied;
 
         /// <summary>
         /// The <see cref="HitObject"/> currently represented by this <see cref="DrawableHitObject"/>.
@@ -130,6 +139,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [Resolved(CanBeNull = true)]
         private DrawableRuleset drawableRuleset { get; set; }
 
+        private Container<PausableSkinnableSound> samplesContainer;
+
         /// <summary>
         /// Creates a new <see cref="DrawableHitObject"/>.
         /// </summary>
@@ -146,6 +157,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
+
+            // Explicit non-virtual function call.
+            base.AddInternal(samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both });
         }
 
         protected override void LoadAsyncComplete()
@@ -160,7 +174,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            StartTimeBindable.BindValueChanged(_ => updateState(State.Value, true));
             comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
 
             updateState(ArmedState.Idle, true);
@@ -214,6 +227,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             StartTimeBindable.BindTo(HitObject.StartTimeBindable);
+            StartTimeBindable.BindValueChanged(onStartTimeChanged);
+
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.BindTo(combo.ComboIndexBindable);
 
@@ -223,6 +238,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject.DefaultsApplied += onDefaultsApplied;
 
             OnApply(hitObject);
+            HitObjectApplied?.Invoke(this);
 
             // If not loaded, the state update happens in LoadComplete(). Otherwise, the update is scheduled to allow for lifetime updates.
             if (IsLoaded)
@@ -242,8 +258,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
-
             samplesBindable.UnbindFrom(HitObject.SamplesBindable);
+
+            // Changes in start time trigger state updates. When a new hitobject is applied, OnApply() automatically performs a state update anyway.
+            StartTimeBindable.ValueChanged -= onStartTimeChanged;
 
             // When a new hitobject is applied, the samples will be cleared before re-populating.
             // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
@@ -312,11 +330,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         protected virtual void LoadSamples()
         {
-            if (Samples != null)
-            {
-                RemoveInternal(Samples);
-                Samples = null;
-            }
+            samplesContainer.Clear();
+            Samples = null;
 
             var samples = GetSamples().ToArray();
 
@@ -329,11 +344,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                     + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
-            AddInternal(Samples);
+            samplesContainer.Add(Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s))));
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
+
+        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => updateState(State.Value, true);
 
         private void onNewResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnNewResult?.Invoke(drawableHitObject, result);
 

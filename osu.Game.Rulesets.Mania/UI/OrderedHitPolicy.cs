@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -44,9 +43,6 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <param name="hitObject">The <see cref="HitObject"/> that was hit.</param>
         public void HandleHit(DrawableHitObject hitObject)
         {
-            if (!IsHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset))
-                throw new InvalidOperationException($"A {hitObject} was hit before it became hittable!");
-
             foreach (var obj in enumerateHitObjectsUpTo(hitObject.HitObject.StartTime))
             {
                 if (obj.Judged)
