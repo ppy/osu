@@ -170,7 +170,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            StartTimeBindable.BindValueChanged(_ => updateState(State.Value, true));
             comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
 
             updateState(ArmedState.Idle, true);
@@ -220,6 +219,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             StartTimeBindable.BindTo(HitObject.StartTimeBindable);
+            StartTimeBindable.BindValueChanged(onStartTimeChanged);
+
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.BindTo(combo.ComboIndexBindable);
 
@@ -249,8 +250,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
-
             samplesBindable.UnbindFrom(HitObject.SamplesBindable);
+
+            // Changes in start time trigger state updates. When a new hitobject is applied, OnApply() automatically performs a state update anyway.
+            StartTimeBindable.ValueChanged -= onStartTimeChanged;
 
             // When a new hitobject is applied, the samples will be cleared before re-populating.
             // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
@@ -329,6 +332,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
+
+        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => updateState(State.Value, true);
 
         private void onNewResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnNewResult?.Invoke(drawableHitObject, result);
 
