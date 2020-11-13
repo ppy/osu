@@ -38,12 +38,21 @@ namespace osu.Game.Screens.Play
             processor.Combo.BindValueChanged(onComboChange);
         }
 
+        [Resolved(canBeNull: true)]
+        private ISamplePlaybackDisabler samplePlaybackDisabler { get; set; }
+
         private void onComboChange(ValueChangedEvent<int> combo)
         {
             if (combo.NewValue == 0 && (combo.OldValue > 20 || (alwaysPlay.Value && firstTime)))
             {
-                comboBreakSample?.Play();
                 firstTime = false;
+
+                // combo break isn't a pausable sound itself as we want to let it play out.
+                // we still need to disable during seeks, though.
+                if (samplePlaybackDisabler?.SamplePlaybackDisabled.Value == true)
+                    return;
+
+                comboBreakSample?.Play();
             }
         }
     }
