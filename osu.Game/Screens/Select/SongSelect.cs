@@ -519,6 +519,12 @@ namespace osu.Game.Screens.Select
             this.FadeInFromZero(250);
             FilterControl.Activate();
 
+            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
+            {
+                backgroundModeBeatmap.BlurAmount.Value = 1;
+                backgroundModeBeatmap.EnableUIBlur.Value = true;
+            }
+
             ModSelect.SelectedMods.BindTo(selectedMods);
 
             beginLooping();
