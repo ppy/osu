@@ -30,6 +30,22 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
+        /// </remarks>
+        public event Action<HitObject> HitObjectUsageBegan;
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become dead.
+        /// </remarks>
+        public event Action<HitObject> HitObjectUsageFinished;
+
+        /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
         public HitObjectContainer HitObjectContainer => hitObjectContainerLazy.Value;
@@ -88,6 +104,8 @@ namespace osu.Game.Rulesets.UI
             {
                 h.NewResult += (d, r) => NewResult?.Invoke(d, r);
                 h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+                h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
+                h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
         }
 
@@ -136,6 +154,8 @@ namespace osu.Game.Rulesets.UI
             return false;
         }
 
+        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
+
         /// <summary>
         /// Adds a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> to this <see cref="Playfield"/>.
         /// </summary>
@@ -143,6 +163,7 @@ namespace osu.Game.Rulesets.UI
         public virtual void Add(HitObjectLifetimeEntry entry)
         {
             HitObjectContainer.Add(entry);
+            lifetimeEntryMap[entry.HitObject] = entry;
             OnHitObjectAdded(entry.HitObject);
         }
 
@@ -155,6 +176,7 @@ namespace osu.Game.Rulesets.UI
         {
             if (HitObjectContainer.Remove(entry))
             {
+                lifetimeEntryMap.Remove(entry.HitObject);
                 OnHitObjectRemoved(entry.HitObject);
                 return true;
             }
@@ -184,6 +206,77 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
+        /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to set.</param>
+        /// <param name="keepAlive">Whether to keep <paramref name="hitObject"/> always alive.</param>
+        public void SetKeepAlive(HitObject hitObject, bool keepAlive)
+        {
+            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+            {
+                entry.KeepAlive = keepAlive;
+                return;
+            }
+
+            if (!nestedPlayfields.IsValueCreated)
+                return;
+
+            foreach (var p in nestedPlayfields.Value)
+                p.SetKeepAlive(hitObject, keepAlive);
+        }
+
+        /// <summary>
+        /// Keeps all <see cref="HitObject"/>s alive within this and all nested <see cref="Playfield"/>s.
+        /// </summary>
+        public void KeepAllAlive()
+        {
+            foreach (var (_, entry) in lifetimeEntryMap)
+                entry.KeepAlive = true;
+
+            if (!nestedPlayfields.IsValueCreated)
+                return;
+
+            foreach (var p in nestedPlayfields.Value)
+                p.KeepAllAlive();
+        }
+
+        /// <summary>
+        /// The amount of time prior to the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        public double PastLifetimeExtension
+        {
+            get => HitObjectContainer.PastLifetimeExtension;
+            set
+            {
+                HitObjectContainer.PastLifetimeExtension = value;
+
+                if (!nestedPlayfields.IsValueCreated)
+                    return;
+
+                foreach (var nested in nestedPlayfields.Value)
+                    nested.PastLifetimeExtension = value;
+            }
+        }
+
+        /// <summary>
+        /// The amount of time after the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        public double FutureLifetimeExtension
+        {
+            get => HitObjectContainer.FutureLifetimeExtension;
+            set
+            {
+                HitObjectContainer.FutureLifetimeExtension = value;
+
+                if (!nestedPlayfields.IsValueCreated)
+                    return;
+
+                foreach (var nested in nestedPlayfields.Value)
+                    nested.FutureLifetimeExtension = value;
+            }
+        }
+
+        /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
         public GameplayCursorContainer Cursor { get; private set; }
@@ -208,6 +301,8 @@ namespace osu.Game.Rulesets.UI
 
             otherPlayfield.NewResult += (d, r) => NewResult?.Invoke(d, r);
             otherPlayfield.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+            otherPlayfield.HitObjectUsageBegan += h => HitObjectUsageBegan?.Invoke(h);
+            otherPlayfield.HitObjectUsageFinished += h => HitObjectUsageFinished?.Invoke(h);
 
             nestedPlayfields.Value.Add(otherPlayfield);
         }
