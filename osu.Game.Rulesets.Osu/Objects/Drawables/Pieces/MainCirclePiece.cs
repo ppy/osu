@@ -51,9 +51,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
 
             state.BindTo(drawableObject.State);
-            state.BindValueChanged(updateState, true);
-
             accentColour.BindTo(drawableObject.AccentColour);
+            indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            state.BindValueChanged(updateState, true);
             accentColour.BindValueChanged(colour =>
             {
                 explode.Colour = colour.NewValue;
@@ -61,7 +67,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 circle.Colour = colour.NewValue;
             }, true);
 
-            indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
         }
 
