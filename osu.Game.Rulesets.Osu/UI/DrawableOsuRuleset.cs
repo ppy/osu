@@ -59,6 +59,8 @@ namespace osu.Game.Rulesets.Osu.UI
             where TDrawable : DrawableHitObject, new()
             => new OsuDrawablePool<TDrawable>(Playfield.CheckHittable, Playfield.OnHitObjectLoaded, initialSize, maximumSize);
 
+        public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h) => null;
+
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(OsuHitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
