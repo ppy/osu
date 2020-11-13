@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -108,7 +109,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         protected virtual float SamplePlaybackPosition => 0.5f;
 
-        private readonly Bindable<double> startTimeBindable = new Bindable<double>();
+        public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
         private readonly BindableList<HitSampleInfo> samplesBindable = new BindableList<HitSampleInfo>();
         private readonly Bindable<bool> userPositionalHitSounds = new Bindable<bool>();
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
@@ -129,6 +130,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private bool hasHitObjectApplied;
 
         /// <summary>
+        /// The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the currently-attached <see cref="HitObject"/>.
+        /// </summary>
+        [CanBeNull]
+        private HitObjectLifetimeEntry lifetimeEntry;
+
+        private Container<PausableSkinnableSound> samplesContainer;
+
+        /// <summary>
         /// Creates a new <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="initialHitObject">
@@ -144,6 +153,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
+
+            // Explicit non-virtual function call.
+            base.AddInternal(samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both });
         }
 
         protected override void LoadAsyncComplete()
@@ -151,14 +163,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.LoadAsyncComplete();
 
             if (HitObject != null)
-                Apply(HitObject);
+                Apply(HitObject, lifetimeEntry);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            startTimeBindable.BindValueChanged(_ => updateState(State.Value, true));
             comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
 
             updateState(ArmedState.Idle, true);
@@ -168,15 +179,32 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Applies a new <see cref="HitObject"/> to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to apply.</param>
-        public void Apply(HitObject hitObject)
+        /// <param name="lifetimeEntry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of <paramref name="hitObject"/>.</param>
+        public void Apply([NotNull] HitObject hitObject, [CanBeNull] HitObjectLifetimeEntry lifetimeEntry)
         {
             free();
 
             HitObject = hitObject ?? throw new InvalidOperationException($"Cannot apply a null {nameof(HitObject)}.");
 
+            this.lifetimeEntry = lifetimeEntry;
+
+            if (lifetimeEntry != null)
+            {
+                // Transfer lifetime from the entry.
+                LifetimeStart = lifetimeEntry.LifetimeStart;
+                LifetimeEnd = lifetimeEntry.LifetimeEnd;
+
+                // Copy any existing result from the entry (required for rewind / judgement revert).
+                Result = lifetimeEntry.Result;
+            }
+
             // Ensure this DHO has a result.
             Result ??= CreateResult(HitObject.CreateJudgement())
                        ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+
+            // Copy back the result to the entry for potential future retrieval.
+            if (lifetimeEntry != null)
+                lifetimeEntry.Result = Result;
 
             foreach (var h in HitObject.NestedHitObjects)
             {
@@ -190,7 +218,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 AddNestedHitObject(drawableNested);
             }
 
-            startTimeBindable.BindTo(HitObject.StartTimeBindable);
+            StartTimeBindable.BindTo(HitObject.StartTimeBindable);
+            StartTimeBindable.BindValueChanged(onStartTimeChanged);
+
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.BindTo(combo.ComboIndexBindable);
 
@@ -217,11 +247,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!hasHitObjectApplied)
                 return;
 
-            startTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
+            StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
-
             samplesBindable.UnbindFrom(HitObject.SamplesBindable);
+
+            // Changes in start time trigger state updates. When a new hitobject is applied, OnApply() automatically performs a state update anyway.
+            StartTimeBindable.ValueChanged -= onStartTimeChanged;
 
             // When a new hitobject is applied, the samples will be cleared before re-populating.
             // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
@@ -245,6 +277,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             OnFree(HitObject);
 
             HitObject = null;
+            lifetimeEntry = null;
+
             hasHitObjectApplied = false;
         }
 
@@ -280,11 +314,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         protected virtual void LoadSamples()
         {
-            if (Samples != null)
-            {
-                RemoveInternal(Samples);
-                Samples = null;
-            }
+            samplesContainer.Clear();
+            Samples = null;
 
             var samples = GetSamples().ToArray();
 
@@ -297,11 +328,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                     + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
-            AddInternal(Samples);
+            samplesContainer.Add(Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s))));
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
+
+        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => updateState(State.Value, true);
 
         private void onNewResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnNewResult?.Invoke(drawableHitObject, result);
 
@@ -311,7 +343,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onDefaultsApplied(HitObject hitObject)
         {
-            Apply(hitObject);
+            Apply(hitObject, lifetimeEntry);
             DefaultsApplied?.Invoke(this);
         }
 
@@ -558,15 +590,27 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
 
-        private double? lifetimeStart;
-
         public override double LifetimeStart
         {
-            get => lifetimeStart ?? (HitObject.StartTime - InitialLifetimeOffset);
-            set
+            get => base.LifetimeStart;
+            set => setLifetime(value, LifetimeEnd);
+        }
+
+        public override double LifetimeEnd
+        {
+            get => base.LifetimeEnd;
+            set => setLifetime(LifetimeStart, value);
+        }
+
+        private void setLifetime(double lifetimeStart, double lifetimeEnd)
+        {
+            base.LifetimeStart = lifetimeStart;
+            base.LifetimeEnd = lifetimeEnd;
+
+            if (lifetimeEntry != null)
             {
-                lifetimeStart = value;
-                base.LifetimeStart = value;
+                lifetimeEntry.LifetimeStart = lifetimeStart;
+                lifetimeEntry.LifetimeEnd = lifetimeEnd;
             }
         }
 

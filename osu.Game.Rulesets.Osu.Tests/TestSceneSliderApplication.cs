@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(300, 0),
                 }),
                 RepeatCount = 1
-            })));
+            }), null));
         }
 
         private Slider prepareObject(Slider slider)
