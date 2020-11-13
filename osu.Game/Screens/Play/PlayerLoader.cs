@@ -268,7 +268,7 @@ namespace osu.Game.Screens.Play
                 // Returns background dim and blur to the values specified by PlayerLoader.
                 Background.EnableGameplayDim.Value = false;
                 Background.EnableUIBlur.Value = true;
-                Background.BlurAmount.Value = 0.5f;
+                Background.BlurAmount.Value = 0.75f;
 
                 BackgroundBrightnessReduction = true;
             }
