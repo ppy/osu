@@ -134,19 +134,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                RegisterPool<TestHitObject, DrawableTestHitObject>(PoolSize);
-            }
-
             protected override HitObjectLifetimeEntry CreateLifetimeEntry(TestHitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
 
             public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h) => null;
 
             protected override PassThroughInputManager CreateInputManager() => new PassThroughInputManager();
 
-            protected override Playfield CreatePlayfield() => new TestPlayfield();
+            protected override Playfield CreatePlayfield() => new TestPlayfield(PoolSize);
 
             private class TestHitObjectLifetimeEntry : HitObjectLifetimeEntry
             {
@@ -161,9 +155,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestPlayfield : Playfield
         {
-            public TestPlayfield()
+            private readonly int poolSize;
+
+            public TestPlayfield(int poolSize)
             {
+                this.poolSize = poolSize;
                 AddInternal(HitObjectContainer);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RegisterPool<TestHitObject, DrawableTestHitObject>(poolSize);
             }
 
             protected override GameplayCursorContainer CreateCursor() => null;
