@@ -15,7 +15,6 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
@@ -246,7 +245,7 @@ namespace osu.Game.Rulesets.UI
             if (drawableRepresentation != null)
                 Playfield.Add(drawableRepresentation);
             else
-                Playfield.Add(GetLifetimeEntry(hitObject));
+                Playfield.Add(hitObject);
         }
 
         /// <summary>
@@ -258,31 +257,16 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
         public bool RemoveHitObject(TObject hitObject)
         {
-            var entry = GetLifetimeEntry(hitObject);
-
-            // May have been newly-created by the above call - remove it anyway.
-            RemoveLifetimeEntry(hitObject);
-
-            if (Playfield.Remove(entry))
+            if (Playfield.Remove(hitObject))
                 return true;
 
-            // If the entry was not removed from the playfield, assume the hitobject is not being pooled and attempt a direct removal.
+            // If the entry was not removed from the playfield, assume the hitobject is not being pooled and attempt a direct drawable removal.
             var drawableObject = Playfield.AllHitObjects.SingleOrDefault(d => d.HitObject == hitObject);
             if (drawableObject != null)
                 return Playfield.Remove(drawableObject);
 
             return false;
         }
-
-        protected sealed override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject)
-        {
-            if (!(hitObject is TObject tHitObject))
-                throw new InvalidOperationException($"Unexpected hitobject type: {hitObject.GetType().ReadableName()}");
-
-            return CreateLifetimeEntry(tHitObject);
-        }
-
-        protected virtual HitObjectLifetimeEntry CreateLifetimeEntry(TObject hitObject) => new HitObjectLifetimeEntry(hitObject);
 
         public override void SetRecordTarget(Replay recordingReplay)
         {
@@ -546,39 +530,6 @@ namespace osu.Game.Rulesets.UI
         /// Invoked when the user requests to pause while the resume overlay is active.
         /// </summary>
         public abstract void CancelResume();
-
-        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntries = new Dictionary<HitObject, HitObjectLifetimeEntry>();
-
-        /// <summary>
-        /// Creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
-        /// </summary>
-        /// <remarks>
-        /// This may be overridden to provide custom lifetime control (e.g. via <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/>.
-        /// </remarks>
-        /// <param name="hitObject">The <see cref="HitObject"/> to create the entry for.</param>
-        /// <returns>The <see cref="HitObjectLifetimeEntry"/>.</returns>
-        [NotNull]
-        protected abstract HitObjectLifetimeEntry CreateLifetimeEntry([NotNull] HitObject hitObject);
-
-        /// <summary>
-        /// Retrieves or creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to retrieve or create the <see cref="HitObjectLifetimeEntry"/> for.</param>
-        /// <returns>The <see cref="HitObjectLifetimeEntry"/> for <paramref name="hitObject"/>.</returns>
-        [NotNull]
-        internal HitObjectLifetimeEntry GetLifetimeEntry([NotNull] HitObject hitObject)
-        {
-            if (lifetimeEntries.TryGetValue(hitObject, out var entry))
-                return entry;
-
-            return lifetimeEntries[hitObject] = CreateLifetimeEntry(hitObject);
-        }
-
-        /// <summary>
-        /// Removes the <see cref="HitObjectLifetimeEntry"/> for a <see cref="HitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to remove the <see cref="HitObjectLifetimeEntry"/> for.</param>
-        internal void RemoveLifetimeEntry([NotNull] HitObject hitObject) => lifetimeEntries.Remove(hitObject);
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException
