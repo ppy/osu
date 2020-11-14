@@ -302,12 +302,12 @@ namespace osu.Game.Screens.Play
                     {
                         ScoreProcessor,
                         HealthProcessor,
+                        new ComboEffects(ScoreProcessor),
                         breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
                         {
                             Breaks = working.Beatmap.Breaks
                         }
                     }),
-                new ComboEffects(ScoreProcessor)
             }
         };
 
