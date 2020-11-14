@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     {
         private UserHistoryCount[] values;
 
-        [CanBeNull]
+        [NotNull]
         public UserHistoryCount[] Values
         {
             get => values;

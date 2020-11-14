@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -38,7 +39,32 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
             if (values?.Length > 1)
             {
-                chart.Values = values;
+                // Fill dates with 0 count
+
+                var newValues = new List<UserHistoryCount> { values[0] };
+                var newLast = values[0];
+
+                for (int i = 1; i < values.Length; i++)
+                {
+                    while (hasMissingDates(newLast, values[i]))
+                    {
+                        newValues.Add(newLast = new UserHistoryCount
+                        {
+                            Count = 0,
+                            Date = newLast.Date.AddMonths(1)
+                        });
+                    }
+
+                    newValues.Add(newLast = values[i]);
+                }
+
+                static bool hasMissingDates(UserHistoryCount prev, UserHistoryCount current)
+                {
+                    var possibleCurrent = prev.Date.AddMonths(1);
+                    return possibleCurrent != current.Date;
+                }
+
+                chart.Values = newValues.ToArray();
                 Show();
                 return;
             }
