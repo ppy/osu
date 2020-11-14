@@ -23,11 +23,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             DrawableSample[] samples = null;
             ISamplePlaybackDisabler sampleDisabler = null;
 
-            AddStep("get variables", () =>
+            AddUntilStep("get variables", () =>
             {
                 sampleDisabler = Player;
-                slider = Player.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).First();
-                samples = slider.ChildrenOfType<DrawableSample>().ToArray();
+                slider = Player.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).FirstOrDefault();
+                samples = slider?.ChildrenOfType<DrawableSample>().ToArray();
+
+                return slider != null;
             });
 
             AddUntilStep("wait for slider sliding then seek", () =>

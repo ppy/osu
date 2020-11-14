@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private HitObjectLifetimeEntry lifetimeEntry;
 
         [Resolved(CanBeNull = true)]
-        private DrawableRuleset drawableRuleset { get; set; }
+        private IPooledHitObjectProvider pooledObjectProvider { get; set; }
 
         private Container<PausableSkinnableSound> samplesContainer;
 
@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             foreach (var h in HitObject.NestedHitObjects)
             {
-                var drawableNested = drawableRuleset?.GetPooledDrawableRepresentation(h)
+                var drawableNested = pooledObjectProvider?.GetPooledDrawableRepresentation(h)
                                      ?? CreateNestedHitObject(h)
                                      ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
 
