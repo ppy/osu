@@ -14,6 +14,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
         }
 
-        protected override UserHistoryCount[] GetValues(User user) => user.MonthlyPlaycounts;
+        protected override UserHistoryCount[] GetValues(User user) => user?.MonthlyPlaycounts;
     }
 }
