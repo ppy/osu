@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         protected ChartProfileSubsection(Bindable<User> user, string headerText)
             : base(user, headerText)
         {
-
         }
 
         protected override Drawable CreateContent() => new Container
