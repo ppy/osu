@@ -28,10 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var d in drawables)
-            {
                 d.HitObjectApplied += applyFadeInAdjustment;
-                applyFadeInAdjustment(d);
-            }
 
             base.ApplyToDrawableHitObjects(drawables);
         }
