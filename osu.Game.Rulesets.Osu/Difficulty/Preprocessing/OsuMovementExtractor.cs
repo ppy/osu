@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             double correctionNeg2Flow = AngleCorrection.FLOW_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
             double correctionNeg2Snap = AngleCorrection.SNAP_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
-            double correctionNeg2Stop = calcCorrection0Stop(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
+            double correctionNeg2Stop = calcCorrection0Stop(xNeg2, yNeg2);
 
             p.SecondLastToCurrentFlowiness = SpecialFunctions.Logistic((correctionNeg2Snap - correctionNeg2Flow - 0.05) * 20);
 
@@ -379,21 +379,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static double calculateDistanceIncreaseBuff(MovementExtractionParameters p)
         {
             // Correction #14 - Sudden distance increase buff
-            double distanceIncreaseBuff = 1;
+            if (p.SecondLastObject == null)
+                return 1;
 
-            if (p.SecondLastObject != null)
-            {
-                double dNeg2PrevOverlapNerf = Math.Min(1, Math.Pow(p.SecondLastToLast?.RelativeLength ?? 0, 3));
-                double timeDifferenceNerf = Math.Exp(-4
-                                                     * Math.Pow(
-                                                         1 - Math.Max(p.LastToCurrent.TimeDelta / ((p.SecondLastToLast?.TimeDelta ?? 0) + 1e-10),
-                                                             (p.SecondLastToLast?.TimeDelta ?? 0) / (p.LastToCurrent.TimeDelta + 1e-10)), 2));
-                double distanceRatio = p.LastToCurrent.RelativeLength / Math.Max(1, p.SecondLastToLast?.RelativeLength ?? 0);
-                double bpmScaling = Math.Max(1, -16 * p.LastToCurrent.TimeDelta + 3.4);
-                distanceIncreaseBuff = 1 + 0.225 * bpmScaling * timeDifferenceNerf * dNeg2PrevOverlapNerf * Math.Max(0, distanceRatio - 2);
-            }
-
-            return distanceIncreaseBuff;
+            double dNeg2PrevOverlapNerf = Math.Min(1, Math.Pow(p.SecondLastToLast?.RelativeLength ?? 0, 3));
+            double timeDifferenceNerf = Math.Exp(-4
+                                                 * Math.Pow(
+                                                     1 - Math.Max(p.LastToCurrent.TimeDelta / ((p.SecondLastToLast?.TimeDelta ?? 0) + 1e-10),
+                                                         (p.SecondLastToLast?.TimeDelta ?? 0) / (p.LastToCurrent.TimeDelta + 1e-10)), 2));
+            double distanceRatio = p.LastToCurrent.RelativeLength / Math.Max(1, p.SecondLastToLast?.RelativeLength ?? 0);
+            double bpmScaling = Math.Max(1, -16 * p.LastToCurrent.TimeDelta + 3.4);
+            return 1 + 0.225 * bpmScaling * timeDifferenceNerf * dNeg2PrevOverlapNerf * Math.Max(0, distanceRatio - 2);
         }
 
         private static double calcCorrection0Stop(double d, double x, double y)
