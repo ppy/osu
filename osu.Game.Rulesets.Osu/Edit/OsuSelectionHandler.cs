@@ -21,12 +21,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.OnSelectionChanged();
 
-            bool canOperate = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
+            Quad quad = selectedMovableObjects.Length > 0 ? getSurroundingQuad(selectedMovableObjects) : new Quad();
 
-            SelectionBox.CanRotate = canOperate;
-            SelectionBox.CanScaleX = canOperate;
-            SelectionBox.CanScaleY = canOperate;
-            SelectionBox.CanReverse = canOperate;
+            SelectionBox.CanRotate = quad.Width > 0 || quad.Height > 0;
+            SelectionBox.CanScaleX = quad.Width > 0;
+            SelectionBox.CanScaleY = quad.Height > 0;
+            SelectionBox.CanReverse = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
         }
 
         protected override void OnOperationEnded()
@@ -45,12 +45,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override bool HandleReverse()
         {
-            var hitObjects = selectedMovableObjects;
+            var hitObjects = EditorBeatmap.SelectedHitObjects;
 
             double endTime = hitObjects.Max(h => h.GetEndTime());
             double startTime = hitObjects.Min(h => h.StartTime);
 
-            bool moreThanOneObject = hitObjects.Length > 1;
+            bool moreThanOneObject = hitObjects.Count > 1;
 
             foreach (var h in hitObjects)
             {

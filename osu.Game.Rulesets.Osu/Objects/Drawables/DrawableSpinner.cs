@@ -29,9 +29,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Container<DrawableSpinnerTick> ticks;
         private SpinnerBonusDisplay bonusDisplay;
+        private Container<PausableSkinnableSound> samplesContainer;
 
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
+
+        public DrawableSpinner()
+            : this(null)
+        {
+        }
 
         public DrawableSpinner([CanBeNull] Spinner s = null)
             : base(s)
@@ -70,7 +76,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Y = -120,
-                }
+                },
+                samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both }
             };
 
             PositionBindable.BindValueChanged(pos => Position = pos.NewValue);
@@ -92,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.LoadSamples();
 
-            spinningSample?.Expire();
+            samplesContainer.Clear();
             spinningSample = null;
 
             var firstSample = HitObject.Samples.FirstOrDefault();
@@ -102,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
                 clone.Name = "spinnerspin";
 
-                AddInternal(spinningSample = new PausableSkinnableSound(clone)
+                samplesContainer.Add(spinningSample = new PausableSkinnableSound(clone)
                 {
                     Volume = { Value = 0 },
                     Looping = true,
@@ -155,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            ticks.Clear();
+            ticks.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)

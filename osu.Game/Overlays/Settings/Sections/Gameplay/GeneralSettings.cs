@@ -68,6 +68,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "立体音效",
                     Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "在第一次断连时播放音效",
+                    Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
+                },
                 new SettingsEnumDropdown<ScoreMeterType>
                 {
                     LabelText = "分数计类型",

@@ -16,8 +16,6 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
-        public const int LATEST_VERSION = 14;
-
         private Beatmap beatmap;
 
         private ConvertHitObjectParser parser;

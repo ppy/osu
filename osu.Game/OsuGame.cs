@@ -470,7 +470,7 @@ namespace osu.Game
 
         #endregion
 
-        private ScheduledDelegate performFromMainMenuTask;
+        private PerformFromMenuRunner performFromMainMenuTask;
 
         /// <summary>
         /// Perform an action only after returning to a specific screen as indicated by <paramref name="validScreens"/>.
@@ -481,34 +481,7 @@ namespace osu.Game
         public void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null)
         {
             performFromMainMenuTask?.Cancel();
-
-            validScreens ??= Enumerable.Empty<Type>();
-            validScreens = validScreens.Append(typeof(MainMenu));
-
-            CloseAllOverlays(false);
-
-            // we may already be at the target screen type.
-            if (validScreens.Contains(ScreenStack.CurrentScreen?.GetType()) && !Beatmap.Disabled)
-            {
-                action(ScreenStack.CurrentScreen);
-                return;
-            }
-
-            // find closest valid target
-            IScreen screen = ScreenStack.CurrentScreen;
-
-            while (screen != null)
-            {
-                if (validScreens.Contains(screen.GetType()))
-                {
-                    screen.MakeCurrent();
-                    break;
-                }
-
-                screen = screen.GetParentScreen();
-            }
-
-            performFromMainMenuTask = Schedule(() => PerformFromScreen(action, validScreens));
+            Add(performFromMainMenuTask = new PerformFromMenuRunner(action, validScreens, () => ScreenStack.CurrentScreen));
         }
 
         /// <summary>
