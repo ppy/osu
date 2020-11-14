@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Osu.UI
+namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuEditDrawablePool<T> : OsuDrawablePool<T>
         where T : DrawableHitObject, new()

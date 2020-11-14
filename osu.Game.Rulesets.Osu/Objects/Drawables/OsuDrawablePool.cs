@@ -5,9 +5,8 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Osu.UI
+namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class OsuDrawablePool<T> : DrawablePool<T>
         where T : DrawableHitObject, new()
