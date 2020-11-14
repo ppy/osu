@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuEditDrawablePool<T> : OsuDrawablePool<T>
+    public class DrawableOsuEditPool<T> : DrawableOsuPool<T>
         where T : DrawableHitObject, new()
     {
         /// <summary>
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         private const double editor_hit_object_fade_out_extension = 700;
 
-        public OsuEditDrawablePool(Func<DrawableHitObject, double, bool> checkHittable, Action<Drawable> onLoaded, int initialSize, int? maximumSize = null)
+        public DrawableOsuEditPool(Func<DrawableHitObject, double, bool> checkHittable, Action<Drawable> onLoaded, int initialSize, int? maximumSize = null)
             : base(checkHittable, onLoaded, initialSize, maximumSize)
         {
         }
