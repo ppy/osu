@@ -7,6 +7,8 @@ using static osu.Game.Users.User;
 using System;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -28,11 +30,25 @@ namespace osu.Game.Tests.Visual.Online
                 new UserHistoryCount { Date = new DateTime(2010, 11, 1), Count = 2100 }
             };
 
-            Add(new ProfileLineChart
+            AddRange(new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Values = values
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background4
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Padding = new MarginPadding { Horizontal = 50 },
+                    Child = new ProfileLineChart
+                    {
+                        Values = values
+                    }
+                }
             });
         }
     }
