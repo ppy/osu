@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             switch (hitObject)
             {
                 default:
-                    // there are quite a few drawable hit types we don't want to extent (spinners, ticks etc.)
+                    // there are quite a few drawable hit types we don't want to extend (spinners, ticks etc.)
                     return;
 
                 case DrawableSlider _:
