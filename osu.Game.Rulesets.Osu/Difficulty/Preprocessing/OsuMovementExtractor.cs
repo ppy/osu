@@ -313,54 +313,45 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static double calculateHighBPMJumpBuff(MovementExtractionParameters p)
         {
             // Correction #6 - High bpm jump buff (alt buff)
-            double highBpmJumpBuff = SpecialFunctions.Logistic((p.EffectiveBPM - 354) / 16) *
-                                     SpecialFunctions.Logistic((p.LastToCurrent.RelativeLength - 1.9) / 0.15) * 0.23;
-            return highBpmJumpBuff;
+            return SpecialFunctions.Logistic((p.EffectiveBPM - 354) / 16) *
+                   SpecialFunctions.Logistic((p.LastToCurrent.RelativeLength - 1.9) / 0.15) * 0.23;
         }
 
         private static double calculateSmallCircleBuff(MovementExtractionParameters p)
         {
             // Correction #7 - Small circle bonus
-            double smallCircleBonus = ((SpecialFunctions.Logistic((55 - 2 * p.CurrentObject.Radius) / 3.0) * 0.3) +
-                                       (Math.Pow(24.5 - Math.Min(p.CurrentObject.Radius, 24.5), 1.4) * 0.01315)) *
-                                      Math.Max(SpecialFunctions.Logistic((p.LastToCurrent.RelativeLength - 0.5) / 0.1), 0.25);
-            return smallCircleBonus;
+            return ((SpecialFunctions.Logistic((55 - 2 * p.CurrentObject.Radius) / 3.0) * 0.3) +
+                    (Math.Pow(24.5 - Math.Min(p.CurrentObject.Radius, 24.5), 1.4) * 0.01315)) *
+                   Math.Max(SpecialFunctions.Logistic((p.LastToCurrent.RelativeLength - 0.5) / 0.1), 0.25);
         }
 
         private static double calculateStackedNoteNerf(OsuObjectPair lastToCurrent)
         {
             // Correction #8 - Stacked notes nerf
-            double dPrevCurrStackedNerf = Math.Max(0, Math.Min(lastToCurrent.RelativeLength, Math.Min(1.2 * lastToCurrent.RelativeLength - 0.185, 1.4 * lastToCurrent.RelativeLength - 0.32)));
-            return dPrevCurrStackedNerf;
+            return Math.Max(0, Math.Min(lastToCurrent.RelativeLength, Math.Min(1.2 * lastToCurrent.RelativeLength - 0.185, 1.4 * lastToCurrent.RelativeLength - 0.32)));
         }
 
         private static double calculateSmallJumpNerf(MovementExtractionParameters p)
         {
             // Correction #9 - Slow small jump nerf
-            double smallJumpNerfFactor = 1 - 0.17 * Math.Exp(-Math.Pow((p.LastToCurrent.RelativeLength - 2.2) / 0.7, 2)) *
+            return 1 - 0.17 * Math.Exp(-Math.Pow((p.LastToCurrent.RelativeLength - 2.2) / 0.7, 2)) *
                 SpecialFunctions.Logistic((255 - p.EffectiveBPM) / 10);
-            return smallJumpNerfFactor;
         }
 
         private static double calculateBigJumpBuff(MovementExtractionParameters p)
         {
             // Correction #10 - Slow big jump buff
-            double bigJumpBuffFactor = 1 + 0.15 * SpecialFunctions.Logistic((p.LastToCurrent.RelativeLength - 6) / 0.5) *
+            return 1 + 0.15 * SpecialFunctions.Logistic((p.LastToCurrent.RelativeLength - 6) / 0.5) *
                 SpecialFunctions.Logistic((210 - p.EffectiveBPM) / 8);
-            return bigJumpBuffFactor;
         }
 
         private static double calculateHiddenCorrection(bool hidden, double noteDensity)
         {
             // Correction #11 - Hidden Mod
-            double correctionHidden = 0;
+            if (!hidden)
+                return 0;
 
-            if (hidden)
-            {
-                correctionHidden = 0.05 + 0.008 * noteDensity;
-            }
-
-            return correctionHidden;
+            return 0.05 + 0.008 * noteDensity;
         }
 
         private static bool isStackedWiggle(MovementExtractionParameters p)
@@ -381,9 +372,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             // Correction #13 - Repetitive jump nerf
             // Nerf big jumps where objNeg2 and objCurr are close or where objNeg4 and objCurr are close
-            double jumpOverlapCorrection = 1 - (Math.Max(0.15 - 0.1 * (p.SecondLastToCurrent?.RelativeLength ?? 0), 0) + Math.Max(0.1125 - 0.075 * (p.FourthLastToCurrent?.RelativeLength ?? 0), 0)) *
+            return 1 - (Math.Max(0.15 - 0.1 * (p.SecondLastToCurrent?.RelativeLength ?? 0), 0) + Math.Max(0.1125 - 0.075 * (p.FourthLastToCurrent?.RelativeLength ?? 0), 0)) *
                 SpecialFunctions.Logistic((p.LastToCurrent.RelativeLength - 3.3) / 0.25);
-            return jumpOverlapCorrection;
         }
 
         private static double calculateDistanceIncreaseBuff(MovementExtractionParameters p)
