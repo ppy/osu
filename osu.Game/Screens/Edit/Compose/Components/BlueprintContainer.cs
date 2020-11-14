@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -34,6 +35,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected SelectionHandler SelectionHandler { get; private set; }
 
+        protected readonly HitObjectComposer Composer;
+
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
 
@@ -44,12 +47,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected EditorBeatmap Beatmap { get; private set; }
 
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
+        private readonly Dictionary<HitObject, SelectionBlueprint> blueprintMap = new Dictionary<HitObject, SelectionBlueprint>();
 
         [Resolved(canBeNull: true)]
         private IPositionSnapProvider snapProvider { get; set; }
 
-        protected BlueprintContainer()
+        protected BlueprintContainer(HitObjectComposer composer)
         {
+            Composer = composer;
+
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -68,8 +74,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
 
-            foreach (var obj in Beatmap.HitObjects)
-                AddBlueprintFor(obj);
+            // For non-pooled rulesets, hitobjects are already present in the playfield which allows the blueprints to be loaded in the async context.
+            if (Composer != null)
+            {
+                foreach (var obj in Composer.HitObjects)
+                    addBlueprintFor(obj.HitObject);
+            }
 
             selectedHitObjects.BindTo(Beatmap.SelectedHitObjects);
             selectedHitObjects.CollectionChanged += (selectedObjects, args) =>
@@ -94,8 +104,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            Beatmap.HitObjectAdded += AddBlueprintFor;
+            Beatmap.HitObjectAdded += addBlueprintFor;
             Beatmap.HitObjectRemoved += removeBlueprintFor;
+
+            if (Composer != null)
+            {
+                // For pooled rulesets, blueprints must be added for hitobjects already "current" as they would've not been "current" during the async load addition process above.
+                foreach (var obj in Composer.HitObjects)
+                    addBlueprintFor(obj.HitObject);
+
+                Composer.Playfield.HitObjectUsageBegan += addBlueprintFor;
+                Composer.Playfield.HitObjectUsageFinished += removeBlueprintFor;
+            }
         }
 
         protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() =>
@@ -247,28 +267,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Blueprint Addition/Removal
 
-        private void removeBlueprintFor(HitObject hitObject)
+        private void addBlueprintFor(HitObject hitObject)
         {
-            var blueprint = SelectionBlueprints.SingleOrDefault(m => m.HitObject == hitObject);
-            if (blueprint == null)
+            if (blueprintMap.ContainsKey(hitObject))
                 return;
 
-            blueprint.Deselect();
-
-            blueprint.Selected -= onBlueprintSelected;
-            blueprint.Deselected -= onBlueprintDeselected;
-
-            SelectionBlueprints.Remove(blueprint);
-
-            if (movementBlueprint == blueprint)
-                finishSelectionMovement();
-        }
-
-        protected virtual void AddBlueprintFor(HitObject hitObject)
-        {
             var blueprint = CreateBlueprintFor(hitObject);
             if (blueprint == null)
                 return;
+
+            blueprintMap[hitObject] = blueprint;
 
             blueprint.Selected += onBlueprintSelected;
             blueprint.Deselected += onBlueprintDeselected;
@@ -277,6 +285,41 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 blueprint.Select();
 
             SelectionBlueprints.Add(blueprint);
+
+            OnBlueprintAdded(hitObject);
+        }
+
+        private void removeBlueprintFor(HitObject hitObject)
+        {
+            if (!blueprintMap.Remove(hitObject, out var blueprint))
+                return;
+
+            blueprint.Deselect();
+            blueprint.Selected -= onBlueprintSelected;
+            blueprint.Deselected -= onBlueprintDeselected;
+
+            SelectionBlueprints.Remove(blueprint);
+
+            if (movementBlueprint == blueprint)
+                finishSelectionMovement();
+
+            OnBlueprintRemoved(hitObject);
+        }
+
+        /// <summary>
+        /// Called after a <see cref="HitObject"/> blueprint has been added.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> for which the blueprint has been added.</param>
+        protected virtual void OnBlueprintAdded(HitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Called after a <see cref="HitObject"/> blueprint has been removed.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> for which the blueprint has been removed.</param>
+        protected virtual void OnBlueprintRemoved(HitObject hitObject)
+        {
         }
 
         #endregion
@@ -295,21 +338,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a selection was performed.</returns>
         private bool beginClickSelection(MouseButtonEvent e)
         {
-            Debug.Assert(!clickSelectionBegan);
-
-            bool selectedPerformed = true;
-
             foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren)
             {
-                if (blueprint.IsHovered)
-                {
-                    selectedPerformed &= SelectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
-                    clickSelectionBegan = true;
-                    break;
-                }
+                if (!blueprint.IsHovered) continue;
+
+                if (SelectionHandler.HandleSelectionRequested(blueprint, e))
+                    return clickSelectionBegan = true;
             }
 
-            return selectedPerformed;
+            return false;
         }
 
         /// <summary>
@@ -355,7 +392,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Selects all <see cref="SelectionBlueprint"/>s.
         /// </summary>
-        private void selectAll() => SelectionBlueprints.ToList().ForEach(m => m.Select());
+        private void selectAll()
+        {
+            Composer.Playfield.KeepAllAlive();
+
+            // Scheduled to allow the change in lifetime to take place.
+            Schedule(() => SelectionBlueprints.ToList().ForEach(m => m.Select()));
+        }
 
         /// <summary>
         /// Deselects all selected <see cref="SelectionBlueprint"/>s.
@@ -366,12 +409,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             SelectionHandler.HandleSelected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 1);
+
+            Composer.Playfield.SetKeepAlive(blueprint.HitObject, true);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
             SelectionHandler.HandleDeselected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 0);
+
+            Composer.Playfield.SetKeepAlive(blueprint.HitObject, false);
         }
 
         #endregion
@@ -462,8 +509,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (Beatmap != null)
             {
-                Beatmap.HitObjectAdded -= AddBlueprintFor;
+                Beatmap.HitObjectAdded -= addBlueprintFor;
                 Beatmap.HitObjectRemoved -= removeBlueprintFor;
+            }
+
+            if (Composer != null)
+            {
+                Composer.Playfield.HitObjectUsageBegan -= addBlueprintFor;
+                Composer.Playfield.HitObjectUsageFinished -= removeBlueprintFor;
             }
         }
     }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,7 +31,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container scaleContainer;
         private InputManager inputManager;
 
-        public DrawableHitCircle(HitCircle h)
+        public DrawableHitCircle()
+            : this(null)
+        {
+        }
+
+        public DrawableHitCircle([CanBeNull] HitCircle h = null)
             : base(h)
         {
         }
@@ -72,10 +78,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Size = HitArea.DrawSize;
 
-            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);
-            StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition, true);
-            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
-            AccentColour.BindValueChanged(accent => ApproachCircle.Colour = accent.NewValue, true);
+            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
+            AccentColour.BindValueChanged(accent => ApproachCircle.Colour = accent.NewValue);
         }
 
         protected override void LoadComplete()

@@ -301,7 +301,9 @@ namespace osu.Game.Screens.Mvis
                                 },
                             }
                         },
-                        skinnableBbBackground = new ModifiedSkinnableSprite("MBottomBar-background", confineMode: ConfineMode.ScaleToFill)
+                        skinnableBbBackground = new ModifiedSkinnableSprite("MBottomBar-background",
+                                                                            confineMode: ConfineMode.ScaleToFill,
+                                                                            masking: true)
                         {
                             Name = "底栏背景图",
                             Anchor = Anchor.BottomCentre,
@@ -312,7 +314,7 @@ namespace osu.Game.Screens.Mvis
                             ChildOrigin = Anchor.BottomCentre,
                             Alpha = 0,
                             CentreComponent = false,
-                            OverrideChildAnchor = true,
+                            OverrideChildAnchor = true
                         },
                         bottomFillFlow = new FillFlowContainer
                         {
@@ -579,16 +581,21 @@ namespace osu.Game.Screens.Mvis
             }, true);
 
             sbLoader.NeedToHideTriangles.BindValueChanged(updateBgTriangles, true);
-            sbLoader.IsReady.BindValueChanged(v =>
+            sbLoader.State.BindValueChanged(v =>
             {
                 switch (v.NewValue)
                 {
-                    case true:
+                    case StoryboardState.Success:
+                    case StoryboardState.NotLoaded:
                         loadingSpinner.Hide();
                         break;
 
-                    case false:
+                    case StoryboardState.Loading:
                         loadingSpinner.Show();
+                        break;
+
+                    case StoryboardState.Failed:
+                        loadingSpinner.FadeColour(Colour4.Red);
                         break;
                 }
             }, true);

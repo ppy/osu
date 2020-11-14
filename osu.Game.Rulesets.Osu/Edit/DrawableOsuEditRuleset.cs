@@ -2,13 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -17,62 +13,21 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class DrawableOsuEditRuleset : DrawableOsuRuleset
     {
-        /// <summary>
-        /// Hit objects are intentionally made to fade out at a constant slower rate than in gameplay.
-        /// This allows a mapper to gain better historical context and use recent hitobjects as reference / snap points.
-        /// </summary>
-        private const double editor_hit_object_fade_out_extension = 700;
-
         public DrawableOsuEditRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }
 
-        public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h)
-            => base.CreateDrawableRepresentation(h)?.With(d => d.ApplyCustomUpdateState += updateState);
-
-        private void updateState(DrawableHitObject hitObject, ArmedState state)
-        {
-            if (state == ArmedState.Idle)
-                return;
-
-            // adjust the visuals of certain object types to make them stay on screen for longer than usual.
-            switch (hitObject)
-            {
-                default:
-                    // there are quite a few drawable hit types we don't want to extent (spinners, ticks etc.)
-                    return;
-
-                case DrawableSlider _:
-                    // no specifics to sliders but let them fade slower below.
-                    break;
-
-                case DrawableHitCircle circle: // also handles slider heads
-                    circle.ApproachCircle
-                          .FadeOutFromOne(editor_hit_object_fade_out_extension)
-                          .Expire();
-                    break;
-            }
-
-            // Get the existing fade out transform
-            var existing = hitObject.Transforms.LastOrDefault(t => t.TargetMember == nameof(Alpha));
-
-            if (existing == null)
-                return;
-
-            hitObject.RemoveTransform(existing);
-
-            using (hitObject.BeginAbsoluteSequence(existing.StartTime))
-                hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();
-        }
-
-        protected override Playfield CreatePlayfield() => new OsuPlayfieldNoCursor();
+        protected override Playfield CreatePlayfield() => new OsuEditPlayfield();
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { Size = Vector2.One };
 
-        private class OsuPlayfieldNoCursor : OsuPlayfield
+        private class OsuEditPlayfield : OsuPlayfield
         {
             protected override GameplayCursorContainer CreateCursor() => null;
+
+            protected override DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
+                => new DrawableOsuEditPool<TDrawable>(CheckHittable, OnHitObjectLoaded, initialSize, maximumSize);
         }
     }
 }

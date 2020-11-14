@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Navigation
             if (withUserPause)
                 AddStep("pause", () => Game.Dependencies.Get<MusicController>().Stop(true));
 
-            AddStep("press enter", () => pressAndRelease(Key.Enter));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
 
             AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
             AddUntilStep("wait for fail", () => player.HasFailed);
@@ -122,11 +122,11 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestOpenOptionsAndExitWithEscape()
         {
             AddUntilStep("Wait for options to load", () => Game.Settings.IsLoaded);
-            AddStep("Enter menu", () => pressAndRelease(Key.Enter));
+            AddStep("Enter menu", () => InputManager.Key(Key.Enter));
             AddStep("Move mouse to options overlay", () => InputManager.MoveMouseTo(optionsButtonPosition));
             AddStep("Click options overlay", () => InputManager.Click(MouseButton.Left));
             AddAssert("Options overlay was opened", () => Game.Settings.State.Value == Visibility.Visible);
-            AddStep("Hide options overlay using escape", () => pressAndRelease(Key.Escape));
+            AddStep("Hide options overlay using escape", () => InputManager.Key(Key.Escape));
             AddAssert("Options overlay was closed", () => Game.Settings.State.Value == Visibility.Hidden);
         }
 
@@ -158,10 +158,8 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("Change ruleset to osu!taiko", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.Number2);
-
+                InputManager.Key(Key.Number2);
                 InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.Number2);
             });
 
             AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.ID == 1);
@@ -181,10 +179,8 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("Change ruleset to osu!taiko", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.Number2);
-
+                InputManager.Key(Key.Number2);
                 InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.Number2);
             });
 
             AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.ID == 1);
@@ -193,7 +189,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         private void pushEscape() =>
-            AddStep("Press escape", () => pressAndRelease(Key.Escape));
+            AddStep("Press escape", () => InputManager.Key(Key.Escape));
 
         private void exitViaEscapeAndConfirm()
         {
@@ -206,12 +202,6 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
             AddStep("Click back button", () => InputManager.Click(MouseButton.Left));
             ConfirmAtMainMenu();
-        }
-
-        private void pressAndRelease(Key key)
-        {
-            InputManager.PressKey(key);
-            InputManager.ReleaseKey(key);
         }
 
         private class TestSongSelect : PlaySongSelect

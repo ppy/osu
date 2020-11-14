@@ -249,6 +249,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
+            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
+            if (Time.Elapsed < 0)
+                return false;
+
             if (CheckHittable?.Invoke(this, Time.Current) == false)
                 return false;
 
@@ -279,6 +283,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
 
             if (action != Action.Value)
+                return;
+
+            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
+            if (Time.Elapsed < 0)
                 return;
 
             // Make sure a hold was started

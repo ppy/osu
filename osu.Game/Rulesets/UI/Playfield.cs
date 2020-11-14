@@ -4,19 +4,34 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class Playfield : CompositeDrawable
+    [Cached(typeof(IPooledHitObjectProvider))]
+    public abstract class Playfield : CompositeDrawable, IPooledHitObjectProvider
     {
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> is judged.
+        /// </summary>
+        public event Action<DrawableHitObject, JudgementResult> NewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> judgement is reverted.
+        /// </summary>
+        public event Action<DrawableHitObject, JudgementResult> RevertResult;
+
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
@@ -72,7 +87,13 @@ namespace osu.Game.Rulesets.UI
         {
             RelativeSizeAxes = Axes.Both;
 
-            hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
+            hitObjectContainerLazy = new Lazy<HitObjectContainer>(() => CreateHitObjectContainer().With(h =>
+            {
+                h.NewResult += (d, r) => NewResult?.Invoke(d, r);
+                h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+                h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
+                h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
+            }));
         }
 
         [Resolved(CanBeNull = true)]
@@ -101,13 +122,40 @@ namespace osu.Game.Rulesets.UI
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to add.</param>
-        public virtual void Add(DrawableHitObject h) => HitObjectContainer.Add(h);
+        public virtual void Add(DrawableHitObject h)
+        {
+            HitObjectContainer.Add(h);
+            OnHitObjectAdded(h.HitObject);
+        }
 
         /// <summary>
         /// Remove a DrawableHitObject from this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
-        public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
+        public virtual bool Remove(DrawableHitObject h)
+        {
+            if (!HitObjectContainer.Remove(h))
+                return false;
+
+            OnHitObjectRemoved(h.HitObject);
+            return false;
+        }
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> is added to this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject">The added <see cref="HitObject"/>.</param>
+        protected virtual void OnHitObjectAdded(HitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> is removed from this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject">The removed <see cref="HitObject"/>.</param>
+        protected virtual void OnHitObjectRemoved(HitObject hitObject)
+        {
+        }
 
         /// <summary>
         /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
@@ -131,6 +179,12 @@ namespace osu.Game.Rulesets.UI
         protected void AddNested(Playfield otherPlayfield)
         {
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
+
+            otherPlayfield.NewResult += (d, r) => NewResult?.Invoke(d, r);
+            otherPlayfield.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+            otherPlayfield.HitObjectUsageBegan += h => HitObjectUsageBegan?.Invoke(h);
+            otherPlayfield.HitObjectUsageFinished += h => HitObjectUsageFinished?.Invoke(h);
+
             nestedPlayfields.Value.Add(otherPlayfield);
         }
 
@@ -161,6 +215,227 @@ namespace osu.Game.Rulesets.UI
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
+
+        #region Pooling support
+
+        [Resolved(CanBeNull = true)]
+        private IPooledHitObjectProvider parentPooledObjectProvider { get; set; }
+
+        private readonly Dictionary<Type, IDrawablePool> pools = new Dictionary<Type, IDrawablePool>();
+
+        /// <summary>
+        /// Adds a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> to this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject"></param>
+        public virtual void Add(HitObject hitObject)
+        {
+            var entry = CreateLifetimeEntry(hitObject);
+            lifetimeEntryMap[entry.HitObject] = entry;
+
+            HitObjectContainer.Add(entry);
+            OnHitObjectAdded(entry.HitObject);
+        }
+
+        /// <summary>
+        /// Removes a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> from this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject"></param>
+        /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
+        public virtual bool Remove(HitObject hitObject)
+        {
+            if (lifetimeEntryMap.Remove(hitObject, out var entry))
+            {
+                HitObjectContainer.Remove(entry);
+                OnHitObjectRemoved(hitObject);
+                return true;
+            }
+
+            bool removedFromNested = false;
+
+            if (nestedPlayfields.IsValueCreated)
+                removedFromNested = nestedPlayfields.Value.Any(p => p.Remove(hitObject));
+
+            return removedFromNested;
+        }
+
+        /// <summary>
+        /// Creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// This may be overridden to provide custom lifetime control (e.g. via <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/>.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="HitObject"/> to create the entry for.</param>
+        /// <returns>The <see cref="HitObjectLifetimeEntry"/>.</returns>
+        [NotNull]
+        protected virtual HitObjectLifetimeEntry CreateLifetimeEntry([NotNull] HitObject hitObject) => new HitObjectLifetimeEntry(hitObject);
+
+        /// <summary>
+        /// Registers a default <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type.
+        /// </summary>
+        /// <param name="initialSize">The number of <see cref="DrawableHitObject"/>s to be initially stored in the pool.</param>
+        /// <param name="maximumSize">
+        /// The maximum number of <see cref="DrawableHitObject"/>s that can be stored in the pool.
+        /// If this limit is exceeded, every subsequent <see cref="DrawableHitObject"/> will be created anew instead of being retrieved from the pool,
+        /// until some of the existing <see cref="DrawableHitObject"/>s are returned to the pool.
+        /// </param>
+        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
+        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
+        protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
+            where TObject : HitObject
+            where TDrawable : DrawableHitObject, new()
+            => RegisterPool<TObject, TDrawable>(new DrawablePool<TDrawable>(initialSize, maximumSize));
+
+        /// <summary>
+        /// Registers a custom <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type.
+        /// </summary>
+        /// <param name="pool">The <see cref="DrawablePool{T}"/> to register.</param>
+        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
+        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
+        protected void RegisterPool<TObject, TDrawable>([NotNull] DrawablePool<TDrawable> pool)
+            where TObject : HitObject
+            where TDrawable : DrawableHitObject, new()
+        {
+            pools[typeof(TObject)] = pool;
+            AddInternal(pool);
+        }
+
+        DrawableHitObject IPooledHitObjectProvider.GetPooledDrawableRepresentation(HitObject hitObject)
+        {
+            var lookupType = hitObject.GetType();
+
+            IDrawablePool pool;
+
+            // Tests may add derived hitobject instances for which pools don't exist. Try to find any applicable pool and dynamically assign the type if the pool exists.
+            if (!pools.TryGetValue(lookupType, out pool))
+            {
+                foreach (var (t, p) in pools)
+                {
+                    if (!t.IsInstanceOfType(hitObject))
+                        continue;
+
+                    pools[lookupType] = pool = p;
+                    break;
+                }
+            }
+
+            if (pool == null)
+                return parentPooledObjectProvider?.GetPooledDrawableRepresentation(hitObject);
+
+            return (DrawableHitObject)pool.Get(d =>
+            {
+                var dho = (DrawableHitObject)d;
+
+                // If this is the first time this DHO is being used (not loaded), then apply the DHO mods.
+                // This is done before Apply() so that the state is updated once when the hitobject is applied.
+                if (!dho.IsLoaded)
+                {
+                    foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
+                        m.ApplyToDrawableHitObjects(dho.Yield());
+                }
+
+                if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+                    lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
+
+                dho.Apply(hitObject, entry);
+            });
+        }
+
+        #endregion
+
+        #region Editor logic
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
+        /// </remarks>
+        internal event Action<HitObject> HitObjectUsageBegan;
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become dead.
+        /// </remarks>
+        internal event Action<HitObject> HitObjectUsageFinished;
+
+        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
+
+        /// <summary>
+        /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to set.</param>
+        /// <param name="keepAlive">Whether to keep <paramref name="hitObject"/> always alive.</param>
+        internal void SetKeepAlive(HitObject hitObject, bool keepAlive)
+        {
+            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+            {
+                entry.KeepAlive = keepAlive;
+                return;
+            }
+
+            if (!nestedPlayfields.IsValueCreated)
+                return;
+
+            foreach (var p in nestedPlayfields.Value)
+                p.SetKeepAlive(hitObject, keepAlive);
+        }
+
+        /// <summary>
+        /// Keeps all <see cref="HitObject"/>s alive within this and all nested <see cref="Playfield"/>s.
+        /// </summary>
+        internal void KeepAllAlive()
+        {
+            foreach (var (_, entry) in lifetimeEntryMap)
+                entry.KeepAlive = true;
+
+            if (!nestedPlayfields.IsValueCreated)
+                return;
+
+            foreach (var p in nestedPlayfields.Value)
+                p.KeepAllAlive();
+        }
+
+        /// <summary>
+        /// The amount of time prior to the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        internal double PastLifetimeExtension
+        {
+            get => HitObjectContainer.PastLifetimeExtension;
+            set
+            {
+                HitObjectContainer.PastLifetimeExtension = value;
+
+                if (!nestedPlayfields.IsValueCreated)
+                    return;
+
+                foreach (var nested in nestedPlayfields.Value)
+                    nested.PastLifetimeExtension = value;
+            }
+        }
+
+        /// <summary>
+        /// The amount of time after the current time within which <see cref="HitObject"/>s should be considered alive.
+        /// </summary>
+        internal double FutureLifetimeExtension
+        {
+            get => HitObjectContainer.FutureLifetimeExtension;
+            set
+            {
+                HitObjectContainer.FutureLifetimeExtension = value;
+
+                if (!nestedPlayfields.IsValueCreated)
+                    return;
+
+                foreach (var nested in nestedPlayfields.Value)
+                    nested.FutureLifetimeExtension = value;
+            }
+        }
+
+        #endregion
 
         public class InvisibleCursorContainer : GameplayCursorContainer
         {

@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         ///<summary>
         ///用于对外提供该BindableBool用于检测故事版功能是否已经准备好了
         ///</summary>
-        public readonly BindableBool IsReady = new BindableBool();
+        public readonly Bindable<StoryboardState> State = new Bindable<StoryboardState>();
 
         public readonly BindableBool NeedToHideTriangles = new BindableBool();
         public readonly BindableBool StoryboardReplacesBackground = new BindableBool();
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 clockContainer?.FadeOut(duration / 2, Easing.OutQuint);
                 StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
-                IsReady.Value = true;
+                State.Value = StoryboardState.NotLoaded;
                 CancelAllTasks();
             }
         }
@@ -106,6 +106,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             catch (Exception e)
             {
                 Logger.Error(e, "加载故事版时出现错误。");
+                State.Value = StoryboardState.Failed;
                 return false;
             }
 
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         public void UpdateStoryBoardAsync(Action onComplete = null)
         {
             CancelAllTasks();
-            IsReady.Value = false;
+            State.Value = StoryboardState.Loading;
             sbLoaded.Value = false;
             NeedToHideTriangles.Value = false;
             StoryboardReplacesBackground.Value = false;
@@ -138,7 +139,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
             if (!enableSb.Value || b == null)
             {
-                IsReady.Value = true;
+                State.Value = StoryboardState.NotLoaded;
                 return;
             }
 
@@ -152,7 +153,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     OnStoryboardReadyAction = () =>
                     {
                         sbLoaded.Value = true;
-                        IsReady.Value = true;
+                        State.Value = StoryboardState.Success;
                         NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
 
                         enableSb.TriggerChange();
@@ -166,5 +167,13 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 await loadTask;
             }, cancellationTokenSource.Token);
         }
+    }
+
+    public enum StoryboardState
+    {
+        NotLoaded,
+        Loading,
+        Failed,
+        Success
     }
 }

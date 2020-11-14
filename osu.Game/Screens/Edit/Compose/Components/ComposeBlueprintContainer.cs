@@ -27,23 +27,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class ComposeBlueprintContainer : BlueprintContainer
     {
-        [Resolved]
-        private HitObjectComposer composer { get; set; }
-
-        private PlacementBlueprint currentPlacement;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
+        private PlacementBlueprint currentPlacement;
         private InputManager inputManager;
 
-        private readonly IEnumerable<DrawableHitObject> drawableHitObjects;
-
-        public ComposeBlueprintContainer(IEnumerable<DrawableHitObject> drawableHitObjects)
+        public ComposeBlueprintContainer(HitObjectComposer composer)
+            : base(composer)
         {
-            this.drawableHitObjects = drawableHitObjects;
-
             placementBlueprintContainer = new Container<PlacementBlueprint>
             {
                 RelativeSizeAxes = Axes.Both
@@ -184,7 +177,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementPosition()
         {
-            var snapResult = composer.SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
+            var snapResult = Composer.SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
 
             currentPlacement.UpdatePosition(snapResult);
         }
@@ -195,7 +188,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Update();
 
-            if (composer.CursorInPlacementArea)
+            if (Composer.CursorInPlacementArea)
                 createPlacement();
             else if (currentPlacement?.PlacementActive == false)
                 removePlacement();
@@ -208,7 +201,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
         {
-            var drawable = drawableHitObjects.FirstOrDefault(d => d.HitObject == hitObject);
+            var drawable = Composer.HitObjects.FirstOrDefault(d => d.HitObject == hitObject);
 
             if (drawable == null)
                 return null;
@@ -218,11 +211,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public virtual OverlaySelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
 
-        protected override void AddBlueprintFor(HitObject hitObject)
+        protected override void OnBlueprintAdded(HitObject hitObject)
         {
-            refreshTool();
+            base.OnBlueprintAdded(hitObject);
 
-            base.AddBlueprintFor(hitObject);
+            refreshTool();
 
             // on successful placement, the new combo button should be reset as this is the most common user interaction.
             if (Beatmap.SelectedHitObjects.Count == 0)

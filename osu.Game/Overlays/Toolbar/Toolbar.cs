@@ -29,8 +29,6 @@ namespace osu.Game.Overlays.Toolbar
         protected ToolbarMfButton ToolbarMfButton { get; private set; }
         private ToolbarUserButton userButton;
         private ToolbarRulesetSelector rulesetSelector;
-        private FillFlowContainer LeftSideToolbar;
-        private ToolbarBackground toolbarBg;
 
         private const double transition_time = 500;
 
@@ -52,8 +50,8 @@ namespace osu.Game.Overlays.Toolbar
 
             Children = new Drawable[]
             {
-                toolbarBg = new ToolbarBackground(),
-                LeftSideToolbar = new FillFlowContainer
+                new ToolbarBackground(),
+                new FillFlowContainer
                 {
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
@@ -67,7 +65,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
-                        ToolbarMfButton =  new ToolbarMfButton(),
+                        ToolbarMfButton = new ToolbarMfButton(),
                         rulesetSelector = new ToolbarRulesetSelector()
                     }
                 },
@@ -104,10 +102,10 @@ namespace osu.Game.Overlays.Toolbar
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
-            optUI.BindValueChanged(UpdateIcons, true);
+            optUI.BindValueChanged(updateIcons, true);
         }
 
-        private void UpdateIcons(ValueChangedEvent<bool> v)
+        private void updateIcons(ValueChangedEvent<bool> v)
         {
             switch (v.NewValue)
             {

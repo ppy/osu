@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     public class PaginatedMostPlayedBeatmapContainer : PaginatedContainer<APIUserMostPlayedBeatmap>
     {
         public PaginatedMostPlayedBeatmapContainer(Bindable<User> user)
-            : base(user, "玩的最多的谱面", "没有(´・ω・`)")
+            : base(user, "玩的最多的谱面", "没有(´・ω・`)", CounterVisibilityState.AlwaysVisible)
         {
             ItemsPerPage = 5;
         }
@@ -26,6 +26,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             ItemsContainer.Direction = FillDirection.Vertical;
         }
+
+        protected override int GetCount(User user) => user.BeatmapPlaycountsCount;
 
         protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest() =>
             new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
