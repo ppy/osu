@@ -232,20 +232,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // Estimate how the whole pattern consisting of objNeg2 to objNext affects
             // the difficulty of hitting objCurr. This only takes effect when the pattern
             // is not so spaced (i.e. does not contain jumps)
-            double patternCorrection = 0;
+            if (!p.LastObjectCenteredBetweenNeighbours || !p.CurrentObjectCenteredBetweenNeighbours)
+                return 0;
 
-            if (p.LastObjectCenteredBetweenNeighbours && p.CurrentObjectCenteredBetweenNeighbours)
-            {
-                Debug.Assert(p.CurrentToNext != null);
-                Debug.Assert(p.SecondLastToLast != null);
+            Debug.Assert(p.CurrentToNext != null);
+            Debug.Assert(p.SecondLastToLast != null);
 
-                double gap = (p.LastToCurrent.RelativeVector - p.CurrentToNext.Value.RelativeVector / 2 - p.SecondLastToLast.Value.RelativeVector / 2).L2Norm() / (p.LastToCurrent.RelativeLength + 0.1);
-                patternCorrection = (SpecialFunctions.Logistic((gap - 1) * 8) - SpecialFunctions.Logistic(-6)) *
-                                    SpecialFunctions.Logistic((p.SecondLastToLast.Value.RelativeLength - 0.7) * 10) * SpecialFunctions.Logistic((p.CurrentToNext.Value.RelativeLength - 0.7) * 10) *
-                                    PowerMean.Of(p.SecondLastToCurrentFlowiness, p.LastToNextFlowiness, 2) * 0.6;
-            }
-
-            return patternCorrection;
+            double gap = (p.LastToCurrent.RelativeVector - p.CurrentToNext.Value.RelativeVector / 2 - p.SecondLastToLast.Value.RelativeVector / 2).L2Norm() / (p.LastToCurrent.RelativeLength + 0.1);
+            return (SpecialFunctions.Logistic((gap - 1) * 8) - SpecialFunctions.Logistic(-6)) *
+                   SpecialFunctions.Logistic((p.SecondLastToLast.Value.RelativeLength - 0.7) * 10) * SpecialFunctions.Logistic((p.CurrentToNext.Value.RelativeLength - 0.7) * 10) *
+                   PowerMean.Of(p.SecondLastToCurrentFlowiness, p.LastToNextFlowiness, 2) * 0.6;
         }
 
         private static double calculateTapStrainBuff(Vector<double> tapStrain, OsuObjectPair lastToCurrent, double movementThroughput)
