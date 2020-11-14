@@ -301,7 +301,9 @@ namespace osu.Game.Screens.Mvis
                                 },
                             }
                         },
-                        skinnableBbBackground = new ModifiedSkinnableSprite("MBottomBar-background", confineMode: ConfineMode.ScaleToFill)
+                        skinnableBbBackground = new ModifiedSkinnableSprite("MBottomBar-background",
+                                                                            confineMode: ConfineMode.ScaleToFill,
+                                                                            masking: true)
                         {
                             Name = "底栏背景图",
                             Anchor = Anchor.BottomCentre,
@@ -312,7 +314,7 @@ namespace osu.Game.Screens.Mvis
                             ChildOrigin = Anchor.BottomCentre,
                             Alpha = 0,
                             CentreComponent = false,
-                            OverrideChildAnchor = true,
+                            OverrideChildAnchor = true
                         },
                         bottomFillFlow = new FillFlowContainer
                         {

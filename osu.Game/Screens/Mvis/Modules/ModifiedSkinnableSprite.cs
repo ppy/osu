@@ -13,12 +13,16 @@ namespace osu.Game.Screens.Mvis.Modules
     {
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 768);
 
-        public ModifiedSkinnableSprite(string textureName, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
+        public ModifiedSkinnableSprite(string textureName,
+                                        Func<ISkinSource, bool> allowFallback = null,
+                                        ConfineMode confineMode = ConfineMode.NoScaling,
+                                        bool masking = false)
             : base(textureName, allowFallback, confineMode)
         {
             Size = new Vector2(1366, 768);
             CentreComponent = false;
             OverrideChildAnchor = true;
+            Masking = masking;
 
             ChildAnchor = Anchor.Centre;
             ChildOrigin = Anchor.Centre;
