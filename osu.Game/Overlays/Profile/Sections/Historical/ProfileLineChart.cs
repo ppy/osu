@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             }
                         }
                     },
-                    new Drawable[]
+                    new[]
                     {
                         Empty(),
                         columnTicksContainer = new Container<TickText>

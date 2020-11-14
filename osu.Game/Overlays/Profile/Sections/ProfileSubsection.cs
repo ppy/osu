@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
 
-            Children = new Drawable[]
+            Children = new[]
             {
                 header = new ProfileSubsectionHeader(headerText, counterVisibilityState)
                 {
