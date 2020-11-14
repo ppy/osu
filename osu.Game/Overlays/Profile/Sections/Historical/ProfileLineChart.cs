@@ -4,7 +4,6 @@
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using JetBrains.Annotations;
-using static osu.Game.Users.User;
 using System;
 using System.Linq;
 using osu.Game.Graphics.Sprites;
@@ -12,6 +11,7 @@ using osu.Framework.Utils;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
+using static osu.Game.Users.User;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
