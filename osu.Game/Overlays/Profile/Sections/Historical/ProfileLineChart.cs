@@ -130,7 +130,9 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.CentreRight,
                     RelativePositionAxes = Axes.Y,
+                    Margin = new MarginPadding { Right = 3 },
                     Text = rollingRow.ToString("N0"),
+                    Font = OsuFont.GetFont(size: 12),
                     Y = y
                 });
 
@@ -172,6 +174,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     Origin = Anchor.CentreLeft,
                     RelativePositionAxes = Axes.X,
                     Text = new DateTime((long)rollingRow).ToString("MMM yyyy"),
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                     Rotation = 45,
                     X = x
                 });
@@ -228,7 +231,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             private void load(OverlayColourProvider colourProvider)
             {
                 Colour = colourProvider.Foreground1;
-                Font = OsuFont.GetFont(size: 12);
             }
         }
 
