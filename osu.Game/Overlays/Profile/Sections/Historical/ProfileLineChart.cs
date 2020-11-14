@@ -29,12 +29,15 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 graph.Values = values;
 
                 createRowTicks();
+                createColumnTicks();
             }
         }
 
         private readonly UserHistoryGraph graph;
         private readonly Container<TickText> rowTicksContainer;
+        private readonly Container<TickText> columnTicksContainer;
         private readonly Container<TickLine> rowLinesContainer;
+        private readonly Container<TickLine> columnLinesContainer;
 
         public ProfileLineChart()
         {
@@ -67,9 +70,20 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                rowLinesContainer = new Container<TickLine>
+                                new Container
                                 {
-                                    RelativeSizeAxes = Axes.Both
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new[]
+                                    {
+                                        rowLinesContainer = new Container<TickLine>
+                                        {
+                                            RelativeSizeAxes = Axes.Both
+                                        },
+                                        columnLinesContainer = new Container<TickLine>
+                                        {
+                                            RelativeSizeAxes = Axes.Both
+                                        }
+                                    }
                                 },
                                 graph = new UserHistoryGraph
                                 {
@@ -81,7 +95,12 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     new Drawable[]
                     {
                         Empty(),
-                        Empty()
+                        columnTicksContainer = new Container<TickText>
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding { Top = 10 }
+                        }
                     }
                 }
             };
@@ -104,7 +123,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
             while (rollingRow <= axisEnd)
             {
-                var y = -Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
+                var y = -Interpolation.ValueAt(rollingRow, 0, 1f, axisStart, axisEnd);
 
                 rowTicksContainer.Add(new TickText
                 {
@@ -129,9 +148,50 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             }
         }
 
+        private void createColumnTicks()
+        {
+            columnTicksContainer.Clear();
+            columnLinesContainer.Clear();
+
+            var min = values.Select(v => v.Date).Min().Ticks;
+            var max = values.Select(v => v.Date).Max().Ticks;
+
+            var niceRange = niceNumber(max - min, false);
+            var niceTick = niceNumber(niceRange / (Math.Min(values.Length, 15) - 1), true);
+            var axisStart = Math.Floor(min / niceTick) * niceTick;
+            var axisEnd = Math.Ceiling(max / niceTick) * niceTick;
+
+            var rollingRow = axisStart;
+
+            while (rollingRow <= axisEnd)
+            {
+                var x = Interpolation.ValueAt(rollingRow, 0, 1f, axisStart, axisEnd);
+
+                columnTicksContainer.Add(new TickText
+                {
+                    Origin = Anchor.CentreLeft,
+                    RelativePositionAxes = Axes.X,
+                    Text = new DateTime((long)rollingRow).ToString("MMM yyyy"),
+                    Rotation = 45,
+                    X = x
+                });
+
+                columnLinesContainer.Add(new TickLine
+                {
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Y,
+                    RelativePositionAxes = Axes.X,
+                    Width = 1,
+                    X = x
+                });
+
+                rollingRow += niceTick;
+            }
+        }
+
         private double niceNumber(double value, bool round)
         {
-            var exponent = (int)Math.Floor(Math.Log10(value));
+            var exponent = Math.Floor(Math.Log10(value));
             var fraction = value / Math.Pow(10, exponent);
 
             double niceFraction;
