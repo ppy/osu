@@ -77,7 +77,11 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     c.OnLoadComplete += d => d.FadeIn(300);
 
                     return c;
-                }, TimeBeforeWrapperLoad), newCover =>
+                }, TimeBeforeWrapperLoad)
+                {
+                    Anchor = Anchor,
+                    Origin = Origin
+                }, newCover =>
                 {
                     var oldCover = cover;
                     oldCover?.FadeOut(300);
@@ -108,7 +112,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
         }
 
-        private class Cover : Sprite
+        public class Cover : Sprite
         {
             private readonly WorkingBeatmap b;
 

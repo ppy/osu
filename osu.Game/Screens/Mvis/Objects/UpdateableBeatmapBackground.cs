@@ -10,6 +10,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Mvis.Modules.v2;
 using osu.Game.Screens.Mvis.Objects.Helpers;
 using osuTK;
 using osuTK.Graphics;
@@ -24,7 +25,7 @@ namespace osu.Game.Screens.Mvis.Objects
         private readonly Container nameContainer;
         private readonly MusicIntensityController intensityController;
 
-        private BeatmapBackground background;
+        private BeatmapCover.Cover background;
         private BeatmapName name;
 
         public UpdateableBeatmapBackground()
@@ -82,11 +83,11 @@ namespace osu.Game.Screens.Mvis.Objects
 
         protected override void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
-            LoadComponentAsync(new BeatmapBackground(beatmap.NewValue)
+            LoadComponentAsync(new BeatmapCover.Cover(beatmap.NewValue)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Alpha = 0,
+                Alpha = 0
             }, newBackground =>
             {
                 background?.FadeOut(animation_duration, Easing.OutQuint);
