@@ -18,11 +18,18 @@ namespace osu.Game.Overlays.Toolbar
             AutoSizeAxes = Axes.X;
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            base.Update();
+            base.LoadComplete();
 
+            updateTime();
+        }
+
+        private void updateTime()
+        {
             DrawableText.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+
+            this.Delay(500).Schedule(updateTime);
         }
     }
 }
