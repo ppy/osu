@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             AddStep("rotate some", () => dho.RotationTracker.AddRotation(180));
-            AddAssert("rotation is set", () => dho.RotationTracker.RateAdjustedRotation == 180);
+            AddAssert("rotation is set", () => dho.Result.RateAdjustedRotation == 180);
 
             AddStep("apply new spinner", () => dho.Apply(prepareObject(new Spinner
             {
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Duration = 1000,
             }), null));
 
-            AddAssert("rotation is reset", () => dho.RotationTracker.RateAdjustedRotation == 0);
+            AddAssert("rotation is reset", () => dho.Result.RateAdjustedRotation == 0);
         }
 
         private Spinner prepareObject(Spinner circle)

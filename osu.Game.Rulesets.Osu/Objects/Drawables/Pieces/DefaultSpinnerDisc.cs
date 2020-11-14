@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             get
             {
-                int rotations = (int)(drawableSpinner.RotationTracker.RateAdjustedRotation / 360);
+                int rotations = (int)(drawableSpinner.Result.RateAdjustedRotation / 360);
 
                 if (wholeRotationCount == rotations) return false;
 
