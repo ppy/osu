@@ -248,14 +248,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             // Correction #4 - Tap Strain
             // Estimate how tap strain affects difficulty
-            double tapCorrection = 0;
+            if (!(lastToCurrent.RelativeLength > 0) || tapStrain == null)
+                return 0;
 
-            if (lastToCurrent.RelativeLength > 0 && tapStrain != null)
-            {
-                tapCorrection = SpecialFunctions.Logistic((PowerMean.Of(tapStrain, 2) / movementThroughput - 1.34) / 0.1) * 0.15;
-            }
-
-            return tapCorrection;
+            return SpecialFunctions.Logistic((PowerMean.Of(tapStrain, 2) / movementThroughput - 1.34) / 0.1) * 0.15;
         }
 
         private static void calculateCheeseWindow(MovementExtractionParameters p, double movementThroughput)
