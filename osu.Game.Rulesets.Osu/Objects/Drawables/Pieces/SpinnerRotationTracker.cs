@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -22,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public SpinnerRotationTracker(DrawableSpinner drawableSpinner)
         {
             this.drawableSpinner = drawableSpinner;
+            drawableSpinner.HitObjectApplied += resetState;
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -106,6 +108,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
             // (see: ModTimeRamp)
             drawableSpinner.Result.RateAdjustedRotation += (float)(Math.Abs(angle) * (gameplayClock?.TrueGameplayRate ?? Clock.Rate));
+        }
+
+        private void resetState(DrawableHitObject obj)
+        {
+            Tracking = false;
+            IsSpinning.Value = false;
+            mousePosition = default;
+            lastAngle = currentRotation = Rotation = 0;
+            rotationTransferred = false;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableSpinner != null)
+                drawableSpinner.HitObjectApplied -= resetState;
         }
     }
 }
