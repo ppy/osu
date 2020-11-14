@@ -116,14 +116,12 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
             var niceRange = niceNumber(max - min, false);
             var niceTick = niceNumber(niceRange / (6 - 1), true);
-            var axisStart = Math.Floor(min / niceTick) * niceTick;
-            var axisEnd = Math.Ceiling(max / niceTick) * niceTick;
 
-            var rollingRow = axisStart;
+            double rollingRow = min;
 
-            while (rollingRow <= axisEnd)
+            while (rollingRow <= max)
             {
-                var y = -Interpolation.ValueAt(rollingRow, 0, 1f, axisStart, axisEnd);
+                var y = -Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
 
                 rowTicksContainer.Add(new TickText
                 {
@@ -155,25 +153,23 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             columnTicksContainer.Clear();
             columnLinesContainer.Clear();
 
-            var min = values.Select(v => v.Date).Min().Ticks;
-            var max = values.Select(v => v.Date).Max().Ticks;
+            var min = values.Select(v => v.Date).Min().ToOADate();
+            var max = values.Select(v => v.Date).Max().ToOADate();
 
             var niceRange = niceNumber(max - min, false);
             var niceTick = niceNumber(niceRange / (Math.Min(values.Length, 15) - 1), true);
-            var axisStart = Math.Floor(min / niceTick) * niceTick;
-            var axisEnd = Math.Ceiling(max / niceTick) * niceTick;
 
-            var rollingRow = axisStart;
+            double rollingRow = min;
 
-            while (rollingRow <= axisEnd)
+            while (rollingRow <= max)
             {
-                var x = Interpolation.ValueAt(rollingRow, 0, 1f, axisStart, axisEnd);
+                var x = Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
 
                 columnTicksContainer.Add(new TickText
                 {
                     Origin = Anchor.CentreLeft,
                     RelativePositionAxes = Axes.X,
-                    Text = new DateTime((long)rollingRow).ToString("MMM yyyy"),
+                    Text = DateTime.FromOADate(rollingRow).ToString("MMM yyyy"),
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                     Rotation = 45,
                     X = x
