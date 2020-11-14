@@ -211,7 +211,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (Time.Current < HitObject.StartTime) return;
 
-            RotationTracker.Complete.Value = Progress >= 1;
+            if (Progress >= 1)
+                Result.TimeCompleted ??= Time.Current;
 
             if (userTriggered || Time.Current < HitObject.EndTime)
                 return;

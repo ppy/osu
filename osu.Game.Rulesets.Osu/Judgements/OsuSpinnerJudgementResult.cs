@@ -38,6 +38,12 @@ namespace osu.Game.Rulesets.Osu.Judgements
         /// </example>
         public float RateAdjustedRotation;
 
+        /// <summary>
+        /// Time instant at which the spinner has been completed (the user has executed all required spins).
+        /// Will be null if all required spins haven't been completed.
+        /// </summary>
+        public double? TimeCompleted;
+
         public OsuSpinnerJudgementResult(HitObject hitObject, Judgement judgement)
             : base(hitObject, judgement)
         {
