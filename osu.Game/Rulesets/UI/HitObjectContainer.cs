@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.UI
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
 
         [Resolved(CanBeNull = true)]
-        private DrawableRuleset drawableRuleset { get; set; }
+        private IPooledHitObjectProvider pooledObjectProvider { get; set; }
 
         public HitObjectContainer()
         {
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.UI
         {
             Debug.Assert(!drawableMap.ContainsKey(entry));
 
-            var drawable = drawableRuleset.GetPooledDrawableRepresentation(entry.HitObject);
+            var drawable = pooledObjectProvider.GetPooledDrawableRepresentation(entry.HitObject);
             if (drawable == null)
                 throw new InvalidOperationException($"A drawable representation could not be retrieved for hitobject type: {entry.HitObject.GetType().ReadableName()}.");
 
