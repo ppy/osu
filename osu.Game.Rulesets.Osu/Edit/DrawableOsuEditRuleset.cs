@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             protected override GameplayCursorContainer CreateCursor() => null;
 
             protected override DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
-                => new OsuEditDrawablePool<TDrawable>(CheckHittable, OnHitObjectLoaded, initialSize, maximumSize);
+                => new DrawableOsuEditPool<TDrawable>(CheckHittable, OnHitObjectLoaded, initialSize, maximumSize);
         }
     }
 }

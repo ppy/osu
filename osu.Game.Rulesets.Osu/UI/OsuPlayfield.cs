@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected virtual DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
             where TDrawable : DrawableHitObject, new()
-            => new OsuDrawablePool<TDrawable>(CheckHittable, OnHitObjectLoaded, initialSize, maximumSize);
+            => new DrawableOsuPool<TDrawable>(CheckHittable, OnHitObjectLoaded, initialSize, maximumSize);
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
 

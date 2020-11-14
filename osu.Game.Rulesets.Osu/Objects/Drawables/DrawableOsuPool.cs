@@ -8,13 +8,13 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class OsuDrawablePool<T> : DrawablePool<T>
+    public class DrawableOsuPool<T> : DrawablePool<T>
         where T : DrawableHitObject, new()
     {
         private readonly Func<DrawableHitObject, double, bool> checkHittable;
         private readonly Action<Drawable> onLoaded;
 
-        public OsuDrawablePool(Func<DrawableHitObject, double, bool> checkHittable, Action<Drawable> onLoaded, int initialSize, int? maximumSize = null)
+        public DrawableOsuPool(Func<DrawableHitObject, double, bool> checkHittable, Action<Drawable> onLoaded, int initialSize, int? maximumSize = null)
             : base(initialSize, maximumSize)
         {
             this.checkHittable = checkHittable;
