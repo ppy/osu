@@ -30,8 +30,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool Tracking { get; set; }
 
-        public readonly BindableBool Complete = new BindableBool();
-
         /// <summary>
         /// Whether the spinning is spinning at a reasonable speed to be considered visually spinning.
         /// </summary>
