@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             double correctionNeg2Flow = AngleCorrection.FLOW_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
             double correctionNeg2Snap = AngleCorrection.SNAP_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
-            double correctionNeg2Stop = calcCorrection0Stop(xNeg2, yNeg2);
+            double correctionNeg2Stop = SpecialFunctions.Logistic(10 * Math.Sqrt(xNeg2 * xNeg2 + yNeg2 * yNeg2 + 1) - 12);
 
             p.SecondLastToCurrentFlowiness = SpecialFunctions.Logistic((correctionNeg2Snap - correctionNeg2Flow - 0.05) * 20);
 
@@ -390,11 +390,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double distanceRatio = p.LastToCurrent.RelativeLength / Math.Max(1, p.SecondLastToLast?.RelativeLength ?? 0);
             double bpmScaling = Math.Max(1, -16 * p.LastToCurrent.TimeDelta + 3.4);
             return 1 + 0.225 * bpmScaling * timeDifferenceNerf * dNeg2PrevOverlapNerf * Math.Max(0, distanceRatio - 2);
-        }
-
-        private static double calcCorrection0Stop(double d, double x, double y)
-        {
-            return SpecialFunctions.Logistic(10 * Math.Sqrt(x * x + y * y + 1) - 12);
         }
     }
 }
