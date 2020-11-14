@@ -137,60 +137,47 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             // Correction #1 - The Previous Object
             // Estimate how objNeg2 affects the difficulty of hitting objCurr
-            double correctionNeg2 = 0;
+            if (p.SecondLastObject == null || p.LastToCurrent.RelativeLength == 0)
+                return 0;
 
-            if (p.SecondLastObject != null && p.LastToCurrent.RelativeLength != 0)
+            Debug.Assert(p.SecondLastToLast != null);
+
+            double tRatioNeg2 = p.LastToCurrent.TimeDelta / p.SecondLastToLast.Value.TimeDelta;
+            double cosNeg2PrevCurr =
+                Math.Min(Math.Max(-p.SecondLastToLast.Value.RelativeVector.DotProduct(p.LastToCurrent.RelativeVector) / p.SecondLastToLast.Value.RelativeLength / p.LastToCurrent.RelativeLength, -1), 1);
+
+            if (tRatioNeg2 > t_ratio_threshold)
             {
-                Debug.Assert(p.SecondLastToLast != null);
+                if (p.SecondLastToLast.Value.RelativeLength == 0)
+                    return 0;
 
-                double tRatioNeg2 = p.LastToCurrent.TimeDelta / p.SecondLastToLast.Value.TimeDelta;
-                double cosNeg2PrevCurr =
-                    Math.Min(Math.Max(-p.SecondLastToLast.Value.RelativeVector.DotProduct(p.LastToCurrent.RelativeVector) / p.SecondLastToLast.Value.RelativeLength / p.LastToCurrent.RelativeLength, -1), 1);
+                double correctionNeg2Moving = correction_neg2_moving_spline.Interpolate(cosNeg2PrevCurr);
 
-                if (tRatioNeg2 > t_ratio_threshold)
-                {
-                    if (p.SecondLastToLast.Value.RelativeLength == 0)
-                    {
-                        correctionNeg2 = correction_neg2_still;
-                    }
-                    else
-                    {
-                        double correctionNeg2Moving = correction_neg2_moving_spline.Interpolate(cosNeg2PrevCurr);
-
-                        double movingness = SpecialFunctions.Logistic(p.SecondLastToLast.Value.RelativeLength * 6 - 5) - SpecialFunctions.Logistic(-5);
-                        correctionNeg2 = (movingness * correctionNeg2Moving + (1 - movingness) * correction_neg2_still) * 1.5;
-                    }
-                }
-                else if (tRatioNeg2 < 1 / t_ratio_threshold)
-                {
-                    if (p.SecondLastToLast.Value.RelativeLength == 0)
-                    {
-                        correctionNeg2 = 0;
-                    }
-                    else
-                    {
-                        correctionNeg2 = (1 - cosNeg2PrevCurr) * SpecialFunctions.Logistic((p.SecondLastToLast.Value.RelativeLength * tRatioNeg2 - 1.5) * 4) * 0.3;
-                    }
-                }
-                else
-                {
-                    p.LastObjectCenteredBetweenNeighbours = true;
-
-                    var normalizedPosNeg2 = -p.SecondLastToLast.Value.RelativeVector / p.SecondLastToLast.Value.TimeDelta * p.LastToCurrent.TimeDelta;
-                    double xNeg2 = normalizedPosNeg2.DotProduct(p.LastToCurrent.RelativeVector) / p.LastToCurrent.RelativeLength;
-                    double yNeg2 = (normalizedPosNeg2 - xNeg2 * p.LastToCurrent.RelativeVector / p.LastToCurrent.RelativeLength).L2Norm();
-
-                    double correctionNeg2Flow = AngleCorrection.FLOW_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
-                    double correctionNeg2Snap = AngleCorrection.SNAP_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
-                    double correctionNeg2Stop = calcCorrection0Stop(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
-
-                    p.SecondLastToCurrentFlowiness = SpecialFunctions.Logistic((correctionNeg2Snap - correctionNeg2Flow - 0.05) * 20);
-
-                    correctionNeg2 = PowerMean.Of(new[] { correctionNeg2Flow, correctionNeg2Snap, correctionNeg2Stop }, -10) * 1.3;
-                }
+                double movingness = SpecialFunctions.Logistic(p.SecondLastToLast.Value.RelativeLength * 6 - 5) - SpecialFunctions.Logistic(-5);
+                return movingness * correctionNeg2Moving * 1.5;
             }
 
-            return correctionNeg2;
+            if (tRatioNeg2 < 1 / t_ratio_threshold)
+            {
+                if (p.SecondLastToLast.Value.RelativeLength == 0)
+                    return 0;
+
+                return (1 - cosNeg2PrevCurr) * SpecialFunctions.Logistic((p.SecondLastToLast.Value.RelativeLength * tRatioNeg2 - 1.5) * 4) * 0.3;
+            }
+
+            p.LastObjectCenteredBetweenNeighbours = true;
+
+            var normalizedPosNeg2 = -p.SecondLastToLast.Value.RelativeVector / p.SecondLastToLast.Value.TimeDelta * p.LastToCurrent.TimeDelta;
+            double xNeg2 = normalizedPosNeg2.DotProduct(p.LastToCurrent.RelativeVector) / p.LastToCurrent.RelativeLength;
+            double yNeg2 = (normalizedPosNeg2 - xNeg2 * p.LastToCurrent.RelativeVector / p.LastToCurrent.RelativeLength).L2Norm();
+
+            double correctionNeg2Flow = AngleCorrection.FLOW_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
+            double correctionNeg2Snap = AngleCorrection.SNAP_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
+            double correctionNeg2Stop = calcCorrection0Stop(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
+
+            p.SecondLastToCurrentFlowiness = SpecialFunctions.Logistic((correctionNeg2Snap - correctionNeg2Flow - 0.05) * 20);
+
+            return PowerMean.Of(new[] { correctionNeg2Flow, correctionNeg2Snap, correctionNeg2Stop }, -10) * 1.3;
         }
 
         private static double calculateNextObjectCorrection(MovementExtractionParameters p)
