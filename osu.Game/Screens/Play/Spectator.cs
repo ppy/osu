@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -35,7 +36,8 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public class Spectator : OsuScreen
+    [Cached(typeof(IPreviewTrackOwner))]
+    public class Spectator : OsuScreen, IPreviewTrackOwner
     {
         private readonly User targetUser;
 
@@ -61,6 +63,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         private Score score;
 
@@ -275,6 +280,7 @@ namespace osu.Game.Screens.Play
         {
             watchButton.Enabled.Value = false;
             beatmapPanelContainer.Clear();
+            previewTrackManager.StopAnyPlaying(this);
         }
 
         private void attemptStart()
@@ -326,7 +332,6 @@ namespace osu.Game.Screens.Play
         {
             if (state?.BeatmapID == null)
             {
-                beatmapPanelContainer.Clear();
                 onlineBeatmap = null;
                 return;
             }
@@ -357,6 +362,12 @@ namespace osu.Game.Screens.Play
                 return;
 
             beatmaps.Download(onlineBeatmap);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            previewTrackManager.StopAnyPlaying(this);
+            return base.OnExiting(next);
         }
 
         protected override void Dispose(bool isDisposing)
