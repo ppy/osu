@@ -151,8 +151,6 @@ namespace osu.Game.Overlays.BeatmapListing
             /// </summary>
             public Action TypingStarted;
 
-            protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);
-
             public BeatmapSearchTextBox()
             {
                 PlaceholderText = @"type in keywords...";
