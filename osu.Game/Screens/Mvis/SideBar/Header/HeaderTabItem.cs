@@ -5,13 +5,14 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis.Modules;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar.Header
 {
     public class HeaderTabItem : OsuClickableContainer
     {
         private readonly Box activeBox;
-        private readonly Box hoverBox;
+        private readonly OsuSpriteText title;
         private bool isActive;
 
         public ISidebarContent Value;
@@ -28,11 +29,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
             Value = content;
             Children = new Drawable[]
             {
-                hoverBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0
-                },
                 activeBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -40,12 +36,12 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft
                 },
-                new OsuSpriteText
+                title = new OsuSpriteText
                 {
                     Text = content.Title,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Margin = new MarginPadding { Horizontal = 10 }
+                    Margin = new MarginPadding { Horizontal = 5 }
                 }
             };
         }
@@ -54,7 +50,8 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         {
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                activeBox.Colour = hoverBox.Colour = colourProvider.Highlight1;
+                activeBox.Colour = colourProvider.Highlight1;
+                title.Colour = isActive ? Color4.White : colourProvider.Highlight1;
             }, true);
 
             base.LoadComplete();
@@ -76,28 +73,18 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
             base.OnHoverLost(e);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            hoverBox.FadeTo(0.6f, 2000, Easing.OutQuint);
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            hoverBox.FadeOut(1000, Easing.OutQuint);
-            base.OnMouseUp(e);
-        }
-
         public void MakeActive()
         {
             isActive = true;
             activeBox.ResizeHeightTo(0.2f, 300, Easing.OutQuint);
+            title.Colour = Color4.White;
         }
 
         public void MakeInActive()
         {
             isActive = false;
             activeBox.ResizeHeightTo(IsHovered ? 0.2f : 0, 300, Easing.OutQuint);
+            title.Colour = colourProvider.Highlight1;
         }
     }
 }

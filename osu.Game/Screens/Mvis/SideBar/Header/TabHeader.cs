@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         {
             OsuScrollContainer scroll;
             Name = "Header";
-            Height = 35;
+            Height = 40;
             RelativeSizeAxes = Axes.X;
 
             Children = new Drawable[]

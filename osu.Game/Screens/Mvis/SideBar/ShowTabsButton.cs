@@ -14,13 +14,16 @@ namespace osu.Game.Screens.Mvis.SideBar
     internal class ShowTabsButton : OsuClickableContainer
     {
         private readonly Box hoverBox;
+        private readonly SpriteIcon icon;
+
+        private bool headerHidden;
 
         public ShowTabsButton()
         {
             Size = new Vector2(50);
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
-            TooltipText = "切换Header";
+            TooltipText = "隐藏工具栏";
             Children = new Drawable[]
             {
                 new Box
@@ -28,9 +31,9 @@ namespace osu.Game.Screens.Mvis.SideBar
                     RelativeSizeAxes = Axes.Both,
                     Colour = Colour4.Black.Opacity(0.4f)
                 },
-                new SpriteIcon
+                icon = new SpriteIcon
                 {
-                    Icon = FontAwesome.Solid.Bars,
+                    Icon = FontAwesome.Solid.ArrowUp,
                     Size = new Vector2(20),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
@@ -74,6 +77,26 @@ namespace osu.Game.Screens.Mvis.SideBar
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
             base.OnMouseUp(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (headerHidden)
+            {
+                //如果隐藏了，这时候应该是工具栏隐藏
+                TooltipText = "隐藏工具栏";
+                icon.RotateTo(0, 300, Easing.OutQuint);
+                headerHidden = false;
+            }
+            else
+            {
+                //如果不是则为显示
+                TooltipText = "显示工具栏";
+                icon.RotateTo(180, 300, Easing.OutQuint);
+                headerHidden = true;
+            }
+
+            return base.OnClick(e);
         }
     }
 }
