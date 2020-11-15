@@ -907,6 +907,8 @@ namespace osu.Game.Screens.Mvis
             sbLoader?.FadeColour(OsuColour.Gray(auto ? (overlaysHidden ? idleBgDim.Value : 0.6f) : brightness), duration, Easing.OutQuint);
         }
 
+        private WorkingBeatmap prevBeatmap;
+
         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
             var beatmap = v.NewValue;
@@ -918,7 +920,10 @@ namespace osu.Game.Screens.Mvis
                 updateBackground(beatmap);
             });
 
-            sbLoader.UpdateStoryBoardAsync();
+            if (beatmap != prevBeatmap)
+                sbLoader.UpdateStoryBoardAsync();
+
+            prevBeatmap = beatmap;
         }
     }
 }
