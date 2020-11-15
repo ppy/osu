@@ -17,17 +17,17 @@ namespace osu.Game.Screens.Mvis.SideBar
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
+        private readonly List<Drawable> components = new List<Drawable>();
+        private readonly WaveContainer waveContainer;
+        private readonly TabHeader header;
+        private const float duration = 400;
+        private Box sidebarBg;
+
         public bool IsHidden = true;
         public bool Hiding;
-
-        private readonly List<Drawable> components = new List<Drawable>();
-        private const float duration = 400;
         public Bindable<Drawable> CurrentDisplay = new Bindable<Drawable>();
 
-        private readonly WaveContainer waveContainer;
         private readonly Container<Drawable> contentContainer;
-        private readonly TabHeader header;
-        private Box sidebarBg;
         protected override Container<Drawable> Content => contentContainer;
 
         public Sidebar()
@@ -46,7 +46,6 @@ namespace osu.Game.Screens.Mvis.SideBar
                     contentContainer = new Container
                     {
                         Name = "Content",
-                        Padding = new MarginPadding { Top = 35 },
                         RelativeSizeAxes = Axes.Both
                     },
                     new Footer.Footer()
@@ -65,7 +64,6 @@ namespace osu.Game.Screens.Mvis.SideBar
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    Padding = new MarginPadding { Bottom = 50 },
                     Depth = float.MaxValue,
                     Child = new SkinnableSprite("MSidebar-background", confineMode: ConfineMode.ScaleToFill)
                     {
@@ -153,7 +151,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         protected override void UpdateAfterChildren()
         {
-            contentContainer.Padding = new MarginPadding { Top = header.Height + header.DrawPosition.Y };
+            contentContainer.Padding = new MarginPadding { Top = header.Height + header.DrawPosition.Y, Bottom = 50 };
             base.UpdateAfterChildren();
         }
 
@@ -171,7 +169,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 return;
             }
 
-            var resizeDuration = IsHidden ? 0 : Sidebar.duration;
+            var resizeDuration = IsHidden ? 0 : duration;
 
             CurrentDisplay.Value?.FadeOut(resizeDuration / 2, Easing.OutQuint);
 
@@ -183,18 +181,21 @@ namespace osu.Game.Screens.Mvis.SideBar
             IsHidden = false;
         }
 
-        public void AddDrawableToList(Drawable d)
+        private void addDrawableToList(Drawable d)
         {
             if (d is ISidebarContent s)
             {
                 d.Alpha = 0;
                 components.Add(d);
+                contentContainer.Add(d);
                 header.Tabs.Add(new HeaderTabItem(s)
                 {
                     Action = () => ResizeFor(d)
                 });
             }
         }
+
+        public override void Add(Drawable drawable) => addDrawableToList(drawable);
 
         protected override void PopOut()
         {

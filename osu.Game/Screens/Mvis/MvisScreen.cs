@@ -205,44 +205,7 @@ namespace osu.Game.Screens.Mvis
                         sidebar = new Sidebar
                         {
                             Name = "Sidebar Container",
-                            Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING },
-                            Children = new Drawable[]
-                            {
-                                new Container
-                                {
-                                    Padding = new MarginPadding { Bottom = 50 },
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        settingsScroll = new SidebarSettingsScrollContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Child = new FillFlowContainer
-                                            {
-                                                AutoSizeAxes = Axes.Y,
-                                                RelativeSizeAxes = Axes.X,
-                                                Spacing = new Vector2(20),
-                                                Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
-                                                Margin = new MarginPadding { Bottom = 10 },
-                                                Direction = FillDirection.Vertical,
-                                                Children = new Drawable[]
-                                                {
-                                                    new MfMvisSection
-                                                    {
-                                                        Margin = new MarginPadding(0)
-                                                    },
-                                                    new SettingsButton
-                                                    {
-                                                        Text = "歌曲选择",
-                                                        Action = () => this.Push(new MvisSongSelect())
-                                                    }
-                                                }
-                                            },
-                                        },
-                                        collectionPanel = new CollectionSelectPanel()
-                                    }
-                                },
-                            }
+                            Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING }
                         },
                         skinnableBbBackground = new ModifiedSkinnableSprite("MBottomBar-background",
                             confineMode: ConfineMode.ScaleToFill,
@@ -446,8 +409,32 @@ namespace osu.Game.Screens.Mvis
                 },
             };
 
-            sidebar.AddDrawableToList(settingsScroll);
-            sidebar.AddDrawableToList(collectionPanel);
+            sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Spacing = new Vector2(20),
+                    Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
+                    Margin = new MarginPadding { Bottom = 10 },
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new MfMvisSection
+                        {
+                            Margin = new MarginPadding(0)
+                        },
+                        new SettingsButton
+                        {
+                            Text = "歌曲选择",
+                            Action = () => this.Push(new MvisSongSelect())
+                        }
+                    }
+                },
+            });
+            sidebar.Add(collectionPanel = new CollectionSelectPanel());
 
             isIdle.BindTo(idleTracker.IsIdle);
             config.BindWith(MfSetting.MvisBgBlur, bgBlur);
