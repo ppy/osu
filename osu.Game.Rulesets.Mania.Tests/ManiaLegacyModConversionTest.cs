@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath | LegacyMods.DoubleTime, new[] { typeof(ManiaModDoubleTime), typeof(ManiaModPerfect) })]
         [TestCase(LegacyMods.Random | LegacyMods.SuddenDeath, new[] { typeof(ManiaModRandom), typeof(ManiaModSuddenDeath) })]
         [TestCase(LegacyMods.Flashlight | LegacyMods.Mirror, new[] { typeof(ManiaModFlashlight), typeof(ManiaModMirror) })]
-        public new void Test(LegacyMods legacyMods, Type[] expectedMods) => base.Test(legacyMods, expectedMods);
+        public new void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods) => base.TestFromLegacy(legacyMods, expectedMods);
 
         protected override Ruleset CreateRuleset() => new ManiaRuleset();
     }

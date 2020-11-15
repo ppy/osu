@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath, new[] { typeof(OsuModPerfect) })]
         [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath | LegacyMods.DoubleTime, new[] { typeof(OsuModDoubleTime), typeof(OsuModPerfect) })]
         [TestCase(LegacyMods.SpunOut | LegacyMods.Easy, new[] { typeof(OsuModSpunOut), typeof(OsuModEasy) })]
-        public new void Test(LegacyMods legacyMods, Type[] expectedMods) => base.Test(legacyMods, expectedMods);
+        public new void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods) => base.TestFromLegacy(legacyMods, expectedMods);
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();
     }

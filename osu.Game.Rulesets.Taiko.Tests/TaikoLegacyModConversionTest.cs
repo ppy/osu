@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [TestCase(LegacyMods.SuddenDeath, new[] { typeof(TaikoModSuddenDeath) })]
         [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath, new[] { typeof(TaikoModPerfect) })]
         [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath | LegacyMods.DoubleTime, new[] { typeof(TaikoModDoubleTime), typeof(TaikoModPerfect) })]
-        public new void Test(LegacyMods legacyMods, Type[] expectedMods) => base.Test(legacyMods, expectedMods);
+        public new void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods) => base.TestFromLegacy(legacyMods, expectedMods);
 
         protected override Ruleset CreateRuleset() => new TaikoRuleset();
     }
