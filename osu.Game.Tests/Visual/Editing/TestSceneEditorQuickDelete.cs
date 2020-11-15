@@ -9,13 +9,9 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using osuTK.Input;
@@ -42,9 +38,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse to object", () =>
             {
-                var pos = blueprintContainer.SelectionBlueprints
-                            .ChildrenOfType<HitCircleSelectionBlueprint>().First()
-                            .ChildrenOfType<HitCirclePiece>().First().ScreenSpaceDrawQuad.Centre;
+                var pos = blueprintContainer.ChildrenOfType<HitCirclePiece>().First().ScreenSpaceDrawQuad.Centre;
                 InputManager.MoveMouseTo(pos);
             });
             AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
@@ -76,10 +70,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse to controlpoint", () =>
             {
-                var pos = blueprintContainer.SelectionBlueprints
-                            .ChildrenOfType<SliderSelectionBlueprint>().First()
-                            .ChildrenOfType<PathControlPointVisualiser>().First()
-                            .ChildrenOfType<PathControlPointPiece>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
+                var pos = blueprintContainer.ChildrenOfType<PathControlPointPiece>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
                 InputManager.MoveMouseTo(pos);
             });
             AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
