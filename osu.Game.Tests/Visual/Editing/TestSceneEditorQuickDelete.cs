@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             Slider slider = new Slider { StartTime = 1000 };
 
-            PathControlPoint[] points = new PathControlPoint[]
+            PathControlPoint[] points =
             {
                 new PathControlPoint(),
                 new PathControlPoint(new Vector2(50, 0)),
