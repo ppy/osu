@@ -13,7 +13,6 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osuTK.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
