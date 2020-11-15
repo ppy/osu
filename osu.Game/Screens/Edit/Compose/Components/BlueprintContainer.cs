@@ -338,18 +338,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a selection was performed.</returns>
         private bool beginClickSelection(MouseButtonEvent e)
         {
-            bool selectedPerformed = true;
-
             foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren)
             {
                 if (!blueprint.IsHovered) continue;
 
-                selectedPerformed &= SelectionHandler.HandleSelectionRequested(blueprint, e);
-                clickSelectionBegan = true;
-                break;
+                return clickSelectionBegan = SelectionHandler.HandleSelectionRequested(blueprint, e);
             }
 
-            return selectedPerformed;
+            return false;
         }
 
         /// <summary>
