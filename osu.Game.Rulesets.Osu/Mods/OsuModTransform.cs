@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn) / 2;
 
-                    Vector2 originalPosition = drawable.Position;
+                    Vector2 originalPosition = hitObject.StackedPosition;
                     Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
 
                     // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
