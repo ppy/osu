@@ -15,6 +15,7 @@ namespace osu.Game.Overlays
         {
             Icon = FontAwesome.Regular.PlayCircle
         };
+
         public override string Header => "M-vis播放器";
 
         public MfMvisSection()

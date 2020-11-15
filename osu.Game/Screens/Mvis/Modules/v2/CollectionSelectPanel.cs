@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private readonly CollectionInfo info;
 
         public float ResizeWidth => 0.85f;
+        public string Title => "收藏夹";
 
         public CollectionSelectPanel()
         {
