@@ -248,7 +248,9 @@ namespace osu.Game.Online.Leaderboards
         [BackgroundDependencyLoader]
         private void load()
         {
-            apiState.BindTo(api.State);
+            if (api != null)
+                apiState.BindTo(api.State);
+
             apiState.BindValueChanged(onlineStateChanged, true);
         }
 
@@ -303,7 +305,7 @@ namespace osu.Game.Online.Leaderboards
                     PlaceholderState = PlaceholderState.NetworkFailure;
                 });
 
-                api.Queue(getScoresRequest);
+                api?.Queue(getScoresRequest);
             });
         }
 
