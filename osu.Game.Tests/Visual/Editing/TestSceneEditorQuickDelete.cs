@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose;
@@ -72,11 +73,10 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse to controlpoint", () =>
             {
-                // This doesn't get the HitCirclePiece corresponding to the last control point on consecutive runs,
-                // causing the slider to translate by 50 every time and go off the screen after about 10 runs.
                 var pos = getBlueprintContainer.SelectionBlueprints
                             .ChildrenOfType<SliderSelectionBlueprint>().First()
-                            .ChildrenOfType<HitCirclePiece>().Last().ScreenSpaceDrawQuad.Centre;
+                            .ChildrenOfType<PathControlPointVisualiser>().First()
+                            .ChildrenOfType<PathControlPointPiece>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
                 InputManager.MoveMouseTo(pos);
             });
             AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
