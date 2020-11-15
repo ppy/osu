@@ -36,6 +36,5 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public bool PerformFail() => true;
 
         public bool RestartOnFail => false;
-
     }
 }
