@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Beatmaps
         /// <returns></returns>
         protected abstract Ruleset CreateRuleset();
 
-        protected void Test(LegacyMods legacyMods, Type[] expectedMods)
+        protected void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods)
         {
             var ruleset = CreateRuleset();
             var mods = ruleset.ConvertFromLegacyMods(legacyMods).ToList();

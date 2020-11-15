@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase(LegacyMods.SuddenDeath, new[] { typeof(CatchModSuddenDeath) })]
         [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath, new[] { typeof(CatchModPerfect) })]
         [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath | LegacyMods.DoubleTime, new[] { typeof(CatchModDoubleTime), typeof(CatchModPerfect) })]
-        public new void Test(LegacyMods legacyMods, Type[] expectedMods) => base.Test(legacyMods, expectedMods);
+        public new void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods) => base.TestFromLegacy(legacyMods, expectedMods);
 
         protected override Ruleset CreateRuleset() => new CatchRuleset();
     }
