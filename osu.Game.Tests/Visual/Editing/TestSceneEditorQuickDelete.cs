@@ -28,6 +28,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
+        private BlueprintContainer blueprintContainer
+            => Editor.ChildrenOfType<BlueprintContainer>().First();
+
         [Test]
         public void TestQuickDeleteRemovesObject()
         {
@@ -39,7 +42,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse to object", () =>
             {
-                var pos = getBlueprintContainer.SelectionBlueprints
+                var pos = blueprintContainer.SelectionBlueprints
                             .ChildrenOfType<HitCircleSelectionBlueprint>().First()
                             .ChildrenOfType<HitCirclePiece>().First().ScreenSpaceDrawQuad.Centre;
                 InputManager.MoveMouseTo(pos);
@@ -73,7 +76,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse to controlpoint", () =>
             {
-                var pos = getBlueprintContainer.SelectionBlueprints
+                var pos = blueprintContainer.SelectionBlueprints
                             .ChildrenOfType<SliderSelectionBlueprint>().First()
                             .ChildrenOfType<PathControlPointVisualiser>().First()
                             .ChildrenOfType<PathControlPointPiece>().ElementAt(1).ScreenSpaceDrawQuad.Centre;
@@ -85,9 +88,5 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("slider has 2 points", () => slider.Path.ControlPoints.Count == 2);
         }
-
-        private BlueprintContainer getBlueprintContainer => Editor.ChildrenOfType<ComposeScreen>().First()
-                                                                  .ChildrenOfType<HitObjectComposer>().First()
-                                                                  .ChildrenOfType<BlueprintContainer>().First();
     }
 }
