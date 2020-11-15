@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 
@@ -11,6 +13,8 @@ namespace osu.Game.Overlays.Toolbar
     public class ToolbarTimeButton : ToolbarButton
     {
         private readonly TimeSpan launchTick = new TimeSpan(DateTime.Now.Ticks);
+        private IBindable<WeakReference<BeatmapSetInfo>> beatmapUpdated;
+        private IBindable<WeakReference<BeatmapSetInfo>> beatmapRemoved;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -21,12 +25,20 @@ namespace osu.Game.Overlays.Toolbar
             AutoSizeAxes = Axes.X;
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            beatmapUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
+            beatmapRemoved = beatmapManager.ItemRemoved.GetBoundCopy();
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             updateTime();
-            updateBeatmaps();
+            beatmapUpdated.BindValueChanged(_ => updateBeatmaps(), true);
+            beatmapRemoved.BindValueChanged(_ => updateBeatmaps());
         }
 
         private void updateTime()
@@ -36,18 +48,15 @@ namespace osu.Game.Overlays.Toolbar
 
             var currentTick = new TimeSpan(currentTime.Ticks);
             var xE = currentTick.Subtract(launchTick);
-            string tooltipMain = "osu!已启动约";
+            string tooltipMain = "osu!已经运行了";
 
             if (xE.Days > 0)
                 tooltipMain += $"{xE.Days}天";
 
             if (xE.Hours > 0)
-                tooltipMain += $"{xE.Hours}小时";
+                tooltipMain += $"{xE.Hours:00}:";
 
-            if (xE.Minutes > 0)
-                tooltipMain += $"{xE.Minutes}分";
-
-            tooltipMain += $"{xE.Seconds}秒";
+            tooltipMain += $"{xE.Minutes:00}:{xE.Seconds:00}。";
 
             TooltipMain = tooltipMain;
 
@@ -56,9 +65,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private void updateBeatmaps()
         {
-            TooltipSub = $"共有{beatmapManager.GetAllUsableBeatmapSets(IncludedDetails.Minimal).Count}张谱面";
-
-            this.Delay(60000).Schedule(updateBeatmaps);
+            TooltipSub = $"你共有{beatmapManager.QueryBeatmapsMinimal(_ => true).ToList().Count}张谱面!";
         }
     }
 }

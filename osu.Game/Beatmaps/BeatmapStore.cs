@@ -106,5 +106,8 @@ namespace osu.Game.Beatmaps
                           .Include(b => b.Metadata)
                           .Include(b => b.Ruleset)
                           .Include(b => b.BaseDifficulty);
+
+        public IQueryable<BeatmapInfo> BeatmapsMinimal =>
+            ContextFactory.Get().BeatmapInfo;
     }
 }
