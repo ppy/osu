@@ -457,6 +457,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (movementBlueprint == null)
                 return false;
 
+            if (snapProvider == null)
+                return true;
+
             Debug.Assert(movementBlueprintOriginalPosition != null);
 
             HitObject draggedObject = movementBlueprint.HitObject;
