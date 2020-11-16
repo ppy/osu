@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModEasy : ModEasy
+    public class ManiaModEasy : ModEasy, IApplicableFailOverride, IApplicableToHealthProcessor
     {
         public override string Description => @"More forgiving HP drain, less accuracy required, and three lives!";
 

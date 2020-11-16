@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModEasy : ModEasy
+    public class CatchModEasy : ModEasy, IApplicableFailOverride, IApplicableToHealthProcessor
     {
         public override string Description => @"Larger fruits, more forgiving HP drain, less accuracy required, and three lives!";
 
