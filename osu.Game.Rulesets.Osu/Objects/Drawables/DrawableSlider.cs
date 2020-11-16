@@ -80,6 +80,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
+                updateBallTint();
             }, true);
 
             Tracking.BindValueChanged(updateSlidingSample);
@@ -244,7 +245,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.ApplySkin(skin, allowFallback);
 
-            bool allowBallTint = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false;
+            updateBallTint();
+        }
+
+        private void updateBallTint()
+        {
+            if (CurrentSkin == null)
+                return;
+
+            bool allowBallTint = CurrentSkin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false;
             Ball.AccentColour = allowBallTint ? AccentColour.Value : Color4.White;
         }
 

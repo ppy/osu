@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -28,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private SpinnerTicks ticks;
 
         private int wholeRotationCount;
+        private readonly BindableBool complete = new BindableBool();
 
         private SpinnerFill fill;
         private Container mainContainer;
@@ -89,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.LoadComplete();
 
-            drawableSpinner.RotationTracker.Complete.BindValueChanged(complete => updateComplete(complete.NewValue, 200));
+            complete.BindValueChanged(complete => updateComplete(complete.NewValue, 200));
             drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
 
             updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
@@ -99,7 +101,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
-            if (drawableSpinner.RotationTracker.Complete.Value)
+            complete.Value = Time.Current >= drawableSpinner.Result.TimeCompleted;
+
+            if (complete.Value)
             {
                 if (checkNewRotationCount)
                 {
@@ -194,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             get
             {
-                int rotations = (int)(drawableSpinner.RotationTracker.RateAdjustedRotation / 360);
+                int rotations = (int)(drawableSpinner.Result.RateAdjustedRotation / 360);
 
                 if (wholeRotationCount == rotations) return false;
 

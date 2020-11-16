@@ -167,6 +167,21 @@ namespace osu.Game.Tests.Visual.Components
             AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
         }
 
+        [Test]
+        public void TestOwnerNotRegistered()
+        {
+            PreviewTrack track = null;
+
+            AddStep("get track", () => Add(new TestTrackOwner(track = getTrack(), registerAsOwner: false)));
+            AddUntilStep("wait for loaded", () => track.IsLoaded);
+
+            AddStep("start track", () => track.Start());
+            AddUntilStep("track is running", () => track.IsRunning);
+
+            AddStep("cancel from anyone", () => trackManager.StopAnyPlaying(this));
+            AddAssert("track stopped", () => !track.IsRunning);
+        }
+
         private TestPreviewTrack getTrack() => (TestPreviewTrack)trackManager.Get(null);
 
         private TestPreviewTrack getOwnedTrack()
@@ -181,10 +196,12 @@ namespace osu.Game.Tests.Visual.Components
         private class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
         {
             private readonly PreviewTrack track;
+            private readonly bool registerAsOwner;
 
-            public TestTrackOwner(PreviewTrack track)
+            public TestTrackOwner(PreviewTrack track, bool registerAsOwner = true)
             {
                 this.track = track;
+                this.registerAsOwner = registerAsOwner;
             }
 
             [BackgroundDependencyLoader]
@@ -196,7 +213,8 @@ namespace osu.Game.Tests.Visual.Components
             protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             {
                 var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-                dependencies.CacheAs<IPreviewTrackOwner>(this);
+                if (registerAsOwner)
+                    dependencies.CacheAs<IPreviewTrackOwner>(this);
                 return dependencies;
             }
         }

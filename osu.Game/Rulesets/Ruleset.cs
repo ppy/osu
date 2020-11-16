@@ -81,8 +81,16 @@ namespace osu.Game.Rulesets
                         value |= LegacyMods.HardRock;
                         break;
 
+                    case ModPerfect _:
+                        value |= LegacyMods.Perfect;
+                        break;
+
                     case ModSuddenDeath _:
                         value |= LegacyMods.SuddenDeath;
+                        break;
+
+                    case ModNightcore _:
+                        value |= LegacyMods.Nightcore;
                         break;
 
                     case ModDoubleTime _:
@@ -99,6 +107,14 @@ namespace osu.Game.Rulesets
 
                     case ModFlashlight _:
                         value |= LegacyMods.Flashlight;
+                        break;
+
+                    case ModCinema _:
+                        value |= LegacyMods.Cinema;
+                        break;
+
+                    case ModAutoplay _:
+                        value |= LegacyMods.Autoplay;
                         break;
                 }
             }
