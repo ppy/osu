@@ -342,8 +342,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 if (!blueprint.IsHovered) continue;
 
-                if (SelectionHandler.HandleSelectionRequested(blueprint, e))
-                    return clickSelectionBegan = true;
+                return clickSelectionBegan = SelectionHandler.HandleSelectionRequested(blueprint, e);
             }
 
             return false;
