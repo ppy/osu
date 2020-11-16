@@ -49,13 +49,7 @@ namespace osu.Game.Database
                 var lookup = new LookupTask(api);
 
                 // always start the next task running when a previous task finishes.
-                lookup.Task.ContinueWith(completed =>
-                {
-                    var dequeued = tasks.Dequeue();
-                    Debug.Assert(completed == dequeued.Task);
-
-                    ensureTaskRunning();
-                });
+                lookup.Task.ContinueWith(checkNextTaskInQueue);
 
                 bool added = lookup.AddUser(userId);
 
@@ -65,13 +59,31 @@ namespace osu.Game.Database
 
                 // in the case this is the first task to be queued, run immediately.
                 if (tasks.Count == 1)
-                    ensureTaskRunning();
+                    startNextTask();
 
                 return lookup.Task;
             }
         }
 
-        private void ensureTaskRunning()
+        /// <summary>
+        /// Dequeue a completed task and start the next pending task.
+        /// </summary>
+        /// <param name="completed">The imminently completed task.</param>
+        private void checkNextTaskInQueue(Task<List<User>> completed)
+        {
+            lock (taskAssignmentLock)
+            {
+                var dequeued = tasks.Dequeue();
+                Debug.Assert(completed == dequeued.Task);
+
+                startNextTask();
+            }
+        }
+
+        /// <summary>
+        /// Starts the next task in the queue, given there is any pending task.
+        /// </summary>
+        private void startNextTask()
         {
             lock (taskAssignmentLock)
             {
