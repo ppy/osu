@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private void applyCustomUpdateState(DrawableHitObject hitObject, ArmedState state)
         {
             if (state == ArmedState.Miss)
-                missFadeTime.Value ??= hitObject.StateUpdateTime;
+                missFadeTime.Value ??= hitObject.HitStateUpdateTime;
         }
 
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
