@@ -29,6 +29,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private readonly Drawable score1Bar;
         private readonly Drawable score2Bar;
 
+        private Bindable<TourneyState> state;
+
         public MatchScoreDisplay()
         {
             RelativeSizeAxes = Axes.X;
@@ -97,10 +99,29 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             score2.BindValueChanged(_ => updateScores());
             score2.BindTo(ipc.Score2);
+
+            state = ipc.State.GetBoundCopy();
+            state.BindValueChanged(newState =>
+            {
+                switch (newState.NewValue)
+                {
+                    default:
+                        // allow for resetting scores in all but ranking screen.
+                        // this will bring state back in-sync in the case IPC score values changed while at the results screen.
+                        updateScores();
+                        break;
+
+                    case TourneyState.Ranking:
+                        break;
+                }
+            }, true);
         }
 
         private void updateScores()
         {
+            if (state.Value == TourneyState.Ranking)
+                return;
+
             score1Text.Current.Value = score1.Value;
             score2Text.Current.Value = score2.Value;
 
