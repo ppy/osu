@@ -20,7 +20,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private readonly Path path;
         private readonly Slider slider;
-        private readonly int controlPointIndex;
+        private int controlPointIndex;
+
+        public int ControlPointIndex
+        {
+            get => controlPointIndex;
+            set
+            {
+                controlPointIndex = value;
+                updateConnectingPath();
+            }
+        }
 
         private IBindable<Vector2> sliderPosition;
         private IBindable<int> pathVersion;
