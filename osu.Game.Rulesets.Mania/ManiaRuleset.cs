@@ -119,6 +119,9 @@ namespace osu.Game.Rulesets.Mania
             if (mods.HasFlag(LegacyMods.Key9))
                 yield return new ManiaModKey9();
 
+            if (mods.HasFlag(LegacyMods.KeyCoop))
+                yield return new ManiaModDualStages();
+
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new ManiaModNoFail();
 
@@ -173,12 +176,21 @@ namespace osu.Game.Rulesets.Mania
                         value |= LegacyMods.Key9;
                         break;
 
+                    case ManiaModDualStages _:
+                        value |= LegacyMods.KeyCoop;
+                        break;
+
                     case ManiaModFadeIn _:
                         value |= LegacyMods.FadeIn;
+                        value &= ~LegacyMods.Hidden; // this is toggled on in the base call due to inheritance, but we don't want that.
                         break;
 
                     case ManiaModMirror _:
                         value |= LegacyMods.Mirror;
+                        break;
+
+                    case ManiaModRandom _:
+                        value |= LegacyMods.Random;
                         break;
                 }
             }
