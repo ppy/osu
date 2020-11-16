@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Mania
 
                     case ManiaModFadeIn _:
                         value |= LegacyMods.FadeIn;
-                        value &= ~LegacyMods.Hidden; // due to inheritance
+                        value &= ~LegacyMods.Hidden; // this is toggled on in the base call due to inheritance, but we don't want that.
                         break;
 
                     case ManiaModMirror _:
