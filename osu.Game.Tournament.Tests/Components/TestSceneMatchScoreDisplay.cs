@@ -45,12 +45,25 @@ namespace osu.Game.Tournament.Tests.Components
 
             double scoreBefore = 0;
 
-            AddStep("store scores", () => scoreBefore = getCounters().Sum(c => c.Current.Value));
+            AddStep("store scores", () => scoreBefore = getCounterTotal());
 
             AddStep("add random score", addRandomScore);
 
-            AddAssert("displayed scores didn't change", () => scoreBefore == getCounters().Sum(c => c.Current.Value));
+            AddAssert("displayed scores didn't change", () => scoreBefore == getCounterTotal());
+
+            AddStep("reset scores", () =>
+            {
+                matchInfo.Score1.Value = 0;
+                matchInfo.Score2.Value = 0;
+            });
+
+            AddAssert("displayed scores didn't change", () => scoreBefore == getCounterTotal());
+
+            AddStep("reset state", () => matchInfo.State.Value = TourneyState.Initialising);
+            AddAssert("scores reset", () => getCounters().Sum(c => c.Current.Value) == 0);
         }
+
+        private double getCounterTotal() => getCounters().Sum(c => c.Current.Value);
 
         private void addRandomScore()
         {
