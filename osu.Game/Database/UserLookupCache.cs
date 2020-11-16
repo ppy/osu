@@ -22,7 +22,7 @@ namespace osu.Game.Database
         protected override async Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
             => await queryUser(lookup);
 
-        private readonly List<(int id, TaskCompletionSource<User>)> pendingUserTasks = new List<(int, TaskCompletionSource<User>)>();
+        private readonly Queue<(int id, TaskCompletionSource<User>)> pendingUserTasks = new Queue<(int, TaskCompletionSource<User>)>();
         private Task pendingRequestTask;
         private readonly object taskAssignmentLock = new object();
 
@@ -33,7 +33,7 @@ namespace osu.Game.Database
                 var tcs = new TaskCompletionSource<User>();
 
                 // Add to the queue.
-                pendingUserTasks.Add((userId, tcs));
+                pendingUserTasks.Enqueue((userId, tcs));
 
                 // Create a request task if there's not already one.
                 if (pendingRequestTask == null)
@@ -52,9 +52,7 @@ namespace osu.Game.Database
             {
                 while (pendingUserTasks.Count > 0 && userTasks.Count < 50)
                 {
-                    (int id, TaskCompletionSource<User> task) next = pendingUserTasks[^1];
-
-                    pendingUserTasks.RemoveAt(pendingUserTasks.Count - 1);
+                    (int id, TaskCompletionSource<User> task) next = pendingUserTasks.Dequeue();
 
                     // Perform a secondary check for existence, in case the user was queried in a previous batch.
                     if (CheckExists(next.id, out var existing))
