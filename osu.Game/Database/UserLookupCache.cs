@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,19 +15,10 @@ namespace osu.Game.Database
 {
     public class UserLookupCache : MemoryCachingComponent<int, User>
     {
-        private readonly HashSet<int> nextTaskIDs = new HashSet<int>();
-
         [Resolved]
         private IAPIProvider api { get; set; }
 
         private readonly object taskAssignmentLock = new object();
-
-        private Task<List<User>> pendingRequest;
-
-        /// <summary>
-        /// Whether <see cref="pendingRequest"/> has already grabbed its IDs.
-        /// </summary>
-        private bool pendingRequestConsumedIDs;
 
         public Task<User> GetUserAsync(int userId, CancellationToken token = default) => GetAsync(userId, token);
 
@@ -36,6 +27,8 @@ namespace osu.Game.Database
             var users = await getQueryTaskForUser(lookup);
             return users.FirstOrDefault(u => u.Id == lookup);
         }
+
+        private readonly Queue<LookupTask> tasks = new Queue<LookupTask>();
 
         /// <summary>
         /// Return the task responsible for fetching the provided user.
@@ -47,70 +40,109 @@ namespace osu.Game.Database
         {
             lock (taskAssignmentLock)
             {
-                nextTaskIDs.Add(userId);
+                // attempt to queue on the next pending task.
+                var lastTask = tasks.LastOrDefault();
 
-                // if there's a pending request which hasn't been started yet (and is not yet full), we can wait on it.
-                if (pendingRequest != null && !pendingRequestConsumedIDs && nextTaskIDs.Count < 50)
-                    return pendingRequest;
+                if (lastTask?.AddUser(userId) == true)
+                    return lastTask.Task;
 
-                return queueNextTask(nextLookup);
+                var lookup = new LookupTask(api);
+
+                // always start the next task running when a previous task finishes.
+                lookup.Task.ContinueWith(completed =>
+                {
+                    var dequeued = tasks.Dequeue();
+                    Debug.Assert(completed == dequeued.Task);
+
+                    ensureTaskRunning();
+                });
+
+                bool added = lookup.AddUser(userId);
+
+                Debug.Assert(added);
+
+                tasks.Enqueue(lookup);
+
+                // in the case this is the first task to be queued, run immediately.
+                if (tasks.Count == 1)
+                    ensureTaskRunning();
+
+                return lookup.Task;
+            }
+        }
+
+        private void ensureTaskRunning()
+        {
+            lock (taskAssignmentLock)
+            {
+                if (tasks.TryPeek(out var task))
+                {
+                    Debug.Assert(task.Task.Status == TaskStatus.Created);
+                    task.Task.Start();
+                }
+            }
+        }
+
+        private class LookupTask
+        {
+            /// <summary>
+            /// The task to be performed.
+            /// </summary>
+            public readonly Task<List<User>> Task;
+
+            private readonly IAPIProvider api;
+
+            /// <summary>
+            /// Locked flag to ensure no user IDs are added after the task has consumed them.
+            /// </summary>
+            private bool wasRun;
+
+            private readonly HashSet<int> users = new HashSet<int>();
+
+            private readonly object lockObject = new object();
+
+            public LookupTask(IAPIProvider api)
+            {
+                this.api = api;
+                Task = new Task<List<User>>(perform);
             }
 
-            List<User> nextLookup()
+            /// <summary>
+            /// Attempt to queue a user ID to this lookup task.
+            /// </summary>
+            /// <param name="id"></param>
+            /// <returns>Whether the user could be queued. If false, a new task should be used instead.</returns>
+            public bool AddUser(int id)
             {
-                int[] lookupItems;
-
-                lock (taskAssignmentLock)
+                lock (lockObject)
                 {
-                    pendingRequestConsumedIDs = true;
-                    lookupItems = nextTaskIDs.ToArray();
-                    nextTaskIDs.Clear();
+                    if (wasRun)
+                        return false;
 
-                    if (lookupItems.Length == 0)
-                    {
-                        queueNextTask(null);
-                        return new List<User>();
-                    }
+                    if (users.Count >= 50)
+                        return false;
+
+                    users.Add(id);
+                    return true;
+                }
+            }
+
+            private List<User> perform()
+            {
+                lock (lockObject)
+                {
+                    Debug.Assert(!wasRun);
+                    wasRun = true;
                 }
 
-                var request = new GetUsersRequest(lookupItems);
+                Debug.Assert(users.Count <= 50);
+
+                var request = new GetUsersRequest(users.ToArray());
 
                 // rather than queueing, we maintain our own single-threaded request stream.
                 api.Perform(request);
 
-                return request.Result?.Users;
-            }
-        }
-
-        /// <summary>
-        /// Queues new work at the end of the current work tasks.
-        /// Ensures the provided work is eventually run.
-        /// </summary>
-        /// <param name="work">The work to run. Can be null to signify the end of available work.</param>
-        /// <returns>The task tracking this work.</returns>
-        private Task<List<User>> queueNextTask(Func<List<User>> work)
-        {
-            lock (taskAssignmentLock)
-            {
-                if (work == null)
-                {
-                    pendingRequest = null;
-                    pendingRequestConsumedIDs = false;
-                }
-                else if (pendingRequest == null)
-                {
-                    // special case for the first request ever.
-                    pendingRequest = Task.Run(work);
-                    pendingRequestConsumedIDs = false;
-                }
-                else
-                {
-                    // append the new request on to the last to be executed.
-                    pendingRequest = pendingRequest.ContinueWith(_ => work());
-                    pendingRequestConsumedIDs = false;
-                }
-
-                return pendingRequest;
+                return request.Result?.Users ?? new List<User>();
             }
         }
     }
