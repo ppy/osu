@@ -76,7 +76,7 @@ namespace osu.Game
             // a dialog may be blocking the execution for now.
             if (checkForDialog(current)) return;
 
-            game.CloseAllOverlays(false);
+            game?.CloseAllOverlays(false);
 
             // we may already be at the target screen type.
             if (validScreens.Contains(getCurrentScreen().GetType()) && !beatmap.Disabled)
