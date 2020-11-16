@@ -119,6 +119,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         private void applyCustomUpdateState(DrawableHitObject hitObject, ArmedState state)
         {
+            // ensure that the hold note is also faded out when the head/tail/any tick is missed.
             if (state == ArmedState.Miss)
                 missFadeTime.Value ??= hitObject.HitStateUpdateTime;
         }
