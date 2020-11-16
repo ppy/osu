@@ -201,6 +201,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 // Copy any existing result from the entry (required for rewind / judgement revert).
                 Result = lifetimeEntry.Result;
             }
+            else
+                LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
 
             // Ensure this DHO has a result.
             Result ??= CreateResult(HitObject.CreateJudgement())
@@ -646,6 +648,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
         /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
         /// A more accurate <see cref="LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
+        /// <para>
+        /// Only has an effect if this <see cref="DrawableHitObject"/> is not being pooled.
+        /// For pooled <see cref="DrawableHitObject"/>s, use <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/> instead.
+        /// </para>
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
