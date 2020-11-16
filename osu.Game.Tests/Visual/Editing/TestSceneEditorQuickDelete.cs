@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(pos);
             });
             AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
-            AddStep("rightclick", () => InputManager.Click(MouseButton.Right));
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
             AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
 
             AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
@@ -74,10 +74,15 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(pos);
             });
             AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
-            AddStep("rightclick", () => InputManager.Click(MouseButton.Right));
-            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
 
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
             AddAssert("slider has 2 points", () => slider.Path.ControlPoints.Count == 2);
+
+            // second click should nuke the object completely.
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+            AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
+
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
         }
     }
 }
