@@ -199,9 +199,12 @@ namespace osu.Game
             {
                 if (weakRemovedInfo.NewValue.TryGetTarget(out var removedInfo))
                 {
-                    // check the removed skin is not the current user choice. if it is, switch back to default.
-                    if (removedInfo.ID == SkinManager.CurrentSkinInfo.Value.ID)
-                        Schedule(() => SkinManager.CurrentSkinInfo.Value = SkinInfo.Default);
+                    Schedule(() =>
+                    {
+                        // check the removed skin is not the current user choice. if it is, switch back to default.
+                        if (removedInfo.ID == SkinManager.CurrentSkinInfo.Value.ID)
+                            SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
+                    });
                 }
             });
 
