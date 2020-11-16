@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
             difficulty.CircleSize *= ratio;
             difficulty.ApproachRate *= ratio;
             difficulty.DrainRate *= ratio;
-            difficulty.OverallDifficulty *= ratio;;
+            difficulty.OverallDifficulty *= ratio;
         }
     }
 }
