@@ -14,11 +14,12 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class CollectionPanel : OsuClickableContainer
+    public class CollectionPanel : CompositeDrawable
     {
         ///<summary>
         ///判断该panel所显示的BeatmapCollection
@@ -148,7 +149,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                             Child = new BeatmapThumbnailFlow(beatmapSets)
                         }
                     }
-                }
+                },
+                new HoverClickSounds()
             });
 
             thumbnailScroll.ScrollContent.RelativeSizeAxes = Axes.None;

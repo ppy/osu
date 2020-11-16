@@ -33,19 +33,16 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
 
-            InternalChildren = new Drawable[]
+            InternalChild = beatmapScroll = new OsuScrollContainer
             {
-                beatmapScroll = new OsuScrollContainer
+                RelativeSizeAxes = Axes.Both,
+                RightMouseScrollbar = true,
+                Child = fillFlow = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    RightMouseScrollbar = true,
-                    Child = fillFlow = new FillFlowContainer
-                    {
-                        Padding = new MarginPadding { Horizontal = 35 },
-                        Spacing = new Vector2(5),
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                    }
+                    Padding = new MarginPadding { Horizontal = 35 },
+                    Spacing = new Vector2(5),
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                 }
             };
 
@@ -80,6 +77,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
             currentPiece?.InActive();
+            currentPiece = null;
 
             foreach (var d in fillFlow)
             {

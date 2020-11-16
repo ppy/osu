@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class CollectionSelectPanel : Container, ISidebarContent
+    public class CollectionSelectPanel : CompositeDrawable, ISidebarContent
     {
         [Resolved]
         private CollectionManager collectionManager { get; set; }
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         {
             RelativeSizeAxes = Axes.Both;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Container
                 {

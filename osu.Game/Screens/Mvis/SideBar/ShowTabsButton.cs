@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Mvis.SideBar
             Size = new Vector2(50);
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
-            TooltipText = "隐藏工具栏";
+            TooltipText = "隐藏标签栏";
             Children = new Drawable[]
             {
                 new Box
@@ -83,15 +83,15 @@ namespace osu.Game.Screens.Mvis.SideBar
         {
             if (headerHidden)
             {
-                //如果隐藏了，这时候应该是工具栏隐藏
-                TooltipText = "隐藏工具栏";
+                //如果隐藏了，这时候应该是标签栏隐藏
+                TooltipText = "隐藏标签栏";
                 icon.RotateTo(0, 300, Easing.OutQuint);
                 headerHidden = false;
             }
             else
             {
                 //如果不是则为显示
-                TooltipText = "显示工具栏";
+                TooltipText = "显示标签栏";
                 icon.RotateTo(180, 300, Easing.OutQuint);
                 headerHidden = true;
             }

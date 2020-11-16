@@ -47,7 +47,8 @@ namespace osu.Game.Screens.Mvis.SideBar
                     contentContainer = new Container
                     {
                         Name = "Content",
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true
                     },
                     new Footer.Footer()
                 }
@@ -165,6 +166,9 @@ namespace osu.Game.Screens.Mvis.SideBar
             if (!components.Contains(c))
                 throw new InvalidOperationException($"组件不包含{c}");
 
+            if (c.ResizeWidth < 0.3f || c.ResizeHeight < 0.3f)
+                throw new InvalidOperationException("组件过小");
+
             Show();
 
             //如果要显示的是当前正在显示的内容，则中断
@@ -201,6 +205,29 @@ namespace osu.Game.Screens.Mvis.SideBar
         }
 
         public override void Add(Drawable drawable) => addDrawableToList(drawable);
+
+        public override void Clear(bool disposeChildren)
+        {
+            header.Tabs.Clear(disposeChildren);
+            contentContainer.Clear(disposeChildren);
+        }
+
+        public override bool Remove(Drawable drawable)
+        {
+            if (drawable is ISidebarContent sc)
+            {
+                foreach (var t in header.Tabs)
+                {
+                    if (t.Value == sc)
+                    {
+                        header.Tabs.Remove(t);
+                        break;
+                    }
+                }
+            }
+
+            return base.Remove(drawable);
+        }
 
         protected override void PopOut()
         {

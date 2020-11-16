@@ -13,11 +13,12 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class BeatmapPiece : OsuClickableContainer
+    public class BeatmapPiece : CompositeDrawable
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
@@ -143,7 +144,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     RelativeSizeAxes = Axes.Both,
                     Colour = Colour4.White.Opacity(0.1f),
                     Alpha = 0
-                }
+                },
+                new HoverClickSounds()
             });
 
             Active.BindValueChanged(OnActiveChanged, true);

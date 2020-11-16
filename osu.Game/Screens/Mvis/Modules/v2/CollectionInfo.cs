@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class CollectionInfo : Container
+    public class CollectionInfo : CompositeDrawable
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
