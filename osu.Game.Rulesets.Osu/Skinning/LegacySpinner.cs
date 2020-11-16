@@ -60,7 +60,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             base.LoadComplete();
 
-            completed.BindTo(DrawableSpinner.RotationTracker.Complete);
             completed.BindValueChanged(onCompletedChanged, true);
 
             DrawableSpinner.ApplyCustomUpdateState += UpdateStateTransforms;
@@ -91,6 +90,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 clear.ClearTransforms();
                 clear.Alpha = 0;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            completed.Value = Time.Current >= DrawableSpinner.Result.TimeCompleted;
         }
 
         protected virtual void UpdateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
