@@ -568,7 +568,7 @@ namespace osu.Game.Screens.Mvis
                 return;
             }
 
-            sidebar.ResizeFor(d);
+            sidebar.ShowComponent(d);
         }
 
         private void seekTo(double position)

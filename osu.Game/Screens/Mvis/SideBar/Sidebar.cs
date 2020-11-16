@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,7 +18,7 @@ namespace osu.Game.Screens.Mvis.SideBar
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
-        private readonly List<Drawable> components = new List<Drawable>();
+        private readonly List<ISidebarContent> components = new List<ISidebarContent>();
         private readonly WaveContainer waveContainer;
         private readonly TabHeader header;
         private const float duration = 400;
@@ -155,11 +156,15 @@ namespace osu.Game.Screens.Mvis.SideBar
             base.UpdateAfterChildren();
         }
 
-        public void ResizeFor(Drawable d)
+        public void ShowComponent(Drawable d)
         {
-            if (!(d is ISidebarContent) || !components.Contains(d)) return;
+            if (!(d is ISidebarContent))
+                throw new InvalidOperationException($"{d}不是{typeof(ISidebarContent)}");
 
             var c = (ISidebarContent)d;
+            if (!components.Contains(c))
+                throw new InvalidOperationException($"组件不包含{c}");
+
             Show();
 
             //如果要显示的是当前正在显示的内容，则中断
@@ -186,11 +191,11 @@ namespace osu.Game.Screens.Mvis.SideBar
             if (d is ISidebarContent s)
             {
                 d.Alpha = 0;
-                components.Add(d);
+                components.Add(s);
                 contentContainer.Add(d);
                 header.Tabs.Add(new HeaderTabItem(s)
                 {
-                    Action = () => ResizeFor(d)
+                    Action = () => ShowComponent(d)
                 });
             }
         }
