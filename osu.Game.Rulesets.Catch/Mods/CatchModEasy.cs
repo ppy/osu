@@ -50,5 +50,10 @@ namespace osu.Game.Rulesets.Catch.Mods
             return false;
         }
         public bool RestartOnFail => false;
+
+        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
+        {
+            health = healthProcessor.Health.GetBoundCopy();
+        }
     }
 }
