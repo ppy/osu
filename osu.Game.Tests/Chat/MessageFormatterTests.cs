@@ -24,7 +24,8 @@ namespace osu.Game.Tests.Chat
         [Test]
         public void TestMultipleComplexLinks()
         {
-            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a http://test.io/link#fragment. (see https://twitter.com). Also, This string should not be altered. http://example.com/" });
+            Message result = MessageFormatter.FormatMessage(new Message
+                { Content = "This is a http://test.io/link#fragment. (see https://twitter.com). Also, This string should not be altered. http://example.com/" });
 
             Assert.AreEqual(result.Content, result.DisplayContent);
             Assert.AreEqual(3, result.Links.Count);
@@ -422,7 +423,10 @@ namespace osu.Game.Tests.Chat
         [Test]
         public void TestLinkComplex()
         {
-            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a [http://www.simple-test.com simple test] with some [traps] and [[wiki links]]. Don't forget to visit https://osu.ppy.sh (now!)[http://google.com]\uD83D\uDE12" });
+            Message result = MessageFormatter.FormatMessage(new Message
+            {
+                Content = "This is a [http://www.simple-test.com simple test] with some [traps] and [[wiki links]]. Don't forget to visit https://osu.ppy.sh (now!)[http://google.com]\uD83D\uDE12"
+            });
 
             Assert.AreEqual("This is a simple test with some [traps] and wiki links. Don't forget to visit https://osu.ppy.sh now!\0\0\0", result.DisplayContent);
             Assert.AreEqual(5, result.Links.Count);

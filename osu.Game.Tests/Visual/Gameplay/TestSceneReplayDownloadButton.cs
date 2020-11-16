@@ -2,14 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Scoring;
-using osu.Game.Users;
-using osu.Framework.Allocation;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {

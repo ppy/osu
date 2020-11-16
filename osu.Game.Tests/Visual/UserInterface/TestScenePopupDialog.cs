@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Add(new TestPopupDialog
                 {
                     RelativeSizeAxes = Axes.Both,
-                    State = { Value = Framework.Graphics.Containers.Visibility.Visible },
+                    State = { Value = Visibility.Visible },
                 }));
         }
 

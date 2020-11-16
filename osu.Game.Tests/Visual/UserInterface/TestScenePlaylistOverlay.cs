@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Music;
 using osuTK;
 using osuTK.Input;
@@ -66,7 +67,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("hold 1st item handle", () =>
             {
-                var handle = this.ChildrenOfType<PlaylistItem.PlaylistItemHandle>().First();
+                var handle = this.ChildrenOfType<OsuRearrangeableListItem<BeatmapSetInfo>.PlaylistItemHandle>().First();
                 InputManager.MoveMouseTo(handle.ScreenSpaceDrawQuad.Centre);
                 InputManager.PressButton(MouseButton.Left);
             });

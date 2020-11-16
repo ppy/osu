@@ -3,10 +3,10 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Overlays;
-using osu.Game.Screens;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Input;
+using osu.Game.Overlays;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Mvis;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (Stack.CurrentScreen != null)
                     Stack?.Exit();
 
-                LoadScreen( mvisScreen = new MvisScreen() );
+                LoadScreen(mvisScreen = new MvisScreen());
             });
         }
 
