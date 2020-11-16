@@ -126,7 +126,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             score2Text.X = Math.Max(5 + score2Text.DrawWidth / 2, score2Bar.DrawWidth);
         }
 
-        private class MatchScoreCounter : ScoreCounter
+        internal class MatchScoreCounter : ScoreCounter
         {
             private OsuSpriteText displayedSpriteText;
 
