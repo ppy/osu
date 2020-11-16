@@ -75,7 +75,6 @@ git pull
 Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this is provided [below](#contributing).
 
 - Visual Studio / Rider users should load the project via one of the platform-specific `.slnf` files, rather than the main `.sln.` This will allow access to template run configurations.
-- Visual Studio Code users must run the `Restore` task before any build attempt.
 
 You can also build and run *osu!* from the command-line with a single command:
 
