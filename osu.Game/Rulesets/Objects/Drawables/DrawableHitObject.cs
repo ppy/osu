@@ -287,6 +287,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject = null;
             lifetimeEntry = null;
 
+            clearExistingStateTransforms();
+
             hasHitObjectApplied = false;
         }
 
@@ -403,8 +405,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             double transformTime = HitObject.StartTime - InitialLifetimeOffset;
 
-            base.ApplyTransformsAt(double.MinValue, true);
-            base.ClearTransformsAfter(double.MinValue, true);
+            clearExistingStateTransforms();
 
             using (BeginAbsoluteSequence(transformTime, true))
                 UpdateInitialTransforms();
@@ -430,6 +431,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (!force && newState == ArmedState.Hit)
                 PlaySamples();
+        }
+
+        private void clearExistingStateTransforms()
+        {
+            base.ApplyTransformsAt(double.MinValue, true);
+            base.ClearTransformsAfter(double.MinValue, true);
         }
 
         /// <summary>
