@@ -45,12 +45,15 @@ namespace osu.Game.Database
 
         private void performLookup()
         {
+            // userTasks may exceed 50 elements, indicating the existence of duplicate user IDs. All duplicated user IDs must be fulfilled.
+            // userIds contains at most 50 unique user IDs from userTasks, which is used to perform the lookup.
             var userTasks = new List<(int id, TaskCompletionSource<User> task)>();
+            var userIds = new HashSet<int>();
 
-            // Grab at most 50 users from the queue.
+            // Grab at most 50 unique user IDs from the queue.
             lock (taskAssignmentLock)
             {
-                while (pendingUserTasks.Count > 0 && userTasks.Count < 50)
+                while (pendingUserTasks.Count > 0 && userIds.Count < 50)
                 {
                     (int id, TaskCompletionSource<User> task) next = pendingUserTasks.Dequeue();
 
@@ -58,12 +61,15 @@ namespace osu.Game.Database
                     if (CheckExists(next.id, out var existing))
                         next.task.SetResult(existing);
                     else
+                    {
                         userTasks.Add(next);
+                        userIds.Add(next.id);
+                    }
                 }
             }
 
             // Query the users.
-            var request = new GetUsersRequest(userTasks.Select(t => t.id).ToArray());
+            var request = new GetUsersRequest(userIds.ToArray());
 
             // rather than queueing, we maintain our own single-threaded request stream.
             api.Perform(request);
