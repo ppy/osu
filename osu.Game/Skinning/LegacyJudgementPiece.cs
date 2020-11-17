@@ -14,14 +14,14 @@ namespace osu.Game.Skinning
     {
         private readonly HitResult result;
 
-        public LegacyJudgementPiece(HitResult result, Drawable texture)
+        public LegacyJudgementPiece(HitResult result, Drawable drawable)
         {
             this.result = result;
 
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
 
-            InternalChild = texture;
+            InternalChild = drawable;
         }
 
         public virtual void PlayAnimation()
