@@ -48,7 +48,6 @@ namespace osu.Game.Screens.Mvis
     {
         private const float duration = 750;
 
-        protected override UserActivity InitialActivity => new UserActivity.InMvis();
         public override bool HideOverlaysOnEnter => true;
         private bool allowCursor;
         public override bool AllowBackButton => false;
@@ -117,9 +116,13 @@ namespace osu.Game.Screens.Mvis
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
+
         public MvisScreen()
         {
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
+
+            Activity.BindTo(activity);
         }
 
         [BackgroundDependencyLoader]
@@ -910,6 +913,7 @@ namespace osu.Game.Screens.Mvis
             if (beatmap != prevBeatmap)
                 sbLoader.UpdateStoryBoardAsync();
 
+            activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;
         }
     }
