@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
+        protected override SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         protected override void OnDrag(DragEvent e)
         {
@@ -195,13 +195,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint>
+        protected class TimelineSelectionBlueprintContainer : SelectionBlueprintContainer
         {
             protected override Container<SelectionBlueprint> Content { get; }
 
             public TimelineSelectionBlueprintContainer()
             {
-                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
+                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
             }
         }
     }
