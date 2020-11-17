@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                     // If removing before the end of the path,
                     // update indices of connections after remove location
-                    if (e.OldStartingIndex + e.OldItems.Count < Pieces.Count + e.OldItems.Count)
+                    if (e.OldStartingIndex < Pieces.Count)
                     {
                         foreach (var connection in Connections)
                         {
