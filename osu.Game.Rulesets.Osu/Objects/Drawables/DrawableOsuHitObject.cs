@@ -61,6 +61,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             PositionBindable.BindTo(HitObject.PositionBindable);
             StackHeightBindable.BindTo(HitObject.StackHeightBindable);
             ScaleBindable.BindTo(HitObject.ScaleBindable);
+
+            // Manually set to reduce the number of future alive objects to a bare minimum.
+            LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
+
+            // Arbitrary lifetime end to prevent past objects in idle states remaining alive in non-frame-stable contexts.
+            // An extra 1000ms is added to always overestimate the true lifetime, and a more exact value is set by hit transforms and the following expiry.
+            LifetimeEnd = HitObject.GetEndTime() + HitObject.HitWindows.WindowFor(HitResult.Miss) + 1000;
         }
 
         protected override void OnFree(HitObject hitObject)
@@ -85,18 +92,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ??= GetContainingInputManager() as OsuInputManager;
 
         public virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
-
-        protected override void UpdateInitialTransforms()
-        {
-            base.UpdateInitialTransforms();
-
-            // Manually set to reduce the number of future alive objects to a bare minimum.
-            LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
-
-            // Arbitrary lifetime end to prevent past objects in idle states remaining alive in non-frame-stable contexts.
-            // An extra 1000ms is added to always overestimate the true lifetime, and a more exact value is set by hit transforms and the following expiry.
-            LifetimeEnd = HitObject.GetEndTime() + HitObject.HitWindows.WindowFor(HitResult.Miss) + 1000;
-        }
 
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
