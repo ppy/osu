@@ -34,6 +34,7 @@ namespace osu.Game.Overlays
         private Placeholder errorPlaceholder;
         private Container placeholderContainer;
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -97,6 +98,11 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
+
+            placeholderContainer.Child = errorPlaceholder;
+
             background.Colour = ColourProvider.Background5;
         }
 
@@ -136,7 +142,6 @@ namespace osu.Game.Overlays
             });
 
             Scheduler.AddOnce(loadNewContent);
-            api?.Register(this);
         }
 
         public void ShowCountry(Country requested)
@@ -184,7 +189,6 @@ namespace osu.Game.Overlays
             request.Failure += _ => Schedule(() => loadContent(null));
 
             api.Queue(request);
-            api?.Register(this);
         }
 
         private APIRequest createScopedRequest()
@@ -234,7 +238,7 @@ namespace osu.Game.Overlays
             {
                 contentContainer.Hide();
                 errorPlaceholder = new LoginPlaceholder(@"Please sign in to view ranking leaderboards");
-                placeholderContainer.Child = errorPlaceholder;
+                //placeholderContainer.Child = errorPlaceholder;
                 placeholderContainer.Show();
                 loading.Hide();
             }
@@ -262,7 +266,6 @@ namespace osu.Game.Overlays
                 contentContainer.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
 
-            api?.Register(this);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -273,7 +276,7 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        public override void APIStateChanged(IAPIProvider api, APIState state)
+        public void onlineStateChanged(ValueChangedEvent<APIState> state)
         {
             checkIsLoggedIn();
         }

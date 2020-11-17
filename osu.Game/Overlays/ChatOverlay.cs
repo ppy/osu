@@ -29,7 +29,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, IOnlineComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/messaging";
         public string Title => "chat";
@@ -48,6 +48,7 @@ namespace osu.Game.Overlays
         private Placeholder errorPlaceholder;
         private Container placeholderContainer;
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -197,7 +198,8 @@ namespace osu.Game.Overlays
                 },
             };
 
-            api?.Register(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
 
             errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
             placeholderContainer.Child = errorPlaceholder;
@@ -501,7 +503,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        public void onlineStateChanged(ValueChangedEvent<APIState> state)
         {
             checkIsLoggedIn();
         }

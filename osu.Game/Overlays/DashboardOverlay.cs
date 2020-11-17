@@ -24,6 +24,8 @@ namespace osu.Game.Overlays
         private LoadingLayer loading;
         private OverlayScrollContainer scrollFlow;
         
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         [Resolved]
         private IAPIProvider api {get; set; }
 
@@ -39,8 +41,6 @@ namespace osu.Game.Overlays
             })
         {
         }
-
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays
                 Margin = new MarginPadding { Bottom = 10, Top = 200}
             }
             };
-            api?.Register(this);
+
             errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
             placeholderContainer.Child = errorPlaceholder; 
         }
@@ -178,7 +178,7 @@ namespace osu.Game.Overlays
             if (api?.IsLoggedIn != true)
             {
                 errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
-                placeholderContainer.Child = errorPlaceholder;
+                //placeholderContainer.Child = errorPlaceholder;
                 placeholderContainer.Show();
             }
             else
