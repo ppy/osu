@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    // If inserting in the the path (not appending),
+                    // If inserting in the path (not appending),
                     // update indices of existing connections after insert location
                     if (e.NewStartingIndex < Pieces.Count)
                     {
@@ -93,8 +93,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    int oldSize = Pieces.Count;
-
                     foreach (var point in e.OldItems.Cast<PathControlPoint>())
                     {
                         Pieces.RemoveAll(p => p.ControlPoint == point);
@@ -103,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                     // If removing before the end of the path,
                     // update indices of connections after remove location
-                    if (e.OldStartingIndex + e.OldItems.Count < oldSize)
+                    if (e.OldStartingIndex + e.OldItems.Count < Pieces.Count + e.OldItems.Count)
                     {
                         foreach (var connection in Connections)
                         {
