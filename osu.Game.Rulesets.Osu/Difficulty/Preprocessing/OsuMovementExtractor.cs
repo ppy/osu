@@ -142,27 +142,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Debug.Assert(p.SecondLastToLast != null);
 
-            double tRatioNeg2 = p.LastToCurrent.TimeDelta / p.SecondLastToLast.Value.TimeDelta;
-            double cosNeg2PrevCurr =
-                Math.Min(Math.Max(-p.SecondLastToLast.Value.RelativeVector.DotProduct(p.LastToCurrent.RelativeVector) / p.SecondLastToLast.Value.RelativeLength / p.LastToCurrent.RelativeLength, -1), 1);
+            double movementLengthRatio = p.LastToCurrent.TimeDelta / p.SecondLastToLast.Value.TimeDelta;
+            double movementAngleCosine = cosineOfAngleBetweenPairs(p.SecondLastToLast.Value, p.LastToCurrent);
 
-            if (tRatioNeg2 > t_ratio_threshold)
+            if (movementLengthRatio > t_ratio_threshold)
             {
                 if (p.SecondLastToLast.Value.RelativeLength == 0)
                     return 0;
 
-                double correctionNeg2Moving = correction_neg2_moving_spline.Interpolate(cosNeg2PrevCurr);
+                double angleCorrection = correction_neg2_moving_spline.Interpolate(movementAngleCosine);
 
                 double movingness = SpecialFunctions.Logistic(p.SecondLastToLast.Value.RelativeLength * 6 - 5) - SpecialFunctions.Logistic(-5);
-                return movingness * correctionNeg2Moving * 1.5;
+                return movingness * angleCorrection * 1.5;
             }
 
-            if (tRatioNeg2 < 1 / t_ratio_threshold)
+            if (movementLengthRatio < 1 / t_ratio_threshold)
             {
                 if (p.SecondLastToLast.Value.RelativeLength == 0)
                     return 0;
 
-                return (1 - cosNeg2PrevCurr) * SpecialFunctions.Logistic((p.SecondLastToLast.Value.RelativeLength * tRatioNeg2 - 1.5) * 4) * 0.3;
+                return (1 - movementAngleCosine) * SpecialFunctions.Logistic((p.SecondLastToLast.Value.RelativeLength * movementLengthRatio - 1.5) * 4) * 0.3;
             }
 
             p.LastObjectCenteredBetweenNeighbours = true;
@@ -390,6 +389,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double distanceRatio = p.LastToCurrent.RelativeLength / Math.Max(1, p.SecondLastToLast?.RelativeLength ?? 0);
             double bpmScaling = Math.Max(1, -16 * p.LastToCurrent.TimeDelta + 3.4);
             return 1 + 0.225 * bpmScaling * timeDifferenceNerf * dNeg2PrevOverlapNerf * Math.Max(0, distanceRatio - 2);
+        }
+
+        private static double cosineOfAngleBetweenPairs(OsuObjectPair first, OsuObjectPair second)
+        {
+            // it is assumed that first points from object A to B, and second points from B to C
+            // therefore to adhere to the dot product formula for cosine, the first vector has to be reversed
+            double cosine = -first.RelativeVector.DotProduct(second.RelativeVector) / first.RelativeLength / second.RelativeLength;
+            // clamp mostly for sanity.
+            return Math.Clamp(cosine, -1, 1);
         }
     }
 }
