@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -34,7 +36,8 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    public class Spectator : OsuScreen
+    [Cached(typeof(IPreviewTrackOwner))]
+    public class Spectator : OsuScreen, IPreviewTrackOwner
     {
         private readonly User targetUser;
 
@@ -61,7 +64,12 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private Replay replay;
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
+
+        private Score score;
+
+        private readonly object scoreLock = new object();
 
         private Container beatmapPanelContainer;
 
@@ -198,23 +206,32 @@ namespace osu.Game.Screens.Play
 
         private void userSentFrames(int userId, FrameDataBundle data)
         {
+            // this is not scheduled as it handles propagation of frames even when in a child screen (at which point we are not alive).
+            // probably not the safest way to handle this.
+
             if (userId != targetUser.Id)
                 return;
 
-            // this should never happen as the server sends the user's state on watching,
-            // but is here as a safety measure.
-            if (replay == null)
-                return;
-
-            foreach (var frame in data.Frames)
+            lock (scoreLock)
             {
-                IConvertibleReplayFrame convertibleFrame = rulesetInstance.CreateConvertibleReplayFrame();
-                convertibleFrame.FromLegacy(frame, beatmap.Value.Beatmap);
+                // this should never happen as the server sends the user's state on watching,
+                // but is here as a safety measure.
+                if (score == null)
+                    return;
 
-                var convertedFrame = (ReplayFrame)convertibleFrame;
-                convertedFrame.Time = frame.Time;
+                // rulesetInstance should be guaranteed to be in sync with the score via scoreLock.
+                Debug.Assert(rulesetInstance != null && rulesetInstance.RulesetInfo.Equals(score.ScoreInfo.Ruleset));
 
-                replay.Frames.Add(convertedFrame);
+                foreach (var frame in data.Frames)
+                {
+                    IConvertibleReplayFrame convertibleFrame = rulesetInstance.CreateConvertibleReplayFrame();
+                    convertibleFrame.FromLegacy(frame, beatmap.Value.Beatmap);
+
+                    var convertedFrame = (ReplayFrame)convertibleFrame;
+                    convertedFrame.Time = frame.Time;
+
+                    score.Replay.Frames.Add(convertedFrame);
+                }
             }
         }
 
@@ -247,10 +264,13 @@ namespace osu.Game.Screens.Play
             if (userId != targetUser.Id)
                 return;
 
-            if (replay != null)
+            lock (scoreLock)
             {
-                replay.HasReceivedAllFrames = true;
-                replay = null;
+                if (score != null)
+                {
+                    score.Replay.HasReceivedAllFrames = true;
+                    score = null;
+                }
             }
 
             Schedule(clearDisplay);
@@ -260,6 +280,7 @@ namespace osu.Game.Screens.Play
         {
             watchButton.Enabled.Value = false;
             beatmapPanelContainer.Clear();
+            previewTrackManager.StopAnyPlaying(this);
         }
 
         private void attemptStart()
@@ -283,34 +304,34 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            replay ??= new Replay { HasReceivedAllFrames = false };
-
-            var scoreInfo = new ScoreInfo
+            lock (scoreLock)
             {
-                Beatmap = resolvedBeatmap,
-                User = targetUser,
-                Mods = state.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
-                Ruleset = resolvedRuleset.RulesetInfo,
-            };
+                score = new Score
+                {
+                    ScoreInfo = new ScoreInfo
+                    {
+                        Beatmap = resolvedBeatmap,
+                        User = targetUser,
+                        Mods = state.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
+                        Ruleset = resolvedRuleset.RulesetInfo,
+                    },
+                    Replay = new Replay { HasReceivedAllFrames = false },
+                };
 
-            ruleset.Value = resolvedRuleset.RulesetInfo;
-            rulesetInstance = resolvedRuleset;
+                ruleset.Value = resolvedRuleset.RulesetInfo;
+                rulesetInstance = resolvedRuleset;
 
-            beatmap.Value = beatmaps.GetWorkingBeatmap(resolvedBeatmap);
-            watchButton.Enabled.Value = true;
+                beatmap.Value = beatmaps.GetWorkingBeatmap(resolvedBeatmap);
+                watchButton.Enabled.Value = true;
 
-            this.Push(new SpectatorPlayerLoader(new Score
-            {
-                ScoreInfo = scoreInfo,
-                Replay = replay,
-            }));
+                this.Push(new SpectatorPlayerLoader(score));
+            }
         }
 
         private void showBeatmapPanel(SpectatorState state)
         {
             if (state?.BeatmapID == null)
             {
-                beatmapPanelContainer.Clear();
                 onlineBeatmap = null;
                 return;
             }
@@ -341,6 +362,12 @@ namespace osu.Game.Screens.Play
                 return;
 
             beatmaps.Download(onlineBeatmap);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            previewTrackManager.StopAnyPlaying(this);
+            return base.OnExiting(next);
         }
 
         protected override void Dispose(bool isDisposing)

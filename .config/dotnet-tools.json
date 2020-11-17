@@ -13,6 +13,24 @@
       "commands": [
         "dotnet-format"
       ]
+    },
+    "jetbrains.resharper.globaltools": {
+      "version": "2020.2.4",
+      "commands": [
+        "jb"
+      ]
+    },
+    "nvika": {
+      "version": "2.0.0",
+      "commands": [
+        "nvika"
+      ]
+    },
+    "codefilesanity": {
+      "version": "15.0.0",
+      "commands": [
+        "CodeFileSanity"
+      ]
     }
   }
 }

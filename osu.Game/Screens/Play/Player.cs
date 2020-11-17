@@ -261,14 +261,14 @@ namespace osu.Game.Screens.Play
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
 
-            DrawableRuleset.OnNewResult += r =>
+            DrawableRuleset.NewResult += r =>
             {
                 HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
                 gameplayBeatmap.ApplyResult(r);
             };
 
-            DrawableRuleset.OnRevertResult += r =>
+            DrawableRuleset.RevertResult += r =>
             {
                 HealthProcessor.RevertResult(r);
                 ScoreProcessor.RevertResult(r);
@@ -302,12 +302,12 @@ namespace osu.Game.Screens.Play
                     {
                         ScoreProcessor,
                         HealthProcessor,
+                        new ComboEffects(ScoreProcessor),
                         breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
                         {
                             Breaks = working.Beatmap.Breaks
                         }
                     }),
-                new ComboEffects(ScoreProcessor)
             }
         };
 

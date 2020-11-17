@@ -25,7 +25,7 @@ namespace osu.Game.Skinning
 
         public static SkinInfo Info { get; } = new SkinInfo
         {
-            ID = -1, // this is temporary until database storage is decided upon.
+            ID = SkinInfo.CLASSIC_SKIN, // this is temporary until database storage is decided upon.
             Name = "osu!classic",
             Creator = "team osu!"
         };
