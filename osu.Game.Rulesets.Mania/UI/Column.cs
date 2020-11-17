@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (result.IsHit)
                 hitPolicy.HandleHit(judgedObject);
 
-            if (!result.IsHit || !DisplayJudgements.Value)
+            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
             HitObjectArea.Explosions.Add(hitExplosionPool.Get(e => e.Apply(result)));
