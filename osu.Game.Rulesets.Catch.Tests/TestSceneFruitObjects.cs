@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -36,15 +37,27 @@ namespace osu.Game.Rulesets.Catch.Tests
                 Scale = 1.5f,
             };
 
-            return new DrawableTinyDroplet(droplet)
+            return new TestDrawableTinyDroplet(droplet)
             {
                 Anchor = Anchor.Centre,
                 RelativePositionAxes = Axes.None,
                 Position = Vector2.Zero,
-                Alpha = 1,
-                LifetimeStart = double.NegativeInfinity,
-                LifetimeEnd = double.PositiveInfinity,
             };
+        }
+
+        private class TestDrawableTinyDroplet : DrawableTinyDroplet
+        {
+            public TestDrawableTinyDroplet(TinyDroplet tinyDroplet)
+                : base(tinyDroplet)
+            {
+            }
+
+            protected override void OnApply(HitObject hitObject)
+            {
+                base.OnApply(hitObject);
+                LifetimeStart = double.NegativeInfinity;
+                LifetimeEnd = double.PositiveInfinity;
+            }
         }
 
         private Drawable createDrawableDroplet(bool hyperdash = false)
@@ -55,15 +68,27 @@ namespace osu.Game.Rulesets.Catch.Tests
                 HyperDashTarget = hyperdash ? new Banana() : null
             };
 
-            return new DrawableDroplet(droplet)
+            return new TestDrawableDroplet(droplet)
             {
                 Anchor = Anchor.Centre,
                 RelativePositionAxes = Axes.None,
                 Position = Vector2.Zero,
-                Alpha = 1,
-                LifetimeStart = double.NegativeInfinity,
-                LifetimeEnd = double.PositiveInfinity,
             };
+        }
+
+        private class TestDrawableDroplet : DrawableDroplet
+        {
+            public TestDrawableDroplet(Droplet droplet)
+                : base(droplet)
+            {
+            }
+
+            protected override void OnApply(HitObject hitObject)
+            {
+                base.OnApply(hitObject);
+                LifetimeStart = double.NegativeInfinity;
+                LifetimeEnd = double.PositiveInfinity;
+            }
         }
 
         private Drawable createDrawable(FruitVisualRepresentation rep, bool hyperdash = false)
@@ -74,15 +99,27 @@ namespace osu.Game.Rulesets.Catch.Tests
                 HyperDashTarget = hyperdash ? new Banana() : null
             };
 
-            return new DrawableFruit(fruit)
+            return new TestDrawableFruit(fruit)
             {
                 Anchor = Anchor.Centre,
                 RelativePositionAxes = Axes.None,
                 Position = Vector2.Zero,
-                Alpha = 1,
-                LifetimeStart = double.NegativeInfinity,
-                LifetimeEnd = double.PositiveInfinity,
             };
+        }
+
+        private class TestDrawableFruit : DrawableFruit
+        {
+            public TestDrawableFruit(Fruit fruit)
+                : base(fruit)
+            {
+            }
+
+            protected override void OnApply(HitObject hitObject)
+            {
+                base.OnApply(hitObject);
+                LifetimeStart = double.NegativeInfinity;
+                LifetimeEnd = double.PositiveInfinity;
+            }
         }
 
         public class TestCatchFruit : Fruit
