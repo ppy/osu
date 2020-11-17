@@ -342,8 +342,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 if (!blueprint.IsHovered) continue;
 
-                if (SelectionHandler.HandleSelectionRequested(blueprint, e))
-                    return clickSelectionBegan = true;
+                return clickSelectionBegan = SelectionHandler.HandleSelectionRequested(blueprint, e);
             }
 
             return false;
@@ -456,6 +455,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (movementBlueprint == null)
                 return false;
+
+            if (snapProvider == null)
+                return true;
 
             Debug.Assert(movementBlueprintOriginalPosition != null);
 

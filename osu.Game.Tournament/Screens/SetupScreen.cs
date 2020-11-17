@@ -83,8 +83,8 @@ namespace osu.Game.Tournament.Screens
                 },
                 new ActionableInfo
                 {
-                    Label = "Current User",
-                    ButtonText = "Change Login",
+                    Label = "Current user",
+                    ButtonText = "Change sign-in",
                     Action = () =>
                     {
                         api.Logout();
@@ -102,12 +102,12 @@ namespace osu.Game.Tournament.Screens
                     },
                     Value = api?.LocalUser.Value.Username,
                     Failing = api?.IsLoggedIn != true,
-                    Description = "In order to access the API and display metadata, a login is required."
+                    Description = "In order to access the API and display metadata, signing in is required."
                 },
                 new LabelledDropdown<RulesetInfo>
                 {
                     Label = "Ruleset",
-                    Description = "Decides what stats are displayed and which ranks are retrieved for players",
+                    Description = "Decides what stats are displayed and which ranks are retrieved for players.",
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },

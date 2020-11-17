@@ -31,6 +31,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container scaleContainer;
         private InputManager inputManager;
 
+        public DrawableHitCircle()
+            : this(null)
+        {
+        }
+
         public DrawableHitCircle([CanBeNull] HitCircle h = null)
             : base(h)
         {

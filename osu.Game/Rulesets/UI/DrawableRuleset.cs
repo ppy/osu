@@ -15,10 +15,7 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -248,7 +245,7 @@ namespace osu.Game.Rulesets.UI
             if (drawableRepresentation != null)
                 Playfield.Add(drawableRepresentation);
             else
-                Playfield.Add(GetLifetimeEntry(hitObject));
+                Playfield.Add(hitObject);
         }
 
         /// <summary>
@@ -260,31 +257,16 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
         public bool RemoveHitObject(TObject hitObject)
         {
-            var entry = GetLifetimeEntry(hitObject);
-
-            // May have been newly-created by the above call - remove it anyway.
-            RemoveLifetimeEntry(hitObject);
-
-            if (Playfield.Remove(entry))
+            if (Playfield.Remove(hitObject))
                 return true;
 
-            // If the entry was not removed from the playfield, assume the hitobject is not being pooled and attempt a direct removal.
+            // If the entry was not removed from the playfield, assume the hitobject is not being pooled and attempt a direct drawable removal.
             var drawableObject = Playfield.AllHitObjects.SingleOrDefault(d => d.HitObject == hitObject);
             if (drawableObject != null)
                 return Playfield.Remove(drawableObject);
 
             return false;
         }
-
-        protected sealed override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject)
-        {
-            if (!(hitObject is TObject tHitObject))
-                throw new InvalidOperationException($"Unexpected hitobject type: {hitObject.GetType().ReadableName()}");
-
-            return CreateLifetimeEntry(tHitObject);
-        }
-
-        protected virtual HitObjectLifetimeEntry CreateLifetimeEntry(TObject hitObject) => new HitObjectLifetimeEntry(hitObject);
 
         public override void SetRecordTarget(Replay recordingReplay)
         {
@@ -327,9 +309,8 @@ namespace osu.Game.Rulesets.UI
         /// Creates a <see cref="DrawableHitObject{TObject}"/> to represent a <see cref="HitObject"/>.
         /// </summary>
         /// <remarks>
-        /// If this method returns <c>null</c>, then this <see cref="DrawableRuleset"/> will assume the requested <see cref="HitObject"/> type is being pooled,
-        /// and will instead attempt to retrieve the <see cref="DrawableHitObject"/>s at the point they should become alive via pools registered through
-        /// <see cref="DrawableRuleset.RegisterPool{TObject, TDrawable}(int, int?)"/> or  <see cref="DrawableRuleset.RegisterPool{TObject, TDrawable}(DrawablePool{TDrawable})"/>.
+        /// If this method returns <c>null</c>, then this <see cref="DrawableRuleset"/> will assume the requested <see cref="HitObject"/> type is being pooled inside the <see cref="Playfield"/>,
+        /// and will instead attempt to retrieve the <see cref="DrawableHitObject"/>s at the point they should become alive via pools registered in the <see cref="Playfield"/>.
         /// </remarks>
         /// <param name="h">The <see cref="HitObject"/> to represent.</param>
         /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
@@ -549,99 +530,6 @@ namespace osu.Game.Rulesets.UI
         /// Invoked when the user requests to pause while the resume overlay is active.
         /// </summary>
         public abstract void CancelResume();
-
-        private readonly Dictionary<Type, IDrawablePool> pools = new Dictionary<Type, IDrawablePool>();
-        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntries = new Dictionary<HitObject, HitObjectLifetimeEntry>();
-
-        /// <summary>
-        /// Registers a default <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
-        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetPooledDrawableRepresentation"/>).
-        /// </summary>
-        /// <param name="initialSize">The number of <see cref="DrawableHitObject"/>s to be initially stored in the pool.</param>
-        /// <param name="maximumSize">
-        /// The maximum number of <see cref="DrawableHitObject"/>s that can be stored in the pool.
-        /// If this limit is exceeded, every subsequent <see cref="DrawableHitObject"/> will be created anew instead of being retrieved from the pool,
-        /// until some of the existing <see cref="DrawableHitObject"/>s are returned to the pool.
-        /// </param>
-        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
-        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
-        protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
-            where TObject : HitObject
-            where TDrawable : DrawableHitObject, new()
-            => RegisterPool<TObject, TDrawable>(new DrawablePool<TDrawable>(initialSize, maximumSize));
-
-        /// <summary>
-        /// Registers a custom <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
-        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type (via <see cref="GetPooledDrawableRepresentation"/>).
-        /// </summary>
-        /// <param name="pool">The <see cref="DrawablePool{T}"/> to register.</param>
-        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
-        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
-        protected void RegisterPool<TObject, TDrawable>([NotNull] DrawablePool<TDrawable> pool)
-            where TObject : HitObject
-            where TDrawable : DrawableHitObject, new()
-        {
-            pools[typeof(TObject)] = pool;
-            AddInternal(pool);
-        }
-
-        /// <summary>
-        /// Attempts to retrieve the poolable <see cref="DrawableHitObject"/> representation of a <see cref="HitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to retrieve the <see cref="DrawableHitObject"/> representation of.</param>
-        /// <returns>The <see cref="DrawableHitObject"/> representing <see cref="HitObject"/>, or <c>null</c> if no poolable representation exists.</returns>
-        [CanBeNull]
-        public DrawableHitObject GetPooledDrawableRepresentation([NotNull] HitObject hitObject)
-        {
-            if (!pools.TryGetValue(hitObject.GetType(), out var pool))
-                return null;
-
-            return (DrawableHitObject)pool.Get(d =>
-            {
-                var dho = (DrawableHitObject)d;
-
-                // If this is the first time this DHO is being used (not loaded), then apply the DHO mods.
-                // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                if (!dho.IsLoaded)
-                {
-                    foreach (var m in Mods.OfType<IApplicableToDrawableHitObjects>())
-                        m.ApplyToDrawableHitObjects(dho.Yield());
-                }
-
-                dho.Apply(hitObject, GetLifetimeEntry(hitObject));
-            });
-        }
-
-        /// <summary>
-        /// Creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
-        /// </summary>
-        /// <remarks>
-        /// This may be overridden to provide custom lifetime control (e.g. via <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/>.
-        /// </remarks>
-        /// <param name="hitObject">The <see cref="HitObject"/> to create the entry for.</param>
-        /// <returns>The <see cref="HitObjectLifetimeEntry"/>.</returns>
-        [NotNull]
-        protected abstract HitObjectLifetimeEntry CreateLifetimeEntry([NotNull] HitObject hitObject);
-
-        /// <summary>
-        /// Retrieves or creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to retrieve or create the <see cref="HitObjectLifetimeEntry"/> for.</param>
-        /// <returns>The <see cref="HitObjectLifetimeEntry"/> for <paramref name="hitObject"/>.</returns>
-        [NotNull]
-        protected HitObjectLifetimeEntry GetLifetimeEntry([NotNull] HitObject hitObject)
-        {
-            if (lifetimeEntries.TryGetValue(hitObject, out var entry))
-                return entry;
-
-            return lifetimeEntries[hitObject] = CreateLifetimeEntry(hitObject);
-        }
-
-        /// <summary>
-        /// Removes the <see cref="HitObjectLifetimeEntry"/> for a <see cref="HitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to remove the <see cref="HitObjectLifetimeEntry"/> for.</param>
-        internal void RemoveLifetimeEntry([NotNull] HitObject hitObject) => lifetimeEntries.Remove(hitObject);
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException
