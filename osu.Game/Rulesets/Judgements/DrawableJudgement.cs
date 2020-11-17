@@ -90,6 +90,11 @@ namespace osu.Game.Rulesets.Judgements
             this.Delay(600).FadeOut(200);
         }
 
+        /// <summary>
+        /// Associate a new result / object with this judgement. Should be called when retrieving a judgement from a pool.
+        /// </summary>
+        /// <param name="result">The applicable judgement.</param>
+        /// <param name="judgedObject">The drawable object.</param>
         public void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
         {
             Result = result;
@@ -104,6 +109,7 @@ namespace osu.Game.Rulesets.Judgements
 
             prepareDrawables();
 
+            // not sure if this should remain going forward.
             skinnableJudgement.ResetAnimation();
 
             this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
