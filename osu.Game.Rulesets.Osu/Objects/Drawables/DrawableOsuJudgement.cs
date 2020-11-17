@@ -17,15 +17,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        public DrawableOsuJudgement(JudgementResult result, DrawableHitObject judgedObject)
-            : base(result, judgedObject)
-        {
-        }
-
-        public DrawableOsuJudgement()
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
