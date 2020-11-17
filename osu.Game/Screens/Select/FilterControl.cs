@@ -71,7 +71,6 @@ namespace osu.Game.Screens.Select
 
             Children = new Drawable[]
             {
-                new MfBgTriangles(),
                 new Box
                 {
                     Colour = Color4.Black,
