@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -19,13 +19,6 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (JudgementText != null)
-                JudgementText.Font = JudgementText.Font.With(size: 25);
-        }
-
         protected override double FadeInDuration => 50;
 
         protected override void ApplyHitAnimations()
@@ -35,6 +28,18 @@ namespace osu.Game.Rulesets.Mania.UI
 
             JudgementBody.Delay(FadeInDuration).ScaleTo(0.75f, 250);
             this.Delay(FadeInDuration).FadeOut(200);
+        }
+
+        protected override Drawable CreateDefaultJudgement(HitResult type)
+            => new ManiaJudgementPiece();
+
+        private class ManiaJudgementPiece : DefaultJudgementPiece
+        {
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                JudgementText.Font = JudgementText.Font.With(size: 25);
+            }
         }
     }
 }

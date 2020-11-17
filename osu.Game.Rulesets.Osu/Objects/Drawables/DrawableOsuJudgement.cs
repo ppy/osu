@@ -4,9 +4,9 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osuTK;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -65,8 +65,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             fadeOutDelay = hitLightingEnabled ? 1400 : base.FadeOutDelay;
 
-            JudgementText?.TransformSpacingTo(Vector2.Zero).Then().TransformSpacingTo(new Vector2(14, 0), 1800, Easing.OutQuint);
             base.ApplyHitAnimations();
+        }
+
+        protected override Drawable CreateDefaultJudgement(HitResult type) => new OsuJudgementPiece();
+
+        private class OsuJudgementPiece : DefaultJudgementPiece
+        {
+            public override void PlayAnimation(HitResult resultType)
+            {
+                base.PlayAnimation(resultType);
+
+                if (resultType != HitResult.Miss)
+                    JudgementText.TransformSpacingTo(Vector2.Zero).Then().TransformSpacingTo(new Vector2(14, 0), 1800, Easing.OutQuint);
+            }
         }
     }
 }
