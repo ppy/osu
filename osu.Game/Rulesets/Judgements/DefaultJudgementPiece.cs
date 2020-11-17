@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Judgements
 
         public DefaultJudgementPiece(HitResult result)
         {
-            this.Result = result;
+            Result = result;
             Origin = Anchor.Centre;
         }
 
