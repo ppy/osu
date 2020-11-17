@@ -15,36 +15,42 @@ namespace osu.Game.Rulesets.Judgements
 {
     public class DefaultJudgementPiece : CompositeDrawable, IAnimatableJudgement
     {
-        protected SpriteText JudgementText { get; }
+        protected readonly HitResult Result;
+
+        protected SpriteText JudgementText { get; private set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public DefaultJudgementPiece()
+        public DefaultJudgementPiece(HitResult result)
         {
+            this.Result = result;
             Origin = Anchor.Centre;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
                 JudgementText = new OsuSpriteText
                 {
+                    Text = Result.GetDescription().ToUpperInvariant(),
+                    Colour = colours.ForHitResult(Result),
                     Font = OsuFont.Numeric.With(size: 20),
                     Scale = new Vector2(0.85f, 1),
                 }
             };
         }
 
-        public virtual void PlayAnimation(HitResult result)
+        public virtual void PlayAnimation()
         {
-            JudgementText.Text = result.GetDescription().ToUpperInvariant();
-            JudgementText.Colour = colours.ForHitResult(result);
-
             this.RotateTo(0);
             this.MoveTo(Vector2.Zero);
 
-            switch (result)
+            switch (Result)
             {
                 case HitResult.Miss:
                     this.ScaleTo(1.6f);
