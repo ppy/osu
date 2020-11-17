@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Judgements
             if (skinnableJudgement.Drawable is IAnimatableJudgement animatable)
             {
                 using (BeginAbsoluteSequence(Result.TimeAbsolute))
-                    animatable.PlayAnimation(Result.Type);
+                    animatable.PlayAnimation();
             }
 
             Expire(true);
@@ -143,6 +143,7 @@ namespace osu.Game.Rulesets.Judgements
         {
             var type = Result?.Type ?? HitResult.Perfect; //TODO: better default type from ruleset
 
+            // todo: this should be removed once judgements are always pooled.
             if (type == currentDrawableType)
                 return;
 
@@ -162,6 +163,6 @@ namespace osu.Game.Rulesets.Judgements
             currentDrawableType = type;
         }
 
-        protected virtual Drawable CreateDefaultJudgement(HitResult type) => new DefaultJudgementPiece();
+        protected virtual Drawable CreateDefaultJudgement(HitResult result) => new DefaultJudgementPiece(result);
     }
 }

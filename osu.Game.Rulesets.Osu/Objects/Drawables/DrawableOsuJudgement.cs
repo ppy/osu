@@ -68,15 +68,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ApplyHitAnimations();
         }
 
-        protected override Drawable CreateDefaultJudgement(HitResult type) => new OsuJudgementPiece();
+        protected override Drawable CreateDefaultJudgement(HitResult result) => new OsuJudgementPiece(result);
 
         private class OsuJudgementPiece : DefaultJudgementPiece
         {
-            public override void PlayAnimation(HitResult resultType)
+            public OsuJudgementPiece(HitResult result)
+                : base(result)
             {
-                base.PlayAnimation(resultType);
+            }
 
-                if (resultType != HitResult.Miss)
+            public override void PlayAnimation()
+            {
+                base.PlayAnimation();
+
+                if (Result != HitResult.Miss)
                     JudgementText.TransformSpacingTo(Vector2.Zero).Then().TransformSpacingTo(new Vector2(14, 0), 1800, Easing.OutQuint);
             }
         }

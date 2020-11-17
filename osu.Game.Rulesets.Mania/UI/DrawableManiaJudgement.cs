@@ -30,14 +30,19 @@ namespace osu.Game.Rulesets.Mania.UI
             this.Delay(FadeInDuration).FadeOut(200);
         }
 
-        protected override Drawable CreateDefaultJudgement(HitResult type)
-            => new ManiaJudgementPiece();
+        protected override Drawable CreateDefaultJudgement(HitResult result) => new ManiaJudgementPiece(result);
 
         private class ManiaJudgementPiece : DefaultJudgementPiece
         {
+            public ManiaJudgementPiece(HitResult result)
+                : base(result)
+            {
+            }
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
                 JudgementText.Font = JudgementText.Font.With(size: 25);
             }
         }
