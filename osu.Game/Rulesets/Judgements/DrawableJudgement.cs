@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Judgements
             this.Delay(FadeOutDelay).FadeOut(400);
         }
 
-        public virtual void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
+        public void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
         {
             Result = result;
             JudgedObject = judgedObject;

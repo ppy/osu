@@ -39,23 +39,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
-        public override void Apply(JudgementResult result, DrawableHitObject judgedObject)
-        {
-            base.Apply(result, judgedObject);
-
-            if (judgedObject?.HitObject is OsuHitObject osuObject)
-            {
-                Position = osuObject.StackedPosition;
-                Scale = new Vector2(osuObject.Scale);
-            }
-        }
-
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
 
             Lighting.ResetAnimation();
             Lighting.SetColourFrom(JudgedObject, Result);
+
+            if (JudgedObject?.HitObject is OsuHitObject osuObject)
+            {
+                Position = osuObject.StackedPosition;
+                Scale = new Vector2(osuObject.Scale);
+            }
         }
 
         private double fadeOutDelay;
