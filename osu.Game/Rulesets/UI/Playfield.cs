@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -17,7 +19,8 @@ using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class Playfield : CompositeDrawable
+    [Cached(typeof(IPooledHitObjectProvider))]
+    public abstract class Playfield : CompositeDrawable, IPooledHitObjectProvider
     {
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
@@ -139,39 +142,6 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Adds a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> to this <see cref="Playfield"/>.
-        /// </summary>
-        /// <param name="entry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the <see cref="HitObject"/>.</param>
-        public virtual void Add(HitObjectLifetimeEntry entry)
-        {
-            HitObjectContainer.Add(entry);
-            lifetimeEntryMap[entry.HitObject] = entry;
-            OnHitObjectAdded(entry.HitObject);
-        }
-
-        /// <summary>
-        /// Removes a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> from this <see cref="Playfield"/>.
-        /// </summary>
-        /// <param name="entry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the <see cref="HitObject"/>.</param>
-        /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
-        public virtual bool Remove(HitObjectLifetimeEntry entry)
-        {
-            if (HitObjectContainer.Remove(entry))
-            {
-                lifetimeEntryMap.Remove(entry.HitObject);
-                OnHitObjectRemoved(entry.HitObject);
-                return true;
-            }
-
-            bool removedFromNested = false;
-
-            if (nestedPlayfields.IsValueCreated)
-                removedFromNested = nestedPlayfields.Value.Any(p => p.Remove(entry));
-
-            return removedFromNested;
-        }
-
-        /// <summary>
         /// Invoked when a <see cref="HitObject"/> is added to this <see cref="Playfield"/>.
         /// </summary>
         /// <param name="hitObject">The added <see cref="HitObject"/>.</param>
@@ -245,6 +215,128 @@ namespace osu.Game.Rulesets.UI
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
+
+        #region Pooling support
+
+        private readonly Dictionary<Type, IDrawablePool> pools = new Dictionary<Type, IDrawablePool>();
+
+        /// <summary>
+        /// Adds a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> to this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject"></param>
+        public virtual void Add(HitObject hitObject)
+        {
+            var entry = CreateLifetimeEntry(hitObject);
+            lifetimeEntryMap[entry.HitObject] = entry;
+
+            HitObjectContainer.Add(entry);
+            OnHitObjectAdded(entry.HitObject);
+        }
+
+        /// <summary>
+        /// Removes a <see cref="HitObjectLifetimeEntry"/> for a pooled <see cref="HitObject"/> from this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="hitObject"></param>
+        /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
+        public virtual bool Remove(HitObject hitObject)
+        {
+            if (lifetimeEntryMap.Remove(hitObject, out var entry))
+            {
+                HitObjectContainer.Remove(entry);
+                OnHitObjectRemoved(hitObject);
+                return true;
+            }
+
+            bool removedFromNested = false;
+
+            if (nestedPlayfields.IsValueCreated)
+                removedFromNested = nestedPlayfields.Value.Any(p => p.Remove(hitObject));
+
+            return removedFromNested;
+        }
+
+        /// <summary>
+        /// Creates the <see cref="HitObjectLifetimeEntry"/> for a given <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// This may be overridden to provide custom lifetime control (e.g. via <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/>.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="HitObject"/> to create the entry for.</param>
+        /// <returns>The <see cref="HitObjectLifetimeEntry"/>.</returns>
+        [NotNull]
+        protected virtual HitObjectLifetimeEntry CreateLifetimeEntry([NotNull] HitObject hitObject) => new HitObjectLifetimeEntry(hitObject);
+
+        /// <summary>
+        /// Registers a default <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type.
+        /// </summary>
+        /// <param name="initialSize">The number of <see cref="DrawableHitObject"/>s to be initially stored in the pool.</param>
+        /// <param name="maximumSize">
+        /// The maximum number of <see cref="DrawableHitObject"/>s that can be stored in the pool.
+        /// If this limit is exceeded, every subsequent <see cref="DrawableHitObject"/> will be created anew instead of being retrieved from the pool,
+        /// until some of the existing <see cref="DrawableHitObject"/>s are returned to the pool.
+        /// </param>
+        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
+        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
+        protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
+            where TObject : HitObject
+            where TDrawable : DrawableHitObject, new()
+            => RegisterPool<TObject, TDrawable>(new DrawablePool<TDrawable>(initialSize, maximumSize));
+
+        /// <summary>
+        /// Registers a custom <see cref="DrawableHitObject"/> pool with this <see cref="DrawableRuleset"/> which is to be used whenever
+        /// <see cref="DrawableHitObject"/> representations are requested for the given <typeparamref name="TObject"/> type.
+        /// </summary>
+        /// <param name="pool">The <see cref="DrawablePool{T}"/> to register.</param>
+        /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
+        /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
+        protected void RegisterPool<TObject, TDrawable>([NotNull] DrawablePool<TDrawable> pool)
+            where TObject : HitObject
+            where TDrawable : DrawableHitObject, new()
+        {
+            pools[typeof(TObject)] = pool;
+            AddInternal(pool);
+        }
+
+        DrawableHitObject IPooledHitObjectProvider.GetPooledDrawableRepresentation(HitObject hitObject)
+        {
+            var lookupType = hitObject.GetType();
+
+            IDrawablePool pool;
+
+            // Tests may add derived hitobject instances for which pools don't exist. Try to find any applicable pool and dynamically assign the type if the pool exists.
+            if (!pools.TryGetValue(lookupType, out pool))
+            {
+                foreach (var (t, p) in pools)
+                {
+                    if (!t.IsInstanceOfType(hitObject))
+                        continue;
+
+                    pools[lookupType] = pool = p;
+                    break;
+                }
+            }
+
+            return (DrawableHitObject)pool?.Get(d =>
+            {
+                var dho = (DrawableHitObject)d;
+
+                // If this is the first time this DHO is being used (not loaded), then apply the DHO mods.
+                // This is done before Apply() so that the state is updated once when the hitobject is applied.
+                if (!dho.IsLoaded)
+                {
+                    foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
+                        m.ApplyToDrawableHitObjects(dho.Yield());
+                }
+
+                if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+                    lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
+
+                dho.Apply(hitObject, entry);
+            });
+        }
+
+        #endregion
 
         #region Editor logic
 

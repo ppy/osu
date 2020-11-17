@@ -9,11 +9,14 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.IO.Stores;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
@@ -21,6 +24,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Beatmaps
 {
+    [HeadlessTest]
     public abstract class HitObjectSampleTest : PlayerTestScene
     {
         protected abstract IResourceStore<byte[]> Resources { get; }
@@ -44,7 +48,9 @@ namespace osu.Game.Tests.Beatmaps
         private readonly TestResourceStore beatmapSkinResourceStore = new TestResourceStore();
         private SkinSourceDependencyContainer dependencies;
         private IBeatmap currentTestBeatmap;
+
         protected sealed override bool HasCustomSteps => true;
+        protected override bool Autoplay => true;
 
         protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => new DependencyContainer(dependencies = new SkinSourceDependencyContainer(base.CreateChildDependencies(parent)));
@@ -53,6 +59,8 @@ namespace osu.Game.Tests.Beatmaps
 
         protected sealed override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
             => new TestWorkingBeatmap(beatmapInfo, beatmapSkinResourceStore, beatmap, storyboard, Clock, Audio);
+
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false);
 
         protected void CreateTestWithBeatmap(string filename)
         {
@@ -73,6 +81,9 @@ namespace osu.Game.Tests.Beatmaps
                     currentTestBeatmap.BeatmapInfo.Ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.RulesetID);
                 });
             });
+
+            AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
+            AddUntilStep("results displayed", () => Stack.CurrentScreen is ResultsScreen);
         }
 
         protected void SetupSkins(string beatmapFile, string userFile)

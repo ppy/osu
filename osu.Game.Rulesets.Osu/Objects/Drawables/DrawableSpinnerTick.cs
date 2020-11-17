@@ -7,6 +7,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
+        public DrawableSpinnerTick()
+            : base(null)
+        {
+        }
+
         public DrawableSpinnerTick(SpinnerTick spinnerTick)
             : base(spinnerTick)
         {
