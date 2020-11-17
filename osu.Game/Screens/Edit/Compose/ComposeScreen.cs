@@ -53,6 +53,6 @@ namespace osu.Game.Screens.Edit.Compose
             return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(composer));
         }
 
-        protected override Drawable CreateTimelineContent() => composer == null ? base.CreateTimelineContent() : new TimelineBlueprintContainer();
+        protected override Drawable CreateTimelineContent() => composer == null ? base.CreateTimelineContent() : new TimelineBlueprintContainer(composer);
     }
 }

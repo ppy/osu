@@ -51,9 +51,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public double? HoldStartTime { get; private set; }
 
         /// <summary>
-        /// Whether the hold note has been released too early and shouldn't give full score for the release.
+        /// Time at which the hold note has been broken, i.e. released too early, resulting in a reduced score.
         /// </summary>
-        public bool HasBroken { get; private set; }
+        public double? HoldBrokenTime { get; private set; }
 
         /// <summary>
         /// Whether the hold note has been released potentially without having caused a break.
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
 
             if (Tail.Judged && !Tail.IsHit)
-                HasBroken = true;
+                HoldBrokenTime = Time.Current;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -247,6 +247,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return false;
 
             if (action != Action.Value)
+                return false;
+
+            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
+            if (Time.Elapsed < 0)
                 return false;
 
             if (CheckHittable?.Invoke(this, Time.Current) == false)
@@ -281,6 +285,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return;
 
+            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
+            if (Time.Elapsed < 0)
+                return;
+
             // Make sure a hold was started
             if (HoldStartTime == null)
                 return;
@@ -290,7 +298,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             // If the key has been released too early, the user should not receive full score for the release
             if (!Tail.IsHit)
-                HasBroken = true;
+                HoldBrokenTime = Time.Current;
 
             releaseTime = Time.Current;
         }

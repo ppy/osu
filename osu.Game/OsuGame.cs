@@ -463,7 +463,7 @@ namespace osu.Game
 
         #endregion
 
-        private ScheduledDelegate performFromMainMenuTask;
+        private PerformFromMenuRunner performFromMainMenuTask;
 
         /// <summary>
         /// Perform an action only after returning to a specific screen as indicated by <paramref name="validScreens"/>.
@@ -474,34 +474,7 @@ namespace osu.Game
         public void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null)
         {
             performFromMainMenuTask?.Cancel();
-
-            validScreens ??= Enumerable.Empty<Type>();
-            validScreens = validScreens.Append(typeof(MainMenu));
-
-            CloseAllOverlays(false);
-
-            // we may already be at the target screen type.
-            if (validScreens.Contains(ScreenStack.CurrentScreen?.GetType()) && !Beatmap.Disabled)
-            {
-                action(ScreenStack.CurrentScreen);
-                return;
-            }
-
-            // find closest valid target
-            IScreen screen = ScreenStack.CurrentScreen;
-
-            while (screen != null)
-            {
-                if (validScreens.Contains(screen.GetType()))
-                {
-                    screen.MakeCurrent();
-                    break;
-                }
-
-                screen = screen.GetParentScreen();
-            }
-
-            performFromMainMenuTask = Schedule(() => PerformFromScreen(action, validScreens));
+            Add(performFromMainMenuTask = new PerformFromMenuRunner(action, validScreens, () => ScreenStack.CurrentScreen));
         }
 
         /// <summary>
@@ -547,6 +520,20 @@ namespace osu.Game
             ScoreManager.PostNotification = n => notifications.Post(n);
             ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
+
+            // make config aware of how to lookup skins for on-screen display purposes.
+            // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
+            LocalConfig.LookupSkinName = id => SkinManager.GetAllUsableSkins().FirstOrDefault(s => s.ID == id)?.ToString() ?? "Unknown";
+
+            LocalConfig.LookupKeyBindings = l =>
+            {
+                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l).ToArray();
+
+                if (combinations.Length == 0)
+                    return "none";
+
+                return string.Join(" or ", combinations);
+            };
 
             Container logoContainer;
             BackButton.Receptor receptor;
@@ -613,7 +600,12 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new OnScreenDisplay(), Add, true);
+            var onScreenDisplay = new OnScreenDisplay();
+
+            onScreenDisplay.BeginTracking(this, frameworkConfig);
+            onScreenDisplay.BeginTracking(this, LocalConfig);
+
+            loadComponentSingleFile(onScreenDisplay, Add, true);
 
             loadComponentSingleFile(notifications.With(d =>
             {
@@ -662,7 +654,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener(), topMostOverlayContent.Add);
 
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
@@ -872,6 +863,10 @@ namespace osu.Game
 
                 case GlobalAction.ToggleGameplayMouseButtons:
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
+                    return true;
+
+                case GlobalAction.RandomSkin:
+                    SkinManager.SelectRandomSkin();
                     return true;
             }
 

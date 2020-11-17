@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
@@ -49,11 +50,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ShakeDuration = 30,
                 RelativeSizeAxes = Axes.Both
             });
+        }
+
+        protected override void OnApply(HitObject hitObject)
+        {
+            base.OnApply(hitObject);
 
             IndexInCurrentComboBindable.BindTo(HitObject.IndexInCurrentComboBindable);
             PositionBindable.BindTo(HitObject.PositionBindable);
             StackHeightBindable.BindTo(HitObject.StackHeightBindable);
             ScaleBindable.BindTo(HitObject.ScaleBindable);
+        }
+
+        protected override void OnFree(HitObject hitObject)
+        {
+            base.OnFree(hitObject);
+
+            IndexInCurrentComboBindable.UnbindFrom(HitObject.IndexInCurrentComboBindable);
+            PositionBindable.UnbindFrom(HitObject.PositionBindable);
+            StackHeightBindable.UnbindFrom(HitObject.StackHeightBindable);
+            ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
         }
 
         // Forward all internal management to shakeContainer.
@@ -67,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ??= GetContainingInputManager() as OsuInputManager;
 
-        protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
+        public virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
         protected override void UpdateInitialTransforms()
         {
