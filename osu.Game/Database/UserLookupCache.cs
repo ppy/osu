@@ -45,15 +45,13 @@ namespace osu.Game.Database
 
         private void performLookup()
         {
-            // userTasks may exceed 50 elements, indicating the existence of duplicate user IDs. All duplicated user IDs must be fulfilled.
-            // userIds contains at most 50 unique user IDs from userTasks, which is used to perform the lookup.
-            var userTasks = new List<(int id, TaskCompletionSource<User> task)>();
-            var userIds = new HashSet<int>();
+            // contains at most 50 unique user IDs from userTasks, which is used to perform the lookup.
+            var userTasks = new Dictionary<int, List<TaskCompletionSource<User>>>();
 
             // Grab at most 50 unique user IDs from the queue.
             lock (taskAssignmentLock)
             {
-                while (pendingUserTasks.Count > 0 && userIds.Count < 50)
+                while (pendingUserTasks.Count > 0 && userTasks.Count < 50)
                 {
                     (int id, TaskCompletionSource<User> task) next = pendingUserTasks.Dequeue();
 
@@ -62,14 +60,16 @@ namespace osu.Game.Database
                         next.task.SetResult(existing);
                     else
                     {
-                        userTasks.Add(next);
-                        userIds.Add(next.id);
+                        if (userTasks.TryGetValue(next.id, out var tasks))
+                            tasks.Add(next.task);
+                        else
+                            userTasks[next.id] = new List<TaskCompletionSource<User>> { next.task };
                     }
                 }
             }
 
             // Query the users.
-            var request = new GetUsersRequest(userIds.ToArray());
+            var request = new GetUsersRequest(userTasks.Keys.ToArray());
 
             // rather than queueing, we maintain our own single-threaded request stream.
             api.Perform(request);
@@ -82,9 +82,23 @@ namespace osu.Game.Database
                     createNewTask();
             }
 
-            // Notify of completion.
-            foreach (var (id, task) in userTasks)
-                task.SetResult(request.Result?.Users?.FirstOrDefault(u => u.Id == id));
+            foreach (var user in request.Result.Users)
+            {
+                if (userTasks.TryGetValue(user.Id, out var tasks))
+                {
+                    foreach (var task in tasks)
+                        task.SetResult(user);
+
+                    userTasks.Remove(user.Id);
+                }
+            }
+
+            // if any tasks remain which were not satisfied, return null.
+            foreach (var tasks in userTasks.Values)
+            {
+                foreach (var task in tasks)
+                    task.SetResult(null);
+            }
         }
 
         private void createNewTask() => pendingRequestTask = Task.Run(performLookup);
