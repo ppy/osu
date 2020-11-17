@@ -19,6 +19,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Import;
 
 namespace osu.Game.Screens.Menu
 {
@@ -105,6 +106,7 @@ namespace osu.Game.Screens.Menu
                             },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
+                            OnImportButton = onImport,
                             OnExit = confirmAndExit,
                         }
                     }
@@ -144,7 +146,7 @@ namespace osu.Game.Screens.Menu
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
-
+        private void onImport() => this.Push(new FileImportScreen());
         private void confirmAndExit()
         {
             if (exitConfirmed) return;
