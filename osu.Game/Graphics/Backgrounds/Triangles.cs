@@ -60,6 +60,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// <summary>
         /// Whether we want to expire triangles as they exit our draw area completely.
         /// </summary>
+        [Obsolete("Unused.")] // Can be removed 20210518
         protected virtual bool ExpireOffScreenTriangles => true;
 
         /// <summary>
