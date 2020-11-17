@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         protected override bool OnHover(HoverEvent e)
         {
             if (!isActive)
-                activeBox.ResizeHeightTo(0.2f, 300, Easing.OutElastic);
+                activeBox.ResizeHeightTo(0.2f, 300, Easing.OutQuint);
 
             return base.OnHover(e);
         }
