@@ -14,6 +14,8 @@ namespace osu.Game.Skinning
     {
         private readonly HitResult result;
 
+        private bool hasParticle;
+
         public LegacyJudgementPiece(HitResult result, Drawable drawable)
         {
             this.result = result;
@@ -37,6 +39,8 @@ namespace osu.Game.Skinning
             if (animation?.FrameCount > 1)
                 return;
 
+            const double animation_length = 500;
+
             switch (result)
             {
                 case HitResult.Miss:
@@ -49,8 +53,19 @@ namespace osu.Game.Skinning
                     break;
 
                 default:
-                    this.ScaleTo(0.9f);
-                    this.ScaleTo(1, 500, Easing.OutElastic);
+                    if (!hasParticle)
+                    {
+                        this.ScaleTo(0.6f).Then()
+                            .ScaleTo(1.1f, animation_length * 0.8f).Then()
+                            .ScaleTo(0.9f, animation_length * 0.4f).Then()
+                            .ScaleTo(1f, animation_length * 0.2f);
+                    }
+                    else
+                    {
+                        this.ScaleTo(0.9f);
+                        this.ScaleTo(1.05f, animation_length);
+                    }
+
                     break;
             }
         }
