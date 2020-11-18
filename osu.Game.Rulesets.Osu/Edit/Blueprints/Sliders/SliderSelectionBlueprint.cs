@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
-        private BindableList<PathControlPoint> controlPoints => HitObject.Path.ControlPoints;
+        private IList<PathControlPoint> controlPoints => HitObject.Path.ControlPoints;
 
         private int addControlPoint(Vector2 position)
         {
