@@ -193,13 +193,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             return base.CreateNestedHitObject(hitObject);
         }
 
-        protected override void UpdateInitialTransforms()
-        {
-            base.UpdateInitialTransforms();
-
-            Body.FadeInFromZero(HitObject.TimeFadeIn);
-        }
-
         public readonly Bindable<bool> Tracking = new Bindable<bool>();
 
         protected override void Update()
@@ -273,6 +266,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 base.PlaySamples();
         }
 
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
+
+            Body.FadeInFromZero(HitObject.TimeFadeIn);
+        }
+
         protected override void UpdateStartTimeStateTransforms()
         {
             base.UpdateStartTimeStateTransforms();
@@ -297,7 +297,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
             }
 
-            this.FadeOut(fade_out_time, Easing.OutQuint);
+            this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
         }
 
         public Drawable ProxiedLayer => HeadCircle.ProxiedLayer;
