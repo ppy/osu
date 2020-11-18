@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -29,12 +30,16 @@ namespace osu.Game.Rulesets.Judgements
         private OsuColour colours { get; set; }
 
         public JudgementResult Result { get; private set; }
+        public HitDetail Detail { get; private set; }
         public DrawableHitObject JudgedObject { get; private set; }
 
         protected Container JudgementBody { get; private set; }
         protected SpriteText JudgementText { get; private set; }
-
+        protected SpriteText JudgementDetailText { get; private set; }
         private SkinnableDrawable bodyDrawable;
+        private SkinnableDrawable detailDrawable;
+
+        private OsuConfigManager config;
 
         /// <summary>
         /// Duration of initial fade in.
@@ -54,6 +59,9 @@ namespace osu.Game.Rulesets.Judgements
         public DrawableJudgement(JudgementResult result, DrawableHitObject judgedObject)
             : this()
         {
+            Result = result;
+            Detail = result.GetDetail();
+            JudgedObject = judgedObject;
             Apply(result, judgedObject);
         }
 
@@ -64,13 +72,23 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            this.config = config;
             prepareDrawables();
+        }
+
+        protected virtual void ApplyConfigUpdates()
+        {
+            if (config.Get<bool>(OsuSetting.ShowJudgementDetail) && Result.Type != Result.Judgement.MaxResult)
+                JudgementDetailText.Show();
+            else
+                JudgementDetailText.Hide();
         }
 
         protected virtual void ApplyHitAnimations()
         {
+            ApplyConfigUpdates();
             JudgementBody.ScaleTo(0.9f);
             JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
 
@@ -80,7 +98,12 @@ namespace osu.Game.Rulesets.Judgements
         public virtual void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
         {
             Result = result;
+            Detail = result.GetDetail();
             JudgedObject = judgedObject;
+            if (JudgementDetailText != null) {
+                JudgementDetailText.Text = detailText(Result);
+                JudgementDetailText.Colour = colours.ForDetailResult(Detail);
+            }
         }
 
         protected override void PrepareForUse()
@@ -92,6 +115,7 @@ namespace osu.Game.Rulesets.Judgements
             prepareDrawables();
 
             bodyDrawable.ResetAnimation();
+            detailDrawable.ResetAnimation();
 
             this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
             JudgementBody.ScaleTo(1);
@@ -121,11 +145,19 @@ namespace osu.Game.Rulesets.Judgements
             Expire(true);
         }
 
+        private string detailText(JudgementResult result)
+        {
+            if (result.TimeOffset == 0 || result.Type == result.Judgement.MaxResult || result.Type == HitResult.Miss)
+                return "";
+            return result.GetDetail().ToString().ToUpperInvariant();
+        }
+
         private HitResult? currentDrawableType;
 
         private void prepareDrawables()
         {
             var type = Result?.Type ?? HitResult.Perfect; //TODO: better default type from ruleset
+            var detail = Result?.GetDetail() ?? HitDetail.Flawless;
 
             if (type == currentDrawableType)
                 return;
@@ -139,13 +171,24 @@ namespace osu.Game.Rulesets.Judgements
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Child = bodyDrawable = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ => JudgementText = new OsuSpriteText
+                Children = new SkinnableDrawable []
                 {
-                    Text = type.GetDescription().ToUpperInvariant(),
-                    Font = OsuFont.Numeric.With(size: 20),
-                    Colour = colours.ForHitResult(type),
-                    Scale = new Vector2(0.85f, 1),
-                }, confineMode: ConfineMode.NoScaling)
+                    detailDrawable = new SkinnableDrawable(new GameplaySkinComponent<HitDetail>(detail), _ => JudgementDetailText = new OsuSpriteText
+                    {
+                        Text = "",
+                        Font = OsuFont.Numeric.With(size: 15),
+                        Colour = colours.ForDetailResult(detail),
+                        Y = -20,
+                        Scale = new Vector2(0.7f, 1),
+                    }, confineMode: ConfineMode.NoScaling),
+                    bodyDrawable = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ => JudgementText = new OsuSpriteText
+                    {
+                        Text = type.GetDescription().ToUpperInvariant(),
+                        Font = OsuFont.Numeric.With(size: 20),
+                        Colour = colours.ForHitResult(type),
+                        Scale = new Vector2(0.85f, 1),
+                    }, confineMode: ConfineMode.NoScaling)
+                }
             });
 
             currentDrawableType = type;

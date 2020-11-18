@@ -23,6 +23,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Show Judgement detail (FAST/SLOW)",
+                    Current = config.GetBindable<bool>(OsuSetting.ShowJudgementDetail)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Hit Lighting",
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },

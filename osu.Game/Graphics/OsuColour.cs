@@ -94,6 +94,21 @@ namespace osu.Game.Graphics
             }
         }
 
+        public Color4 ForDetailResult(HitDetail detail)
+        {
+            switch (detail)
+            {
+                case HitDetail.Fast:
+                    return this.BlueLight;
+
+                case HitDetail.Slow:
+                    return this.RedLight;
+
+                default:
+                    return Color4.White;
+            }
+        }
+
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
         public readonly Color4 PurpleLighter = Color4Extensions.FromHex(@"eeeeff");
         public readonly Color4 PurpleLight = Color4Extensions.FromHex(@"aa88ff");

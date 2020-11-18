@@ -83,6 +83,19 @@ namespace osu.Game.Rulesets.Judgements
             Judgement = judgement;
         }
 
+        /// <summary>
+        /// Gets the <see cref="HitDetail"/> associated with this judgement.
+        /// </summary>
+        public HitDetail GetDetail()
+        {
+           if (TimeOffset < 0)
+               return HitDetail.Fast;
+           if (TimeOffset > 0)
+               return HitDetail.Slow;
+           return HitDetail.Flawless;
+        }
+
+
         public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
     }
 }
