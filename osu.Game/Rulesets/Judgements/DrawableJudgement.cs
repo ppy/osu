@@ -28,7 +28,12 @@ namespace osu.Game.Rulesets.Judgements
 
         protected Container JudgementBody { get; private set; }
 
+        public override bool RemoveCompletedTransforms => false;
+
         private SkinnableDrawable skinnableJudgement;
+
+        [Resolved]
+        private ISkinSource skinSource { get; set; }
 
         /// <summary>
         /// Duration of initial fade in.
@@ -63,6 +68,27 @@ namespace osu.Game.Rulesets.Judgements
         private void load()
         {
             prepareDrawables();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            skinSource.SourceChanged += onSkinChanged;
+        }
+
+        private void onSkinChanged()
+        {
+            // on a skin change, the child component will update but not get correctly triggered to play its animation.
+            // we need to trigger a reinitialisation to make things right.
+            currentDrawableType = null;
+
+            PrepareForUse();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            skinSource.SourceChanged -= onSkinChanged;
         }
 
         /// <summary>
@@ -110,6 +136,12 @@ namespace osu.Game.Rulesets.Judgements
 
             prepareDrawables();
 
+            runAnimation();
+        }
+
+        private void runAnimation()
+        {
+            ClearTransforms(true);
             LifetimeStart = Result.TimeAbsolute;
 
             using (BeginAbsoluteSequence(Result.TimeAbsolute, true))
@@ -135,18 +167,13 @@ namespace osu.Game.Rulesets.Judgements
                 {
                     var drawableAnimation = (Drawable)animatable;
 
-                    drawableAnimation.ClearTransforms();
-
                     animatable.PlayAnimation();
 
-                    // a derived version of DrawableJudgement may be adjusting lifetime.
+                    // a derived version of DrawableJudgement may be proposing a lifetime.
                     // if not adjusted (or the skinned portion requires greater bounds than calculated) use the skinned source's lifetime.
                     double lastTransformTime = drawableAnimation.LatestTransformEndTime;
-
                     if (LifetimeEnd == double.MaxValue || lastTransformTime > LifetimeEnd)
-                    {
                         LifetimeEnd = lastTransformTime;
-                    }
                 }
             }
         }
