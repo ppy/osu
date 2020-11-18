@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableHoldNoteTick : DrawableManiaHitObject<HoldNoteTick>
     {
-        public override bool DisplayResult => false;
-
         /// <summary>
         /// References the time at which the user started holding the hold note.
         /// </summary>
