@@ -12,17 +12,20 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
-using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi.Lounge
 {
+    [Cached]
     public class LoungeSubScreen : MultiplayerSubScreen
     {
         public override string Title => "Lounge";
 
         protected FilterControl Filter;
+
+        protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
         private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
@@ -32,7 +35,7 @@ namespace osu.Game.Screens.Multi.Lounge
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private MusicController music { get; set; }
 
         private bool joiningRoom;
@@ -102,8 +105,8 @@ namespace osu.Game.Screens.Multi.Lounge
             content.Padding = new MarginPadding
             {
                 Top = Filter.DrawHeight,
-                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + HORIZONTAL_OVERFLOW_PADDING,
-                Right = SearchableListOverlay.WIDTH_PADDING + HORIZONTAL_OVERFLOW_PADDING,
+                Left = WaveOverlayContainer.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + HORIZONTAL_OVERFLOW_PADDING,
+                Right = WaveOverlayContainer.WIDTH_PADDING + HORIZONTAL_OVERFLOW_PADDING,
             };
         }
 
@@ -126,7 +129,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (selectedRoom.Value?.RoomID.Value == null)
                 selectedRoom.Value = new Room();
 
-            music.EnsurePlayingSomething();
+            music?.EnsurePlayingSomething();
 
             onReturning();
         }

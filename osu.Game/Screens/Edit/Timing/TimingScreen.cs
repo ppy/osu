@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -21,8 +22,10 @@ namespace osu.Game.Screens.Edit.Timing
         [Cached]
         private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
 
-        [Resolved]
-        private EditorClock clock { get; set; }
+        public TimingScreen()
+            : base(EditorScreenMode.Timing)
+        {
+        }
 
         protected override Drawable CreateMainContent() => new GridContainer
         {
@@ -42,15 +45,10 @@ namespace osu.Game.Screens.Edit.Timing
             }
         };
 
-        protected override void LoadComplete()
+        protected override void OnTimelineLoaded(TimelineArea timelineArea)
         {
-            base.LoadComplete();
-
-            selectedGroup.BindValueChanged(selected =>
-            {
-                if (selected.NewValue != null)
-                    clock.SeekTo(selected.NewValue.Time);
-            });
+            base.OnTimelineLoaded(timelineArea);
+            timelineArea.Timeline.Zoom = timelineArea.Timeline.MinZoom;
         }
 
         public class ControlPointList : CompositeDrawable
@@ -58,7 +56,7 @@ namespace osu.Game.Screens.Edit.Timing
             private OsuButton deleteButton;
             private ControlPointTable table;
 
-            private IBindableList<ControlPointGroup> controlGroups;
+            private readonly IBindableList<ControlPointGroup> controlPointGroups = new BindableList<ControlPointGroup>();
 
             [Resolved]
             private EditorClock clock { get; set; }
@@ -68,6 +66,9 @@ namespace osu.Game.Screens.Edit.Timing
 
             [Resolved]
             private Bindable<ControlPointGroup> selectedGroup { get; set; }
+
+            [Resolved(canBeNull: true)]
+            private IEditorChangeHandler changeHandler { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -123,13 +124,13 @@ namespace osu.Game.Screens.Edit.Timing
 
                 selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
 
-                controlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
-                controlGroups.ItemsAdded += _ => createContent();
-                controlGroups.ItemsRemoved += _ => createContent();
-                createContent();
+                controlPointGroups.BindTo(Beatmap.Value.Beatmap.ControlPointInfo.Groups);
+                controlPointGroups.BindCollectionChanged((sender, args) =>
+                {
+                    table.ControlGroups = controlPointGroups;
+                    changeHandler?.SaveState();
+                }, true);
             }
-
-            private void createContent() => table.ControlGroups = controlGroups;
 
             private void delete()
             {

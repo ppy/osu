@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             Masking = true,
             BorderColour = Color4.White,
-            BorderThickness = SelectionHandler.BORDER_RADIUS,
+            BorderThickness = SelectionBox.BORDER_RADIUS,
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,

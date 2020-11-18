@@ -24,19 +24,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         public override bool RemoveCompletedTransforms => false;
 
         /// <summary>
-        /// Adds the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
+        /// Adds the <see cref="FollowPoint"/>s around an <see cref="OsuHitObject"/>.
         /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to add <see cref="FollowPoint"/>s for.</param>
-        public void AddFollowPoints(DrawableOsuHitObject hitObject)
+        /// <param name="hitObject">The <see cref="OsuHitObject"/> to add <see cref="FollowPoint"/>s for.</param>
+        public void AddFollowPoints(OsuHitObject hitObject)
             => addConnection(new FollowPointConnection(hitObject).With(g => g.StartTime.BindValueChanged(_ => onStartTimeChanged(g))));
 
         /// <summary>
-        /// Removes the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
+        /// Removes the <see cref="FollowPoint"/>s around an <see cref="OsuHitObject"/>.
         /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to remove <see cref="FollowPoint"/>s for.</param>
-        public void RemoveFollowPoints(DrawableOsuHitObject hitObject) => removeGroup(connections.Single(g => g.Start == hitObject));
+        /// <param name="hitObject">The <see cref="OsuHitObject"/> to remove <see cref="FollowPoint"/>s for.</param>
+        public void RemoveFollowPoints(OsuHitObject hitObject) => removeGroup(connections.Single(g => g.Start == hitObject));
 
         /// <summary>
         /// Adds a <see cref="FollowPointConnection"/> to this <see cref="FollowPointRenderer"/>.
@@ -46,7 +46,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private void addConnection(FollowPointConnection connection)
         {
             // Groups are sorted by their start time when added such that the index can be used to post-process other surrounding connections
-            int index = connections.AddInPlace(connection, Comparer<FollowPointConnection>.Create((g1, g2) => g1.StartTime.Value.CompareTo(g2.StartTime.Value)));
+            int index = connections.AddInPlace(connection, Comparer<FollowPointConnection>.Create((g1, g2) =>
+            {
+                int comp = g1.StartTime.Value.CompareTo(g2.StartTime.Value);
+
+                if (comp != 0)
+                    return comp;
+
+                // we always want to insert the new item after equal ones.
+                // this is important for beatmaps with multiple hitobjects at the same point in time.
+                // if we use standard comparison insert order, there will be a churn of connections getting re-updated to
+                // the next object at the point-in-time, adding a construction/disposal overhead (see FollowPointConnection.End implementation's ClearInternal).
+                // this is easily visible on https://osu.ppy.sh/beatmapsets/150945#osu/372245
+                return -1;
+            }));
 
             if (index < connections.Count - 1)
             {

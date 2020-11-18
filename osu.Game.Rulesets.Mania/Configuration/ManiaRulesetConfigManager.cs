@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
         {
             base.InitialiseDefaults();
 
-            Set(ManiaRulesetSetting.ScrollTime, 1500.0, DrawableManiaRuleset.MIN_TIME_RANGE, DrawableManiaRuleset.MAX_TIME_RANGE, 1);
+            Set(ManiaRulesetSetting.ScrollTime, 1500.0, DrawableManiaRuleset.MIN_TIME_RANGE, DrawableManiaRuleset.MAX_TIME_RANGE, 5);
             Set(ManiaRulesetSetting.ScrollDirection, ManiaScrollingDirection.Down);
         }
 

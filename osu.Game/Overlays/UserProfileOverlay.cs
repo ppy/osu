@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
@@ -17,23 +18,22 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class UserProfileOverlay : FullscreenOverlay
+    public class UserProfileOverlay : FullscreenOverlay<ProfileHeader>
     {
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
-        protected ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
         private ProfileSectionTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
 
         public UserProfileOverlay()
-            : base(OverlayColourScheme.Pink)
+            : base(OverlayColourScheme.Pink, new ProfileHeader())
         {
         }
 
-        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
+        public void ShowUser(int userId) => ShowUser(new User { Id = userId });
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
@@ -44,6 +44,9 @@ namespace osu.Game.Overlays
 
             if (user.Id == Header?.User.Value?.Id)
                 return;
+
+            if (sectionsContainer != null)
+                sectionsContainer.ExpandableHeader = null;
 
             userReq?.Cancel();
             Clear();
@@ -77,7 +80,7 @@ namespace osu.Game.Overlays
 
             Add(sectionsContainer = new ProfileSectionsContainer
             {
-                ExpandableHeader = Header = new ProfileHeader(),
+                ExpandableHeader = Header,
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
@@ -173,6 +176,10 @@ namespace osu.Game.Overlays
             {
                 AccentColour = colourProvider.Highlight1;
             }
+
+            protected override bool OnClick(ClickEvent e) => true;
+
+            protected override bool OnHover(HoverEvent e) => true;
 
             private class ProfileSectionTabItem : OverlayTabItem
             {

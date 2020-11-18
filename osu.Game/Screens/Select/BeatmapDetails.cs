@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Select
         private void updateMetrics()
         {
             var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) && (beatmap?.Metrics.Fails?.Any() ?? false);
+            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) || (beatmap?.Metrics?.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
@@ -300,6 +300,7 @@ namespace osu.Game.Screens.Select
 
             public MetadataSection(string title)
             {
+                Alpha = 0;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 

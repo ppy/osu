@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private OsuInputManager inputManager;
 
+        private IFrameStableClock gameplayClock;
+
         private List<OsuReplayFrame> replayFrames;
 
         private int currentFrame;
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (currentFrame == replayFrames.Count - 1) return;
 
-            double time = playfield.Time.Current;
+            double time = gameplayClock.CurrentTime;
 
             // Very naive implementation of autopilot based on proximity to replay frames.
             // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
@@ -53,6 +55,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
+            gameplayClock = drawableRuleset.FrameStableClock;
+
             // Grab the input manager to disable the user's cursor, and for future use
             inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
             inputManager.AllowUserCursorMovement = false;

@@ -35,22 +35,25 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation)
         {
-            Container explodingFruitContainer;
-
-            InternalChildren = new Drawable[]
+            var explodingFruitContainer = new Container
             {
-                explodingFruitContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                CatcherArea = new CatcherArea(difficulty)
-                {
-                    CreateDrawableRepresentation = createDrawableRepresentation,
-                    ExplodingFruitTarget = explodingFruitContainer,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                },
-                HitObjectContainer
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            CatcherArea = new CatcherArea(difficulty)
+            {
+                CreateDrawableRepresentation = createDrawableRepresentation,
+                ExplodingFruitTarget = explodingFruitContainer,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.TopLeft,
+            };
+
+            InternalChildren = new[]
+            {
+                explodingFruitContainer,
+                CatcherArea.MovableCatcher.CreateProxiedContent(),
+                HitObjectContainer,
+                CatcherArea,
             };
         }
 
@@ -59,6 +62,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public override void Add(DrawableHitObject h)
         {
             h.OnNewResult += onNewResult;
+            h.OnRevertResult += onRevertResult;
 
             base.Add(h);
 
@@ -67,6 +71,9 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
-            => CatcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
+            => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
+
+        private void onRevertResult(DrawableHitObject judgedObject, JudgementResult result)
+            => CatcherArea.OnRevertResult((DrawableCatchHitObject)judgedObject, result);
     }
 }

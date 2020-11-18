@@ -2,22 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osuTK;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuJudgement : DrawableJudgement
     {
-        private SkinnableSprite lighting;
-        private Bindable<Color4> lightingColour;
+        protected SkinnableLighting Lighting { get; private set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         public DrawableOsuJudgement(JudgementResult result, DrawableHitObject judgedObject)
             : base(result, judgedObject)
@@ -29,18 +27,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
-            if (config.Get<bool>(OsuSetting.HitLighting))
+            AddInternal(Lighting = new SkinnableLighting
             {
-                AddInternal(lighting = new SkinnableSprite("lighting")
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Blending = BlendingParameters.Additive,
-                    Depth = float.MaxValue
-                });
-            }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Blending = BlendingParameters.Additive,
+                Depth = float.MaxValue,
+                Alpha = 0
+            });
         }
 
         public override void Apply(JudgementResult result, DrawableHitObject judgedObject)
@@ -58,33 +54,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.PrepareForUse();
 
-            lightingColour?.UnbindAll();
-
-            if (lighting != null)
-            {
-                if (JudgedObject != null)
-                {
-                    lightingColour = JudgedObject.AccentColour.GetBoundCopy();
-                    lightingColour.BindValueChanged(colour => lighting.Colour = Result.Type == HitResult.Miss ? Color4.Transparent : colour.NewValue, true);
-                }
-                else
-                {
-                    lighting.Colour = Color4.White;
-                }
-            }
+            Lighting.ResetAnimation();
+            Lighting.SetColourFrom(JudgedObject, Result);
         }
 
-        protected override double FadeOutDelay => lighting == null ? base.FadeOutDelay : 1400;
+        private double fadeOutDelay;
+        protected override double FadeOutDelay => fadeOutDelay;
 
         protected override void ApplyHitAnimations()
         {
-            if (lighting != null)
+            bool hitLightingEnabled = config.Get<bool>(OsuSetting.HitLighting);
+
+            if (hitLightingEnabled)
             {
                 JudgementBody.FadeIn().Delay(FadeInDuration).FadeOut(400);
 
-                lighting.ScaleTo(0.8f).ScaleTo(1.2f, 600, Easing.Out);
-                lighting.FadeIn(200).Then().Delay(200).FadeOut(1000);
+                Lighting.ScaleTo(0.8f).ScaleTo(1.2f, 600, Easing.Out);
+                Lighting.FadeIn(200).Then().Delay(200).FadeOut(1000);
             }
+            else
+            {
+                JudgementBody.Alpha = 1;
+            }
+
+            fadeOutDelay = hitLightingEnabled ? 1400 : base.FadeOutDelay;
 
             JudgementText?.TransformSpacingTo(Vector2.Zero).Then().TransformSpacingTo(new Vector2(14, 0), 1800, Easing.OutQuint);
             base.ApplyHitAnimations();

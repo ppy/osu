@@ -4,9 +4,11 @@
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Legacy;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Skinning
 {
@@ -27,14 +29,17 @@ namespace osu.Game.Skinning
 
         public abstract Drawable GetDrawableComponent(ISkinComponent component);
 
-        public Texture GetTexture(string componentName) => Source.GetTexture(componentName);
+        public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
+
+        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
+            => Source.GetTexture(componentName, wrapModeS, wrapModeT);
 
         public virtual SampleChannel GetSample(ISampleInfo sampleInfo)
         {
             if (!(sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample))
                 return Source.GetSample(sampleInfo);
 
-            var playLayeredHitSounds = GetConfig<GlobalSkinConfiguration, bool>(GlobalSkinConfiguration.LayeredHitSounds);
+            var playLayeredHitSounds = GetConfig<LegacySetting, bool>(LegacySetting.LayeredHitSounds);
             if (legacySample.IsLayered && playLayeredHitSounds?.Value == false)
                 return new SampleChannelVirtual();
 

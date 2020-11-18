@@ -12,7 +12,6 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -35,7 +34,6 @@ using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Mania
 {
-    [ExcludeFromDynamicCompile]
     public class ManiaRuleset : Ruleset, ILegacyRuleset
     {
         /// <summary>
@@ -51,7 +49,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap, this);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new ManiaPerformanceCalculator(this, attributes, score);
 
         public const string SHORT_NAME = "mania";
 
@@ -121,11 +119,17 @@ namespace osu.Game.Rulesets.Mania
             if (mods.HasFlag(LegacyMods.Key9))
                 yield return new ManiaModKey9();
 
+            if (mods.HasFlag(LegacyMods.KeyCoop))
+                yield return new ManiaModDualStages();
+
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new ManiaModNoFail();
 
             if (mods.HasFlag(LegacyMods.Random))
                 yield return new ManiaModRandom();
+
+            if (mods.HasFlag(LegacyMods.Mirror))
+                yield return new ManiaModMirror();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -172,8 +176,21 @@ namespace osu.Game.Rulesets.Mania
                         value |= LegacyMods.Key9;
                         break;
 
+                    case ManiaModDualStages _:
+                        value |= LegacyMods.KeyCoop;
+                        break;
+
                     case ManiaModFadeIn _:
                         value |= LegacyMods.FadeIn;
+                        value &= ~LegacyMods.Hidden; // this is toggled on in the base call due to inheritance, but we don't want that.
+                        break;
+
+                    case ManiaModMirror _:
+                        value |= LegacyMods.Mirror;
+                        break;
+
+                    case ManiaModRandom _:
+                        value |= LegacyMods.Random;
                         break;
                 }
             }
@@ -220,6 +237,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
                         new ManiaModDifficultyAdjust(),
+                        new ManiaModInvert(),
                     };
 
                 case ModType.Automation:
@@ -313,6 +331,31 @@ namespace osu.Game.Rulesets.Mania
             return (PlayfieldType)Enum.GetValues(typeof(PlayfieldType)).Cast<int>().OrderByDescending(i => i).First(v => variant >= v);
         }
 
+        protected override IEnumerable<HitResult> GetValidHitResults()
+        {
+            return new[]
+            {
+                HitResult.Perfect,
+                HitResult.Great,
+                HitResult.Good,
+                HitResult.Ok,
+                HitResult.Meh,
+
+                HitResult.LargeTickHit,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LargeTickHit:
+                    return "hold tick";
+            }
+
+            return base.GetDisplayNameForHitResult(result);
+        }
+
         public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
             new StatisticRow
@@ -324,6 +367,16 @@ namespace osu.Game.Rulesets.Mania
                         RelativeSizeAxes = Axes.X,
                         Height = 250
                     }),
+                }
+            },
+            new StatisticRow
+            {
+                Columns = new[]
+                {
+                    new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                    {
+                        new UnstableRate(score.HitEvents)
+                    }))
                 }
             }
         };

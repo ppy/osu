@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -92,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             string noteImage = GetColumnSkinConfig<string>(skin, lookup)?.Value
                                ?? $"mania-note{FallbackColumnIndex}{suffix}";
 
-            return skin.GetTexture(noteImage);
+            return skin.GetTexture(noteImage, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
         }
     }
 }

@@ -17,7 +17,7 @@ using osuTK.Graphics;
 namespace osu.Game.Overlays
 {
     /// <summary>
-    /// <see cref="OsuScrollContainer"/> which provides <see cref="ScrollToTopButton"/>. Mostly used in <see cref="FullscreenOverlay"/>.
+    /// <see cref="OsuScrollContainer"/> which provides <see cref="ScrollToTopButton"/>. Mostly used in <see cref="FullscreenOverlay{T}"/>.
     /// </summary>
     public class OverlayScrollContainer : OsuScrollContainer
     {

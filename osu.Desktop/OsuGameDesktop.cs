@@ -16,6 +16,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
+using osu.Desktop.Windows;
 
 namespace osu.Desktop
 {
@@ -98,6 +99,9 @@ namespace osu.Desktop
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
@@ -121,19 +125,22 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
+            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
+
             switch (host.Window)
             {
                 // Legacy osuTK DesktopGameWindow
-                case DesktopGameWindow desktopGameWindow:
+                case OsuTKDesktopWindow desktopGameWindow:
                     desktopGameWindow.CursorState |= CursorState.Hidden;
-                    desktopGameWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
+                    desktopGameWindow.SetIconFromStream(iconStream);
                     desktopGameWindow.Title = Name;
                     desktopGameWindow.FileDrop += (_, e) => fileDrop(e.FileNames);
                     break;
 
                 // SDL2 DesktopWindow
                 case DesktopWindow desktopWindow:
-                    desktopWindow.CursorState.Value |= CursorState.Hidden;
+                    desktopWindow.CursorState |= CursorState.Hidden;
+                    desktopWindow.SetIconFromStream(iconStream);
                     desktopWindow.Title = Name;
                     desktopWindow.DragDrop += f => fileDrop(new[] { f });
                     break;

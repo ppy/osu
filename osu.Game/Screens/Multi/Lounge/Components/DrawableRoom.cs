@@ -21,10 +21,12 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable
+    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu
     {
         public const float SELECTION_BORDER_WIDTH = 4;
         private const float corner_radius = 5;
@@ -38,6 +40,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private readonly Box selectionBox;
         private CachedModelDependencyContainer<Room> dependencies;
+
+        [Resolved(canBeNull: true)]
+        private Multiplayer multiplayer { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -219,6 +224,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 Alpha = 0;
         }
 
+        protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
+
         private class RoomName : OsuSpriteText
         {
             [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.Name))]
@@ -230,5 +237,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 Current = name;
             }
         }
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+            {
+                multiplayer?.CreateRoom(Room.CreateCopy());
+            })
+        };
     }
 }

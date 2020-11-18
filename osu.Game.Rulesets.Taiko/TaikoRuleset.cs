@@ -22,7 +22,6 @@ using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using System;
 using System.Linq;
-using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Edit;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -32,7 +31,6 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko
 {
-    [ExcludeFromDynamicCompile]
     public class TaikoRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableTaikoRuleset(this, beatmap, mods);
@@ -94,6 +92,19 @@ namespace osu.Game.Rulesets.Taiko
 
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new TaikoModRelax();
+
+            if (mods.HasFlag(LegacyMods.Random))
+                yield return new TaikoModRandom();
+        }
+
+        public override LegacyMods ConvertToLegacyMods(Mod[] mods)
+        {
+            var value = base.ConvertToLegacyMods(mods);
+
+            if (mods.OfType<TaikoModRandom>().Any())
+                value |= LegacyMods.Random;
+
+            return value;
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -155,25 +166,67 @@ namespace osu.Game.Rulesets.Taiko
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(this, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new TaikoPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new TaikoPerformanceCalculator(this, attributes, score);
 
         public int LegacyID => 1;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 
-        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
+        protected override IEnumerable<HitResult> GetValidHitResults()
         {
-            new StatisticRow
+            return new[]
             {
-                Columns = new[]
-                {
-                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents.Where(e => e.HitObject is Hit).ToList())
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 250
-                    }),
-                }
+                HitResult.Great,
+                HitResult.Ok,
+
+                HitResult.SmallTickHit,
+
+                HitResult.SmallBonus,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.SmallTickHit:
+                    return "drum tick";
+
+                case HitResult.SmallBonus:
+                    return "strong bonus";
             }
-        };
+
+            return base.GetDisplayNameForHitResult(result);
+        }
+
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        {
+            var timedHitEvents = score.HitEvents.Where(e => e.HitObject is Hit).ToList();
+
+            return new[]
+            {
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(timedHitEvents)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        {
+                            new UnstableRate(timedHitEvents)
+                        }))
+                    }
+                }
+            };
+        }
     }
 }

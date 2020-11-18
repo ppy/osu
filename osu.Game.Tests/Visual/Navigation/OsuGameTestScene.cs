@@ -34,6 +34,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         protected TestOsuGame Game;
 
+        protected override bool UseFreshStoragePerRun => true;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
@@ -47,7 +49,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public virtual void SetUpSteps()
         {
             AddStep("Create new game instance", () =>
             {

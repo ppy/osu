@@ -4,9 +4,8 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 
@@ -15,7 +14,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     public class RoomInfo : MultiplayerComposite
     {
         private readonly List<Drawable> statusElements = new List<Drawable>();
-        private readonly SpriteText roomName;
+        private readonly OsuTextFlowContainer roomName;
 
         public RoomInfo()
         {
@@ -43,18 +42,23 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                AutoSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical,
                                 Children = new Drawable[]
                                 {
-                                    roomName = new OsuSpriteText { Font = OsuFont.GetFont(size: 30) },
+                                    roomName = new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(size: 30))
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                    },
                                     statusInfo = new RoomStatusInfo(),
                                 }
                             },
                             typeInfo = new ModeTypeInfo
                             {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight
                             }
                         }
                     },

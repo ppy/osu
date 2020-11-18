@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -34,12 +35,12 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, SkinManager skinManager)
+        private void load(AudioManager audio, SkinManager skinManager, OsuGameBase game)
         {
             var dllStore = new DllResourceStore(DynamicCompilationOriginal.GetType().Assembly);
 
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
-            defaultSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
+            defaultSkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), audio);
             specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), audio, true);
             oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), audio, true);
         }
@@ -64,17 +65,15 @@ namespace osu.Game.Tests.Visual
         private Drawable createProvider(Skin skin, Func<Drawable> creationFunction, IBeatmap beatmap)
         {
             var created = creationFunction();
+
             createdDrawables.Add(created);
 
-            var autoSize = created.RelativeSizeAxes == Axes.None;
+            SkinProvidingContainer mainProvider;
+            Container childContainer;
+            OutlineBox outlineBox;
+            SkinProvidingContainer skinProvider;
 
-            var mainProvider = new SkinProvidingContainer(skin)
-            {
-                RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
-                AutoSizeAxes = autoSize ? Axes.Both : Axes.None,
-            };
-
-            return new Container
+            var children = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 BorderColour = Color4.White,
@@ -95,27 +94,47 @@ namespace osu.Game.Tests.Visual
                         Scale = new Vector2(1.5f),
                         Padding = new MarginPadding(5),
                     },
-                    new Container
+                    childContainer = new Container
                     {
-                        RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
-                        AutoSizeAxes = autoSize ? Axes.Both : Axes.None,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
                         {
-                            new OutlineBox { Alpha = autoSize ? 1 : 0 },
-                            mainProvider.WithChild(
-                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
+                            outlineBox = new OutlineBox(),
+                            (mainProvider = new SkinProvidingContainer(skin)).WithChild(
+                                skinProvider = new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
                                 {
                                     Child = created,
-                                    RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
-                                    AutoSizeAxes = autoSize ? Axes.Both : Axes.None,
                                 }
                             )
                         }
                     },
                 }
             };
+
+            // run this once initially to bring things into a sane state as early as possible.
+            updateSizing();
+
+            // run this once after construction to handle the case the changes are made in a BDL/LoadComplete call.
+            Schedule(updateSizing);
+
+            return children;
+
+            void updateSizing()
+            {
+                var autoSize = created.RelativeSizeAxes == Axes.None;
+
+                foreach (var c in new[] { mainProvider, childContainer, skinProvider })
+                {
+                    c.RelativeSizeAxes = Axes.None;
+                    c.AutoSizeAxes = Axes.None;
+
+                    c.RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None;
+                    c.AutoSizeAxes = autoSize ? Axes.Both : Axes.None;
+                }
+
+                outlineBox.Alpha = autoSize ? 1 : 0;
+            }
         }
 
         /// <summary>
@@ -157,18 +176,23 @@ namespace osu.Game.Tests.Visual
                 this.extrapolateAnimations = extrapolateAnimations;
             }
 
-            public override Texture GetTexture(string componentName)
+            public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
+                var lookup = base.GetTexture(componentName, wrapModeS, wrapModeT);
+
+                if (lookup != null)
+                    return lookup;
+
                 // extrapolate frames to test longer animations
                 if (extrapolateAnimations)
                 {
                     var match = Regex.Match(componentName, "-([0-9]*)");
 
                     if (match.Length > 0 && int.TryParse(match.Groups[1].Value, out var number) && number < 60)
-                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"));
+                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"), wrapModeS, wrapModeT);
                 }
 
-                return base.GetTexture(componentName);
+                return null;
             }
         }
     }

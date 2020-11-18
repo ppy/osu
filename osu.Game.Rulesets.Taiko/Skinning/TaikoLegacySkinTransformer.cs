@@ -7,6 +7,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 
@@ -14,13 +15,29 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 {
     public class TaikoLegacySkinTransformer : LegacySkinTransformer
     {
+        private Lazy<bool> hasExplosion;
+
         public TaikoLegacySkinTransformer(ISkinSource source)
             : base(source)
         {
+            Source.SourceChanged += sourceChanged;
+            sourceChanged();
+        }
+
+        private void sourceChanged()
+        {
+            hasExplosion = new Lazy<bool>(() => Source.GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
+            if (component is GameplaySkinComponent<HitResult>)
+            {
+                // if a taiko skin is providing explosion sprites, hide the judgements completely
+                if (hasExplosion.Value)
+                    return Drawable.Empty();
+            }
+
             if (!(component is TaikoSkinComponent taikoComponent))
                 return null;
 
@@ -74,13 +91,34 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     return null;
 
-                case TaikoSkinComponents.TaikoExplosionGood:
-                case TaikoSkinComponents.TaikoExplosionGreat:
                 case TaikoSkinComponents.TaikoExplosionMiss:
 
-                    var sprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
-                    if (sprite != null)
-                        return new LegacyHitExplosion(sprite);
+                    var missSprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
+                    if (missSprite != null)
+                        return new LegacyHitExplosion(missSprite);
+
+                    return null;
+
+                case TaikoSkinComponents.TaikoExplosionOk:
+                case TaikoSkinComponents.TaikoExplosionGreat:
+
+                    var hitName = getHitName(taikoComponent.Component);
+                    var hitSprite = this.GetAnimation(hitName, true, false);
+
+                    if (hitSprite != null)
+                    {
+                        var strongHitSprite = this.GetAnimation($"{hitName}k", true, false);
+
+                        return new LegacyHitExplosion(hitSprite, strongHitSprite);
+                    }
+
+                    return null;
+
+                case TaikoSkinComponents.TaikoExplosionKiai:
+                    // suppress the default kiai explosion if the skin brings its own sprites.
+                    // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
+                    if (hasExplosion.Value)
+                        return Drawable.Empty().With(d => d.LifetimeEnd = double.MinValue);
 
                     return null;
 
@@ -91,10 +129,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                     return null;
 
                 case TaikoSkinComponents.Mascot:
-                    if (GetTexture("pippidonclear0") != null)
-                        return new DrawableTaikoMascot();
-
-                    return null;
+                    return new DrawableTaikoMascot();
             }
 
             return Source.GetDrawableComponent(component);
@@ -107,14 +142,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 case TaikoSkinComponents.TaikoExplosionMiss:
                     return "taiko-hit0";
 
-                case TaikoSkinComponents.TaikoExplosionGood:
+                case TaikoSkinComponents.TaikoExplosionOk:
                     return "taiko-hit100";
 
                 case TaikoSkinComponents.TaikoExplosionGreat:
                     return "taiko-hit300";
             }
 
-            throw new ArgumentOutOfRangeException(nameof(component), "Invalid result type");
+            throw new ArgumentOutOfRangeException(nameof(component), $"Invalid component type: {component}");
         }
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo) => Source.GetSample(new LegacyTaikoSampleInfo(sampleInfo));
@@ -135,7 +170,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 get
                 {
                     foreach (var name in source.LookupNames)
-                        yield return $"taiko-{name}";
+                        yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
 
                     foreach (var name in source.LookupNames)
                         yield return name;

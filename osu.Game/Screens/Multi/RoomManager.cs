@@ -14,7 +14,6 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Multi.Lounge.Components;
@@ -114,7 +113,7 @@ namespace osu.Game.Screens.Multi
         public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             currentJoinRoomRequest?.Cancel();
-            currentJoinRoomRequest = new JoinRoomRequest(room, api.LocalUser.Value);
+            currentJoinRoomRequest = new JoinRoomRequest(room);
 
             currentJoinRoomRequest.Success += () =>
             {
@@ -139,7 +138,7 @@ namespace osu.Game.Screens.Multi
             if (joinedRoom == null)
                 return;
 
-            api.Queue(new PartRoomRequest(joinedRoom, api.LocalUser.Value));
+            api.Queue(new PartRoomRequest(joinedRoom));
             joinedRoom = null;
         }
 

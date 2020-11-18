@@ -9,6 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Timing;
@@ -124,6 +125,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (!enabled) return null;
 
+                if (component is OsuSkinComponent osuComponent && osuComponent.Component == OsuSkinComponents.SliderBody)
+                    return null;
+
                 return new OsuSpriteText
                 {
                     Text = identifier,
@@ -131,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
             }
 
-            public Texture GetTexture(string componentName) => null;
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
             public SampleChannel GetSample(ISampleInfo sampleInfo) => null;
 

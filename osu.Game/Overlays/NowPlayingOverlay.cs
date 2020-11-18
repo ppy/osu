@@ -25,8 +25,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class NowPlayingOverlay : OsuFocusedOverlayContainer
+    public class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/music";
+        public string Title => "now playing";
+        public string Description => "manage the currently playing track";
+
         private const float player_height = 130;
         private const float transition_length = 800;
         private const float progress_height = 10;
@@ -234,9 +238,9 @@ namespace osu.Game.Overlays
                 pendingBeatmapSwitch = null;
             }
 
-            var track = beatmap.Value?.TrackLoaded ?? false ? beatmap.Value.Track : null;
+            var track = musicController.CurrentTrack;
 
-            if (track?.IsDummyDevice == false)
+            if (!track.IsDummyDevice)
             {
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
@@ -304,7 +308,6 @@ namespace osu.Game.Overlays
             if (disabled)
                 playlist.Hide();
 
-            playButton.Enabled.Value = !disabled;
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;

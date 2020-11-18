@@ -28,37 +28,9 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        public static int? GetCount300(this ScoreInfo scoreInfo)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
-            {
-                case 0:
-                case 1:
-                case 3:
-                    return getCount(scoreInfo, HitResult.Great);
+        public static int? GetCount300(this ScoreInfo scoreInfo) => getCount(scoreInfo, HitResult.Great);
 
-                case 2:
-                    return getCount(scoreInfo, HitResult.Perfect);
-            }
-
-            return null;
-        }
-
-        public static void SetCount300(this ScoreInfo scoreInfo, int value)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
-            {
-                case 0:
-                case 1:
-                case 3:
-                    scoreInfo.Statistics[HitResult.Great] = value;
-                    break;
-
-                case 2:
-                    scoreInfo.Statistics[HitResult.Perfect] = value;
-                    break;
-            }
-        }
+        public static void SetCount300(this ScoreInfo scoreInfo, int value) => scoreInfo.Statistics[HitResult.Great] = value;
 
         public static int? GetCountKatu(this ScoreInfo scoreInfo)
         {
@@ -94,8 +66,6 @@ namespace osu.Game.Scoring.Legacy
             {
                 case 0:
                 case 1:
-                    return getCount(scoreInfo, HitResult.Good);
-
                 case 3:
                     return getCount(scoreInfo, HitResult.Ok);
 
@@ -112,9 +82,6 @@ namespace osu.Game.Scoring.Legacy
             {
                 case 0:
                 case 1:
-                    scoreInfo.Statistics[HitResult.Good] = value;
-                    break;
-
                 case 3:
                     scoreInfo.Statistics[HitResult.Ok] = value;
                     break;

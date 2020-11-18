@@ -16,8 +16,6 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
-        public const int LATEST_VERSION = 14;
-
         private Beatmap beatmap;
 
         private ConvertHitObjectParser parser;
@@ -175,6 +173,10 @@ namespace osu.Game.Beatmaps.Formats
                 case @"WidescreenStoryboard":
                     beatmap.BeatmapInfo.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
                     break;
+
+                case @"EpilepsyWarning":
+                    beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
+                    break;
             }
         }
 
@@ -307,12 +309,7 @@ namespace osu.Game.Beatmaps.Formats
                     double start = getOffsetTime(Parsing.ParseDouble(split[1]));
                     double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
 
-                    var breakEvent = new BreakPeriod(start, end);
-
-                    if (!breakEvent.HasEffect)
-                        return;
-
-                    beatmap.Breaks.Add(breakEvent);
+                    beatmap.Breaks.Add(new BreakPeriod(start, end));
                     break;
             }
         }
@@ -369,7 +366,9 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-            addControlPoint(time, new LegacyDifficultyControlPoint
+#pragma warning disable 618
+            addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
+#pragma warning restore 618
             {
                 SpeedMultiplier = speedMultiplier,
             }, timingChange);

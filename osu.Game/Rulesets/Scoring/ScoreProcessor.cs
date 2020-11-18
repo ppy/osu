@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -16,8 +17,6 @@ namespace osu.Game.Rulesets.Scoring
 {
     public class ScoreProcessor : JudgementProcessor
     {
-        private const double base_portion = 0.3;
-        private const double combo_portion = 0.7;
         private const double max_score = 1000000;
 
         /// <summary>
@@ -55,12 +54,23 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
 
-        private double maxHighestCombo;
+        /// <summary>
+        /// The default portion of <see cref="max_score"/> awarded for hitting <see cref="HitObject"/>s accurately. Defaults to 30%.
+        /// </summary>
+        protected virtual double DefaultAccuracyPortion => 0.3;
 
+        /// <summary>
+        /// The default portion of <see cref="max_score"/> awarded for achieving a high combo. Default to 70%.
+        /// </summary>
+        protected virtual double DefaultComboPortion => 0.7;
+
+        private readonly double accuracyPortion;
+        private readonly double comboPortion;
+
+        private int maxAchievableCombo;
         private double maxBaseScore;
         private double rollingMaxBaseScore;
         private double baseScore;
-        private double bonusScore;
 
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject lastHitObject;
@@ -69,7 +79,11 @@ namespace osu.Game.Rulesets.Scoring
 
         public ScoreProcessor()
         {
-            Debug.Assert(base_portion + combo_portion == 1.0);
+            accuracyPortion = DefaultAccuracyPortion;
+            comboPortion = DefaultComboPortion;
+
+            if (!Precision.AlmostEquals(1.0, accuracyPortion + comboPortion))
+                throw new InvalidOperationException($"{nameof(DefaultAccuracyPortion)} + {nameof(DefaultComboPortion)} must equal 1.");
 
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += accuracy =>
@@ -101,14 +115,15 @@ namespace osu.Game.Rulesets.Scoring
             if (result.FailedAtJudgement)
                 return;
 
-            if (result.Judgement.AffectsCombo)
+            if (!result.Type.IsScorable())
+                return;
+
+            if (result.Type.AffectsCombo())
             {
                 switch (result.Type)
                 {
-                    case HitResult.None:
-                        break;
-
                     case HitResult.Miss:
+                    case HitResult.LargeTickMiss:
                         Combo.Value = 0;
                         break;
 
@@ -118,19 +133,15 @@ namespace osu.Game.Rulesets.Scoring
                 }
             }
 
-            if (result.Judgement.IsBonus)
-            {
-                if (result.IsHit)
-                    bonusScore += result.Judgement.NumericResultFor(result);
-            }
-            else
-            {
-                if (result.HasResult)
-                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
+            double scoreIncrease = result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
 
-                baseScore += result.Judgement.NumericResultFor(result);
+            if (!result.Type.IsBonus())
+            {
+                baseScore += scoreIncrease;
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
+
+            scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
 
             hitEvents.Add(CreateHitEvent(result));
             lastHitObject = result.HitObject;
@@ -154,19 +165,18 @@ namespace osu.Game.Rulesets.Scoring
             if (result.FailedAtJudgement)
                 return;
 
-            if (result.Judgement.IsBonus)
-            {
-                if (result.IsHit)
-                    bonusScore -= result.Judgement.NumericResultFor(result);
-            }
-            else
-            {
-                if (result.HasResult)
-                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
+            if (!result.Type.IsScorable())
+                return;
 
-                baseScore -= result.Judgement.NumericResultFor(result);
+            double scoreIncrease = result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
+
+            if (!result.Type.IsBonus())
+            {
+                baseScore -= scoreIncrease;
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
+
+            scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
 
             Debug.Assert(hitEvents.Count > 0);
             lastHitObject = hitEvents[^1].LastHitObject;
@@ -185,17 +195,41 @@ namespace osu.Game.Rulesets.Scoring
 
         private double getScore(ScoringMode mode)
         {
+            return GetScore(mode, maxAchievableCombo,
+                maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
+                maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1,
+                scoreResultCounts);
+        }
+
+        /// <summary>
+        /// Computes the total score.
+        /// </summary>
+        /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
+        /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
+        /// <param name="accuracyRatio">The accuracy percentage achieved by the player.</param>
+        /// <param name="comboRatio">The proportion of <paramref name="maxCombo"/> achieved by the player.</param>
+        /// <param name="statistics">Any statistics to be factored in.</param>
+        /// <returns>The total score.</returns>
+        public double GetScore(ScoringMode mode, int maxCombo, double accuracyRatio, double comboRatio, Dictionary<HitResult, int> statistics)
+        {
             switch (mode)
             {
                 default:
                 case ScoringMode.Standardised:
-                    return (max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore) * scoreMultiplier;
+                    double accuracyScore = accuracyPortion * accuracyRatio;
+                    double comboScore = comboPortion * comboRatio;
+
+                    return (max_score * (accuracyScore + comboScore) + getBonusScore(statistics)) * scoreMultiplier;
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo.Value - 1) * scoreMultiplier / 25);
+                    return getBonusScore(statistics) + (accuracyRatio * Math.Max(1, maxCombo) * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
             }
         }
+
+        private double getBonusScore(Dictionary<HitResult, int> statistics)
+            => statistics.GetOrDefault(HitResult.SmallBonus) * Judgement.SMALL_BONUS_SCORE
+               + statistics.GetOrDefault(HitResult.LargeBonus) * Judgement.LARGE_BONUS_SCORE;
 
         private ScoreRank rankFrom(double acc)
         {
@@ -231,19 +265,12 @@ namespace osu.Game.Rulesets.Scoring
 
             if (storeResults)
             {
-                maxHighestCombo = HighestCombo.Value;
+                maxAchievableCombo = HighestCombo.Value;
                 maxBaseScore = baseScore;
-
-                if (maxBaseScore == 0 || maxHighestCombo == 0)
-                {
-                    Mode.Value = ScoringMode.Classic;
-                    Mode.Disabled = true;
-                }
             }
 
             baseScore = 0;
             rollingMaxBaseScore = 0;
-            bonusScore = 0;
 
             TotalScore.Value = 0;
             Accuracy.Value = 1;
@@ -263,16 +290,14 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public virtual void PopulateScore(ScoreInfo score)
         {
-            score.TotalScore = (long)Math.Round(TotalScore.Value);
+            score.TotalScore = (long)Math.Round(GetStandardisedScore());
             score.Combo = Combo.Value;
             score.MaxCombo = HighestCombo.Value;
             score.Accuracy = Math.Round(Accuracy.Value, 4);
             score.Rank = Rank.Value;
             score.Date = DateTimeOffset.Now;
 
-            var hitWindows = CreateHitWindows();
-
-            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.IsScorable()))
                 score.Statistics[result] = GetStatistic(result);
 
             score.HitEvents = hitEvents;
@@ -281,6 +306,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Create a <see cref="HitWindows"/> for this processor.
         /// </summary>
+        [Obsolete("Method is now unused.")] // Can be removed 20210328
         public virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 
