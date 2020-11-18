@@ -43,10 +43,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             showResult(HitResult.Great);
 
             AddUntilStep("judgements shown", () => this.ChildrenOfType<TestDrawableOsuJudgement>().Any());
-            AddAssert("judgement body immediately visible",
-                () => this.ChildrenOfType<TestDrawableOsuJudgement>().All(judgement => judgement.JudgementBody.Alpha == 1));
             AddAssert("hit lighting hidden",
-                () => this.ChildrenOfType<TestDrawableOsuJudgement>().All(judgement => judgement.Lighting.Alpha == 0));
+                () => this.ChildrenOfType<TestDrawableOsuJudgement>().All(judgement => !judgement.Lighting.Transforms.Any()));
         }
 
         [Test]
@@ -57,10 +55,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             showResult(HitResult.Great);
 
             AddUntilStep("judgements shown", () => this.ChildrenOfType<TestDrawableOsuJudgement>().Any());
-            AddAssert("judgement body not immediately visible",
-                () => this.ChildrenOfType<TestDrawableOsuJudgement>().All(judgement => judgement.JudgementBody.Alpha > 0 && judgement.JudgementBody.Alpha < 1));
             AddAssert("hit lighting shown",
-                () => this.ChildrenOfType<TestDrawableOsuJudgement>().All(judgement => judgement.Lighting.Alpha > 0));
+                () => this.ChildrenOfType<TestDrawableOsuJudgement>().Any(judgement => judgement.Lighting.Transforms.Any()));
         }
 
         private void showResult(HitResult result)
