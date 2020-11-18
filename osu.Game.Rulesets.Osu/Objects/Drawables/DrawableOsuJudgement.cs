@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (hitLightingEnabled && Lighting.Drawable != null)
             {
+                // todo: this animation changes slightly based on new/old legacy skin versions.
                 Lighting.ScaleTo(0.8f).ScaleTo(1.2f, 600, Easing.Out);
                 Lighting.FadeIn(200).Then().Delay(200).FadeOut(1000);
 
