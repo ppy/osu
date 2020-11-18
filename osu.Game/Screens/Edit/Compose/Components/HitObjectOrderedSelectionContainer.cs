@@ -6,9 +6,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
+    /// <summary>
+    /// A container for <see cref="SelectionBlueprint"/> ordered by their <see cref="HitObject"/> start times.
+    /// </summary>
     public sealed class HitObjectOrderedSelectionContainer : Container<SelectionBlueprint>
     {
         public override void Add(SelectionBlueprint drawable)
