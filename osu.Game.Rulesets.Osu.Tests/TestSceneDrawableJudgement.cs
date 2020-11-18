@@ -89,7 +89,13 @@ namespace osu.Game.Rulesets.Osu.Tests
                         Children = new Drawable[]
                         {
                             pool,
-                            pool.Get(j => j.Apply(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null)).With(j =>
+                            pool.Get(j => j.Apply(new JudgementResult(new HitObject
+                            {
+                                StartTime = Time.Current
+                            }, new Judgement())
+                            {
+                                Type = result,
+                            }, null)).With(j =>
                             {
                                 j.Anchor = Anchor.Centre;
                                 j.Origin = Anchor.Centre;
