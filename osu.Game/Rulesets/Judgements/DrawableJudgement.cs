@@ -89,7 +89,6 @@ namespace osu.Game.Rulesets.Judgements
         /// </remarks>
         protected virtual void ApplyMissAnimations()
         {
-            this.Delay(600).FadeOut(200);
         }
 
         /// <summary>
@@ -111,33 +110,43 @@ namespace osu.Game.Rulesets.Judgements
 
             prepareDrawables();
 
-            // not sure if this should remain going forward.
-            skinnableJudgement.ResetAnimation();
+            LifetimeStart = Result.TimeAbsolute;
 
-            switch (Result.Type)
+            using (BeginAbsoluteSequence(Result.TimeAbsolute, true))
             {
-                case HitResult.None:
-                    break;
+                // not sure if this should remain going forward.
+                skinnableJudgement.ResetAnimation();
 
-                case HitResult.Miss:
-                    ApplyMissAnimations();
-                    break;
+                switch (Result.Type)
+                {
+                    case HitResult.None:
+                        break;
 
-                default:
-                    ApplyHitAnimations();
-                    break;
-            }
+                    case HitResult.Miss:
+                        ApplyMissAnimations();
+                        break;
 
-            if (skinnableJudgement.Drawable is IAnimatableJudgement animatable)
-            {
-                using (BeginAbsoluteSequence(Result.TimeAbsolute))
+                    default:
+                        ApplyHitAnimations();
+                        break;
+                }
+
+                if (skinnableJudgement.Drawable is IAnimatableJudgement animatable)
+                {
+                    var drawableAnimation = (Drawable)animatable;
+
+                    drawableAnimation.ClearTransforms();
+
                     animatable.PlayAnimation();
+
+                    drawableAnimation.Expire(true);
+
+                    // a derived version of DrawableJudgement may be adjusting lifetime.
+                    // if not adjusted (or the skinned portion requires greater bounds than calculated) use the skinned source's lifetime.
+                    if (LifetimeEnd == double.MaxValue || drawableAnimation.LifetimeEnd > LifetimeEnd)
+                        LifetimeEnd = drawableAnimation.LifetimeEnd;
+                }
             }
-
-            JudgementBody.Expire(true);
-
-            LifetimeStart = JudgementBody.LifetimeStart;
-            LifetimeEnd = JudgementBody.LifetimeEnd;
         }
 
         private HitResult? currentDrawableType;

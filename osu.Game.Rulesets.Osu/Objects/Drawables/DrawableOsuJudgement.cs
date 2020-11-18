@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Lighting.FadeIn(200).Then().Delay(200).FadeOut(1000);
 
                 // extend the lifetime to cover lighting fade
-                LifetimeEnd = 1400;
+                LifetimeEnd = Lighting.LatestTransformEndTime;
             }
 
             base.ApplyHitAnimations();
