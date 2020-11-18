@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -22,13 +23,18 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public AudioSection()
         {
-            Children = new Drawable[]
+            List<Drawable> children = new List<Drawable>();
+            children.Add(new AudioDevicesSettings());
+            children.Add(new VolumeSettings());
+            children.Add(new OffsetSettings());
+            if (!(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)))
             {
-                new AudioDevicesSettings(),
-                new VolumeSettings(),
-                new OffsetSettings(),
-                new MainMenuSettings()
-            };
+                // Adjusting latency is neither required nor supported on
+                // Windows and Mac.
+                children.Add(new LatencySettings());
+            }
+            children.Add(new MainMenuSettings());
+            Children = children;
         }
     }
 }
