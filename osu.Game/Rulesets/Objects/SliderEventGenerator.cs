@@ -10,14 +10,6 @@ namespace osu.Game.Rulesets.Objects
 {
     public static class SliderEventGenerator
     {
-        [Obsolete("Use the overload with cancellation support instead.")] // can be removed 20201115
-        // ReSharper disable once RedundantOverload.Global
-        public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount,
-                                                                  double? legacyLastTickOffset)
-        {
-            return Generate(startTime, spanDuration, velocity, tickDistance, totalDistance, spanCount, legacyLastTickOffset, default);
-        }
-
         // ReSharper disable once MethodOverloadWithOptionalParameter
         public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount,
                                                                   double? legacyLastTickOffset, CancellationToken cancellationToken = default)

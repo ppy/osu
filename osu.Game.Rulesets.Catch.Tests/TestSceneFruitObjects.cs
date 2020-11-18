@@ -18,71 +18,42 @@ namespace osu.Game.Rulesets.Catch.Tests
             base.LoadComplete();
 
             foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
-                AddStep($"show {rep}", () => SetContents(() => createDrawable(rep)));
+                AddStep($"show {rep}", () => SetContents(() => createDrawableFruit(rep)));
 
             AddStep("show droplet", () => SetContents(() => createDrawableDroplet()));
             AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
 
             foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
-                AddStep($"show hyperdash {rep}", () => SetContents(() => createDrawable(rep, true)));
+                AddStep($"show hyperdash {rep}", () => SetContents(() => createDrawableFruit(rep, true)));
 
             AddStep("show hyperdash droplet", () => SetContents(() => createDrawableDroplet(true)));
         }
 
-        private Drawable createDrawableTinyDroplet()
+        private Drawable createDrawableFruit(FruitVisualRepresentation rep, bool hyperdash = false) =>
+            setProperties(new DrawableFruit(new TestCatchFruit(rep)), hyperdash);
+
+        private Drawable createDrawableDroplet(bool hyperdash = false) => setProperties(new DrawableDroplet(new Droplet()), hyperdash);
+
+        private Drawable createDrawableTinyDroplet() => setProperties(new DrawableTinyDroplet(new TinyDroplet()));
+
+        private DrawableCatchHitObject setProperties(DrawableCatchHitObject d, bool hyperdash = false)
         {
-            var droplet = new TestCatchTinyDroplet
-            {
-                Scale = 1.5f,
-            };
+            var hitObject = d.HitObject;
+            hitObject.StartTime = 1000000000000;
+            hitObject.Scale = 1.5f;
 
-            return new DrawableTinyDroplet(droplet)
-            {
-                Anchor = Anchor.Centre,
-                RelativePositionAxes = Axes.None,
-                Position = Vector2.Zero,
-                Alpha = 1,
-                LifetimeStart = double.NegativeInfinity,
-                LifetimeEnd = double.PositiveInfinity,
-            };
-        }
+            if (hyperdash)
+                hitObject.HyperDashTarget = new Banana();
 
-        private Drawable createDrawableDroplet(bool hyperdash = false)
-        {
-            var droplet = new TestCatchDroplet
+            d.Anchor = Anchor.Centre;
+            d.RelativePositionAxes = Axes.None;
+            d.Position = Vector2.Zero;
+            d.HitObjectApplied += _ =>
             {
-                Scale = 1.5f,
-                HyperDashTarget = hyperdash ? new Banana() : null
+                d.LifetimeStart = double.NegativeInfinity;
+                d.LifetimeEnd = double.PositiveInfinity;
             };
-
-            return new DrawableDroplet(droplet)
-            {
-                Anchor = Anchor.Centre,
-                RelativePositionAxes = Axes.None,
-                Position = Vector2.Zero,
-                Alpha = 1,
-                LifetimeStart = double.NegativeInfinity,
-                LifetimeEnd = double.PositiveInfinity,
-            };
-        }
-
-        private Drawable createDrawable(FruitVisualRepresentation rep, bool hyperdash = false)
-        {
-            Fruit fruit = new TestCatchFruit(rep)
-            {
-                Scale = 1.5f,
-                HyperDashTarget = hyperdash ? new Banana() : null
-            };
-
-            return new DrawableFruit(fruit)
-            {
-                Anchor = Anchor.Centre,
-                RelativePositionAxes = Axes.None,
-                Position = Vector2.Zero,
-                Alpha = 1,
-                LifetimeStart = double.NegativeInfinity,
-                LifetimeEnd = double.PositiveInfinity,
-            };
+            return d;
         }
 
         public class TestCatchFruit : Fruit
@@ -90,26 +61,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             public TestCatchFruit(FruitVisualRepresentation rep)
             {
                 VisualRepresentation = rep;
-                StartTime = 1000000000000;
             }
 
             public override FruitVisualRepresentation VisualRepresentation { get; }
-        }
-
-        public class TestCatchDroplet : Droplet
-        {
-            public TestCatchDroplet()
-            {
-                StartTime = 1000000000000;
-            }
-        }
-
-        public class TestCatchTinyDroplet : TinyDroplet
-        {
-            public TestCatchTinyDroplet()
-            {
-                StartTime = 1000000000000;
-            }
         }
     }
 }
