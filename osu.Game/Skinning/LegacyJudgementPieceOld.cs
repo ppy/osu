@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
@@ -10,20 +11,21 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyJudgementPiece : CompositeDrawable, IAnimatableJudgement
+    public class LegacyJudgementPieceOld : CompositeDrawable, IAnimatableJudgement
     {
         private readonly HitResult result;
 
-        private bool hasParticle;
+        private readonly float finalScale;
 
-        public LegacyJudgementPiece(HitResult result, Drawable drawable)
+        public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f)
         {
             this.result = result;
+            this.finalScale = finalScale;
 
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
 
-            InternalChild = drawable;
+            InternalChild = createMainDrawable();
         }
 
         public virtual void PlayAnimation()
@@ -39,8 +41,6 @@ namespace osu.Game.Skinning
             if (animation?.FrameCount > 1)
                 return;
 
-            const double animation_length = 500;
-
             switch (result)
             {
                 case HitResult.Miss:
@@ -53,19 +53,14 @@ namespace osu.Game.Skinning
                     break;
 
                 default:
-                    if (!hasParticle)
-                    {
-                        this.ScaleTo(0.6f).Then()
-                            .ScaleTo(1.1f, animation_length * 0.8f).Then()
-                            .ScaleTo(0.9f, animation_length * 0.4f).Then()
-                            .ScaleTo(1f, animation_length * 0.2f);
-                    }
-                    else
-                    {
-                        this.ScaleTo(0.9f);
-                        this.ScaleTo(1.05f, animation_length);
-                    }
+                    const double animation_length = 120;
 
+                    this.ScaleTo(0.6f).Then()
+                        .ScaleTo(1.1f, animation_length * 0.8f).Then()
+                        // this is actually correct to match stable; there were overlapping transforms.
+                        .ScaleTo(0.9f).Delay(animation_length * 0.2f)
+                        .ScaleTo(1.1f).ScaleTo(0.9f, animation_length * 0.2f).Then()
+                        .ScaleTo(0.95f).ScaleTo(finalScale, animation_length * 0.2f);
                     break;
             }
         }
