@@ -19,15 +19,14 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
-        protected override double FadeInDuration => 50;
-
         protected override void ApplyHitAnimations()
         {
             JudgementBody.ScaleTo(0.8f);
             JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
 
-            JudgementBody.Delay(FadeInDuration).ScaleTo(0.75f, 250);
-            this.Delay(FadeInDuration).FadeOut(200);
+            JudgementBody.Delay(50)
+                         .ScaleTo(0.75f, 250)
+                         .FadeOut(200);
         }
 
         protected override Drawable CreateDefaultJudgement(HitResult result) => new ManiaJudgementPiece(result);

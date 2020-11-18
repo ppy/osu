@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -32,11 +33,13 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// Duration of initial fade in.
         /// </summary>
+        [Obsolete("Apply any animations manually via ApplyHitAnimations / ApplyMissAnimations. Defaults were moved inside skinned components.")]
         protected virtual double FadeInDuration => 100;
 
         /// <summary>
         /// Duration to wait until fade out begins. Defaults to <see cref="FadeInDuration"/>.
         /// </summary>
+        [Obsolete("Apply any animations manually via ApplyHitAnimations / ApplyMissAnimations. Defaults were moved inside skinned components.")]
         protected virtual double FadeOutDelay => FadeInDuration;
 
         /// <summary>
@@ -73,7 +76,6 @@ namespace osu.Game.Rulesets.Judgements
         /// </remarks>
         protected virtual void ApplyHitAnimations()
         {
-            this.Delay(FadeOutDelay).FadeOut(400);
         }
 
         /// <summary>
@@ -112,8 +114,6 @@ namespace osu.Game.Rulesets.Judgements
             // not sure if this should remain going forward.
             skinnableJudgement.ResetAnimation();
 
-            this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
-
             switch (Result.Type)
             {
                 case HitResult.None:
@@ -134,7 +134,10 @@ namespace osu.Game.Rulesets.Judgements
                     animatable.PlayAnimation();
             }
 
-            Expire(true);
+            JudgementBody.Expire(true);
+
+            LifetimeStart = JudgementBody.LifetimeStart;
+            LifetimeEnd = JudgementBody.LifetimeEnd;
         }
 
         private HitResult? currentDrawableType;
