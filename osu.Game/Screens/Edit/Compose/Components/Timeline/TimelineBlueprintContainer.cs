@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (lastDragEvent != null)
                 OnDrag(lastDragEvent);
 
-            if (Composer != null)
+            if (Composer != null && timeline != null)
             {
                 Composer.Playfield.PastLifetimeExtension = timeline.VisibleRange / 2;
                 Composer.Playfield.FutureLifetimeExtension = timeline.VisibleRange / 2;
@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public TimelineSelectionBlueprintContainer()
             {
-                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
+                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
             }
         }
     }

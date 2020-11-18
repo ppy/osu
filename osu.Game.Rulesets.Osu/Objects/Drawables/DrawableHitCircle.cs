@@ -180,6 +180,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     this.Delay(800).FadeOut();
                     break;
             }
+
+            Expire();
         }
 
         public Drawable ProxiedLayer => ApproachCircle;

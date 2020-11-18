@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Edit.Timing
                 controlPointGroups.BindCollectionChanged((sender, args) =>
                 {
                     table.ControlGroups = controlPointGroups;
-                    changeHandler.SaveState();
+                    changeHandler?.SaveState();
                 }, true);
             }
 

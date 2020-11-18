@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "在休息时段使背景变量",
+                    LabelText = "在休息时段使背景变亮",
                     Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
                 },
                 new SettingsEnumDropdown<HUDVisibilityMode>
