@@ -12,6 +12,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
+        private readonly PlayerSettingsDropdown<HUDVisibilityMode> hudVisibilityModeDropdown;
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
@@ -39,6 +40,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
                 new OsuSpriteText
                 {
+                    Text = "HUD Visibility:"
+                },
+                hudVisibilityModeDropdown = new PlayerSettingsDropdown<HUDVisibilityMode>
+                {
+                    RelativeSizeAxes = Axes.X
+                },
+                new OsuSpriteText
+                {
                     Text = "Toggles:"
                 },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboard / Video" },
@@ -52,6 +61,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             dimSliderBar.Current = config.GetBindable<double>(OsuSetting.DimLevel);
             blurSliderBar.Current = config.GetBindable<double>(OsuSetting.BlurLevel);
+            hudVisibilityModeDropdown.Current = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
             showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
