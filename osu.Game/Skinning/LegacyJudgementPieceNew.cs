@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -53,9 +54,14 @@ namespace osu.Game.Skinning
 
             animation?.GotoFrame(0);
 
-            this.RotateTo(0);
-            this.MoveTo(Vector2.Zero);
+            const double fade_in_length = 120;
+            const double fade_out_delay = 500;
+            const double fade_out_length = 600;
 
+            this.FadeInFromZero(fade_in_length);
+            this.Delay(fade_out_delay).FadeOut(fade_out_length);
+
+            // new style non-miss judgements show the original style temporarily, with additive colour.
             if (temporaryOldStyle != null)
             {
                 temporaryOldStyle.PlayAnimation();
@@ -73,19 +79,23 @@ namespace osu.Game.Skinning
             switch (result)
             {
                 case HitResult.Miss:
-                    mainPiece.ScaleTo(1.6f);
-                    mainPiece.ScaleTo(1, 100, Easing.In);
+                    this.ScaleTo(1.6f);
+                    this.ScaleTo(1, 100, Easing.In);
 
-                    mainPiece.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+                    //todo: this only applies to osu! ruleset apparently.
+                    this.MoveTo(new Vector2(0, -2));
+                    this.MoveToOffset(new Vector2(0, 20), fade_out_delay + fade_out_length, Easing.In);
 
-                    mainPiece.RotateTo(40, 800, Easing.InQuint);
+                    float rotation = RNG.NextSingle(-8.6f, 8.6f);
+
+                    this.RotateTo(0);
+                    this.RotateTo(rotation, fade_in_length)
+                        .Then().RotateTo(rotation * 2, fade_out_delay + fade_out_length - fade_in_length, Easing.In);
                     break;
 
                 default:
-                    const double animation_length = 1100;
-
                     mainPiece.ScaleTo(0.9f);
-                    mainPiece.ScaleTo(1.05f, animation_length);
+                    mainPiece.ScaleTo(1.05f, fade_out_delay + fade_out_length);
                     break;
             }
         }

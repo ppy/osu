@@ -5,9 +5,9 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -34,8 +34,12 @@ namespace osu.Game.Skinning
 
             animation?.GotoFrame(0);
 
-            this.RotateTo(0);
-            this.MoveTo(Vector2.Zero);
+            const double fade_in_length = 120;
+            const double fade_out_delay = 500;
+            const double fade_out_length = 600;
+
+            this.FadeInFromZero(fade_in_length);
+            this.Delay(fade_out_delay).FadeOut(fade_out_length);
 
             // legacy judgements don't play any transforms if they are an animation.
             if (animation?.FrameCount > 1)
@@ -47,20 +51,21 @@ namespace osu.Game.Skinning
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
-                    this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+                    float rotation = RNG.NextSingle(-8.6f, 8.6f);
 
-                    this.RotateTo(40, 800, Easing.InQuint);
+                    this.RotateTo(0);
+                    this.RotateTo(rotation, fade_in_length)
+                        .Then().RotateTo(rotation * 2, fade_out_delay + fade_out_length - fade_in_length, Easing.In);
                     break;
 
                 default:
-                    const double animation_length = 120;
 
                     this.ScaleTo(0.6f).Then()
-                        .ScaleTo(1.1f, animation_length * 0.8f).Then()
+                        .ScaleTo(1.1f, fade_in_length * 0.8f).Then()
                         // this is actually correct to match stable; there were overlapping transforms.
-                        .ScaleTo(0.9f).Delay(animation_length * 0.2f)
-                        .ScaleTo(1.1f).ScaleTo(0.9f, animation_length * 0.2f).Then()
-                        .ScaleTo(0.95f).ScaleTo(finalScale, animation_length * 0.2f);
+                        .ScaleTo(0.9f).Delay(fade_in_length * 0.2f)
+                        .ScaleTo(1.1f).ScaleTo(0.9f, fade_in_length * 0.2f).Then()
+                        .ScaleTo(0.95f).ScaleTo(finalScale, fade_in_length * 0.2f);
                     break;
             }
         }
