@@ -139,12 +139,14 @@ namespace osu.Game.Rulesets.Judgements
 
                     animatable.PlayAnimation();
 
-                    drawableAnimation.Expire(true);
-
                     // a derived version of DrawableJudgement may be adjusting lifetime.
                     // if not adjusted (or the skinned portion requires greater bounds than calculated) use the skinned source's lifetime.
-                    if (LifetimeEnd == double.MaxValue || drawableAnimation.LifetimeEnd > LifetimeEnd)
-                        LifetimeEnd = drawableAnimation.LifetimeEnd;
+                    double lastTransformTime = drawableAnimation.LatestTransformEndTime;
+
+                    if (LifetimeEnd == double.MaxValue || lastTransformTime > LifetimeEnd)
+                    {
+                        LifetimeEnd = lastTransformTime;
+                    }
                 }
             }
         }
