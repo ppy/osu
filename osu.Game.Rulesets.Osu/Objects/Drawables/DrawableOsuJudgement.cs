@@ -44,26 +44,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        private double fadeOutDelay;
-        protected override double FadeOutDelay => fadeOutDelay;
-
         protected override void ApplyHitAnimations()
         {
             bool hitLightingEnabled = config.Get<bool>(OsuSetting.HitLighting);
 
             if (hitLightingEnabled)
             {
-                JudgementBody.FadeIn().Delay(FadeInDuration).FadeOut(400);
-
                 Lighting.ScaleTo(0.8f).ScaleTo(1.2f, 600, Easing.Out);
                 Lighting.FadeIn(200).Then().Delay(200).FadeOut(1000);
-            }
-            else
-            {
-                JudgementBody.Alpha = 1;
-            }
 
-            fadeOutDelay = hitLightingEnabled ? 1400 : base.FadeOutDelay;
+                // extend the lifetime to cover lighting fade
+                LifetimeEnd = 1400;
+            }
 
             base.ApplyHitAnimations();
         }
