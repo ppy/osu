@@ -371,25 +371,34 @@ namespace osu.Game.Skinning
                 }
 
                 case GameplaySkinComponent<HitResult> resultComponent:
-                    switch (resultComponent.Component)
-                    {
-                        case HitResult.Miss:
-                            return this.GetAnimation("hit0", true, false);
-
-                        case HitResult.Meh:
-                            return this.GetAnimation("hit50", true, false);
-
-                        case HitResult.Ok:
-                            return this.GetAnimation("hit100", true, false);
-
-                        case HitResult.Great:
-                            return this.GetAnimation("hit300", true, false);
-                    }
+                    var drawable = getJudgementAnimation(resultComponent.Component);
+                    if (drawable != null)
+                        return new LegacyJudgementPiece(resultComponent.Component, drawable);
 
                     break;
             }
 
             return this.GetAnimation(component.LookupName, false, false);
+        }
+
+        private Drawable getJudgementAnimation(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Miss:
+                    return this.GetAnimation("hit0", true, false);
+
+                case HitResult.Meh:
+                    return this.GetAnimation("hit50", true, false);
+
+                case HitResult.Ok:
+                    return this.GetAnimation("hit100", true, false);
+
+                case HitResult.Great:
+                    return this.GetAnimation("hit300", true, false);
+            }
+
+            return null;
         }
 
         public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)

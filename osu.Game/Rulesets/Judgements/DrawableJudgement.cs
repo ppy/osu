@@ -3,18 +3,14 @@
 
 using System.Diagnostics;
 using JetBrains.Annotations;
-using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Judgements
 {
@@ -25,16 +21,13 @@ namespace osu.Game.Rulesets.Judgements
     {
         private const float judgement_size = 128;
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         public JudgementResult Result { get; private set; }
+
         public DrawableHitObject JudgedObject { get; private set; }
 
         protected Container JudgementBody { get; private set; }
-        protected SpriteText JudgementText { get; private set; }
 
-        private SkinnableDrawable bodyDrawable;
+        private SkinnableDrawable skinnableJudgement;
 
         /// <summary>
         /// Duration of initial fade in.
@@ -69,15 +62,40 @@ namespace osu.Game.Rulesets.Judgements
             prepareDrawables();
         }
 
+        /// <summary>
+        /// Apply top-level animations to the current judgement when successfully hit.
+        /// Generally used for fading, defaulting to a simple fade out based on <see cref="FadeOutDelay"/>.
+        /// This will be used to calculate the lifetime of the judgement.
+        /// </summary>
+        /// <remarks>
+        /// For animating the actual "default skin" judgement itself, it is recommended to use <see cref="CreateDefaultJudgement"/>.
+        /// This allows applying animations which don't affect custom skins.
+        /// </remarks>
         protected virtual void ApplyHitAnimations()
         {
-            JudgementBody.ScaleTo(0.9f);
-            JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
-
             this.Delay(FadeOutDelay).FadeOut(400);
         }
 
-        public virtual void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
+        /// <summary>
+        /// Apply top-level animations to the current judgement when missed.
+        /// Generally used for fading, defaulting to a simple fade out based on <see cref="FadeOutDelay"/>.
+        /// This will be used to calculate the lifetime of the judgement.
+        /// </summary>
+        /// <remarks>
+        /// For animating the actual "default skin" judgement itself, it is recommended to use <see cref="CreateDefaultJudgement"/>.
+        /// This allows applying animations which don't affect custom skins.
+        /// </remarks>
+        protected virtual void ApplyMissAnimations()
+        {
+            this.Delay(600).FadeOut(200);
+        }
+
+        /// <summary>
+        /// Associate a new result / object with this judgement. Should be called when retrieving a judgement from a pool.
+        /// </summary>
+        /// <param name="result">The applicable judgement.</param>
+        /// <param name="judgedObject">The drawable object.</param>
+        public void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
         {
             Result = result;
             JudgedObject = judgedObject;
@@ -91,12 +109,10 @@ namespace osu.Game.Rulesets.Judgements
 
             prepareDrawables();
 
-            bodyDrawable.ResetAnimation();
+            // not sure if this should remain going forward.
+            skinnableJudgement.ResetAnimation();
 
             this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
-            JudgementBody.ScaleTo(1);
-            JudgementBody.RotateTo(0);
-            JudgementBody.MoveTo(Vector2.Zero);
 
             switch (Result.Type)
             {
@@ -104,18 +120,18 @@ namespace osu.Game.Rulesets.Judgements
                     break;
 
                 case HitResult.Miss:
-                    JudgementBody.ScaleTo(1.6f);
-                    JudgementBody.ScaleTo(1, 100, Easing.In);
-
-                    JudgementBody.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
-                    JudgementBody.RotateTo(40, 800, Easing.InQuint);
-
-                    this.Delay(600).FadeOut(200);
+                    ApplyMissAnimations();
                     break;
 
                 default:
                     ApplyHitAnimations();
                     break;
+            }
+
+            if (skinnableJudgement.Drawable is IAnimatableJudgement animatable)
+            {
+                using (BeginAbsoluteSequence(Result.TimeAbsolute))
+                    animatable.PlayAnimation();
             }
 
             Expire(true);
@@ -127,6 +143,7 @@ namespace osu.Game.Rulesets.Judgements
         {
             var type = Result?.Type ?? HitResult.Perfect; //TODO: better default type from ruleset
 
+            // todo: this should be removed once judgements are always pooled.
             if (type == currentDrawableType)
                 return;
 
@@ -139,16 +156,13 @@ namespace osu.Game.Rulesets.Judgements
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Child = bodyDrawable = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ => JudgementText = new OsuSpriteText
-                {
-                    Text = type.GetDescription().ToUpperInvariant(),
-                    Font = OsuFont.Numeric.With(size: 20),
-                    Colour = colours.ForHitResult(type),
-                    Scale = new Vector2(0.85f, 1),
-                }, confineMode: ConfineMode.NoScaling)
+                Child = skinnableJudgement = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ =>
+                    CreateDefaultJudgement(type), confineMode: ConfineMode.NoScaling)
             });
 
             currentDrawableType = type;
         }
+
+        protected virtual Drawable CreateDefaultJudgement(HitResult result) => new DefaultJudgementPiece(result);
     }
 }
