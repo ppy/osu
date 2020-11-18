@@ -166,13 +166,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             p.LastObjectCenteredBetweenNeighbours = true;
 
-            var normalizedPosNeg2 = -p.SecondLastToLast.Value.RelativeVector / p.SecondLastToLast.Value.TimeDelta * p.LastToCurrent.TimeDelta;
-            double xNeg2 = normalizedPosNeg2.DotProduct(p.LastToCurrent.RelativeVector) / p.LastToCurrent.RelativeLength;
-            double yNeg2 = (normalizedPosNeg2 - xNeg2 * p.LastToCurrent.RelativeVector / p.LastToCurrent.RelativeLength).L2Norm();
+            // rescale SecondLastToLast so that it's comparable timescale-wise to LastToCurrent
+            var timeNormalisedSecondLastToLast = -p.SecondLastToLast.Value.RelativeVector / p.SecondLastToLast.Value.TimeDelta * p.LastToCurrent.TimeDelta;
+            // transform secondLastObject to coordinates anchored in lastObject
+            double secondLastTransformedX = timeNormalisedSecondLastToLast.DotProduct(p.LastToCurrent.RelativeVector) / p.LastToCurrent.RelativeLength;
+            double secondLastTransformedY = (timeNormalisedSecondLastToLast - secondLastTransformedX * p.LastToCurrent.RelativeVector / p.LastToCurrent.RelativeLength).L2Norm();
 
-            double correctionNeg2Flow = AngleCorrection.FLOW_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
-            double correctionNeg2Snap = AngleCorrection.SNAP_NEG2.Evaluate(p.LastToCurrent.RelativeLength, xNeg2, yNeg2);
-            double correctionNeg2Stop = SpecialFunctions.Logistic(10 * Math.Sqrt(xNeg2 * xNeg2 + yNeg2 * yNeg2 + 1) - 12);
+            double correctionNeg2Flow = AngleCorrection.FLOW_NEG2.Evaluate(p.LastToCurrent.RelativeLength, secondLastTransformedX, secondLastTransformedY);
+            double correctionNeg2Snap = AngleCorrection.SNAP_NEG2.Evaluate(p.LastToCurrent.RelativeLength, secondLastTransformedX, secondLastTransformedY);
+            double correctionNeg2Stop = SpecialFunctions.Logistic(10 * Math.Sqrt(secondLastTransformedX * secondLastTransformedX + secondLastTransformedY * secondLastTransformedY + 1) - 12);
 
             p.SecondLastToCurrentFlowiness = SpecialFunctions.Logistic((correctionNeg2Snap - correctionNeg2Flow - 0.05) * 20);
 

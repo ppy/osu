@@ -102,24 +102,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             correctionInterpolator = new TricubicInterpolator(currentMovementDistance, otherMovementDistance, angles, values, dzLower: 0, dzUpper: 0);
         }
 
-        public double Evaluate(double distance1, double x, double y)
+        /// <summary>
+        /// Evaluates the angle correction of a movement between three objects.
+        /// </summary>
+        /// <remarks>
+        /// This method presumes that in the Cartesian 2D coordinates:
+        /// <list type="bullet">
+        /// <item>the first object is placed at (<paramref name="firstX"/>, <paramref name="firstY"/>),</item>
+        /// <item>the second object is placed at (0, 0),</item>
+        /// <item>the third object is placed at (<paramref name="thirdX"/>, 0).</item>
+        /// </list>
+        /// </remarks>
+        public double Evaluate(double thirdX, double firstX, double firstY)
         {
             if (otherMovementScalingFactor != null)
             {
                 // we want to scale the other movement's length up by the given factor,
                 // so to fit the nodes given in the arrays below we actually need to scale the function argument *down* by the inverse.
-                double scalingFactor = 1 / otherMovementScalingFactor(distance1);
-                (x, y) = (scalingFactor * x, scalingFactor * y);
+                double scalingFactor = 1 / otherMovementScalingFactor(thirdX);
+                (firstX, firstY) = (scalingFactor * firstX, scalingFactor * firstY);
             }
 
-            double angle = Math.Abs(Math.Atan2(y, x));
-            double distance2 = Math.Sqrt(x * x + y * y);
-            double maxVal = maximumCorrection?.Evaluate(distance1) ?? 1;
-            double minVal = minimumCorrection?.Evaluate(distance1) ?? 0;
+            double angle = Math.Abs(Math.Atan2(firstY, firstX));
+            double distance2 = Math.Sqrt(firstX * firstX + firstY * firstY);
+            double maxVal = maximumCorrection?.Evaluate(thirdX) ?? 1;
+            double minVal = minimumCorrection?.Evaluate(thirdX) ?? 0;
 
             // rescale the correction onto the interval [minVal, maxVal]
             double scale = maxVal - minVal;
-            return minVal + scale * Math.Clamp(correctionInterpolator.Evaluate(distance1, distance2, angle), 0, 1);
+            return minVal + scale * Math.Clamp(correctionInterpolator.Evaluate(thirdX, distance2, angle), 0, 1);
         }
 
         /// <summary>
