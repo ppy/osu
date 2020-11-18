@@ -139,7 +139,7 @@ namespace osu.Desktop
 
                 // SDL2 DesktopWindow
                 case DesktopWindow desktopWindow:
-                    desktopWindow.CursorState.Value |= CursorState.Hidden;
+                    desktopWindow.CursorState |= CursorState.Hidden;
                     desktopWindow.SetIconFromStream(iconStream);
                     desktopWindow.Title = Name;
                     desktopWindow.DragDrop += f => fileDrop(new[] { f });
