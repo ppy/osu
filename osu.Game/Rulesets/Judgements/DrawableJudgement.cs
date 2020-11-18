@@ -90,8 +90,7 @@ namespace osu.Game.Rulesets.Judgements
 
         /// <summary>
         /// Apply top-level animations to the current judgement when successfully hit.
-        /// Generally used for fading, defaulting to a simple fade out based on <see cref="FadeOutDelay"/>.
-        /// This will be used to calculate the lifetime of the judgement.
+        /// If displaying components which require lifetime extensions, manually adjusting <see cref="Drawable.LifetimeEnd"/> is required.
         /// </summary>
         /// <remarks>
         /// For animating the actual "default skin" judgement itself, it is recommended to use <see cref="CreateDefaultJudgement"/>.
@@ -103,8 +102,7 @@ namespace osu.Game.Rulesets.Judgements
 
         /// <summary>
         /// Apply top-level animations to the current judgement when missed.
-        /// Generally used for fading, defaulting to a simple fade out based on <see cref="FadeOutDelay"/>.
-        /// This will be used to calculate the lifetime of the judgement.
+        /// If displaying components which require lifetime extensions, manually adjusting <see cref="Drawable.LifetimeEnd"/> is required.
         /// </summary>
         /// <remarks>
         /// For animating the actual "default skin" judgement itself, it is recommended to use <see cref="CreateDefaultJudgement"/>.
