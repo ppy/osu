@@ -218,9 +218,6 @@ namespace osu.Game.Rulesets.UI
 
         #region Pooling support
 
-        [Resolved(CanBeNull = true)]
-        private IPooledHitObjectProvider parentPooledObjectProvider { get; set; }
-
         private readonly Dictionary<Type, IDrawablePool> pools = new Dictionary<Type, IDrawablePool>();
 
         /// <summary>
@@ -320,10 +317,7 @@ namespace osu.Game.Rulesets.UI
                 }
             }
 
-            if (pool == null)
-                return parentPooledObjectProvider?.GetPooledDrawableRepresentation(hitObject);
-
-            return (DrawableHitObject)pool.Get(d =>
+            return (DrawableHitObject)pool?.Get(d =>
             {
                 var dho = (DrawableHitObject)d;
 
