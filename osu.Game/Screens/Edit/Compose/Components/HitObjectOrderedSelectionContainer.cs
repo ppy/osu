@@ -9,14 +9,12 @@ using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class SelectionBlueprintContainer : Container<SelectionBlueprint>
+    public sealed class HitObjectOrderedSelectionContainer : Container<SelectionBlueprint>
     {
         public override void Add(SelectionBlueprint drawable)
         {
             base.Add(drawable);
-
-            if (Content == this)
-                bindStartTime(drawable);
+            bindStartTime(drawable);
         }
 
         public override bool Remove(SelectionBlueprint drawable)
@@ -24,8 +22,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!base.Remove(drawable))
                 return false;
 
-            if (Content == this)
-                unbindStartTime(drawable);
+            unbindStartTime(drawable);
             return true;
         }
 
@@ -65,8 +62,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override int Compare(Drawable x, Drawable y)
         {
-            if (!(x is SelectionBlueprint xObj) || !(y is SelectionBlueprint yObj))
-                return base.Compare(x, y);
+            var xObj = (SelectionBlueprint)x;
+            var yObj = (SelectionBlueprint)y;
 
             // Put earlier blueprints towards the end of the list, so they handle input first
             int i = yObj.HitObject.StartTime.CompareTo(xObj.HitObject.StartTime);

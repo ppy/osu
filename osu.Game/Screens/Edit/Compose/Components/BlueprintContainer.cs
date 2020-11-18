@@ -118,8 +118,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        protected virtual SelectionBlueprintContainer CreateSelectionBlueprintContainer() =>
-            new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
+        protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both };
 
         /// <summary>
         /// Creates a <see cref="Components.SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
