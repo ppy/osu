@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             bool hitLightingEnabled = config.Get<bool>(OsuSetting.HitLighting);
 
-            if (hitLightingEnabled)
+            if (hitLightingEnabled && Lighting.Drawable != null)
             {
                 Lighting.ScaleTo(0.8f).ScaleTo(1.2f, 600, Easing.Out);
                 Lighting.FadeIn(200).Then().Delay(200).FadeOut(1000);
