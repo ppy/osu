@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         new OsuSpriteText
                         {
                             Text = Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20)
                         },
                         new OsuSpriteText
                         {

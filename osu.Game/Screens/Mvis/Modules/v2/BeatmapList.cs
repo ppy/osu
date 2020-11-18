@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class BeatmapList : VisibilityContainer
+    public class BeatmapList : CompositeDrawable
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public void ClearList() =>
             fillFlow.Clear();
 
-        protected override void PopIn()
+        public override void Show()
         {
             this.FadeIn(250);
 
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             working.TriggerChange();
         }
 
-        protected override void PopOut()
+        public override void Hide()
         {
             this.FadeOut(250);
         }

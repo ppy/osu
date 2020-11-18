@@ -130,7 +130,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                         {
                                             Font = OsuFont.GetFont(size: 30),
                                             RelativeSizeAxes = Axes.X,
-                                            Text = "???"
+                                            Text = "???",
+                                            Truncate = true,
                                         },
                                         collectionBeatmapCount = new OsuSpriteText
                                         {

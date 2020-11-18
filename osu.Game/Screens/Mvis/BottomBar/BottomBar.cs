@@ -21,13 +21,13 @@ namespace osu.Game.Screens.Mvis.BottomBar
 
         protected override bool OnHover(Framework.Input.Events.HoverEvent e)
         {
-            this.Hovered.Value = true;
+            Hovered.Value = true;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(Framework.Input.Events.HoverLostEvent e)
         {
-            this.Hovered.Value = false;
+            Hovered.Value = false;
             base.OnHoverLost(e);
         }
     }

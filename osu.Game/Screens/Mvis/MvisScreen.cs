@@ -303,7 +303,6 @@ namespace osu.Game.Screens.Mvis
                                                                 songProgressButton = new SongProgressButton
                                                                 {
                                                                     TooltipText = "切换暂停",
-                                                                    AutoSizeAxes = Axes.X,
                                                                     Action = togglePause,
                                                                     Anchor = Anchor.Centre,
                                                                     Origin = Anchor.Centre,

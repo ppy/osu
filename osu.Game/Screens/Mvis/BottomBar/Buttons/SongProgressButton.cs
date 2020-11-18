@@ -1,5 +1,6 @@
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Skinning;
 
@@ -22,6 +23,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         public SongProgressButton()
         {
             TooltipText = "切换暂停";
+            AutoSizeAxes = Axes.X;
             NoIcon = true;
         }
 
