@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private class TestDrawableOsuJudgement : DrawableOsuJudgement
         {
             public new SkinnableSprite Lighting => base.Lighting;
-            public new Container JudgementBody => base.JudgementBody;
+            public new SkinnableDrawable JudgementBody => base.JudgementBody;
         }
     }
 }

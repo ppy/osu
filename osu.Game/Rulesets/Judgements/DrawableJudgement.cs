@@ -6,7 +6,6 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -26,11 +25,9 @@ namespace osu.Game.Rulesets.Judgements
 
         public DrawableHitObject JudgedObject { get; private set; }
 
-        protected Container JudgementBody { get; private set; }
-
         public override bool RemoveCompletedTransforms => false;
 
-        private SkinnableDrawable skinnableJudgement;
+        protected SkinnableDrawable JudgementBody { get; private set; }
 
         [Resolved]
         private ISkinSource skinSource { get; set; }
@@ -147,7 +144,7 @@ namespace osu.Game.Rulesets.Judgements
             using (BeginAbsoluteSequence(Result.TimeAbsolute, true))
             {
                 // not sure if this should remain going forward.
-                skinnableJudgement.ResetAnimation();
+                JudgementBody.ResetAnimation();
 
                 switch (Result.Type)
                 {
@@ -163,7 +160,7 @@ namespace osu.Game.Rulesets.Judgements
                         break;
                 }
 
-                if (skinnableJudgement.Drawable is IAnimatableJudgement animatable)
+                if (JudgementBody.Drawable is IAnimatableJudgement animatable)
                 {
                     var drawableAnimation = (Drawable)animatable;
 
@@ -192,13 +189,11 @@ namespace osu.Game.Rulesets.Judgements
             if (JudgementBody != null)
                 RemoveInternal(JudgementBody);
 
-            AddInternal(JudgementBody = new Container
+            AddInternal(JudgementBody = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ =>
+                CreateDefaultJudgement(type), confineMode: ConfineMode.NoScaling)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Child = skinnableJudgement = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ =>
-                    CreateDefaultJudgement(type), confineMode: ConfineMode.NoScaling)
             });
 
             currentDrawableType = type;
