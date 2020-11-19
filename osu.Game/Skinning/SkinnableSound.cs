@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -38,16 +39,21 @@ namespace osu.Game.Skinning
         [Resolved(CanBeNull = true)]
         private IPooledSampleProvider pooledProvider { get; set; }
 
-        public SkinnableSound(ISampleInfo sample)
-            : this(new[] { sample })
+        public SkinnableSound()
         {
         }
 
-        public SkinnableSound(IEnumerable<ISampleInfo> samples)
+        public SkinnableSound([NotNull] IEnumerable<ISampleInfo> samples)
+            : this()
         {
             this.samples = samples.ToArray();
 
             InternalChild = SamplesContainer = new AudioContainer<PoolableSkinnableSample>();
+        }
+
+        public SkinnableSound([NotNull] ISampleInfo sample)
+            : this(new[] { sample })
+        {
         }
 
         private ISampleInfo[] samples;
@@ -57,8 +63,7 @@ namespace osu.Game.Skinning
             get => samples;
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                value ??= Array.Empty<ISampleInfo>();
 
                 if (samples == value)
                     return;
