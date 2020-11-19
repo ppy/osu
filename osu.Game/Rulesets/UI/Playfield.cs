@@ -348,7 +348,7 @@ namespace osu.Game.Rulesets.UI
         public PoolableSkinnableSample GetPooledSample(ISampleInfo sampleInfo)
         {
             if (!samplePools.TryGetValue(sampleInfo, out var existingPool))
-                AddInternal(samplePools[sampleInfo] = existingPool = new DrawableSamplePool(sampleInfo, 1, 30));
+                AddInternal(samplePools[sampleInfo] = existingPool = new DrawableSamplePool(sampleInfo, 1));
 
             return existingPool.Get();
         }
