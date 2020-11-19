@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -26,10 +27,18 @@ namespace osu.Game.Graphics
             }
         }
 
+        public void Restart()
+        {
+            foreach (var p in InternalChildren.OfType<Particle>())
+                p.Play();
+        }
+
         private class Particle : Sprite
         {
             private readonly double duration;
             private readonly float direction;
+
+            public override bool RemoveWhenNotAlive => false;
 
             private Vector2 positionForOffset(float offset) => new Vector2(
                 (float)(offset * Math.Sin(direction)),
@@ -40,18 +49,25 @@ namespace osu.Game.Graphics
             {
                 this.duration = duration;
                 this.direction = direction;
-                Anchor = Anchor.Centre;
+
                 Origin = Anchor.Centre;
+                Blending = BlendingParameters.Additive;
+
                 RelativePositionAxes = Axes.Both;
-                Position = positionForOffset(0);
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+                Play();
+            }
 
-                this.MoveTo(positionForOffset(1), duration);
-                this.FadeOut(duration);
+            public void Play()
+            {
+                this.MoveTo(new Vector2(0.5f));
+                this.MoveTo(new Vector2(0.5f) + positionForOffset(0.5f), duration);
+
+                this.FadeOutFromOne(duration);
                 Expire();
             }
         }
