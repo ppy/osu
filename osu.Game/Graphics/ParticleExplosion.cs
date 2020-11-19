@@ -20,7 +20,7 @@ namespace osu.Game.Graphics
             {
                 double rDuration = RNG.NextDouble(duration / 3, duration);
 
-                AddInternal(new Particle(rDuration, RNG.NextSingle(0, MathF.PI * 2))
+                AddInternal(new Particle(rDuration)
                 {
                     Texture = texture
                 });
@@ -36,19 +36,12 @@ namespace osu.Game.Graphics
         private class Particle : Sprite
         {
             private readonly double duration;
-            private readonly float direction;
 
             public override bool RemoveWhenNotAlive => false;
 
-            private Vector2 positionForOffset(float offset) => new Vector2(
-                (float)(offset * Math.Sin(direction)),
-                (float)(offset * Math.Cos(direction))
-            );
-
-            public Particle(double duration, float direction)
+            public Particle(double duration)
             {
                 this.duration = duration;
-                this.direction = direction;
 
                 Origin = Anchor.Centre;
                 Blending = BlendingParameters.Additive;
@@ -64,11 +57,18 @@ namespace osu.Game.Graphics
 
             public void Play()
             {
+                double direction = RNG.NextSingle(0, MathF.PI * 2);
+
                 this.MoveTo(new Vector2(0.5f));
                 this.MoveTo(new Vector2(0.5f) + positionForOffset(0.5f), duration);
 
                 this.FadeOutFromOne(duration);
                 Expire();
+
+                Vector2 positionForOffset(float offset) => new Vector2(
+                    (float)(offset * Math.Sin(direction)),
+                    (float)(offset * Math.Cos(direction))
+                );
             }
         }
     }
