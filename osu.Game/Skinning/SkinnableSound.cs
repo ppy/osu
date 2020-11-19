@@ -16,6 +16,9 @@ using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// A sound consisting of one or more samples to be played.
+    /// </summary>
     public class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         public override bool RemoveWhenNotAlive => false;
@@ -39,17 +42,28 @@ namespace osu.Game.Skinning
         [Resolved(CanBeNull = true)]
         private IPooledSampleProvider pooledProvider { get; set; }
 
+        /// <summary>
+        /// Creates a new <see cref="SkinnableSound"/>.
+        /// </summary>
         public SkinnableSound()
         {
             InternalChild = SamplesContainer = new AudioContainer<PoolableSkinnableSample>();
         }
 
+        /// <summary>
+        /// Creates a new <see cref="SkinnableSound"/> with some initial samples.
+        /// </summary>
+        /// <param name="samples">The initial samples.</param>
         public SkinnableSound([NotNull] IEnumerable<ISampleInfo> samples)
             : this()
         {
             this.samples = samples.ToArray();
         }
 
+        /// <summary>
+        /// Creates a new <see cref="SkinnableSound"/> with an initial sample.
+        /// </summary>
+        /// <param name="sample">The initial sample.</param>
         public SkinnableSound([NotNull] ISampleInfo sample)
             : this(new[] { sample })
         {
@@ -57,6 +71,9 @@ namespace osu.Game.Skinning
 
         private ISampleInfo[] samples = Array.Empty<ISampleInfo>();
 
+        /// <summary>
+        /// The samples that should be played.
+        /// </summary>
         public ISampleInfo[] Samples
         {
             get => samples;
@@ -76,6 +93,9 @@ namespace osu.Game.Skinning
 
         private bool looping;
 
+        /// <summary>
+        /// Whether the samples should loop on completion.
+        /// </summary>
         public bool Looping
         {
             get => looping;
@@ -89,6 +109,9 @@ namespace osu.Game.Skinning
             }
         }
 
+        /// <summary>
+        /// Plays the samples.
+        /// </summary>
         public virtual void Play()
         {
             SamplesContainer.ForEach(c =>
@@ -98,6 +121,9 @@ namespace osu.Game.Skinning
             });
         }
 
+        /// <summary>
+        /// Stops the samples.
+        /// </summary>
         public virtual void Stop()
         {
             SamplesContainer.ForEach(c => c.Stop());
@@ -149,6 +175,9 @@ namespace osu.Game.Skinning
         public void RemoveAllAdjustments(AdjustableProperty type)
             => SamplesContainer.RemoveAllAdjustments(type);
 
+        /// <summary>
+        /// Whether any samples currently playing.
+        /// </summary>
         public bool IsPlaying => SamplesContainer.Any(s => s.Playing);
 
         #endregion
