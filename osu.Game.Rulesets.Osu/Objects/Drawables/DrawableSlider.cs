@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI;
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
-        private Container<PausableSkinnableSound> samplesContainer;
+        private PausableSkinnableSound slidingSample;
 
         public DrawableSlider()
             : this(null)
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
-                samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both }
+                slidingSample = new PausableSkinnableSound { Looping = true }
             };
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
@@ -100,16 +101,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnFree(hitObject);
 
             PathVersion.UnbindFrom(HitObject.Path.Version);
-        }
 
-        private PausableSkinnableSound slidingSample;
+            slidingSample.Samples = null;
+        }
 
         protected override void LoadSamples()
         {
             base.LoadSamples();
-
-            samplesContainer.Clear();
-            slidingSample = null;
 
             var firstSample = HitObject.Samples.FirstOrDefault();
 
@@ -118,10 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
                 clone.Name = "sliderslide";
 
-                samplesContainer.Add(slidingSample = new PausableSkinnableSound(clone)
-                {
-                    Looping = true
-                });
+                slidingSample.Samples = new ISampleInfo[] { clone };
             }
         }
 
