@@ -13,8 +13,12 @@ using osuTK;
 
 namespace osu.Game.Graphics
 {
+    /// <summary>
+    /// An explosion of textured particles based on how osu-stable randomises the explosion pattern.
+    /// </summary>
     public class ParticleExplosion : Sprite
     {
+        private readonly int particleCount;
         private readonly double duration;
         private double startTime;
 
@@ -23,11 +27,9 @@ namespace osu.Game.Graphics
         public ParticleExplosion(Texture texture, int particleCount, double duration)
         {
             Texture = texture;
+            this.particleCount = particleCount;
             this.duration = duration;
             Blending = BlendingParameters.Additive;
-
-            for (int i = 0; i < particleCount; i++)
-                parts.Add(new ParticlePart(duration));
         }
 
         protected override void LoadComplete()
@@ -36,19 +38,23 @@ namespace osu.Game.Graphics
             Restart();
         }
 
+        /// <summary>
+        /// Restart the animation from the current point in time.
+        /// Supports transform time offset chaining.
+        /// </summary>
         public void Restart()
         {
             startTime = TransformStartTime;
             this.FadeOutFromOne(duration);
 
-            foreach (var p in parts)
-                p.Randomise();
+            parts.Clear();
+            for (int i = 0; i < particleCount; i++)
+                parts.Add(new ParticlePart(duration));
         }
 
         protected override void Update()
         {
             base.Update();
-
             Invalidate(Invalidation.DrawNode);
         }
 
@@ -56,7 +62,7 @@ namespace osu.Game.Graphics
 
         private class ParticleExplosionDrawNode : SpriteDrawNode
         {
-            private List<ParticlePart> parts = new List<ParticlePart>();
+            private readonly List<ParticlePart> parts = new List<ParticlePart>();
 
             private ParticleExplosion source => (ParticleExplosion)Source;
 
@@ -73,9 +79,9 @@ namespace osu.Game.Graphics
             {
                 base.ApplyState();
 
-                // this is mostly safe as the parts are immutable.
-                // the most that can go wrong is the random state be incorrect
-                parts = source.parts;
+                parts.Clear();
+                parts.AddRange(source.parts);
+
                 sourceSize = source.Size;
                 startTime = source.startTime;
                 currentTime = source.Time.Current;
@@ -111,22 +117,13 @@ namespace osu.Game.Graphics
             }
         }
 
-        private class ParticlePart
+        private readonly struct ParticlePart
         {
-            private readonly double availableDuration;
-
-            private double duration;
-            private double direction;
-            private float distance;
+            private readonly double duration;
+            private readonly double direction;
+            private readonly float distance;
 
             public ParticlePart(double availableDuration)
-            {
-                this.availableDuration = availableDuration;
-
-                Randomise();
-            }
-
-            public void Randomise()
             {
                 distance = RNG.NextSingle(0.5f);
                 duration = RNG.NextDouble(availableDuration / 3, availableDuration);
@@ -137,12 +134,8 @@ namespace osu.Game.Graphics
 
             public Vector2 PositionAtTime(double time)
             {
-                return new Vector2(0.5f) + positionForOffset(distance * progressAtTime(time));
-
-                Vector2 positionForOffset(float offset) => new Vector2(
-                    (float)(offset * Math.Sin(direction)),
-                    (float)(offset * Math.Cos(direction))
-                );
+                var travelledDistance = distance * progressAtTime(time);
+                return new Vector2(0.5f) + travelledDistance * new Vector2((float)Math.Sin(direction), (float)Math.Cos(direction));
             }
 
             private float progressAtTime(double time) => (float)Math.Clamp(time / duration, 0, 1);
