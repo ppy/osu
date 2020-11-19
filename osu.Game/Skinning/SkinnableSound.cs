@@ -55,7 +55,7 @@ namespace osu.Game.Skinning
         {
         }
 
-        private ISampleInfo[] samples;
+        private ISampleInfo[] samples = Array.Empty<ISampleInfo>();
 
         public ISampleInfo[] Samples
         {
@@ -101,6 +101,12 @@ namespace osu.Game.Skinning
         public virtual void Stop()
         {
             SamplesContainer.ForEach(c => c.Stop());
+        }
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+            updateSamples();
         }
 
         private void updateSamples()
