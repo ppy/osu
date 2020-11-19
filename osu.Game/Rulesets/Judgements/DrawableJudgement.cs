@@ -85,7 +85,9 @@ namespace osu.Game.Rulesets.Judgements
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            skinSource.SourceChanged -= onSkinChanged;
+
+            if (skinSource != null)
+                skinSource.SourceChanged -= onSkinChanged;
         }
 
         /// <summary>
