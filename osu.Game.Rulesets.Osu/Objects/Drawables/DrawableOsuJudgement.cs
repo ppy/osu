@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             bool hitLightingEnabled = config.Get<bool>(OsuSetting.HitLighting);
 
+            Lighting.Alpha = 0;
+
             if (hitLightingEnabled && Lighting.Drawable != null)
             {
                 // todo: this animation changes slightly based on new/old legacy skin versions.
