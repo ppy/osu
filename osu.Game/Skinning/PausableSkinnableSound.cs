@@ -14,13 +14,13 @@ namespace osu.Game.Skinning
     {
         protected bool RequestedPlaying { get; private set; }
 
-        public PausableSkinnableSound(ISampleInfo hitSamples)
-            : base(hitSamples)
+        public PausableSkinnableSound(ISampleInfo sample)
+            : base(sample)
         {
         }
 
-        public PausableSkinnableSound(IEnumerable<ISampleInfo> hitSamples)
-            : base(hitSamples)
+        public PausableSkinnableSound(IEnumerable<ISampleInfo> samples)
+            : base(samples)
         {
         }
 

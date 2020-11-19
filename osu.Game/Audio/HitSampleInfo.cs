@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Game.Audio
 {
@@ -10,7 +11,7 @@ namespace osu.Game.Audio
     /// Describes a gameplay hit sample.
     /// </summary>
     [Serializable]
-    public class HitSampleInfo : ISampleInfo
+    public class HitSampleInfo : ISampleInfo, IEquatable<HitSampleInfo>
     {
         public const string HIT_WHISTLE = @"hitwhistle";
         public const string HIT_FINISH = @"hitfinish";
@@ -57,5 +58,17 @@ namespace osu.Game.Audio
         }
 
         public HitSampleInfo Clone() => (HitSampleInfo)MemberwiseClone();
+
+        public bool Equals(HitSampleInfo other)
+            => other != null && Bank == other.Bank && Name == other.Name && Suffix == other.Suffix;
+
+        public override bool Equals(object obj)
+            => obj is HitSampleInfo other && Equals(other);
+
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")] // This will have to be addressed eventually
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Bank, Name, Suffix);
+        }
     }
 }
