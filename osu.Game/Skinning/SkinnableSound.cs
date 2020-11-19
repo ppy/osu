@@ -103,13 +103,6 @@ namespace osu.Game.Skinning
             SamplesContainer.ForEach(c => c.Stop());
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            // Start playback internally for the new samples if the previous ones were playing beforehand.
-            if (IsPlaying)
-                Play();
-        }
-
         private void updateSamples()
         {
             bool wasPlaying = IsPlaying;

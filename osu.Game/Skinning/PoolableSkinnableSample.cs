@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -13,27 +14,48 @@ using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// A sample corresponding to an <see cref="ISampleInfo"/> that supports being pooled and responding to skin changes.
+    /// </summary>
     public class PoolableSkinnableSample : SkinReloadableDrawable, IAggregateAudioAdjustment, IAdjustableAudioComponent
     {
-        private readonly AudioContainer<DrawableSample> sampleContainer;
+        /// <summary>
+        /// The currently-loaded <see cref="DrawableSample"/>.
+        /// </summary>
+        [CanBeNull]
+        public DrawableSample Sample { get; private set; }
 
+        private readonly AudioContainer<DrawableSample> sampleContainer;
         private ISampleInfo sampleInfo;
-        private DrawableSample sample;
 
         [Resolved]
         private ISampleStore sampleStore { get; set; }
 
+        /// <summary>
+        /// Creates a new <see cref="PoolableSkinnableSample"/> with no applied <see cref="ISampleInfo"/>.
+        /// An <see cref="ISampleInfo"/> can be applied later via <see cref="Apply"/>.
+        /// </summary>
         public PoolableSkinnableSample()
         {
             InternalChild = sampleContainer = new AudioContainer<DrawableSample> { RelativeSizeAxes = Axes.Both };
         }
 
+        /// <summary>
+        /// Creates a new <see cref="PoolableSkinnableSample"/> with an applied <see cref="ISampleInfo"/>.
+        /// </summary>
+        /// <param name="sampleInfo">The <see cref="ISampleInfo"/> to attach.</param>
         public PoolableSkinnableSample(ISampleInfo sampleInfo)
             : this()
         {
             Apply(sampleInfo);
         }
 
+        /// <summary>
+        /// Applies an <see cref="ISampleInfo"/> that describes the sample to retrieve.
+        /// Only one <see cref="ISampleInfo"/> can ever be applied to a <see cref="PoolableSkinnableSample"/>.
+        /// </summary>
+        /// <param name="sampleInfo">The <see cref="ISampleInfo"/> to apply.</param>
+        /// <exception cref="InvalidOperationException">If an <see cref="ISampleInfo"/> has already been applied to this <see cref="PoolableSkinnableSample"/>.</exception>
         public void Apply(ISampleInfo sampleInfo)
         {
             if (this.sampleInfo != null)
@@ -55,6 +77,11 @@ namespace osu.Game.Skinning
 
         private void updateSample()
         {
+            if (sampleInfo == null)
+                return;
+
+            bool wasPlaying = Playing;
+
             sampleContainer.Clear();
 
             var ch = CurrentSkin.GetSample(sampleInfo);
@@ -71,17 +98,34 @@ namespace osu.Game.Skinning
             if (ch == null)
                 return;
 
-            sampleContainer.Add(sample = new DrawableSample(ch) { Looping = Looping });
+            sampleContainer.Add(Sample = new DrawableSample(ch) { Looping = Looping });
+
+            // Start playback internally for the new sample if the previous one was playing beforehand.
+            if (wasPlaying)
+                Play();
         }
 
-        public void Play(bool restart = true) => sample?.Play(restart);
+        /// <summary>
+        /// Plays the sample.
+        /// </summary>
+        /// <param name="restart">Whether to play the sample from the beginning.</param>
+        public void Play(bool restart = true) => Sample?.Play(restart);
 
-        public void Stop() => sample?.Stop();
+        /// <summary>
+        /// Stops the sample.
+        /// </summary>
+        public void Stop() => Sample?.Stop();
 
-        public bool Playing => sample?.Playing ?? false;
+        /// <summary>
+        /// Whether the sample is currently playing.
+        /// </summary>
+        public bool Playing => Sample?.Playing ?? false;
 
         private bool looping;
 
+        /// <summary>
+        /// Gets or sets whether the sample should loop on completion.
+        /// </summary>
         public bool Looping
         {
             get => looping;
@@ -89,29 +133,17 @@ namespace osu.Game.Skinning
             {
                 looping = value;
 
-                if (sample != null)
-                    sample.Looping = value;
+                if (Sample != null)
+                    Sample.Looping = value;
             }
         }
 
-        /// <summary>
-        /// The volume of this component.
-        /// </summary>
         public BindableNumber<double> Volume => sampleContainer.Volume;
 
-        /// <summary>
-        /// The playback balance of this sample (-1 .. 1 where 0 is centered)
-        /// </summary>
         public BindableNumber<double> Balance => sampleContainer.Balance;
 
-        /// <summary>
-        /// Rate at which the component is played back (affects pitch). 1 is 100% playback speed, or default frequency.
-        /// </summary>
         public BindableNumber<double> Frequency => sampleContainer.Frequency;
 
-        /// <summary>
-        /// Rate at which the component is played back (does not affect pitch). 1 is 100% playback speed.
-        /// </summary>
         public BindableNumber<double> Tempo => sampleContainer.Tempo;
 
         public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => sampleContainer.AddAdjustment(type, adjustBindable);
