@@ -60,7 +60,7 @@ namespace osu.Game.Graphics
                 double direction = RNG.NextSingle(0, MathF.PI * 2);
 
                 this.MoveTo(new Vector2(0.5f));
-                this.MoveTo(new Vector2(0.5f) + positionForOffset(0.5f), duration);
+                this.MoveTo(new Vector2(0.5f) + positionForOffset(RNG.NextSingle(0.5f)), duration);
 
                 this.FadeOutFromOne(duration);
                 Expire();
