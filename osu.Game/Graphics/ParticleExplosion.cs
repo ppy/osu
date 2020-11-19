@@ -120,7 +120,7 @@ namespace osu.Game.Graphics
         private readonly struct ParticlePart
         {
             private readonly double duration;
-            private readonly double direction;
+            private readonly float direction;
             private readonly float distance;
 
             public ParticlePart(double availableDuration)
@@ -135,7 +135,7 @@ namespace osu.Game.Graphics
             public Vector2 PositionAtTime(double time)
             {
                 var travelledDistance = distance * progressAtTime(time);
-                return new Vector2(0.5f) + travelledDistance * new Vector2((float)Math.Sin(direction), (float)Math.Cos(direction));
+                return new Vector2(0.5f) + travelledDistance * new Vector2(MathF.Sin(direction), MathF.Cos(direction));
             }
 
             private float progressAtTime(double time) => (float)Math.Clamp(time / duration, 0, 1);
