@@ -5,6 +5,7 @@ using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
@@ -500,7 +501,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
 
-        public class LegacyHitSampleInfo : HitSampleInfo
+        public class LegacyHitSampleInfo : HitSampleInfo, IEquatable<LegacyHitSampleInfo>
         {
             private int customSampleBank;
 
@@ -524,9 +525,21 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// using the <see cref="LegacySkinConfiguration.LegacySetting.LayeredHitSounds"/> skin config option.
             /// </remarks>
             public bool IsLayered { get; set; }
+
+            public bool Equals(LegacyHitSampleInfo other)
+                => other != null && base.Equals(other) && CustomSampleBank == other.CustomSampleBank;
+
+            public override bool Equals(object obj)
+                => obj is LegacyHitSampleInfo other && Equals(other);
+
+            [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")] // This will have to be addressed eventually
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(base.GetHashCode(), customSampleBank);
+            }
         }
 
-        private class FileHitSampleInfo : LegacyHitSampleInfo
+        private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
         {
             public string Filename;
 
@@ -542,6 +555,18 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 Filename,
                 Path.ChangeExtension(Filename, null)
             };
+
+            public bool Equals(FileHitSampleInfo other)
+                => other != null && Filename == other.Filename;
+
+            public override bool Equals(object obj)
+                => obj is FileHitSampleInfo other && Equals(other);
+
+            [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")] // This will have to be addressed eventually
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Filename);
+            }
         }
     }
 }
