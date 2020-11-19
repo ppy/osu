@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
 
             // Explicit non-virtual function call.
-            base.AddInternal(Samples = new PausableSkinnableSound(Array.Empty<ISampleInfo>()));
+            base.AddInternal(Samples = new PausableSkinnableSound());
         }
 
         protected override void LoadAsyncComplete()
@@ -266,7 +266,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
             samplesBindable.CollectionChanged -= onSamplesChanged;
 
-            Samples.Samples = Array.Empty<ISampleInfo>();
+            // Release the samples for other hitobjects to use.
+            Samples.Samples = null;
 
             if (nestedHitObjects.IsValueCreated)
             {
@@ -334,8 +335,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         protected virtual void LoadSamples()
         {
-            Samples.Samples = Array.Empty<ISampleInfo>();
-
             var samples = GetSamples().ToArray();
 
             if (samples.Length <= 0)
