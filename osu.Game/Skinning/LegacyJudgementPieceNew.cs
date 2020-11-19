@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
 
         private readonly Drawable mainPiece;
 
-        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Drawable particleDrawable)
+        public LegacyJudgementPieceNew(HitResult result, Func<Drawable> createMainDrawable, Func<Drawable> createParticleDrawable)
         {
             this.result = result;
 
