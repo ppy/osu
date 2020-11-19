@@ -39,7 +39,6 @@ namespace osu.Game.Graphics
         public void Restart()
         {
             startTime = TransformStartTime;
-
             this.FadeOutFromOne(duration);
 
             foreach (var p in parts)
@@ -74,6 +73,8 @@ namespace osu.Game.Graphics
             {
                 base.ApplyState();
 
+                // this is mostly safe as the parts are immutable.
+                // the most that can go wrong is the random state be incorrect
                 parts = source.parts;
                 sourceSize = source.Size;
                 startTime = source.startTime;
@@ -82,13 +83,20 @@ namespace osu.Game.Graphics
 
             protected override void Blit(Action<TexturedVertex2D> vertexAction)
             {
+                var time = currentTime - startTime;
+
                 foreach (var p in parts)
                 {
-                    var pos = p.PositionAtTime(currentTime - startTime);
+                    Vector2 pos = p.PositionAtTime(time);
+                    float alpha = p.AlphaAtTime(time);
 
-                    // todo: implement per particle.
-                    var rect = new RectangleF(pos.X * sourceSize.X, pos.Y * sourceSize.Y, Texture.DisplayWidth, Texture.DisplayHeight);
+                    var rect = new RectangleF(
+                        pos.X * sourceSize.X - Texture.DisplayWidth / 2,
+                        pos.Y * sourceSize.Y - Texture.DisplayHeight / 2,
+                        Texture.DisplayWidth,
+                        Texture.DisplayHeight);
 
+                    // convert to screen space.
                     var quad = new Quad(
                         Vector2Extensions.Transform(rect.TopLeft, DrawInfo.Matrix),
                         Vector2Extensions.Transform(rect.TopRight, DrawInfo.Matrix),
@@ -96,7 +104,7 @@ namespace osu.Game.Graphics
                         Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
                     );
 
-                    DrawQuad(Texture, quad, DrawColourInfo.Colour, null, vertexAction,
+                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
                         new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
                         null, TextureCoords);
                 }
@@ -105,22 +113,31 @@ namespace osu.Game.Graphics
 
         private class ParticlePart
         {
-            private readonly double totalDuration;
+            private readonly double availableDuration;
 
             private double duration;
             private double direction;
             private float distance;
 
-            public ParticlePart(double totalDuration)
+            public ParticlePart(double availableDuration)
             {
-                this.totalDuration = totalDuration;
+                this.availableDuration = availableDuration;
 
                 Randomise();
             }
 
+            public void Randomise()
+            {
+                distance = RNG.NextSingle(0.5f);
+                duration = RNG.NextDouble(availableDuration / 3, availableDuration);
+                direction = RNG.NextSingle(0, MathF.PI * 2);
+            }
+
+            public float AlphaAtTime(double time) => 1 - progressAtTime(time);
+
             public Vector2 PositionAtTime(double time)
             {
-                return new Vector2(0.5f) + positionForOffset(distance * (float)(time / duration));
+                return new Vector2(0.5f) + positionForOffset(distance * progressAtTime(time));
 
                 Vector2 positionForOffset(float offset) => new Vector2(
                     (float)(offset * Math.Sin(direction)),
@@ -128,12 +145,7 @@ namespace osu.Game.Graphics
                 );
             }
 
-            public void Randomise()
-            {
-                distance = RNG.NextSingle(0.5f);
-                duration = RNG.NextDouble(totalDuration / 3, totalDuration);
-                direction = RNG.NextSingle(0, MathF.PI * 2);
-            }
+            private float progressAtTime(double time) => (float)Math.Clamp(time / duration, 0, 1);
         }
     }
 }
