@@ -16,15 +16,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            AddStep(@"display", () =>
+            AddRepeatStep(@"display", () =>
             {
                 Child = new ParticleExplosion(textures.Get("Cursor/cursortrail"), 150, 1200)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(200)
+                    Size = new Vector2(400)
                 };
-            });
+            }, 10);
         }
     }
 }
