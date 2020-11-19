@@ -13,17 +13,26 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneParticleExplosion : OsuTestScene
     {
+        private ParticleExplosion explosion;
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            AddRepeatStep(@"display", () =>
+            AddStep("create initial", () =>
             {
-                Child = new ParticleExplosion(textures.Get("Cursor/cursortrail"), 150, 1200)
+                Child = explosion = new ParticleExplosion(textures.Get("Cursor/cursortrail"), 150, 1200)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(400)
                 };
+            });
+
+            AddWaitStep("wait for playback", 5);
+
+            AddRepeatStep(@"restart animation", () =>
+            {
+                explosion.Restart();
             }, 10);
         }
     }
