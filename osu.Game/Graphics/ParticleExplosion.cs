@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -12,63 +13,126 @@ using osuTK;
 
 namespace osu.Game.Graphics
 {
-    public class ParticleExplosion : CompositeDrawable
+    public class ParticleExplosion : Sprite
     {
+        private readonly double duration;
+        private double startTime;
+
+        private readonly List<ParticlePart> parts = new List<ParticlePart>();
+
         public ParticleExplosion(Texture texture, int particleCount, double duration)
         {
-            for (int i = 0; i < particleCount; i++)
-            {
-                double rDuration = RNG.NextDouble(duration / 3, duration);
+            Texture = texture;
+            this.duration = duration;
+            Blending = BlendingParameters.Additive;
 
-                AddInternal(new Particle(rDuration)
-                {
-                    Texture = texture
-                });
-            }
+            for (int i = 0; i < particleCount; i++)
+                parts.Add(new ParticlePart(duration));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Restart();
         }
 
         public void Restart()
         {
-            foreach (var p in InternalChildren.OfType<Particle>())
-                p.Play();
+            startTime = TransformStartTime;
+
+            this.FadeOutFromOne(duration);
+
+            foreach (var p in parts)
+                p.Randomise();
         }
 
-        private class Particle : Sprite
+        protected override void Update()
         {
-            private readonly double duration;
+            base.Update();
 
-            public override bool RemoveWhenNotAlive => false;
+            Invalidate(Invalidation.DrawNode);
+        }
 
-            public Particle(double duration)
+        protected override DrawNode CreateDrawNode() => new ParticleExplosionDrawNode(this);
+
+        private class ParticleExplosionDrawNode : SpriteDrawNode
+        {
+            private List<ParticlePart> parts = new List<ParticlePart>();
+
+            private ParticleExplosion source => (ParticleExplosion)Source;
+
+            private double startTime;
+            private double currentTime;
+            private Vector2 sourceSize;
+
+            public ParticleExplosionDrawNode(Sprite source)
+                : base(source)
             {
-                this.duration = duration;
-
-                Origin = Anchor.Centre;
-                Blending = BlendingParameters.Additive;
-
-                RelativePositionAxes = Axes.Both;
             }
 
-            protected override void LoadComplete()
+            public override void ApplyState()
             {
-                base.LoadComplete();
-                Play();
+                base.ApplyState();
+
+                parts = source.parts;
+                sourceSize = source.Size;
+                startTime = source.startTime;
+                currentTime = source.Time.Current;
             }
 
-            public void Play()
+            protected override void Blit(Action<TexturedVertex2D> vertexAction)
             {
-                double direction = RNG.NextSingle(0, MathF.PI * 2);
+                foreach (var p in parts)
+                {
+                    var pos = p.PositionAtTime(currentTime - startTime);
 
-                this.MoveTo(new Vector2(0.5f));
-                this.MoveTo(new Vector2(0.5f) + positionForOffset(RNG.NextSingle(0.5f)), duration);
+                    // todo: implement per particle.
+                    var rect = new RectangleF(pos.X * sourceSize.X, pos.Y * sourceSize.Y, Texture.DisplayWidth, Texture.DisplayHeight);
 
-                this.FadeOutFromOne(duration);
-                Expire();
+                    var quad = new Quad(
+                        Vector2Extensions.Transform(rect.TopLeft, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(rect.TopRight, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(rect.BottomLeft, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
+                    );
+
+                    DrawQuad(Texture, quad, DrawColourInfo.Colour, null, vertexAction,
+                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                        null, TextureCoords);
+                }
+            }
+        }
+
+        private class ParticlePart
+        {
+            private readonly double totalDuration;
+
+            private double duration;
+            private double direction;
+            private float distance;
+
+            public ParticlePart(double totalDuration)
+            {
+                this.totalDuration = totalDuration;
+
+                Randomise();
+            }
+
+            public Vector2 PositionAtTime(double time)
+            {
+                return new Vector2(0.5f) + positionForOffset(distance * (float)(time / duration));
 
                 Vector2 positionForOffset(float offset) => new Vector2(
                     (float)(offset * Math.Sin(direction)),
                     (float)(offset * Math.Cos(direction))
                 );
+            }
+
+            public void Randomise()
+            {
+                distance = RNG.NextSingle(0.5f);
+                duration = RNG.NextDouble(totalDuration / 3, totalDuration);
+                direction = RNG.NextSingle(0, MathF.PI * 2);
             }
         }
     }
