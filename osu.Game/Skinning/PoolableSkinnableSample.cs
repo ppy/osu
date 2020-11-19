@@ -124,7 +124,7 @@ namespace osu.Game.Skinning
         private bool looping;
 
         /// <summary>
-        /// Gets or sets whether the sample should loop on completion.
+        /// Whether the sample should loop on completion.
         /// </summary>
         public bool Looping
         {
