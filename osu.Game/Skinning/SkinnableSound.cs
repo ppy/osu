@@ -41,14 +41,13 @@ namespace osu.Game.Skinning
 
         public SkinnableSound()
         {
+            InternalChild = SamplesContainer = new AudioContainer<PoolableSkinnableSample>();
         }
 
         public SkinnableSound([NotNull] IEnumerable<ISampleInfo> samples)
             : this()
         {
             this.samples = samples.ToArray();
-
-            InternalChild = SamplesContainer = new AudioContainer<PoolableSkinnableSample>();
         }
 
         public SkinnableSound([NotNull] ISampleInfo sample)
@@ -123,6 +122,7 @@ namespace osu.Game.Skinning
             {
                 var sample = pooledProvider?.GetPooledSample(s) ?? new PoolableSkinnableSample(s);
                 sample.Looping = Looping;
+                sample.Volume.Value = s.Volume / 100.0;
 
                 SamplesContainer.Add(sample);
             }
