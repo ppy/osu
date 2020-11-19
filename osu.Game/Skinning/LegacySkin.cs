@@ -377,7 +377,7 @@ namespace osu.Game.Skinning
                     if (createDrawable() != null)
                     {
                         if (Configuration.LegacyVersion > 1)
-                            return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, () => getParticleDrawable(resultComponent.Component));
+                            return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, getParticleTexture(resultComponent.Component));
                         else
                             return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
@@ -388,18 +388,18 @@ namespace osu.Game.Skinning
             return this.GetAnimation(component.LookupName, false, false);
         }
 
-        private Drawable getParticleDrawable(HitResult result)
+        private Texture getParticleTexture(HitResult result)
         {
             switch (result)
             {
                 case HitResult.Meh:
-                    return this.GetAnimation("particle50", false, false);
+                    return GetTexture("particle50");
 
                 case HitResult.Ok:
-                    return this.GetAnimation("particle100", false, false);
+                    return GetTexture("particle100");
 
                 case HitResult.Great:
-                    return this.GetAnimation("particle300", false, false);
+                    return GetTexture("particle300");
             }
 
             return null;
