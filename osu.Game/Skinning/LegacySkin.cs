@@ -377,7 +377,7 @@ namespace osu.Game.Skinning
                     if (createDrawable() != null)
                     {
                         if (Configuration.LegacyVersion > 1)
-                            return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, getParticleDrawable(resultComponent.Component));
+                            return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, () => getParticleDrawable(resultComponent.Component));
                         else
                             return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
