@@ -2,11 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
-using JetBrains.Annotations;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
@@ -15,150 +12,77 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises the <see cref="FollowPoint"/>s between two <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointConnection : CompositeDrawable
+    public class FollowPointConnection : PoolableDrawable
     {
         // Todo: These shouldn't be constants
-        private const int spacing = 32;
-        private const double preempt = 800;
+        public const int SPACING = 32;
+        public const double PREEMPT = 800;
 
-        public override bool RemoveWhenNotAlive => false;
+        public FollowPointRenderer.FollowPointLifetimeEntry Entry;
+        public DrawablePool<FollowPoint> Pool;
 
-        /// <summary>
-        /// The start time of <see cref="Start"/>.
-        /// </summary>
-        public readonly Bindable<double> StartTime = new BindableDouble();
-
-        /// <summary>
-        /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.
-        /// </summary>
-        [NotNull]
-        public readonly OsuHitObject Start;
-
-        /// <summary>
-        /// Creates a new <see cref="FollowPointConnection"/>.
-        /// </summary>
-        /// <param name="start">The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.</param>
-        public FollowPointConnection([NotNull] OsuHitObject start)
+        protected override void FreeAfterUse()
         {
-            Start = start;
-
-            RelativeSizeAxes = Axes.Both;
-
-            StartTime.BindTo(start.StartTimeBindable);
+            base.FreeAfterUse();
+            ClearInternal(false);
         }
 
-        protected override void LoadComplete()
+        protected override void PrepareForUse()
         {
-            base.LoadComplete();
-            bindEvents(Start);
-        }
+            base.PrepareForUse();
 
-        private OsuHitObject end;
+            OsuHitObject start = Entry.Start;
+            OsuHitObject end = Entry.End;
 
-        /// <summary>
-        /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will enter.
-        /// </summary>
-        [CanBeNull]
-        public OsuHitObject End
-        {
-            get => end;
-            set
-            {
-                end = value;
+            double startTime = start.GetEndTime();
 
-                if (end != null)
-                    bindEvents(end);
-
-                if (IsLoaded)
-                    scheduleRefresh();
-                else
-                    refresh();
-            }
-        }
-
-        private void bindEvents(OsuHitObject obj)
-        {
-            obj.PositionBindable.BindValueChanged(_ => scheduleRefresh());
-            obj.DefaultsApplied += _ => scheduleRefresh();
-        }
-
-        private void scheduleRefresh()
-        {
-            Scheduler.AddOnce(refresh);
-        }
-
-        private void refresh()
-        {
-            double startTime = Start.GetEndTime();
-
-            LifetimeStart = startTime;
-
-            if (End == null || End.NewCombo || Start is Spinner || End is Spinner)
-            {
-                // ensure we always set a lifetime for full LifetimeManagementContainer benefits
-                LifetimeEnd = LifetimeStart;
+            if (end == null || end.NewCombo || start is Spinner || end is Spinner)
                 return;
-            }
 
-            Vector2 startPosition = Start.StackedEndPosition;
-            Vector2 endPosition = End.StackedPosition;
-            double endTime = End.StartTime;
+            Vector2 startPosition = start.StackedEndPosition;
+            Vector2 endPosition = end.StackedPosition;
+            double endTime = end.StartTime;
 
             Vector2 distanceVector = endPosition - startPosition;
             int distance = (int)distanceVector.Length;
             float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
             double duration = endTime - startTime;
 
-            double? firstTransformStartTime = null;
             double finalTransformEndTime = startTime;
 
-            int point = 0;
-
-            ClearInternal();
-
-            for (int d = (int)(spacing * 1.5); d < distance - spacing; d += spacing)
+            for (int d = (int)(SPACING * 1.5); d < distance - SPACING; d += SPACING)
             {
                 float fraction = (float)d / distance;
                 Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
                 Vector2 pointEndPosition = startPosition + fraction * distanceVector;
                 double fadeOutTime = startTime + fraction * duration;
-                double fadeInTime = fadeOutTime - preempt;
+                double fadeInTime = fadeOutTime - PREEMPT;
 
                 FollowPoint fp;
 
-                AddInternal(fp = new FollowPoint());
+                AddInternal(fp = Pool.Get());
 
-                Debug.Assert(End != null);
-
+                fp.ClearTransforms();
                 fp.Position = pointStartPosition;
                 fp.Rotation = rotation;
                 fp.Alpha = 0;
-                fp.Scale = new Vector2(1.5f * End.Scale);
-
-                firstTransformStartTime ??= fadeInTime;
+                fp.Scale = new Vector2(1.5f * end.Scale);
 
                 fp.AnimationStartTime = fadeInTime;
 
                 using (fp.BeginAbsoluteSequence(fadeInTime))
                 {
-                    fp.FadeIn(End.TimeFadeIn);
-                    fp.ScaleTo(End.Scale, End.TimeFadeIn, Easing.Out);
-                    fp.MoveTo(pointEndPosition, End.TimeFadeIn, Easing.Out);
-                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(End.TimeFadeIn);
+                    fp.FadeIn(end.TimeFadeIn);
+                    fp.ScaleTo(end.Scale, end.TimeFadeIn, Easing.Out);
+                    fp.MoveTo(pointEndPosition, end.TimeFadeIn, Easing.Out);
+                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(end.TimeFadeIn);
 
-                    finalTransformEndTime = fadeOutTime + End.TimeFadeIn;
+                    finalTransformEndTime = fadeOutTime + end.TimeFadeIn;
                 }
-
-                point++;
             }
 
-            int excessPoints = InternalChildren.Count - point;
-            for (int i = 0; i < excessPoints; i++)
-                RemoveInternal(InternalChildren[^1]);
-
             // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
-            LifetimeStart = firstTransformStartTime ?? startTime;
-            LifetimeEnd = finalTransformEndTime;
+            Entry.LifetimeEnd = finalTransformEndTime;
         }
     }
 }
