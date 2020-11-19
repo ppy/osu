@@ -115,7 +115,12 @@ namespace osu.Game.Skinning
             SamplesContainer.Clear();
 
             foreach (var s in samples)
-                SamplesContainer.Add(pooledProvider?.GetPooledSample(s) ?? new PoolableSkinnableSample(s));
+            {
+                var sample = pooledProvider?.GetPooledSample(s) ?? new PoolableSkinnableSample(s);
+                sample.Looping = Looping;
+
+                SamplesContainer.Add(sample);
+            }
 
             if (wasPlaying)
                 Play();
