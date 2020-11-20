@@ -24,8 +24,6 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-	  <!-- WorkaroundWorkaround for a System.IO.FileNotFoundException on startup. Required because of old EF Core version. -->
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
     <PackageReference Include="System.IO.Packaging" Version="5.0.0" />
     <PackageReference Include="ppy.squirrel.windows" Version="1.9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
