@@ -44,31 +44,12 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             InternalChildren = new Drawable[]
             {
-                playfieldBorder = new PlayfieldBorder
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 3
-                },
-                spinnerProxies = new ProxyContainer
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-                followPoints = new FollowPointRenderer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 2,
-                },
-                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 1,
-                },
+                playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
+                spinnerProxies = new ProxyContainer { RelativeSizeAxes = Axes.Both },
+                followPoints = new FollowPointRenderer { RelativeSizeAxes = Axes.Both },
+                judgementLayer = new JudgementContainer<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
                 HitObjectContainer,
-                approachCircles = new ProxyContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = -1,
-                },
+                approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
