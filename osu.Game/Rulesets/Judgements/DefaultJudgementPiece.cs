@@ -70,6 +70,6 @@ namespace osu.Game.Rulesets.Judgements
             this.FadeOutFromOne(800);
         }
 
-        public Drawable GetAboveHitObjectsProxiedContent() => this.CreateProxy();
+        public Drawable GetAboveHitObjectsProxiedContent() => null;
     }
 }
