@@ -121,5 +121,7 @@ namespace osu.Game.Skinning
                     break;
             }
         }
+
+        public Drawable GetAboveHitObjectsProxiedContent() => temporaryOldStyle?.CreateProxy(); // for new style judgements, only the old style temporary display is in front of objects.
     }
 }
