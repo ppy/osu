@@ -43,6 +43,11 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> is added.
+        /// </summary>
+        public event Action<DrawableHitObject> DrawableHitObjectAdded;
+
+        /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <remarks>
@@ -115,6 +120,8 @@ namespace osu.Game.Rulesets.UI
             bindStartTime(drawable);
             AddInternal(drawableMap[entry] = drawable, false);
 
+            DrawableHitObjectAdded?.Invoke(drawable);
+
             HitObjectUsageBegan?.Invoke(entry.HitObject);
         }
 
@@ -147,6 +154,16 @@ namespace osu.Game.Rulesets.UI
             hitObject.OnRevertResult += onRevertResult;
 
             AddInternal(hitObject);
+
+            onDrawableHitObjectAddedRecursive(hitObject);
+        }
+
+        private void onDrawableHitObjectAddedRecursive(DrawableHitObject hitObject)
+        {
+            DrawableHitObjectAdded?.Invoke(hitObject);
+
+            foreach (var nested in hitObject.NestedHitObjects)
+                onDrawableHitObjectAddedRecursive(nested);
         }
 
         public virtual bool Remove(DrawableHitObject hitObject)
