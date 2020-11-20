@@ -96,10 +96,20 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void onDrawableHitObjectAdded(DrawableHitObject drawable)
         {
-            if (!drawable.IsLoaded)
-                drawable.OnLoadComplete += onDrawableHitObjectLoaded;
-
             ((DrawableOsuHitObject)drawable).CheckHittable = CheckHittable;
+
+            switch (drawable)
+            {
+                case DrawableSpinner _:
+                    if (!drawable.HasProxy)
+                        spinnerProxies.Add(drawable.CreateProxy());
+                    break;
+
+                case IDrawableHitObjectWithProxiedApproach approach:
+                    if (!approach.ProxiedLayer.HasProxy)
+                        approachCircles.Add(approach.ProxiedLayer.CreateProxy());
+                    break;
+            }
         }
 
         [BackgroundDependencyLoader(true)]
@@ -132,27 +142,6 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             base.OnHitObjectRemoved(hitObject);
             followPoints.RemoveFollowPoints((OsuHitObject)hitObject);
-        }
-
-        private void onDrawableHitObjectLoaded(Drawable drawable)
-        {
-            switch (drawable)
-            {
-                case DrawableSliderHead _:
-                case DrawableSliderTail _:
-                case DrawableSliderTick _:
-                case DrawableSliderRepeat _:
-                case DrawableSpinnerTick _:
-                    break;
-
-                case DrawableSpinner _:
-                    spinnerProxies.Add(drawable.CreateProxy());
-                    break;
-
-                case IDrawableHitObjectWithProxiedApproach approach:
-                    approachCircles.Add(approach.ProxiedLayer.CreateProxy());
-                    break;
-            }
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
