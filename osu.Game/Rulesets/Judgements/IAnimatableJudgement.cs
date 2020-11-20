@@ -10,6 +10,14 @@ namespace osu.Game.Rulesets.Judgements
     /// </summary>
     public interface IAnimatableJudgement : IDrawable
     {
+        /// <summary>
+        /// Start the animation for this judgement from the current point in time.
+        /// </summary>
         void PlayAnimation();
+
+        /// <summary>
+        /// Get proxied content which should be displayed above all hitobjects.
+        /// </summary>
+        Drawable GetAboveHitObjectsProxiedContent();
     }
 }
