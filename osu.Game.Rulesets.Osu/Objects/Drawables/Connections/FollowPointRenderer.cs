@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     {
         public override bool RemoveCompletedTransforms => false;
 
+        public IReadOnlyList<FollowPointLifetimeEntry> Entries => lifetimeEntries;
+
         private DrawablePool<FollowPointConnection> connectionPool;
         private DrawablePool<FollowPoint> pointPool;
 
