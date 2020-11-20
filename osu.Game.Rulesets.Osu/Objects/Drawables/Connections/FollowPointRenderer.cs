@@ -143,8 +143,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             public FollowPointLifetimeEntry(OsuHitObject start)
             {
                 Start = start;
-
-                LifetimeStart = LifetimeEnd = Start.StartTime;
+                LifetimeStart = Start.StartTime;
             }
 
             private OsuHitObject end;
@@ -178,6 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 double fadeInTime = fadeOutTime - FollowPointConnection.PREEMPT;
 
                 LifetimeStart = fadeInTime;
+                LifetimeEnd = double.MaxValue; // This will be set by the connection.
             }
         }
     }
