@@ -53,9 +53,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             double startTime = start.GetEndTime();
 
-            if (end == null || end.NewCombo || start is Spinner || end is Spinner)
-                return;
-
             Vector2 startPosition = start.StackedEndPosition;
             Vector2 endPosition = end.StackedPosition;
             double endTime = end.StartTime;
