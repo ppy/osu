@@ -272,7 +272,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private DrawableOsuHitObject getObject(int index) => hitObjectContainer[index];
 
-        private FollowPointRenderer.FollowPointLifetimeEntry getEntry(int index) => followPointRenderer.Entries[index];
+        private FollowPointLifetimeEntry getEntry(int index) => followPointRenderer.Entries[index];
 
         private FollowPointConnection getGroup(int index) => followPointRenderer.ChildrenOfType<FollowPointConnection>().Single(c => c.Entry == getEntry(index));
 
