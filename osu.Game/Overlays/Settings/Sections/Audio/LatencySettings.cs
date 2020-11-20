@@ -19,8 +19,22 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 new SettingsSlider<int>
                 {
-                    LabelText = "Device Period",
-                    Current = audio.DevicePeriod,
+                    LabelText = "Device update period",
+                    Current = audio.DeviceUpdatePeriod,
+                    KeyboardStep = 1,
+                    TransferValueOnCommit = true
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "Device buffer size",
+                    Current = audio.DeviceBufferSize,
+                    KeyboardStep = 1,
+                    TransferValueOnCommit = true
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "Playback buffer size",
+                    Current = audio.PlaybackBufferSize,
                     KeyboardStep = 1,
                     TransferValueOnCommit = true
                 }
