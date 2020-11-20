@@ -43,12 +43,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             InternalChildren = new Drawable[]
             {
-                connectionPool = new DrawablePool<FollowPointConnection>(1, 200),
-                pointPool = new DrawablePool<FollowPoint>(50, 1000)
+                connectionPool = new DrawablePoolNoLifetime<FollowPointConnection>(1, 200),
+                pointPool = new DrawablePoolNoLifetime<FollowPoint>(50, 1000)
             };
-
-            MakeChildAlive(connectionPool);
-            MakeChildAlive(pointPool);
         }
 
         public void AddFollowPoints(OsuHitObject hitObject)
@@ -136,7 +133,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
         }
 
-        protected override bool CheckChildrenLife() => lifetimeManager.Update(Time.Current);
+        protected override bool CheckChildrenLife()
+        {
+            bool anyAliveChanged = base.CheckChildrenLife();
+            anyAliveChanged |= lifetimeManager.Update(Time.Current);
+            return anyAliveChanged;
+        }
 
         private void onEntryBecameAlive(LifetimeEntry entry)
         {
@@ -149,7 +151,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             connectionsInUse[entry] = connection;
 
             AddInternal(connection);
-            MakeChildAlive(connection);
         }
 
         private void onEntryBecameDead(LifetimeEntry entry)
@@ -171,6 +172,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             foreach (var entry in lifetimeEntries)
                 entry.UnbindEvents();
             lifetimeEntries.Clear();
+        }
+
+        private class DrawablePoolNoLifetime<T> : DrawablePool<T>
+            where T : PoolableDrawable, new()
+        {
+            public override bool RemoveWhenNotAlive => false;
+
+            public DrawablePoolNoLifetime(int initialSize, int? maximumSize = null)
+                : base(initialSize, maximumSize)
+            {
+            }
         }
 
         public class FollowPointLifetimeEntry : LifetimeEntry
