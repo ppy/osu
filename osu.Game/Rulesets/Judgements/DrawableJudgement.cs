@@ -6,6 +6,7 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -28,6 +29,8 @@ namespace osu.Game.Rulesets.Judgements
         public override bool RemoveCompletedTransforms => false;
 
         protected SkinnableDrawable JudgementBody { get; private set; }
+
+        private readonly Container aboveHitObjectsContent;
 
         [Resolved]
         private ISkinSource skinSource { get; set; }
@@ -59,6 +62,12 @@ namespace osu.Game.Rulesets.Judgements
         {
             Size = new Vector2(judgement_size);
             Origin = Anchor.Centre;
+
+            AddInternal(aboveHitObjectsContent = new Container
+            {
+                Depth = float.MinValue,
+                RelativeSizeAxes = Axes.Both
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -66,6 +75,8 @@ namespace osu.Game.Rulesets.Judgements
         {
             prepareDrawables();
         }
+
+        public Drawable GetProxyAboveHitObjectsContent() => aboveHitObjectsContent.CreateProxy();
 
         protected override void LoadComplete()
         {
@@ -189,12 +200,20 @@ namespace osu.Game.Rulesets.Judgements
             if (JudgementBody != null)
                 RemoveInternal(JudgementBody);
 
+            aboveHitObjectsContent.Clear();
             AddInternal(JudgementBody = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ =>
                 CreateDefaultJudgement(type), confineMode: ConfineMode.NoScaling)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
+
+            if (JudgementBody.Drawable is IAnimatableJudgement animatable)
+            {
+                var proxiedContent = animatable.GetAboveHitObjectsProxiedContent();
+                if (proxiedContent != null)
+                    aboveHitObjectsContent.Add(proxiedContent);
+            }
 
             currentDrawableType = type;
         }
