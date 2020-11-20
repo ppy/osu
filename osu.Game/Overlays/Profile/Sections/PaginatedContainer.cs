@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly string missingText;
         private ShowMoreButton moreButton;
         private OsuSpriteText missing;
-        private PaginatedContainerHeader header;
+        private ProfileSubsectionHeader header;
 
         private readonly string headerText;
         private readonly CounterVisibilityState counterVisibilityState;
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
             Children = new Drawable[]
             {
-                header = new PaginatedContainerHeader(headerText, counterVisibilityState)
+                header = new ProfileSubsectionHeader(headerText, counterVisibilityState)
                 {
                     Alpha = string.IsNullOrEmpty(headerText) ? 0 : 1
                 },
