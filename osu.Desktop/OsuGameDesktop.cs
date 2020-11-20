@@ -79,7 +79,7 @@ namespace osu.Desktop
         private string getStableInstallPathFromRegistry()
         {
             using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString()?.Split('"')[1].Replace("osu!.exe", "");
+                return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
         protected override UpdateManager CreateUpdateManager()
