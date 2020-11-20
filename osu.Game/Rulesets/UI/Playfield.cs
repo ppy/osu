@@ -33,12 +33,14 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> is added.
+        /// Invoked before a new <see cref="DrawableHitObject"/> is added.
+        /// This event is invoked only once for each <see cref="DrawableHitObject"/>
+        /// even the drawable is pooled and used multiple times for different <see cref="HitObject"/>s.
         /// </summary>
         /// <remarks>
         /// This event is also called for nested <see cref="DrawableHitObject"/>s.
         /// </remarks>
-        public event Action<DrawableHitObject> DrawableHitObjectAdded;
+        public event Action<DrawableHitObject> OnNewDrawableHitObject;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
@@ -93,13 +95,15 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected Playfield()
         {
+            OnNewDrawableHitObject += d =>
+                d.OnNestedDrawableCreated += nested => OnNewDrawableHitObject?.Invoke(nested);
+
             RelativeSizeAxes = Axes.Both;
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(() => CreateHitObjectContainer().With(h =>
             {
                 h.NewResult += (d, r) => NewResult?.Invoke(d, r);
                 h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
-                h.DrawableHitObjectAdded += d => DrawableHitObjectAdded?.Invoke(d);
                 h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
                 h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
@@ -133,6 +137,8 @@ namespace osu.Game.Rulesets.UI
         /// <param name="h">The DrawableHitObject to add.</param>
         public virtual void Add(DrawableHitObject h)
         {
+            OnNewDrawableHitObject?.Invoke(h);
+
             HitObjectContainer.Add(h);
             OnHitObjectAdded(h.HitObject);
         }
@@ -334,6 +340,8 @@ namespace osu.Game.Rulesets.UI
                 // This is done before Apply() so that the state is updated once when the hitobject is applied.
                 if (!dho.IsLoaded)
                 {
+                    OnNewDrawableHitObject?.Invoke(dho);
+
                     foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
                         m.ApplyToDrawableHitObjects(dho.Yield());
                 }
