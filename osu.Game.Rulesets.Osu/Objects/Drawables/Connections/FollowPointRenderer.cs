@@ -248,12 +248,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 Vector2 startPosition = Start.StackedEndPosition;
                 Vector2 endPosition = End.StackedPosition;
                 Vector2 distanceVector = endPosition - startPosition;
+
+                // The lifetime start will match the fade-in time of the first follow point.
                 float fraction = (int)(FollowPointConnection.SPACING * 1.5) / distanceVector.Length;
-
-                double duration = End.StartTime - Start.GetEndTime();
-
-                double fadeOutTime = Start.StartTime + fraction * duration;
-                double fadeInTime = fadeOutTime - FollowPointConnection.PREEMPT;
+                FollowPointConnection.GetFadeTimes(Start, End, fraction, out var fadeInTime, out _);
 
                 LifetimeStart = fadeInTime;
                 LifetimeEnd = double.MaxValue; // This will be set by the connection.

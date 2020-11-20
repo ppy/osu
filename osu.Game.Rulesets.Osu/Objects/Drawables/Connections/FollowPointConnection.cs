@@ -55,12 +55,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             Vector2 startPosition = start.StackedEndPosition;
             Vector2 endPosition = end.StackedPosition;
-            double endTime = end.StartTime;
 
             Vector2 distanceVector = endPosition - startPosition;
             int distance = (int)distanceVector.Length;
             float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
-            double duration = endTime - startTime;
 
             double finalTransformEndTime = startTime;
 
@@ -69,8 +67,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 float fraction = (float)d / distance;
                 Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
                 Vector2 pointEndPosition = startPosition + fraction * distanceVector;
-                double fadeOutTime = startTime + fraction * duration;
-                double fadeInTime = fadeOutTime - PREEMPT;
+
+                GetFadeTimes(start, end, (float)d / distance, out var fadeInTime, out var fadeOutTime);
 
                 FollowPoint fp;
 
@@ -97,6 +95,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
             Entry.LifetimeEnd = finalTransformEndTime;
+        }
+
+        /// <summary>
+        /// Computes the fade time of follow point positioned between two hitobjects.
+        /// </summary>
+        /// <param name="start">The first <see cref="OsuHitObject"/>, where follow points should originate from.</param>
+        /// <param name="end">The second <see cref="OsuHitObject"/>, which follow points should target.</param>
+        /// <param name="fraction">The fractional distance along <paramref name="start"/> and <paramref name="end"/> at which the follow point is to be located.</param>
+        /// <param name="fadeInTime">The fade-in time of the follow point/</param>
+        /// <param name="fadeOutTime">The fade-out time of the follow point.</param>
+        public static void GetFadeTimes(OsuHitObject start, OsuHitObject end, float fraction, out double fadeInTime, out double fadeOutTime)
+        {
+            double startTime = start.GetEndTime();
+            double duration = end.StartTime - startTime;
+
+            fadeOutTime = startTime + fraction * duration;
+            fadeInTime = fadeOutTime - PREEMPT;
         }
     }
 }
