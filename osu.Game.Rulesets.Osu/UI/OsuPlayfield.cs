@@ -125,13 +125,13 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override void OnHitObjectAdded(HitObject hitObject)
         {
             base.OnHitObjectAdded(hitObject);
-            followPoints.AddFollowPoints2((OsuHitObject)hitObject);
+            followPoints.AddFollowPoints((OsuHitObject)hitObject);
         }
 
         protected override void OnHitObjectRemoved(HitObject hitObject)
         {
             base.OnHitObjectRemoved(hitObject);
-            followPoints.RemoveFollowPoints2((OsuHitObject)hitObject);
+            followPoints.RemoveFollowPoints((OsuHitObject)hitObject);
         }
 
         public void OnHitObjectLoaded(Drawable drawable)

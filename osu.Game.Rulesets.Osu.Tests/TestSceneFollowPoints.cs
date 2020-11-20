@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     }
 
                     hitObjectContainer.Add(drawableObject);
-                    followPointRenderer.AddFollowPoints2(objects[i]);
+                    followPointRenderer.AddFollowPoints(objects[i]);
                 }
             });
         }
@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 var drawableObject = getFunc.Invoke();
 
                 hitObjectContainer.Remove(drawableObject);
-                followPointRenderer.RemoveFollowPoints2(drawableObject.HitObject);
+                followPointRenderer.RemoveFollowPoints(drawableObject.HitObject);
             });
         }
 
