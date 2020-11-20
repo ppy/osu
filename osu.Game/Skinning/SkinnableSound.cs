@@ -152,7 +152,7 @@ namespace osu.Game.Skinning
                 SamplesContainer.Add(sample);
             }
 
-            if (wasPlaying)
+            if (wasPlaying && !Looping)
                 Play();
         }
 
