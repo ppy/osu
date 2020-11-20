@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             MakeChildAlive(pointPool);
         }
 
-        public void AddFollowPoints2(OsuHitObject hitObject)
+        public void AddFollowPoints(OsuHitObject hitObject)
         {
             addEntry(hitObject);
 
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             startTimeMap[hitObject] = startTimeBindable;
         }
 
-        public void RemoveFollowPoints2(OsuHitObject hitObject)
+        public void RemoveFollowPoints(OsuHitObject hitObject)
         {
             removeEntry(hitObject);
 
