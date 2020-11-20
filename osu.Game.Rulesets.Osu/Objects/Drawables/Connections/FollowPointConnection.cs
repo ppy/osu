@@ -21,15 +21,32 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         public FollowPointRenderer.FollowPointLifetimeEntry Entry;
         public DrawablePool<FollowPoint> Pool;
 
-        protected override void FreeAfterUse()
-        {
-            base.FreeAfterUse();
-            ClearInternal(false);
-        }
-
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
+
+            Entry.Invalidated += onEntryInvalidated;
+
+            refreshPoints();
+        }
+
+        protected override void FreeAfterUse()
+        {
+            base.FreeAfterUse();
+
+            Entry.Invalidated -= onEntryInvalidated;
+
+            // Return points to the pool.
+            ClearInternal(false);
+
+            Entry = null;
+        }
+
+        private void onEntryInvalidated() => refreshPoints();
+
+        private void refreshPoints()
+        {
+            ClearInternal(false);
 
             OsuHitObject start = Entry.Start;
             OsuHitObject end = Entry.End;
