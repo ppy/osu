@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -20,7 +19,6 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -40,44 +38,18 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
 
-        private readonly Bindable<bool> playfieldBorderStyle = new BindableBool();
-
         private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
 
         public OsuPlayfield()
         {
             InternalChildren = new Drawable[]
             {
-                playfieldBorder = new PlayfieldBorder
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 3
-                },
-                spinnerProxies = new ProxyContainer
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-                followPoints = new FollowPointRenderer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 2,
-                },
-                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 1,
-                },
-                // Todo: This should not exist, but currently helps to reduce LOH allocations due to unbinding skin source events on judgement disposal
-                // Todo: Remove when hitobjects are properly pooled
-                new SkinProvidingContainer(null)
-                {
-                    Child = HitObjectContainer,
-                },
-                approachCircles = new ProxyContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = -1,
-                },
+                playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
+                spinnerProxies = new ProxyContainer { RelativeSizeAxes = Axes.Both },
+                followPoints = new FollowPointRenderer { RelativeSizeAxes = Axes.Both },
+                judgementLayer = new JudgementContainer<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
+                HitObjectContainer,
+                approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
