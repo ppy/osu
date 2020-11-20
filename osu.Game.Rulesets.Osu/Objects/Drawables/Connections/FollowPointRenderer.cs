@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -117,7 +118,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private void removeEntry(OsuHitObject hitObject)
         {
             int index = lifetimeEntries.FindIndex(e => e.Start == hitObject);
+
             var entry = lifetimeEntries[index];
+            entry.UnbindEvents();
 
             lifetimeEntries.RemoveAt(index);
             lifetimeManager.RemoveEntry(entry);
@@ -161,14 +164,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             addEntry(hitObject);
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            foreach (var entry in lifetimeEntries)
+                entry.UnbindEvents();
+            lifetimeEntries.Clear();
+        }
+
         public class FollowPointLifetimeEntry : LifetimeEntry
         {
+            public event Action Invalidated;
             public readonly OsuHitObject Start;
 
             public FollowPointLifetimeEntry(OsuHitObject start)
             {
                 Start = start;
                 LifetimeStart = Start.StartTime;
+
+                bindEvents();
             }
 
             private OsuHitObject end;
@@ -178,12 +193,51 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 get => end;
                 set
                 {
+                    UnbindEvents();
+
                     end = value;
-                    computeLifetimes();
+
+                    bindEvents();
+
+                    refreshLifetimes();
                 }
             }
 
-            private void computeLifetimes()
+            private void bindEvents()
+            {
+                UnbindEvents();
+
+                // Note: Positions are bound for instantaneous feedback from positional changes from the editor, before ApplyDefaults() is called on hitobjects.
+                Start.DefaultsApplied += onDefaultsApplied;
+                Start.PositionBindable.ValueChanged += onPositionChanged;
+
+                if (End != null)
+                {
+                    End.DefaultsApplied += onDefaultsApplied;
+                    End.PositionBindable.ValueChanged += onPositionChanged;
+                }
+            }
+
+            public void UnbindEvents()
+            {
+                if (Start != null)
+                {
+                    Start.DefaultsApplied -= onDefaultsApplied;
+                    Start.PositionBindable.ValueChanged -= onPositionChanged;
+                }
+
+                if (End != null)
+                {
+                    End.DefaultsApplied -= onDefaultsApplied;
+                    End.PositionBindable.ValueChanged -= onPositionChanged;
+                }
+            }
+
+            private void onDefaultsApplied(HitObject obj) => refreshLifetimes();
+
+            private void onPositionChanged(ValueChangedEvent<Vector2> obj) => refreshLifetimes();
+
+            private void refreshLifetimes()
             {
                 if (end == null)
                 {
@@ -203,6 +257,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                 LifetimeStart = fadeInTime;
                 LifetimeEnd = double.MaxValue; // This will be set by the connection.
+
+                Invalidated?.Invoke();
             }
         }
     }
