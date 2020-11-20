@@ -69,5 +69,7 @@ namespace osu.Game.Skinning
                     break;
             }
         }
+
+        public Drawable GetAboveHitObjectsProxiedContent() => CreateProxy();
     }
 }
