@@ -19,7 +19,6 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
