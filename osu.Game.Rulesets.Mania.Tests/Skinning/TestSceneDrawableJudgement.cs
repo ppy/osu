@@ -24,7 +24,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                 if (hitWindows.IsHitResultAllowed(result))
                 {
                     AddStep("Show " + result.GetDescription(), () => SetContents(() =>
-                        new DrawableManiaJudgement(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null)
+                        new DrawableManiaJudgement(new JudgementResult(new HitObject { StartTime = Time.Current }, new Judgement())
+                        {
+                            Type = result
+                        }, null)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
