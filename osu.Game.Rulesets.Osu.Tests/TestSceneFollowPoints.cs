@@ -95,9 +95,19 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             addMultipleObjectsStep();
 
-            AddStep("move hitobject", () => getObject(2).HitObject.Position = new Vector2(300, 100));
+            AddStep("move hitobject", () =>
+            {
+                var manualClock = new ManualClock();
+                followPointRenderer.Clock = new FramedClock(manualClock);
+
+                manualClock.CurrentTime = getObject(1).HitObject.StartTime;
+                followPointRenderer.UpdateSubTree();
+
+                getObject(2).HitObject.Position = new Vector2(300, 100);
+            });
 
             assertGroups();
+            assertDirections();
         }
 
         [TestCase(0, 0)] // Start -> Start
