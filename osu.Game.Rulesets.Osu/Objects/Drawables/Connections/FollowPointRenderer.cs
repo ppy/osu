@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             private void refreshLifetimes()
             {
-                if (end == null)
+                if (End == null || End.NewCombo || Start is Spinner || End is Spinner)
                 {
                     LifetimeEnd = LifetimeStart;
                     return;
