@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Overlays;
@@ -56,18 +57,11 @@ namespace osu.Desktop
 
             string stableInstallPath;
 
-            try
+            if (OperatingSystem.IsWindows())
             {
-#pragma warning disable CA1416 // Validate platform compatibility
-                using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                    stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString()?.Split('"')[1].Replace("osu!.exe", "");
-#pragma warning restore CA1416 // Validate platform compatibility
-
+                stableInstallPath = getStableInstallPathFromRegistry();
                 if (checkExists(stableInstallPath))
                     return stableInstallPath;
-            }
-            catch
-            {
             }
 
             stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
@@ -79,6 +73,13 @@ namespace osu.Desktop
                 return stableInstallPath;
 
             return null;
+        }
+
+        [SupportedOSPlatform("windows")]
+        private string getStableInstallPathFromRegistry()
+        {
+            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+                return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
         protected override UpdateManager CreateUpdateManager()
