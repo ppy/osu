@@ -47,8 +47,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             switch (hitObject)
             {
                 case CatchHitObject catchObject:
-                    return createDrawableRepresentation?.Invoke(catchObject)?.With(o =>
-                        ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
+                    return createDrawableRepresentation?.Invoke(catchObject);
             }
 
             throw new ArgumentException($"{nameof(hitObject)} must be of type {nameof(CatchHitObject)}.");

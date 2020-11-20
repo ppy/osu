@@ -55,20 +55,13 @@ namespace osu.Game.Rulesets.Catch.UI
                 HitObjectContainer,
                 CatcherArea,
             };
+
+            NewResult += onNewResult;
+            RevertResult += onRevertResult;
+            DrawableHitObjectAdded += d => ((DrawableCatchHitObject)d).CheckPosition = CheckIfWeCanCatch;
         }
 
         public bool CheckIfWeCanCatch(CatchHitObject obj) => CatcherArea.AttemptCatch(obj);
-
-        public override void Add(DrawableHitObject h)
-        {
-            h.OnNewResult += onNewResult;
-            h.OnRevertResult += onRevertResult;
-
-            base.Add(h);
-
-            var fruit = (DrawableCatchHitObject)h;
-            fruit.CheckPosition = CheckIfWeCanCatch;
-        }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
             => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
