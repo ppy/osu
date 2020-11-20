@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -40,8 +39,6 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
 
-        private readonly Bindable<bool> playfieldBorderStyle = new BindableBool();
-
         private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
 
         public OsuPlayfield()
@@ -67,12 +64,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     RelativeSizeAxes = Axes.Both,
                     Depth = 1,
                 },
-                // Todo: This should not exist, but currently helps to reduce LOH allocations due to unbinding skin source events on judgement disposal
-                // Todo: Remove when hitobjects are properly pooled
-                new SkinProvidingContainer(null)
-                {
-                    Child = HitObjectContainer,
-                },
+                HitObjectContainer,
                 approachCircles = new ProxyContainer
                 {
                     RelativeSizeAxes = Axes.Both,
