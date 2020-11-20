@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             public OsuEditPlayfield()
             {
-                DrawableHitObjectAdded += d => d.ApplyCustomUpdateState += updateState;
+                OnNewDrawableHitObject += d => d.ApplyCustomUpdateState += updateState;
             }
 
             private const double editor_hit_object_fade_out_extension = 700;

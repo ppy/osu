@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -91,23 +92,28 @@ namespace osu.Game.Rulesets.Osu.UI
             AddRangeInternal(poolDictionary.Values);
 
             NewResult += onNewResult;
-            DrawableHitObjectAdded += onDrawableHitObjectAdded;
+            OnNewDrawableHitObject += onDrawableHitObjectAdded;
         }
 
         private void onDrawableHitObjectAdded(DrawableHitObject drawable)
         {
             ((DrawableOsuHitObject)drawable).CheckHittable = CheckHittable;
 
+            Debug.Assert(!drawable.IsLoaded, $"Already loaded {nameof(DrawableHitObject)} is added to {nameof(OsuPlayfield)}");
+            drawable.OnLoadComplete += onDrawableHitObjectLoaded;
+        }
+
+        private void onDrawableHitObjectLoaded(Drawable drawable)
+        {
+            // note: `Slider`'s `ProxiedLayer` is added when its nested `DrawableHitCircle` is loaded.
             switch (drawable)
             {
                 case DrawableSpinner _:
-                    if (!drawable.HasProxy)
-                        spinnerProxies.Add(drawable.CreateProxy());
+                    spinnerProxies.Add(drawable.CreateProxy());
                     break;
 
-                case IDrawableHitObjectWithProxiedApproach approach:
-                    if (!approach.ProxiedLayer.HasProxy)
-                        approachCircles.Add(approach.ProxiedLayer.CreateProxy());
+                case DrawableHitCircle hitCircle:
+                    approachCircles.Add(hitCircle.ProxiedLayer.CreateProxy());
                     break;
             }
         }
