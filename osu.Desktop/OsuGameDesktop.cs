@@ -58,8 +58,10 @@ namespace osu.Desktop
 
             try
             {
+#pragma warning disable CA1416 // Validate platform compatibility
                 using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
                     stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString()?.Split('"')[1].Replace("osu!.exe", "");
+#pragma warning restore CA1416 // Validate platform compatibility
 
                 if (checkExists(stableInstallPath))
                     return stableInstallPath;
