@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         private readonly List<FollowPointLifetimeEntry> lifetimeEntries = new List<FollowPointLifetimeEntry>();
         private readonly Dictionary<LifetimeEntry, FollowPointConnection> connectionsInUse = new Dictionary<LifetimeEntry, FollowPointConnection>();
+        private readonly Dictionary<HitObject, IBindable> startTimeMap = new Dictionary<HitObject, IBindable>();
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
 
         public FollowPointRenderer()
@@ -49,6 +51,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         }
 
         public void AddFollowPoints2(OsuHitObject hitObject)
+        {
+            addEntry(hitObject);
+
+            var startTimeBindable = hitObject.StartTimeBindable.GetBoundCopy();
+            startTimeBindable.ValueChanged += _ => onStartTimeChanged(hitObject);
+            startTimeMap[hitObject] = startTimeBindable;
+        }
+
+        public void RemoveFollowPoints2(OsuHitObject hitObject)
+        {
+            removeEntry(hitObject);
+
+            startTimeMap[hitObject].UnbindAll();
+            startTimeMap.Remove(hitObject);
+        }
+
+        private void addEntry(OsuHitObject hitObject)
         {
             var newEntry = new FollowPointLifetimeEntry(hitObject);
 
@@ -95,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             lifetimeManager.AddEntry(newEntry);
         }
 
-        public void RemoveFollowPoints2(OsuHitObject hitObject)
+        private void removeEntry(OsuHitObject hitObject)
         {
             int index = lifetimeEntries.FindIndex(e => e.Start == hitObject);
             var entry = lifetimeEntries[index];
@@ -134,6 +153,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             RemoveInternal(connectionsInUse[entry]);
             connectionsInUse.Remove(entry);
+        }
+
+        private void onStartTimeChanged(OsuHitObject hitObject)
+        {
+            removeEntry(hitObject);
+            addEntry(hitObject);
         }
 
         public class FollowPointLifetimeEntry : LifetimeEntry
