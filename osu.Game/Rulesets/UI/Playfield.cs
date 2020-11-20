@@ -33,6 +33,11 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> is added.
+        /// </summary>
+        public event Action<DrawableHitObject> DrawableHitObjectAdded;
+
+        /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
         public HitObjectContainer HitObjectContainer => hitObjectContainerLazy.Value;
@@ -91,6 +96,7 @@ namespace osu.Game.Rulesets.UI
             {
                 h.NewResult += (d, r) => NewResult?.Invoke(d, r);
                 h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
+                h.DrawableHitObjectAdded += d => DrawableHitObjectAdded?.Invoke(d);
                 h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
                 h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
