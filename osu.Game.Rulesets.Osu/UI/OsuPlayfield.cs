@@ -91,6 +91,15 @@ namespace osu.Game.Rulesets.Osu.UI
             AddRangeInternal(poolDictionary.Values);
 
             NewResult += onNewResult;
+            DrawableHitObjectAdded += onDrawableHitObjectAdded;
+        }
+
+        private void onDrawableHitObjectAdded(DrawableHitObject drawable)
+        {
+            if (!drawable.IsLoaded)
+                drawable.OnLoadComplete += onDrawableHitObjectLoaded;
+
+            ((DrawableOsuHitObject)drawable).CheckHittable = CheckHittable;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -98,27 +107,18 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
 
-            registerPool<HitCircle, DrawableHitCircle>(10, 100);
+            RegisterPool<HitCircle, DrawableHitCircle>(10, 100);
 
-            registerPool<Slider, DrawableSlider>(10, 100);
-            registerPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
-            registerPool<SliderTailCircle, DrawableSliderTail>(10, 100);
-            registerPool<SliderTick, DrawableSliderTick>(10, 100);
-            registerPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
+            RegisterPool<Slider, DrawableSlider>(10, 100);
+            RegisterPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
+            RegisterPool<SliderTailCircle, DrawableSliderTail>(10, 100);
+            RegisterPool<SliderTick, DrawableSliderTick>(10, 100);
+            RegisterPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
 
-            registerPool<Spinner, DrawableSpinner>(2, 20);
-            registerPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
-            registerPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
+            RegisterPool<Spinner, DrawableSpinner>(2, 20);
+            RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
+            RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
         }
-
-        private void registerPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
-            where TObject : HitObject
-            where TDrawable : DrawableHitObject, new()
-            => RegisterPool<TObject, TDrawable>(CreatePool<TDrawable>(initialSize, maximumSize));
-
-        protected virtual DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
-            where TDrawable : DrawableHitObject, new()
-            => new DrawableOsuPool<TDrawable>(CheckHittable, OnHitObjectLoaded, initialSize, maximumSize);
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.UI
             followPoints.RemoveFollowPoints((OsuHitObject)hitObject);
         }
 
-        public void OnHitObjectLoaded(Drawable drawable)
+        private void onDrawableHitObjectLoaded(Drawable drawable)
         {
             switch (drawable)
             {
