@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         public const int SPACING = 32;
         public const double PREEMPT = 800;
 
-        public FollowPointRenderer.FollowPointLifetimeEntry Entry;
+        public FollowPointLifetimeEntry Entry;
         public DrawablePool<FollowPoint> Pool;
 
         protected override void PrepareForUse()
