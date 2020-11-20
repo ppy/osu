@@ -45,6 +45,9 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is added.
         /// </summary>
+        /// <remarks>
+        /// This event is also called for nested <see cref="DrawableHitObject"/>s.
+        /// </remarks>
         public event Action<DrawableHitObject> DrawableHitObjectAdded;
 
         /// <summary>
