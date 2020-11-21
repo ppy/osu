@@ -69,8 +69,11 @@ namespace osu.Game.Screens.Select
             return beatmap;
         }
 
-        private void calculateRecommendedDifficulties()
+        private void calculateRecommendedDifficulties(bool onlyIfNoPreviousValues = false)
         {
+            if (recommendedStarDifficulty.Any() && onlyIfNoPreviousValues)
+                return;
+
             // only query API for built-in rulesets
             rulesets.AvailableRulesets.Where(ruleset => ruleset.ID <= 3).ForEach(rulesetInfo =>
             {
@@ -122,7 +125,7 @@ namespace osu.Game.Screens.Select
             switch (state.NewValue)
             {
                 case APIState.Online:
-                    calculateRecommendedDifficulties();
+                    calculateRecommendedDifficulties(true);
                     break;
             }
         });
