@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -33,10 +35,13 @@ namespace osu.Game.Overlays.Profile.Sections
         private CancellationTokenSource loadCancellation;
 
         private ShowMoreButton moreButton;
+        private OsuSpriteText missing;
+        private readonly string missingText;
 
         protected PaginatedProfileSubsection(Bindable<User> user, string headerText = "", string missingText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
-            : base(user, headerText, missingText, counterVisibilityState)
+            : base(user, headerText, counterVisibilityState)
         {
+            this.missingText = missingText;
         }
 
         protected override Drawable CreateContent() => new FillFlowContainer
@@ -59,6 +64,12 @@ namespace osu.Game.Overlays.Profile.Sections
                     Alpha = 0,
                     Margin = new MarginPadding { Top = 10 },
                     Action = showMore,
+                },
+                missing = new OsuSpriteText
+                {
+                    Font = OsuFont.GetFont(size: 15),
+                    Text = missingText,
+                    Alpha = 0,
                 }
             }
         };
@@ -97,15 +108,15 @@ namespace osu.Game.Overlays.Profile.Sections
                 moreButton.Hide();
                 moreButton.IsLoading = false;
 
-                if (!string.IsNullOrEmpty(Missing.Text))
-                    Missing.Show();
+                if (!string.IsNullOrEmpty(missingText))
+                    missing.Show();
 
                 return;
             }
 
             LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
             {
-                Missing.Hide();
+                missing.Hide();
                 moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
                 moreButton.IsLoading = false;
 
