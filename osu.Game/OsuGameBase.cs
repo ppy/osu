@@ -159,7 +159,7 @@ namespace osu.Game
                 VersionHash = $"{Version}-{RuntimeInfo.OS}".ComputeMD5Hash();
             }
 
-            Resources.AddStore(new DllResourceStore(typeof(MResources).Assembly));
+            Resources.AddStore(new DllResourceStore(MResources.ResourceAssembly));
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
