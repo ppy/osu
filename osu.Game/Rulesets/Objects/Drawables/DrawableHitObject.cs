@@ -147,6 +147,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private Container<PausableSkinnableSound> samplesContainer;
 
         /// <summary>
+        /// Whether the initialization logic in <see cref="Playfield" /> has applied.
+        /// </summary>
+        internal bool HasInitialized;
+
+        /// <summary>
         /// Creates a new <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="initialHitObject">
