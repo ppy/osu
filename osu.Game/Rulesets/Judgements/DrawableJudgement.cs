@@ -149,6 +149,7 @@ namespace osu.Game.Rulesets.Judgements
 
         private void runAnimation()
         {
+            ApplyTransformsAt(double.MinValue, true);
             ClearTransforms(true);
             LifetimeStart = Result.TimeAbsolute;
 
