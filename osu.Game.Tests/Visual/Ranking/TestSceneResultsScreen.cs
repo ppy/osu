@@ -326,7 +326,7 @@ namespace osu.Game.Tests.Visual.Ranking
             public HotkeyRetryOverlay RetryOverlay;
 
             public UnrankedSoloResultsScreen(ScoreInfo score)
-                : base(score, false)
+                : base(score, true)
             {
                 Score.Beatmap.OnlineBeatmapID = 0;
                 Score.Beatmap.Status = BeatmapSetOnlineStatus.Pending;
