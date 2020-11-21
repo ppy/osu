@@ -25,8 +25,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [BackgroundDependencyLoader]
         private void load(BeatmapManager manager, Framework.Game game)
         {
-            manager.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/circles.osz"), "circles.osz"));
-            manager.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/welcome.osz"), "welcome.osz"));
+            manager.Import(new ZipArchiveReader(game.Resources.GetStream("Tracks/circles.osz"), "circles.osz"));
+            manager.Import(new ZipArchiveReader(game.Resources.GetStream("Tracks/welcome.osz"), "welcome.osz"));
 
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     AddUntilStep("previous track", () =>
                     {
                         PreviousTrackResult result = PreviousTrackResult.None;
-                        musicController.PreviousTrack((a) => result = a);
+                        musicController.PreviousTrack(r => result = r);
                         return result != PreviousTrackResult.Restart;
                     });
                 }
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     AddUntilStep("previous track", () =>
                     {
                         PreviousTrackResult result = PreviousTrackResult.None;
-                        musicController.PreviousTrack((a) => result = a);
+                        musicController.PreviousTrack(r => result = r);
                         return result != PreviousTrackResult.Restart;
                     });
                 }
