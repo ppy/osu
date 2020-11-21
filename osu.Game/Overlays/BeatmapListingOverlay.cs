@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapListingOverlay : FullscreenOverlay
+    public class BeatmapListingOverlay : FullscreenOverlay<BeatmapListingHeader>
     {
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays
         private OverlayScrollContainer resultScrollContainer;
 
         public BeatmapListingOverlay()
-            : base(OverlayColourScheme.Blue)
+            : base(OverlayColourScheme.Blue, new BeatmapListingHeader())
         {
         }
 
@@ -65,9 +65,10 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new BeatmapListingHeader(),
+                            Header,
                             filterControl = new BeatmapListingFilterControl
                             {
+                                TypingStarted = onTypingStarted,
                                 SearchStarted = onSearchStarted,
                                 SearchFinished = onSearchFinished,
                             },
@@ -100,6 +101,12 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+        }
+
+        private void onTypingStarted()
+        {
+            // temporary until the textbox/header is updated to always stay on screen.
+            resultScrollContainer.ScrollToStart();
         }
 
         protected override void OnFocus(FocusEvent e)

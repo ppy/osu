@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
         /// </summary>
-        protected readonly HitObject HitObject;
+        public readonly HitObject HitObject;
 
         [Resolved(canBeNull: true)]
         protected EditorClock EditorClock { get; private set; }

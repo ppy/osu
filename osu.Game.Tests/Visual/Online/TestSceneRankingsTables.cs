@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Rankings;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -105,7 +106,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             onLoadStarted();
 
-            request = new GetSpotlightRankingsRequest(ruleset, spotlight);
+            request = new GetSpotlightRankingsRequest(ruleset, spotlight, RankingsSortCriteria.All);
             ((GetSpotlightRankingsRequest)request).Success += rankings => Schedule(() =>
             {
                 var table = new ScoresTable(1, rankings.Users);

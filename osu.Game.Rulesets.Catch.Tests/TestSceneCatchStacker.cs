@@ -4,18 +4,13 @@
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Tests.Visual;
+using osu.Game.Rulesets.Catch.UI;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatchStacker : PlayerTestScene
+    public class TestSceneCatchStacker : TestSceneCatchPlayer
     {
-        public TestSceneCatchStacker()
-            : base(new CatchRuleset())
-        {
-        }
-
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
@@ -28,7 +23,14 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
 
             for (int i = 0; i < 512; i++)
-                beatmap.HitObjects.Add(new Fruit { X = 0.5f + i / 2048f * (i % 10 - 5), StartTime = i * 100, NewCombo = i % 8 == 0 });
+            {
+                beatmap.HitObjects.Add(new Fruit
+                {
+                    X = (0.5f + i / 2048f * (i % 10 - 5)) * CatchPlayfield.WIDTH,
+                    StartTime = i * 100,
+                    NewCombo = i % 8 == 0
+                });
+            }
 
             return beatmap;
         }

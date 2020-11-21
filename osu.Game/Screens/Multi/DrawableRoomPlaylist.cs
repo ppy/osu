@@ -60,8 +60,6 @@ namespace osu.Game.Screens.Multi
             RequestDeletion = requestDeletion
         };
 
-        private void requestSelection(PlaylistItem item) => SelectedItem.Value = item;
-
         private void requestDeletion(PlaylistItem item)
         {
             if (SelectedItem.Value == item)

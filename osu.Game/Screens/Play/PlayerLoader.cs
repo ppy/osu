@@ -4,12 +4,14 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -53,6 +55,8 @@ namespace osu.Game.Screens.Play
 
         private bool backgroundBrightnessReduction;
 
+        private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
+
         protected bool BackgroundBrightnessReduction
         {
             set
@@ -68,7 +72,7 @@ namespace osu.Game.Screens.Play
 
         private bool readyForPush =>
             // don't push unless the player is completely loaded
-            player.LoadState == LoadState.Ready
+            player?.LoadState == LoadState.Ready
             // don't push if the user is hovering one of the panes, unless they are idle.
             && (IsHovered || idleTracker.IsIdle.Value)
             // don't push if the user is dragging a slider or otherwise.
@@ -89,6 +93,9 @@ namespace osu.Game.Screens.Play
         private IdleTracker idleTracker;
 
         private ScheduledDelegate scheduledPushPlayer;
+
+        [CanBeNull]
+        private EpilepsyWarning epilepsyWarning;
 
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notificationOverlay { get; set; }
@@ -138,6 +145,15 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750)
             });
+
+            if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
+            {
+                AddInternal(epilepsyWarning = new EpilepsyWarning
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            }
         }
 
         protected override void LoadComplete()
@@ -153,7 +169,9 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            prepareNewPlayer();
+            if (epilepsyWarning != null)
+                epilepsyWarning.DimmableBackground = Background;
+            Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             content.ScaleTo(0.7f);
             Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
@@ -172,11 +190,6 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            MetadataInfo.Loading = true;
-
-            // we will only be resumed if the player has requested a re-run (see restartRequested).
-            prepareNewPlayer();
-
             this.Delay(400).Schedule(pushWhenLoaded);
         }
 
@@ -187,6 +200,11 @@ namespace osu.Game.Screens.Play
             cancelLoad();
 
             BackgroundBrightnessReduction = false;
+
+            // we're moving to player, so a period of silence is upcoming.
+            // stop the track before removing adjustment to avoid a volume spike.
+            Beatmap.Value.Track.Stop();
+            Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
         }
 
         public override bool OnExiting(IScreen next)
@@ -198,6 +216,7 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = false;
             BackgroundBrightnessReduction = false;
+            Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             return base.OnExiting(next);
         }
@@ -257,6 +276,9 @@ namespace osu.Game.Screens.Play
 
         private void prepareNewPlayer()
         {
+            if (!this.IsCurrentScreen())
+                return;
+
             var restartCount = player?.RestartCount + 1 ?? 0;
 
             player = createPlayer();
@@ -274,8 +296,10 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            content.ScaleTo(1, 650, Easing.OutQuint);
+            MetadataInfo.Loading = true;
+
             content.FadeInFromZero(400);
+            content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
         }
 
         private void contentOut()
@@ -308,7 +332,27 @@ namespace osu.Game.Screens.Play
                 {
                     contentOut();
 
-                    this.Delay(250).Schedule(() =>
+                    TransformSequence<PlayerLoader> pushSequence = this.Delay(250);
+
+                    // only show if the warning was created (i.e. the beatmap needs it)
+                    // and this is not a restart of the map (the warning expires after first load).
+                    if (epilepsyWarning?.IsAlive == true)
+                    {
+                        const double epilepsy_display_length = 3000;
+
+                        pushSequence
+                            .Schedule(() => epilepsyWarning.State.Value = Visibility.Visible)
+                            .TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint)
+                            .Delay(epilepsy_display_length)
+                            .Schedule(() =>
+                            {
+                                epilepsyWarning.Hide();
+                                epilepsyWarning.Expire();
+                            })
+                            .Delay(EpilepsyWarning.FADE_DURATION);
+                    }
+
+                    pushSequence.Schedule(() =>
                     {
                         if (!this.IsCurrentScreen()) return;
 

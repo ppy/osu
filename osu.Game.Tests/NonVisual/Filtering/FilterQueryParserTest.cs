@@ -60,9 +60,23 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
-        public void TestApplyDrainRateQueries()
+        public void TestApplyDrainRateQueriesByDrKeyword()
         {
             const string query = "dr>2 quite specific dr<:6";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(2, filterCriteria.SearchTerms.Length);
+            Assert.Greater(filterCriteria.DrainRate.Min, 2.0f);
+            Assert.Less(filterCriteria.DrainRate.Min, 2.1f);
+            Assert.Greater(filterCriteria.DrainRate.Max, 6.0f);
+            Assert.Less(filterCriteria.DrainRate.Min, 6.1f);
+        }
+
+        [Test]
+        public void TestApplyDrainRateQueriesByHpKeyword()
+        {
+            const string query = "hp>2 quite specific hp<=6";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("quite specific", filterCriteria.SearchText.Trim());

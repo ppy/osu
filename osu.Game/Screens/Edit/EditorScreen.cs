@@ -23,8 +23,12 @@ namespace osu.Game.Screens.Edit
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        protected EditorScreen()
+        public readonly EditorScreenMode Type;
+
+        protected EditorScreen(EditorScreenMode type)
         {
+            Type = type;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
@@ -39,11 +43,6 @@ namespace osu.Game.Screens.Edit
             this.FadeTo(0)
                 .Then()
                 .FadeTo(1f, 250, Easing.OutQuint);
-        }
-
-        public void Exit()
-        {
-            this.FadeOut(250).Expire();
         }
     }
 }

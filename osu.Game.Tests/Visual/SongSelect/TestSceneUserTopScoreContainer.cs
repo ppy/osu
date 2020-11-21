@@ -6,11 +6,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         public TestSceneUserTopScoreContainer()
         {
-            UserTopScoreContainer topScoreContainer;
+            UserTopScoreContainer<ScoreInfo> topScoreContainer;
 
             Add(dialogOverlay = new DialogOverlay
             {
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.DarkGreen,
                     },
-                    topScoreContainer = new UserTopScoreContainer
+                    topScoreContainer = new UserTopScoreContainer<ScoreInfo>(s => new LeaderboardScore(s, s.Position, false))
                     {
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.BottomCentre,
@@ -52,69 +52,60 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             var scores = new[]
             {
-                new APILegacyUserTopScoreInfo
+                new ScoreInfo
                 {
                     Position = 999,
-                    Score = new APILegacyScoreInfo
+                    Rank = ScoreRank.XH,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
                     {
-                        Rank = ScoreRank.XH,
-                        Accuracy = 1,
-                        MaxCombo = 244,
-                        TotalScore = 1707827,
-                        Mods = new[] { new OsuModHidden().Acronym, new OsuModHardRock().Acronym, },
-                        User = new User
+                        Id = 6602580,
+                        Username = @"waaiiru",
+                        Country = new Country
                         {
-                            Id = 6602580,
-                            Username = @"waaiiru",
-                            Country = new Country
-                            {
-                                FullName = @"Spain",
-                                FlagName = @"ES",
-                            },
+                            FullName = @"Spain",
+                            FlagName = @"ES",
                         },
-                    }
+                    },
                 },
-                new APILegacyUserTopScoreInfo
+                new ScoreInfo
                 {
                     Position = 110000,
-                    Score = new APILegacyScoreInfo
+                    Rank = ScoreRank.X,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    User = new User
                     {
-                        Rank = ScoreRank.X,
-                        Accuracy = 1,
-                        MaxCombo = 244,
-                        TotalScore = 1707827,
-                        User = new User
+                        Id = 4608074,
+                        Username = @"Skycries",
+                        Country = new Country
                         {
-                            Id = 4608074,
-                            Username = @"Skycries",
-                            Country = new Country
-                            {
-                                FullName = @"Brazil",
-                                FlagName = @"BR",
-                            },
+                            FullName = @"Brazil",
+                            FlagName = @"BR",
                         },
-                    }
+                    },
                 },
-                new APILegacyUserTopScoreInfo
+                new ScoreInfo
                 {
                     Position = 22333,
-                    Score = new APILegacyScoreInfo
+                    Rank = ScoreRank.S,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    User = new User
                     {
-                        Rank = ScoreRank.S,
-                        Accuracy = 1,
-                        MaxCombo = 244,
-                        TotalScore = 1707827,
-                        User = new User
+                        Id = 1541390,
+                        Username = @"Toukai",
+                        Country = new Country
                         {
-                            Id = 1541390,
-                            Username = @"Toukai",
-                            Country = new Country
-                            {
-                                FullName = @"Canada",
-                                FlagName = @"CA",
-                            },
+                            FullName = @"Canada",
+                            FlagName = @"CA",
                         },
-                    }
+                    },
                 }
             };
 

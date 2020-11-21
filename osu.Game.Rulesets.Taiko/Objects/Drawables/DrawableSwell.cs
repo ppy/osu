@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     }
                 }
 
-                nextTick?.TriggerResult(HitResult.Great);
+                nextTick?.TriggerResult(true);
 
                 var numHits = ticks.Count(r => r.IsHit);
 
@@ -208,24 +208,22 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         continue;
                     }
 
-                    tick.TriggerResult(HitResult.Miss);
+                    tick.TriggerResult(false);
                 }
 
-                var hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss;
-
-                ApplyResult(r => r.Type = hitResult);
+                ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult);
             }
         }
 
-        protected override void UpdateInitialTransforms()
+        protected override void UpdateStartTimeStateTransforms()
         {
-            base.UpdateInitialTransforms();
+            base.UpdateStartTimeStateTransforms();
 
-            using (BeginAbsoluteSequence(HitObject.StartTime - ring_appear_offset, true))
+            using (BeginDelayedSequence(-ring_appear_offset, true))
                 targetRing.ScaleTo(target_ring_scale, 400, Easing.OutQuint);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
             const double transition_duration = 300;
 
@@ -237,12 +235,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 case ArmedState.Miss:
                 case ArmedState.Hit:
-                    using (BeginDelayedSequence(HitObject.Duration, true))
-                    {
-                        this.FadeOut(transition_duration, Easing.Out);
-                        bodyContainer.ScaleTo(1.4f, transition_duration);
-                    }
-
+                    this.FadeOut(transition_duration, Easing.Out);
+                    bodyContainer.ScaleTo(1.4f, transition_duration);
                     break;
             }
         }

@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -15,6 +14,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
     {
         private readonly Drawable animationContent;
 
+        private Sprite layerNd;
+        private Sprite layerSpec;
+
         public LegacySliderBall(Drawable animationContent)
         {
             this.animationContent = animationContent;
@@ -23,24 +25,43 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, DrawableHitObject drawableObject)
+        private void load(ISkinSource skin)
         {
-            animationContent.Colour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
+            var ballColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
 
             InternalChildren = new[]
             {
-                new Sprite
+                layerNd = new Sprite
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Texture = skin.GetTexture("sliderb-nd"),
                     Colour = new Color4(5, 5, 5, 255),
                 },
-                animationContent,
-                new Sprite
+                LegacyColourCompatibility.ApplyWithDoubledAlpha(animationContent.With(d =>
                 {
+                    d.Anchor = Anchor.Centre;
+                    d.Origin = Anchor.Centre;
+                }), ballColour),
+                layerSpec = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Texture = skin.GetTexture("sliderb-spec"),
                     Blending = BlendingParameters.Additive,
                 },
             };
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            //undo rotation on layers which should not be rotated.
+            float appliedRotation = Parent.Rotation;
+
+            layerNd.Rotation = -appliedRotation;
+            layerSpec.Rotation = -appliedRotation;
         }
     }
 }

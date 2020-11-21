@@ -14,10 +14,12 @@ using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -25,6 +27,12 @@ namespace osu.Game.Screens.Select.Details
     {
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
 
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
@@ -71,6 +79,7 @@ namespace osu.Game.Screens.Select.Details
         {
             base.LoadComplete();
 
+            ruleset.BindValueChanged(_ => updateStatistics());
             mods.BindValueChanged(modsChanged, true);
         }
 
@@ -132,11 +141,39 @@ namespace osu.Game.Screens.Select.Details
                     break;
             }
 
-            starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), null);
-
             HpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate);
             Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
             ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
+
+            updateStarDifficulty();
+        }
+
+        private IBindable<StarDifficulty> normalStarDifficulty;
+        private IBindable<StarDifficulty> moddedStarDifficulty;
+        private CancellationTokenSource starDifficultyCancellationSource;
+
+        private void updateStarDifficulty()
+        {
+            starDifficultyCancellationSource?.Cancel();
+
+            if (Beatmap == null)
+                return;
+
+            starDifficultyCancellationSource = new CancellationTokenSource();
+
+            normalStarDifficulty = difficultyCache.GetBindableDifficulty(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            moddedStarDifficulty = difficultyCache.GetBindableDifficulty(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+
+            normalStarDifficulty.BindValueChanged(_ => updateDisplay());
+            moddedStarDifficulty.BindValueChanged(_ => updateDisplay(), true);
+
+            void updateDisplay() => starDifficulty.Value = ((float)normalStarDifficulty.Value.Stars, (float)moddedStarDifficulty.Value.Stars);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            starDifficultyCancellationSource?.Cancel();
         }
 
         public class StatisticRow : Container, IHasAccentColour

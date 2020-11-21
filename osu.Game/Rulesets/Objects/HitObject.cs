@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
+        [JsonIgnore]
         public HitWindows HitWindows { get; set; }
 
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
@@ -133,8 +134,7 @@ namespace osu.Game.Rulesets.Objects
         {
             Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 
-            if (HitWindows == null)
-                HitWindows = CreateHitWindows();
+            HitWindows ??= CreateHitWindows();
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 
@@ -146,6 +146,7 @@ namespace osu.Game.Rulesets.Objects
 #pragma warning restore 618
         }
 
+        [Obsolete("Use the cancellation-supporting override")] // Can be removed 20210318
         protected virtual void CreateNestedHitObjects()
         {
         }

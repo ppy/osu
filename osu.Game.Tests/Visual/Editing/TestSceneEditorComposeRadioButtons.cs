@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     new RadioButton("Item 1", () => { }),
                     new RadioButton("Item 2", () => { }),
-                    new RadioButton("Item 3", () => { }),
+                    new RadioButton("Item 3", () => { }, () => new SpriteIcon { Icon = FontAwesome.Regular.Angry }),
                     new RadioButton("Item 4", () => { }),
                     new RadioButton("Item 5", () => { })
                 }
