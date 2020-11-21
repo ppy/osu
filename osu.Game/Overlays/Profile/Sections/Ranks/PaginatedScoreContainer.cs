@@ -14,7 +14,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedContainer<APILegacyScoreInfo>
+    public class PaginatedScoreContainer : PaginatedProfileSubsection<APILegacyScoreInfo>
     {
         private readonly ScoreType type;
 
