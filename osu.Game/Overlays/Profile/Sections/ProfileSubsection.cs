@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets;
 using osu.Game.Users;
 using JetBrains.Annotations;
 
@@ -16,8 +15,6 @@ namespace osu.Game.Overlays.Profile.Sections
     public abstract class ProfileSubsection : FillFlowContainer
     {
         protected readonly Bindable<User> User = new Bindable<User>();
-
-        protected RulesetStore Rulesets { get; private set; }
 
         protected OsuSpriteText Missing { get; private set; }
 
@@ -36,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Sections
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -56,8 +53,6 @@ namespace osu.Game.Overlays.Profile.Sections
                     Alpha = 0,
                 },
             };
-
-            Rulesets = rulesets;
         }
 
         protected override void LoadComplete()

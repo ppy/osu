@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -19,6 +20,9 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        protected RulesetStore Rulesets { get; private set; }
 
         protected int VisiblePages;
         protected int ItemsPerPage;
