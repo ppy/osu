@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
 
@@ -27,7 +28,7 @@ namespace osu.Game.Skinning
 
             foreach (var filename in base.GetFilenames(name))
             {
-                var path = getPathForFile(filename);
+                var path = getPathForFile(filename.ToStandardisedPath());
                 if (path != null)
                     yield return path;
             }

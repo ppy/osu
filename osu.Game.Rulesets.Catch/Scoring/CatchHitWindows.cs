@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
         {
             switch (result)
             {
-                case HitResult.Perfect:
+                case HitResult.Great:
                 case HitResult.Miss:
                     return true;
             }

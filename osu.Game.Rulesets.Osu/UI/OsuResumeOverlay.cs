@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private OsuClickToResumeCursor clickToResumeCursor;
 
         private OsuCursorContainer localCursorContainer;
-        private Bindable<float> localCursorScale;
+        private IBindable<float> localCursorScale;
 
         public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 

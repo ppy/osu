@@ -5,11 +5,12 @@ using osu.Framework.Bindables;
 using osu.Game.Rulesets.Mania.Objects.Types;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    public abstract class ManiaHitObject : HitObject, IHasColumn
+    public abstract class ManiaHitObject : HitObject, IHasColumn, IHasXPosition
     {
         public readonly Bindable<int> ColumnBindable = new Bindable<int>();
 
@@ -20,5 +21,11 @@ namespace osu.Game.Rulesets.Mania.Objects
         }
 
         protected override HitWindows CreateHitWindows() => new ManiaHitWindows();
+
+        #region LegacyBeatmapEncoder
+
+        float IHasXPosition.X => Column;
+
+        #endregion
     }
 }

@@ -12,7 +12,7 @@ namespace osu.Game.Users
     public class User : IEquatable<User>
     {
         [JsonProperty(@"id")]
-        public long Id = 1;
+        public int Id = 1;
 
         [JsonProperty(@"join_date")]
         public DateTimeOffset JoinDate;
@@ -69,6 +69,9 @@ namespace osu.Game.Users
         [JsonProperty(@"support_level")]
         public int SupportLevel;
 
+        [JsonProperty(@"current_mode_rank")]
+        public int? CurrentModeRank;
+
         [JsonProperty(@"is_gmt")]
         public bool IsGMT;
 
@@ -108,9 +111,6 @@ namespace osu.Game.Users
         [JsonProperty(@"twitter")]
         public string Twitter;
 
-        [JsonProperty(@"lastfm")]
-        public string Lastfm;
-
         [JsonProperty(@"skype")]
         public string Skype;
 
@@ -144,6 +144,9 @@ namespace osu.Game.Users
         [JsonProperty(@"scores_first_count")]
         public int ScoresFirstCount;
 
+        [JsonProperty(@"beatmap_playcounts_count")]
+        public int BeatmapPlaycountsCount;
+
         [JsonProperty]
         private string[] playstyle
         {
@@ -170,8 +173,27 @@ namespace osu.Game.Users
             public int Available;
         }
 
+        private UserStatistics statistics;
+
         [JsonProperty(@"statistics")]
-        public UserStatistics Statistics;
+        public UserStatistics Statistics
+        {
+            get => statistics ??= new UserStatistics();
+            set
+            {
+                if (statistics != null)
+                    // we may already have rank history populated
+                    value.RankHistory = statistics.RankHistory;
+
+                statistics = value;
+            }
+        }
+
+        [JsonProperty(@"rank_history")]
+        private RankHistoryData rankHistory
+        {
+            set => statistics.RankHistory = value;
+        }
 
         public class RankHistoryData
         {
@@ -180,12 +202,6 @@ namespace osu.Game.Users
 
             [JsonProperty(@"data")]
             public int[] Data;
-        }
-
-        [JsonProperty(@"rankHistory")]
-        private RankHistoryData rankHistory
-        {
-            set => Statistics.RankHistory = value;
         }
 
         [JsonProperty("badges")]

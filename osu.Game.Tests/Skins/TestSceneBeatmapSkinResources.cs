@@ -26,6 +26,7 @@ namespace osu.Game.Tests.Skins
         {
             var imported = beatmaps.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-beatmap.osz"))).Result;
             beatmap = beatmaps.GetWorkingBeatmap(imported.Beatmaps[0]);
+            beatmap.LoadTrack();
         }
 
         [Test]

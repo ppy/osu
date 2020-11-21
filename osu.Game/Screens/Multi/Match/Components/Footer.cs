@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class Footer : CompositeDrawable
     {
-        public const float HEIGHT = 100;
+        public const float HEIGHT = 50;
 
         public Action OnStart;
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();

@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Notifications
         {
             base.LoadComplete();
 
-            //we may have received changes before we were displayed.
+            // we may have received changes before we were displayed.
             updateState();
         }
 

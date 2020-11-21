@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -14,7 +15,7 @@ namespace osu.Game.Online
     /// A <see cref="Container"/> for displaying online content which require a local user to be logged in.
     /// Shows its children only when the local user is logged in and supports displaying a placeholder if not.
     /// </summary>
-    public abstract class OnlineViewContainer : Container, IOnlineComponent
+    public abstract class OnlineViewContainer : Container
     {
         protected LoadingSpinner LoadingSpinner { get; private set; }
 
@@ -34,8 +35,10 @@ namespace osu.Game.Online
             this.placeholderMessage = placeholderMessage;
         }
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
             InternalChildren = new Drawable[]
             {
@@ -46,18 +49,14 @@ namespace osu.Game.Online
                     Alpha = 0,
                 }
             };
+
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
         }
 
-        protected override void LoadComplete()
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            base.LoadComplete();
-
-            API.Register(this);
-        }
-
-        public virtual void APIStateChanged(IAPIProvider api, APIState state)
-        {
-            switch (state)
+            switch (state.NewValue)
             {
                 case APIState.Offline:
                     PopContentOut(Content);
@@ -79,7 +78,7 @@ namespace osu.Game.Online
                     placeholder.FadeOut(transform_duration / 2, Easing.OutQuint);
                     break;
             }
-        }
+        });
 
         /// <summary>
         /// Applies a transform to the online content to make it hidden.
@@ -90,11 +89,5 @@ namespace osu.Game.Online
         /// Applies a transform to the online content to make it visible.
         /// </summary>
         protected virtual void PopContentIn(Drawable content) => content.FadeIn(transform_duration, Easing.OutQuint);
-
-        protected override void Dispose(bool isDisposing)
-        {
-            API?.Unregister(this);
-            base.Dispose(isDisposing);
-        }
     }
 }

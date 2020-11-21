@@ -30,6 +30,9 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
         public override Replay Generate()
         {
+            if (Beatmap.HitObjects.Count == 0)
+                return Replay;
+
             bool hitButton = true;
 
             Frames.Add(new TaikoReplayFrame(-100000));
@@ -97,7 +100,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                     {
                         TaikoAction[] actions;
 
-                        if (hit is CentreHit)
+                        if (hit.Type == HitType.Centre)
                         {
                             actions = h.IsStrong
                                 ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }

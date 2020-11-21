@@ -32,8 +32,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 Height = 1,
                 Colour = Color4.White.Opacity(0.2f),
             });
-
-            Current.Value = EditorScreenMode.Compose;
         }
 
         [BackgroundDependencyLoader]

@@ -36,9 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public class SliderTickJudgement : OsuJudgement
         {
-            public override bool IsBonus => true;
-
-            protected override int NumericResultFor(HitResult result) => result == MaxResult ? 10 : 0;
+            public override HitResult MaxResult => HitResult.LargeTickHit;
         }
     }
 }

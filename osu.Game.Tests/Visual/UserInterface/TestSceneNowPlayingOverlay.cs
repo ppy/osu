@@ -1,16 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
-using osu.Framework.Graphics.Containers;
-using System.Linq;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -19,8 +17,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         [Cached]
         private MusicController musicController = new MusicController();
-
-        private WorkingBeatmap currentBeatmap;
 
         private NowPlayingOverlay nowPlayingOverlay;
 
@@ -47,23 +43,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"hide", () => nowPlayingOverlay.Hide());
         }
 
-        [Test]
-        public void TestPrevTrackBehavior()
-        {
-            AddStep(@"Play track", () =>
-            {
-                musicController.NextTrack();
-                currentBeatmap = Beatmap.Value;
-            });
-
-            AddStep(@"Seek track to 6 second", () => musicController.SeekTo(6000));
-            AddUntilStep(@"Wait for current time to update", () => currentBeatmap.Track.CurrentTime > 5000);
-            AddAssert(@"Check action is restart track", () => musicController.PreviousTrack() == PreviousTrackResult.Restart);
-            AddUntilStep("Wait for current time to update", () => Precision.AlmostEquals(currentBeatmap.Track.CurrentTime, 0));
-            AddAssert(@"Check track didn't change", () => currentBeatmap == Beatmap.Value);
-            AddAssert(@"Check action is not restart", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
-        }
-
         [TestCase(true)]
         [TestCase(false)]
         public void TestBackgroundNotScrolling(bool goNext)
@@ -79,10 +58,18 @@ namespace osu.Game.Tests.Visual.UserInterface
                 AddUntilStep("Is hidden", () => nowPlayingOverlay.Alpha == 0);
 
                 AddStep("Assign current background", () => currentBackground = getFirstBackground());
+
                 if (goNext)
                     AddStep("next track", () => musicController.NextTrack());
                 else
-                    AddUntilStep("previous track", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
+                {
+                    AddUntilStep("previous track", () =>
+                    {
+                        PreviousTrackResult result = PreviousTrackResult.None;
+                        musicController.PreviousTrack((a) => result = a);
+                        return result != PreviousTrackResult.Restart;
+                    });
+                }
 
                 AddStep(@"show", () => nowPlayingOverlay.Show());
             }
@@ -112,10 +99,18 @@ namespace osu.Game.Tests.Visual.UserInterface
             void step()
             {
                 AddStep("Assign current background", () => currentBackground = getFirstBackground());
+
                 if (goNext)
                     AddStep("next track", () => musicController.NextTrack());
                 else
-                    AddUntilStep("previous track", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
+                {
+                    AddUntilStep("previous track", () =>
+                    {
+                        PreviousTrackResult result = PreviousTrackResult.None;
+                        musicController.PreviousTrack((a) => result = a);
+                        return result != PreviousTrackResult.Restart;
+                    });
+                }
             }
 
             step();

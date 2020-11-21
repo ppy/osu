@@ -37,7 +37,7 @@ namespace osu.Game.Tournament
 
         public const float STREAM_AREA_WIDTH = 1366;
 
-        public const double REQUIRED_WIDTH = TournamentSceneManager.CONTROL_AREA_WIDTH * 2 + TournamentSceneManager.STREAM_AREA_WIDTH;
+        public const double REQUIRED_WIDTH = CONTROL_AREA_WIDTH * 2 + STREAM_AREA_WIDTH;
 
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
@@ -127,10 +127,10 @@ namespace osu.Game.Tournament
                                 new ScreenButton(typeof(ScheduleScreen)) { Text = "Schedule", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(LadderScreen)) { Text = "Bracket", RequestSelection = SetScreen },
                                 new Separator(),
-                                new ScreenButton(typeof(TeamIntroScreen)) { Text = "TeamIntro", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(TeamIntroScreen)) { Text = "Team Intro", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(SeedingScreen)) { Text = "Seeding", RequestSelection = SetScreen },
                                 new Separator(),
-                                new ScreenButton(typeof(MapPoolScreen)) { Text = "MapPool", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(MapPoolScreen)) { Text = "Map Pool", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(GameplayScreen)) { Text = "Gameplay", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(TeamWinScreen)) { Text = "Win", RequestSelection = SetScreen },

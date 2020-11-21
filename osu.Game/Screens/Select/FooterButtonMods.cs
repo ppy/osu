@@ -27,18 +27,19 @@ namespace osu.Game.Screens.Select
         }
 
         protected readonly OsuSpriteText MultiplierText;
-        private readonly FooterModDisplay modDisplay;
+        private readonly ModDisplay modDisplay;
         private Color4 lowMultiplierColour;
         private Color4 highMultiplierColour;
 
         public FooterButtonMods()
         {
-            ButtonContentContainer.Add(modDisplay = new FooterModDisplay
+            ButtonContentContainer.Add(modDisplay = new ModDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 DisplayUnrankedText = false,
-                Scale = new Vector2(0.8f)
+                Scale = new Vector2(0.8f),
+                ExpansionMode = ExpansionMode.AlwaysContracted,
             });
             ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
             {
@@ -83,17 +84,6 @@ namespace osu.Game.Screens.Select
                 modDisplay.FadeIn();
             else
                 modDisplay.FadeOut();
-        }
-
-        private class FooterModDisplay : ModDisplay
-        {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
-
-            public FooterModDisplay()
-            {
-                ExpansionMode = ExpansionMode.AlwaysContracted;
-                IconsContainer.Margin = new MarginPadding();
-            }
         }
     }
 }

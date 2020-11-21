@@ -1,0 +1,10 @@
+osu file format v14
+
+[General]
+Mode: 3
+
+[TimingPoints]
+0,300,4,0,2,100,1,0
+
+[HitObjects]
+444,320,1000,5,1,0:0:0:0:
