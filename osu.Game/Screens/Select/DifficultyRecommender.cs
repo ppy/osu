@@ -81,7 +81,6 @@ namespace osu.Game.Screens.Select
 
                 req.Success += result =>
                 {
-                    bestRulesetOrder = null;
                     // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
                     recommendedStarDifficulty[rulesetInfo] = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
                 };
@@ -90,19 +89,12 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        private IEnumerable<RulesetInfo> bestRulesetOrder;
-
         private IEnumerable<RulesetInfo> getBestRulesetOrder()
         {
-            bestRulesetOrder ??= recommendedStarDifficulty.OrderByDescending(pair => pair.Value)
-                                                          .Select(pair => pair.Key)
-                                                          .ToList();
+            IEnumerable<RulesetInfo> bestRulesetOrder = recommendedStarDifficulty.OrderByDescending(pair => pair.Value)
+                                                                                 .Select(pair => pair.Key)
+                                                                                 .ToList();
 
-            return moveCurrentRulesetToFirst();
-        }
-
-        private IEnumerable<RulesetInfo> moveCurrentRulesetToFirst()
-        {
             List<RulesetInfo> orderedRulesets;
 
             if (bestRulesetOrder.Contains(ruleset.Value))

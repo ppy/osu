@@ -335,11 +335,15 @@ namespace osu.Game
         /// The user should have already requested this interactively.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
-        /// <param name="difficultyCriteria">
-        /// Optional predicate used to filter which difficulties to select.
-        /// If omitted, this will try to present a recommended beatmap from the current ruleset.
-        /// In case of failure the first difficulty of the set will be presented, ignoring the predicate.
-        /// </param>
+        /// <param name="difficultyCriteria">Optional predicate used to narrow the set of difficulties to select from when presenting.</param>
+        /// <remarks>
+        /// Among items satisfying the predicate, the order of preference is:
+        /// <list type="bullet">
+        /// <item>beatmap with recommended difficulty, as provided by <see cref="DifficultyRecommender"/>,</item>
+        /// <item>first beatmap from the current ruleset,</item>
+        /// <item>first beatmap from any ruleset.</item>
+        /// </list>
+        /// </remarks>
         public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
             var databasedSet = beatmap.OnlineBeatmapSetID != null
@@ -373,11 +377,12 @@ namespace osu.Game
 
                 // Try to select recommended beatmap
                 // This should give us a beatmap from current ruleset if there are any in our matched beatmaps
-                var selection = DifficultyRecommender.GetRecommendedBeatmap(beatmaps) ?? (
-                    // Fallback if a difficulty can't be recommended, maybe we are offline
-                    // First try to find a beatmap in current ruleset, otherwise use first beatmap
-                    beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value)) ?? beatmaps.First()
-                );
+                var selection = DifficultyRecommender.GetRecommendedBeatmap(beatmaps);
+                // Fallback if a difficulty can't be recommended, maybe we are offline
+                // First try to find a beatmap in current ruleset
+                selection ??= beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value));
+                // Otherwise use first beatmap
+                selection ??= beatmaps.First();
 
                 Ruleset.Value = selection.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
