@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
 
+        private readonly Container judgementAboveHitObjectLayer;
+
         public OsuPlayfield()
         {
             InternalChildren = new Drawable[]
@@ -49,6 +51,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 followPoints = new FollowPointRenderer { RelativeSizeAxes = Axes.Both },
                 judgementLayer = new JudgementContainer<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
                 HitObjectContainer,
+                judgementAboveHitObjectLayer = new Container { RelativeSizeAxes = Axes.Both },
                 approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             };
 
@@ -58,11 +61,16 @@ namespace osu.Game.Rulesets.Osu.UI
             var hitWindows = new OsuHitWindows();
 
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
-                poolDictionary.Add(result, new DrawableJudgementPool(result));
+                poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgmentLoaded));
 
             AddRangeInternal(poolDictionary.Values);
 
             NewResult += onNewResult;
+        }
+
+        private void onJudgmentLoaded(DrawableOsuJudgement judgement)
+        {
+            judgementAboveHitObjectLayer.Add(judgement.GetProxyAboveHitObjectsContent());
         }
 
         [BackgroundDependencyLoader(true)]
@@ -150,11 +158,13 @@ namespace osu.Game.Rulesets.Osu.UI
         private class DrawableJudgementPool : DrawablePool<DrawableOsuJudgement>
         {
             private readonly HitResult result;
+            private readonly Action<DrawableOsuJudgement> onLoaded;
 
-            public DrawableJudgementPool(HitResult result)
+            public DrawableJudgementPool(HitResult result, Action<DrawableOsuJudgement> onLoaded)
                 : base(10)
             {
                 this.result = result;
+                this.onLoaded = onLoaded;
             }
 
             protected override DrawableOsuJudgement CreateNewDrawable()
@@ -163,6 +173,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
                 // just a placeholder to initialise the correct drawable hierarchy for this pool.
                 judgement.Apply(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null);
+
+                onLoaded?.Invoke(judgement);
 
                 return judgement;
             }
