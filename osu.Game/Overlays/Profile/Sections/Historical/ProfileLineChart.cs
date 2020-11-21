@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using static osu.Game.Users.User;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -140,7 +141,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.X,
                     RelativePositionAxes = Axes.Y,
-                    Height = 1,
+                    Height = 0.1f,
+                    EdgeSmoothness = Vector2.One,
                     Y = y
                 });
 
@@ -180,7 +182,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Y,
                     RelativePositionAxes = Axes.X,
-                    Width = 1,
+                    Width = 0.1f,
+                    EdgeSmoothness = Vector2.One,
                     X = x
                 });
 
