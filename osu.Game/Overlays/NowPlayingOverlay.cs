@@ -212,11 +212,14 @@ namespace osu.Game.Overlays
             dragContainer.ScaleTo(1, transition_length, Easing.OutElastic);
         }
 
+        private bool fadingOut;
+
         protected override void PopOut()
         {
+            fadingOut = true;
             base.PopOut();
 
-            this.FadeOut(transition_length, Easing.OutQuint);
+            this.FadeOut(transition_length, Easing.OutQuint).OnComplete(_ => fadingOut = false);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
         }
 
@@ -232,7 +235,7 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            if (pendingBeatmapSwitch != null)
+            if (pendingBeatmapSwitch != null && !fadingOut)
             {
                 pendingBeatmapSwitch();
                 pendingBeatmapSwitch = null;
