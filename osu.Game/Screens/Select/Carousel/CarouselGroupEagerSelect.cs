@@ -101,8 +101,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual CarouselItem GetNextToSelect()
         {
-            return Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
-                   Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
+            return InternalChildren.OrderBy(i => Math.Abs(InternalChildren.IndexOf(i) - lastSelectedIndex)).FirstOrDefault(i => !i.Filtered.Value);
         }
 
         protected virtual void PerformSelection()
