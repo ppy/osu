@@ -167,6 +167,10 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
+            // Tick judgements should not display text.
+            if (judgedObject is DrawableHoldNoteTick)
+                return;
+
             judgements.Clear(false);
             judgements.Add(judgementPool.Get(j =>
             {

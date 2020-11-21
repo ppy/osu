@@ -32,7 +32,13 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             Child = chart = new ProfileLineChart()
         };
 
-        protected override void OnUserChanged(ValueChangedEvent<User> e)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            User.BindValueChanged(onUserChanged, true);
+        }
+
+        private void onUserChanged(ValueChangedEvent<User> e)
         {
             var values = GetValues(e.NewValue);
 
