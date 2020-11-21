@@ -29,9 +29,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             protected override GameplayCursorContainer CreateCursor() => null;
 
-            public OsuEditPlayfield()
+            protected override void OnNewDrawableHitObject(DrawableHitObject d)
             {
-                OnNewDrawableHitObject += d => d.ApplyCustomUpdateState += updateState;
+                d.ApplyCustomUpdateState += updateState;
             }
 
             private const double editor_hit_object_fade_out_extension = 700;

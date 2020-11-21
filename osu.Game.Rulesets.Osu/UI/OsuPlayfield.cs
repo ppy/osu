@@ -92,10 +92,9 @@ namespace osu.Game.Rulesets.Osu.UI
             AddRangeInternal(poolDictionary.Values);
 
             NewResult += onNewResult;
-            OnNewDrawableHitObject += onDrawableHitObjectAdded;
         }
 
-        private void onDrawableHitObjectAdded(DrawableHitObject drawable)
+        protected override void OnNewDrawableHitObject(DrawableHitObject drawable)
         {
             ((DrawableOsuHitObject)drawable).CheckHittable = CheckHittable;
 

@@ -58,7 +58,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
             NewResult += onNewResult;
             RevertResult += onRevertResult;
-            OnNewDrawableHitObject += d => ((DrawableCatchHitObject)d).CheckPosition = CheckIfWeCanCatch;
+        }
+
+        protected override void OnNewDrawableHitObject(DrawableHitObject d)
+        {
+            ((DrawableCatchHitObject)d).CheckPosition = CheckIfWeCanCatch;
         }
 
         public bool CheckIfWeCanCatch(CatchHitObject obj) => CatcherArea.AttemptCatch(obj);

@@ -34,16 +34,6 @@ namespace osu.Game.Rulesets.UI
         public event Action<DrawableHitObject, JudgementResult> RevertResult;
 
         /// <summary>
-        /// Invoked before a new <see cref="DrawableHitObject"/> is added.
-        /// This event is invoked only once for each <see cref="DrawableHitObject"/>
-        /// even the drawable is pooled and used multiple times for different <see cref="HitObject"/>s.
-        /// </summary>
-        /// <remarks>
-        /// This event is also called for nested <see cref="DrawableHitObject"/>s.
-        /// </remarks>
-        public event Action<DrawableHitObject> OnNewDrawableHitObject;
-
-        /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
         public HitObjectContainer HitObjectContainer => hitObjectContainerLazy.Value;
@@ -128,7 +118,7 @@ namespace osu.Game.Rulesets.UI
         {
             d.OnNestedDrawableCreated += onNewDrawableHitObject;
 
-            OnNewDrawableHitObject?.Invoke(d);
+            OnNewDrawableHitObject(d);
 
             Debug.Assert(!d.HasInitialized);
             d.HasInitialized = true;
@@ -180,6 +170,17 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="hitObject">The removed <see cref="HitObject"/>.</param>
         protected virtual void OnHitObjectRemoved(HitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Invoked before a new <see cref="DrawableHitObject"/> is added to this <see cref="Playfield"/>.
+        /// It is invoked only once even the drawable is pooled and used multiple times for different <see cref="HitObject"/>s.
+        /// </summary>
+        /// <remarks>
+        /// This is also invoked for nested <see cref="DrawableHitObject"/>s.
+        /// </remarks>
+        protected virtual void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
         {
         }
 
