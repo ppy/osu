@@ -39,7 +39,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
             AddAssert("frame count correct", () => animation.FrameCount == frame_count);
             assertPlaybackPosition(0);
 
-            AddStep("set start time to 1000", () => animationTimeReference.AnimationStartTime = 1000);
+            AddStep("set start time to 1000", () => animationTimeReference.AnimationStartTime.Value = 1000);
             assertPlaybackPosition(-1000);
 
             AddStep("set current time to 500", () => animationTimeReference.ManualClock.CurrentTime = 500);
@@ -67,7 +67,8 @@ namespace osu.Game.Tests.NonVisual.Skinning
         {
             public ManualClock ManualClock { get; }
             public IFrameBasedClock Clock { get; }
-            public double AnimationStartTime { get; set; }
+            public Bindable<double> AnimationStartTime { get; } = new BindableDouble();
+            IBindable<double> IAnimationTimeReference.AnimationStartTime => AnimationStartTime;
 
             public TestAnimationTimeReference()
             {
