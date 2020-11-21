@@ -1,0 +1,137 @@
+{
+    "Mappings": [{
+            "StartTime": 0,
+            "Objects": [{
+                    "StartTime": 0,
+                    "EndTime": 0,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": true
+                },
+                {
+                    "StartTime": 162,
+                    "EndTime": 162,
+                    "IsRim": false,
+                    "IsCentre": true,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 325,
+                    "EndTime": 325,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": true
+                },
+                {
+                    "StartTime": 487,
+                    "EndTime": 487,
+                    "IsRim": false,
+                    "IsCentre": true,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 650,
+                    "EndTime": 650,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": true
+                },
+                {
+                    "StartTime": 813,
+                    "EndTime": 813,
+                    "IsRim": false,
+                    "IsCentre": true,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 975,
+                    "EndTime": 975,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": true
+                }
+            ]
+        },
+        {
+            "StartTime": 2000,
+            "Objects": [{
+                    "StartTime": 2000,
+                    "EndTime": 2000,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 2162,
+                    "EndTime": 2162,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 2325,
+                    "EndTime": 2325,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": true
+                },
+                {
+                    "StartTime": 2487,
+                    "EndTime": 2487,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 2650,
+                    "EndTime": 2650,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 2813,
+                    "EndTime": 2813,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": true
+                },
+                {
+                    "StartTime": 2975,
+                    "EndTime": 2975,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                }
+            ]
+        }
+    ]
+}

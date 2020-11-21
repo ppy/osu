@@ -33,6 +33,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("user")]
         public User User { get; set; }
 
+        [JsonProperty("position")]
+        public int? Position { get; set; }
+
         public ScoreInfo CreateScoreInfo() =>
             new ScoreInfo
             {
@@ -40,6 +43,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 PP = PP,
                 TotalScore = TotalScore,
                 User = User,
+                Position = Position
             };
     }
 }

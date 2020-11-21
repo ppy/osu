@@ -24,10 +24,12 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -36,31 +38,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     public class TestScenePlaySongSelect : ScreenTestScene
     {
         private BeatmapManager manager;
-
         private RulesetStore rulesets;
-
         private MusicController music;
-
         private WorkingBeatmap defaultBeatmap;
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Screens.Select.SongSelect),
-            typeof(BeatmapCarousel),
-
-            typeof(CarouselItem),
-            typeof(CarouselGroup),
-            typeof(CarouselGroupEagerSelect),
-            typeof(CarouselBeatmap),
-            typeof(CarouselBeatmapSet),
-
-            typeof(DrawableCarouselItem),
-            typeof(CarouselItemState),
-
-            typeof(DrawableCarouselBeatmap),
-            typeof(DrawableCarouselBeatmapSet),
-        };
-
         private TestSongSelect songSelect;
 
         [BackgroundDependencyLoader]
@@ -110,7 +90,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+            waitForInitialSelection();
 
             WorkingBeatmap selected = null;
 
@@ -118,10 +98,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select next and enter", () =>
             {
-                InputManager.PressKey(Key.Down);
-                InputManager.ReleaseKey(Key.Down);
-                InputManager.PressKey(Key.Enter);
-                InputManager.ReleaseKey(Key.Enter);
+                InputManager.Key(Key.Down);
+                InputManager.Key(Key.Enter);
             });
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
@@ -135,7 +113,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+            waitForInitialSelection();
 
             WorkingBeatmap selected = null;
 
@@ -143,10 +121,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select next and enter", () =>
             {
-                InputManager.PressKey(Key.Enter);
-                InputManager.ReleaseKey(Key.Enter);
-                InputManager.PressKey(Key.Down);
-                InputManager.ReleaseKey(Key.Down);
+                InputManager.Key(Key.Enter);
+                InputManager.Key(Key.Down);
             });
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
@@ -171,11 +147,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.MoveMouseTo(songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
                                                    .First(b => ((CarouselBeatmap)b.Item).Beatmap != songSelect.Carousel.SelectedBeatmap));
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
 
-                InputManager.PressKey(Key.Enter);
-                InputManager.ReleaseKey(Key.Enter);
+                InputManager.Key(Key.Enter);
             });
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
@@ -189,7 +163,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+            waitForInitialSelection();
 
             WorkingBeatmap selected = null;
 
@@ -202,8 +176,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 InputManager.PressButton(MouseButton.Left);
 
-                InputManager.PressKey(Key.Enter);
-                InputManager.ReleaseKey(Key.Enter);
+                InputManager.Key(Key.Enter);
 
                 InputManager.ReleaseButton(MouseButton.Left);
             });
@@ -324,15 +297,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
-            var sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
-
-            AddStep(@"Sort by Artist", delegate { sortMode.Value = SortMode.Artist; });
-            AddStep(@"Sort by Title", delegate { sortMode.Value = SortMode.Title; });
-            AddStep(@"Sort by Author", delegate { sortMode.Value = SortMode.Author; });
-            AddStep(@"Sort by DateAdded", delegate { sortMode.Value = SortMode.DateAdded; });
-            AddStep(@"Sort by BPM", delegate { sortMode.Value = SortMode.BPM; });
-            AddStep(@"Sort by Length", delegate { sortMode.Value = SortMode.Length; });
-            AddStep(@"Sort by Difficulty", delegate { sortMode.Value = SortMode.Difficulty; });
+            AddStep(@"Sort by Artist", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Artist));
+            AddStep(@"Sort by Title", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Title));
+            AddStep(@"Sort by Author", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Author));
+            AddStep(@"Sort by DateAdded", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.DateAdded));
+            AddStep(@"Sort by BPM", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.BPM));
+            AddStep(@"Sort by Length", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Length));
+            AddStep(@"Sort by Difficulty", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Difficulty));
         }
 
         [Test]
@@ -529,7 +500,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var selectedPanel = songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First(s => s.Item.State.Value == CarouselItemState.Selected);
 
                 // special case for converts checked here.
-                return selectedPanel.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().All(i =>
+                return selectedPanel.ChildrenOfType<FilterableDifficultyIcon>().All(i =>
                     i.IsFiltered || i.Item.Beatmap.Ruleset.ID == targetRuleset || i.Item.Beatmap.Ruleset.ID == 0);
             });
 
@@ -589,10 +560,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("press ctrl+enter", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.Enter);
-
+                InputManager.Key(Key.Enter);
                 InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.Enter);
             });
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
@@ -628,10 +597,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 set = songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First();
             });
 
-            DrawableCarouselBeatmapSet.FilterableDifficultyIcon difficultyIcon = null;
+            FilterableDifficultyIcon difficultyIcon = null;
             AddStep("Find an icon", () =>
             {
-                difficultyIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>()
+                difficultyIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
                                     .First(icon => getDifficultyIconIndex(set, icon) != getCurrentBeatmapIndex());
             });
 
@@ -639,8 +608,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 InputManager.MoveMouseTo(difficultyIcon);
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Selected beatmap correct", () => getCurrentBeatmapIndex() == getDifficultyIconIndex(set, difficultyIcon));
@@ -656,21 +624,20 @@ namespace osu.Game.Tests.Visual.SongSelect
             }));
 
             BeatmapInfo filteredBeatmap = null;
-            DrawableCarouselBeatmapSet.FilterableDifficultyIcon filteredIcon = null;
+            FilterableDifficultyIcon filteredIcon = null;
 
             AddStep("Get filtered icon", () =>
             {
                 filteredBeatmap = songSelect.Carousel.SelectedBeatmapSet.Beatmaps.First(b => b.BPM < maxBPM);
                 int filteredBeatmapIndex = getBeatmapIndex(filteredBeatmap.BeatmapSet, filteredBeatmap);
-                filteredIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().ElementAt(filteredBeatmapIndex);
+                filteredIcon = set.ChildrenOfType<FilterableDifficultyIcon>().ElementAt(filteredBeatmapIndex);
             });
 
             AddStep("Click on a filtered difficulty", () =>
             {
                 InputManager.MoveMouseTo(filteredIcon);
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Selected beatmap correct", () => songSelect.Carousel.SelectedBeatmap == filteredBeatmap);
@@ -696,10 +663,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return set != null;
             });
 
-            DrawableCarouselBeatmapSet.FilterableDifficultyIcon difficultyIcon = null;
+            FilterableDifficultyIcon difficultyIcon = null;
             AddStep("Find an icon for different ruleset", () =>
             {
-                difficultyIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>()
+                difficultyIcon = set.ChildrenOfType<FilterableDifficultyIcon>()
                                     .First(icon => icon.Item.Beatmap.Ruleset.ID == 3);
             });
 
@@ -713,8 +680,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 InputManager.MoveMouseTo(difficultyIcon);
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
@@ -747,10 +713,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return set != null;
             });
 
-            DrawableCarouselBeatmapSet.FilterableGroupedDifficultyIcon groupIcon = null;
+            FilterableGroupedDifficultyIcon groupIcon = null;
             AddStep("Find group icon for different ruleset", () =>
             {
-                groupIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableGroupedDifficultyIcon>()
+                groupIcon = set.ChildrenOfType<FilterableGroupedDifficultyIcon>()
                                .First(icon => icon.Items.First().Beatmap.Ruleset.ID == 3);
             });
 
@@ -760,8 +726,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 InputManager.MoveMouseTo(groupIcon);
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
@@ -769,13 +734,83 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Check first item in group selected", () => Beatmap.Value.BeatmapInfo == groupIcon.Items.First().Beatmap);
         }
 
+        [Test]
+        public void TestChangeRulesetWhilePresentingScore()
+        {
+            BeatmapInfo getPresentBeatmap() => manager.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.RulesetID == 0);
+            BeatmapInfo getSwitchBeatmap() => manager.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.RulesetID == 1);
+
+            changeRuleset(0);
+
+            createSongSelect();
+
+            addRulesetImportStep(0);
+            addRulesetImportStep(1);
+
+            AddStep("present score", () =>
+            {
+                // this ruleset change should be overridden by the present.
+                Ruleset.Value = getSwitchBeatmap().Ruleset;
+
+                songSelect.PresentScore(new ScoreInfo
+                {
+                    User = new User { Username = "woo" },
+                    Beatmap = getPresentBeatmap(),
+                    Ruleset = getPresentBeatmap().Ruleset
+                });
+            });
+
+            AddUntilStep("wait for results screen presented", () => !songSelect.IsCurrentScreen());
+
+            AddAssert("check beatmap is correct for score", () => Beatmap.Value.BeatmapInfo.Equals(getPresentBeatmap()));
+            AddAssert("check ruleset is correct for score", () => Ruleset.Value.ID == 0);
+        }
+
+        [Test]
+        public void TestChangeBeatmapWhilePresentingScore()
+        {
+            BeatmapInfo getPresentBeatmap() => manager.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.RulesetID == 0);
+            BeatmapInfo getSwitchBeatmap() => manager.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.RulesetID == 1);
+
+            changeRuleset(0);
+
+            addRulesetImportStep(0);
+            addRulesetImportStep(1);
+
+            createSongSelect();
+
+            AddStep("present score", () =>
+            {
+                // this beatmap change should be overridden by the present.
+                Beatmap.Value = manager.GetWorkingBeatmap(getSwitchBeatmap());
+
+                songSelect.PresentScore(new ScoreInfo
+                {
+                    User = new User { Username = "woo" },
+                    Beatmap = getPresentBeatmap(),
+                    Ruleset = getPresentBeatmap().Ruleset
+                });
+            });
+
+            AddUntilStep("wait for results screen presented", () => !songSelect.IsCurrentScreen());
+
+            AddAssert("check beatmap is correct for score", () => Beatmap.Value.BeatmapInfo.Equals(getPresentBeatmap()));
+            AddAssert("check ruleset is correct for score", () => Ruleset.Value.ID == 0);
+        }
+
+        private void waitForInitialSelection()
+        {
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+            AddUntilStep("wait for difficulty panels visible", () => songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>().Any());
+        }
+
         private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.FindIndex(b => b == info);
 
         private int getCurrentBeatmapIndex() => getBeatmapIndex(songSelect.Carousel.SelectedBeatmapSet, songSelect.Carousel.SelectedBeatmap);
 
-        private int getDifficultyIconIndex(DrawableCarouselBeatmapSet set, DrawableCarouselBeatmapSet.FilterableDifficultyIcon icon)
+        private int getDifficultyIconIndex(DrawableCarouselBeatmapSet set, FilterableDifficultyIcon icon)
         {
-            return set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().ToList().FindIndex(i => i == icon);
+            return set.ChildrenOfType<FilterableDifficultyIcon>().ToList().FindIndex(i => i == icon);
         }
 
         private void addRulesetImportStep(int id) => AddStep($"import test map for ruleset {id}", () => importForRuleset(id));
@@ -831,7 +866,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     Ruleset = getRuleset(),
                     OnlineBeatmapID = beatmapId,
-                    Path = "normal.osu",
                     Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                     Length = length,
                     BPM = bpm,
@@ -875,6 +909,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
+
+            public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 
             protected override bool OnStart()
             {

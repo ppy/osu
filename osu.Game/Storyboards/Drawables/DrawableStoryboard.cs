@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
@@ -14,6 +15,7 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
+        [Cached]
         public Storyboard Storyboard { get; }
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
@@ -71,6 +73,8 @@ namespace osu.Game.Storyboards.Drawables
                 Add(layer.CreateDrawable());
             }
         }
+
+        public DrawableStoryboardLayer OverlayLayer => Children.Single(layer => layer.Name == "Overlay");
 
         private void updateLayerVisibility()
         {

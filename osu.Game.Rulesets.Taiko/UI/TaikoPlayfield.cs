@@ -9,12 +9,14 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -32,6 +34,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private JudgementContainer<DrawableTaikoJudgement> judgementContainer;
         private ScrollingHitObjectContainer drumRollHitContainer;
         internal Drawable HitTarget;
+        private SkinnableDrawable mascot;
 
         private ProxyContainer topLevelHitContainer;
         private ProxyContainer barlineContainer;
@@ -125,12 +128,20 @@ namespace osu.Game.Rulesets.Taiko.UI
                         },
                     }
                 },
+                mascot = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Mascot), _ => Empty())
+                {
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.TopLeft,
+                    RelativePositionAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.None,
+                    Y = 0.2f
+                },
                 topLevelHitContainer = new ProxyContainer
                 {
                     Name = "Top level hit objects",
                     RelativeSizeAxes = Axes.Both,
                 },
-                drumRollHitContainer.CreateProxy()
+                drumRollHitContainer.CreateProxy(),
             };
         }
 
@@ -142,6 +153,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             // This is basically allowing for correct alignment as relative pieces move around them.
             rightArea.Padding = new MarginPadding { Left = leftArea.DrawWidth };
             hitTargetOffsetContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
+
+            mascot.Scale = new Vector2(DrawHeight / DEFAULT_HEIGHT);
         }
 
         public override void Add(DrawableHitObject h)
@@ -193,12 +206,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                         X = result.IsHit ? judgedObject.Position.X : 0,
                     });
 
-                    if (!result.IsHit)
-                        break;
-
                     var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
-
-                    addExplosion(judgedObject, type);
+                    addExplosion(judgedObject, result.Type, type);
                     break;
             }
         }
@@ -206,9 +215,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private void addDrumRollHit(DrawableDrumRollTick drawableTick) =>
             drumRollHitContainer.Add(new DrawableFlyingHit(drawableTick));
 
-        private void addExplosion(DrawableHitObject drawableObject, HitType type)
+        private void addExplosion(DrawableHitObject drawableObject, HitResult result, HitType type)
         {
-            hitExplosionContainer.Add(new HitExplosion(drawableObject));
+            hitExplosionContainer.Add(new HitExplosion(drawableObject, result));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }

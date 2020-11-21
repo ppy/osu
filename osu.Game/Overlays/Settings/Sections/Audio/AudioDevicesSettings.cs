@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             updateItems();
 
-            dropdown.Bindable = audio.AudioDevice;
+            dropdown.Current = audio.AudioDevice;
 
             audio.OnNewDevice += onDeviceChanged;
             audio.OnLostDevice += onDeviceChanged;

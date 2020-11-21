@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         private IScrollingInfo scrollingInfo { get; set; }
 
         [Resolved]
-        private IManiaHitObjectComposer composer { get; set; }
+        private HitObjectComposer composer { get; set; }
 
         public override bool HandleMovement(MoveSelectionEvent moveEvent)
         {
@@ -31,7 +32,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         private void performColumnMovement(int lastColumn, MoveSelectionEvent moveEvent)
         {
-            var currentColumn = composer.ColumnAt(moveEvent.ScreenSpacePosition);
+            var maniaPlayfield = ((ManiaHitObjectComposer)composer).Playfield;
+
+            var currentColumn = maniaPlayfield.GetColumnByPosition(moveEvent.ScreenSpacePosition);
             if (currentColumn == null)
                 return;
 
@@ -42,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             int minColumn = int.MaxValue;
             int maxColumn = int.MinValue;
 
-            foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
+            foreach (var obj in EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>())
             {
                 if (obj.Column < minColumn)
                     minColumn = obj.Column;
@@ -50,9 +53,9 @@ namespace osu.Game.Rulesets.Mania.Edit
                     maxColumn = obj.Column;
             }
 
-            columnDelta = Math.Clamp(columnDelta, -minColumn, composer.TotalColumns - 1 - maxColumn);
+            columnDelta = Math.Clamp(columnDelta, -minColumn, maniaPlayfield.TotalColumns - 1 - maxColumn);
 
-            foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
+            foreach (var obj in EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>())
                 obj.Column += columnDelta;
         }
     }

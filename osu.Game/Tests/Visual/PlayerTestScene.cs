@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
@@ -17,16 +18,9 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Whether custom test steps are provided. Custom tests should invoke <see cref="CreateTest"/> to create the test steps.
         /// </summary>
-        protected virtual bool HasCustomSteps { get; } = false;
-
-        private readonly Ruleset ruleset;
+        protected virtual bool HasCustomSteps => false;
 
         protected TestPlayer Player;
-
-        protected PlayerTestScene(Ruleset ruleset)
-        {
-            this.ruleset = ruleset;
-        }
 
         protected OsuConfigManager LocalConfig;
 
@@ -53,7 +47,7 @@ namespace osu.Game.Tests.Visual
 
             action?.Invoke();
 
-            AddStep(ruleset.RulesetInfo.Name, LoadPlayer);
+            AddStep(CreatePlayerRuleset().Description, LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
@@ -63,11 +57,10 @@ namespace osu.Game.Tests.Visual
 
         protected void LoadPlayer()
         {
+            var ruleset = Ruleset.Value.CreateInstance();
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
-            Ruleset.Value = ruleset.RulesetInfo;
-
             SelectedMods.Value = Array.Empty<Mod>();
 
             if (!AllowFail)
@@ -87,6 +80,20 @@ namespace osu.Game.Tests.Visual
             Player = CreatePlayer(ruleset);
             LoadScreen(Player);
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            LocalConfig?.Dispose();
+            base.Dispose(isDisposing);
+        }
+
+        /// <summary>
+        /// Creates the ruleset for setting up the <see cref="Player"/> component.
+        /// </summary>
+        [NotNull]
+        protected abstract Ruleset CreatePlayerRuleset();
+
+        protected sealed override Ruleset CreateRuleset() => CreatePlayerRuleset();
 
         protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
     }

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets;
 using osuTK.Input;
@@ -17,15 +17,7 @@ namespace osu.Game.Tests.Visual.Menus
     [TestFixture]
     public class TestSceneToolbar : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ToolbarButton),
-            typeof(ToolbarRulesetSelector),
-            typeof(ToolbarRulesetTabButton),
-            typeof(ToolbarNotificationButton),
-        };
-
-        private Toolbar toolbar;
+        private TestToolbar toolbar;
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -33,7 +25,7 @@ namespace osu.Game.Tests.Visual.Menus
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = toolbar = new Toolbar { State = { Value = Visibility.Visible } };
+            Child = toolbar = new TestToolbar { State = { Value = Visibility.Visible } };
         });
 
         [Test]
@@ -73,14 +65,31 @@ namespace osu.Game.Tests.Visual.Menus
                 AddStep($"switch to ruleset {i} via shortcut", () =>
                 {
                     InputManager.PressKey(Key.ControlLeft);
-                    InputManager.PressKey(numberKey);
-
+                    InputManager.Key(numberKey);
                     InputManager.ReleaseKey(Key.ControlLeft);
-                    InputManager.ReleaseKey(numberKey);
                 });
 
                 AddUntilStep("ruleset switched", () => rulesetSelector.Current.Value.Equals(expected));
             }
+        }
+
+        [TestCase(OverlayActivation.All)]
+        [TestCase(OverlayActivation.Disabled)]
+        public void TestRespectsOverlayActivation(OverlayActivation mode)
+        {
+            AddStep($"set activation mode to {mode}", () => toolbar.OverlayActivationMode.Value = mode);
+            AddStep("hide toolbar", () => toolbar.Hide());
+            AddStep("try to show toolbar", () => toolbar.Show());
+
+            if (mode == OverlayActivation.Disabled)
+                AddAssert("toolbar still hidden", () => toolbar.State.Value == Visibility.Hidden);
+            else
+                AddAssert("toolbar is visible", () => toolbar.State.Value == Visibility.Visible);
+        }
+
+        public class TestToolbar : Toolbar
+        {
+            public new Bindable<OverlayActivation> OverlayActivationMode => base.OverlayActivationMode as Bindable<OverlayActivation>;
         }
     }
 }

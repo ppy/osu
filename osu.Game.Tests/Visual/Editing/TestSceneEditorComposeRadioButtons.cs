@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -12,8 +11,6 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneEditorComposeRadioButtons : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableRadioButton) };
-
         public TestSceneEditorComposeRadioButtons()
         {
             RadioButtonCollection collection;
@@ -26,7 +23,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     new RadioButton("Item 1", () => { }),
                     new RadioButton("Item 2", () => { }),
-                    new RadioButton("Item 3", () => { }),
+                    new RadioButton("Item 3", () => { }, () => new SpriteIcon { Icon = FontAwesome.Regular.Angry }),
                     new RadioButton("Item 4", () => { }),
                     new RadioButton("Item 5", () => { })
                 }

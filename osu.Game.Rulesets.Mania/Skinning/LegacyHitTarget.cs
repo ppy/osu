@@ -14,27 +14,22 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
-    public class LegacyHitTarget : LegacyManiaElement
+    public class LegacyHitTarget : CompositeDrawable
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Container directionContainer;
 
-        public LegacyHitTarget()
-        {
-            RelativeSizeAxes = Axes.Both;
-        }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string targetImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.HitTargetImage)?.Value
+            string targetImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.HitTargetImage)?.Value
                                  ?? "mania-stage-hint";
 
-            bool showJudgementLine = GetManiaSkinConfig<bool>(skin, LegacyManiaSkinConfigurationLookups.ShowJudgementLine)?.Value
+            bool showJudgementLine = skin.GetManiaSkinConfig<bool>(LegacyManiaSkinConfigurationLookups.ShowJudgementLine)?.Value
                                      ?? true;
 
-            Color4 lineColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.JudgementLineColour)?.Value
+            Color4 lineColour = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.JudgementLineColour)?.Value
                                 ?? Color4.White;
 
             InternalChild = directionContainer = new Container
@@ -56,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                         Anchor = Anchor.CentreLeft,
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
-                        Colour = lineColour,
+                        Colour = LegacyColourCompatibility.DisallowZeroAlpha(lineColour),
                         Alpha = showJudgementLine ? 0.9f : 0
                     }
                 }

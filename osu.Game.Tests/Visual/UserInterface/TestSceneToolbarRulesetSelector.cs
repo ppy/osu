@@ -3,8 +3,6 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Toolbar;
-using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using System.Linq;
 using NUnit.Framework;
@@ -16,12 +14,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneToolbarRulesetSelector : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ToolbarRulesetSelector),
-            typeof(ToolbarRulesetTabButton),
-        };
-
         [Resolved]
         private RulesetStore rulesets { get; set; }
 

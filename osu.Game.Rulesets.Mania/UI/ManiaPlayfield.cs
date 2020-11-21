@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.UI
     [Cached]
     public class ManiaPlayfield : ScrollingPlayfield
     {
+        public IReadOnlyList<Stage> Stages => stages;
+
         private readonly List<Stage> stages = new List<Stage>();
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));

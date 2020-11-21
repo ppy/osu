@@ -16,10 +16,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly TwoLayerButton button;
 
-        public BackButton(Receptor receptor)
+        public BackButton(Receptor receptor = null)
         {
-            receptor.OnBackPressed = () => button.Click();
-
             Size = TwoLayerButton.SIZE_EXTENDED;
 
             Child = button = new TwoLayerButton
@@ -30,6 +28,14 @@ namespace osu.Game.Graphics.UserInterface
                 Icon = OsuIcon.LeftCircle,
                 Action = () => Action?.Invoke()
             };
+
+            if (receptor == null)
+            {
+                // if a receptor wasn't provided, create our own locally.
+                Add(receptor = new Receptor());
+            }
+
+            receptor.OnBackPressed = () => button.Click();
         }
 
         [BackgroundDependencyLoader]

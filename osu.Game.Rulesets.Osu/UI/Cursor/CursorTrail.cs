@@ -119,6 +119,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         /// </summary>
         protected virtual bool InterpolateMovements => true;
 
+        protected virtual float IntervalMultiplier => 1.0f;
+
         private Vector2? lastPosition;
         private readonly InputResampler resampler = new InputResampler();
 
@@ -147,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = partSize.X / 2.5f;
+                    float interval = partSize.X / 2.5f * IntervalMultiplier;
 
                     for (float d = interval; d < distance; d += interval)
                     {
@@ -237,6 +239,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     {
                         Position = new Vector2(part.Position.X - size.X / 2, part.Position.Y + size.Y / 2),
                         TexturePosition = textureRect.BottomLeft,
+                        TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomLeft.Linear,
                         Time = part.Time
                     });
@@ -245,6 +248,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     {
                         Position = new Vector2(part.Position.X + size.X / 2, part.Position.Y + size.Y / 2),
                         TexturePosition = textureRect.BottomRight,
+                        TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomRight.Linear,
                         Time = part.Time
                     });
@@ -253,6 +257,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     {
                         Position = new Vector2(part.Position.X + size.X / 2, part.Position.Y - size.Y / 2),
                         TexturePosition = textureRect.TopRight,
+                        TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopRight.Linear,
                         Time = part.Time
                     });
@@ -261,6 +266,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     {
                         Position = new Vector2(part.Position.X - size.X / 2, part.Position.Y - size.Y / 2),
                         TexturePosition = textureRect.TopLeft,
+                        TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopLeft.Linear,
                         Time = part.Time
                     });
@@ -289,6 +295,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 TexturePosition;
+
+            [VertexMember(4, VertexAttribPointerType.Float)]
+            public Vector4 TextureRect;
 
             [VertexMember(1, VertexAttribPointerType.Float)]
             public float Time;

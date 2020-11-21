@@ -22,8 +22,39 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public class BeatmapListingFilterControl : CompositeDrawable
     {
+        /// <summary>
+        /// Fired when a search finishes. Contains only new items in the case of pagination.
+        /// </summary>
         public Action<List<BeatmapSetInfo>> SearchFinished;
+
+        /// <summary>
+        /// Fired when search criteria change.
+        /// </summary>
         public Action SearchStarted;
+
+        /// <summary>
+        /// Any time the search text box receives key events (even while masked).
+        /// </summary>
+        public Action TypingStarted;
+
+        /// <summary>
+        /// True when pagination has reached the end of available results.
+        /// </summary>
+        private bool noMoreResults;
+
+        /// <summary>
+        /// The current page fetched of results (zero index).
+        /// </summary>
+        public int CurrentPage { get; private set; }
+
+        private readonly BeatmapListingSearchControl searchControl;
+        private readonly BeatmapListingSortTabControl sortControl;
+        private readonly Box sortControlBackground;
+
+        private ScheduledDelegate queryChangedDebounce;
+
+        private SearchBeatmapSetsRequest getSetsRequest;
+        private SearchBeatmapSetsResponse lastResponse;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -31,16 +62,11 @@ namespace osu.Game.Overlays.BeatmapListing
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private readonly BeatmapListingSearchControl searchControl;
-        private readonly BeatmapListingSortTabControl sortControl;
-        private readonly Box sortControlBackground;
-
-        private SearchBeatmapSetsRequest getSetsRequest;
-
         public BeatmapListingFilterControl()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -61,7 +87,10 @@ namespace osu.Game.Overlays.BeatmapListing
                             Radius = 3,
                             Offset = new Vector2(0f, 1f),
                         },
-                        Child = searchControl = new BeatmapListingSearchControl(),
+                        Child = searchControl = new BeatmapListingSearchControl
+                        {
+                            TypingStarted = () => TypingStarted?.Invoke()
+                        }
                     },
                     new Container
                     {
@@ -109,56 +138,100 @@ namespace osu.Game.Overlays.BeatmapListing
             searchControl.Category.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Genre.BindValueChanged(_ => queueUpdateSearch());
             searchControl.Language.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.Extra.CollectionChanged += (_, __) => queueUpdateSearch();
+            searchControl.Ranks.CollectionChanged += (_, __) => queueUpdateSearch();
+            searchControl.Played.BindValueChanged(_ => queueUpdateSearch());
 
             sortCriteria.BindValueChanged(_ => queueUpdateSearch());
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
         }
 
-        private ScheduledDelegate queryChangedDebounce;
+        public void TakeFocus() => searchControl.TakeFocus();
+
+        /// <summary>
+        /// Fetch the next page of results. May result in a no-op if a fetch is already in progress, or if there are no results left.
+        /// </summary>
+        public void FetchNextPage()
+        {
+            // there may be no results left.
+            if (noMoreResults)
+                return;
+
+            // there may already be an active request.
+            if (getSetsRequest != null)
+                return;
+
+            if (lastResponse != null)
+                CurrentPage++;
+
+            performRequest();
+        }
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {
             SearchStarted?.Invoke();
 
-            getSetsRequest?.Cancel();
+            resetSearch();
 
-            queryChangedDebounce?.Cancel();
-            queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
+            queryChangedDebounce = Scheduler.AddDelayed(() =>
+            {
+                resetSearch();
+                FetchNextPage();
+            }, queryTextChanged ? 500 : 100);
         }
 
-        private void updateSearch()
+        private void performRequest()
         {
-            getSetsRequest = new SearchBeatmapSetsRequest(searchControl.Query.Value, searchControl.Ruleset.Value)
-            {
-                SearchCategory = searchControl.Category.Value,
-                SortCriteria = sortControl.Current.Value,
-                SortDirection = sortControl.SortDirection.Value,
-                Genre = searchControl.Genre.Value,
-                Language = searchControl.Language.Value
-            };
+            getSetsRequest = new SearchBeatmapSetsRequest(
+                searchControl.Query.Value,
+                searchControl.Ruleset.Value,
+                lastResponse?.Cursor,
+                searchControl.Category.Value,
+                sortControl.Current.Value,
+                sortControl.SortDirection.Value,
+                searchControl.Genre.Value,
+                searchControl.Language.Value,
+                searchControl.Extra,
+                searchControl.Ranks,
+                searchControl.Played.Value);
 
-            getSetsRequest.Success += response => Schedule(() => onSearchFinished(response));
+            getSetsRequest.Success += response =>
+            {
+                var sets = response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList();
+
+                if (sets.Count == 0)
+                    noMoreResults = true;
+
+                if (CurrentPage == 0)
+                    searchControl.BeatmapSet = sets.FirstOrDefault();
+
+                lastResponse = response;
+                getSetsRequest = null;
+
+                SearchFinished?.Invoke(sets);
+            };
 
             api.Queue(getSetsRequest);
         }
 
-        private void onSearchFinished(SearchBeatmapSetsResponse response)
+        private void resetSearch()
         {
-            var beatmaps = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
+            noMoreResults = false;
+            CurrentPage = 0;
 
-            searchControl.BeatmapSet = response.Total == 0 ? null : beatmaps.First();
+            lastResponse = null;
 
-            SearchFinished?.Invoke(beatmaps);
+            getSetsRequest?.Cancel();
+            getSetsRequest = null;
+
+            queryChangedDebounce?.Cancel();
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            getSetsRequest?.Cancel();
-            queryChangedDebounce?.Cancel();
+            resetSearch();
 
             base.Dispose(isDisposing);
         }
-
-        public void TakeFocus() => searchControl.TakeFocus();
     }
 }

@@ -7,13 +7,16 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -23,9 +26,18 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly IBeatmap beatmap;
 
-        public LegacyBeatmapEncoder(IBeatmap beatmap)
+        [CanBeNull]
+        private readonly ISkin skin;
+
+        /// <summary>
+        /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to encode.</param>
+        /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] ISkin skin)
         {
             this.beatmap = beatmap;
+            this.skin = skin;
 
             if (beatmap.BeatmapInfo.RulesetID < 0 || beatmap.BeatmapInfo.RulesetID > 3)
                 throw new ArgumentException("Only beatmaps in the osu, taiko, catch, or mania rulesets can be encoded to the legacy beatmap format.", nameof(beatmap));
@@ -52,6 +64,9 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine();
             handleControlPoints(writer);
+
+            writer.WriteLine();
+            handleColours(writer);
 
             writer.WriteLine();
             handleHitObjects(writer);
@@ -196,12 +211,34 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleHitObjects(TextWriter writer)
+        private void handleColours(TextWriter writer)
         {
-            if (beatmap.HitObjects.Count == 0)
+            var colours = skin?.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+
+            if (colours == null || colours.Count == 0)
                 return;
 
+            writer.WriteLine("[Colours]");
+
+            for (var i = 0; i < colours.Count; i++)
+            {
+                var comboColour = colours[i];
+
+                writer.Write(FormattableString.Invariant($"Combo{i}: "));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.R * byte.MaxValue)},"));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.G * byte.MaxValue)},"));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.B * byte.MaxValue)},"));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.A * byte.MaxValue)}"));
+                writer.WriteLine();
+            }
+        }
+
+        private void handleHitObjects(TextWriter writer)
+        {
             writer.WriteLine("[HitObjects]");
+
+            if (beatmap.HitObjects.Count == 0)
+                return;
 
             foreach (var h in beatmap.HitObjects)
                 handleHitObject(writer, h);
@@ -218,7 +255,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case 2:
-                    position.X = ((IHasXPosition)hitObject).X * 512;
+                    position.X = ((IHasXPosition)hitObject).X;
                     break;
 
                 case 3:
@@ -233,14 +270,14 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(FormattableString.Invariant($"{(int)getObjectType(hitObject)},"));
             writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
 
-            if (hitObject is IHasCurve curveData)
+            if (hitObject is IHasPath path)
             {
-                addCurveData(writer, curveData, position);
+                addPathData(writer, path, position);
                 writer.Write(getSampleBank(hitObject.Samples, zeroBanks: true));
             }
             else
             {
-                if (hitObject is IHasEndTime)
+                if (hitObject is IHasDuration)
                     addEndTimeData(writer, hitObject);
 
                 writer.Write(getSampleBank(hitObject.Samples));
@@ -263,11 +300,11 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (hitObject)
             {
-                case IHasCurve _:
+                case IHasPath _:
                     type |= LegacyHitObjectType.Slider;
                     break;
 
-                case IHasEndTime _:
+                case IHasDuration _:
                     if (beatmap.BeatmapInfo.RulesetID == 3)
                         type |= LegacyHitObjectType.Hold;
                     else
@@ -282,13 +319,13 @@ namespace osu.Game.Beatmaps.Formats
             return type;
         }
 
-        private void addCurveData(TextWriter writer, IHasCurve curveData, Vector2 position)
+        private void addPathData(TextWriter writer, IHasPath pathData, Vector2 position)
         {
             PathType? lastType = null;
 
-            for (int i = 0; i < curveData.Path.ControlPoints.Count; i++)
+            for (int i = 0; i < pathData.Path.ControlPoints.Count; i++)
             {
-                PathControlPoint point = curveData.Path.ControlPoints[i];
+                PathControlPoint point = pathData.Path.ControlPoints[i];
 
                 if (point.Type.Value != null)
                 {
@@ -325,29 +362,34 @@ namespace osu.Game.Beatmaps.Formats
                 if (i != 0)
                 {
                     writer.Write(FormattableString.Invariant($"{position.X + point.Position.Value.X}:{position.Y + point.Position.Value.Y}"));
-                    writer.Write(i != curveData.Path.ControlPoints.Count - 1 ? "|" : ",");
+                    writer.Write(i != pathData.Path.ControlPoints.Count - 1 ? "|" : ",");
                 }
             }
 
-            writer.Write(FormattableString.Invariant($"{curveData.RepeatCount + 1},"));
-            writer.Write(FormattableString.Invariant($"{curveData.Path.Distance},"));
+            var curveData = pathData as IHasPathWithRepeats;
 
-            for (int i = 0; i < curveData.NodeSamples.Count; i++)
-            {
-                writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
-                writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
-            }
+            writer.Write(FormattableString.Invariant($"{(curveData?.RepeatCount ?? 0) + 1},"));
+            writer.Write(FormattableString.Invariant($"{pathData.Path.Distance},"));
 
-            for (int i = 0; i < curveData.NodeSamples.Count; i++)
+            if (curveData != null)
             {
-                writer.Write(getSampleBank(curveData.NodeSamples[i], true));
-                writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                for (int i = 0; i < curveData.NodeSamples.Count; i++)
+                {
+                    writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
+                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                }
+
+                for (int i = 0; i < curveData.NodeSamples.Count; i++)
+                {
+                    writer.Write(getSampleBank(curveData.NodeSamples[i], true));
+                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                }
             }
         }
 
         private void addEndTimeData(TextWriter writer, HitObject hitObject)
         {
-            var endTimeData = (IHasEndTime)hitObject;
+            var endTimeData = (IHasDuration)hitObject;
             var type = getObjectType(hitObject);
 
             char suffix = ',';
@@ -375,7 +417,7 @@ namespace osu.Game.Beatmaps.Formats
                 string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
-                sb.Append(":");
+                sb.Append(':');
                 sb.Append(FormattableString.Invariant($"{customSampleBank}:"));
                 sb.Append(FormattableString.Invariant($"{volume}:"));
                 sb.Append(FormattableString.Invariant($"{sampleFilename}"));

@@ -225,6 +225,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
                 case OverlayPanelDisplayStyle.List:
                     return new UserListPanel(user);
+
+                case OverlayPanelDisplayStyle.Brick:
+                    return new UserBrickPanel(user);
             }
         }
 

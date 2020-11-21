@@ -46,6 +46,9 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         public override Replay Generate()
         {
+            if (Beatmap.HitObjects.Count == 0)
+                return Replay;
+
             var pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
 
             var actions = new List<ManiaAction>();

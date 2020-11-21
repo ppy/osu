@@ -1,8 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -17,11 +16,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneBeatmapListingSearchControl : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(BeatmapListingSearchControl),
-        };
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
@@ -34,6 +28,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuSpriteText category;
             OsuSpriteText genre;
             OsuSpriteText language;
+            OsuSpriteText extra;
+            OsuSpriteText ranks;
+            OsuSpriteText played;
 
             Add(control = new BeatmapListingSearchControl
             {
@@ -53,6 +50,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                     category = new OsuSpriteText(),
                     genre = new OsuSpriteText(),
                     language = new OsuSpriteText(),
+                    extra = new OsuSpriteText(),
+                    ranks = new OsuSpriteText(),
+                    played = new OsuSpriteText()
                 }
             });
 
@@ -61,6 +61,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             control.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
             control.Genre.BindValueChanged(g => genre.Text = $"Genre: {g.NewValue}", true);
             control.Language.BindValueChanged(l => language.Text = $"Language: {l.NewValue}", true);
+            control.Extra.BindCollectionChanged((u, v) => extra.Text = $"Extra: {(control.Extra.Any() ? string.Join('.', control.Extra.Select(i => i.ToString().ToLowerInvariant())) : "")}", true);
+            control.Ranks.BindCollectionChanged((u, v) => ranks.Text = $"Ranks: {(control.Ranks.Any() ? string.Join('.', control.Ranks.Select(i => i.ToString())) : "")}", true);
+            control.Played.BindValueChanged(p => played.Text = $"Played: {p.NewValue}", true);
         }
 
         [Test]

@@ -23,7 +23,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -32,12 +31,12 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// The minimum time range. This occurs at a <see cref="relativeTimeRange"/> of 40.
         /// </summary>
-        public const double MIN_TIME_RANGE = 150;
+        public const double MIN_TIME_RANGE = 340;
 
         /// <summary>
         /// The maximum time range. This occurs at a <see cref="relativeTimeRange"/> of 1.
         /// </summary>
-        public const double MAX_TIME_RANGE = 6000;
+        public const double MAX_TIME_RANGE = 13720;
 
         protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
 
@@ -107,13 +106,6 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         private void updateTimeRange() => TimeRange.Value = configTimeRange.Value * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value;
-
-        /// <summary>
-        /// Retrieves the column that intersects a screen-space position.
-        /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
-        public Column GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
 

@@ -3,14 +3,14 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
     /// A drawable which has a callback when the skin changes.
     /// </summary>
-    public abstract class SkinReloadableDrawable : CompositeDrawable
+    public abstract class SkinReloadableDrawable : PoolableDrawable
     {
         /// <summary>
         /// Invoked when <see cref="CurrentSkin"/> has changed.

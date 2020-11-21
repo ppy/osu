@@ -34,6 +34,12 @@ namespace osu.Game.Tests.Beatmaps
             var ourResult = convert(name, mods.Select(m => (Mod)Activator.CreateInstance(m)).ToArray());
             var expectedResult = read(name);
 
+            foreach (var m in ourResult.Mappings)
+                m.PostProcess();
+
+            foreach (var m in expectedResult.Mappings)
+                m.PostProcess();
+
             Assert.Multiple(() =>
             {
                 int mappingCounter = 0;
@@ -99,10 +105,7 @@ namespace osu.Game.Tests.Beatmaps
 
         private ConvertResult convert(string name, Mod[] mods)
         {
-            var beatmap = getBeatmap(name);
-
-            var rulesetInstance = CreateRuleset();
-            beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
+            var beatmap = GetBeatmap(name);
 
             var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
 
@@ -115,7 +118,7 @@ namespace osu.Game.Tests.Beatmaps
                 }
             };
 
-            working.GetPlayableBeatmap(rulesetInstance.RulesetInfo, mods);
+            working.GetPlayableBeatmap(CreateRuleset().RulesetInfo, mods);
 
             return new ConvertResult
             {
@@ -143,14 +146,19 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private IBeatmap getBeatmap(string name)
+        public IBeatmap GetBeatmap(string name)
         {
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
-                return decoder.Decode(stream);
+                var beatmap = decoder.Decode(stream);
+
+                var rulesetInstance = CreateRuleset();
+                beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
+
+                return beatmap;
             }
         }
 
@@ -206,7 +214,7 @@ namespace osu.Game.Tests.Beatmaps
 
             protected override Texture GetBackground() => throw new NotImplementedException();
 
-            protected override Track GetTrack() => throw new NotImplementedException();
+            protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 
             protected override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
             {
@@ -235,6 +243,13 @@ namespace osu.Game.Tests.Beatmaps
         private List<TConvertValue> setObjects
         {
             set => Objects = value;
+        }
+
+        /// <summary>
+        /// Invoked after this <see cref="ConvertMapping{TConvertValue}"/> is populated to post-process the contained data.
+        /// </summary>
+        public virtual void PostProcess()
+        {
         }
 
         public virtual bool Equals(ConvertMapping<TConvertValue> other) => StartTime == other?.StartTime;

@@ -3,26 +3,18 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays.Dashboard.Friends;
-using osu.Framework.Graphics;
-using osu.Game.Users;
-using osu.Game.Overlays;
-using osu.Framework.Allocation;
 using NUnit.Framework;
-using osu.Game.Online.API;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dashboard.Friends;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneFriendDisplay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(FriendDisplay),
-            typeof(FriendOnlineStreamControl),
-            typeof(UserListToolbar)
-        };
-
         protected override bool UseOnlineAPI => true;
 
         [Cached]
@@ -43,7 +35,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOffline()
         {
-            AddStep("Populate", () => display.Users = getUsers());
+            AddStep("Populate with offline test users", () => display.Users = getUsers());
         }
 
         [Test]
@@ -87,14 +79,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestFriendDisplay : FriendDisplay
         {
-            public void Fetch()
-            {
-                base.APIStateChanged(API, APIState.Online);
-            }
-
-            public override void APIStateChanged(IAPIProvider api, APIState state)
-            {
-            }
+            public void Fetch() => PerformFetch();
         }
     }
 }

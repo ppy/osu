@@ -77,6 +77,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         public override Quad SelectionQuad => ScreenSpaceDrawQuad;
 
-        public override Vector2 SelectionPoint => DrawableObject.Head.ScreenSpaceDrawQuad.Centre;
+        public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.Head.ScreenSpaceDrawQuad.Centre;
     }
 }

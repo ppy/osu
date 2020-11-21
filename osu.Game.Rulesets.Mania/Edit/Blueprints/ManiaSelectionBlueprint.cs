@@ -11,17 +11,14 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class ManiaSelectionBlueprint : OverlaySelectionBlueprint
+    public abstract class ManiaSelectionBlueprint : OverlaySelectionBlueprint
     {
         public new DrawableManiaHitObject DrawableObject => (DrawableManiaHitObject)base.DrawableObject;
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        [Resolved]
-        private IManiaHitObjectComposer composer { get; set; }
-
-        public ManiaSelectionBlueprint(DrawableHitObject drawableObject)
+        protected ManiaSelectionBlueprint(DrawableHitObject drawableObject)
             : base(drawableObject)
         {
             RelativeSizeAxes = Axes.None;

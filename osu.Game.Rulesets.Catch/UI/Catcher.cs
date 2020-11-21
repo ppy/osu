@@ -3,25 +3,38 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.Skinning;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class Catcher : Container, IKeyBindingHandler<CatchAction>
+    public class Catcher : SkinReloadableDrawable, IKeyBindingHandler<CatchAction>
     {
+        /// <summary>
+        /// The default colour used to tint hyper-dash fruit, along with the moving catcher, its trail
+        /// and end glow/after-image during a hyper-dash.
+        /// </summary>
         public static readonly Color4 DEFAULT_HYPER_DASH_COLOUR = Color4.Red;
+
+        /// <summary>
+        /// The duration between transitioning to hyper-dash state.
+        /// </summary>
+        public const double HYPER_DASH_TRANSITION_DURATION = 180;
 
         /// <summary>
         /// Whether we are hyper-dashing or not.
@@ -31,46 +44,45 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// The relative space to cover in 1 millisecond. based on 1 game pixel per millisecond as in osu-stable.
         /// </summary>
-        public const double BASE_SPEED = 1.0 / 512;
+        public const double BASE_SPEED = 1.0;
 
         public Container ExplodingFruitTarget;
 
-        public Container AdditiveTarget;
+        private Container<DrawableHitObject> caughtFruitContainer { get; } = new Container<DrawableHitObject>
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.BottomCentre,
+        };
+
+        [NotNull]
+        private readonly Container trailsTarget;
+
+        private CatcherTrailDisplay trails;
 
         public CatcherAnimationState CurrentState { get; private set; }
 
         /// <summary>
         /// The width of the catcher which can receive fruit. Equivalent to "catchMargin" in osu-stable.
         /// </summary>
-        private const float allowed_catch_range = 0.8f;
+        public const float ALLOWED_CATCH_RANGE = 0.8f;
 
-        protected bool Dashing
+        /// <summary>
+        /// The drawable catcher for <see cref="CurrentState"/>.
+        /// </summary>
+        internal Drawable CurrentDrawableCatcher => currentCatcher.Drawable;
+
+        private bool dashing;
+
+        public bool Dashing
         {
             get => dashing;
-            set
+            protected set
             {
                 if (value == dashing) return;
 
                 dashing = value;
 
-                Trail |= dashing;
-            }
-        }
-
-        /// <summary>
-        /// Activate or deactivate the trail. Will be automatically deactivated when conditions to keep the trail displayed are no longer met.
-        /// </summary>
-        protected bool Trail
-        {
-            get => trail;
-            set
-            {
-                if (value == trail || AdditiveTarget == null) return;
-
-                trail = value;
-
-                if (Trail)
-                    beginTrail();
+                updateTrailVisibility();
             }
         }
 
@@ -79,28 +91,25 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private readonly float catchWidth;
 
-        private Container<DrawableHitObject> caughtFruit;
-
         private CatcherSprite catcherIdle;
         private CatcherSprite catcherKiai;
         private CatcherSprite catcherFail;
 
         private CatcherSprite currentCatcher;
 
+        private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
+        private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
+
         private int currentDirection;
-
-        private bool dashing;
-
-        private bool trail;
 
         private double hyperDashModifier = 1;
         private int hyperDashDirection;
         private float hyperDashTargetPosition;
+        private Bindable<bool> hitLighting;
 
-        public Catcher(BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
         {
-            RelativePositionAxes = Axes.X;
-            X = 0.5f;
+            this.trailsTarget = trailsTarget;
 
             Origin = Anchor.TopCentre;
 
@@ -112,15 +121,13 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
-            Children = new Drawable[]
+            hitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
+
+            InternalChildren = new Drawable[]
             {
-                caughtFruit = new Container<DrawableHitObject>
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.BottomCentre,
-                },
+                caughtFruitContainer,
                 catcherIdle = new CatcherSprite(CatcherAnimationState.Idle)
                 {
                     Anchor = Anchor.TopCentre,
@@ -138,8 +145,23 @@ namespace osu.Game.Rulesets.Catch.UI
                 }
             };
 
+            trails = new CatcherTrailDisplay(this);
+
             updateCatcher();
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // don't add in above load as we may potentially modify a parent in an unsafe manner.
+            trailsTarget.Add(trails);
+        }
+
+        /// <summary>
+        /// Creates proxied content to be displayed beneath hitobjects.
+        /// </summary>
+        public Drawable CreateProxiedContent() => caughtFruitContainer.CreateProxy();
 
         /// <summary>
         /// Calculates the scale of the catcher based off the provided beatmap difficulty.
@@ -152,7 +174,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         /// <param name="scale">The scale of the catcher.</param>
         internal static float CalculateCatchWidth(Vector2 scale)
-            => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * allowed_catch_range;
+            => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * ALLOWED_CATCH_RANGE;
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
@@ -172,7 +194,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             const float allowance = 10;
 
-            while (caughtFruit.Any(f =>
+            while (caughtFruitContainer.Any(f =>
                 f.LifetimeEnd == double.MaxValue &&
                 Vector2Extensions.Distance(f.Position, fruit.Position) < (ourRadius + (theirRadius = f.DrawSize.X / 2 * f.Scale.X)) / (allowance / 2)))
             {
@@ -183,13 +205,16 @@ namespace osu.Game.Rulesets.Catch.UI
 
             fruit.X = Math.Clamp(fruit.X, -CatcherArea.CATCHER_SIZE / 2, CatcherArea.CATCHER_SIZE / 2);
 
-            caughtFruit.Add(fruit);
+            caughtFruitContainer.Add(fruit);
 
-            Add(new HitExplosion(fruit)
+            if (hitLighting.Value)
             {
-                X = fruit.X,
-                Scale = new Vector2(fruit.HitObject.Scale)
-            });
+                AddInternal(new HitExplosion(fruit)
+                {
+                    X = fruit.X,
+                    Scale = new Vector2(fruit.HitObject.Scale)
+                });
+            }
         }
 
         /// <summary>
@@ -199,25 +224,27 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <returns>Whether the catch is possible.</returns>
         public bool AttemptCatch(CatchHitObject fruit)
         {
+            if (!fruit.CanBePlated)
+                return false;
+
             var halfCatchWidth = catchWidth * 0.5f;
 
             // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
-            var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
-            var catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
+            var catchObjectPosition = fruit.X;
+            var catcherPosition = Position.X;
 
             var validCatch =
                 catchObjectPosition >= catcherPosition - halfCatchWidth &&
                 catchObjectPosition <= catcherPosition + halfCatchWidth;
 
-            // only update hyperdash state if we are catching a fruit.
-            // exceptions are Droplets and JuiceStreams.
-            if (!(fruit is Fruit)) return validCatch;
+            // only update hyperdash state if we are not catching a tiny droplet.
+            if (fruit is TinyDroplet) return validCatch;
 
             if (validCatch && fruit.HyperDash)
             {
                 var target = fruit.HyperDashTarget;
                 var timeDifference = target.StartTime - fruit.StartTime;
-                double positionDifference = target.X * CatchPlayfield.BASE_WIDTH - catcherPosition;
+                double positionDifference = target.X - catcherPosition;
                 var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
                 SetHyperDashState(Math.Abs(velocity), target.X);
@@ -240,8 +267,6 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <param name="targetPosition">When this catcher crosses this position, this catcher ends hyper-dashing.</param>
         public void SetHyperDashState(double modifier = 1, float targetPosition = -1)
         {
-            const float hyper_dash_transition_length = 180;
-
             var wasHyperDashing = HyperDashing;
 
             if (modifier <= 1 || X == targetPosition)
@@ -250,11 +275,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 hyperDashDirection = 0;
 
                 if (wasHyperDashing)
-                {
-                    this.FadeColour(Color4.White, hyper_dash_transition_length, Easing.OutQuint);
-                    this.FadeTo(1, hyper_dash_transition_length, Easing.OutQuint);
-                    Trail &= Dashing;
-                }
+                    runHyperDashStateTransition(false);
             }
             else
             {
@@ -264,19 +285,29 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (!wasHyperDashing)
                 {
-                    this.FadeColour(Color4.OrangeRed, hyper_dash_transition_length, Easing.OutQuint);
-                    this.FadeTo(0.2f, hyper_dash_transition_length, Easing.OutQuint);
-                    Trail = true;
-
-                    var hyperDashEndGlow = createAdditiveSprite();
-
-                    hyperDashEndGlow.MoveToOffset(new Vector2(0, -10), 1200, Easing.In);
-                    hyperDashEndGlow.ScaleTo(hyperDashEndGlow.Scale * 0.95f).ScaleTo(hyperDashEndGlow.Scale * 1.2f, 1200, Easing.In);
-                    hyperDashEndGlow.FadeOut(1200);
-                    hyperDashEndGlow.Expire(true);
+                    trails.DisplayEndGlow();
+                    runHyperDashStateTransition(true);
                 }
             }
         }
+
+        private void runHyperDashStateTransition(bool hyperDashing)
+        {
+            updateTrailVisibility();
+
+            if (hyperDashing)
+            {
+                this.FadeColour(hyperDashColour, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                this.FadeTo(0.2f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+            }
+            else
+            {
+                this.FadeColour(Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                this.FadeTo(1f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+            }
+        }
+
+        private void updateTrailVisibility() => trails.DisplayTrail = Dashing || HyperDashing;
 
         public bool OnPressed(CatchAction action)
         {
@@ -318,7 +349,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void UpdatePosition(float position)
         {
-            position = Math.Clamp(position, 0, 1);
+            position = Math.Clamp(position, 0, CatchPlayfield.WIDTH);
 
             if (position == X)
                 return;
@@ -332,7 +363,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public void Drop()
         {
-            foreach (var f in caughtFruit.ToArray())
+            foreach (var f in caughtFruitContainer.ToArray())
                 Drop(f);
         }
 
@@ -341,7 +372,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public void Explode()
         {
-            foreach (var f in caughtFruit.ToArray())
+            foreach (var f in caughtFruitContainer.ToArray())
                 Explode(f);
         }
 
@@ -364,6 +395,24 @@ namespace osu.Game.Rulesets.Catch.UI
                 f.MoveToX(f.X + originalX * 6, 1000);
                 f.FadeOut(750);
             });
+        }
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            hyperDashColour =
+                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
+                DEFAULT_HYPER_DASH_COLOUR;
+
+            hyperDashEndGlowColour =
+                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ??
+                hyperDashColour;
+
+            trails.HyperDashTrailsColour = hyperDashColour;
+            trails.EndGlowSpritesColour = hyperDashEndGlowColour;
+
+            runHyperDashStateTransition(HyperDashing);
         }
 
         protected override void Update()
@@ -411,22 +460,6 @@ namespace osu.Game.Rulesets.Catch.UI
             (currentCatcher.Drawable as IFramedAnimation)?.GotoFrame(0);
         }
 
-        private void beginTrail()
-        {
-            if (!dashing && !HyperDashing)
-            {
-                Trail = false;
-                return;
-            }
-
-            var additive = createAdditiveSprite();
-
-            additive.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
-            additive.Expire(true);
-
-            Scheduler.AddDelayed(beginTrail, HyperDashing ? 25 : 50);
-        }
-
         private void updateState(CatcherAnimationState state)
         {
             if (CurrentState == state)
@@ -436,33 +469,14 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCatcher();
         }
 
-        private CatcherTrailSprite createAdditiveSprite()
-        {
-            var tex = (currentCatcher.Drawable as TextureAnimation)?.CurrentFrame ?? ((Sprite)currentCatcher.Drawable).Texture;
-
-            var sprite = new CatcherTrailSprite(tex)
-            {
-                Anchor = Anchor,
-                Scale = Scale,
-                Colour = HyperDashing ? Color4.Red : Color4.White,
-                Blending = BlendingParameters.Additive,
-                RelativePositionAxes = RelativePositionAxes,
-                Position = Position
-            };
-
-            AdditiveTarget?.Add(sprite);
-
-            return sprite;
-        }
-
         private void removeFromPlateWithTransform(DrawableHitObject fruit, Action<DrawableHitObject> action)
         {
             if (ExplodingFruitTarget != null)
             {
                 fruit.Anchor = Anchor.TopLeft;
-                fruit.Position = caughtFruit.ToSpaceOfOtherDrawable(fruit.DrawPosition, ExplodingFruitTarget);
+                fruit.Position = caughtFruitContainer.ToSpaceOfOtherDrawable(fruit.DrawPosition, ExplodingFruitTarget);
 
-                if (!caughtFruit.Remove(fruit))
+                if (!caughtFruitContainer.Remove(fruit))
                     // we may have already been removed by a previous operation (due to the weird OnLoadComplete scheduling).
                     // this avoids a crash on potentially attempting to Add a fruit to ExplodingFruitTarget twice.
                     return;
