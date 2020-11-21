@@ -46,9 +46,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             base.SetUpSteps();
 
-            // Force recommender to calculate its star ratings again
-            AddStep("calculate recommended SRs", () => recommender.APIStateChanged(API, APIState.Online));
-
             User getUser(int? rulesetID)
             {
                 return new User
