@@ -58,6 +58,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             });
         }
 
-        protected override void UpdateStateTransforms(ArmedState state) => this.FadeOut(150);
+        protected override void UpdateHitStateTransforms(ArmedState state) => this.FadeOut(150);
     }
 }

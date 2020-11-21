@@ -197,8 +197,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestHitObject : ConvertHitObject, IHasPosition
         {
-            public float X { get; } = 0;
-            public float Y { get; } = 0;
+            public float X => 0;
+            public float Y => 0;
             public Vector2 Position { get; } = Vector2.Zero;
         }
     }

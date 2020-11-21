@@ -3,8 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
-using System;
 using osu.Framework.Allocation;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
@@ -22,10 +22,12 @@ namespace osu.Game.Screens.Edit.Components
             {
                 trackTimer = new OsuSpriteText
                 {
-                    Origin = Anchor.BottomLeft,
-                    RelativePositionAxes = Axes.Y,
-                    Font = OsuFont.GetFont(size: 22, fixedWidth: true),
-                    Y = 0.5f,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    // intentionally fudged centre to avoid movement of the number portion when
+                    // going negative.
+                    X = -35,
+                    Font = OsuFont.GetFont(size: 25, fixedWidth: true),
                 }
             };
         }
@@ -33,8 +35,7 @@ namespace osu.Game.Screens.Edit.Components
         protected override void Update()
         {
             base.Update();
-
-            trackTimer.Text = TimeSpan.FromMilliseconds(editorClock.CurrentTime).ToString(@"mm\:ss\:fff");
+            trackTimer.Text = editorClock.CurrentTime.ToEditorFormattedString();
         }
     }
 }

@@ -2,17 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 using osuTK.Graphics;
@@ -24,6 +27,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly TestRulesetInputManager playbackManager;
 
         private readonly TestRulesetInputManager recordingManager;
+
+        [Cached]
+        private GameplayBeatmap gameplayBeatmap = new GameplayBeatmap(new Beatmap());
 
         public TestSceneReplayRecording()
         {
@@ -113,19 +119,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
         }
 
-        public override List<IInput> GetPendingInputs()
+        public override void CollectPendingInputs(List<IInput> inputs)
         {
-            return new List<IInput>
-            {
-                new MousePositionAbsoluteInput
-                {
-                    Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero)
-                },
-                new ReplayState<TestAction>
-                {
-                    PressedActions = CurrentFrame?.Actions ?? new List<TestAction>()
-                }
-            };
+            inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero) });
+            inputs.Add(new ReplayState<TestAction> { PressedActions = CurrentFrame?.Actions ?? new List<TestAction>() });
         }
     }
 

@@ -13,6 +13,7 @@ using osu.Framework.Development;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -23,6 +24,7 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
+        [ExcludeFromDynamicCompile]
         private class BeatmapOnlineLookupQueue : IDisposable
         {
             private readonly IAPIProvider api;
@@ -48,23 +50,20 @@ namespace osu.Game.Beatmaps
 
             public Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
             {
-                if (api?.State != APIState.Online)
-                    return Task.CompletedTask;
-
                 LogForModel(beatmapSet, "Performing online lookups...");
                 return Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
             }
 
             // todo: expose this when we need to do individual difficulty lookups.
             protected Task UpdateAsync(BeatmapSetInfo beatmapSet, BeatmapInfo beatmap, CancellationToken cancellationToken)
-                => Task.Factory.StartNew(() => lookup(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
+                => Task.Factory.StartNew(() => lookup(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
 
             private void lookup(BeatmapSetInfo set, BeatmapInfo beatmap)
             {
                 if (checkLocalCache(set, beatmap))
                     return;
 
-                if (api?.State != APIState.Online)
+                if (api?.State.Value != APIState.Online)
                     return;
 
                 var req = new GetBeatmapRequest(beatmap);
@@ -183,6 +182,7 @@ namespace osu.Game.Beatmaps
             public void Dispose()
             {
                 cacheDownloadRequest?.Dispose();
+                updateScheduler?.Dispose();
             }
 
             [Serializable]

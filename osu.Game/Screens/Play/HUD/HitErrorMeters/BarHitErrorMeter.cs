@@ -99,7 +99,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Size = new Vector2(10),
                                 Icon = FontAwesome.Solid.ShippingFast,
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
+                                Origin = Anchor.Centre,
+                                // undo any layout rotation to display the icon the correct orientation
+                                Rotation = -Rotation,
                             },
                             new SpriteIcon
                             {
@@ -107,7 +109,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Size = new Vector2(10),
                                 Icon = FontAwesome.Solid.Bicycle,
                                 Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
+                                Origin = Anchor.Centre,
+                                // undo any layout rotation to display the icon the correct orientation
+                                Rotation = -Rotation,
                             }
                         }
                     },

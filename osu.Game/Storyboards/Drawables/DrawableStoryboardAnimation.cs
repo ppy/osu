@@ -2,18 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
+using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
+    public class DrawableStoryboardAnimation : DrawableAnimation, IFlippable, IVectorScalable
     {
         public StoryboardAnimation Animation { get; }
 
@@ -115,18 +113,13 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            for (var frame = 0; frame < Animation.FrameCount; frame++)
+            for (int frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
             {
-                var framePath = Animation.Path.Replace(".", frame + ".");
-
-                var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.Equals(framePath, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
-                if (path == null)
-                    continue;
-
-                var texture = textureStore.Get(path);
-                AddFrame(texture, Animation.FrameDelay);
+                string framePath = Animation.Path.Replace(".", frameIndex + ".");
+                Drawable frame = storyboard.CreateSpriteFromResourcePath(framePath, textureStore) ?? Empty();
+                AddFrame(frame, Animation.FrameDelay);
             }
 
             Animation.ApplyTransforms(this);

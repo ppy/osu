@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
@@ -21,34 +20,25 @@ namespace osu.Game.Online.API
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
-        public bool IsLoggedIn => State == APIState.Online;
+        public string AccessToken => "token";
+
+        public bool IsLoggedIn => State.Value == APIState.Online;
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
         public string Endpoint => "http://localhost";
-
-        private APIState state = APIState.Online;
-
-        private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
         /// <summary>
         /// Provide handling logic for an arbitrary API request.
         /// </summary>
         public Action<APIRequest> HandleRequest;
 
-        public APIState State
-        {
-            get => state;
-            set
-            {
-                if (state == value)
-                    return;
+        private readonly Bindable<APIState> state = new Bindable<APIState>(APIState.Online);
 
-                state = value;
-
-                Scheduler.Add(() => components.ForEach(c => c.APIStateChanged(this, value)));
-            }
-        }
+        /// <summary>
+        /// The current connectivity state of the API.
+        /// </summary>
+        public IBindable<APIState> State => state;
 
         public DummyAPIAccess()
         {
@@ -72,17 +62,6 @@ namespace osu.Game.Online.API
             return Task.CompletedTask;
         }
 
-        public void Register(IOnlineComponent component)
-        {
-            Scheduler.Add(delegate { components.Add(component); });
-            component.APIStateChanged(this, state);
-        }
-
-        public void Unregister(IOnlineComponent component)
-        {
-            Scheduler.Add(delegate { components.Remove(component); });
-        }
-
         public void Login(string username, string password)
         {
             LocalUser.Value = new User
@@ -91,13 +70,13 @@ namespace osu.Game.Online.API
                 Id = 1001,
             };
 
-            State = APIState.Online;
+            state.Value = APIState.Online;
         }
 
         public void Logout()
         {
             LocalUser.Value = new GuestUser();
-            State = APIState.Offline;
+            state.Value = APIState.Offline;
         }
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
@@ -105,5 +84,7 @@ namespace osu.Game.Online.API
             Thread.Sleep(200);
             return null;
         }
+
+        public void SetState(APIState newState) => state.Value = newState;
     }
 }

@@ -6,12 +6,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class CirclePiece : CompositeDrawable
     {
+        [Resolved]
+        private DrawableHitObject drawableObject { get; set; }
+
+        private TrianglesPiece triangles;
+
         public CirclePiece()
         {
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -35,13 +41,32 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Origin = Anchor.Centre,
                     Texture = textures.Get(@"Gameplay/osu/disc"),
                 },
-                new TrianglesPiece
+                triangles = new TrianglesPiece
                 {
                     RelativeSizeAxes = Axes.Both,
                     Blending = BlendingParameters.Additive,
                     Alpha = 0.5f,
                 }
             };
+
+            drawableObject.HitObjectApplied += onHitObjectApplied;
+            onHitObjectApplied(drawableObject);
+        }
+
+        private void onHitObjectApplied(DrawableHitObject obj)
+        {
+            if (obj.HitObject == null)
+                return;
+
+            triangles.Reset((int)obj.HitObject.StartTime);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject != null)
+                drawableObject.HitObjectApplied -= onHitObjectApplied;
         }
     }
 }

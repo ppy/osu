@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -76,7 +77,7 @@ namespace osu.Game.Tests.Visual.Editing
                 };
             });
 
-            AddUntilStep("wait for load", () => graph.ResampledWaveform != null);
+            AddUntilStep("wait for load", () => graph.Loaded.IsSet);
         }
 
         [Test]
@@ -98,12 +99,18 @@ namespace osu.Game.Tests.Visual.Editing
                 };
             });
 
-            AddUntilStep("wait for load", () => graph.ResampledWaveform != null);
+            AddUntilStep("wait for load", () => graph.Loaded.IsSet);
         }
 
         public class TestWaveformGraph : WaveformGraph
         {
-            public new Waveform ResampledWaveform => base.ResampledWaveform;
+            public readonly ManualResetEventSlim Loaded = new ManualResetEventSlim();
+
+            protected override void OnWaveformRegenerated(Waveform waveform)
+            {
+                base.OnWaveformRegenerated(waveform);
+                Loaded.Set();
+            }
         }
     }
 }

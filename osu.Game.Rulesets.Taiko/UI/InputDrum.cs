@@ -25,11 +25,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         private const float middle_split = 0.025f;
 
         [Cached]
-        private DrumSampleMapping sampleMapping;
+        private DrumSampleContainer sampleContainer;
 
         public InputDrum(ControlPointInfo controlPoints)
         {
-            sampleMapping = new DrumSampleMapping(controlPoints);
+            sampleContainer = new DrumSampleContainer(controlPoints);
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -37,39 +37,41 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                Scale = new Vector2(0.9f),
-                Children = new Drawable[]
+                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
                 {
-                    new TaikoHalfDrum(false)
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fit,
+                    Scale = new Vector2(0.9f),
+                    Children = new Drawable[]
                     {
-                        Name = "Left Half",
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.CentreRight,
-                        RelativeSizeAxes = Axes.Both,
-                        RelativePositionAxes = Axes.X,
-                        X = -middle_split / 2,
-                        RimAction = TaikoAction.LeftRim,
-                        CentreAction = TaikoAction.LeftCentre
-                    },
-                    new TaikoHalfDrum(true)
-                    {
-                        Name = "Right Half",
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.Both,
-                        RelativePositionAxes = Axes.X,
-                        X = middle_split / 2,
-                        RimAction = TaikoAction.RightRim,
-                        CentreAction = TaikoAction.RightCentre
+                        new TaikoHalfDrum(false)
+                        {
+                            Name = "Left Half",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreRight,
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.X,
+                            X = -middle_split / 2,
+                            RimAction = TaikoAction.LeftRim,
+                            CentreAction = TaikoAction.LeftCentre
+                        },
+                        new TaikoHalfDrum(true)
+                        {
+                            Name = "Right Half",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.X,
+                            X = middle_split / 2,
+                            RimAction = TaikoAction.RightRim,
+                            CentreAction = TaikoAction.RightCentre
+                        }
                     }
-                }
-            });
-
-            AddRangeInternal(sampleMapping.Sounds);
+                }),
+                sampleContainer
+            };
         }
 
         /// <summary>
@@ -93,7 +95,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             private readonly Sprite centreHit;
 
             [Resolved]
-            private DrumSampleMapping sampleMappings { get; set; }
+            private DrumSampleContainer sampleContainer { get; set; }
 
             public TaikoHalfDrum(bool flipped)
             {
@@ -154,23 +156,21 @@ namespace osu.Game.Rulesets.Taiko.UI
                 Drawable target = null;
                 Drawable back = null;
 
-                var drumSample = sampleMappings.SampleAt(Time.Current);
+                var drumSample = sampleContainer.SampleAt(Time.Current);
 
                 if (action == CentreAction)
                 {
                     target = centreHit;
                     back = centre;
 
-                    if (gameplayClock?.IsSeeking != true)
-                        drumSample.Centre?.Play();
+                    drumSample.Centre?.Play();
                 }
                 else if (action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
 
-                    if (gameplayClock?.IsSeeking != true)
-                        drumSample.Rim?.Play();
+                    drumSample.Rim?.Play();
                 }
 
                 if (target != null)

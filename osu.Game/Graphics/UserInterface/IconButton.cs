@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 iconColour = value;
-                icon.Colour = value;
+                icon.FadeColour(value);
             }
         }
 

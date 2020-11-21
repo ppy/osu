@@ -3,10 +3,12 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.Utils;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
@@ -17,13 +19,21 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
-        public readonly double TrackLength;
+        public IBindable<Track> Track => track;
+
+        private readonly Bindable<Track> track = new Bindable<Track>();
+
+        public double TrackLength => track.Value?.Length ?? 60000;
 
         public ControlPointInfo ControlPointInfo;
 
         private readonly BindableBeatDivisor beatDivisor;
 
         private readonly DecoupleableInterpolatingFramedClock underlyingClock;
+
+        public IBindable<bool> SeekingOrStopped => seekingOrStopped;
+
+        private readonly Bindable<bool> seekingOrStopped = new Bindable<bool>(true);
 
         public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
             : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
@@ -35,7 +45,6 @@ namespace osu.Game.Screens.Edit
             this.beatDivisor = beatDivisor;
 
             ControlPointInfo = controlPointInfo;
-            TrackLength = trackLength;
 
             underlyingClock = new DecoupleableInterpolatingFramedClock();
         }
@@ -76,7 +85,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="snapped">Whether to snap to the closest beat after seeking.</param>
         /// <param name="amount">The relative amount (magnitude) which should be seeked.</param>
-        public void SeekBackward(bool snapped = false, double amount = 1) => seek(-1, snapped, amount);
+        public void SeekBackward(bool snapped = false, double amount = 1) => seek(-1, snapped, amount + (IsRunning ? 1.5 : 0));
 
         /// <summary>
         /// Seeks forwards by one beat length.
@@ -118,9 +127,14 @@ namespace osu.Game.Screens.Edit
 
             seekTime = timingPoint.Time + closestBeat * seekAmount;
 
+            // limit forward seeking to only up to the next timing point's start time.
+            var nextTimingPoint = ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
+            if (seekTime > nextTimingPoint?.Time)
+                seekTime = nextTimingPoint.Time;
+
             // Due to the rounding above, we may end up on the current beat. This will effectively cause 0 seeking to happen, but we don't want this.
             // Instead, we'll go to the next beat in the direction when this is the case
-            if (Precision.AlmostEquals(current, seekTime))
+            if (Precision.AlmostEquals(current, seekTime, 0.5f))
             {
                 closestBeat += direction > 0 ? 1 : -1;
                 seekTime = timingPoint.Time + closestBeat * seekAmount;
@@ -128,10 +142,6 @@ namespace osu.Game.Screens.Edit
 
             if (seekTime < timingPoint.Time && timingPoint != ControlPointInfo.TimingPoints.First())
                 seekTime = timingPoint.Time;
-
-            var nextTimingPoint = ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
-            if (seekTime > nextTimingPoint?.Time)
-                seekTime = nextTimingPoint.Time;
 
             // Ensure the sought point is within the boundaries
             seekTime = Math.Clamp(seekTime, 0, TrackLength);
@@ -160,11 +170,14 @@ namespace osu.Game.Screens.Edit
 
         public void Stop()
         {
+            seekingOrStopped.Value = true;
             underlyingClock.Stop();
         }
 
         public bool Seek(double position)
         {
+            seekingOrStopped.Value = true;
+
             ClearTransforms();
             return underlyingClock.Seek(position);
         }
@@ -189,7 +202,11 @@ namespace osu.Game.Screens.Edit
 
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
-        public void ChangeSource(IClock source) => underlyingClock.ChangeSource(source);
+        public void ChangeSource(IClock source)
+        {
+            track.Value = source as Track;
+            underlyingClock.ChangeSource(source);
+        }
 
         public IClock Source => underlyingClock.Source;
 
@@ -201,8 +218,35 @@ namespace osu.Game.Screens.Edit
 
         private const double transform_time = 300;
 
+        protected override void Update()
+        {
+            base.Update();
+
+            updateSeekingState();
+        }
+
+        private void updateSeekingState()
+        {
+            if (seekingOrStopped.Value)
+            {
+                if (track.Value?.IsRunning != true)
+                {
+                    // seeking in the editor can happen while the track isn't running.
+                    // in this case we always want to expose ourselves as seeking (to avoid sample playback).
+                    return;
+                }
+
+                // we are either running a seek tween or doing an immediate seek.
+                // in the case of an immediate seek the seeking bool will be set to false after one update.
+                // this allows for silencing hit sounds and the likes.
+                seekingOrStopped.Value = Transforms.Any();
+            }
+        }
+
         public void SeekTo(double seekDestination)
         {
+            seekingOrStopped.Value = true;
+
             if (IsRunning)
                 Seek(seekDestination);
             else
@@ -222,8 +266,15 @@ namespace osu.Game.Screens.Edit
         {
             public override string TargetMember => nameof(currentTime);
 
-            protected override void Apply(EditorClock clock, double time) =>
-                clock.currentTime = Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            protected override void Apply(EditorClock clock, double time) => clock.currentTime = valueAt(time);
+
+            private double valueAt(double time)
+            {
+                if (time < StartTime) return StartValue;
+                if (time >= EndTime) return EndValue;
+
+                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            }
 
             protected override void ReadIntoStartValue(EditorClock clock) => StartValue = clock.currentTime;
         }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace osu.Game.Database
@@ -19,6 +20,6 @@ namespace osu.Game.Database
         /// <summary>
         /// An array of accepted file extensions (in the standard format of ".abc").
         /// </summary>
-        string[] HandledExtensions { get; }
+        IEnumerable<string> HandledExtensions { get; }
     }
 }

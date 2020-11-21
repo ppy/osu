@@ -23,15 +23,19 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestHitObjectAddEvent()
         {
-            var editorBeatmap = new EditorBeatmap(new OsuBeatmap());
-
-            HitObject addedObject = null;
-            editorBeatmap.HitObjectAdded += h => addedObject = h;
-
             var hitCircle = new HitCircle();
 
-            editorBeatmap.Add(hitCircle);
-            Assert.That(addedObject, Is.EqualTo(hitCircle));
+            HitObject addedObject = null;
+            EditorBeatmap editorBeatmap = null;
+
+            AddStep("add beatmap", () =>
+            {
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+                editorBeatmap.HitObjectAdded += h => addedObject = h;
+            });
+
+            AddStep("add hitobject", () => editorBeatmap.Add(hitCircle));
+            AddAssert("received add event", () => addedObject == hitCircle);
         }
 
         /// <summary>
@@ -41,13 +45,15 @@ namespace osu.Game.Tests.Beatmaps
         public void HitObjectRemoveEvent()
         {
             var hitCircle = new HitCircle();
-            var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
-
             HitObject removedObject = null;
-            editorBeatmap.HitObjectRemoved += h => removedObject = h;
-
-            editorBeatmap.Remove(hitCircle);
-            Assert.That(removedObject, Is.EqualTo(hitCircle));
+            EditorBeatmap editorBeatmap = null;
+            AddStep("add beatmap", () =>
+            {
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
+                editorBeatmap.HitObjectRemoved += h => removedObject = h;
+            });
+            AddStep("remove hitobject", () => editorBeatmap.Remove(editorBeatmap.HitObjects.First()));
+            AddAssert("received remove event", () => removedObject == hitCircle);
         }
 
         /// <summary>
@@ -147,6 +153,7 @@ namespace osu.Game.Tests.Beatmaps
         public void TestResortWhenStartTimeChanged()
         {
             var hitCircle = new HitCircle { StartTime = 1000 };
+
             var editorBeatmap = new EditorBeatmap(new OsuBeatmap
             {
                 HitObjects =

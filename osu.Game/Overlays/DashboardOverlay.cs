@@ -15,29 +15,38 @@ using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Overlays
 {
-    public class DashboardOverlay : FullscreenOverlay
+    public class DashboardOverlay : FullscreenOverlay<DashboardOverlayHeader>
     {
         private CancellationTokenSource cancellationToken;
 
-        private Box background;
         private Container content;
-        private DashboardOverlayHeader header;
         private LoadingLayer loading;
         private OverlayScrollContainer scrollFlow;
 
         public DashboardOverlay()
-            : base(OverlayColourScheme.Purple)
+            : base(OverlayColourScheme.Purple, new DashboardOverlayHeader
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Depth = -float.MaxValue
+            })
         {
         }
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
+
             Children = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourProvider.Background5
                 },
                 scrollFlow = new OverlayScrollContainer
                 {
@@ -50,12 +59,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new DashboardOverlayHeader
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Depth = -float.MaxValue
-                            },
+                            Header,
                             content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -66,15 +70,13 @@ namespace osu.Game.Overlays
                 },
                 loading = new LoadingLayer(content),
             };
-
-            background.Colour = ColourProvider.Background5;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            header.Current.BindValueChanged(onTabChanged);
+            Header.Current.BindValueChanged(onTabChanged);
         }
 
         private bool displayUpdateRequired = true;
@@ -86,7 +88,7 @@ namespace osu.Game.Overlays
             // We don't want to create a new display on every call, only when exiting from fully closed state.
             if (displayUpdateRequired)
             {
-                header.Current.TriggerChange();
+                Header.Current.TriggerChange();
                 displayUpdateRequired = false;
             }
         }
@@ -128,18 +130,22 @@ namespace osu.Game.Overlays
                     loadDisplay(new FriendDisplay());
                     break;
 
+                case DashboardOverlayTabs.CurrentlyPlaying:
+                    loadDisplay(new CurrentlyPlayingDisplay());
+                    break;
+
                 default:
                     throw new NotImplementedException($"Display for {tab.NewValue} tab is not implemented");
             }
         }
 
-        public override void APIStateChanged(IAPIProvider api, APIState state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             if (State.Value == Visibility.Hidden)
                 return;
 
-            header.Current.TriggerChange();
-        }
+            Header.Current.TriggerChange();
+        });
 
         protected override void Dispose(bool isDisposing)
         {

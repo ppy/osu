@@ -85,6 +85,8 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed) return false;
+
             if (ToggleKeys != null)
             {
                 var index = Array.IndexOf(ToggleKeys, e.Key);
@@ -132,7 +134,7 @@ namespace osu.Game.Overlays.Mods
         {
             foreach (var button in buttons)
             {
-                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m)));
+                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t == m.GetType()));
 
                 if (i >= 0)
                     button.SelectAt(i);

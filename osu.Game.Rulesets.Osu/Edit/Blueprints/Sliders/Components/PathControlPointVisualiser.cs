@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Humanizer;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,12 +19,16 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // allow context menu to appear outside of the playfield.
+
         internal readonly Container<PathControlPointPiece> Pieces;
         internal readonly Container<PathControlPointConnectionPiece> Connections;
 
@@ -64,6 +69,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    // If inserting in the path (not appending),
+                    // update indices of existing connections after insert location
+                    if (e.NewStartingIndex < Pieces.Count)
+                    {
+                        foreach (var connection in Connections)
+                        {
+                            if (connection.ControlPointIndex >= e.NewStartingIndex)
+                                connection.ControlPointIndex += e.NewItems.Count;
+                        }
+                    }
+
                     for (int i = 0; i < e.NewItems.Count; i++)
                     {
                         var point = (PathControlPoint)e.NewItems[i];
@@ -86,6 +102,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         Connections.RemoveAll(c => c.ControlPoint == point);
                     }
 
+                    // If removing before the end of the path,
+                    // update indices of connections after remove location
+                    if (e.OldStartingIndex < Pieces.Count)
+                    {
+                        foreach (var connection in Connections)
+                        {
+                            if (connection.ControlPointIndex >= e.OldStartingIndex)
+                                connection.ControlPointIndex -= e.OldItems.Count;
+                        }
+                    }
+
                     break;
             }
         }
@@ -105,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (action.ActionMethod)
             {
                 case PlatformActionMethod.Delete:
-                    return deleteSelected();
+                    return DeleteSelected();
             }
 
             return false;
@@ -126,7 +153,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
-        private bool deleteSelected()
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
+        public bool DeleteSelected()
         {
             List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.ControlPoint).ToList();
 
@@ -134,7 +164,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (toRemove.Count == 0)
                 return false;
 
+            changeHandler?.BeginChange();
             RemoveControlPointsRequested?.Invoke(toRemove);
+            changeHandler?.EndChange();
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
@@ -169,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => deleteSelected()),
+                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => DeleteSelected()),
                     new OsuMenuItem("Curve type")
                     {
                         Items = items

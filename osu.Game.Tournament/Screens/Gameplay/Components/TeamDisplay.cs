@@ -14,7 +14,10 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
     {
         private readonly TeamScore score;
 
-        public bool ShowScore { set => score.FadeTo(value ? 1 : 0, 200); }
+        public bool ShowScore
+        {
+            set => score.FadeTo(value ? 1 : 0, 200);
+        }
 
         public TeamDisplay(TournamentTeam team, TeamColour colour, Bindable<int?> currentTeamScore, int pointsToWin)
             : base(team)
@@ -26,7 +29,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             var anchor = flip ? Anchor.TopLeft : Anchor.TopRight;
 
             Flag.RelativeSizeAxes = Axes.None;
-            Flag.Size = new Vector2(60, 40);
+            Flag.Scale = new Vector2(0.8f);
             Flag.Origin = anchor;
             Flag.Anchor = anchor;
 
@@ -59,6 +62,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(5),
+                                        Origin = anchor,
+                                        Anchor = anchor,
                                         Children = new Drawable[]
                                         {
                                             new DrawableTeamHeader(colour)

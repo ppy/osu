@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -276,7 +277,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override bool CanConvert() => true;
 
-            protected override IEnumerable<TestHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
+            protected override IEnumerable<TestHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
             {
                 yield return new TestHitObject
                 {

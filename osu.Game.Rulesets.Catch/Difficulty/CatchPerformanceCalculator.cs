@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -25,8 +24,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         private int tinyTicksMissed;
         private int misses;
 
-        public CatchPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
-            : base(ruleset, beatmap, score)
+        public CatchPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
+            : base(ruleset, attributes, score)
         {
         }
 
@@ -34,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             mods = Score.Mods;
 
-            fruitsHit = Score.Statistics.GetOrDefault(HitResult.Perfect);
+            fruitsHit = Score.Statistics.GetOrDefault(HitResult.Great);
             ticksHit = Score.Statistics.GetOrDefault(HitResult.LargeTickHit);
             tinyTicksHit = Score.Statistics.GetOrDefault(HitResult.SmallTickHit);
             tinyTicksMissed = Score.Statistics.GetOrDefault(HitResult.SmallTickMiss);
@@ -78,7 +77,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             if (mods.Any(m => m is ModHidden))
             {
-                value *= 1.05 + 0.075 * (10.0 - Math.Min(10.0, Attributes.ApproachRate)); // 7.5% for each AR below 10
                 // Hiddens gives almost nothing on max approach rate, and more the lower it is
                 if (approachRate <= 10.0)
                     value *= 1.05 + 0.075 * (10.0 - approachRate); // 7.5% for each AR below 10

@@ -21,6 +21,7 @@
     <AndroidLinkTool>r8</AndroidLinkTool>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GameplayScreenRotationLocker.cs" />
     <Compile Include="OsuGameActivity.cs" />
     <Compile Include="OsuGameAndroid.cs" />
   </ItemGroup>

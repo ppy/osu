@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -17,6 +18,12 @@ namespace osu.Game.Skinning
         /// The displayed component.
         /// </summary>
         public Drawable Drawable { get; private set; }
+
+        /// <summary>
+        /// Whether the drawable component should be centered in available space.
+        /// Defaults to true.
+        /// </summary>
+        public bool CentreComponent { get; set; } = true;
 
         public new Axes AutoSizeAxes
         {
@@ -50,6 +57,11 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
+        /// <summary>
+        /// Seeks to the 0-th frame if the content of this <see cref="SkinnableDrawable"/> is an <see cref="IFramedAnimation"/>.
+        /// </summary>
+        public void ResetAnimation() => (Drawable as IFramedAnimation)?.GotoFrame(0);
+
         private readonly Func<ISkinComponent, Drawable> createDefault;
 
         private readonly Cached scaling = new Cached();
@@ -78,8 +90,13 @@ namespace osu.Game.Skinning
             if (Drawable != null)
             {
                 scaling.Invalidate();
-                Drawable.Origin = Anchor.Centre;
-                Drawable.Anchor = Anchor.Centre;
+
+                if (CentreComponent)
+                {
+                    Drawable.Origin = Anchor.Centre;
+                    Drawable.Anchor = Anchor.Centre;
+                }
+
                 InternalChild = Drawable;
             }
             else

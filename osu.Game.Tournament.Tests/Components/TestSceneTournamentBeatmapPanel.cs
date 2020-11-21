@@ -8,12 +8,11 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
-using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneTournamentBeatmapPanel : OsuTestScene
+    public class TestSceneTournamentBeatmapPanel : TournamentTestScene
     {
         [Resolved]
         private IAPIProvider api { get; set; }

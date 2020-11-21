@@ -4,34 +4,55 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderHead : DrawableHitCircle
     {
-        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;
 
-        private readonly Slider slider;
+        private DrawableSlider drawableSlider;
 
-        public DrawableSliderHead(Slider slider, SliderHeadCircle h)
+        private Slider slider => drawableSlider?.HitObject;
+
+        public DrawableSliderHead()
+        {
+        }
+
+        public DrawableSliderHead(SliderHeadCircle h)
             : base(h)
         {
-            this.slider = slider;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            positionBindable.BindTo(HitObject.PositionBindable);
-            pathVersion.BindTo(slider.Path.Version);
+            PositionBindable.BindValueChanged(_ => updatePosition());
+            pathVersion.BindValueChanged(_ => updatePosition());
+        }
 
-            positionBindable.BindValueChanged(_ => updatePosition());
-            pathVersion.BindValueChanged(_ => updatePosition(), true);
+        protected override void OnFree(HitObject hitObject)
+        {
+            base.OnFree(hitObject);
+
+            pathVersion.UnbindFrom(drawableSlider.PathVersion);
+        }
+
+        protected override void OnParentReceived(DrawableHitObject parent)
+        {
+            base.OnParentReceived(parent);
+
+            drawableSlider = (DrawableSlider)parent;
+
+            pathVersion.BindTo(drawableSlider.PathVersion);
+
+            OnShake = drawableSlider.Shake;
+            CheckHittable = (d, t) => drawableSlider.CheckHittable?.Invoke(d, t) ?? true;
         }
 
         protected override void Update()
@@ -47,8 +68,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Action<double> OnShake;
 
-        protected override void Shake(double maximumLength) => OnShake?.Invoke(maximumLength);
+        public override void Shake(double maximumLength) => OnShake?.Invoke(maximumLength);
 
-        private void updatePosition() => Position = HitObject.Position - slider.Position;
+        private void updatePosition()
+        {
+            if (slider != null)
+                Position = HitObject.Position - slider.Position;
+        }
     }
 }

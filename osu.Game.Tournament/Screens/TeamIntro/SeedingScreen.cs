@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         new SettingsTeamDropdown(LadderInfo.Teams)
                         {
                             LabelText = "Show specific team",
-                            Bindable = currentTeam,
+                            Current = currentTeam,
                         }
                     }
                 }
@@ -203,13 +203,14 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = TournamentGame.TEXT_COLOUR,
+                                            Colour = TournamentGame.ELEMENT_BACKGROUND_COLOUR,
                                         },
                                         new TournamentSpriteText
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Text = seeding.ToString("#,0"),
+                                            Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR
                                         },
                                     }
                                 },
@@ -287,8 +288,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     AutoSizeAxes = Axes.Both;
 
                     Flag.RelativeSizeAxes = Axes.None;
-                    Flag.Size = new Vector2(300, 200);
-                    Flag.Scale = new Vector2(0.3f);
+                    Flag.Scale = new Vector2(1.2f);
 
                     InternalChild = new FillFlowContainer
                     {

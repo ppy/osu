@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
+            ContentSidePadding = UserProfileOverlay.CONTENT_X_MARGIN;
+
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem("info");
@@ -39,7 +41,7 @@ namespace osu.Game.Overlays.Profile
                 Masking = true,
                 Children = new Drawable[]
                 {
-                    coverContainer = new UserCoverBackground
+                    coverContainer = new ProfileCoverBackground
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -95,8 +97,13 @@ namespace osu.Game.Overlays.Profile
             public ProfileHeaderTitle()
             {
                 Title = "player info";
-                IconTexture = "Icons/profile";
+                IconTexture = "Icons/Hexacons/profile";
             }
+        }
+
+        private class ProfileCoverBackground : UserCoverBackground
+        {
+            protected override double LoadDelay => 0;
         }
     }
 }

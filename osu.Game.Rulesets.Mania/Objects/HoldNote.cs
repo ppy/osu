@@ -102,14 +102,14 @@ namespace osu.Game.Rulesets.Mania.Objects
             {
                 StartTime = StartTime,
                 Column = Column,
-                Samples = getNodeSamples(0),
+                Samples = GetNodeSamples(0),
             });
 
             AddNested(Tail = new TailNote
             {
                 StartTime = EndTime,
                 Column = Column,
-                Samples = getNodeSamples((NodeSamples?.Count - 1) ?? 1),
+                Samples = GetNodeSamples((NodeSamples?.Count - 1) ?? 1),
             });
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
+        public IList<HitSampleInfo> GetNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples?.Count ? NodeSamples[nodeIndex] : Samples;
     }
 }

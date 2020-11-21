@@ -1,9 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
@@ -14,6 +19,11 @@ namespace osu.Game.Storyboards
         public IEnumerable<StoryboardLayer> Layers => layers.Values;
 
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
+
+        /// <summary>
+        /// Whether the storyboard can fall back to skin sprites in case no matching storyboard sprites are found.
+        /// </summary>
+        public bool UseSkinSprites { get; set; }
 
         public bool HasDrawable => Layers.Any(l => l.Elements.Any(e => e.IsDrawable));
 
@@ -62,6 +72,20 @@ namespace osu.Game.Storyboards
         {
             var drawable = new DrawableStoryboard(this);
             drawable.Width = drawable.Height * (BeatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f);
+            return drawable;
+        }
+
+        public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
+        {
+            Drawable drawable = null;
+            var storyboardPath = BeatmapInfo.BeatmapSet?.Files?.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+
+            if (storyboardPath != null)
+                drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };
+            // if the texture isn't available locally in the beatmap, some storyboards choose to source from the underlying skin lookup hierarchy.
+            else if (UseSkinSprites)
+                drawable = new SkinnableSprite(path);
+
             return drawable;
         }
     }

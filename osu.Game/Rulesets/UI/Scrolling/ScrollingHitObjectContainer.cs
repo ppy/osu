@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
+using osu.Framework.Threading;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -17,7 +19,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
     {
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
-        private readonly Dictionary<DrawableHitObject, Cached> hitObjectInitialStateCache = new Dictionary<DrawableHitObject, Cached>();
+        private readonly Dictionary<DrawableHitObject, InitialState> hitObjectInitialStateCache = new Dictionary<DrawableHitObject, InitialState>();
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
@@ -175,10 +177,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             // The cache may not exist if the hitobject state hasn't been computed yet (e.g. if the hitobject was added + defaults applied in the same frame).
             // In such a case, combinedObjCache will take care of updating the hitobject.
-            if (hitObjectInitialStateCache.TryGetValue(drawableObject, out var objCache))
+            if (hitObjectInitialStateCache.TryGetValue(drawableObject, out var state))
             {
                 combinedObjCache.Invalidate();
-                objCache.Invalidate();
+                state.Cache.Invalidate();
             }
         }
 
@@ -190,8 +192,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (!layoutCache.IsValid)
             {
-                foreach (var cached in hitObjectInitialStateCache.Values)
-                    cached.Invalidate();
+                foreach (var state in hitObjectInitialStateCache.Values)
+                    state.Cache.Invalidate();
                 combinedObjCache.Invalidate();
 
                 scrollingInfo.Algorithm.Reset();
@@ -215,16 +217,18 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
                 foreach (var obj in Objects)
                 {
-                    if (!hitObjectInitialStateCache.TryGetValue(obj, out var objCache))
-                        objCache = hitObjectInitialStateCache[obj] = new Cached();
+                    if (!hitObjectInitialStateCache.TryGetValue(obj, out var state))
+                        state = hitObjectInitialStateCache[obj] = new InitialState(new Cached());
 
-                    if (objCache.IsValid)
+                    if (state.Cache.IsValid)
                         continue;
 
-                    computeLifetimeStartRecursive(obj);
-                    computeInitialStateRecursive(obj);
+                    state.ScheduledComputation?.Cancel();
+                    state.ScheduledComputation = computeInitialStateRecursive(obj);
 
-                    objCache.Validate();
+                    computeLifetimeStartRecursive(obj);
+
+                    state.Cache.Validate();
                 }
 
                 combinedObjCache.Validate();
@@ -267,8 +271,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, originAdjustment, timeRange.Value, scrollLength);
         }
 
-        // Cant use AddOnce() since the delegate is re-constructed every invocation
-        private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
+        private ScheduledDelegate computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
         {
             if (hitObject.HitObject is IHasDuration e)
             {
@@ -323,6 +326,20 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 case ScrollingDirection.Right:
                     hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
                     break;
+            }
+        }
+
+        private class InitialState
+        {
+            [NotNull]
+            public readonly Cached Cache;
+
+            [CanBeNull]
+            public ScheduledDelegate ScheduledComputation;
+
+            public InitialState(Cached cache)
+            {
+                Cache = cache;
             }
         }
     }

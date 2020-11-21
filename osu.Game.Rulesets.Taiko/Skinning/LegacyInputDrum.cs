@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             public readonly Sprite Centre;
 
             [Resolved]
-            private DrumSampleMapping sampleMappings { get; set; }
+            private DrumSampleContainer sampleContainer { get; set; }
 
             public LegacyHalfDrum(bool flipped)
             {
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             public bool OnPressed(TaikoAction action)
             {
                 Drawable target = null;
-                var drumSample = sampleMappings.SampleAt(Time.Current);
+                var drumSample = sampleContainer.SampleAt(Time.Current);
 
                 if (action == CentreAction)
                 {

@@ -30,6 +30,9 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
         public override Replay Generate()
         {
+            if (Beatmap.HitObjects.Count == 0)
+                return Replay;
+
             bool hitButton = true;
 
             Frames.Add(new TaikoReplayFrame(-100000));

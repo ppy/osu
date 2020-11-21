@@ -40,6 +40,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             float getRandomAngle() => 180 * (RNG.NextSingle() * 2 - 1);
         }
 
+        public override void PlaySamples()
+        {
+            base.PlaySamples();
+            if (Samples != null)
+                Samples.Frequency.Value = 0.77f + ((Banana)HitObject).BananaIndex * 0.006f;
+        }
+
         private Color4 getBananaColour()
         {
             switch (RNG.Next(0, 3))

@@ -3,12 +3,22 @@
 
 using osu.Framework.Bindables;
 using osu.Game.Audio;
+using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
     public class SampleControlPoint : ControlPoint
     {
         public const string DEFAULT_BANK = "normal";
+
+        public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
+        {
+            SampleBankBindable = { Disabled = true },
+            SampleVolumeBindable = { Disabled = true }
+        };
+
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
 
         /// <summary>
         /// The default sample bank at this control point.

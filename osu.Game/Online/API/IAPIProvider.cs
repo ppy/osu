@@ -11,13 +11,20 @@ namespace osu.Game.Online.API
     {
         /// <summary>
         /// The local user.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         Bindable<User> LocalUser { get; }
 
         /// <summary>
         /// The current user's activity.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         Bindable<UserActivity> Activity { get; }
+
+        /// <summary>
+        /// Retrieve the OAuth access token.
+        /// </summary>
+        string AccessToken { get; }
 
         /// <summary>
         /// Returns whether the local user is logged in.
@@ -35,7 +42,11 @@ namespace osu.Game.Online.API
         /// </summary>
         string Endpoint { get; }
 
-        APIState State { get; }
+        /// <summary>
+        /// The current connection state of the API.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// </summary>
+        IBindable<APIState> State { get; }
 
         /// <summary>
         /// Queue a new request.
@@ -60,18 +71,6 @@ namespace osu.Game.Online.API
         /// </remarks>
         /// <param name="request">The request to perform.</param>
         Task PerformAsync(APIRequest request);
-
-        /// <summary>
-        /// Register a component to receive state changes.
-        /// </summary>
-        /// <param name="component">The component to register.</param>
-        void Register(IOnlineComponent component);
-
-        /// <summary>
-        /// Unregisters a component to receive state changes.
-        /// </summary>
-        /// <param name="component">The component to unregister.</param>
-        void Unregister(IOnlineComponent component);
 
         /// <summary>
         /// Attempt to login using the provided credentials. This is a non-blocking operation.

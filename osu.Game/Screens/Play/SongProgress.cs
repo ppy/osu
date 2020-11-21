@@ -70,7 +70,6 @@ namespace osu.Game.Screens.Play
         public SongProgress()
         {
             Masking = true;
-            Height = bottom_bar_height + graph_height + handle_size.Y + info_height;
 
             Children = new Drawable[]
             {
@@ -148,6 +147,8 @@ namespace osu.Game.Screens.Play
 
             bar.CurrentTime = gameplayTime;
             graph.Progress = (int)(graph.ColumnCount * progress);
+
+            Height = bottom_bar_height + graph_height + handle_size.Y + info_height - graph.Y;
         }
 
         private void updateBarVisibility()

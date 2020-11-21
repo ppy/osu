@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!(obj is DrawableDrumRollTick))
                 return;
 
-            if (result.Type > HitResult.Miss)
+            if (result.IsHit)
                 rollingHits++;
             else
                 rollingHits--;
@@ -129,19 +129,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             if (countHit >= HitObject.RequiredGoodHits)
             {
-                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
+                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Ok);
             }
             else
-                ApplyResult(r => r.Type = HitResult.Miss);
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
             switch (state)
             {
                 case ArmedState.Hit:
                 case ArmedState.Miss:
-                    this.Delay(HitObject.Duration).FadeOut(100);
+                    this.FadeOut(100);
                     break;
             }
         }
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 if (!MainObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = MainObject.IsHit ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = MainObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
             }
 
             public override bool OnPressed(TaikoAction action) => false;

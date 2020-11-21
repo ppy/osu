@@ -14,11 +14,6 @@ namespace osu.Game.Tests.Visual
     {
         protected sealed override bool HasCustomSteps => true;
 
-        protected ModTestScene(Ruleset ruleset)
-            : base(ruleset)
-        {
-        }
-
         private ModTestData currentTestData;
 
         protected void CreateModTest(ModTestData testData) => CreateTest(() =>
@@ -45,8 +40,8 @@ namespace osu.Game.Tests.Visual
         {
             var mods = new List<Mod>(SelectedMods.Value);
 
-            if (currentTestData.Mod != null)
-                mods.Add(currentTestData.Mod);
+            if (currentTestData.Mods != null)
+                mods.AddRange(currentTestData.Mods);
             if (currentTestData.Autoplay)
                 mods.Add(ruleset.GetAutoplayMod());
 
@@ -90,9 +85,18 @@ namespace osu.Game.Tests.Visual
             public Func<bool> PassCondition;
 
             /// <summary>
-            /// The <see cref="Mod"/> this test case tests.
+            /// The <see cref="Mod"/>s this test case tests.
             /// </summary>
-            public Mod Mod;
+            public IReadOnlyList<Mod> Mods;
+
+            /// <summary>
+            /// Convenience property for setting <see cref="Mods"/> if only
+            /// a single mod is to be tested.
+            /// </summary>
+            public Mod Mod
+            {
+                set => Mods = new[] { value };
+            }
         }
     }
 }

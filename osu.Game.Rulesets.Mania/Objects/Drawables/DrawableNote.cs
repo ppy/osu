@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
                 return;
             }
 
@@ -62,6 +62,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public virtual bool OnPressed(ManiaAction action)
         {
             if (action != Action.Value)
+                return false;
+
+            if (CheckHittable?.Invoke(this, Time.Current) == false)
                 return false;
 
             return UpdateResult(true);

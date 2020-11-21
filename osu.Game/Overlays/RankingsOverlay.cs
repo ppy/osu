@@ -17,17 +17,16 @@ using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays
 {
-    public class RankingsOverlay : FullscreenOverlay
+    public class RankingsOverlay : FullscreenOverlay<RankingsOverlayHeader>
     {
-        protected Bindable<Country> Country => header.Country;
+        protected Bindable<Country> Country => Header.Country;
 
-        protected Bindable<RankingsScope> Scope => header.Current;
+        protected Bindable<RankingsScope> Scope => Header.Current;
 
         private readonly OverlayScrollContainer scrollFlow;
         private readonly Container contentContainer;
         private readonly LoadingLayer loading;
         private readonly Box background;
-        private readonly RankingsOverlayHeader header;
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
@@ -36,7 +35,12 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         public RankingsOverlay()
-            : base(OverlayColourScheme.Green)
+            : base(OverlayColourScheme.Green, new RankingsOverlayHeader
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Depth = -float.MaxValue
+            })
         {
             Children = new Drawable[]
             {
@@ -55,12 +59,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new RankingsOverlayHeader
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Depth = -float.MaxValue
-                            },
+                            Header,
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -97,7 +96,7 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            header.Ruleset.BindTo(ruleset);
+            Header.Ruleset.BindTo(ruleset);
 
             Country.BindValueChanged(_ =>
             {

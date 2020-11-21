@@ -19,10 +19,10 @@ namespace osu.Game.Tests.Visual.Menus
         [Cached]
         private OsuLogo logo;
 
+        protected OsuScreenStack IntroStack;
+
         protected IntroTestScene()
         {
-            OsuScreenStack introStack = null;
-
             Children = new Drawable[]
             {
                 new Box
@@ -45,17 +45,17 @@ namespace osu.Game.Tests.Visual.Menus
                 logo.FinishTransforms();
                 logo.IsTracking = false;
 
-                introStack?.Expire();
+                IntroStack?.Expire();
 
-                Add(introStack = new OsuScreenStack
+                Add(IntroStack = new OsuScreenStack
                 {
                     RelativeSizeAxes = Axes.Both,
                 });
 
-                introStack.Push(CreateScreen());
+                IntroStack.Push(CreateScreen());
             });
 
-            AddUntilStep("wait for menu", () => introStack.CurrentScreen is MainMenu);
+            AddUntilStep("wait for menu", () => IntroStack.CurrentScreen is MainMenu);
         }
 
         protected abstract IScreen CreateScreen();

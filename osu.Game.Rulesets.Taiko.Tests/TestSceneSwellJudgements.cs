@@ -5,17 +5,11 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneSwellJudgements : PlayerTestScene
+    public class TestSceneSwellJudgements : TestSceneTaikoPlayer
     {
-        public TestSceneSwellJudgements()
-            : base(new TaikoRuleset())
-        {
-        }
-
         [Test]
         public void TestZeroTickTimeOffsets()
         {

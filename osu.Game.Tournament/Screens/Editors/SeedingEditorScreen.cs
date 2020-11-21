@@ -74,13 +74,13 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Mod",
                                 Width = 0.33f,
-                                Bindable = Model.Mod
+                                Current = Model.Mod
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Seed",
                                 Width = 0.33f,
-                                Bindable = Model.Seed
+                                Current = Model.Seed
                             },
                             new SettingsButton
                             {
@@ -187,21 +187,21 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "Beatmap ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = beatmapId,
+                                        Current = beatmapId,
                                     },
                                     new SettingsSlider<int>
                                     {
                                         LabelText = "Seed",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = beatmap.Seed
+                                        Current = beatmap.Seed
                                     },
                                     new SettingsTextBox
                                     {
                                         LabelText = "Score",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = score,
+                                        Current = score,
                                     },
                                     drawableContainer = new Container
                                     {

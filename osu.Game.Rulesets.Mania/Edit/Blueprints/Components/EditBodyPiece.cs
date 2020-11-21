@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 
@@ -15,7 +16,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
             AccentColour.Value = colours.Yellow;
 
             Background.Alpha = 0.5f;
-            Foreground.Alpha = 0;
         }
+
+        protected override Drawable CreateForeground() => base.CreateForeground().With(d => d.Alpha = 0);
     }
 }

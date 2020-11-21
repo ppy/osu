@@ -14,6 +14,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         public TestSceneMatchHeader()
         {
+            Room = new Room();
             Room.Playlist.Add(new PlaylistItem
             {
                 Beatmap =

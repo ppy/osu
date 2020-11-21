@@ -135,7 +135,6 @@ namespace osu.Game.Overlays.Profile.Header
                 anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
             anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
             anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
-            anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
 
             // If no information was added to the bottomLinkContainer, hide it to avoid unwanted padding
@@ -149,7 +148,7 @@ namespace osu.Game.Overlays.Profile.Header
             if (string.IsNullOrEmpty(content)) return false;
 
             // newlines could be contained in API returned user content.
-            content = content.Replace("\n", " ");
+            content = content.Replace('\n', ' ');
 
             bottomLinkContainer.AddIcon(icon, text =>
             {

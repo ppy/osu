@@ -90,11 +90,10 @@ namespace osu.Game.Tournament.Screens.TeamWin
             {
                 new DrawableTeamFlag(match.Winner)
                 {
-                    Size = new Vector2(300, 200),
-                    Scale = new Vector2(0.5f),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Position = new Vector2(-300, 10),
+                    Scale = new Vector2(2f)
                 },
                 new FillFlowContainer
                 {

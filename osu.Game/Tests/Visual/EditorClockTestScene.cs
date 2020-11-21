@@ -20,6 +20,8 @@ namespace osu.Game.Tests.Visual
         protected readonly BindableBeatDivisor BeatDivisor = new BindableBeatDivisor();
         protected new readonly EditorClock Clock;
 
+        protected virtual bool ScrollUsingMouseWheel => true;
+
         protected EditorClockTestScene()
         {
             Clock = new EditorClock(new ControlPointInfo(), 5000, BeatDivisor) { IsCoupled = false };
@@ -57,6 +59,9 @@ namespace osu.Game.Tests.Visual
 
         protected override bool OnScroll(ScrollEvent e)
         {
+            if (!ScrollUsingMouseWheel)
+                return false;
+
             if (e.ScrollDelta.Y > 0)
                 Clock.SeekBackward(true);
             else

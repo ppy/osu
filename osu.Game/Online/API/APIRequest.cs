@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
@@ -62,6 +63,11 @@ namespace osu.Game.Online.API
         protected WebRequest WebRequest;
 
         /// <summary>
+        /// The currently logged in user. Note that this will only be populated during <see cref="Perform"/>.
+        /// </summary>
+        protected User User { get; private set; }
+
+        /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
@@ -86,6 +92,7 @@ namespace osu.Game.Online.API
             }
 
             API = apiAccess;
+            User = apiAccess.LocalUser.Value;
 
             if (checkAndScheduleFailure())
                 return;
@@ -129,6 +136,11 @@ namespace osu.Game.Online.API
             Success?.Invoke();
         }
 
+        internal void TriggerFailure(Exception e)
+        {
+            Failure?.Invoke(e);
+        }
+
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
 
         public void Fail(Exception e)
@@ -159,7 +171,7 @@ namespace osu.Game.Online.API
             }
 
             Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
-            pendingFailure = () => Failure?.Invoke(e);
+            pendingFailure = () => TriggerFailure(e);
             checkAndScheduleFailure();
         }
 

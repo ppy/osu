@@ -21,7 +21,7 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings);
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -35,9 +35,12 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleDirect),
+            new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
+
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
 
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
@@ -45,15 +48,28 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
+
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
+        };
+
+        public IEnumerable<KeyBinding> EditorKeyBindings => new[]
+        {
+            new KeyBinding(new[] { InputKey.F1 }, GlobalAction.EditorComposeMode),
+            new KeyBinding(new[] { InputKey.F2 }, GlobalAction.EditorDesignMode),
+            new KeyBinding(new[] { InputKey.F3 }, GlobalAction.EditorTimingMode),
+            new KeyBinding(new[] { InputKey.F4 }, GlobalAction.EditorSetupMode),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
+            new KeyBinding(InputKey.ExtraMouseButton2, GlobalAction.SkipCutscene),
             new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
+            new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
+            new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -63,7 +79,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Alt, InputKey.Down }, GlobalAction.DecreaseVolume),
             new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.DecreaseVolume),
 
-            new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
+            new KeyBinding(new[] { InputKey.Control, InputKey.F4 }, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.TrackPrevious, GlobalAction.MusicPrev),
             new KeyBinding(InputKey.F1, GlobalAction.MusicPrev),
@@ -134,7 +150,7 @@ namespace osu.Game.Input.Bindings
         [Description("Quick exit (Hold)")]
         QuickExit,
 
-        // Game-wide beatmap msi ccotolle keybindings
+        // Game-wide beatmap music controller keybindings
         [Description("Next track")]
         MusicNext,
 
@@ -152,5 +168,33 @@ namespace osu.Game.Input.Bindings
 
         [Description("Next Selection")]
         SelectNext,
+
+        [Description("Home")]
+        Home,
+
+        [Description("Toggle notifications")]
+        ToggleNotifications,
+
+        [Description("Pause")]
+        PauseGameplay,
+
+        // Editor
+        [Description("Setup Mode")]
+        EditorSetupMode,
+
+        [Description("Compose Mode")]
+        EditorComposeMode,
+
+        [Description("Design Mode")]
+        EditorDesignMode,
+
+        [Description("Timing Mode")]
+        EditorTimingMode,
+
+        [Description("Hold for HUD")]
+        HoldForHUD,
+
+        [Description("Random Skin")]
+        RandomSkin,
     }
 }
