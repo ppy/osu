@@ -43,18 +43,8 @@ namespace osu.Game.Overlays.Profile.Sections
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            User.BindValueChanged(OnUserChanged, true);
-        }
-
         [NotNull]
         protected abstract Drawable CreateContent();
-
-        protected virtual void OnUserChanged(ValueChangedEvent<User> e)
-        {
-        }
 
         protected void SetCount(int value) => header.Current.Value = value;
     }
