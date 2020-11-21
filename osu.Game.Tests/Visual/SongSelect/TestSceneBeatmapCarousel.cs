@@ -638,6 +638,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
 
             loadBeatmaps(sets);
+            setSelected(1, 1);
             advanceSelection(false);
 
             for (int i = 1; i < makeThisManyGroups; i++)
@@ -730,7 +731,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null, int? count = null, bool randomDifficulties = false)
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null, int? count = null,
+                                  bool randomDifficulties = false)
         {
             bool changed = false;
 
