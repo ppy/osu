@@ -44,37 +44,40 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
             if (values?.Length > 1)
             {
-                // Fill dates with 0 count
-
-                var newValues = new List<UserHistoryCount> { values[0] };
-                var newLast = values[0];
-
-                for (int i = 1; i < values.Length; i++)
-                {
-                    while (hasMissingDates(newLast, values[i]))
-                    {
-                        newValues.Add(newLast = new UserHistoryCount
-                        {
-                            Count = 0,
-                            Date = newLast.Date.AddMonths(1)
-                        });
-                    }
-
-                    newValues.Add(newLast = values[i]);
-                }
-
-                static bool hasMissingDates(UserHistoryCount prev, UserHistoryCount current)
-                {
-                    var possibleCurrent = prev.Date.AddMonths(1);
-                    return possibleCurrent != current.Date;
-                }
-
-                chart.Values = newValues.ToArray();
+                chart.Values = fillZeroValues(values);
                 Show();
                 return;
             }
 
             Hide();
+        }
+
+        private UserHistoryCount[] fillZeroValues(UserHistoryCount[] values)
+        {
+            var newValues = new List<UserHistoryCount> { values[0] };
+            var newLast = values[0];
+
+            for (int i = 1; i < values.Length; i++)
+            {
+                while (hasMissingDates(newLast, values[i]))
+                {
+                    newValues.Add(newLast = new UserHistoryCount
+                    {
+                        Count = 0,
+                        Date = newLast.Date.AddMonths(1)
+                    });
+                }
+
+                newValues.Add(newLast = values[i]);
+            }
+
+            return newValues.ToArray();
+
+            static bool hasMissingDates(UserHistoryCount prev, UserHistoryCount current)
+            {
+                var possibleCurrent = prev.Date.AddMonths(1);
+                return possibleCurrent != current.Date;
+            }
         }
 
         protected abstract UserHistoryCount[] GetValues(User user);
