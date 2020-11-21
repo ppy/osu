@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected int VisiblePages;
         protected int ItemsPerPage;
+
         protected FillFlowContainer ItemsContainer { get; private set; }
 
         private APIRequest<List<TModel>> retrievalRequest;
