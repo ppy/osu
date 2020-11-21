@@ -9,9 +9,8 @@
     <Product>osu!lazer</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>2020.1114.0</Version>
+    <Version>2020.1121.0</Version>
     <FileVersion>0.0.0</FileVersion>
-    <PackageVersion>2020.1121.0</PackageVersion>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>osu.Desktop.Program</StartupObject>
