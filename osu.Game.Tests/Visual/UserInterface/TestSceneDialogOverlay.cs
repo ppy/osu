@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -27,12 +28,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new PopupDialogOkButton
                     {
                         Text = @"I never want to see this again.",
-                        Action = () => System.Console.WriteLine(@"OK"),
+                        Action = () => Console.WriteLine(@"OK"),
                     },
                     new PopupDialogCancelButton
                     {
                         Text = @"Firetruck, I still want quick ranks!",
-                        Action = () => System.Console.WriteLine(@"Cancel"),
+                        Action = () => Console.WriteLine(@"Cancel"),
                     },
                 },
             }));

@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class BeatmapList : VisibilityContainer
+    public class BeatmapList : CompositeDrawable
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -33,19 +33,16 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
 
-            InternalChildren = new Drawable[]
+            InternalChild = beatmapScroll = new OsuScrollContainer
             {
-                beatmapScroll = new OsuScrollContainer
+                RelativeSizeAxes = Axes.Both,
+                RightMouseScrollbar = true,
+                Child = fillFlow = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    RightMouseScrollbar = true,
-                    Child = fillFlow = new FillFlowContainer
-                    {
-                        Padding = new MarginPadding { Horizontal = 35 },
-                        Spacing = new Vector2(5),
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                    }
+                    Padding = new MarginPadding { Horizontal = 35 },
+                    Spacing = new Vector2(5),
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                 }
             };
 
@@ -80,6 +77,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
             currentPiece?.InActive();
+            currentPiece = null;
 
             foreach (var d in fillFlow)
             {
@@ -127,7 +125,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
             else
             {
-                float distance = (index - 1) * 85 - 1;
+                float distance = (index - 1) * 85;
 
                 //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
                 //n个piece, n-1个间隔
@@ -144,7 +142,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public void ClearList() =>
             fillFlow.Clear();
 
-        protected override void PopIn()
+        public override void Show()
         {
             this.FadeIn(250);
 
@@ -152,7 +150,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             working.TriggerChange();
         }
 
-        protected override void PopOut()
+        public override void Hide()
         {
             this.FadeOut(250);
         }

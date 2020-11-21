@@ -12,7 +12,7 @@ using osu.Game.Screens.Mvis.Objects;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class BeatmapCover : Container
+    public class BeatmapCover : CompositeDrawable
     {
         private readonly WorkingBeatmap b;
 
@@ -77,14 +77,18 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     c.OnLoadComplete += d => d.FadeIn(300);
 
                     return c;
-                }, TimeBeforeWrapperLoad), newCover =>
+                }, TimeBeforeWrapperLoad)
+                {
+                    Anchor = Anchor,
+                    Origin = Origin
+                }, newCover =>
                 {
                     var oldCover = cover;
                     oldCover?.FadeOut(300);
                     oldCover?.Expire();
 
                     cover = newCover;
-                    Add(cover);
+                    AddInternal(cover);
                 }, changeCoverTask.Token);
             }
             else
@@ -101,14 +105,14 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     oldCover?.Expire();
 
                     cover = newCover;
-                    Add(cover);
+                    AddInternal(cover);
 
                     Schedule(() => cover?.FadeIn(300));
                 }, changeCoverTask.Token);
             }
         }
 
-        private class Cover : Sprite
+        public class Cover : Sprite
         {
             private readonly WorkingBeatmap b;
 

@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -69,7 +68,6 @@ namespace osu.Game.Screens.Select
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                new MfBgTriangles(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,

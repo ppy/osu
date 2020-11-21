@@ -1,24 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Utils;
-using osuTK;
-using osuTK.Graphics;
 using System;
+using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Batches;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Allocation;
-using System.Collections.Generic;
-using osu.Framework.Graphics.Batches;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Lists;
-using osu.Framework.Bindables;
-using osu.Game.Configuration;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Configuration;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -27,11 +27,11 @@ namespace osu.Game.Graphics.Backgrounds
         [Resolved]
         private Bindable<WorkingBeatmap> b { get; set; }
 
-        private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
-        private float ExtraY;
+        private readonly Bindable<bool> trianglesEnabled = new Bindable<bool>();
+        private float extraY;
         public bool IgnoreSettings;
         public bool EnableBeatSync;
-        private float alpha_orig = 1;
+        private float alphaOrig = 1;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
 
@@ -72,6 +72,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// <summary>
         /// Whether we want to expire triangles as they exit our draw area completely.
         /// </summary>
+        [Obsolete("Unused.")] // Can be removed 20210518
         protected virtual bool ExpireOffScreenTriangles => true;
 
         /// <summary>
@@ -98,12 +99,9 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         public float Velocity = 1;
 
-        private readonly Random stableRandom;
-
-        private float nextRandom() => (float)(stableRandom?.NextDouble() ?? RNG.NextSingle());
-
         private readonly SortedList<TriangleParticle> parts = new SortedList<TriangleParticle>(Comparer<TriangleParticle>.Default);
 
+        private Random stableRandom;
         private IShader shader;
         private readonly Texture texture;
 
@@ -124,38 +122,39 @@ namespace osu.Game.Graphics.Backgrounds
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
 
-            alpha_orig = Alpha;
-            config.BindWith(MfSetting.TrianglesEnabled, TrianglesEnabled);
+            alphaOrig = Alpha;
+            config.BindWith(MfSetting.TrianglesEnabled, trianglesEnabled);
 
-            TrianglesEnabled.ValueChanged += _ => UpdateIcons();
+            trianglesEnabled.ValueChanged += _ => updateIcons();
         }
 
-        private void UpdateFreq()
+        private void updateFreq()
         {
             float[] sum = b.Value?.Track.CurrentAmplitudes.FrequencyAmplitudes.ToArray() ?? new float[256];
-            float totalSum = 0.25f;
-            bool IsKiai = b.Value?.Beatmap.ControlPointInfo.EffectPointAt(b.Value?.Track?.CurrentTime ?? 0).KiaiMode ?? false;
+            float totalSum = 0.1f;
+            bool isKiai = b.Value?.Beatmap.ControlPointInfo.EffectPointAt(b.Value?.Track?.CurrentTime ?? 0).KiaiMode ?? false;
 
             sum.ForEach(a => totalSum += a);
 
-            if (IsKiai) totalSum *= 1.5f;
+            if (isKiai) totalSum *= 1.5f;
 
-            ExtraY = totalSum;
+            extraY = totalSum;
         }
 
-        private void UpdateIcons()
+        private void updateIcons()
         {
-            if (!IgnoreSettings)
-                switch (TrianglesEnabled.Value)
-                {
-                    case true:
-                        this.FadeTo(alpha_orig, 250);
-                        break;
+            if (IgnoreSettings) return;
 
-                    case false:
-                        this.FadeOut(250);
-                        break;
-                }
+            switch (trianglesEnabled.Value)
+            {
+                case true:
+                    this.FadeTo(alphaOrig, 250);
+                    break;
+
+                case false:
+                    this.FadeOut(250);
+                    break;
+            }
         }
 
         protected override void LoadComplete()
@@ -163,7 +162,7 @@ namespace osu.Game.Graphics.Backgrounds
             base.LoadComplete();
             addTriangles(true);
 
-            UpdateIcons();
+            updateIcons();
         }
 
         public float TriangleScale
@@ -189,11 +188,11 @@ namespace osu.Game.Graphics.Backgrounds
 
             if (EnableBeatSync)
             {
-                UpdateFreq();
+                updateFreq();
             }
             else
             {
-                ExtraY = 1;
+                extraY = 1;
             }
 
             Invalidate(Invalidation.DrawNode);
@@ -210,7 +209,7 @@ namespace osu.Game.Graphics.Backgrounds
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
             // Since we will later multiply by the scale of individual triangles we normalize by
             // dividing by triangleScale.
-            float movedDistance = (-elapsedSeconds * Velocity * base_velocity * ExtraY) / (DrawHeight * triangleScale);
+            float movedDistance = (-elapsedSeconds * Velocity * base_velocity * extraY) / (DrawHeight * triangleScale);
 
             for (int i = 0; i < parts.Count; i++)
             {
@@ -228,7 +227,20 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        protected int AimCount;
+        /// <summary>
+        /// Clears and re-initialises triangles according to a given seed.
+        /// </summary>
+        /// <param name="seed">An optional seed to stabilise random positions / attributes. Note that this does not guarantee stable playback when seeking in time.</param>
+        public void Reset(int? seed = null)
+        {
+            if (seed != null)
+                stableRandom = new Random(seed.Value);
+
+            parts.Clear();
+            addTriangles(true);
+        }
+
+        protected int AimCount { get; private set; }
 
         private void addTriangles(bool randomY)
         {
@@ -281,6 +293,8 @@ namespace osu.Game.Graphics.Backgrounds
                 parts[i] = newParticle;
             }
         }
+
+        private float nextRandom() => (float)(stableRandom?.NextDouble() ?? RNG.NextSingle());
 
         protected override DrawNode CreateDrawNode() => new TrianglesDrawNode(this);
 

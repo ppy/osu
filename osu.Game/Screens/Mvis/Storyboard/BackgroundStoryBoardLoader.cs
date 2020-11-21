@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.Storyboard
 {
@@ -49,6 +50,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
+
+        [Resolved]
+        private MusicController music { get; set; }
 
         public BackgroundStoryBoardLoader()
         {

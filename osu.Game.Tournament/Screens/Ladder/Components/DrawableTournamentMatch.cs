@@ -144,9 +144,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 if (selected)
                 {
                     selectionBox.Show();
-                    if (editor)
+                    if (editor && editorInfo != null)
                         editorInfo.Selected.Value = Match;
-                    else
+                    else if (ladderInfo != null)
                         ladderInfo.CurrentMatch.Value = Match;
                 }
                 else

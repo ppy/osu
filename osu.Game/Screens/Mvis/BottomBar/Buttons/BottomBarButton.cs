@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -8,18 +9,18 @@ using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Graphics.Containers;
 using osuTK.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis.Modules;
 using osu.Game.Configuration;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
-    public class BottomBarButton : OsuClickableContainer
+    public class BottomBarButton : CompositeDrawable, IHasTooltip
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
@@ -37,6 +38,9 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         protected Box BgBox;
         private Box flashBox;
         private Container content;
+
+        public Action Action;
+        public string TooltipText { get; set; }
 
         public IconUsage ButtonIcon
         {
@@ -73,7 +77,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 content = new Container
                 {
@@ -151,6 +155,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         protected override bool OnClick(ClickEvent e)
         {
             OnClickAnimation();
+            Action?.Invoke();
             return base.OnClick(e);
         }
 

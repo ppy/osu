@@ -96,8 +96,8 @@ namespace osu.Game.Beatmaps
             trackStore = audioManager.GetTrackStore(Files.Store);
         }
 
-        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool UseSayobot, bool noVideo, bool IsMini) =>
-            new DownloadBeatmapSetRequest(set, UseSayobot, noVideo, IsMini);
+        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool useSayobot, bool noVideo, bool isMini) =>
+            new DownloadBeatmapSetRequest(set, useSayobot, noVideo, isMini);
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 
@@ -385,6 +385,8 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
         public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
+
+        public IQueryable<BeatmapInfo> QueryBeatmapsMinimal(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.BeatmapsMinimal.AsNoTracking().Where(query);
 
         protected override string HumanisedModelName => "谱面";
 

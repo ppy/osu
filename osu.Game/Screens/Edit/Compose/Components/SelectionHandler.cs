@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void OnOperationBegan()
         {
-            ChangeHandler.BeginChange();
+            ChangeHandler?.BeginChange();
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void OnOperationEnded()
         {
-            ChangeHandler.EndChange();
+            ChangeHandler?.EndChange();
         }
 
         #region User Input Handling

@@ -75,8 +75,9 @@ namespace osu.Desktop
 
         private void updateStatus()
         {
-            if(!client.IsInitialized)
+            if (!client.IsInitialized)
                 return;
+
             if (status.Value is UserStatusOffline)
             {
                 client.ClearPresence();
@@ -134,6 +135,11 @@ namespace osu.Desktop
 
                 case UserActivity.Editing edit:
                     return edit.Beatmap.ToString();
+
+                case UserActivity.InMvis mvis:
+                    return (mvis.Beatmap.Metadata.ArtistUnicode ?? mvis.Beatmap.Metadata.Artist)
+                           + " - "
+                           + (mvis.Beatmap.Metadata.TitleUnicode ?? mvis.Beatmap.Metadata.Title);
 
                 case UserActivity.InLobby lobby:
                     return lobby.Room.Name.Value;

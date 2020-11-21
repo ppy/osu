@@ -207,11 +207,17 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             Quad quad = getSurroundingQuad(hitObjects);
 
-            if (quad.TopLeft.X + delta.X < 0 ||
-                quad.TopLeft.Y + delta.Y < 0 ||
-                quad.BottomRight.X + delta.X > DrawWidth ||
-                quad.BottomRight.Y + delta.Y > DrawHeight)
-                return false;
+            Vector2 newTopLeft = quad.TopLeft + delta;
+            if (newTopLeft.X < 0)
+                delta.X -= newTopLeft.X;
+            if (newTopLeft.Y < 0)
+                delta.Y -= newTopLeft.Y;
+
+            Vector2 newBottomRight = quad.BottomRight + delta;
+            if (newBottomRight.X > DrawWidth)
+                delta.X -= newBottomRight.X - DrawWidth;
+            if (newBottomRight.Y > DrawHeight)
+                delta.Y -= newBottomRight.Y - DrawHeight;
 
             foreach (var h in hitObjects)
                 h.Position += delta;

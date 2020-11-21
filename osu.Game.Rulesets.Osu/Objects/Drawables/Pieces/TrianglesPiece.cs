@@ -7,7 +7,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class TrianglesPiece : Triangles
     {
-        protected override bool ExpireOffScreenTriangles => false;
         protected override bool CreateNewTriangles => false;
         protected override float SpawnRatio => 0.5f;
 

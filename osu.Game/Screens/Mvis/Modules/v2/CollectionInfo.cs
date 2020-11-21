@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class CollectionInfo : Container
+    public class CollectionInfo : CompositeDrawable
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -109,7 +109,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                                             {
                                                 Font = OsuFont.GetFont(size: 50),
                                                 RelativeSizeAxes = Axes.X,
-                                                Text = "未选择收藏夹"
+                                                Text = "未选择收藏夹",
+                                                Truncate = true,
                                             },
                                             collectionBeatmapCount = new OsuSpriteText
                                             {

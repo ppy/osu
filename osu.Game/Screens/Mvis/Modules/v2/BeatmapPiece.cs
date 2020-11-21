@@ -13,11 +13,12 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
 {
-    public class BeatmapPiece : OsuClickableContainer
+    public class BeatmapPiece : CompositeDrawable
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
@@ -62,7 +63,9 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                 new BeatmapCover(Beatmap)
                 {
                     BackgroundBox = false,
-                    TimeBeforeWrapperLoad = 100
+                    TimeBeforeWrapperLoad = 100,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
                 },
                 maskBox = new Box
                 {
@@ -123,7 +126,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         new OsuSpriteText
                         {
                             Text = Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20)
                         },
                         new OsuSpriteText
                         {
@@ -141,7 +144,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     RelativeSizeAxes = Axes.Both,
                     Colour = Colour4.White.Opacity(0.1f),
                     Alpha = 0
-                }
+                },
+                new HoverClickSounds()
             });
 
             Active.BindValueChanged(OnActiveChanged, true);

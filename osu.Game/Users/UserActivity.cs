@@ -32,6 +32,13 @@ namespace osu.Game.Users
 
         public class InMvis : UserActivity
         {
+            public BeatmapInfo Beatmap { get; }
+
+            public InMvis(BeatmapInfo info)
+            {
+                Beatmap = info;
+            }
+
             public override string Status => "正在听歌";
         }
 
@@ -69,12 +76,12 @@ namespace osu.Game.Users
 
         public class SearchingForLobby : UserActivity
         {
-            public override string Status => @"Looking for a lobby";
+            public override string Status => @"正在寻找多人游戏房间";
         }
 
         public class InLobby : UserActivity
         {
-            public override string Status => @"正在多人游戏大厅中";
+            public override string Status => @"正在多人游戏房间中";
 
             public readonly Room Room;
 

@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Framework.Allocation;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -23,21 +20,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         public DrawableTaikoJudgement(JudgementResult result, DrawableHitObject judgedObject)
             : base(result, judgedObject)
         {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            switch (Result.Type)
-            {
-                case HitResult.Ok:
-                    JudgementBody.Colour = colours.GreenLight;
-                    break;
-
-                case HitResult.Great:
-                    JudgementBody.Colour = colours.BlueLight;
-                    break;
-            }
         }
 
         protected override void ApplyHitAnimations()

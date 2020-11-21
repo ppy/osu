@@ -11,6 +11,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 
@@ -77,7 +78,7 @@ namespace osu.Game.Audio
         /// <param name="source">The <see cref="IPreviewTrackOwner"/> which may be the owner of the <see cref="PreviewTrack"/>.</param>
         public void StopAnyPlaying(IPreviewTrackOwner source)
         {
-            if (CurrentTrack == null || CurrentTrack.Owner != source)
+            if (CurrentTrack == null || (CurrentTrack.Owner != null && CurrentTrack.Owner != source))
                 return;
 
             CurrentTrack.Stop();
@@ -87,11 +88,12 @@ namespace osu.Game.Audio
         /// <summary>
         /// Creates the <see cref="TrackManagerPreviewTrack"/>.
         /// </summary>
-        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
+        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) =>
+            new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
         public class TrackManagerPreviewTrack : PreviewTrack
         {
-            [Resolved]
+            [Resolved(canBeNull: true)]
             public IPreviewTrackOwner Owner { get; private set; }
 
             private readonly BeatmapSetInfo beatmapSetInfo;
@@ -103,7 +105,13 @@ namespace osu.Game.Audio
                 this.trackManager = trackManager;
             }
 
-            private string TrackURI()
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Logger.Log($"A {nameof(PreviewTrack)} was created without a containing {nameof(IPreviewTrackOwner)}. An owner should be added for correct behaviour.");
+            }
+
+            private string trackURI()
             {
                 switch ( mfConfig.Get<bool>(MfSetting.UseSayobot) )
                 {
@@ -115,7 +123,7 @@ namespace osu.Game.Audio
                 }
             }
 
-            protected override Track GetTrack() => trackManager.Get($@"{TrackURI()}");
+            protected override Track GetTrack() => trackManager.Get(trackURI());
         }
 
         private class PreviewTrackStore : AudioCollectionManager<AdjustableAudioComponent>, ITrackStore
