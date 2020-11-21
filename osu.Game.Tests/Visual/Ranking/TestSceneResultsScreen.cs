@@ -256,7 +256,7 @@ namespace osu.Game.Tests.Visual.Ranking
             public HotkeyRetryOverlay RetryOverlay;
 
             public TestResultsScreen(ScoreInfo score)
-                : base(score)
+                : base(score, true)
             {
             }
 
