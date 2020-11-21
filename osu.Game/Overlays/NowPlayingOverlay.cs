@@ -219,7 +219,7 @@ namespace osu.Game.Overlays
             fadingOut = true;
             base.PopOut();
 
-            this.FadeOut(transition_length, Easing.OutQuint).OnComplete(_ => fadingOut = false);
+            this.FadeOut(transition_length, Easing.OutQuint).Finally(_ => fadingOut = false);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
         }
 
