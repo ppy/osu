@@ -12,27 +12,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedContainer<TModel> : ProfileSubsection
+    public abstract class PaginatedProfileSubsection<TModel> : ProfileSubsection
     {
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        protected RulesetStore Rulesets { get; private set; }
+
         protected int VisiblePages;
         protected int ItemsPerPage;
-
-        protected FillFlowContainer ItemsContainer;
+        protected FillFlowContainer ItemsContainer { get; private set; }
 
         private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
 
         private ShowMoreButton moreButton;
+        private OsuSpriteText missing;
+        private readonly string missingText;
 
-        protected PaginatedContainer(Bindable<User> user, string headerText = "", string missingText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
-            : base(user, headerText, missingText, counterVisibilityState)
+        protected PaginatedProfileSubsection(Bindable<User> user, string headerText = "", string missingText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+            : base(user, headerText, counterVisibilityState)
         {
+            this.missingText = missingText;
         }
 
         protected override Drawable CreateContent() => new FillFlowContainer
@@ -56,10 +64,22 @@ namespace osu.Game.Overlays.Profile.Sections
                     Margin = new MarginPadding { Top = 10 },
                     Action = showMore,
                 },
+                missing = new OsuSpriteText
+                {
+                    Font = OsuFont.GetFont(size: 15),
+                    Text = missingText,
+                    Alpha = 0,
+                }
             }
         };
 
-        protected override void OnUserChanged(ValueChangedEvent<User> e)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            User.BindValueChanged(onUserChanged, true);
+        }
+
+        private void onUserChanged(ValueChangedEvent<User> e)
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
@@ -93,15 +113,15 @@ namespace osu.Game.Overlays.Profile.Sections
                 moreButton.Hide();
                 moreButton.IsLoading = false;
 
-                if (!string.IsNullOrEmpty(Missing.Text))
-                    Missing.Show();
+                if (!string.IsNullOrEmpty(missingText))
+                    missing.Show();
 
                 return;
             }
 
             LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
             {
-                Missing.Hide();
+                missing.Hide();
                 moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
                 moreButton.IsLoading = false;
 
@@ -121,8 +141,9 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
             retrievalRequest?.Cancel();
+            loadCancellation?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }

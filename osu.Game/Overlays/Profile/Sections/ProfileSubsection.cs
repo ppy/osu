@@ -5,9 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets;
 using osu.Game.Users;
 using JetBrains.Annotations;
 
@@ -17,26 +14,20 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         protected readonly Bindable<User> User = new Bindable<User>();
 
-        protected RulesetStore Rulesets { get; private set; }
-
-        protected OsuSpriteText Missing { get; private set; }
-
         private readonly string headerText;
-        private readonly string missingText;
         private readonly CounterVisibilityState counterVisibilityState;
 
         private ProfileSubsectionHeader header;
 
-        protected ProfileSubsection(Bindable<User> user, string headerText = "", string missingText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        protected ProfileSubsection(Bindable<User> user, string headerText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
         {
             this.headerText = headerText;
-            this.missingText = missingText;
             this.counterVisibilityState = counterVisibilityState;
             User.BindTo(user);
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -48,30 +39,12 @@ namespace osu.Game.Overlays.Profile.Sections
                 {
                     Alpha = string.IsNullOrEmpty(headerText) ? 0 : 1
                 },
-                CreateContent(),
-                Missing = new OsuSpriteText
-                {
-                    Font = OsuFont.GetFont(size: 15),
-                    Text = missingText,
-                    Alpha = 0,
-                },
+                CreateContent()
             };
-
-            Rulesets = rulesets;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            User.BindValueChanged(OnUserChanged, true);
         }
 
         [NotNull]
         protected abstract Drawable CreateContent();
-
-        protected virtual void OnUserChanged(ValueChangedEvent<User> e)
-        {
-        }
 
         protected void SetCount(int value) => header.Current.Value = value;
     }

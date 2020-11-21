@@ -44,6 +44,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
 
+        private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
+        private readonly IBindable<int> pathVersion = new Bindable<int>();
+
         public SliderSelectionBlueprint(DrawableSlider slider)
             : base(slider)
         {
@@ -61,13 +64,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             };
         }
 
-        private IBindable<int> pathVersion;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            pathVersion = HitObject.Path.Version.GetBoundCopy();
+            controlPoints.BindTo(HitObject.Path.ControlPoints);
+
+            pathVersion.BindTo(HitObject.Path.Version);
             pathVersion.BindValueChanged(_ => updatePath());
 
             BodyPiece.UpdateFrom(HitObject);
@@ -163,8 +166,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 changeHandler?.EndChange();
             }
         }
-
-        private BindableList<PathControlPoint> controlPoints => HitObject.Path.ControlPoints;
 
         private int addControlPoint(Vector2 position)
         {

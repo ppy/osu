@@ -10,8 +10,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
@@ -23,6 +25,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableSpinner : DrawableOsuHitObject
     {
         public new Spinner HitObject => (Spinner)base.HitObject;
+
+        public new OsuSpinnerJudgementResult Result => (OsuSpinnerJudgementResult)base.Result;
 
         public SpinnerRotationTracker RotationTracker { get; private set; }
         public SpinnerSpmCounter SpmCounter { get; private set; }
@@ -153,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateHitStateTransforms(state);
 
-            this.FadeOut(160);
+            this.FadeOut(160).Expire();
 
             // skin change does a rewind of transforms, which will stop the spinning sound from playing if it's currently in playback.
             isSpinning?.TriggerChange();
@@ -197,15 +201,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     // these become implicitly hit.
                     return 1;
 
-                return Math.Clamp(RotationTracker.RateAdjustedRotation / 360 / HitObject.SpinsRequired, 0, 1);
+                return Math.Clamp(Result.RateAdjustedRotation / 360 / HitObject.SpinsRequired, 0, 1);
             }
         }
+
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuSpinnerJudgementResult(HitObject, judgement);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (Time.Current < HitObject.StartTime) return;
 
-            RotationTracker.Complete.Value = Progress >= 1;
+            if (Progress >= 1)
+                Result.TimeCompleted ??= Time.Current;
 
             if (userTriggered || Time.Current < HitObject.EndTime)
                 return;
@@ -244,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (!SpmCounter.IsPresent && RotationTracker.Tracking)
                 SpmCounter.FadeIn(HitObject.TimeFadeIn);
-            SpmCounter.SetRotation(RotationTracker.RateAdjustedRotation);
+            SpmCounter.SetRotation(Result.RateAdjustedRotation);
 
             updateBonusScore();
         }
@@ -256,7 +263,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (ticks.Count == 0)
                 return;
 
-            int spins = (int)(RotationTracker.RateAdjustedRotation / 360);
+            int spins = (int)(Result.RateAdjustedRotation / 360);
 
             if (spins < wholeSpins)
             {

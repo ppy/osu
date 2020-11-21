@@ -46,11 +46,14 @@ namespace osu.Game.Online
             {
                 if (modelInfo.NewValue == null)
                     attachDownload(null);
-                else if (manager.IsAvailableLocally(modelInfo.NewValue))
+                else if (manager?.IsAvailableLocally(modelInfo.NewValue) == true)
                     State.Value = DownloadState.LocallyAvailable;
                 else
-                    attachDownload(manager.GetExistingDownload(modelInfo.NewValue));
+                    attachDownload(manager?.GetExistingDownload(modelInfo.NewValue));
             }, true);
+
+            if (manager == null)
+                return;
 
             managerDownloadBegan = manager.DownloadBegan.GetBoundCopy();
             managerDownloadBegan.BindValueChanged(downloadBegan);

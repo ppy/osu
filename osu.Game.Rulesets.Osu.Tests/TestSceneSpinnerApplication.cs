@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestSceneSpinnerApplication : OsuTestScene
     {
         [Test]
-        public void TestApplyNewCircle()
+        public void TestApplyNewSpinner()
         {
             DrawableSpinner dho = null;
 
@@ -23,11 +23,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Position = new Vector2(256, 192),
                 IndexInCurrentCombo = 0,
-                Duration = 0,
+                Duration = 500,
             }))
             {
                 Clock = new FramedClock(new StopwatchClock())
             });
+
+            AddStep("rotate some", () => dho.RotationTracker.AddRotation(180));
+            AddAssert("rotation is set", () => dho.Result.RateAdjustedRotation == 180);
 
             AddStep("apply new spinner", () => dho.Apply(prepareObject(new Spinner
             {
@@ -35,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 ComboIndex = 1,
                 Duration = 1000,
             }), null));
+
+            AddAssert("rotation is reset", () => dho.Result.RateAdjustedRotation == 0);
         }
 
         private Spinner prepareObject(Spinner circle)

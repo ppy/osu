@@ -118,8 +118,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() =>
-            new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both };
+        protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both };
 
         /// <summary>
         /// Creates a <see cref="Components.SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
@@ -338,12 +337,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a selection was performed.</returns>
         private bool beginClickSelection(MouseButtonEvent e)
         {
-            foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren)
+            // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
+            foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren.Reverse())
             {
                 if (!blueprint.IsHovered) continue;
 
-                if (SelectionHandler.HandleSelectionRequested(blueprint, e))
-                    return clickSelectionBegan = true;
+                return clickSelectionBegan = SelectionHandler.HandleSelectionRequested(blueprint, e);
             }
 
             return false;
@@ -456,6 +455,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (movementBlueprint == null)
                 return false;
+
+            if (snapProvider == null)
+                return true;
 
             Debug.Assert(movementBlueprintOriginalPosition != null);
 

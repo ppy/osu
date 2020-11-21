@@ -58,6 +58,43 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestCustomTransformsClearedBetweenReuses()
+        {
+            ManualClock clock = null;
+
+            createTest(new Beatmap
+            {
+                HitObjects =
+                {
+                    new HitObject(),
+                    new HitObject { StartTime = 2000 }
+                }
+            }, 1, () => new FramedClock(clock = new ManualClock()));
+
+            DrawableTestHitObject firstObject = null;
+            Vector2 position = default;
+
+            AddUntilStep("first object shown", () => this.ChildrenOfType<DrawableTestHitObject>().SingleOrDefault()?.HitObject == drawableRuleset.Beatmap.HitObjects[0]);
+            AddStep("get DHO", () => firstObject = this.ChildrenOfType<DrawableTestHitObject>().Single());
+            AddStep("store position", () => position = firstObject.Position);
+            AddStep("add custom transform", () => firstObject.ApplyCustomUpdateState += onStateUpdate);
+
+            AddStep("fast forward past first object", () => clock.CurrentTime = 1500);
+            AddStep("unapply custom transform", () => firstObject.ApplyCustomUpdateState -= onStateUpdate);
+
+            AddStep("fast forward to second object", () => clock.CurrentTime = drawableRuleset.Beatmap.HitObjects[1].StartTime);
+            AddUntilStep("second object shown", () => this.ChildrenOfType<DrawableTestHitObject>().SingleOrDefault()?.HitObject == drawableRuleset.Beatmap.HitObjects[1]);
+            AddAssert("DHO reused", () => this.ChildrenOfType<DrawableTestHitObject>().Single() == firstObject);
+            AddAssert("object in new position", () => firstObject.Position != position);
+
+            void onStateUpdate(DrawableHitObject hitObject, ArmedState state)
+            {
+                using (hitObject.BeginAbsoluteSequence(hitObject.StateUpdateTime))
+                    hitObject.MoveToOffset(new Vector2(-100, 0));
+            }
+        }
+
+        [Test]
         public void TestNotReusedWithHitObjectsSpacedClose()
         {
             ManualClock clock = null;
@@ -210,7 +247,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
-                Position = new Vector2(RNG.Next(-200, 200), RNG.Next(-200, 200));
                 Size = new Vector2(50, 50);
 
                 Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1f);
@@ -223,6 +259,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     RelativeSizeAxes = Axes.Both,
                 });
+            }
+
+            protected override void OnApply(HitObject hitObject)
+            {
+                base.OnApply(hitObject);
+                Position = new Vector2(RNG.Next(-200, 200), RNG.Next(-200, 200));
             }
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
