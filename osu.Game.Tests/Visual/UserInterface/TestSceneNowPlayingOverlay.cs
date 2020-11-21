@@ -7,6 +7,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
+using osu.Game.IO.Archives;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 
@@ -21,8 +23,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         private NowPlayingOverlay nowPlayingOverlay;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(BeatmapManager manager, Framework.Game game)
         {
+            manager.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/circles.osz"), "circles.osz"));
+            manager.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/welcome.osz"), "welcome.osz"));
+
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             nowPlayingOverlay = new NowPlayingOverlay
