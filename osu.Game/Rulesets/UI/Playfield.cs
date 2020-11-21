@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osuTK;
+using System.Diagnostics;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -95,9 +96,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected Playfield()
         {
-            OnNewDrawableHitObject += d =>
-                d.OnNestedDrawableCreated += nested => OnNewDrawableHitObject?.Invoke(nested);
-
             RelativeSizeAxes = Axes.Both;
 
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(() => CreateHitObjectContainer().With(h =>
@@ -126,6 +124,16 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
+        private void onNewDrawableHitObject(DrawableHitObject d)
+        {
+            d.OnNestedDrawableCreated += onNewDrawableHitObject;
+
+            OnNewDrawableHitObject?.Invoke(d);
+
+            Debug.Assert(!d.HasInitialized);
+            d.HasInitialized = true;
+        }
+
         /// <summary>
         /// Performs post-processing tasks (if any) after all DrawableHitObjects are loaded into this Playfield.
         /// </summary>
@@ -137,7 +145,10 @@ namespace osu.Game.Rulesets.UI
         /// <param name="h">The DrawableHitObject to add.</param>
         public virtual void Add(DrawableHitObject h)
         {
-            OnNewDrawableHitObject?.Invoke(h);
+            if (h.HasInitialized)
+                throw new InvalidOperationException($"{nameof(Playfield.Add)} doesn't support {nameof(DrawableHitObject)} reuse. Use pooling instead.");
+
+            onNewDrawableHitObject(h);
 
             HitObjectContainer.Add(h);
             OnHitObjectAdded(h.HitObject);
@@ -336,12 +347,12 @@ namespace osu.Game.Rulesets.UI
             {
                 var dho = (DrawableHitObject)d;
 
-                // If this is the first time this DHO is being used (not loaded), then apply the DHO mods.
-                // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                if (!dho.IsLoaded)
+                if (!dho.HasInitialized)
                 {
-                    OnNewDrawableHitObject?.Invoke(dho);
+                    onNewDrawableHitObject(dho);
 
+                    // If this is the first time this DHO is being used, then apply the DHO mods.
+                    // This is done before Apply() so that the state is updated once when the hitobject is applied.
                     foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
                         m.ApplyToDrawableHitObjects(dho.Yield());
                 }
