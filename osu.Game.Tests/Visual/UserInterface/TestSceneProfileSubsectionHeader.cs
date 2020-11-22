@@ -11,12 +11,12 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestScenePaginatedContainerHeader : OsuTestScene
+    public class TestSceneProfileSubsectionHeader : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
-        private PaginatedContainerHeader header;
+        private ProfileSubsectionHeader header;
 
         [Test]
         public void TestHiddenCounter()
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void createHeader(string text, CounterVisibilityState state, int initialValue = 0)
         {
             Clear();
-            Add(header = new PaginatedContainerHeader(text, state)
+            Add(header = new ProfileSubsectionHeader(text, state)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

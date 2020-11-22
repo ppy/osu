@@ -371,14 +371,38 @@ namespace osu.Game.Skinning
                 }
 
                 case GameplaySkinComponent<HitResult> resultComponent:
-                    var drawable = getJudgementAnimation(resultComponent.Component);
-                    if (drawable != null)
-                        return new LegacyJudgementPiece(resultComponent.Component, drawable);
+                    Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component);
+
+                    // kind of wasteful that we throw this away, but should do for now.
+                    if (createDrawable() != null)
+                    {
+                        if (Configuration.LegacyVersion > 1)
+                            return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, getParticleTexture(resultComponent.Component));
+                        else
+                            return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
+                    }
 
                     break;
             }
 
             return this.GetAnimation(component.LookupName, false, false);
+        }
+
+        private Texture getParticleTexture(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Meh:
+                    return GetTexture("particle50");
+
+                case HitResult.Ok:
+                    return GetTexture("particle100");
+
+                case HitResult.Great:
+                    return GetTexture("particle300");
+            }
+
+            return null;
         }
 
         private Drawable getJudgementAnimation(HitResult result)

@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Skinning;
 
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// A single follow point positioned between two adjacent <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPoint : Container, IAnimationTimeReference
+    public class FollowPoint : PoolableDrawable, IAnimationTimeReference
     {
         private const float width = 8;
 
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             Origin = Anchor.Centre;
 
-            Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.FollowPoint), _ => new CircularContainer
+            InternalChild = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.FollowPoint), _ => new CircularContainer
             {
                 Masking = true,
                 AutoSizeAxes = Axes.Both,
