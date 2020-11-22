@@ -7,7 +7,6 @@ using osu.Game.Online.API;
 using osu.Game.Users;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
