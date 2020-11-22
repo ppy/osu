@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModEasy : ModEasy
+    public class ManiaModEasy : ModEasyWithExtraLives
     {
         public override string Description => @"更少的扣血,更低的准确率要求,并且拥有额外生命!";
     }

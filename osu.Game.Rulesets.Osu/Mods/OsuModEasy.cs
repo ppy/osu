@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModEasy : ModEasy
+    public class OsuModEasy : ModEasyWithExtraLives
     {
         public override string Description => @"更大的圆圈,更少的扣血,更低的准确率要求,并且拥有额外生命!";
     }

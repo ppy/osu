@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModEasy : ModEasy
+    public class CatchModEasy : ModEasyWithExtraLives
     {
         public override string Description => @"更大的水果,更少的扣血,更低的准确率要求,并且拥有额外生命!";
     }
