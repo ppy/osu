@@ -115,17 +115,19 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             var min = values.Select(v => v.Count).Min();
             var max = values.Select(v => v.Count).Max();
 
-            var niceRange = niceNumber(max - min, false);
-            var niceTick = niceNumber(niceRange / (6 - 1), true);
+            var tick = getTick(getRange(max - min), 6);
 
-            double rollingRow = min;
+            double rollingRow = 0;
 
             while (rollingRow <= max)
             {
-                var y = -Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
-                addRowTick(y, (long)rollingRow);
+                if (rollingRow >= min)
+                {
+                    var y = -Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
+                    addRowTick(y, (long)rollingRow);
+                }
 
-                rollingRow += niceTick;
+                rollingRow += tick;
             }
         }
 
@@ -138,10 +140,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
             int monthsPerTick = 1;
 
-            if (totalMonths >= 45)
-                monthsPerTick = 3;
-            else if (totalMonths >= 20)
-                monthsPerTick = 2;
+            if (totalMonths > 20)
+                monthsPerTick = totalMonths / 10;
 
             for (int i = 0; i < totalMonths; i += monthsPerTick)
             {
@@ -198,37 +198,44 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             });
         }
 
-        private double niceNumber(double value, bool round)
+        private long getRange(double initialRange)
         {
+            var exponent = Math.Floor(Math.Log10(initialRange));
+            var fraction = initialRange / Math.Pow(10, exponent);
+
+            double niceFraction;
+
+            if (fraction <= 1.0)
+                niceFraction = 1.0;
+            else if (fraction <= 2.0)
+                niceFraction = 2.0;
+            else if (fraction <= 5.0)
+                niceFraction = 5.0;
+            else
+                niceFraction = 10.0;
+
+            return (long)(niceFraction * Math.Pow(10, exponent));
+        }
+
+        private long getTick(long range, int maxTicksCount)
+        {
+            var value = range / (maxTicksCount - 1);
+
             var exponent = Math.Floor(Math.Log10(value));
             var fraction = value / Math.Pow(10, exponent);
 
             double niceFraction;
 
-            if (round)
-            {
-                if (fraction < 1.5)
-                    niceFraction = 1.0;
-                else if (fraction < 3)
-                    niceFraction = 2.0;
-                else if (fraction < 7)
-                    niceFraction = 5.0;
-                else
-                    niceFraction = 10.0;
-            }
+            if (fraction < 1.5)
+                niceFraction = 1.0;
+            else if (fraction < 3)
+                niceFraction = 2.0;
+            else if (fraction < 7)
+                niceFraction = 5.0;
             else
-            {
-                if (fraction <= 1.0)
-                    niceFraction = 1.0;
-                else if (fraction <= 2.0)
-                    niceFraction = 2.0;
-                else if (fraction <= 5.0)
-                    niceFraction = 5.0;
-                else
-                    niceFraction = 10.0;
-            }
+                niceFraction = 10.0;
 
-            return niceFraction * Math.Pow(10, exponent);
+            return (long)(niceFraction * Math.Pow(10, exponent));
         }
 
         private class TickText : OsuSpriteText
