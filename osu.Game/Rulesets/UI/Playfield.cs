@@ -120,8 +120,8 @@ namespace osu.Game.Rulesets.UI
 
             OnNewDrawableHitObject(d);
 
-            Debug.Assert(!d.HasInitialized);
-            d.HasInitialized = true;
+            Debug.Assert(!d.IsInitialized);
+            d.IsInitialized = true;
         }
 
         /// <summary>
@@ -135,8 +135,8 @@ namespace osu.Game.Rulesets.UI
         /// <param name="h">The DrawableHitObject to add.</param>
         public virtual void Add(DrawableHitObject h)
         {
-            if (h.HasInitialized)
-                throw new InvalidOperationException($"{nameof(Playfield.Add)} doesn't support {nameof(DrawableHitObject)} reuse. Use pooling instead.");
+            if (h.IsInitialized)
+                throw new InvalidOperationException($"{nameof(Add)} doesn't support {nameof(DrawableHitObject)} reuse. Use pooling instead.");
 
             onNewDrawableHitObject(h);
 
@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.UI
 
         /// <summary>
         /// Invoked before a new <see cref="DrawableHitObject"/> is added to this <see cref="Playfield"/>.
-        /// It is invoked only once even the drawable is pooled and used multiple times for different <see cref="HitObject"/>s.
+        /// It is invoked only once even if the drawable is pooled and used multiple times for different <see cref="HitObject"/>s.
         /// </summary>
         /// <remarks>
         /// This is also invoked for nested <see cref="DrawableHitObject"/>s.
@@ -348,7 +348,7 @@ namespace osu.Game.Rulesets.UI
             {
                 var dho = (DrawableHitObject)d;
 
-                if (!dho.HasInitialized)
+                if (!dho.IsInitialized)
                 {
                     onNewDrawableHitObject(dho);
 
