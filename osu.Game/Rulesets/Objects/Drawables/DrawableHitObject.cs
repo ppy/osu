@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether the initialization logic in <see cref="Playfield" /> has applied.
         /// </summary>
-        internal bool HasInitialized;
+        internal bool IsInitialized;
 
         /// <summary>
         /// Creates a new <see cref="DrawableHitObject"/>.
