@@ -14,7 +14,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class PaginatedContainerHeader : CompositeDrawable, IHasCurrentValue<int>
+    public class ProfileSubsectionHeader : CompositeDrawable, IHasCurrentValue<int>
     {
         private readonly BindableWithCurrent<int> current = new BindableWithCurrent<int>();
 
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private CounterPill counterPill;
 
-        public PaginatedContainerHeader(string text, CounterVisibilityState counterState)
+        public ProfileSubsectionHeader(string text, CounterVisibilityState counterState)
         {
             this.text = text;
             this.counterState = counterState;
