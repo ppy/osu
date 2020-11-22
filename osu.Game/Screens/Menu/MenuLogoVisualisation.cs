@@ -28,12 +28,12 @@ namespace osu.Game.Screens.Menu
 
         private void updateColour()
         {
-            Color4 defaultColour = Color4.White.Opacity(0.2f);
+            Color4 defaultColour = Color4.White;
 
             if (user.Value?.IsSupporter ?? false)
-                AccentColour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? defaultColour;
+                Colour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? defaultColour;
             else
-                AccentColour = defaultColour;
+                Colour = defaultColour;
         }
     }
 }

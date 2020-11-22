@@ -20,6 +20,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
@@ -67,7 +68,7 @@ namespace osu.Game.Screens.Menu
 
         private int indexOffset;
 
-        public Color4 AccentColour { get; set; }
+        public Color4 AccentColour { get; set; } = Color4.White.Opacity(.2f);
 
         /// <summary>
         /// The relative movement of bars based on input amplification. Defaults to 1.

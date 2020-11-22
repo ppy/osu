@@ -144,7 +144,6 @@ namespace osu.Game.Screens.Menu
                                                     RelativeSizeAxes = Axes.Both,
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
-                                                    Alpha = 0.5f,
                                                     Size = new Vector2(0.96f)
                                                 },
                                                 new Container
