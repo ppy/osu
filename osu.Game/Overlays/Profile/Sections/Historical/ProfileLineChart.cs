@@ -11,8 +11,8 @@ using osu.Framework.Utils;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
-using static osu.Game.Users.User;
 using osuTK;
+using static osu.Game.Users.User;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
