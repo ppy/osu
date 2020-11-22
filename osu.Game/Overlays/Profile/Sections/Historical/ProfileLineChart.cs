@@ -123,28 +123,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             while (rollingRow <= max)
             {
                 var y = -Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
-
-                rowTicksContainer.Add(new TickText
-                {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.CentreRight,
-                    RelativePositionAxes = Axes.Y,
-                    Margin = new MarginPadding { Right = 3 },
-                    Text = rollingRow.ToString("N0"),
-                    Font = OsuFont.GetFont(size: 12),
-                    Y = y
-                });
-
-                rowLinesContainer.Add(new TickLine
-                {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.CentreRight,
-                    RelativeSizeAxes = Axes.X,
-                    RelativePositionAxes = Axes.Y,
-                    Height = 0.1f,
-                    EdgeSmoothness = Vector2.One,
-                    Y = y
-                });
+                addRowTick(y, (long)rollingRow);
 
                 rollingRow += niceTick;
             }
@@ -155,40 +134,68 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             columnTicksContainer.Clear();
             columnLinesContainer.Clear();
 
-            var min = values.Select(v => v.Date).Min().ToOADate();
-            var max = values.Select(v => v.Date).Max().ToOADate();
+            var totalMonths = values.Length - 1;
 
-            var niceRange = niceNumber(max - min, false);
-            var niceTick = niceNumber(niceRange / (Math.Min(values.Length, 15) - 1), true);
+            int monthsPerTick = 1;
 
-            double rollingRow = min;
+            if (totalMonths >= 45)
+                monthsPerTick = 3;
+            else if (totalMonths >= 20)
+                monthsPerTick = 2;
 
-            while (rollingRow <= max)
+            for (int i = 0; i < totalMonths; i += monthsPerTick)
             {
-                var x = Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
-
-                columnTicksContainer.Add(new TickText
-                {
-                    Origin = Anchor.CentreLeft,
-                    RelativePositionAxes = Axes.X,
-                    Text = DateTime.FromOADate(rollingRow).ToString("MMM yyyy"),
-                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                    Rotation = 45,
-                    X = x
-                });
-
-                columnLinesContainer.Add(new TickLine
-                {
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Y,
-                    RelativePositionAxes = Axes.X,
-                    Width = 0.1f,
-                    EdgeSmoothness = Vector2.One,
-                    X = x
-                });
-
-                rollingRow += niceTick;
+                var x = (float)i / totalMonths;
+                addColumnTick(x, values[i].Date);
             }
+        }
+
+        private void addRowTick(float y, long value)
+        {
+            rowTicksContainer.Add(new TickText
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.CentreRight,
+                RelativePositionAxes = Axes.Y,
+                Margin = new MarginPadding { Right = 3 },
+                Text = value.ToString("N0"),
+                Font = OsuFont.GetFont(size: 12),
+                Y = y
+            });
+
+            rowLinesContainer.Add(new TickLine
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.CentreRight,
+                RelativeSizeAxes = Axes.X,
+                RelativePositionAxes = Axes.Y,
+                Height = 0.1f,
+                EdgeSmoothness = Vector2.One,
+                Y = y
+            });
+        }
+
+        private void addColumnTick(float x, DateTime value)
+        {
+            columnTicksContainer.Add(new TickText
+            {
+                Origin = Anchor.CentreLeft,
+                RelativePositionAxes = Axes.X,
+                Text = value.ToString("MMM yyyy"),
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                Rotation = 45,
+                X = x
+            });
+
+            columnLinesContainer.Add(new TickLine
+            {
+                Origin = Anchor.TopCentre,
+                RelativeSizeAxes = Axes.Y,
+                RelativePositionAxes = Axes.X,
+                Width = 0.1f,
+                EdgeSmoothness = Vector2.One,
+                X = x
+            });
         }
 
         private double niceNumber(double value, bool round)
