@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Multi.Ranking
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        public TimeshiftResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry = true)
+        public TimeshiftResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry)
             : base(score, allowRetry)
         {
             this.roomId = roomId;
