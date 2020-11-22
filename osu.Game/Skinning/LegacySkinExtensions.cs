@@ -85,7 +85,7 @@ namespace osu.Game.Skinning
                 if (timeReference != null)
                 {
                     Clock = timeReference.Clock;
-                    ((IBindable<double>)animationStartTime).BindTo(timeReference.AnimationStartTime);
+                    animationStartTime.BindTo(timeReference.AnimationStartTime);
                 }
 
                 animationStartTime.BindValueChanged(_ => updatePlaybackPosition(), true);

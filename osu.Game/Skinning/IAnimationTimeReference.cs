@@ -26,6 +26,6 @@ namespace osu.Game.Skinning
         /// <summary>
         /// The time which animations should be started from, relative to <see cref="Clock"/>.
         /// </summary>
-        IBindable<double> AnimationStartTime { get; }
+        Bindable<double> AnimationStartTime { get; }
     }
 }
