@@ -140,8 +140,12 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
             int monthsPerTick = 1;
 
-            if (totalMonths > 20)
-                monthsPerTick = totalMonths / 10;
+            if (totalMonths > 80)
+                monthsPerTick = 12;
+            else if (totalMonths >= 45)
+                monthsPerTick = 3;
+            else if (totalMonths > 20)
+                monthsPerTick = 2;
 
             for (int i = 0; i < totalMonths; i += monthsPerTick)
             {
