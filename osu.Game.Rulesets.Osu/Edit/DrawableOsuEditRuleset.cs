@@ -34,6 +34,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                 d.ApplyCustomUpdateState += updateState;
             }
 
+            /// <summary>
+            /// Hit objects are intentionally made to fade out at a constant slower rate than in gameplay.
+            /// This allows a mapper to gain better historical context and use recent hitobjects as reference / snap points.
+            /// </summary>
             private const double editor_hit_object_fade_out_extension = 700;
 
             private void updateState(DrawableHitObject hitObject, ArmedState state)
