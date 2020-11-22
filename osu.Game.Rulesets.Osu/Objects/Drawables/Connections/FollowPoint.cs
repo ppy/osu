@@ -49,6 +49,5 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         }
 
         public Bindable<double> AnimationStartTime { get; } = new BindableDouble();
-        IBindable<double> IAnimationTimeReference.AnimationStartTime => AnimationStartTime;
     }
 }

@@ -68,7 +68,6 @@ namespace osu.Game.Tests.NonVisual.Skinning
             public ManualClock ManualClock { get; }
             public IFrameBasedClock Clock { get; }
             public Bindable<double> AnimationStartTime { get; } = new BindableDouble();
-            IBindable<double> IAnimationTimeReference.AnimationStartTime => AnimationStartTime;
 
             public TestAnimationTimeReference()
             {
