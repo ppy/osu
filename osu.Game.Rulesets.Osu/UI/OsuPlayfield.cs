@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
-        public readonly Func<DrawableHitObject, double, bool> CheckHittable;
-
         private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
@@ -57,7 +55,6 @@ namespace osu.Game.Rulesets.Osu.UI
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
-            CheckHittable = hitPolicy.IsHittable;
 
             var hitWindows = new OsuHitWindows();
 
@@ -71,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void OnNewDrawableHitObject(DrawableHitObject drawable)
         {
-            ((DrawableOsuHitObject)drawable).CheckHittable = CheckHittable;
+            ((DrawableOsuHitObject)drawable).CheckHittable = hitPolicy.IsHittable;
 
             Debug.Assert(!drawable.IsLoaded, $"Already loaded {nameof(DrawableHitObject)} is added to {nameof(OsuPlayfield)}");
             drawable.OnLoadComplete += onDrawableHitObjectLoaded;
