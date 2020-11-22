@@ -117,6 +117,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
             var tick = getTick(getRange(max - min), 6);
 
+            bool tickIsDecimal = tick < 1.0;
+
             double rollingRow = 0;
 
             while (rollingRow <= max)
@@ -124,7 +126,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 if (rollingRow >= min)
                 {
                     var y = -Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
-                    addRowTick(y, (long)rollingRow);
+                    addRowTick(y, rollingRow, tickIsDecimal);
                 }
 
                 rollingRow += tick;
@@ -136,7 +138,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             columnTicksContainer.Clear();
             columnLinesContainer.Clear();
 
-            var totalMonths = values.Length - 1;
+            var totalMonths = values.Length;
 
             int monthsPerTick = 1;
 
@@ -149,12 +151,12 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
             for (int i = 0; i < totalMonths; i += monthsPerTick)
             {
-                var x = (float)i / totalMonths;
+                var x = (float)i / (totalMonths - 1);
                 addColumnTick(x, values[i].Date);
             }
         }
 
-        private void addRowTick(float y, long value)
+        private void addRowTick(float y, double value, bool tickIsDecimal)
         {
             rowTicksContainer.Add(new TickText
             {
@@ -162,7 +164,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 Origin = Anchor.CentreRight,
                 RelativePositionAxes = Axes.Y,
                 Margin = new MarginPadding { Right = 3 },
-                Text = value.ToString("N0"),
+                Text = tickIsDecimal ? value.ToString("F1") : value.ToString("N0"),
                 Font = OsuFont.GetFont(size: 12),
                 Y = y
             });
@@ -202,7 +204,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             });
         }
 
-        private long getRange(double initialRange)
+        private double getRange(double initialRange)
         {
             var exponent = Math.Floor(Math.Log10(initialRange));
             var fraction = initialRange / Math.Pow(10, exponent);
@@ -218,10 +220,10 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             else
                 niceFraction = 10.0;
 
-            return (long)(niceFraction * Math.Pow(10, exponent));
+            return niceFraction * Math.Pow(10, exponent);
         }
 
-        private long getTick(long range, int maxTicksCount)
+        private double getTick(double range, int maxTicksCount)
         {
             var value = range / (maxTicksCount - 1);
 
@@ -239,7 +241,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             else
                 niceFraction = 10.0;
 
-            return (long)(niceFraction * Math.Pow(10, exponent));
+            return niceFraction * Math.Pow(10, exponent);
         }
 
         private class TickText : OsuSpriteText
