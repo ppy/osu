@@ -124,8 +124,16 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 if (currentTick < min)
                     continue;
 
-                float y = -Interpolation.ValueAt(currentTick, 0, 1f, min, max);
-                addRowTick(y, currentTick);
+                float y;
+                // special-case the min == max case to match LineGraph.
+                // lerp isn't really well-defined over a zero interval anyway.
+                if (min == max)
+                    y = currentTick > 1 ? 1 : 0;
+                else
+                    y = Interpolation.ValueAt(currentTick, 0, 1f, min, max);
+
+                // y axis is inverted in graph-like coordinates.
+                addRowTick(-y, currentTick);
             }
         }
 

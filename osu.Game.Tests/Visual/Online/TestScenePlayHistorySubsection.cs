@@ -70,6 +70,20 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestConstantValues()
+        {
+            AddStep("Load user", () => user.Value = user_with_constant_values);
+            AddAssert("Section is visible", () => section.Alpha == 1);
+        }
+
+        [Test]
+        public void TestConstantZeroValues()
+        {
+            AddStep("Load user", () => user.Value = user_with_zero_values);
+            AddAssert("Section is visible", () => section.Alpha == 1);
+        }
+
+        [Test]
         public void TestFilledValues()
         {
             AddStep("Load user", () => user.Value = user_with_filled_values);
@@ -117,9 +131,31 @@ namespace osu.Game.Tests.Visual.Online
             }
         };
 
-        private static readonly User user_with_filled_values = new User
+        private static readonly User user_with_constant_values = new User
         {
             Id = 5,
+            MonthlyPlaycounts = new[]
+            {
+                new UserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 5 },
+                new UserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 5 },
+                new UserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 5 }
+            }
+        };
+
+        private static readonly User user_with_zero_values = new User
+        {
+            Id = 6,
+            MonthlyPlaycounts = new[]
+            {
+                new UserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 0 },
+                new UserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 0 },
+                new UserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 0 }
+            }
+        };
+
+        private static readonly User user_with_filled_values = new User
+        {
+            Id = 7,
             MonthlyPlaycounts = new[]
             {
                 new UserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 1000 },
@@ -134,7 +170,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private static readonly User user_with_missing_values = new User
         {
-            Id = 6,
+            Id = 8,
             MonthlyPlaycounts = new[]
             {
                 new UserHistoryCount { Date = new DateTime(2020, 1, 1), Count = 100 },
