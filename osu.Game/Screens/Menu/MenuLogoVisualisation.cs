@@ -27,12 +27,10 @@ namespace osu.Game.Screens.Menu
 
         private void updateColour()
         {
-            Color4 defaultColour = Color4.White;
-
             if (user.Value?.IsSupporter ?? false)
-                Colour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? defaultColour;
+                Colour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? Color4.White;
             else
-                Colour = defaultColour;
+                Colour = Color4.White;
         }
     }
 }
