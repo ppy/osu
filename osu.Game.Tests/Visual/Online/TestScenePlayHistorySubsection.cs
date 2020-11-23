@@ -16,7 +16,7 @@ using static osu.Game.Users.User;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneChartProfileSubsection : OsuTestScene
+    public class TestScenePlayHistorySubsection : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Red);
@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Online
         private readonly Bindable<User> user = new Bindable<User>();
         private readonly PlayHistorySubsection section;
 
-        public TestSceneChartProfileSubsection()
+        public TestScenePlayHistorySubsection()
         {
             AddRange(new Drawable[]
             {
