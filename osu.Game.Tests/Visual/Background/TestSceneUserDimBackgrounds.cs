@@ -318,7 +318,7 @@ namespace osu.Game.Tests.Visual.Background
         private class FadeAccessibleResults : ResultsScreen
         {
             public FadeAccessibleResults(ScoreInfo score)
-                : base(score)
+                : base(score, true)
             {
             }
 
