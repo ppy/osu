@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             static bool hasMissingDates(UserHistoryCount prev, UserHistoryCount current)
             {
                 var possibleCurrent = prev.Date.AddMonths(1);
-                return possibleCurrent != current.Date;
+                return possibleCurrent < current.Date;
             }
         }
 
