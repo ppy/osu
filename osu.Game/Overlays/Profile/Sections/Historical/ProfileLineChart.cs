@@ -115,9 +115,11 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             var min = values.Select(v => v.Count).Min();
             var max = values.Select(v => v.Count).Max();
 
-            var tick = getTick(getRange(max - min), 6);
+            var tick = getTick(max - min, 6);
 
-            bool tickIsDecimal = tick < 1.0;
+            // Prevent infinite loop in case if tick is zero
+            if (tick == 0)
+                tick = 1;
 
             double rollingRow = 0;
 
@@ -126,7 +128,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 if (rollingRow >= min)
                 {
                     var y = -Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
-                    addRowTick(y, rollingRow, tickIsDecimal);
+                    addRowTick(y, rollingRow);
                 }
 
                 rollingRow += tick;
@@ -156,7 +158,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             }
         }
 
-        private void addRowTick(float y, double value, bool tickIsDecimal)
+        private void addRowTick(float y, double value)
         {
             rowTicksContainer.Add(new TickText
             {
@@ -164,7 +166,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 Origin = Anchor.CentreRight,
                 RelativePositionAxes = Axes.Y,
                 Margin = new MarginPadding { Right = 3 },
-                Text = tickIsDecimal ? value.ToString("F1") : value.ToString("N0"),
+                Text = value.ToString("N0"),
                 Font = OsuFont.GetFont(size: 12),
                 Y = y
             });
@@ -204,28 +206,9 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             });
         }
 
-        private double getRange(double initialRange)
+        private long getTick(long range, int maxTicksCount)
         {
-            var exponent = Math.Floor(Math.Log10(initialRange));
-            var fraction = initialRange / Math.Pow(10, exponent);
-
-            double niceFraction;
-
-            if (fraction <= 1.0)
-                niceFraction = 1.0;
-            else if (fraction <= 2.0)
-                niceFraction = 2.0;
-            else if (fraction <= 5.0)
-                niceFraction = 5.0;
-            else
-                niceFraction = 10.0;
-
-            return niceFraction * Math.Pow(10, exponent);
-        }
-
-        private double getTick(double range, int maxTicksCount)
-        {
-            var value = range / (maxTicksCount - 1);
+            var value = (float)range / (maxTicksCount - 1);
 
             var exponent = Math.Floor(Math.Log10(value));
             var fraction = value / Math.Pow(10, exponent);
@@ -241,7 +224,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             else
                 niceFraction = 10.0;
 
-            return niceFraction * Math.Pow(10, exponent);
+            return (long)(niceFraction * Math.Pow(10, exponent));
         }
 
         private class TickText : OsuSpriteText
