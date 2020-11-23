@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Menu
             // Assuming the logo is a circle, we don't need a second dimension.
             private float size;
 
-            private static readonly Color4 transparent_white = Color4.White.Opacity(0.1f);
+            private static readonly Color4 transparent_white = Color4.White.Opacity(0.2f);
 
             private float[] audioData;
 
