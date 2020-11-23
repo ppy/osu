@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             var min = values.Select(v => v.Count).Min();
             var max = values.Select(v => v.Count).Max();
 
-            var tick = getTick(max - min, 6);
+            var tick = getTickInterval(max - min, 6);
 
             // Prevent infinite loop in case if tick is zero
             if (tick == 0)
@@ -208,25 +208,32 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             });
         }
 
-        private long getTick(long range, int maxTicksCount)
+        private long getTickInterval(long range, int maxTicksCount)
         {
-            var value = (float)range / (maxTicksCount - 1);
+            // this interval is what would be achieved if the interval was divided perfectly evenly into maxTicksCount ticks.
+            // can contain ugly fractional parts.
+            var exactTickInterval = (float)range / (maxTicksCount - 1);
 
-            var exponent = Math.Floor(Math.Log10(value));
-            var fraction = value / Math.Pow(10, exponent);
+            // the ideal ticks start with a 1, 2 or 5, and are multipliers of powers of 10.
+            // first off, use log10 to calculate the number of digits in the "exact" interval.
+            var numberOfDigits = Math.Floor(Math.Log10(exactTickInterval));
+            var tickBase = Math.Pow(10, numberOfDigits);
+            // then see how the exact tick relates to the power of 10.
+            var exactTickMultiplier = exactTickInterval / tickBase;
 
-            double niceFraction;
+            double tickMultiplier;
 
-            if (fraction < 1.5)
-                niceFraction = 1.0;
-            else if (fraction < 3)
-                niceFraction = 2.0;
-            else if (fraction < 7)
-                niceFraction = 5.0;
+            // round up the fraction to start with a 1, 2 or 5. closest match wins.
+            if (exactTickMultiplier < 1.5)
+                tickMultiplier = 1.0;
+            else if (exactTickMultiplier < 3)
+                tickMultiplier = 2.0;
+            else if (exactTickMultiplier < 7)
+                tickMultiplier = 5.0;
             else
-                niceFraction = 10.0;
+                tickMultiplier = 10.0;
 
-            return (long)(niceFraction * Math.Pow(10, exponent));
+            return Math.Max((long)(tickMultiplier * tickBase), 1);
         }
 
         private class TickText : OsuSpriteText
