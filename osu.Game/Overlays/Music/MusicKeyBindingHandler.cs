@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.OSD;
 
@@ -26,9 +25,6 @@ namespace osu.Game.Overlays.Music
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
-        [Resolved]
-        private OsuConfigManager config { get; set; }
-
         public bool OnPressed(GlobalAction action)
         {
             if (beatmap.Disabled)
@@ -41,11 +37,11 @@ namespace osu.Game.Overlays.Music
                     bool wasPlaying = musicController.IsPlaying;
 
                     if (musicController.TogglePause())
-                        onScreenDisplay?.Display(new MusicActionToast(wasPlaying ? "Pause track" : "Play track", config.LookupKeyBindings(action)));
+                        onScreenDisplay?.Display(new MusicActionToast(wasPlaying ? "Pause track" : "Play track", action));
                     return true;
 
                 case GlobalAction.MusicNext:
-                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast("Next track", config.LookupKeyBindings(action))));
+                    musicController.NextTrack(() => onScreenDisplay?.Display(new MusicActionToast("Next track", action)));
 
                     return true;
 
@@ -55,11 +51,11 @@ namespace osu.Game.Overlays.Music
                         switch (res)
                         {
                             case PreviousTrackResult.Restart:
-                                onScreenDisplay?.Display(new MusicActionToast("Restart track", config.LookupKeyBindings(action)));
+                                onScreenDisplay?.Display(new MusicActionToast("Restart track", action));
                                 break;
 
                             case PreviousTrackResult.Previous:
-                                onScreenDisplay?.Display(new MusicActionToast("Previous track", config.LookupKeyBindings(action)));
+                                onScreenDisplay?.Display(new MusicActionToast("Previous track", action));
                                 break;
                         }
                     });
@@ -76,8 +72,8 @@ namespace osu.Game.Overlays.Music
 
         private class MusicActionToast : Toast
         {
-            public MusicActionToast(string action, string shortcut)
-                : base("Music Playback", action, shortcut)
+            public MusicActionToast(string value, GlobalAction action)
+                : base("Music Playback", value, action: action)
             {
             }
         }
