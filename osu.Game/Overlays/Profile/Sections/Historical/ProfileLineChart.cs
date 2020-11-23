@@ -117,23 +117,15 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             var min = values.Select(v => v.Count).Min();
             var max = values.Select(v => v.Count).Max();
 
-            var tick = getTickInterval(max - min, 6);
+            var tickInterval = getTickInterval(max - min, 6);
 
-            // Prevent infinite loop in case if tick is zero
-            if (tick == 0)
-                tick = 1;
-
-            double rollingRow = 0;
-
-            while (rollingRow <= max)
+            for (long currentTick = 0; currentTick <= max; currentTick += tickInterval)
             {
-                if (rollingRow >= min)
-                {
-                    var y = -Interpolation.ValueAt(rollingRow, 0, 1f, min, max);
-                    addRowTick(y, rollingRow);
-                }
+                if (currentTick < min)
+                    continue;
 
-                rollingRow += tick;
+                float y = -Interpolation.ValueAt(currentTick, 0, 1f, min, max);
+                addRowTick(y, currentTick);
             }
         }
 
