@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestOveValue()
+        public void TestOneValue()
         {
             AddStep("Load user", () => user.Value = user_with_one_value);
             AddAssert("Section is hidden", () => section.Alpha == 0);
