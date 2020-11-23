@@ -37,7 +37,7 @@ namespace osu.Game.Input
         /// </summary>
         /// <param name="globalAction">The action to lookup.</param>
         /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
-        public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
+        public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction? globalAction)
         {
             foreach (var action in Query().Where(b => (GlobalAction)b.Action == globalAction))
             {
