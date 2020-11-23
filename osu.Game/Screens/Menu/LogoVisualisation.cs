@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Menu
             // Assuming the logo is a circle, we don't need a second dimension.
             private float size;
 
-            private readonly Color4 colour = Color4.White.Opacity(0.2f);
+            private static readonly Color4 transparent_white = Color4.White.Opacity(0.1f);
 
             private float[] audioData;
 
@@ -204,7 +204,7 @@ namespace osu.Game.Screens.Menu
                 Vector2 inflation = DrawInfo.MatrixInverse.ExtractScale().Xy;
 
                 ColourInfo colourInfo = DrawColourInfo.Colour;
-                colourInfo.ApplyChild(colour);
+                colourInfo.ApplyChild(transparent_white);
 
                 if (audioData != null)
                 {
