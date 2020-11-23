@@ -7,7 +7,6 @@ using osu.Game.Online.API;
 using osu.Game.Users;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
@@ -28,12 +27,10 @@ namespace osu.Game.Screens.Menu
 
         private void updateColour()
         {
-            Color4 defaultColour = Color4.White.Opacity(0.2f);
-
             if (user.Value?.IsSupporter ?? false)
-                AccentColour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? defaultColour;
+                Colour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? Color4.White;
             else
-                AccentColour = defaultColour;
+                Colour = Color4.White;
         }
     }
 }
