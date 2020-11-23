@@ -26,8 +26,10 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             get => values;
             set
             {
-                values = value;
-                graph.Values = values;
+                if (value.Length == 0)
+                    throw new ArgumentException("At least one value expected!", nameof(value));
+
+                graph.Values = values = value;
 
                 createRowTicks();
                 createColumnTicks();
