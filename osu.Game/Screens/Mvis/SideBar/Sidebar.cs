@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -7,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis.Modules;
+using osu.Game.Screens.Mvis.Modules.Skinning;
 using osu.Game.Screens.Mvis.SideBar.Header;
 using osu.Game.Skinning;
 using osuTK;
@@ -22,6 +24,8 @@ namespace osu.Game.Screens.Mvis.SideBar
         private readonly WaveContainer waveContainer;
         private readonly TabHeader header;
         private const float duration = 400;
+
+        [CanBeNull]
         private Box sidebarBg;
 
         public bool IsHidden = true;
@@ -62,22 +66,27 @@ namespace osu.Game.Screens.Mvis.SideBar
         {
             contentContainer.AddRange(new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Depth = float.MaxValue,
-                    Child = new SkinnableSprite("MSidebar-background", confineMode: ConfineMode.ScaleToFill)
+                new SkinnableComponent(
+                    "MSidebar-background",
+                    confineMode: ConfineMode.ScaleToFill,
+                    masking: true,
+                    defaultImplementation: _ => sidebarBg = new Box
                     {
-                        Name = "侧边栏背景图",
-                        Anchor = Anchor.BottomRight,
-                        Origin = Anchor.BottomRight,
-                        ChildAnchor = Anchor.BottomRight,
-                        ChildOrigin = Anchor.BottomRight,
                         RelativeSizeAxes = Axes.Both,
-                        CentreComponent = false,
-                        OverrideChildAnchor = true,
-                    }
+                        Colour = colourProvider.Background5,
+                        Alpha = 0.5f,
+                        Depth = float.MaxValue
+                    })
+                {
+                    Name = "侧边栏背景",
+                    Depth = float.MaxValue,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    ChildAnchor = Anchor.BottomRight,
+                    ChildOrigin = Anchor.BottomRight,
+                    RelativeSizeAxes = Axes.Both,
+                    CentreComponent = false,
+                    OverrideChildAnchor = true,
                 },
                 new ShowTabsButton
                 {
@@ -101,18 +110,10 @@ namespace osu.Game.Screens.Mvis.SideBar
                 }
             });
 
-            waveContainer.Add(sidebarBg = new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = colourProvider.Background5,
-                Alpha = 0.5f,
-                Depth = float.MaxValue
-            });
-
             colourProvider.HueColour.BindValueChanged(_ =>
             {
                 updateWaves();
-                sidebarBg.Colour = colourProvider.Background5;
+                sidebarBg?.FadeColour(colourProvider.Background5);
             }, true);
         }
 

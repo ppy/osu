@@ -33,15 +33,15 @@ namespace osu.Game.Skinning
 
             return new Sprite { Texture = texture };
         }
+    }
 
-        private class SpriteComponent : ISkinComponent
+    public class SpriteComponent : ISkinComponent
+    {
+        public SpriteComponent(string textureName)
         {
-            public SpriteComponent(string textureName)
-            {
-                LookupName = textureName;
-            }
-
-            public string LookupName { get; }
+            LookupName = textureName;
         }
+
+        public string LookupName { get; }
     }
 }

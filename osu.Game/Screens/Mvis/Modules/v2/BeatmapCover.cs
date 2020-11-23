@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public void UpdateBackground(WorkingBeatmap beatmap)
         {
             changeCoverTask?.Cancel();
+            if (IsDisposed) return;
+
             changeCoverTask = new CancellationTokenSource();
 
             if (beatmap == null)

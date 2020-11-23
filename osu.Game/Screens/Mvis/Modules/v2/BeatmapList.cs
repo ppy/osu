@@ -1,12 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens.Mvis.Modules.Skinning;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Modules.v2
@@ -20,40 +26,81 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         private Bindable<WorkingBeatmap> working { get; set; }
 
         private readonly List<BeatmapSetInfo> beatmapSets;
-        private BeatmapPiece currentPiece;
-        public BindableBool IsCurrent = new BindableBool();
-        private readonly OsuScrollContainer beatmapScroll;
-        private readonly FillFlowContainer fillFlow;
         private readonly Cached scrollCache = new Cached();
+        private BeatmapPiece currentPiece;
+        private OsuScrollContainer beatmapScroll;
+        private FillFlowContainer fillFlow;
+
+        [CanBeNull]
+        private Box topBox;
+
+        [CanBeNull]
+        private Box bottomBox;
+
         private bool firstScroll = true;
+
+        public BindableBool IsCurrent = new BindableBool();
 
         public BeatmapList(List<BeatmapSetInfo> set)
         {
-            Padding = new MarginPadding { Vertical = 20 };
+            Padding = new MarginPadding { Vertical = 10 };
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
-
-            InternalChild = beatmapScroll = new OsuScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                RightMouseScrollbar = true,
-                Child = fillFlow = new FillFlowContainer
-                {
-                    Padding = new MarginPadding { Horizontal = 35 },
-                    Spacing = new Vector2(5),
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                }
-            };
 
             beatmapSets = set;
         }
 
+        [Resolved]
+        private CustomColourProvider colourProvider { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            addBeatmapSets();
+            InternalChildren = new Drawable[]
+            {
+                beatmapScroll = new OsuScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RightMouseScrollbar = true,
+                    Child = fillFlow = new FillFlowContainer
+                    {
+                        Padding = new MarginPadding { Horizontal = 35 },
+                        Margin = new MarginPadding { Vertical = 20 },
+                        Spacing = new Vector2(5),
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    }
+                },
+                new SkinnableComponent(
+                    "MbeatmapListMask",
+                    _ => topBox = createDefaultMaskBox(),
+                    confineMode: ConfineMode.ScaleToFill)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 21,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    ChildAnchor = Anchor.TopCentre,
+                    ChildOrigin = Anchor.TopCentre,
+                    Y = -1
+                }, //高度+1并上移/下移一个像素可以避免一些奇怪的渲染问题
+                new SkinnableComponent(
+                    "MbeatmapListMask",
+                    _ => bottomBox = createDefaultMaskBox(),
+                    confineMode: ConfineMode.ScaleToFill)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 21,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    ChildAnchor = Anchor.TopCentre,
+                    ChildOrigin = Anchor.TopCentre,
+                    Rotation = 180,
+                    Y = -19,
+                }
+            };
 
+            addBeatmapSets();
             working.BindValueChanged(OnBeatmapChanged);
             IsCurrent.BindValueChanged(v =>
             {
@@ -65,6 +112,28 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
                 currentPiece?.TriggerActiveChange();
             });
+
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                var boxColor = ColourInfo.GradientVertical(
+                    colourProvider.Background3,
+                    colourProvider.Background3.Opacity(0));
+                topBox?.FadeColour(boxColor);
+                bottomBox?.FadeColour(boxColor);
+            }, true);
+        }
+
+        private Box createDefaultMaskBox()
+        {
+            var b = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = ColourInfo.GradientVertical(
+                    colourProvider.Background3,
+                    colourProvider.Background3.Opacity(0))
+            };
+
+            return b;
         }
 
         protected override void UpdateAfterChildren()
@@ -125,7 +194,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
             else
             {
-                float distance = (index - 1) * 85;
+                //列表顶部多出的20像素(?)会导致原有的滚动距离比实际需要的短从而造成没有滚动到正确位置的问题
+                //因此在后面加20确保列表能正确滚动，将(index-1)处的beatmapPiece显示在顶部
+                //滚动到(index-1)能让用户知道当前播放的不是列表中的第一首歌曲
+                float distance = (index - 1) * 85 + 20;
 
                 //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
                 //n个piece, n-1个间隔

@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
-            CornerRadius = 12.5f;
+            CornerRadius = 10f;
             Alpha = 0;
 
             Collection = c;

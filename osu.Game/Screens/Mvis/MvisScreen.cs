@@ -34,6 +34,7 @@ using osu.Game.Graphics;
 using osu.Framework;
 using osu.Game.Users;
 using osu.Game.Screens.Mvis.Modules;
+using osu.Game.Screens.Mvis.Modules.Skinning;
 using osu.Game.Screens.Mvis.Modules.v2;
 using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Skinning;
@@ -110,8 +111,8 @@ namespace osu.Game.Screens.Mvis
         private SidebarSettingsScrollContainer settingsScroll;
         private CustomColourProvider colourProvider;
         private DependencyContainer dependencies;
-        private SkinnableSprite skinnableForeground;
-        private SkinnableSprite skinnableBbBackground;
+        private FullScreenSkinnableComponent skinnableForeground;
+        private FullScreenSkinnableComponent skinnableBbBackground;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -184,7 +185,7 @@ namespace osu.Game.Screens.Mvis
                         }
                     }
                 },
-                skinnableForeground = new ModifiedSkinnableSprite("MPlayer-foreground", confineMode: ConfineMode.ScaleToFill)
+                skinnableForeground = new FullScreenSkinnableComponent("MPlayer-foreground", confineMode: ConfineMode.ScaleToFill, defaultImplementation: _ => new PlaceHolder())
                 {
                     Name = "前景图",
                     RelativeSizeAxes = Axes.Both,
@@ -210,9 +211,10 @@ namespace osu.Game.Screens.Mvis
                             Name = "Sidebar Container",
                             Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING }
                         },
-                        skinnableBbBackground = new ModifiedSkinnableSprite("MBottomBar-background",
+                        skinnableBbBackground = new FullScreenSkinnableComponent("MBottomBar-background",
                             confineMode: ConfineMode.ScaleToFill,
-                            masking: true)
+                            masking: true,
+                            defaultImplementation: _ => new PlaceHolder())
                         {
                             Name = "底栏背景图",
                             Anchor = Anchor.BottomCentre,
@@ -426,7 +428,8 @@ namespace osu.Game.Screens.Mvis
                     {
                         new MfMvisSection
                         {
-                            Margin = new MarginPadding(0)
+                            Margin = new MarginPadding { Top = -15 },
+                            Padding = new MarginPadding(0)
                         },
                         new SettingsButton
                         {
