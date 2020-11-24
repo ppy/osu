@@ -454,6 +454,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void clearExistingStateTransforms()
         {
             base.ApplyTransformsAt(double.MinValue, true);
+
+            // has to call this method directly (not ClearTransforms) to bypass the local ClearTransformsAfter override.
             base.ClearTransformsAfter(double.MinValue, true);
         }
 

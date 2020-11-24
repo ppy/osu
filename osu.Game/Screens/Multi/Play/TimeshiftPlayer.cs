@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Multi.Play
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
             Debug.Assert(roomId.Value != null);
-            return new TimeshiftResultsScreen(score, roomId.Value.Value, playlistItem);
+            return new TimeshiftResultsScreen(score, roomId.Value.Value, playlistItem, true);
         }
 
         protected override ScoreInfo CreateScore()
