@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -52,32 +53,30 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             Hide();
         }
 
-        private UserHistoryCount[] fillZeroValues(UserHistoryCount[] values)
+        /// <summary>
+        /// Add entries for any missing months (filled with zero values).
+        /// </summary>
+        private UserHistoryCount[] fillZeroValues(UserHistoryCount[] historyEntries)
         {
-            var newValues = new List<UserHistoryCount> { values[0] };
-            var newLast = values[0];
+            var filledHistoryEntries = new List<UserHistoryCount>();
 
-            for (int i = 1; i < values.Length; i++)
+            foreach (var entry in historyEntries)
             {
-                while (hasMissingDates(newLast, values[i]))
+                var lastFilled = filledHistoryEntries.LastOrDefault();
+
+                while (lastFilled?.Date.AddMonths(1) < entry.Date)
                 {
-                    newValues.Add(newLast = new UserHistoryCount
+                    filledHistoryEntries.Add(lastFilled = new UserHistoryCount
                     {
                         Count = 0,
-                        Date = newLast.Date.AddMonths(1)
+                        Date = lastFilled.Date.AddMonths(1)
                     });
                 }
 
-                newValues.Add(newLast = values[i]);
+                filledHistoryEntries.Add(entry);
             }
 
-            return newValues.ToArray();
-
-            static bool hasMissingDates(UserHistoryCount prev, UserHistoryCount current)
-            {
-                var possibleCurrent = prev.Date.AddMonths(1);
-                return possibleCurrent < current.Date;
-            }
+            return filledHistoryEntries.ToArray();
         }
 
         protected abstract UserHistoryCount[] GetValues(User user);
