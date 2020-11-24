@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Select
             AddRangeInternal(new Drawable[]
             {
                 recommender,
-                new ResetScrollContainer(() => Carousel.ScrollToSelected())
+                new ResetScrollContainer(() => Carousel.TrackSelectedItem())
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 250,

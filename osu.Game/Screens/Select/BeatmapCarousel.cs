@@ -114,7 +114,6 @@ namespace osu.Game.Screens.Select
 
             ScrollableContent.Clear(false);
             itemsCache.Invalidate();
-            scrollPositionCache.Invalidate();
 
             // apply any pending filter operation that may have been delayed (see applyActiveCriteria's scheduling behaviour when BeatmapSetsLoaded is false).
             FlushPendingFilterOperations();
@@ -130,7 +129,6 @@ namespace osu.Game.Screens.Select
         private readonly List<CarouselItem> visibleItems = new List<CarouselItem>();
 
         private readonly Cached itemsCache = new Cached();
-        private readonly Cached scrollPositionCache = new Cached();
 
         protected readonly Container<DrawableCarouselItem> ScrollableContent;
 
@@ -157,6 +155,7 @@ namespace osu.Game.Screens.Select
                 RelativeSizeAxes = Axes.Both,
                 Child = scroll = new CarouselScrollContainer
                 {
+                    UserScrolled = () => scrollTrackingCurrent = false,
                     Masking = false,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -468,17 +467,19 @@ namespace osu.Game.Screens.Select
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
 
-                if (alwaysResetScrollPosition || !scroll.UserScrolling)
-                    ScrollToSelected();
+                if (alwaysResetScrollPosition)
+                    TrackSelectedItem();
             }
         }
 
-        private float? scrollTarget;
+        private CarouselItem scrollTarget;
+
+        private bool scrollTrackingCurrent = true;
 
         /// <summary>
-        /// Scroll to the current <see cref="SelectedBeatmap"/>.
+        /// Start automatically scroll-tracking the selected item.
         /// </summary>
-        public void ScrollToSelected() => scrollPositionCache.Invalidate();
+        public void TrackSelectedItem() => scrollTrackingCurrent = true;
 
         #region Key / button selection logic
 
@@ -674,8 +675,13 @@ namespace osu.Game.Screens.Select
         {
             base.UpdateAfterChildren();
 
-            if (!scrollPositionCache.IsValid)
-                updateScrollPosition();
+            if (scrollTrackingCurrent && scrollTarget != null)
+            {
+                // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
+                // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
+                // then reapply the top semi-transparent area (because carousel's screen space starts below it)
+                scroll.ScrollTo(scrollTarget.CarouselYPosition + scrollTarget.TotalHeight - visibleHalfHeight + BleedTop);
+            }
         }
 
         private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
@@ -726,7 +732,7 @@ namespace osu.Game.Screens.Select
                         SelectionChanged?.Invoke(c.Beatmap);
 
                         itemsCache.Invalidate();
-                        ScrollToSelected();
+                        TrackSelectedItem();
                     }
                 };
             }
@@ -762,23 +768,22 @@ namespace osu.Game.Screens.Select
 
                         if (item.State.Value == CarouselItemState.Selected)
                         {
-                            // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
-                            // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
-                            // then reapply the top semi-transparent area (because carousel's screen space starts below it)
-                            scrollTarget = currentY + DrawableCarouselBeatmapSet.HEIGHT - visibleHalfHeight + BleedTop;
+                            scrollTarget = item;
+
+                            float beatmapPanelY = currentY;
 
                             foreach (var b in set.Beatmaps)
                             {
                                 if (!b.Visible)
                                     continue;
 
+                                b.CarouselYPosition = beatmapPanelY += b.TotalHeight;
+
                                 if (b.State.Value == CarouselItemState.Selected)
                                 {
-                                    scrollTarget += b.TotalHeight / 2;
+                                    scrollTarget = b;
                                     break;
                                 }
-
-                                scrollTarget += b.TotalHeight;
                             }
                         }
 
@@ -798,24 +803,6 @@ namespace osu.Game.Screens.Select
             }
 
             itemsCache.Validate();
-        }
-
-        private bool firstScroll = true;
-
-        private void updateScrollPosition()
-        {
-            if (scrollTarget != null)
-            {
-                if (firstScroll)
-                {
-                    // reduce movement when first displaying the carousel.
-                    scroll.ScrollTo(scrollTarget.Value - 200, false);
-                    firstScroll = false;
-                }
-
-                scroll.ScrollTo(scrollTarget.Value);
-                scrollPositionCache.Validate();
-            }
         }
 
         /// <summary>
@@ -894,21 +881,15 @@ namespace osu.Game.Screens.Select
             private bool rightMouseScrollBlocked;
 
             /// <summary>
-            /// Whether the last scroll event was user triggered, directly on the scroll container.
+            /// Fired whenever the user triggers a scroll event.
             /// </summary>
-            public bool UserScrolling { get; private set; }
+            public Action UserScrolled;
 
             // ReSharper disable once OptionalParameterHierarchyMismatch 2020.3 EAP4 bug. (https://youtrack.jetbrains.com/issue/RSRP-481535?p=RIDER-51910)
             protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
             {
-                UserScrolling = true;
+                UserScrolled?.Invoke();
                 base.OnUserScroll(value, animated, distanceDecay);
-            }
-
-            public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
-            {
-                UserScrolling = false;
-                base.ScrollTo(value, animated, distanceDecay);
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
