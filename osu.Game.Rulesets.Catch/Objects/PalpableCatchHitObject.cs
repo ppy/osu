@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 namespace osu.Game.Rulesets.Catch.Objects
@@ -25,7 +25,5 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// The target fruit if we are to initiate a hyperdash.
         /// </summary>
         public CatchHitObject HyperDashTarget;
-
-        public virtual bool StaysOnPlate => true;
     }
 }

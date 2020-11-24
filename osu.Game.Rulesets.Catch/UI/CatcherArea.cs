@@ -69,10 +69,10 @@ namespace osu.Game.Rulesets.Catch.UI
                     lastPlateableFruit.OnLoadComplete += _ => action();
             }
 
-            if (result.IsHit && hitObject.HitObject is PalpableCatchHitObject fruit)
+            if (result.IsHit && hitObject is DrawablePalpableCatchHitObject fruit)
             {
                 // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
-                var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit);
+                var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
 
                 if (caughtFruit == null) return;
 

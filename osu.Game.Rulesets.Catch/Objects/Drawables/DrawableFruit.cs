@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableFruit : DrawablePalpableCatchHitObject
     {
-        public override bool StaysOnPlate => true;
-
         public DrawableFruit(CatchHitObject h)
             : base(h)
         {
