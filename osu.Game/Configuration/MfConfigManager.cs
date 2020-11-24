@@ -42,7 +42,6 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisUseOsuLogoVisualisation, false);
             Set(MfSetting.MvisIdleBgDim, 0.9f, 0f, 1f);
             Set(MfSetting.MvisEnableBgTriangles, true);
-            Set(MfSetting.MvisEnableSBOverlayProxy, true);
             Set(MfSetting.MvisAdjustMusicWithFreq, true);
             Set(MfSetting.MvisMusicSpeed, 1.0, 0.1, 2.0);
             Set(MfSetting.MvisEnableNightcoreBeat, false);
@@ -77,7 +76,6 @@ namespace osu.Game.Configuration
         MvisIdleBgDim,
         MvisContentAlpha,
         MvisEnableBgTriangles,
-        MvisEnableSBOverlayProxy,
         MvisShowParticles,
         MvisVisualizerAmount,
         MvisBarWidth,
