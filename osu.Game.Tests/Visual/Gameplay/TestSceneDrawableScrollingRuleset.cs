@@ -445,7 +445,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             private readonly Container<DrawableHitObject> container;
 
             public DrawableTestParentHitObject([CanBeNull] TestHitObject hitObject)
-                : base(hitObject)
+            : base(hitObject)
             {
                 InternalChildren[0].Colour = Color4.LightYellow;
                 InternalChildren[1].Colour = Color4.Yellow;
