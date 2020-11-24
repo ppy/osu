@@ -147,11 +147,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         /// <summary>
         /// Invalidate the cache of the layout of this hit object.
-        /// A hit object should be invalidated after all its nested hit objects are invalidated.
         /// </summary>
         public void InvalidateDrawableHitObject(DrawableHitObject hitObject)
         {
-            // lifetime is computed before update
+            // Lifetime is computed once early and
+            // layout (Width/Height if `IHasDuration`, and nested object positions) will be computed when the object becomes alive.
+            // An assumption is that a hit object layout update (setting `Height` or `Width`) won't affect its lifetime.
+            // This is satisfied in practice because otherwise the hit object won't be aligned to its `StartTime`.
             hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
 
             lifetimeComputedHitObjects.Add(hitObject);
