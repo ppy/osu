@@ -125,6 +125,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     continue;
 
                 float y;
+
                 // special-case the min == max case to match LineGraph.
                 // lerp isn't really well-defined over a zero interval anyway.
                 if (min == max)
@@ -218,6 +219,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             // first off, use log10 to calculate the number of digits in the "exact" interval.
             var numberOfDigits = Math.Floor(Math.Log10(exactTickInterval));
             var tickBase = Math.Pow(10, numberOfDigits);
+
             // then see how the exact tick relates to the power of 10.
             var exactTickMultiplier = exactTickInterval / tickBase;
 
