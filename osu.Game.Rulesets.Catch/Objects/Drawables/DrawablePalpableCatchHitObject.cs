@@ -12,6 +12,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject
     {
+        /// <summary>
+        /// Whether this hit object should stay on the catcher plate when the object is caught by the catcher.
+        /// </summary>
         public virtual bool StaysOnPlate => true;
 
         protected readonly Container ScaleContainer;
