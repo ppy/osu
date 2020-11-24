@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject
     {
+        public new PalpableCatchHitObject HitObject => (PalpableCatchHitObject)base.HitObject;
+
         /// <summary>
         /// Whether this hit object should stay on the catcher plate when the object is caught by the catcher.
         /// </summary>
