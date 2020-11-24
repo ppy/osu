@@ -43,14 +43,14 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             var values = GetValues(e.NewValue);
 
-            if (values?.Length > 1)
+            if (values == null || values.Length <= 1)
             {
-                chart.Values = fillZeroValues(values);
-                Show();
+                Hide();
                 return;
             }
 
-            Hide();
+            chart.Values = fillZeroValues(values);
+            Show();
         }
 
         /// <summary>
