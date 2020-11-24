@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -32,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject, ISkinSource skin)
         {
-            DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
+            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
 
             accentColour.BindTo(drawableCatchObject.AccentColour);
 
@@ -52,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 },
             };
 
-            if (((PalpableCatchHitObject)drawableCatchObject.HitObject).HyperDash)
+            if (drawableCatchObject.HitObject.HyperDash)
             {
                 var hyperDash = new Sprite
                 {

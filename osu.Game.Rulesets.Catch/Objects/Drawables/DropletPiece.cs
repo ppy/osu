@@ -22,8 +22,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
         {
-            DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
-            var hitObject = (PalpableCatchHitObject)drawableCatchObject.HitObject;
+            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
 
             InternalChild = new Pulp
             {
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 AccentColour = { BindTarget = drawableObject.AccentColour }
             };
 
-            if (hitObject.HyperDash)
+            if (drawableCatchObject.HitObject.HyperDash)
             {
                 AddInternal(new Container
                 {

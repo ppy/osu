@@ -30,12 +30,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
         {
-            DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
-            hitObject = (PalpableCatchHitObject)drawableCatchObject.HitObject;
+            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
+            hitObject = drawableCatchObject.HitObject;
 
             AddRangeInternal(new[]
             {
-                getFruitFor(drawableCatchObject.HitObject.VisualRepresentation),
+                getFruitFor(hitObject.VisualRepresentation),
                 border = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
