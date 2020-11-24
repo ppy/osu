@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly HashSet<DrawableHitObject> layoutComputedHitObjects = new HashSet<DrawableHitObject>();
 
         // Used to recompute all lifetime when `layoutCache` becomes invalid
-        private readonly HashSet<DrawableHitObject> lifetimeComputedHitObjects = new HashSet<DrawableHitObject>();
+        private readonly HashSet<DrawableHitObject> allHitObjects = new HashSet<DrawableHitObject>();
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
@@ -150,18 +150,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public void InvalidateDrawableHitObject(DrawableHitObject hitObject)
         {
-            // Lifetime is computed once early and
-            // layout (Width/Height if `IHasDuration`, and nested object positions) will be computed when the object becomes alive.
-            // An assumption is that a hit object layout update (setting `Height` or `Width`) won't affect its lifetime.
-            // This is satisfied in practice because otherwise the hit object won't be aligned to its `StartTime`.
-            hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
+            // Lifetime computation is delayed to the next update because `scrollLength` may not be valid here.
+            // Layout computation will be delayed to when the object becomes alive.
+            // An assumption is that a hit object layout update (setting `Height` or `Width`) won't affect its lifetime but
+            // this is satisfied in practice because otherwise the hit object won't be aligned to its `StartTime`.
 
-            lifetimeComputedHitObjects.Add(hitObject);
+            layoutCache.Invalidate();
+
+            allHitObjects.Add(hitObject);
+
             layoutComputedHitObjects.Remove(hitObject);
         }
 
-        // Use a nonzero value to prevent infinite results
-        private float scrollLength = 1;
+        private float scrollLength;
 
         protected override void Update()
         {
@@ -170,7 +171,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             if (!layoutCache.IsValid)
             {
                 // this.Objects cannot be used as it doesn't contain nested objects
-                foreach (var hitObject in lifetimeComputedHitObjects)
+                foreach (var hitObject in allHitObjects)
                     hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
 
                 layoutComputedHitObjects.Clear();
