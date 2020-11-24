@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Import
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Margin = new MarginPadding { Bottom = 15, Top =15 } ,
+                                            Margin = new MarginPadding { Bottom = 15, Top = 15 },
                                             Children = new Drawable[]
                                             {
                                                 new FillFlowContainer
@@ -148,8 +148,8 @@ namespace osu.Game.Screens.Import
                                                                     startImport(d);
                                                                 else
                                                                     currentFileText.FlashColour(Color4.Red, 500);
-                                                                }
                                                             }
+                                                        }
                                                     }
                                                 }
                                             }
