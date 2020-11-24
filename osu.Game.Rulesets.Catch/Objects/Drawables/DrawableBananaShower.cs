@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableBananaShower : DrawableCatchHitObject<BananaShower>
+    public class DrawableBananaShower : DrawableCatchHitObject
     {
         private readonly Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation;
         private readonly Container bananaContainer;

@@ -13,12 +13,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public abstract class PalpableDrawableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
-        where TObject : PalpableCatchHitObject
+    public abstract class PalpableDrawableCatchHitObject : DrawableCatchHitObject
     {
         protected Container ScaleContainer { get; private set; }
 
-        protected PalpableDrawableCatchHitObject(TObject hitObject)
+        protected PalpableDrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
             Origin = Anchor.Centre;
@@ -46,19 +45,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             comboColours[(HitObject.IndexInBeatmap + 1) % comboColours.Count];
     }
 
-    public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
-        where TObject : CatchHitObject
-    {
-        public new TObject HitObject;
-
-        protected DrawableCatchHitObject(TObject hitObject)
-            : base(hitObject)
-        {
-            HitObject = hitObject;
-            Anchor = Anchor.BottomLeft;
-        }
-    }
-
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
         protected override double InitialLifetimeOffset => HitObject.TimePreempt;
@@ -73,6 +59,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             : base(hitObject)
         {
             X = hitObject.X;
+            Anchor = Anchor.BottomLeft;
         }
 
         public Func<CatchHitObject, bool> CheckPosition;
