@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.UI
         /// <remarks>
         /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
         /// </remarks>
-        internal event Action<HitObject> HitObjectUsageBegan;
+        internal event Action<DrawableHitObject> HitObjectUsageBegan;
 
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.UI
         /// <remarks>
         /// If this <see cref="HitObjectContainer"/> uses pooled objects, this represents the time when the <see cref="HitObject"/>s become dead.
         /// </remarks>
-        internal event Action<HitObject> HitObjectUsageFinished;
+        internal event Action<DrawableHitObject> HitObjectUsageFinished;
 
         /// <summary>
         /// The amount of time prior to the current time within which <see cref="HitObject"/>s should be considered alive.
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.UI
             bindStartTime(drawable);
             AddInternal(drawableMap[entry] = drawable, false);
 
-            HitObjectUsageBegan?.Invoke(entry.HitObject);
+            HitObjectUsageBegan?.Invoke(drawable);
         }
 
         private void removeDrawable(HitObjectLifetimeEntry entry)
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.UI
             unbindStartTime(drawable);
             RemoveInternal(drawable);
 
-            HitObjectUsageFinished?.Invoke(entry.HitObject);
+            HitObjectUsageFinished?.Invoke(drawable);
         }
 
         #endregion
