@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         private void load(DrawableHitObject drawableObject)
         {
             DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
-            var hitObject = drawableCatchObject.HitObject;
+            var hitObject = (PalpableCatchHitObject)drawableCatchObject.HitObject;
 
             InternalChild = new Pulp
             {
