@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Setup
                 CurrentFile = { BindTarget = currentFile }
             };
 
-            sectionsContainer?.ScrollTo(fileSelector);
+            sectionsContainer.ScrollTo(fileSelector);
         }
 
         internal class FileChooserOsuTextBox : OsuTextBox
