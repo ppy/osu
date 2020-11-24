@@ -48,33 +48,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
             timeRange.ValueChanged += _ => layoutCache.Invalidate();
         }
 
-        public override void Add(DrawableHitObject hitObject)
-        {
-            combinedObjCache.Invalidate();
-            hitObject.DefaultsApplied += onDefaultsApplied;
-            base.Add(hitObject);
-        }
-
-        public override bool Remove(DrawableHitObject hitObject)
-        {
-            var result = base.Remove(hitObject);
-
-            if (result)
-            {
-                combinedObjCache.Invalidate();
-                hitObjectInitialStateCache.Remove(hitObject);
-
-                hitObject.DefaultsApplied -= onDefaultsApplied;
-            }
-
-            return result;
-        }
-
         public override void Clear(bool disposeChildren = true)
         {
-            foreach (var h in Objects)
-                h.DefaultsApplied -= onDefaultsApplied;
-
             base.Clear(disposeChildren);
 
             combinedObjCache.Invalidate();
@@ -173,18 +148,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        private void onDefaultsApplied(DrawableHitObject drawableObject)
+        /// <summary>
+        /// Invalidate the cache of the layout of this hit object.
+        /// </summary>
+        public void InvalidateDrawableHitObject(DrawableHitObject drawableObject)
         {
-            // The cache may not exist if the hitobject state hasn't been computed yet (e.g. if the hitobject was added + defaults applied in the same frame).
-            // In such a case, combinedObjCache will take care of updating the hitobject.
             if (hitObjectInitialStateCache.TryGetValue(drawableObject, out var state))
-            {
-                combinedObjCache.Invalidate();
                 state.Cache.Invalidate();
-            }
+
+            combinedObjCache.Invalidate();
         }
 
-        private float scrollLength;
+        // Use a nonzero value to prevent infinite results
+        private float scrollLength = 1;
 
         protected override void Update()
         {
