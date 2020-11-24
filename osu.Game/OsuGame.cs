@@ -420,7 +420,7 @@ namespace osu.Game
                         break;
 
                     case ScorePresentType.Results:
-                        screen.Push(new SoloResultsScreen(databasedScore.ScoreInfo));
+                        screen.Push(new SoloResultsScreen(databasedScore.ScoreInfo, false));
                         break;
                 }
             }, validScreens: new[] { typeof(PlaySongSelect) });
