@@ -12,29 +12,27 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject
     {
-        protected Container ScaleContainer { get; private set; }
+        public virtual bool StaysOnPlate => true;
 
-        protected DrawablePalpableCatchHitObject(CatchHitObject hitObject)
-            : base(hitObject)
+        protected readonly Container ScaleContainer;
+
+        protected DrawablePalpableCatchHitObject(CatchHitObject h)
+            : base(h)
         {
             Origin = Anchor.Centre;
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
-            Masking = false;
+
+            AddInternal(ScaleContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+            });
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRangeInternal(new Drawable[]
-            {
-                ScaleContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                }
-            });
-
             ScaleContainer.Scale = new Vector2(HitObject.Scale);
         }
 
