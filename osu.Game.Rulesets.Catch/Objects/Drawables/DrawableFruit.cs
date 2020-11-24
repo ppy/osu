@@ -8,7 +8,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableFruit : PalpableDrawableCatchHitObject
+    public class DrawableFruit : DrawablePalpableCatchHitObject
     {
         public DrawableFruit(CatchHitObject h)
             : base(h)

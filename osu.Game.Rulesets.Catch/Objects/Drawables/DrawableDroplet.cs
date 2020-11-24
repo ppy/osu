@@ -8,7 +8,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableDroplet : PalpableDrawableCatchHitObject
+    public class DrawableDroplet : DrawablePalpableCatchHitObject
     {
         public override bool StaysOnPlate => false;
 
