@@ -1,11 +1,11 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
     /// <summary>
     /// Represents a single object that can be caught by the catcher.
-    /// This includes normal fruits, droplets, and bananas but excludes objects that acts only as a container of nested hit objects.
+    /// This includes normal fruits, droplets, and bananas but excludes objects that act only as a container of nested hit objects.
     /// </summary>
     public abstract class PalpableCatchHitObject : CatchHitObject
     {
