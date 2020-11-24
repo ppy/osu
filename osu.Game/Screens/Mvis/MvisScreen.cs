@@ -523,10 +523,17 @@ namespace osu.Game.Screens.Mvis
 
                     case StoryboardState.Loading:
                         loadingSpinner.Show();
+                        loadingSpinner.FadeColour(Color4.White, 300);
+                        break;
+
+                    case StoryboardState.Waiting:
+                        loadingSpinner.Show();
+                        loadingSpinner.FadeColour(Color4.Gray);
                         break;
 
                     case StoryboardState.Failed:
-                        loadingSpinner.FadeColour(Colour4.Red);
+                        loadingSpinner.Show();
+                        loadingSpinner.FadeColour(Colour4.Red, 300);
                         break;
                 }
             }, true);
@@ -616,7 +623,6 @@ namespace osu.Game.Screens.Mvis
 
             //停止beatmapLogo，取消故事版家在任务以及锁定变更
             beatmapLogo.StopResponseOnBeatmapChanges();
-            sbLoader.CancelAllTasks();
             lockChanges.Value = true;
 
             //背景层的动画
@@ -914,7 +920,7 @@ namespace osu.Game.Screens.Mvis
             });
 
             if (beatmap != prevBeatmap)
-                sbLoader.UpdateStoryBoardAsync();
+                sbLoader.UpdateStoryBoardAsync(beatmap);
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;

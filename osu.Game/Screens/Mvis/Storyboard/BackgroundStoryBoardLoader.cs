@@ -1,11 +1,9 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
@@ -42,14 +40,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
         private Action onComplete;
 
         private StoryboardClock storyboardClock = new StoryboardClock();
-        private BackgroundStoryboard clockContainer;
-        private Task<bool> loadTask;
+        private BackgroundStoryboard currentStoryboard;
 
-        private CancellationTokenSource cancellationTokenSource;
-        private BackgroundStoryboard nextStoryboard;
-
-        [Resolved]
-        private IBindable<WorkingBeatmap> b { get; set; }
+        private WorkingBeatmap currentBeatmap;
 
         [Resolved]
         private MusicController music { get; set; }
@@ -70,78 +63,91 @@ namespace osu.Game.Screens.Mvis.Storyboard
             enableSb.BindValueChanged(OnEnableSBChanged);
         }
 
+        private Task loadTask;
+
+        private void prepareStoryboard(WorkingBeatmap beatmap)
+        {
+            State.Value = StoryboardState.Loading;
+
+            storyboardClock = new StoryboardClock();
+            storyboardClock.ChangeSource(beatmap.Track);
+            Seek(beatmap.Track.CurrentTime);
+
+            loadTask = LoadComponentAsync(
+                currentStoryboard = new BackgroundStoryboard(beatmap)
+                {
+                    RunningClock = storyboardClock,
+                    Alpha = 0.1f
+                },
+                onLoaded: newStoryboard =>
+                {
+                    sbLoaded.Value = true;
+                    State.Value = StoryboardState.Success;
+                    NeedToHideTriangles.Value = beatmap.Storyboard.HasDrawable;
+
+                    Add(newStoryboard);
+
+                    enableSb.TriggerChange();
+                    onComplete?.Invoke();
+                    onComplete = null;
+                });
+        }
+
         public void OnEnableSBChanged(ValueChangedEvent<bool> v)
         {
             if (v.NewValue)
             {
                 if (!sbLoaded.Value)
-                    UpdateStoryBoardAsync(onComplete);
+                    UpdateStoryBoardAsync(currentBeatmap);
                 else
                 {
-                    StoryboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
-                    NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
+                    if (currentBeatmap != null)
+                    {
+                        StoryboardReplacesBackground.Value = currentBeatmap.Storyboard.ReplacesBackground && currentBeatmap.Storyboard.HasDrawable;
+                        NeedToHideTriangles.Value = currentBeatmap.Storyboard.HasDrawable;
+                    }
+                    else
+                    {
+                        StoryboardReplacesBackground.Value = NeedToHideTriangles.Value = false;
+                    }
                 }
 
-                clockContainer?.FadeIn(duration, Easing.OutQuint);
+                currentStoryboard?.FadeIn(duration, Easing.OutQuint);
             }
             else
             {
-                clockContainer?.FadeOut(duration / 2, Easing.OutQuint);
+                currentStoryboard?.FadeOut(duration / 2, Easing.OutQuint);
                 StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
                 State.Value = StoryboardState.NotLoaded;
-                CancelAllTasks();
             }
-        }
-
-        public bool LoadStoryboardFor(WorkingBeatmap beatmap)
-        {
-            try
-            {
-                LoadComponentAsync(nextStoryboard, newClockContainer =>
-                {
-                    storyboardClock.ChangeSource(beatmap.Track);
-                    Seek(beatmap.Track.CurrentTime);
-
-                    Add(newClockContainer);
-                    clockContainer = newClockContainer;
-                }, cancellationTokenSource.Token);
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "加载故事版时出现错误。");
-                State.Value = StoryboardState.Failed;
-                return false;
-            }
-
-            return true;
         }
 
         public void Seek(double position) =>
             storyboardClock?.Seek(position);
 
-        public void CancelAllTasks() =>
-            cancellationTokenSource?.Cancel();
-
-        public void UpdateStoryBoardAsync(Action onComplete = null)
+        private void cancelAllTasks()
         {
-            CancelAllTasks();
-            State.Value = StoryboardState.Loading;
+            if (loadTask != null)
+            {
+                var b = currentStoryboard;
+                loadTask?.ContinueWith(_ => b?.Expire());
+            }
+        }
+
+        public void UpdateStoryBoardAsync(WorkingBeatmap b)
+        {
+            cancelAllTasks();
+            currentBeatmap = b;
+            State.Value = StoryboardState.Waiting;
             sbLoaded.Value = false;
             NeedToHideTriangles.Value = false;
             StoryboardReplacesBackground.Value = false;
-            nextStoryboard = null;
-            this.onComplete = onComplete;
-
-            cancellationTokenSource = new CancellationTokenSource();
 
             storyboardClock.IsCoupled = false;
             storyboardClock.Stop();
 
-            foreach (var item in this)
-                item.Cleanup(duration);
-
-            if (!enableSb.Value || b == null)
+            if (!enableSb.Value)
             {
                 State.Value = StoryboardState.NotLoaded;
                 return;
@@ -149,33 +155,25 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
             Task.Run(async () =>
             {
-                nextStoryboard = new BackgroundStoryboard(b.Value, b.Value.Skin)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RunningClock = storyboardClock = new StoryboardClock(),
-                    Alpha = 0.1f,
-                    OnStoryboardReadyAction = () =>
-                    {
-                        sbLoaded.Value = true;
-                        State.Value = StoryboardState.Success;
-                        NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
+                var task = Task.Run(() => prepareStoryboard(currentBeatmap));
 
-                        enableSb.TriggerChange();
-                        onComplete?.Invoke();
-                        onComplete = null;
-                    }
-                };
+                await task;
+            });
+        }
 
-                loadTask = Task.Run(() => LoadStoryboardFor(b.Value), cancellationTokenSource.Token);
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
 
-                await loadTask;
-            }, cancellationTokenSource.Token);
+            if (isDisposing)
+                cancelAllTasks();
         }
     }
 
     public enum StoryboardState
     {
         NotLoaded,
+        Waiting,
         Loading,
         Failed,
         Success
