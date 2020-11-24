@@ -135,14 +135,14 @@ namespace osu.Game.Screens.Import
                                                     {
                                                         new TriangleButton
                                                         {
-															Text = "Import",
-															Anchor = Anchor.BottomCentre,
-															Origin = Anchor.BottomCentre,
-															RelativeSizeAxes = Axes.X,
-															Height = 50,
-															Width = 0.9f,
-															Action = () =>
-															{
+                                                            Text = "Import",
+                                                            Anchor = Anchor.BottomCentre,
+                                                            Origin = Anchor.BottomCentre,
+                                                            RelativeSizeAxes = Axes.X,
+                                                            Height = 50,
+                                                            Width = 0.9f,
+                                                            Action = () =>
+                                                            {
                                                                 var d = currentFile.Value?.FullName;
                                                                 if (d != null)
                                                                     startImport(d);
