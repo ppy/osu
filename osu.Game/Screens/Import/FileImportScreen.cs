@@ -10,7 +10,6 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
-using osu.Game.Overlays.Settings;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Graphics.UserInterface;
@@ -27,12 +26,11 @@ namespace osu.Game.Screens.Import
 
         public override bool HideOverlaysOnEnter => true;
 
-        private string[] fileExtensions = { ".foo" };
+        private readonly string[] fileExtensions = { ".osk", ".osz", ".osr" };
         private string defaultPath;
 
         private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
         private readonly IBindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
-        private readonly Bindable<FileFilterType> filterType = new Bindable<FileFilterType>();
         private TextFlowContainer currentFileText;
         private OsuScrollContainer fileNameScroll;
         private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
@@ -83,126 +81,69 @@ namespace osu.Game.Screens.Import
                         CornerRadius = 10,
                         Children = new Drawable[]
                         {
+                            new Box
+                            {
+                                Colour = overlayColourProvider.Background3,
+                                RelativeSizeAxes = Axes.Both
+                            },
+                            fileNameScroll = new OsuScrollContainer
+                            {
+                                Masking = false,
+                                RelativeSizeAxes = Axes.Both,
+                                Child = currentFileText = new TextFlowContainer(t => t.Font = OsuFont.Default.With(size: 30))
+                                {
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    TextAnchor = Anchor.Centre
+                                },
+                            },
                             new GridContainer
                             {
-                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                                Margin = new MarginPadding { Bottom = 15 },
                                 RowDimensions = new[]
                                 {
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize)
                                 },
                                 Content = new[]
                                 {
                                     new Drawable[]
                                     {
-                                        new Container
+                                        new TriangleButton
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
-                                            Children = new Drawable[]
-                                            {
-                                                new Box
-                                                {
-                                                    Colour = overlayColourProvider.Background3,
-                                                    RelativeSizeAxes = Axes.Both
-                                                },
-                                                fileNameScroll = new OsuScrollContainer
-                                                {
-                                                    Masking = false,
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Child = currentFileText = new TextFlowContainer(t => t.Font = OsuFont.Default.With(size: 30))
-                                                    {
-                                                        AutoSizeAxes = Axes.Y,
-                                                        RelativeSizeAxes = Axes.X,
-                                                        Anchor = Anchor.Centre,
-                                                        Origin = Anchor.Centre,
-                                                        TextAnchor = Anchor.Centre
-                                                    },
-                                                },
-                                            }
-                                        },
-                                    },
-                                    new Drawable[]
-                                    {
-                                        new Container
-                                        {
+                                            Anchor = Anchor.BottomCentre,
+                                            Origin = Anchor.BottomCentre,
                                             RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Children = new Drawable[]
+                                            Height = 50,
+                                            Width = 0.9f,
+                                            Text = "刷新文件列表",
+                                            Action = refresh
+                                        },
+                                        new TriangleButton
+                                        {
+                                            Text = "导入该文件",
+                                            Anchor = Anchor.BottomCentre,
+                                            Origin = Anchor.BottomCentre,
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 50,
+                                            Width = 0.9f,
+                                            Action = () =>
                                             {
-                                                new Box
-                                                {
-                                                    Colour = overlayColourProvider.Background4,
-                                                    RelativeSizeAxes = Axes.Both
-                                                },
-                                                new FillFlowContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Spacing = new Vector2(10),
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new SettingsEnumDropdown<FileFilterType>
-                                                        {
-                                                            Anchor = Anchor.BottomCentre,
-                                                            Origin = Anchor.BottomCentre,
-                                                            LabelText = "文件类型",
-                                                            Current = config.GetBindable<FileFilterType>(MfSetting.FileFilter),
-                                                            Margin = new MarginPadding { Bottom = 15 }
-                                                        },
-                                                        new GridContainer
-                                                        {
-                                                            Anchor = Anchor.BottomCentre,
-                                                            Origin = Anchor.BottomCentre,
-                                                            AutoSizeAxes = Axes.Y,
-                                                            RelativeSizeAxes = Axes.X,
-                                                            Margin = new MarginPadding { Top = 15 },
-                                                            RowDimensions = new[]
-                                                            {
-                                                                new Dimension(GridSizeMode.AutoSize)
-                                                            },
-                                                            Content = new[]
-                                                            {
-                                                                new Drawable[]
-                                                                {
-                                                                    new TriangleButton
-                                                                    {
-                                                                        Anchor = Anchor.BottomCentre,
-                                                                        Origin = Anchor.BottomCentre,
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Height = 50,
-                                                                        Width = 0.9f,
-                                                                        Text = "刷新文件列表",
-                                                                        Action = refresh
-                                                                    },
-                                                                    new TriangleButton
-                                                                    {
-                                                                        Text = "导入该文件",
-                                                                        Anchor = Anchor.BottomCentre,
-                                                                        Origin = Anchor.BottomCentre,
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Height = 50,
-                                                                        Width = 0.9f,
-                                                                        Action = () =>
-                                                                        {
-                                                                            var d = currentFile.Value?.FullName;
-                                                                            if (d != null)
-                                                                                startImport(d);
-                                                                            else
-                                                                                currentFileText.FlashColour(Color4.Red, 500);
-                                                                        },
-                                                                    }
-                                                                },
-                                                            }
-                                                        },
-                                                    }
-                                                },
-                                            }
+                                                var d = currentFile.Value?.FullName;
+                                                if (d != null)
+                                                    startImport(d);
+                                                else
+                                                    currentFileText.FlashColour(Color4.Red, 500);
+                                            },
                                         }
-                                    }
+                                    },
                                 }
-                            },
+                            }
                         }
                     }
                 }
@@ -211,38 +152,11 @@ namespace osu.Game.Screens.Import
             fileNameScroll.ScrollContent.Anchor = Anchor.Centre;
             fileNameScroll.ScrollContent.Origin = Anchor.Centre;
 
-            config.BindWith(MfSetting.FileFilter, filterType);
-
             currentFile.BindValueChanged(updateFileSelectionText, true);
             currentDirectory.BindValueChanged(_ =>
             {
                 currentFile.Value = null;
             });
-
-            filterType.BindValueChanged(OnFilterTypeChanged, true);
-        }
-
-        private void OnFilterTypeChanged(ValueChangedEvent<FileFilterType> v)
-        {
-            switch (v.NewValue)
-            {
-                case FileFilterType.Beatmap:
-                    fileExtensions = new string[] { ".osz" };
-                    break;
-
-                case FileFilterType.Skin:
-                    fileExtensions = new string[] { ".osk" };
-                    break;
-
-                case FileFilterType.Replay:
-                    fileExtensions = new string[] { ".osr" };
-                    break;
-
-                default:
-                case FileFilterType.All:
-                    fileExtensions = new string[] { ".osk", ".osr", ".osz" };
-                    break;
-            }
 
             refresh();
         }
