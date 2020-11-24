@@ -129,10 +129,10 @@ namespace osu.Game.Rulesets.UI
 
             drawableMap.Remove(entry);
 
+            HitObjectUsageFinished?.Invoke(drawable);
+
             unbindStartTime(drawable);
             RemoveInternal(drawable);
-
-            HitObjectUsageFinished?.Invoke(drawable);
         }
 
         #endregion
