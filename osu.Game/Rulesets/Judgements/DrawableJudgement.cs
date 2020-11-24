@@ -168,8 +168,6 @@ namespace osu.Game.Rulesets.Judgements
 
         private void prepareDrawables()
         {
-            Logger.Log("prepareDrawables on DrawableJudgement");
-
             var type = Result?.Type ?? HitResult.Perfect; //TODO: better default type from ruleset
 
             // todo: this should be removed once judgements are always pooled.
