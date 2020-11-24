@@ -69,6 +69,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
+            new KeyBinding(InputKey.Space, GlobalAction.PauseReplay),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
@@ -175,7 +176,7 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle notifications")]
         ToggleNotifications,
 
-        [Description("Pause")]
+        [Description("Pause Gameplay")]
         PauseGameplay,
 
         // Editor
@@ -196,5 +197,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Random Skin")]
         RandomSkin,
+
+        [Description("Pause Replay")]
+        PauseReplay,
     }
 }
