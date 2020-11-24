@@ -91,8 +91,8 @@ namespace osu.Game.Rulesets.UI
             {
                 h.NewResult += (d, r) => NewResult?.Invoke(d, r);
                 h.RevertResult += (d, r) => RevertResult?.Invoke(d, r);
-                h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
-                h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
+                h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o.HitObject);
+                h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o.HitObject);
             }));
         }
 

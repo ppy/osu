@@ -17,11 +17,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        // If a hit object is not in this set, the position and the size should be updated when the hit object becomes alive.
-        private readonly HashSet<DrawableHitObject> layoutComputedHitObjects = new HashSet<DrawableHitObject>();
+        // Tracks all `DrawableHitObject` (nested or not) applied a `HitObject`.
+        // It dynamically changes based on approximate lifetime when a pooling is used.
+        private readonly HashSet<DrawableHitObject> hitObjectApplied = new HashSet<DrawableHitObject>();
 
-        // Used to recompute all lifetime when `layoutCache` becomes invalid
-        private readonly HashSet<DrawableHitObject> allHitObjects = new HashSet<DrawableHitObject>();
+        // The lifetime of a hit object in this will be computed in next update.
+        private readonly HashSet<DrawableHitObject> toComputeLifetime = new HashSet<DrawableHitObject>();
+
+        // The layout (length if IHasDuration, and nested object positions) of a hit object *not* in this set will be computed in next updated.
+        // Only objects in `AliveObjects` are considered, to prevent a massive recomputation when scrolling speed or something changes.
+        private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
@@ -34,6 +39,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             RelativeSizeAxes = Axes.Both;
 
             AddLayout(layoutCache);
+
+            HitObjectUsageBegan += onHitObjectUsageBegin;
+            HitObjectUsageFinished += onHitObjectUsageFinished;
         }
 
         [BackgroundDependencyLoader]
@@ -50,7 +58,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.Clear(disposeChildren);
 
-            layoutComputedHitObjects.Clear();
+            hitObjectApplied.Clear();
+            toComputeLifetime.Clear();
+            layoutComputed.Clear();
         }
 
         /// <summary>
@@ -145,21 +155,20 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        /// <summary>
-        /// Invalidate the cache of the layout of this hit object.
-        /// </summary>
-        public void InvalidateDrawableHitObject(DrawableHitObject hitObject)
+        private void onHitObjectUsageBegin(DrawableHitObject hitObject)
         {
-            // Lifetime computation is delayed to the next update because `scrollLength` may not be valid here.
-            // Layout computation will be delayed to when the object becomes alive.
-            // An assumption is that a hit object layout update (setting `Height` or `Width`) won't affect its lifetime but
-            // this is satisfied in practice because otherwise the hit object won't be aligned to its `StartTime`.
+            // Lifetime computation is delayed until next update because
+            // when the hit object is not pooled this container is not loaded here and `scrollLength` cannot be computed.
+            hitObjectApplied.Add(hitObject);
+            toComputeLifetime.Add(hitObject);
+            layoutComputed.Remove(hitObject);
+        }
 
-            layoutCache.Invalidate();
-
-            allHitObjects.Add(hitObject);
-
-            layoutComputedHitObjects.Remove(hitObject);
+        private void onHitObjectUsageFinished(DrawableHitObject hitObject)
+        {
+            hitObjectApplied.Remove(hitObject);
+            toComputeLifetime.Remove(hitObject);
+            layoutComputed.Remove(hitObject);
         }
 
         private float scrollLength;
@@ -170,11 +179,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (!layoutCache.IsValid)
             {
-                // this.Objects cannot be used as it doesn't contain nested objects
-                foreach (var hitObject in allHitObjects)
-                    hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
+                foreach (var hitObject in hitObjectApplied)
+                    toComputeLifetime.Add(hitObject);
 
-                layoutComputedHitObjects.Clear();
+                layoutComputed.Clear();
 
                 scrollingInfo.Algorithm.Reset();
 
@@ -193,14 +201,21 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 layoutCache.Validate();
             }
 
+            foreach (var hitObject in toComputeLifetime)
+                hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
+
+            toComputeLifetime.Clear();
+
+            // An assumption is that this update won't affect lifetime,
+            // but this is satisfied in practice because otherwise the hit object won't be aligned to its `StartTime`.
             foreach (var obj in AliveObjects)
             {
-                if (layoutComputedHitObjects.Contains(obj))
+                if (layoutComputed.Contains(obj))
                     continue;
 
                 updateLayoutRecursive(obj);
 
-                layoutComputedHitObjects.Add(obj);
+                layoutComputed.Add(obj);
             }
         }
 
