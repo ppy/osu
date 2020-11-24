@@ -28,9 +28,7 @@ namespace osu.Game.Screens.Import
 
         public override bool HideOverlaysOnEnter => true;
 
-        private string[] fileExtensions;
         private string defaultPath;
-
         private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
         private readonly IBindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
         private TextFlowContainer currentFileText;
@@ -45,7 +43,7 @@ namespace osu.Game.Screens.Import
         {
             storage.GetStorageForDirectory("imports");
             var originalPath = storage.GetFullPath("imports", true);
-            fileExtensions = new string[] { ".osk", ".osr", ".osz" };
+            string[] fileExtensions = { ".osk", ".osr", ".osz" };
             defaultPath = originalPath;
 
             InternalChild = contentContainer = new Container
@@ -126,7 +124,7 @@ namespace osu.Game.Screens.Import
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Margin = new MarginPadding { Bottom = 15, Top =15 },
+                                            Margin = new MarginPadding { Bottom = 15, Top =15 } ,
                                             Children = new Drawable[]
                                             {
                                                 new FillFlowContainer
@@ -135,21 +133,21 @@ namespace osu.Game.Screens.Import
                                                     AutoSizeAxes = Axes.Y,
                                                     Children = new Drawable[]
                                                     {
-                                                            new TriangleButton
-                                                            {
-                                                                Text = "Import",
-                                                                Anchor = Anchor.BottomCentre,
-                                                                Origin = Anchor.BottomCentre,
-                                                                RelativeSizeAxes = Axes.X,
-                                                                Height = 50,
-                                                                Width = 0.9f,
-                                                                Action = () =>
-                                                                {
-                                                                    var d = currentFile.Value?.FullName;
-                                                                    if (d != null)
-                                                                        startImport(d);
-                                                                    else
-                                                                        currentFileText.FlashColour(Color4.Red, 500);
+                                                        new TriangleButton
+                                                        {
+															Text = "Import",
+															Anchor = Anchor.BottomCentre,
+															Origin = Anchor.BottomCentre,
+															RelativeSizeAxes = Axes.X,
+															Height = 50,
+															Width = 0.9f,
+															Action = () =>
+															{
+                                                                var d = currentFile.Value?.FullName;
+                                                                if (d != null)
+                                                                    startImport(d);
+                                                                else
+                                                                    currentFileText.FlashColour(Color4.Red, 500);
                                                                 }
                                                             }
                                                     }
@@ -187,6 +185,7 @@ namespace osu.Game.Screens.Import
 
             fileSelectContainer.Add(fileSelector);
         }
+
         private void updateFileSelectionText(ValueChangedEvent<FileInfo> v)
         {
             currentFileText.Text = v.NewValue?.Name ?? "Select a file";
