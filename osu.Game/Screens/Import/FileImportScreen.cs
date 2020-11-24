@@ -228,13 +228,5 @@ namespace osu.Game.Screens.Import
 
             Task.Factory.StartNew(() => gameBase.Import(paths), TaskCreationOptions.LongRunning);
         }
-
-        public enum FileFilterType
-        {
-            Skin,
-            Beatmap,
-            Replay,
-            All
-        }
     }
 }
