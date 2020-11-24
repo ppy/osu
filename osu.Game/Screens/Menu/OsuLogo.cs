@@ -81,6 +81,8 @@ namespace osu.Game.Screens.Menu
             set => rippleContainer.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint);
         }
 
+        private const float visualizer_default_alpha = 0.5f;
+
         private readonly Box flashLayer;
 
         private readonly Container impactContainer;
@@ -144,7 +146,7 @@ namespace osu.Game.Screens.Menu
                                                     RelativeSizeAxes = Axes.Both,
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
-                                                    Alpha = 0.5f,
+                                                    Alpha = visualizer_default_alpha,
                                                     Size = new Vector2(0.96f)
                                                 },
                                                 new Container
@@ -282,8 +284,7 @@ namespace osu.Game.Screens.Menu
                 this.Delay(early_activation).Schedule(() => sampleBeat.Play());
 
             logoBeatContainer
-                .ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, Easing.Out)
-                .Then()
+                .ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, Easing.Out).Then()
                 .ScaleTo(1, beatLength * 2, Easing.OutQuint);
 
             ripple.ClearTransforms();
@@ -296,15 +297,13 @@ namespace osu.Game.Screens.Menu
             {
                 flashLayer.ClearTransforms();
                 flashLayer
-                    .FadeTo(0.2f * amplitudeAdjust, early_activation, Easing.Out)
-                    .Then()
+                    .FadeTo(0.2f * amplitudeAdjust, early_activation, Easing.Out).Then()
                     .FadeOut(beatLength);
 
                 visualizer.ClearTransforms();
                 visualizer
-                    .FadeTo(0.9f * amplitudeAdjust, early_activation, Easing.Out)
-                    .Then()
-                    .FadeTo(0.5f, beatLength);
+                    .FadeTo(visualizer_default_alpha * 1.8f * amplitudeAdjust, early_activation, Easing.Out).Then()
+                    .FadeTo(visualizer_default_alpha, beatLength);
             }
         }
 
