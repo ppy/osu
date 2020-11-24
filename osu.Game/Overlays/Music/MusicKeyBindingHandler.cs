@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.OSD;
 
@@ -72,9 +73,18 @@ namespace osu.Game.Overlays.Music
 
         private class MusicActionToast : Toast
         {
+            private readonly GlobalAction action;
+
             public MusicActionToast(string value, GlobalAction action)
-                : base("Music Playback", value, action: action)
+                : base("Music Playback", value, string.Empty)
             {
+                this.action = action;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                ShortcutText.Text = config.LookupKeyBindings(action).ToUpperInvariant();
             }
         }
     }
