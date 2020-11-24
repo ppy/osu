@@ -6,9 +6,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens.Mvis.SideBar;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Modules.v2
+namespace osu.Game.Screens.Mvis.Collections.Interface
 {
     public class CollectionSelectPanel : CompositeDrawable, ISidebarContent
     {

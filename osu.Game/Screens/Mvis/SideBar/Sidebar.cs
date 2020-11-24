@@ -7,9 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Mvis.Modules;
-using osu.Game.Screens.Mvis.Modules.Skinning;
 using osu.Game.Screens.Mvis.SideBar.Header;
+using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 using osuTK;
 

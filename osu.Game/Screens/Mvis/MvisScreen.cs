@@ -32,11 +32,12 @@ using osuTK.Input;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics;
 using osu.Framework;
+using osu.Game.Screens.Mvis.Collections;
+using osu.Game.Screens.Mvis.Collections.Interface;
 using osu.Game.Users;
-using osu.Game.Screens.Mvis.Modules;
-using osu.Game.Screens.Mvis.Modules.Skinning;
-using osu.Game.Screens.Mvis.Modules.v2;
 using osu.Game.Screens.Mvis.Objects;
+using osu.Game.Screens.Mvis.SideBar;
+using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 using Sidebar = osu.Game.Screens.Mvis.SideBar.Sidebar;
 

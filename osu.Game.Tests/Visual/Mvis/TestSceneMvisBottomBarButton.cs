@@ -3,8 +3,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
-using osu.Game.Screens.Mvis.Modules;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Mvis

@@ -1,6 +1,6 @@
 using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Screens.Mvis.Modules
+namespace osu.Game.Screens.Mvis.SideBar
 {
     public class SidebarSettingsScrollContainer : OsuScrollContainer, ISidebarContent
     {

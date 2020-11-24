@@ -8,7 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
 
-namespace osu.Game.Screens.Mvis.Modules
+namespace osu.Game.Screens.Mvis.Collections
 {
     public class CollectionHelper : Component
     {

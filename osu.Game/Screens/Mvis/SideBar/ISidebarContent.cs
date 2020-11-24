@@ -1,4 +1,4 @@
-namespace osu.Game.Screens.Mvis.Modules
+namespace osu.Game.Screens.Mvis.SideBar
 {
     public interface ISidebarContent
     {

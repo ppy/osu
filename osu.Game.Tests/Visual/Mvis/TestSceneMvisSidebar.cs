@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Modules;
+using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.SideBar;
 using osuTK;
 

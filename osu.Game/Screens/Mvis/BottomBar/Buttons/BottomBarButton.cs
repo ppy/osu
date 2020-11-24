@@ -10,7 +10,6 @@ using osuTK;
 using osu.Framework.Graphics.Containers;
 using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Modules;
 using osu.Game.Configuration;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Extensions.Color4Extensions;

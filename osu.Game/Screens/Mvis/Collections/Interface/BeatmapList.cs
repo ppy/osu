@@ -11,11 +11,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Mvis.Modules.Skinning;
+using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Modules.v2
+namespace osu.Game.Screens.Mvis.Collections.Interface
 {
     public class BeatmapList : CompositeDrawable
     {
@@ -43,7 +43,6 @@ namespace osu.Game.Screens.Mvis.Modules.v2
 
         public BeatmapList(List<BeatmapSetInfo> set)
         {
-            Padding = new MarginPadding { Vertical = 10 };
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
 
@@ -65,7 +64,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                     Child = fillFlow = new FillFlowContainer
                     {
                         Padding = new MarginPadding { Horizontal = 35 },
-                        Margin = new MarginPadding { Vertical = 20 },
+                        Margin = new MarginPadding { Vertical = 30 },
                         Spacing = new Vector2(5),
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -194,10 +193,10 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             }
             else
             {
-                //列表顶部多出的20像素(?)会导致原有的滚动距离比实际需要的短从而造成没有滚动到正确位置的问题
-                //因此在后面加20确保列表能正确滚动，将(index-1)处的beatmapPiece显示在顶部
+                //列表顶部多出的30像素(?)会导致原有的滚动距离比实际需要的短从而造成没有滚动到正确位置的问题
+                //因此在后面加30确保列表能正确滚动，将(index-1)处的beatmapPiece显示在顶部
                 //滚动到(index-1)能让用户知道当前播放的不是列表中的第一首歌曲
-                float distance = (index - 1) * 85 + 20;
+                float distance = (index - 1) * 85 + 30;
 
                 //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
                 //n个piece, n-1个间隔

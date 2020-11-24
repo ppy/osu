@@ -4,8 +4,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Screens.Mvis.Modules;
-using osu.Game.Screens.Mvis.Modules.Skinning;
+using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.SideBar.Footer

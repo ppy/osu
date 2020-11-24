@@ -14,11 +14,11 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis.Modules.Skinning;
+using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Modules.v2
+namespace osu.Game.Screens.Mvis.Collections.Interface
 {
     public class CollectionInfo : CompositeDrawable
     {

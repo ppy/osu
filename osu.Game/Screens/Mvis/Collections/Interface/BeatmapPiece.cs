@@ -16,7 +16,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
-namespace osu.Game.Screens.Mvis.Modules.v2
+namespace osu.Game.Screens.Mvis.Collections.Interface
 {
     public class BeatmapPiece : CompositeDrawable
     {

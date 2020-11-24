@@ -1,7 +1,7 @@
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 
-namespace osu.Game.Screens.Mvis.Modules.v2
+namespace osu.Game.Screens.Mvis.Collections.Interface
 {
     public class TooltipContainer : Container, IHasTooltip
     {

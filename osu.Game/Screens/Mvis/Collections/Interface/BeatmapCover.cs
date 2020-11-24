@@ -1,16 +1,16 @@
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using System.Threading;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Colour;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Beatmaps;
 using osu.Game.Screens.Mvis.Objects;
 
-namespace osu.Game.Screens.Mvis.Modules.v2
+namespace osu.Game.Screens.Mvis.Collections.Interface
 {
     public class BeatmapCover : CompositeDrawable
     {

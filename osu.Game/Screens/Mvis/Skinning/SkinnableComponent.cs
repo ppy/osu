@@ -6,7 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
 
-namespace osu.Game.Screens.Mvis.Modules.Skinning
+namespace osu.Game.Screens.Mvis.Skinning
 {
     public class SkinnableComponent : SkinnableDrawable
     {
