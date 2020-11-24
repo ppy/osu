@@ -13,11 +13,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public abstract class PalpableDrawableCatchHitObject : DrawableCatchHitObject
+    public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject
     {
         protected Container ScaleContainer { get; private set; }
 
-        protected PalpableDrawableCatchHitObject(CatchHitObject hitObject)
+        protected DrawablePalpableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
             Origin = Anchor.Centre;
