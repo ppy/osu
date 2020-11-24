@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 var first = (OsuHitObject)objects.First();
                 var second = (OsuHitObject)objects.Last();
 
-                return first.Position == second.Position;
+                return Precision.AlmostEquals(first.EndPosition, second.Position);
             });
         }
 
