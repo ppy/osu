@@ -452,7 +452,6 @@ namespace osu.Game.Overlays
 
                     break;
             }
-            
             CheckIsLoggedIn();
         }
 

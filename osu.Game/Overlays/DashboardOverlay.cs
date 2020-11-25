@@ -166,7 +166,6 @@ namespace osu.Game.Overlays
                 placeholderContainer.Show();
                 loading.Hide();
             }
-            
             if (State.Value == Visibility.Hidden)
                 return;
 
