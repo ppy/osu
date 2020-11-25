@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableBananaShower : DrawableCatchHitObject<BananaShower>
+    public class DrawableBananaShower : DrawableCatchHitObject
     {
         private readonly Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation;
         private readonly Container bananaContainer;
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             switch (hitObject)
             {
                 case Banana banana:
-                    return createDrawableRepresentation?.Invoke(banana)?.With(o => ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
+                    return createDrawableRepresentation?.Invoke(banana);
             }
 
             return base.CreateNestedHitObject(hitObject);
