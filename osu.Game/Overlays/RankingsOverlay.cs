@@ -249,7 +249,6 @@ namespace osu.Game.Overlays
                 loading.Hide();
                 contentContainer.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
-
         }
 
         protected override void Dispose(bool isDisposing)
