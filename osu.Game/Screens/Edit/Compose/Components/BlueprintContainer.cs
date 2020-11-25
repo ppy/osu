@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Button == MouseButton.Right)
                 return false;
 
-            if (movementBlueprint != null)
+            if (movementBlueprints != null)
             {
                 isDraggingBlueprint = true;
                 changeHandler?.BeginChange();
@@ -299,7 +299,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             SelectionBlueprints.Remove(blueprint);
 
-            if (movementBlueprint == blueprint)
+            if (movementBlueprints?.Contains(blueprint) == true)
                 finishSelectionMovement();
 
             OnBlueprintRemoved(hitObject);
@@ -425,7 +425,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region Selection Movement
 
         private Vector2[] movementBlueprintOriginalPositions;
-        private SelectionBlueprint movementBlueprint;
+        private SelectionBlueprint[] movementBlueprints;
         private bool isDraggingBlueprint;
 
         /// <summary>
@@ -442,9 +442,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
-            var orderedSelection = SelectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime);
-            movementBlueprint = orderedSelection.First();
-            movementBlueprintOriginalPositions = orderedSelection.Select(m => m.ScreenSpaceSelectionPoint).ToArray();
+            movementBlueprints = SelectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).ToArray();
+            movementBlueprintOriginalPositions = movementBlueprints.Select(m => m.ScreenSpaceSelectionPoint).ToArray();
         }
 
         /// <summary>
@@ -454,7 +453,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a movement was active.</returns>
         private bool moveCurrentSelection(DragEvent e)
         {
-            if (movementBlueprint == null)
+            if (movementBlueprints == null)
                 return false;
 
             if (snapProvider == null)
@@ -474,7 +473,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (positionalResult.ScreenSpacePosition == testPosition) continue;
 
                 // attempt to move the objects, and abort any time based snapping if we can.
-                if (SelectionHandler.HandleMovement(new MoveSelectionEvent(SelectionHandler.SelectedBlueprints.ElementAt(i), positionalResult.ScreenSpacePosition)))
+                if (SelectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprints[i], positionalResult.ScreenSpacePosition)))
                     return true;
             }
 
@@ -488,13 +487,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var result = snapProvider.SnapScreenSpacePositionToValidTime(movePosition);
 
             // Move the hitobjects.
-            if (!SelectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, result.ScreenSpacePosition)))
+            if (!SelectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprints.First(), result.ScreenSpacePosition)))
                 return true;
 
             if (result.Time.HasValue)
             {
                 // Apply the start time at the newly snapped-to position
-                double offset = result.Time.Value - movementBlueprint.HitObject.StartTime;
+                double offset = result.Time.Value - movementBlueprints.First().HitObject.StartTime;
 
                 foreach (HitObject obj in Beatmap.SelectedHitObjects)
                 {
@@ -512,11 +511,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a movement was active.</returns>
         private bool finishSelectionMovement()
         {
-            if (movementBlueprint == null)
+            if (movementBlueprints == null)
                 return false;
 
             movementBlueprintOriginalPositions = null;
-            movementBlueprint = null;
+            movementBlueprints = null;
 
             return true;
         }
