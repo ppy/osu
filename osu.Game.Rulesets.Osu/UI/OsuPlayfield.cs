@@ -176,6 +176,8 @@ namespace osu.Game.Rulesets.Osu.UI
             public OsuHitObjectLifetimeEntry(HitObject hitObject)
                 : base(hitObject)
             {
+                // Arbitrary lifetime end to prevent past objects in idle states remaining alive in non-frame-stable contexts.
+                LifetimeEnd = HitObject.GetEndTime() + HitObject.HitWindows.WindowFor(HitResult.Miss) + 1000;
             }
 
             protected override double InitialLifetimeOffset => ((OsuHitObject)HitObject).TimePreempt;
