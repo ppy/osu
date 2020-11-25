@@ -125,8 +125,8 @@ namespace osu.Game.Rulesets.Judgements
             prepareDrawables();
 
             // undo any transforms applies in ApplyMissAnimations/ApplyHitAnimations to get a sane initial state.
-            // ApplyTransformsAt(double.MinValue, true);
-            // ClearTransforms(true);
+            ApplyTransformsAt(double.MinValue, true);
+            ClearTransforms(true);
 
             LifetimeStart = Result.TimeAbsolute;
 
