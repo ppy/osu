@@ -164,6 +164,10 @@ namespace osu.Game.Overlays
                                 placeholderContainer = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat")
+                                    }
                                 }
                             }
                         },
@@ -200,9 +204,6 @@ namespace osu.Game.Overlays
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
-
-            errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
-            placeholderContainer.Child = errorPlaceholder;
             
             textbox.OnCommit += postMessage;
 
@@ -304,6 +305,7 @@ namespace osu.Game.Overlays
                     currentChannelContainer.Clear(false);
                     currentChannelContainer.Add(loaded);
                     currentChannelContainer.FadeIn(500, Easing.OutQuint);
+                    checkIsLoggedIn();
                 });
             }
             else
@@ -490,7 +492,6 @@ namespace osu.Game.Overlays
             //hide the chat and asks to log in if the user is not logged in
             if (this.api?.IsLoggedIn != true)
             {
-                this.errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
                 this.currentChannelContainer.Hide();
                 this.placeholderContainer.Show();
                 this.textbox.Hide();
@@ -505,7 +506,18 @@ namespace osu.Game.Overlays
 
         public void onlineStateChanged(ValueChangedEvent<APIState> state)
         {
-            checkIsLoggedIn();
+            if(state.NewValue == APIState.Online)
+            {
+                this.currentChannelContainer.Show();
+                this.placeholderContainer.Hide();
+                this.textbox.Show();
+            }
+            else if(state.NewValue == APIState.Offline)
+            {
+                this.currentChannelContainer.Hide();
+                this.placeholderContainer.Show();
+                this.textbox.Hide();
+            }
         }
 
         private class TabsArea : Container

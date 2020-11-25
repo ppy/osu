@@ -159,7 +159,15 @@ namespace osu.Game.Overlays
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            checkIsLoggedIn();
+            if(state.NewValue == APIState.Online)
+            {
+                this.placeholderContainer.Hide();
+            }
+            else if(state.NewValue == APIState.Offline)
+            {
+                this.placeholderContainer.Show();
+                loading.Hide();
+            }
             if (State.Value == Visibility.Hidden)
                 return;
 
@@ -170,21 +178,6 @@ namespace osu.Game.Overlays
         {
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
-        }
-
-        private void checkIsLoggedIn()
-        {
-            //ask to log in if the user is not logged in
-            if (api?.IsLoggedIn != true)
-            {
-                errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
-                //placeholderContainer.Child = errorPlaceholder;
-                placeholderContainer.Show();
-            }
-            else
-            {
-                placeholderContainer.Hide();
-            }
         }
     }
 }

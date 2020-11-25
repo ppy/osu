@@ -85,7 +85,11 @@ namespace osu.Game.Overlays
                                         Origin = Anchor.TopCentre,
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding { Bottom = 10, Top = 200}
+                                        Margin = new MarginPadding { Bottom = 10, Top = 200},
+                                        Children = new Drawable[]
+                                        {
+                                            errorPlaceholder = new LoginPlaceholder(@"Please sign in to view ranking leaderboards")
+                                        }
                                     }
                                 }
                             }
@@ -100,8 +104,6 @@ namespace osu.Game.Overlays
         {
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
-
-            placeholderContainer.Child = errorPlaceholder;
 
             background.Colour = ColourProvider.Background5;
         }
@@ -231,24 +233,6 @@ namespace osu.Game.Overlays
             return null;
         }
 
-        private void checkIsLoggedIn()
-        {
-            //ask to log in if the user is not logged in
-            if (api?.IsLoggedIn != true)
-            {
-                contentContainer.Hide();
-                errorPlaceholder = new LoginPlaceholder(@"Please sign in to view ranking leaderboards");
-                //placeholderContainer.Child = errorPlaceholder;
-                placeholderContainer.Show();
-                loading.Hide();
-            }
-            else
-            {
-                placeholderContainer.Hide();
-                contentContainer.Show();
-            }
-        }
-
         private void loadContent(Drawable content)
         {
             scrollFlow.ScrollToStart();
@@ -278,7 +262,17 @@ namespace osu.Game.Overlays
 
         public void onlineStateChanged(ValueChangedEvent<APIState> state)
         {
-            checkIsLoggedIn();
+            if(state.NewValue == APIState.Online)
+            {
+                this.contentContainer.Show();
+                this.placeholderContainer.Hide();
+            }
+            else if(state.NewValue == APIState.Offline)
+            {
+                this.contentContainer.Hide();
+                this.placeholderContainer.Show();
+                this.loading.Hide();
+            }
         }
     }
 }

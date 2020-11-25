@@ -111,7 +111,11 @@ namespace osu.Game.Overlays
                                         Origin = Anchor.TopCentre,
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding { Bottom = 10, Top = 200}
+                                        Margin = new MarginPadding { Bottom = 10, Top = 200},
+                                        Children = new Drawable[]
+                                        {
+                                            errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!")
+                                        }
                                     }
                                 }
                             },
@@ -123,9 +127,6 @@ namespace osu.Game.Overlays
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
 
-            errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!");
-            placeholderContainer.Child = errorPlaceholder;
-            checkIsLoggedIn();
         }
 
         private void onTypingStarted()
@@ -287,43 +288,25 @@ namespace osu.Game.Overlays
                 filterControl.FetchNextPage();
         }
 
-        private void checkIsLoggedIn()
-        {
-            //ask to log in if the user is not logged in
-            if (api?.IsLoggedIn != true)
-            {
-                errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!");
-                placeholderContainer.Show();
-                //placeholderContainer.Child = errorPlaceholder;
-               
-                panelTarget.Hide();
-            }
-            else
-            {
-                placeholderContainer.Hide();
-                panelTarget.Show();
-            }
-        }
+    
         public void onlineStateChanged(ValueChangedEvent<APIState> state)
         {
-            Console.WriteLine("onlinestatechanged");
+            //Console.WriteLine("onlinestatechanged");
             if(state.NewValue == APIState.Online)
             {
                 placeholderContainer.Hide();
                 panelTarget.Show();
-                Console.WriteLine("si online");
+                //Console.WriteLine("if online");
                 foundContent.Show();
             }
             else if(state.NewValue == APIState.Offline)
             {
-                errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!");
+                
                 placeholderContainer.Show();
-                //placeholderContainer.Child = errorPlaceholder;
-                Console.WriteLine("si offline");
+                //Console.WriteLine("if offline");
                 panelTarget.Hide();
                 foundContent.Hide();
             }
-            checkIsLoggedIn();
         }
     }
 }
