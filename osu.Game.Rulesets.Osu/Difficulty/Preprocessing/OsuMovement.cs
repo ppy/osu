@@ -399,7 +399,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Correction #14 - Sudden distance increase buff
             double distanceIncreaseBuff = 1;
-
+            /*
             if (objNeg2 != null)
             {
                 double dNeg2PrevOverlapNerf = Math.Min(1, Math.Pow(dNeg2Prev, 3));
@@ -408,7 +408,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double bpmScaling = Math.Max(1, -16 * tPrevCurr + 3.4);
                 distanceIncreaseBuff = 1 + 0.225 * bpmScaling * timeDifferenceNerf * dNeg2PrevOverlapNerf * Math.Max(0, distanceRatio - 2);
             }
-
+            */
             // Apply the corrections
             double dPrevCurrWithCorrection = dPrevCurrStackedNerf * (1 + smallCircleBonus) * (1 + correctionNeg2 + correctionNext + patternCorrection) *
                                        (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * bigJumpBuffFactor * (1 + correctionHidden) *
