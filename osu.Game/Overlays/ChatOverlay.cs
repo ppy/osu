@@ -45,10 +45,12 @@ namespace osu.Game.Overlays
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
-        private Placeholder errorPlaceholder;
         private Container placeholderContainer;
 
+        private Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
+
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -166,7 +168,7 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat")
+                                        errorPlaceholder
                                     }
                                 }
                             }
@@ -203,7 +205,7 @@ namespace osu.Game.Overlays
             };
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(onlineStateChanged, true);
+            apiState.BindValueChanged(OnlineStateChanged, true);
             textbox.OnCommit += postMessage;
 
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
@@ -237,7 +239,7 @@ namespace osu.Game.Overlays
             chatBackground.Colour = colours.ChatBlue;
 
             placeholderContainer.Show();
-            checkIsLoggedIn();
+            CheckIsLoggedIn();
 
             // This is a relatively expensive (and blocking) operation.
             // Scheduling it ensures that it won't be performed unless the user decides to open chat.
@@ -267,13 +269,13 @@ namespace osu.Game.Overlays
                 textbox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
                 ChannelSelectionOverlay.Show();
-                checkIsLoggedIn();
+                CheckIsLoggedIn();
                 return;
             }
 
             if (e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel)
             {
-                checkIsLoggedIn();
+                CheckIsLoggedIn();
                 return;
             }
 
@@ -295,7 +297,7 @@ namespace osu.Game.Overlays
                 {
                     if (currentChannel.Value != e.NewValue)
                     {
-                        checkIsLoggedIn();
+                        CheckIsLoggedIn();
                         return;
                     }
 
@@ -304,7 +306,7 @@ namespace osu.Game.Overlays
                     currentChannelContainer.Clear(false);
                     currentChannelContainer.Add(loaded);
                     currentChannelContainer.FadeIn(500, Easing.OutQuint);
-                    checkIsLoggedIn();
+                    CheckIsLoggedIn();
                 });
             }
             else
@@ -316,7 +318,7 @@ namespace osu.Game.Overlays
             // mark channel as read when channel switched
             if (e.NewValue.Messages.Any())
                 channelManager.MarkChannelAsRead(e.NewValue);
-            checkIsLoggedIn();
+            CheckIsLoggedIn();
         }
 
         private float startDragChatHeight;
@@ -400,7 +402,7 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            checkIsLoggedIn();
+            CheckIsLoggedIn();
             this.MoveToY(0, transition_length, Easing.OutQuint);
             this.FadeIn(transition_length, Easing.OutQuint);
 
@@ -411,7 +413,7 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            checkIsLoggedIn();
+            CheckIsLoggedIn();
             this.MoveToY(Height, transition_length, Easing.InSine);
             this.FadeOut(transition_length, Easing.InSine);
 
@@ -450,7 +452,7 @@ namespace osu.Game.Overlays
 
                     break;
             }
-            checkIsLoggedIn();
+            CheckIsLoggedIn();
         }
 
         private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -485,36 +487,36 @@ namespace osu.Game.Overlays
             textbox.Text = string.Empty;
         }
 
-        public void checkIsLoggedIn()
+        public void CheckIsLoggedIn()
         {
             //hide the chat and asks to log in if the user is not logged in
             if (this.api?.IsLoggedIn != true)
             {
-                this.currentChannelContainer.Hide();
-                this.placeholderContainer.Show();
-                this.textbox.Hide();
+                currentChannelContainer.Hide();
+                placeholderContainer.Show();
+                textbox.Hide();
             }
             else
             {
-                this.currentChannelContainer.Show();
-                this.placeholderContainer.Hide();
-                this.textbox.Show();
+                currentChannelContainer.Show();
+                placeholderContainer.Hide();
+                textbox.Show();
             }
         }
 
-        public void onlineStateChanged(ValueChangedEvent<APIState> state)
+        public void OnlineStateChanged(ValueChangedEvent<APIState> state)
         {
             if (state.NewValue == APIState.Online)
             {
-                this.currentChannelContainer.Show();
-                this.placeholderContainer.Hide();
-                this.textbox.Show();
+                currentChannelContainer.Show();
+                placeholderContainer.Hide();
+                textbox.Show();
             }
             else if (state.NewValue == APIState.Offline)
             {
-                this.currentChannelContainer.Hide();
-                this.placeholderContainer.Show();
-                this.textbox.Hide();
+                currentChannelContainer.Hide();
+                placeholderContainer.Show();
+                textbox.Hide();
             }
         }
 

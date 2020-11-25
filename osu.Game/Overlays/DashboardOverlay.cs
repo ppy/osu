@@ -24,10 +24,11 @@ namespace osu.Game.Overlays
         private LoadingLayer loading;
         private OverlayScrollContainer scrollFlow;
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [Resolved]
         private IAPIProvider api { get; set; }
         private Container placeholderContainer;
-        private Placeholder errorPlaceholder;
+        private Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
 
         public DashboardOverlay()
             : base(OverlayColourScheme.Purple, new DashboardOverlayHeader
@@ -75,16 +76,17 @@ namespace osu.Game.Overlays
                 loading = new LoadingLayer(content),
                 placeholderContainer = new Container
                 {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-                Margin = new MarginPadding { Bottom = 10, Top = 200}
-            }
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Margin = new MarginPadding { Bottom = 10, Top = 200 },
+                    Children = new Drawable[]
+                    {
+                        errorPlaceholder
+                    }
+                }
             };
-
-            errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
-            placeholderContainer.Child = errorPlaceholder;
         }
 
         protected override void LoadComplete()

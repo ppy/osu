@@ -31,10 +31,11 @@ namespace osu.Game.Overlays
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
-        private Placeholder errorPlaceholder;
         private Container placeholderContainer;
+        private Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the rankings!");
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays
                                         Margin = new MarginPadding { Bottom = 10, Top = 200},
                                         Children = new Drawable[]
                                         {
-                                            errorPlaceholder = new LoginPlaceholder(@"Please sign in to view ranking leaderboards")
+                                            errorPlaceholder
                                         }
                                     }
                                 }
@@ -263,14 +264,14 @@ namespace osu.Game.Overlays
         {
             if (state.NewValue == APIState.Online)
             {
-                this.contentContainer.Show();
-                this.placeholderContainer.Hide();
+                contentContainer.Show();
+                placeholderContainer.Hide();
             }
             else if (state.NewValue == APIState.Offline)
             {
-                this.contentContainer.Hide();
-                this.placeholderContainer.Show();
-                this.loading.Hide();
+                contentContainer.Hide();
+                placeholderContainer.Show();
+                loading.Hide();
             }
         }
     }

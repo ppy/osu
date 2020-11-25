@@ -42,10 +42,12 @@ namespace osu.Game.Overlays
         private OverlayScrollContainer resultScrollContainer;
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [Resolved]
         private IAPIProvider api { get; set; }
+
         private Container placeholderContainer;
-        private Placeholder errorPlaceholder;
+        private Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!");
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue, new BeatmapListingHeader())
@@ -111,10 +113,10 @@ namespace osu.Game.Overlays
                                         Origin = Anchor.TopCentre,
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding { Bottom = 10, Top = 200},
+                                        Margin = new MarginPadding { Bottom = 10, Top = 200 },
                                         Children = new Drawable[]
                                         {
-                                            errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!")
+                                            errorPlaceholder
                                         }
                                     }
                                 }
