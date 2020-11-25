@@ -102,7 +102,7 @@ namespace osu.Game.Overlays
                                         {
                                             foundContent = new FillFlowContainer<BeatmapPanel>(),
                                             notFoundContent = new NotFoundDrawable(),
-                                            loadingLayer = new LoadingLayer(panelTarget),  
+                                            loadingLayer = new LoadingLayer(panelTarget),
                                         }
                                     },
                                     placeholderContainer = new Container
@@ -126,7 +126,6 @@ namespace osu.Game.Overlays
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
-
         }
 
         private void onTypingStarted()
@@ -288,22 +287,17 @@ namespace osu.Game.Overlays
                 filterControl.FetchNextPage();
         }
 
-    
         public void onlineStateChanged(ValueChangedEvent<APIState> state)
         {
-            //Console.WriteLine("onlinestatechanged");
             if(state.NewValue == APIState.Online)
             {
                 placeholderContainer.Hide();
                 panelTarget.Show();
-                //Console.WriteLine("if online");
                 foundContent.Show();
             }
             else if(state.NewValue == APIState.Offline)
             {
-                
                 placeholderContainer.Show();
-                //Console.WriteLine("if offline");
                 panelTarget.Hide();
                 foundContent.Hide();
             }

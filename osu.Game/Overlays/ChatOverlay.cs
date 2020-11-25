@@ -204,7 +204,6 @@ namespace osu.Game.Overlays
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
-            
             textbox.OnCommit += postMessage;
 
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
@@ -317,7 +316,6 @@ namespace osu.Game.Overlays
             // mark channel as read when channel switched
             if (e.NewValue.Messages.Any())
                 channelManager.MarkChannelAsRead(e.NewValue);
-            
             checkIsLoggedIn();
         }
 

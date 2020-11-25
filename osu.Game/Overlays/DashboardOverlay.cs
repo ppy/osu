@@ -23,12 +23,9 @@ namespace osu.Game.Overlays
         private Container content;
         private LoadingLayer loading;
         private OverlayScrollContainer scrollFlow;
-        
-
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         [Resolved]
         private IAPIProvider api {get; set; }
-
         private Container placeholderContainer;
         private Placeholder errorPlaceholder;
 
@@ -87,7 +84,7 @@ namespace osu.Game.Overlays
             };
 
             errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
-            placeholderContainer.Child = errorPlaceholder; 
+            placeholderContainer.Child = errorPlaceholder;
         }
 
         protected override void LoadComplete()
@@ -160,9 +157,7 @@ namespace osu.Game.Overlays
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             if(state.NewValue == APIState.Online)
-            {
                 this.placeholderContainer.Hide();
-            }
             else if(state.NewValue == APIState.Offline)
             {
                 this.placeholderContainer.Show();
