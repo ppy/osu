@@ -6,6 +6,7 @@ using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Mvis.Storyboard
 {
+    [LongRunningLoad]
     public class BackgroundStoryboard : BeatmapSkinProvidingContainer
     {
         public StoryboardClock RunningClock;

@@ -11,8 +11,7 @@ using osu.Game.Overlays;
 namespace osu.Game.Screens.Mvis.Storyboard
 {
     ///<summary>
-    ///bug:
-    ///故事版会莫名奇妙地报个引用空对象错误
+    /// 负责故事版的异步加载功能
     ///</summary>
     public class BackgroundStoryBoardLoader : Container<BackgroundStoryboard>
     {
@@ -63,6 +62,14 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
         private void prepareStoryboard(WorkingBeatmap beatmap)
         {
+            cancelAllTasks();
+            sbLoaded.Value = false;
+            NeedToHideTriangles.Value = false;
+            StoryboardReplacesBackground.Value = false;
+
+            storyboardClock.IsCoupled = false;
+            storyboardClock.Stop();
+
             State.Value = StoryboardState.Loading;
 
             storyboardClock = new StoryboardClock();
@@ -124,14 +131,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
         public void UpdateStoryBoardAsync()
         {
-            cancelAllTasks();
-            sbLoaded.Value = false;
-            NeedToHideTriangles.Value = false;
-            StoryboardReplacesBackground.Value = false;
-
-            storyboardClock.IsCoupled = false;
-            storyboardClock.Stop();
-
             if (!enableSb.Value)
             {
                 State.Value = StoryboardState.NotLoaded;
