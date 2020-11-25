@@ -32,7 +32,8 @@ namespace osu.Game.Screens.Edit.Compose
             composer = ruleset?.CreateHitObjectComposer();
 
             // make the composer available to the timeline and other components in this screen.
-            dependencies.CacheAs(composer);
+            if (composer != null)
+                dependencies.CacheAs(composer);
 
             return dependencies;
         }
