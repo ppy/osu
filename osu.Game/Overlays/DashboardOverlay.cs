@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
         private OverlayScrollContainer scrollFlow;
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         [Resolved]
-        private IAPIProvider api {get; set; }
+        private IAPIProvider api { get; set; }
         private Container placeholderContainer;
         private Placeholder errorPlaceholder;
 
@@ -156,9 +156,9 @@ namespace osu.Game.Overlays
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            if(state.NewValue == APIState.Online)
+            if (state.NewValue == APIState.Online)
                 this.placeholderContainer.Hide();
-            else if(state.NewValue == APIState.Offline)
+            else if (state.NewValue == APIState.Offline)
             {
                 this.placeholderContainer.Show();
                 loading.Hide();

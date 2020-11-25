@@ -504,13 +504,13 @@ namespace osu.Game.Overlays
 
         public void onlineStateChanged(ValueChangedEvent<APIState> state)
         {
-            if(state.NewValue == APIState.Online)
+            if (state.NewValue == APIState.Online)
             {
                 this.currentChannelContainer.Show();
                 this.placeholderContainer.Hide();
                 this.textbox.Show();
             }
-            else if(state.NewValue == APIState.Offline)
+            else if (state.NewValue == APIState.Offline)
             {
                 this.currentChannelContainer.Hide();
                 this.placeholderContainer.Show();

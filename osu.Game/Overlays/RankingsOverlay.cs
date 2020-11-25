@@ -261,12 +261,12 @@ namespace osu.Game.Overlays
 
         public void onlineStateChanged(ValueChangedEvent<APIState> state)
         {
-            if(state.NewValue == APIState.Online)
+            if (state.NewValue == APIState.Online)
             {
                 this.contentContainer.Show();
                 this.placeholderContainer.Hide();
             }
-            else if(state.NewValue == APIState.Offline)
+            else if (state.NewValue == APIState.Offline)
             {
                 this.contentContainer.Hide();
                 this.placeholderContainer.Show();
