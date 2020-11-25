@@ -196,7 +196,7 @@ namespace osu.Game.Configuration
 
         public Func<int, string> LookupSkinName { private get; set; }
 
-        public Func<GlobalAction, string> LookupKeyBindings { private get; set; }
+        public Func<GlobalAction, string> LookupKeyBindings { get; set; }
     }
 
     public enum OsuSetting
