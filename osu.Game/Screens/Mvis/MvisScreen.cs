@@ -158,8 +158,7 @@ namespace osu.Game.Screens.Mvis
                             Name = "Gameplay Background Elements Container",
                             Children = new Drawable[]
                             {
-                                bgTriangles = new BgTrianglesContainer(),
-                                sbLoader = new BackgroundStoryBoardLoader()
+                                bgTriangles = new BgTrianglesContainer()
                             }
                         },
                         gameplayContent = new Container
@@ -486,13 +485,6 @@ namespace osu.Game.Screens.Mvis
                 }
             }, true);
 
-            //collectionHelper.CurrentCollection.BindValueChanged(_ =>
-            //{
-            //    if (PlayFromCollection.Value
-            //            && !collectionHelper.currentCollectionContains(Beatmap.Value))
-            //        collectionHelper.PlayFirstBeatmap();
-            //});
-
             isIdle.BindValueChanged(v =>
             {
                 if (v.NewValue) tryHideOverlays();
@@ -511,34 +503,6 @@ namespace osu.Game.Screens.Mvis
                 }
             }, true);
 
-            sbLoader.NeedToHideTriangles.BindValueChanged(updateBgTriangles, true);
-            sbLoader.State.BindValueChanged(v =>
-            {
-                switch (v.NewValue)
-                {
-                    case StoryboardState.Success:
-                    case StoryboardState.NotLoaded:
-                        loadingSpinner.Hide();
-                        break;
-
-                    case StoryboardState.Loading:
-                        loadingSpinner.Show();
-                        loadingSpinner.FadeColour(Color4.White, 300);
-                        break;
-
-                    case StoryboardState.Waiting:
-                        loadingSpinner.Show();
-                        loadingSpinner.FadeColour(Color4.Gray);
-                        break;
-
-                    case StoryboardState.Failed:
-                        loadingSpinner.Show();
-                        loadingSpinner.FadeColour(Colour4.Red, 300);
-                        break;
-                }
-            }, true);
-
-            sbLoader.StoryboardReplacesBackground.BindValueChanged(_ => applyBackgroundBrightness());
             inputManager = GetContainingInputManager();
 
             progressBar.OnSeek = seekTo;
@@ -587,7 +551,7 @@ namespace osu.Game.Screens.Mvis
         private void seekTo(double position)
         {
             musicController.SeekTo(position);
-            sbLoader.Seek(position);
+            sbLoader?.Seek(position);
         }
 
         protected override void Update()
@@ -896,7 +860,7 @@ namespace osu.Game.Screens.Mvis
             if (auto)
             {
                 Background?.FadeColour(
-                    sbLoader.StoryboardReplacesBackground.Value ? Color4.Black : OsuColour.Gray(overlaysHidden ? idleBgDim.Value : 0.6f),
+                    (sbLoader?.StoryboardReplacesBackground.Value ?? false) ? Color4.Black : OsuColour.Gray(overlaysHidden ? idleBgDim.Value : 0.6f),
                     duration,
                     Easing.OutQuint);
             }
@@ -920,10 +884,42 @@ namespace osu.Game.Screens.Mvis
             });
 
             if (beatmap != prevBeatmap)
-                sbLoader.UpdateStoryBoardAsync(beatmap);
+            {
+                sbLoader?.FadeOut(BackgroundStoryBoardLoader.STORYBOARD_FADEOUT_DURATION, Easing.OutQuint).Expire();
+                sbLoader = null;
+                gameplayBackground.Add(sbLoader = new BackgroundStoryBoardLoader(beatmap));
+                reBind();
+            }
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;
+        }
+
+        private void reBind()
+        {
+            sbLoader.NeedToHideTriangles.BindValueChanged(updateBgTriangles, true);
+            sbLoader.State.BindValueChanged(v =>
+            {
+                switch (v.NewValue)
+                {
+                    case StoryboardState.Success:
+                    case StoryboardState.NotLoaded:
+                        loadingSpinner.Hide();
+                        break;
+
+                    case StoryboardState.Loading:
+                        loadingSpinner.Show();
+                        loadingSpinner.FadeColour(Color4.White, 300);
+                        break;
+
+                    case StoryboardState.Failed:
+                        loadingSpinner.Show();
+                        loadingSpinner.FadeColour(Colour4.Red, 300);
+                        break;
+                }
+            }, true);
+
+            sbLoader.StoryboardReplacesBackground.BindValueChanged(_ => applyBackgroundBrightness());
         }
     }
 }

@@ -12,13 +12,12 @@ namespace osu.Game.Screens.Mvis.Storyboard
 {
     ///<summary>
     ///bug:
-    ///快速切换时会有Storyboard Container不消失导致一直在那积累
     ///故事版会莫名奇妙地报个引用空对象错误
-    ///故事版获取Overlay Proxy时会报错(???)
     ///</summary>
     public class BackgroundStoryBoardLoader : Container<BackgroundStoryboard>
     {
-        private const float duration = 750;
+        public const float STORYBOARD_FADEIN_DURATION = 750;
+        public const float STORYBOARD_FADEOUT_DURATION = STORYBOARD_FADEIN_DURATION / 2;
         private readonly BindableBool enableSb = new BindableBool();
 
         ///<summary>
@@ -34,22 +33,18 @@ namespace osu.Game.Screens.Mvis.Storyboard
         public readonly BindableBool NeedToHideTriangles = new BindableBool();
         public readonly BindableBool StoryboardReplacesBackground = new BindableBool();
 
-        /// <summary>
-        /// 当准备的故事版加载完毕时要调用的Action
-        /// </summary>
-        private Action onComplete;
-
         private StoryboardClock storyboardClock = new StoryboardClock();
         private BackgroundStoryboard currentStoryboard;
 
-        private WorkingBeatmap currentBeatmap;
+        private readonly WorkingBeatmap currentBeatmap;
 
         [Resolved]
         private MusicController music { get; set; }
 
-        public BackgroundStoryBoardLoader()
+        public BackgroundStoryBoardLoader(WorkingBeatmap working)
         {
             RelativeSizeAxes = Axes.Both;
+            currentBeatmap = working;
         }
 
         [BackgroundDependencyLoader]
@@ -61,6 +56,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         protected override void LoadComplete()
         {
             enableSb.BindValueChanged(OnEnableSBChanged);
+            UpdateStoryBoardAsync();
         }
 
         private Task loadTask;
@@ -88,8 +84,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     Add(newStoryboard);
 
                     enableSb.TriggerChange();
-                    onComplete?.Invoke();
-                    onComplete = null;
                 });
         }
 
@@ -98,25 +92,18 @@ namespace osu.Game.Screens.Mvis.Storyboard
             if (v.NewValue)
             {
                 if (!sbLoaded.Value)
-                    UpdateStoryBoardAsync(currentBeatmap);
+                    UpdateStoryBoardAsync();
                 else
                 {
-                    if (currentBeatmap != null)
-                    {
-                        StoryboardReplacesBackground.Value = currentBeatmap.Storyboard.ReplacesBackground && currentBeatmap.Storyboard.HasDrawable;
-                        NeedToHideTriangles.Value = currentBeatmap.Storyboard.HasDrawable;
-                    }
-                    else
-                    {
-                        StoryboardReplacesBackground.Value = NeedToHideTriangles.Value = false;
-                    }
+                    StoryboardReplacesBackground.Value = currentBeatmap.Storyboard.ReplacesBackground && currentBeatmap.Storyboard.HasDrawable;
+                    NeedToHideTriangles.Value = currentBeatmap.Storyboard.HasDrawable;
                 }
 
-                currentStoryboard?.FadeIn(duration, Easing.OutQuint);
+                currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
             }
             else
             {
-                currentStoryboard?.FadeOut(duration / 2, Easing.OutQuint);
+                currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
                 StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
                 State.Value = StoryboardState.NotLoaded;
@@ -135,11 +122,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
             }
         }
 
-        public void UpdateStoryBoardAsync(WorkingBeatmap b)
+        public void UpdateStoryBoardAsync()
         {
             cancelAllTasks();
-            currentBeatmap = b;
-            State.Value = StoryboardState.Waiting;
             sbLoaded.Value = false;
             NeedToHideTriangles.Value = false;
             StoryboardReplacesBackground.Value = false;
@@ -152,6 +137,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 State.Value = StoryboardState.NotLoaded;
                 return;
             }
+
+            if (currentBeatmap == null)
+                throw new InvalidOperationException("currentBeatmap 不能为 null");
 
             Task.Run(async () =>
             {
@@ -173,7 +161,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
     public enum StoryboardState
     {
         NotLoaded,
-        Waiting,
         Loading,
         Failed,
         Success
