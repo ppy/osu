@@ -98,15 +98,24 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("place first object", () => InputManager.Click(MouseButton.Left));
 
+            AddStep("increment time", () => EditorClock.SeekForward(true));
+
             AddStep("move mouse right", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.2f, 0)));
             AddStep("place second object", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("increment time", () => EditorClock.SeekForward(true));
 
             AddStep("move mouse down", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(0, playfield.ScreenSpaceDrawQuad.Width * 0.2f)));
             AddStep("place third object", () => InputManager.Click(MouseButton.Left));
 
             AddStep("enter selection mode", () => InputManager.Key(Key.Number1));
 
-            AddStep("select objects 2 and 3", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects.Skip(1)));
+            AddStep("select objects 2 and 3", () =>
+            {
+                // add selection backwards to test non-sequential time ordering
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[2]);
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[1]);
+            });
 
             AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
 
