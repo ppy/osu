@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         private Container placeholderContainer;
-        private Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!");
+        private readonly Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to view beatmap listing!");
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue, new BeatmapListingHeader())
@@ -127,7 +127,7 @@ namespace osu.Game.Overlays
             };
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(onlineStateChanged, true);
+            apiState.BindValueChanged(OnlineStateChanged, true);
         }
 
         private void onTypingStarted()
@@ -289,7 +289,7 @@ namespace osu.Game.Overlays
                 filterControl.FetchNextPage();
         }
 
-        public void onlineStateChanged(ValueChangedEvent<APIState> state)
+        public void OnlineStateChanged(ValueChangedEvent<APIState> state)
         {
             if (state.NewValue == APIState.Online)
             {

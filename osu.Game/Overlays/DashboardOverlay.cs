@@ -27,8 +27,9 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
         private Container placeholderContainer;
-        private Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
+        private readonly Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the dashboard!");
 
         public DashboardOverlay()
             : base(OverlayColourScheme.Purple, new DashboardOverlayHeader
@@ -159,12 +160,13 @@ namespace osu.Game.Overlays
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             if (state.NewValue == APIState.Online)
-                this.placeholderContainer.Hide();
+                placeholderContainer.Hide();
             else if (state.NewValue == APIState.Offline)
             {
-                this.placeholderContainer.Show();
+                placeholderContainer.Show();
                 loading.Hide();
             }
+            
             if (State.Value == Visibility.Hidden)
                 return;
 

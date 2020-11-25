@@ -31,8 +31,8 @@ namespace osu.Game.Overlays
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
-        private Container placeholderContainer;
-        private Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the rankings!");
+        private readonly Container placeholderContainer;
+        private readonly Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to view the rankings!");
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays
                                         Origin = Anchor.TopCentre,
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding { Bottom = 10, Top = 200},
+                                        Margin = new MarginPadding { Bottom = 10, Top = 200 },
                                         Children = new Drawable[]
                                         {
                                             errorPlaceholder
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays
         private void load()
         {
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(onlineStateChanged, true);
+            apiState.BindValueChanged(OnlineStateChanged, true);
 
             background.Colour = ColourProvider.Background5;
         }
@@ -260,7 +260,7 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        public void onlineStateChanged(ValueChangedEvent<APIState> state)
+        public void OnlineStateChanged(ValueChangedEvent<APIState> state)
         {
             if (state.NewValue == APIState.Online)
             {

@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
 
         private Container placeholderContainer;
 
-        private Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
+        private readonly Placeholder errorPlaceholder = new LoginPlaceholder(@"Please sign in to chat");
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
@@ -452,6 +452,7 @@ namespace osu.Game.Overlays
 
                     break;
             }
+            
             CheckIsLoggedIn();
         }
 
@@ -490,7 +491,7 @@ namespace osu.Game.Overlays
         public void CheckIsLoggedIn()
         {
             //hide the chat and asks to log in if the user is not logged in
-            if (this.api?.IsLoggedIn != true)
+            if (api?.IsLoggedIn != true)
             {
                 currentChannelContainer.Hide();
                 placeholderContainer.Show();
