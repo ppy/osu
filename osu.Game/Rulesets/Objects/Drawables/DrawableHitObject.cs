@@ -75,6 +75,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public event Action<DrawableHitObject, JudgementResult> OnRevertResult;
 
         /// <summary>
+        /// Invoked when a new nested hit object is created by <see cref="CreateNestedHitObject" />.
+        /// </summary>
+        internal event Action<DrawableHitObject> OnNestedDrawableCreated;
+
+        /// <summary>
         /// Whether a visual indicator should be displayed when a scoring result occurs.
         /// </summary>
         public virtual bool DisplayResult => true;
@@ -140,6 +145,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
 
         private Container<PausableSkinnableSound> samplesContainer;
+
+        /// <summary>
+        /// Whether the initialization logic in <see cref="Playfield" /> has applied.
+        /// </summary>
+        internal bool IsInitialized;
 
         /// <summary>
         /// Creates a new <see cref="DrawableHitObject"/>.
@@ -214,9 +224,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             foreach (var h in HitObject.NestedHitObjects)
             {
-                var drawableNested = pooledObjectProvider?.GetPooledDrawableRepresentation(h)
+                var pooledDrawableNested = pooledObjectProvider?.GetPooledDrawableRepresentation(h);
+                var drawableNested = pooledDrawableNested
                                      ?? CreateNestedHitObject(h)
                                      ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
+
+                // Invoke the event only if this nested object is just created by `CreateNestedHitObject`.
+                if (pooledDrawableNested == null)
+                    OnNestedDrawableCreated?.Invoke(drawableNested);
 
                 drawableNested.OnNewResult += onNewResult;
                 drawableNested.OnRevertResult += onRevertResult;
@@ -514,11 +529,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void updateComboColour()
         {
-            if (!(HitObject is IHasComboInformation)) return;
+            if (!(HitObject is IHasComboInformation combo)) return;
 
-            var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
-
-            AccentColour.Value = GetComboColour(comboColours);
+            var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
+            AccentColour.Value = combo.GetComboColour(comboColours);
         }
 
         /// <summary>
@@ -529,6 +543,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// This will only be called if the <see cref="HitObject"/> implements <see cref="IHasComboInformation"/>.
         /// </remarks>
         /// <param name="comboColours">A list of combo colours provided by the beatmap or skin. Can be null if not available.</param>
+        [Obsolete("Unused. Implement IHasComboInformation and IHasComboInformation.GetComboColour() on the HitObject model instead.")] // Can be removed 20210527
         protected virtual Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
         {
             if (!(HitObject is IHasComboInformation combo))
