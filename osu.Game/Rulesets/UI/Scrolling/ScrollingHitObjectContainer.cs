@@ -167,6 +167,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             if (!layoutCache.IsValid)
             {
                 toComputeLifetime.Clear();
+
                 foreach (var hitObject in Objects)
                 {
                     if (hitObject.HitObject != null)
