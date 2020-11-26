@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             hitObject.Scale = 1.5f;
 
             if (hyperdash)
-                hitObject.HyperDashTarget = new Banana();
+                ((PalpableCatchHitObject)hitObject).HyperDashTarget = new Banana();
 
             d.Anchor = Anchor.Centre;
             d.RelativePositionAxes = Axes.None;
