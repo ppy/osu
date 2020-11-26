@@ -5,10 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
@@ -19,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         /// </summary>
         public const float RADIUS_ADJUST = 1.1f;
 
-        private Circle border;
+        private BorderPiece border;
         private PalpableCatchHitObject hitObject;
 
         public FruitPiece()
@@ -36,46 +33,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
             AddRangeInternal(new[]
             {
                 getFruitFor(hitObject.VisualRepresentation),
-                border = new Circle
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    BorderColour = Color4.White,
-                    BorderThickness = 6f * RADIUS_ADJUST,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            AlwaysPresent = true,
-                            Alpha = 0,
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    }
-                },
+                border = new BorderPiece(),
             });
 
             if (hitObject.HyperDash)
             {
-                AddInternal(new Circle
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    BorderColour = Catcher.DEFAULT_HYPER_DASH_COLOUR,
-                    BorderThickness = 12f * RADIUS_ADJUST,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            AlwaysPresent = true,
-                            Alpha = 0.3f,
-                            Blending = BlendingParameters.Additive,
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR,
-                        }
-                    }
-                });
+                AddInternal(new HyperBorderPiece());
             }
         }
 
