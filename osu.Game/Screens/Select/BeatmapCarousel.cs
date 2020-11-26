@@ -618,16 +618,6 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            // Finally, if the filtered items have changed, animate drawables to their new locations.
-            // This is common if a selected/collapsed state has changed.
-            if (revalidateItems)
-            {
-                foreach (DrawableCarouselItem panel in ScrollableContent.Children)
-                {
-                    panel.MoveToY(panel.Item.CarouselYPosition, 800, Easing.OutQuint);
-                }
-            }
-
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
             foreach (DrawableCarouselItem item in Scroll.Children)
