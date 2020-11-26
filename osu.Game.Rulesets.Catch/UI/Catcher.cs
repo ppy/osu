@@ -220,11 +220,11 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Let the catcher attempt to catch a fruit.
         /// </summary>
-        /// <param name="fruit">The fruit to catch.</param>
+        /// <param name="hitObject">The fruit to catch.</param>
         /// <returns>Whether the catch is possible.</returns>
-        public bool AttemptCatch(CatchHitObject fruit)
+        public bool AttemptCatch(CatchHitObject hitObject)
         {
-            if (!fruit.CanBePlated)
+            if (!(hitObject is PalpableCatchHitObject fruit))
                 return false;
 
             var halfCatchWidth = catchWidth * 0.5f;

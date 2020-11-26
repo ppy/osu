@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +15,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that can scroll to each section inside it.
     /// </summary>
+    [Cached]
     public class SectionsContainer<T> : Container<T>
         where T : Drawable
     {

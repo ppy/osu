@@ -2,10 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osuTK;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawables
+namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
     public class BananaPiece : PulpFormation
     {

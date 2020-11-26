@@ -2,68 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public abstract class PalpableDrawableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
-        where TObject : PalpableCatchHitObject
-    {
-        protected Container ScaleContainer { get; private set; }
-
-        protected PalpableDrawableCatchHitObject(TObject hitObject)
-            : base(hitObject)
-        {
-            Origin = Anchor.Centre;
-            Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
-            Masking = false;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AddRangeInternal(new Drawable[]
-            {
-                ScaleContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                }
-            });
-
-            ScaleContainer.Scale = new Vector2(HitObject.Scale);
-        }
-
-        protected override Color4 GetComboColour(IReadOnlyList<Color4> comboColours) =>
-            comboColours[(HitObject.IndexInBeatmap + 1) % comboColours.Count];
-    }
-
-    public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
-        where TObject : CatchHitObject
-    {
-        public new TObject HitObject;
-
-        protected DrawableCatchHitObject(TObject hitObject)
-            : base(hitObject)
-        {
-            HitObject = hitObject;
-            Anchor = Anchor.BottomLeft;
-        }
-    }
-
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
         protected override double InitialLifetimeOffset => HitObject.TimePreempt;
-
-        public virtual bool StaysOnPlate => HitObject.CanBePlated;
 
         public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
 
@@ -73,6 +20,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             : base(hitObject)
         {
             X = hitObject.X;
+            Anchor = Anchor.BottomLeft;
         }
 
         public Func<CatchHitObject, bool> CheckPosition;
