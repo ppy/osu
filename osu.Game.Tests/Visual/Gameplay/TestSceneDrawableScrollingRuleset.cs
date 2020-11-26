@@ -46,10 +46,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUp]
         public void Setup() => Schedule(() => testClock.CurrentTime = 0);
 
-        [Test]
-        public void TestHitObjectPooling()
+        [TestCase("pooled")]
+        [TestCase("non-pooled")]
+        public void TestHitObjectLifetime(string pooled)
         {
-            var beatmap = createBeatmap(_ => new TestPooledHitObject());
+            var beatmap = createBeatmap(_ => pooled == "pooled" ? new TestPooledHitObject() : new TestHitObject());
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
             createTest(beatmap);
 
@@ -208,13 +209,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         /// <summary>
         /// Get a <see cref="DrawableTestHitObject" /> corresponding to the <paramref name="index"/>'th <see cref="TestHitObject"/>.
-        /// When a pooling is used and the hit object is not alive, `null` is returned.
+        /// When the hit object is not alive, `null` is returned.
         /// </summary>
         [CanBeNull]
         private DrawableTestHitObject getDrawableHitObject(int index)
         {
             var hitObject = drawableRuleset.Beatmap.HitObjects.ElementAt(index);
-            return (DrawableTestHitObject)drawableRuleset.Playfield.HitObjectContainer.Objects.FirstOrDefault(obj => obj.HitObject == hitObject);
+            return (DrawableTestHitObject)drawableRuleset.Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(obj => obj.HitObject == hitObject);
         }
 
         private float yScale => drawableRuleset.Playfield.HitObjectContainer.DrawHeight;
@@ -426,6 +427,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 });
             }
+            protected override void Update() => LifetimeEnd = HitObject.EndTime;
         }
 
         private class DrawableTestPooledHitObject : DrawableTestHitObject
@@ -436,8 +438,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InternalChildren[0].Colour = Color4.LightSkyBlue;
                 InternalChildren[1].Colour = Color4.Blue;
             }
-
-            protected override void Update() => LifetimeEnd = HitObject.EndTime;
         }
 
         private class DrawableTestParentHitObject : DrawableTestHitObject
