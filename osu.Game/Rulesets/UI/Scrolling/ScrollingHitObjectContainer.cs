@@ -17,10 +17,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        // Tracks all `DrawableHitObject` (nested or not) applied a `HitObject`.
-        // It dynamically changes based on approximate lifetime when a pooling is used.
-        private readonly HashSet<DrawableHitObject> hitObjectApplied = new HashSet<DrawableHitObject>();
-
         // The lifetime of a hit object in this will be computed in next update.
         private readonly HashSet<DrawableHitObject> toComputeLifetime = new HashSet<DrawableHitObject>();
 
@@ -39,9 +35,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             RelativeSizeAxes = Axes.Both;
 
             AddLayout(layoutCache);
-
-            HitObjectUsageBegan += onHitObjectUsageBegin;
-            HitObjectUsageFinished += onHitObjectUsageFinished;
         }
 
         [BackgroundDependencyLoader]
@@ -58,7 +51,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.Clear(disposeChildren);
 
-            hitObjectApplied.Clear();
             toComputeLifetime.Clear();
             layoutComputed.Clear();
         }
@@ -159,15 +151,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             // Lifetime computation is delayed until next update because
             // when the hit object is not pooled this container is not loaded here and `scrollLength` cannot be computed.
-            hitObjectApplied.Add(hitObject);
             toComputeLifetime.Add(hitObject);
-            layoutComputed.Remove(hitObject);
-        }
-
-        private void onHitObjectUsageFinished(DrawableHitObject hitObject)
-        {
-            hitObjectApplied.Remove(hitObject);
-            toComputeLifetime.Remove(hitObject);
             layoutComputed.Remove(hitObject);
         }
 
@@ -179,8 +163,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (!layoutCache.IsValid)
             {
-                foreach (var hitObject in hitObjectApplied)
-                    toComputeLifetime.Add(hitObject);
+                toComputeLifetime.Clear();
+                foreach (var hitObject in Objects)
+                {
+                    if (hitObject.HitObject != null)
+                        toComputeLifetime.Add(hitObject);
+                }
 
                 layoutComputed.Clear();
 
