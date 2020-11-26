@@ -163,10 +163,10 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle now playing overlay")]
         ToggleNowPlaying,
 
-        [Description("Previous Selection")]
+        [Description("Previous selection")]
         SelectPrevious,
 
-        [Description("Next Selection")]
+        [Description("Next selection")]
         SelectNext,
 
         [Description("Home")]
@@ -175,26 +175,26 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle notifications")]
         ToggleNotifications,
 
-        [Description("Pause")]
+        [Description("Pause gameplay")]
         PauseGameplay,
 
         // Editor
-        [Description("Setup Mode")]
+        [Description("Setup mode")]
         EditorSetupMode,
 
-        [Description("Compose Mode")]
+        [Description("Compose mode")]
         EditorComposeMode,
 
-        [Description("Design Mode")]
+        [Description("Design mode")]
         EditorDesignMode,
 
-        [Description("Timing Mode")]
+        [Description("Timing mode")]
         EditorTimingMode,
 
         [Description("Hold for HUD")]
         HoldForHUD,
 
-        [Description("Random Skin")]
+        [Description("Random skin")]
         RandomSkin,
     }
 }
