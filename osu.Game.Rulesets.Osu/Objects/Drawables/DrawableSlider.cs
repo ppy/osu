@@ -19,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
+    public class DrawableSlider : DrawableOsuHitObject
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
