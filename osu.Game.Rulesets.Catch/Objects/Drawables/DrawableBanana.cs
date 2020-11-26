@@ -1,10 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
@@ -13,14 +11,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public DrawableBanana(Banana h)
             : base(h)
         {
-        }
-
-        private Color4? colour;
-
-        protected override Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
-        {
-            // override any external colour changes with banananana
-            return colour ??= getBananaColour();
         }
 
         protected override void UpdateInitialTransforms()
@@ -45,21 +35,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             base.PlaySamples();
             if (Samples != null)
                 Samples.Frequency.Value = 0.77f + ((Banana)HitObject).BananaIndex * 0.006f;
-        }
-
-        private Color4 getBananaColour()
-        {
-            switch (RNG.Next(0, 3))
-            {
-                default:
-                    return new Color4(255, 240, 0, 255);
-
-                case 1:
-                    return new Color4(255, 192, 0, 255);
-
-                case 2:
-                    return new Color4(214, 221, 28, 255);
-            }
         }
     }
 }
