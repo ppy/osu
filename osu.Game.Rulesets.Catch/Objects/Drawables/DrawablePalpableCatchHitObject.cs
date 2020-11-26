@@ -1,12 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
@@ -40,8 +38,5 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             ScaleContainer.Scale = new Vector2(HitObject.Scale);
         }
-
-        protected override Color4 GetComboColour(IReadOnlyList<Color4> comboColours) =>
-            comboColours[(HitObject.IndexInBeatmap + 1) % comboColours.Count];
     }
 }
