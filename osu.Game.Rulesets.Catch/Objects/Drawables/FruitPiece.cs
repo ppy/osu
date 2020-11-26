@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public const float RADIUS_ADJUST = 1.1f;
 
         private Circle border;
-        private CatchHitObject hitObject;
+        private PalpableCatchHitObject hitObject;
 
         public FruitPiece()
         {
@@ -30,12 +30,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
         {
-            DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
+            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
             hitObject = drawableCatchObject.HitObject;
 
             AddRangeInternal(new[]
             {
-                getFruitFor(drawableCatchObject.HitObject.VisualRepresentation),
+                getFruitFor(hitObject.VisualRepresentation),
                 border = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
