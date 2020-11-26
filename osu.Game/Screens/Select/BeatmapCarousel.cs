@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
-        private readonly CarouselScrollContainer scroll;
+        protected readonly CarouselScrollContainer Scroll;
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Select
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
 
-            ScrollableContent.Clear(false);
+            Scroll.Clear(false);
             itemsCache.Invalidate();
             scrollPositionCache.Invalidate();
 
@@ -131,8 +131,6 @@ namespace osu.Game.Screens.Select
 
         private readonly Cached itemsCache = new Cached();
         private readonly Cached scrollPositionCache = new Cached();
-
-        protected readonly Container<DrawableCarouselItem> ScrollableContent;
 
         public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
 
@@ -155,17 +153,12 @@ namespace osu.Game.Screens.Select
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = scroll = new CarouselScrollContainer
+                Children = new Drawable[]
                 {
-                    Masking = false,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    setPool,
+                    Scroll = new CarouselScrollContainer
                     {
-                        setPool,
-                        ScrollableContent = new Container<DrawableCarouselItem>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                        }
+                        RelativeSizeAxes = Axes.Both,
                     }
                 }
             };
@@ -180,7 +173,7 @@ namespace osu.Game.Screens.Select
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
-            RightClickScrollingEnabled.ValueChanged += enabled => scroll.RightMouseScrollbar = enabled.NewValue;
+            RightClickScrollingEnabled.ValueChanged += enabled => Scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
 
             itemUpdated = beatmaps.ItemUpdated.GetBoundCopy();
@@ -421,12 +414,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// The position of the lower visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleBottomBound => scroll.Current + DrawHeight + BleedBottom;
+        private float visibleBottomBound => Scroll.Current + DrawHeight + BleedBottom;
 
         /// <summary>
         /// The position of the upper visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleUpperBound => scroll.Current - BleedTop;
+        private float visibleUpperBound => Scroll.Current - BleedTop;
 
         public void FlushPendingFilterOperations()
         {
@@ -468,7 +461,7 @@ namespace osu.Game.Screens.Select
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
 
-                if (alwaysResetScrollPosition || !scroll.UserScrolling)
+                if (alwaysResetScrollPosition || !Scroll.UserScrolling)
                     ScrollToSelected();
             }
         }
@@ -594,7 +587,7 @@ namespace osu.Game.Screens.Select
                 {
                     var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
 
-                    foreach (var panel in ScrollableContent.Children)
+                    foreach (var panel in Scroll.Children)
                     {
                         if (toDisplay.Remove(panel.Item))
                         {
@@ -620,7 +613,7 @@ namespace osu.Game.Screens.Select
                         panel.Depth = item.CarouselYPosition;
                         panel.Y = item.CarouselYPosition;
 
-                        ScrollableContent.Add(panel);
+                        Scroll.Add(panel);
                     }
                 }
             }
@@ -637,7 +630,7 @@ namespace osu.Game.Screens.Select
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
-            foreach (DrawableCarouselItem item in ScrollableContent.Children)
+            foreach (DrawableCarouselItem item in Scroll.Children)
             {
                 updateItem(item);
 
@@ -789,7 +782,8 @@ namespace osu.Game.Screens.Select
             }
 
             currentY += visibleHalfHeight;
-            ScrollableContent.Height = currentY;
+
+            Scroll.ScrollContent.Height = currentY;
 
             if (BeatmapSetsLoaded && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
             {
@@ -809,7 +803,7 @@ namespace osu.Game.Screens.Select
                 if (firstScroll)
                 {
                     // reduce movement when first displaying the carousel.
-                    scroll.ScrollTo(scrollTarget.Value - 200, false);
+                    Scroll.ScrollTo(scrollTarget.Value - 200, false);
                     firstScroll = false;
                 }
 
@@ -844,7 +838,7 @@ namespace osu.Game.Screens.Select
         /// <param name="parent">For nested items, the parent of the item to be updated.</param>
         private void updateItem(DrawableCarouselItem item, DrawableCarouselItem parent = null)
         {
-            Vector2 posInScroll = ScrollableContent.ToLocalSpace(item.Header.ScreenSpaceDrawQuad.Centre);
+            Vector2 posInScroll = Scroll.ScrollContent.ToLocalSpace(item.Header.ScreenSpaceDrawQuad.Centre);
             float itemDrawY = posInScroll.Y - visibleUpperBound;
             float dist = Math.Abs(1f - itemDrawY / visibleHalfHeight);
 
@@ -889,7 +883,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private class CarouselScrollContainer : OsuScrollContainer
+        protected class CarouselScrollContainer : OsuScrollContainer<DrawableCarouselItem>
         {
             private bool rightMouseScrollBlocked;
 
@@ -897,6 +891,12 @@ namespace osu.Game.Screens.Select
             /// Whether the last scroll event was user triggered, directly on the scroll container.
             /// </summary>
             public bool UserScrolling { get; private set; }
+
+            public CarouselScrollContainer()
+            {
+                // size is determined by the carousel itself, due to not all content necessarily being loaded.
+                ScrollContent.AutoSizeAxes = Axes.None;
+            }
 
             // ReSharper disable once OptionalParameterHierarchyMismatch 2020.3 EAP4 bug. (https://youtrack.jetbrains.com/issue/RSRP-481535?p=RIDER-51910)
             protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
