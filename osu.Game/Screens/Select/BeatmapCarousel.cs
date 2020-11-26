@@ -573,6 +573,9 @@ namespace osu.Game.Screens.Select
             if (revalidateItems)
                 updateYPositions();
 
+            if (!scrollPositionCache.IsValid)
+                updateScrollPosition();
+
             // This data is consumed to find the currently displayable range.
             // This is the range we want to keep drawables for, and should exceed the visible range slightly to avoid drawable churn.
             var newDisplayRange = getDisplayRange();
@@ -651,14 +654,6 @@ namespace osu.Game.Screens.Select
             lastIndex = Math.Clamp(lastIndex + 1, firstIndex, Math.Max(0, visibleItems.Count - 1));
 
             return (firstIndex, lastIndex);
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            if (!scrollPositionCache.IsValid)
-                updateScrollPosition();
         }
 
         private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
