@@ -4,8 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
@@ -31,36 +29,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 
             if (drawableCatchObject.HitObject.HyperDash)
             {
-                AddInternal(new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(2f),
-                    Depth = 1,
-                    Children = new Drawable[]
-                    {
-                        new Circle
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            BorderColour = Catcher.DEFAULT_HYPER_DASH_COLOUR,
-                            BorderThickness = 6,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    AlwaysPresent = true,
-                                    Alpha = 0.3f,
-                                    Blending = BlendingParameters.Additive,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR,
-                                }
-                            }
-                        }
-                    }
-                });
+                AddInternal(new HyperDropletBorderPiece());
             }
         }
     }
