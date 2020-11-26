@@ -147,7 +147,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        private void onHitObjectUsageBegin(DrawableHitObject hitObject)
+        /// <summary>
+        /// Make this <see cref="DrawableHitObject"/> lifetime and layout computed in next update.
+        /// </summary>
+        internal void InvalidateHitObject(DrawableHitObject hitObject)
         {
             // Lifetime computation is delayed until next update because
             // when the hit object is not pooled this container is not loaded here and `scrollLength` cannot be computed.
