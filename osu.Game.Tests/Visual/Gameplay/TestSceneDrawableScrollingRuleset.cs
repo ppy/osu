@@ -427,6 +427,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 });
             }
+
             protected override void Update() => LifetimeEnd = HitObject.EndTime;
         }
 
