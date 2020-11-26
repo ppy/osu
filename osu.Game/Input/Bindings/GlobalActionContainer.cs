@@ -69,6 +69,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
+            new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
@@ -196,5 +197,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Random skin")]
         RandomSkin,
+
+        [Description("Pause / resume replay")]
+        TogglePauseReplay,
     }
 }
