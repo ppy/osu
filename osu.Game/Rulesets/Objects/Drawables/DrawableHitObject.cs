@@ -128,6 +128,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private readonly Bindable<ArmedState> state = new Bindable<ArmedState>();
 
+        /// <summary>
+        /// The state of this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// For pooled hitobjects, <see cref="ApplyCustomUpdateState"/> is recommended to be used instead for better editor/rewinding support.
+        /// </remarks>
         public IBindable<ArmedState> State => state;
 
         /// <summary>
@@ -259,7 +265,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             // If not loaded, the state update happens in LoadComplete(). Otherwise, the update is scheduled to allow for lifetime updates.
             if (IsLoaded)
-                Schedule(() => updateState(ArmedState.Idle, true));
+            {
+                Scheduler.Add(() =>
+                {
+                    if (Result.IsHit)
+                        updateState(ArmedState.Hit, true);
+                    else if (Result.HasResult)
+                        updateState(ArmedState.Miss, true);
+                    else
+                        updateState(ArmedState.Idle, true);
+                });
+            }
 
             hasHitObjectApplied = true;
         }
