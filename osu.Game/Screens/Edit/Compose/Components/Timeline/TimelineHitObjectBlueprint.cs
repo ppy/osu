@@ -55,6 +55,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private const float circle_size = 24;
 
+        [Resolved(CanBeNull = true)]
+        private HitObjectComposer composer { get; set; }
+
         public TimelineHitObjectBlueprint(HitObject hitObject)
             : base(hitObject)
         {
@@ -152,19 +155,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             updateShadows();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(HitObjectComposer composer)
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             if (composer != null)
             {
                 // best effort to get the drawable representation for grabbing colour and what not.
                 drawableHitObject = composer.HitObjects.FirstOrDefault(d => d.HitObject == HitObject);
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             if (HitObject is IHasComboInformation comboInfo)
             {
