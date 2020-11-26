@@ -157,6 +157,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             var snapResult = Composer.SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
 
+            // if no time was found from positional snapping, we should still quantize to the beat.
+            snapResult.Time ??= Beatmap.SnapTime(EditorClock.CurrentTime, null);
+
             currentPlacement.UpdateTimeAndPosition(snapResult);
         }
 
