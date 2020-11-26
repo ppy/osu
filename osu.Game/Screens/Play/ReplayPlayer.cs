@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play
         {
             switch (action)
             {
-                case GlobalAction.PauseReplay:
+                case GlobalAction.TogglePauseReplay:
                     if (GameplayClockContainer.IsPaused.Value)
                         GameplayClockContainer.Start();
                     else
