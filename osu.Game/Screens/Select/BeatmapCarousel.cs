@@ -573,6 +573,9 @@ namespace osu.Game.Screens.Select
             if (revalidateItems)
                 updateYPositions();
 
+            // if there is a pending scroll action we apply it without animation and transfer the difference in position to the panels.
+            // due to this, scroll application needs to be run immediately after y position updates.
+            // if this isn't the case, the on-screen pooling / display logic following will fail briefly.
             if (!scrollPositionCache.IsValid)
                 updateScrollPosition();
 
@@ -792,8 +795,17 @@ namespace osu.Game.Screens.Select
                     firstScroll = false;
                 }
 
-                scroll.ScrollTo(scrollTarget.Value);
+                // in order to simplify animation logic, rather than using the animated version of ScrollTo,
+                // we take the difference in scroll height and apply to all visible panels.
+                // this avoids edge cases like when the visible panels is reduced suddenly, causing ScrollContainer
+                // to enter clamp-special-case mode where it animates completely differently to normal.
+                float scrollChange = scrollTarget.Value - Scroll.Current;
+
+                Scroll.ScrollTo(scrollTarget.Value, false);
                 scrollPositionCache.Validate();
+
+                foreach (var i in Scroll.Children)
+                    i.Y += scrollChange;
             }
         }
 
