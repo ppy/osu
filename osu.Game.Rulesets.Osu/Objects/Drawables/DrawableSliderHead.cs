@@ -36,9 +36,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             pathVersion.BindValueChanged(_ => updatePosition());
         }
 
-        protected override void OnFree(HitObject hitObject)
+        protected override void OnFree()
         {
-            base.OnFree(hitObject);
+            base.OnFree();
 
             pathVersion.UnbindFrom(drawableSlider.PathVersion);
         }
