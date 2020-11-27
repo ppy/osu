@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit
                 var newState = stream.ToArray();
 
                 // if the previous state is binary equal we don't need to push a new one, unless this is the initial state.
-                if (savedStates.Count > 0 && newState.SequenceEqual(savedStates.Last())) return;
+                if (savedStates.Count > 0 && newState.SequenceEqual(savedStates[currentState])) return;
 
                 if (currentState < savedStates.Count - 1)
                     savedStates.RemoveRange(currentState + 1, savedStates.Count - currentState - 1);
