@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Select
 
             Scroll.Clear(false);
             itemsCache.Invalidate();
-            scrollPositionCache.Invalidate();
+            ScrollToSelected();
 
             // apply any pending filter operation that may have been delayed (see applyActiveCriteria's scheduling behaviour when BeatmapSetsLoaded is false).
             FlushPendingFilterOperations();
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Select
         private readonly List<CarouselItem> visibleItems = new List<CarouselItem>();
 
         private readonly Cached itemsCache = new Cached();
-        private readonly Cached scrollPositionCache = new Cached();
+        private PendingScrollOperation pendingScrollOperation = PendingScrollOperation.None;
 
         public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
 
@@ -462,7 +462,7 @@ namespace osu.Game.Screens.Select
                 itemsCache.Invalidate();
 
                 if (alwaysResetScrollPosition || !Scroll.UserScrolling)
-                    ScrollToSelected();
+                    ScrollToSelected(true);
             }
         }
 
@@ -471,7 +471,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Scroll to the current <see cref="SelectedBeatmap"/>.
         /// </summary>
-        public void ScrollToSelected() => scrollPositionCache.Invalidate();
+        /// <param name="immediate">
+        /// Whether the scroll position should immediately be shifted to the target, delegating animation to visible panels.
+        /// This should be true for operations like filtering - where panels are changing visibility state - to avoid large jumps in animation.
+        /// </param>
+        public void ScrollToSelected(bool immediate = false) =>
+            pendingScrollOperation = immediate ? PendingScrollOperation.Immediate : PendingScrollOperation.Standard;
 
         #region Key / button selection logic
 
@@ -481,12 +486,12 @@ namespace osu.Game.Screens.Select
             {
                 case Key.Left:
                     if (!e.Repeat)
-                        beginRepeatSelection(() => SelectNext(-1, true), e.Key);
+                        beginRepeatSelection(() => SelectNext(-1), e.Key);
                     return true;
 
                 case Key.Right:
                     if (!e.Repeat)
-                        beginRepeatSelection(() => SelectNext(1, true), e.Key);
+                        beginRepeatSelection(() => SelectNext(), e.Key);
                     return true;
             }
 
@@ -574,9 +579,8 @@ namespace osu.Game.Screens.Select
                 updateYPositions();
 
             // if there is a pending scroll action we apply it without animation and transfer the difference in position to the panels.
-            // due to this, scroll application needs to be run immediately after y position updates.
-            // if this isn't the case, the on-screen pooling / display logic following will fail briefly.
-            if (!scrollPositionCache.IsValid)
+            // this is intentionally applied before updating the visible range below, to avoid animating new items (sourced from pool) from locations off-screen, as it looks bad.
+            if (pendingScrollOperation != PendingScrollOperation.None)
                 updateScrollPosition();
 
             // This data is consumed to find the currently displayable range.
@@ -795,17 +799,27 @@ namespace osu.Game.Screens.Select
                     firstScroll = false;
                 }
 
-                // in order to simplify animation logic, rather than using the animated version of ScrollTo,
-                // we take the difference in scroll height and apply to all visible panels.
-                // this avoids edge cases like when the visible panels is reduced suddenly, causing ScrollContainer
-                // to enter clamp-special-case mode where it animates completely differently to normal.
-                float scrollChange = scrollTarget.Value - Scroll.Current;
+                switch (pendingScrollOperation)
+                {
+                    case PendingScrollOperation.Standard:
+                        Scroll.ScrollTo(scrollTarget.Value);
+                        break;
 
-                Scroll.ScrollTo(scrollTarget.Value, false);
-                scrollPositionCache.Validate();
+                    case PendingScrollOperation.Immediate:
+                        // in order to simplify animation logic, rather than using the animated version of ScrollTo,
+                        // we take the difference in scroll height and apply to all visible panels.
+                        // this avoids edge cases like when the visible panels is reduced suddenly, causing ScrollContainer
+                        // to enter clamp-special-case mode where it animates completely differently to normal.
+                        float scrollChange = scrollTarget.Value - Scroll.Current;
 
-                foreach (var i in Scroll.Children)
-                    i.Y += scrollChange;
+                        Scroll.ScrollTo(scrollTarget.Value, false);
+
+                        foreach (var i in Scroll.Children)
+                            i.Y += scrollChange;
+                        break;
+                }
+
+                pendingScrollOperation = PendingScrollOperation.None;
             }
         }
 
@@ -847,6 +861,13 @@ namespace osu.Game.Screens.Select
             // additional container and setting that container's alpha) such that we can
             // layer alpha transformations on top.
             item.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
+        }
+
+        private enum PendingScrollOperation
+        {
+            None,
+            Standard,
+            Immediate,
         }
 
         /// <summary>
