@@ -26,11 +26,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             Direction.BindTo(ScrollingInfo.Direction);
         }
 
-        protected override void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
-        {
-            drawableHitObject.HitObjectApplied += d => HitObjectContainer.InvalidateHitObject(d);
-        }
-
         /// <summary>
         /// Given a position in screen space, return the time within this column.
         /// </summary>
