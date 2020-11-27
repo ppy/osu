@@ -203,7 +203,7 @@ namespace osu.Game.Graphics.Containers
                 }
                 else
                 {
-                    SelectedSection.Value = Children.TakeWhile(section => diff(section) <= 0).LastOrDefault()
+                    SelectedSection.Value = Children.TakeWhile(section => diff(section) <= section.Margin.Top).LastOrDefault()
                                             ?? Children.FirstOrDefault();
                 }
             }
