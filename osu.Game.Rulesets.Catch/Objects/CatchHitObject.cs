@@ -16,25 +16,47 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public const float OBJECT_RADIUS = 64;
 
-        private float x;
+        // This value is after XOffset applied.
+        public readonly Bindable<float> XBindable = new Bindable<float>();
+
+        // This value is before XOffset applied.
+        private float originalX;
 
         /// <summary>
         /// The horizontal position of the fruit between 0 and <see cref="CatchPlayfield.WIDTH"/>.
         /// </summary>
         public float X
         {
-            get => x + XOffset;
-            set => x = value;
+            // TODO: I don't like this asymmetry.
+            get => XBindable.Value;
+            // originalX is set by `XBindable.BindValueChanged`
+            set => XBindable.Value = value + xOffset;
         }
+
+        private float xOffset;
 
         /// <summary>
         /// A random offset applied to <see cref="X"/>, set by the <see cref="CatchBeatmapProcessor"/>.
         /// </summary>
-        internal float XOffset { get; set; }
+        internal float XOffset
+        {
+            get => xOffset;
+            set
+            {
+                xOffset = value;
+                XBindable.Value = originalX + xOffset;
+            }
+        }
 
         public double TimePreempt = 1000;
 
-        public int IndexInBeatmap { get; set; }
+        public readonly Bindable<int> IndexInBeatmapBindable = new Bindable<int>();
+
+        public int IndexInBeatmap
+        {
+            get => IndexInBeatmapBindable.Value;
+            set => IndexInBeatmapBindable.Value = value;
+        }
 
         public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(IndexInBeatmap % 4);
 
@@ -69,7 +91,13 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => LastInComboBindable.Value = value;
         }
 
-        public float Scale { get; set; } = 1;
+        public readonly Bindable<float> ScaleBindable = new Bindable<float>(1);
+
+        public float Scale
+        {
+            get => ScaleBindable.Value;
+            set => ScaleBindable.Value = value;
+        }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -81,6 +109,11 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        protected CatchHitObject()
+        {
+            XBindable.BindValueChanged(x => originalX = x.NewValue - xOffset);
+        }
     }
 
     public enum FruitVisualRepresentation
