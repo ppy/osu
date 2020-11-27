@@ -36,15 +36,19 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 VisualRepresentation.Value = GetVisualRepresentation(change.NewValue);
             }, true);
 
-            VisualRepresentation.BindValueChanged(change =>
-            {
-                ScaleContainer.Child = new SkinnableDrawable(
-                    new CatchSkinComponent(getComponent(change.NewValue)),
-                    _ => fruitPiece = new FruitPiece
-                    {
-                        VisualRepresentation = { BindTarget = VisualRepresentation },
-                    });
-            }, true);
+            VisualRepresentation.BindValueChanged(_ => updatePiece());
+            HyperDash.BindValueChanged(_ => updatePiece(), true);
+        }
+
+        private void updatePiece()
+        {
+            ScaleContainer.Child = new SkinnableDrawable(
+                new CatchSkinComponent(getComponent(VisualRepresentation.Value)),
+                _ => fruitPiece = new FruitPiece
+                {
+                    VisualRepresentation = { BindTarget = VisualRepresentation },
+                    HyperDash = { BindTarget = HyperDash },
+                });
         }
 
         protected override void OnApply()

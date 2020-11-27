@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -10,6 +11,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
+        public readonly Bindable<float> XBindable = new Bindable<float>();
+
         protected override double InitialLifetimeOffset => HitObject.TimePreempt;
 
         public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
@@ -19,8 +22,24 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
-            X = hitObject.X;
+            if (hitObject != null)
+                XBindable.Value = hitObject.X;
+
             Anchor = Anchor.BottomLeft;
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            XBindable.BindTo(HitObject.XBindable);
+        }
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+
+            XBindable.UnbindFrom(HitObject.XBindable);
         }
 
         public Func<CatchHitObject, bool> CheckPosition;
