@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public int BananaIndex;
 
-        public override FruitVisualRepresentation VisualRepresentation => FruitVisualRepresentation.Banana;
-
         public override Judgement CreateJudgement() => new CatchBananaJudgement();
 
         private static readonly List<HitSampleInfo> samples = new List<HitSampleInfo> { new BananaHitSampleInfo() };
