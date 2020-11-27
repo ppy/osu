@@ -8,6 +8,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableBanana : DrawableFruit
     {
+        protected override FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => FruitVisualRepresentation.Banana;
+
         public DrawableBanana(Banana h)
             : base(h)
         {

@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
@@ -16,8 +15,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         /// </summary>
         public const float RADIUS_ADJUST = 1.1f;
 
-        private BorderPiece border;
-        private PalpableCatchHitObject hitObject;
+        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
+        public readonly Bindable<bool> HyperDash = new Bindable<bool>();
+
+        public BorderPiece Border;
 
         public FruitPiece()
         {
@@ -25,27 +26,18 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject)
+        private void load()
         {
-            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
-            hitObject = drawableCatchObject.HitObject;
-
             AddRangeInternal(new[]
             {
-                getFruitFor(hitObject.VisualRepresentation),
-                border = new BorderPiece(),
+                getFruitFor(VisualRepresentation.Value),
+                Border = new BorderPiece(),
             });
 
-            if (hitObject.HyperDash)
+            if (HyperDash.Value)
             {
                 AddInternal(new HyperBorderPiece());
             }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            border.Alpha = (float)Math.Clamp((hitObject.StartTime - Time.Current) / 500, 0, 1);
         }
 
         private Drawable getFruitFor(FruitVisualRepresentation representation)

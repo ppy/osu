@@ -58,8 +58,6 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => IndexInBeatmapBindable.Value = value;
         }
 
-        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(IndexInBeatmap % 4);
-
         public virtual bool NewCombo { get; set; }
 
         public int ComboOffset { get; set; }
@@ -114,14 +112,5 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             XBindable.BindValueChanged(x => originalX = x.NewValue - xOffset);
         }
-    }
-
-    public enum FruitVisualRepresentation
-    {
-        Pear,
-        Grape,
-        Pineapple,
-        Raspberry,
-        Banana // banananananannaanana
     }
 }

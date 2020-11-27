@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         private Drawable createDrawableFruit(FruitVisualRepresentation rep, bool hyperdash = false) =>
-            setProperties(new DrawableFruit(new TestCatchFruit(rep)), hyperdash);
+            setProperties(new TestDrawableFruit(new Fruit(), rep), hyperdash);
 
         private Drawable createDrawableDroplet(bool hyperdash = false) => setProperties(new DrawableDroplet(new Droplet()), hyperdash);
 
@@ -56,14 +56,17 @@ namespace osu.Game.Rulesets.Catch.Tests
             return d;
         }
 
-        public class TestCatchFruit : Fruit
+        public class TestDrawableFruit : DrawableFruit
         {
-            public TestCatchFruit(FruitVisualRepresentation rep)
-            {
-                VisualRepresentation = rep;
-            }
+            private readonly FruitVisualRepresentation visualRepresentation;
 
-            public override FruitVisualRepresentation VisualRepresentation { get; }
+            protected override FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => visualRepresentation;
+
+            public TestDrawableFruit(Fruit fruit, FruitVisualRepresentation rep)
+                : base(fruit)
+            {
+                visualRepresentation = rep;
+            }
         }
     }
 }

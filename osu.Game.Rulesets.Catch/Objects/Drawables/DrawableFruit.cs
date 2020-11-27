@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Skinning;
@@ -11,18 +12,61 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableFruit : DrawablePalpableCatchHitObject
     {
+        public readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
+
+        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
+
+        protected virtual FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => (FruitVisualRepresentation)(indexInBeatmap % 4);
+
+        private FruitPiece fruitPiece;
+
         public DrawableFruit(CatchHitObject h)
             : base(h)
         {
+            IndexInBeatmap.Value = h.IndexInBeatmap;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            ScaleContainer.Child = new SkinnableDrawable(
-                new CatchSkinComponent(getComponent(HitObject.VisualRepresentation)), _ => new FruitPiece());
-
             ScaleContainer.Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
+
+            IndexInBeatmap.BindValueChanged(change =>
+            {
+                VisualRepresentation.Value = GetVisualRepresentation(change.NewValue);
+            }, true);
+
+            VisualRepresentation.BindValueChanged(change =>
+            {
+                ScaleContainer.Child = new SkinnableDrawable(
+                    new CatchSkinComponent(getComponent(change.NewValue)),
+                    _ => fruitPiece = new FruitPiece
+                    {
+                        VisualRepresentation = { BindTarget = VisualRepresentation },
+                    });
+            }, true);
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            IndexInBeatmap.BindTo(HitObject.IndexInBeatmapBindable);
+        }
+
+        protected override void OnFree()
+        {
+            IndexInBeatmap.UnbindFrom(HitObject.IndexInBeatmapBindable);
+
+            base.OnFree();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (fruitPiece != null)
+                fruitPiece.Border.Alpha = (float)Math.Clamp((StartTimeBindable.Value - Time.Current) / 500, 0, 1);
         }
 
         private CatchSkinComponents getComponent(FruitVisualRepresentation hitObjectVisualRepresentation)
@@ -48,5 +92,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                     throw new ArgumentOutOfRangeException(nameof(hitObjectVisualRepresentation), hitObjectVisualRepresentation, null);
             }
         }
+    }
+
+    public enum FruitVisualRepresentation
+    {
+        Pear,
+        Grape,
+        Pineapple,
+        Raspberry,
+        Banana // banananananannaanana
     }
 }
