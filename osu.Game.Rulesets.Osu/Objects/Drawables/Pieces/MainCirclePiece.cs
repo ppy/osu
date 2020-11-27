@@ -38,7 +38,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             };
         }
 
-        private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
 
@@ -50,7 +49,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
 
-            state.BindTo(drawableObject.State);
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
         }
@@ -59,7 +57,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.LoadComplete();
 
-            state.BindValueChanged(updateState, true);
             accentColour.BindValueChanged(colour =>
             {
                 explode.Colour = colour.NewValue;
@@ -68,15 +65,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }, true);
 
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
+
+            drawableObject.ApplyCustomUpdateState += updateState;
+            updateState(drawableObject, drawableObject.State.Value);
         }
 
-        private void updateState(ValueChangedEvent<ArmedState> state)
+        private void updateState(DrawableHitObject drawableObject, ArmedState state)
         {
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime, true))
             {
                 glow.FadeOut(400);
 
-                switch (state.NewValue)
+                switch (state)
                 {
                     case ArmedState.Hit:
                         const double flash_in = 40;

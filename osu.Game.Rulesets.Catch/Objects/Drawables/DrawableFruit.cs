@@ -4,11 +4,12 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableFruit : PalpableDrawableCatchHitObject
+    public class DrawableFruit : DrawablePalpableCatchHitObject
     {
         public DrawableFruit(CatchHitObject h)
             : base(h)

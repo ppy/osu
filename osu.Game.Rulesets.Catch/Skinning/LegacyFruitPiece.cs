@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject, ISkinSource skin)
         {
-            DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
+            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
 
             accentColour.BindTo(drawableCatchObject.AccentColour);
 
