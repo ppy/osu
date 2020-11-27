@@ -12,8 +12,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableFruit : DrawablePalpableCatchHitObject
     {
-        public readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
-
         public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
 
         protected virtual FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => (FruitVisualRepresentation)(indexInBeatmap % 4);
@@ -23,7 +21,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public DrawableFruit(CatchHitObject h)
             : base(h)
         {
-            IndexInBeatmap.Value = h.IndexInBeatmap;
         }
 
         [BackgroundDependencyLoader]
@@ -49,20 +46,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                     VisualRepresentation = { BindTarget = VisualRepresentation },
                     HyperDash = { BindTarget = HyperDash },
                 });
-        }
-
-        protected override void OnApply()
-        {
-            base.OnApply();
-
-            IndexInBeatmap.BindTo(HitObject.IndexInBeatmapBindable);
-        }
-
-        protected override void OnFree()
-        {
-            IndexInBeatmap.UnbindFrom(HitObject.IndexInBeatmapBindable);
-
-            base.OnFree();
         }
 
         protected override void Update()

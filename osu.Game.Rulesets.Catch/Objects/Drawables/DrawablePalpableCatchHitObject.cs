@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public Bindable<float> ScaleBindable { get; } = new Bindable<float>(1);
 
+        public readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
+
         /// <summary>
         /// The multiplicative factor applied to <see cref="ScaleContainer"/> scale relative to <see cref="HitObject"/> scale.
         /// </summary>
@@ -41,6 +43,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
             });
+
+            IndexInBeatmap.Value = h.IndexInBeatmap;
         }
 
         [BackgroundDependencyLoader]
@@ -55,6 +59,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             {
                 ScaleContainer.Scale = new Vector2(scale.NewValue * ScaleFactor);
             }, true);
+
+            IndexInBeatmap.BindValueChanged(_ => UpdateComboColour());
         }
 
         protected override void OnApply()
@@ -63,12 +69,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             HyperDash.BindTo(HitObject.HyperDashBindable);
             ScaleBindable.BindTo(HitObject.ScaleBindable);
+            IndexInBeatmap.BindTo(HitObject.IndexInBeatmapBindable);
         }
 
         protected override void OnFree()
         {
             HyperDash.UnbindFrom(HitObject.HyperDashBindable);
             ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
+            IndexInBeatmap.UnbindFrom(HitObject.IndexInBeatmapBindable);
 
             base.OnFree();
         }
