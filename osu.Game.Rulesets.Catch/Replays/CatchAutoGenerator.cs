@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             float lastPosition = CatchPlayfield.CENTER_X;
             double lastTime = 0;
 
-            void moveToNext(CatchHitObject h)
+            void moveToNext(PalpableCatchHitObject h)
             {
                 float positionChange = Math.Abs(lastPosition - h.X);
                 double timeAvailable = h.StartTime - lastTime;
@@ -101,23 +101,16 @@ namespace osu.Game.Rulesets.Catch.Replays
 
             foreach (var obj in Beatmap.HitObjects)
             {
-                switch (obj)
+                if (obj is PalpableCatchHitObject palpableObject)
                 {
-                    case Fruit _:
-                        moveToNext(obj);
-                        break;
+                    moveToNext(palpableObject);
                 }
 
                 foreach (var nestedObj in obj.NestedHitObjects.Cast<CatchHitObject>())
                 {
-                    switch (nestedObj)
+                    if (nestedObj is PalpableCatchHitObject palpableNestedObject)
                     {
-                        case Banana _:
-                        case TinyDroplet _:
-                        case Droplet _:
-                        case Fruit _:
-                            moveToNext(nestedObj);
-                            break;
+                        moveToNext(palpableNestedObject);
                     }
                 }
             }

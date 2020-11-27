@@ -105,10 +105,19 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
         }
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition)
         {
             if (snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
                 return snapResult;
+
+            return new SnapResult(screenSpacePosition, null);
+        }
+
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        {
+            var positionSnap = SnapScreenSpacePositionToValidPosition(screenSpacePosition);
+            if (positionSnap.ScreenSpacePosition != screenSpacePosition)
+                return positionSnap;
 
             // will be null if distance snap is disabled or not feasible for the current time value.
             if (distanceSnapGrid == null)

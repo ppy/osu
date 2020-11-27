@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 var first = (OsuHitObject)objects.First();
                 var second = (OsuHitObject)objects.Last();
 
-                return first.Position == second.Position;
+                return Precision.AlmostEquals(first.EndPosition, second.Position);
             });
         }
 
@@ -85,6 +85,65 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 return Precision.AlmostEquals(first.EndPosition, second.Position);
             });
+        }
+
+        [Test]
+        public void TestSecondCircleInSelectionAlsoSnaps()
+        {
+            AddStep("move mouse to centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre));
+
+            AddStep("disable distance snap", () => InputManager.Key(Key.Q));
+
+            AddStep("enter placement mode", () => InputManager.Key(Key.Number2));
+
+            AddStep("place first object", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("increment time", () => EditorClock.SeekForward(true));
+
+            AddStep("move mouse right", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.2f, 0)));
+            AddStep("place second object", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("increment time", () => EditorClock.SeekForward(true));
+
+            AddStep("move mouse down", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(0, playfield.ScreenSpaceDrawQuad.Width * 0.2f)));
+            AddStep("place third object", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("enter selection mode", () => InputManager.Key(Key.Number1));
+
+            AddStep("select objects 2 and 3", () =>
+            {
+                // add selection backwards to test non-sequential time ordering
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[2]);
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[1]);
+            });
+
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("move mouse slightly off centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.02f, 0)));
+
+            AddAssert("object 3 snapped to 1", () =>
+            {
+                var objects = EditorBeatmap.HitObjects;
+
+                var first = (OsuHitObject)objects.First();
+                var third = (OsuHitObject)objects.Last();
+
+                return Precision.AlmostEquals(first.EndPosition, third.Position);
+            });
+
+            AddStep("move mouse slightly off centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * -0.22f, playfield.ScreenSpaceDrawQuad.Width * 0.21f)));
+
+            AddAssert("object 2 snapped to 1", () =>
+            {
+                var objects = EditorBeatmap.HitObjects;
+
+                var first = (OsuHitObject)objects.First();
+                var second = (OsuHitObject)objects.ElementAt(1);
+
+                return Precision.AlmostEquals(first.EndPosition, second.Position);
+            });
+
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
         }
     }
 }

@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -192,24 +192,24 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private static void initialiseHyperDash(IBeatmap beatmap)
         {
-            List<CatchHitObject> objectWithDroplets = new List<CatchHitObject>();
+            List<PalpableCatchHitObject> palpableObjects = new List<PalpableCatchHitObject>();
 
             foreach (var currentObject in beatmap.HitObjects)
             {
                 if (currentObject is Fruit fruitObject)
-                    objectWithDroplets.Add(fruitObject);
+                    palpableObjects.Add(fruitObject);
 
                 if (currentObject is JuiceStream)
                 {
-                    foreach (var currentJuiceElement in currentObject.NestedHitObjects)
+                    foreach (var juice in currentObject.NestedHitObjects)
                     {
-                        if (!(currentJuiceElement is TinyDroplet))
-                            objectWithDroplets.Add((CatchHitObject)currentJuiceElement);
+                        if (juice is PalpableCatchHitObject palpableObject && !(juice is TinyDroplet))
+                            palpableObjects.Add(palpableObject);
                     }
                 }
             }
 
-            objectWithDroplets.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+            palpableObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             double halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) / 2;
 
@@ -221,10 +221,10 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
 
-            for (int i = 0; i < objectWithDroplets.Count - 1; i++)
+            for (int i = 0; i < palpableObjects.Count - 1; i++)
             {
-                CatchHitObject currentObject = objectWithDroplets[i];
-                CatchHitObject nextObject = objectWithDroplets[i + 1];
+                var currentObject = palpableObjects[i];
+                var nextObject = palpableObjects[i + 1];
 
                 // Reset variables in-case values have changed (e.g. after applying HR)
                 currentObject.HyperDashTarget = null;
