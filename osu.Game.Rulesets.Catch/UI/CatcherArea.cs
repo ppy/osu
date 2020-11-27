@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        public void OnNewResult(DrawableCatchHitObject fruit, JudgementResult result)
+        public void OnNewResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
             if (!result.Type.IsScorable())
                 return;
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     lastPlateableFruit.OnLoadComplete += _ => action();
             }
 
-            if (result.IsHit && fruit.HitObject.CanBePlated)
+            if (result.IsHit && hitObject is DrawablePalpableCatchHitObject fruit)
             {
                 // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
                 var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 if (caughtFruit == null) return;
 
                 caughtFruit.RelativePositionAxes = Axes.None;
-                caughtFruit.Position = new Vector2(MovableCatcher.ToLocalSpace(fruit.ScreenSpaceDrawQuad.Centre).X - MovableCatcher.DrawSize.X / 2, 0);
+                caughtFruit.Position = new Vector2(MovableCatcher.ToLocalSpace(hitObject.ScreenSpaceDrawQuad.Centre).X - MovableCatcher.DrawSize.X / 2, 0);
                 caughtFruit.IsOnPlate = true;
 
                 caughtFruit.Anchor = Anchor.TopCentre;
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     runAfterLoaded(() => MovableCatcher.Explode(caughtFruit));
             }
 
-            if (fruit.HitObject.LastInCombo)
+            if (hitObject.HitObject.LastInCombo)
             {
                 if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
                     runAfterLoaded(() => MovableCatcher.Explode());
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     MovableCatcher.Drop();
             }
 
-            comboDisplay.OnNewResult(fruit, result);
+            comboDisplay.OnNewResult(hitObject, result);
         }
 
         public void OnRevertResult(DrawableCatchHitObject fruit, JudgementResult result)
