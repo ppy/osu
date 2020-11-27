@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -36,9 +35,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             pathVersion.BindValueChanged(_ => updatePosition());
         }
 
-        protected override void OnFree(HitObject hitObject)
+        protected override void OnFree()
         {
-            base.OnFree(hitObject);
+            base.OnFree();
 
             pathVersion.UnbindFrom(drawableSlider.PathVersion);
         }
