@@ -30,13 +30,13 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         private Drawable createDrawableFruit(FruitVisualRepresentation rep, bool hyperdash = false) =>
-            setProperties(new TestDrawableFruit(new Fruit(), rep), hyperdash);
+            SetProperties(new TestDrawableFruit(new Fruit(), rep), hyperdash);
 
-        private Drawable createDrawableDroplet(bool hyperdash = false) => setProperties(new DrawableDroplet(new Droplet()), hyperdash);
+        private Drawable createDrawableDroplet(bool hyperdash = false) => SetProperties(new DrawableDroplet(new Droplet()), hyperdash);
 
-        private Drawable createDrawableTinyDroplet() => setProperties(new DrawableTinyDroplet(new TinyDroplet()));
+        private Drawable createDrawableTinyDroplet() => SetProperties(new DrawableTinyDroplet(new TinyDroplet()));
 
-        private DrawableCatchHitObject setProperties(DrawableCatchHitObject d, bool hyperdash = false)
+        protected virtual DrawableCatchHitObject SetProperties(DrawableCatchHitObject d, bool hyperdash = false)
         {
             var hitObject = d.HitObject;
             hitObject.StartTime = 1000000000000;
