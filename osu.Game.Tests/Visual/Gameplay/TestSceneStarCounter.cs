@@ -39,6 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             setStars(5);
 
             AddRepeatStep("random value", () => setStars(RNG.NextSingle() * (starCounter.StarCount + 1)), 10);
+            AddSliderStep("exact value", 0f, 10f, 5f, setStars);
             AddStep("stop animation", () => starCounter.StopAnimation());
             AddStep("reset", () => setStars(0));
         }
