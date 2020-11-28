@@ -307,8 +307,7 @@ namespace osu.Game.Screens.Mvis
                                                                     TooltipText = "切换暂停",
                                                                     Action = togglePause,
                                                                     Anchor = Anchor.Centre,
-                                                                    Origin = Anchor.Centre,
-                                                                    NoIcon = true,
+                                                                    Origin = Anchor.Centre
                                                                 },
                                                                 nextButton = new NextPrevButton
                                                                 {
@@ -348,19 +347,11 @@ namespace osu.Game.Screens.Mvis
 
                                                                         updateSidebarState(null);
 
-                                                                        //防止手机端无法退出桌面背景模式
-                                                                        if (RuntimeInfo.IsDesktop)
-                                                                        {
-                                                                            lockChanges.Value = true;
-                                                                            lockButton.ToggleableValue.Value = false;
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            lockChanges.Value = false;
-                                                                            lockButton.ToggleableValue.Value = true;
-                                                                        }
+                                                                        //防止手机端无法恢复界面
+                                                                        lockChanges.Value = RuntimeInfo.IsDesktop;
+                                                                        lockButton.ToggleableValue.Value = !RuntimeInfo.IsDesktop;
                                                                     },
-                                                                    TooltipText = "桌面背景模式(切换强制锁定后移动鼠标即可恢复正常)"
+                                                                    TooltipText = "隐藏界面并锁定变更"
                                                                 },
                                                                 loopToggleButton = new ToggleLoopButton
                                                                 {
