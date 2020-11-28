@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -7,7 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
 
-namespace osu.Game.Screens.Mvis.Modules
+namespace osu.Game.Screens.Mvis.Collections
 {
     public class CollectionHelper : Component
     {
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Mvis.Modules
         {
             base.LoadComplete();
             CurrentCollection.BindValueChanged(OnCollectionChanged);
+
+            collectionManager.Collections.CollectionChanged += triggerRefresh;
         }
 
         public void PlayNextBeatmap() => Schedule(NextTrack);
@@ -94,8 +97,6 @@ namespace osu.Game.Screens.Mvis.Modules
             controller.Play();
         }
 
-        public void PlayFirstBeatmap() => playFirstBeatmap(beatmapList);
-
         ///<summary>
         ///用来更新<see cref="beatmapList"/>
         ///</summary>
@@ -119,12 +120,18 @@ namespace osu.Game.Screens.Mvis.Modules
 
         public void UpdateBeatmaps() => updateBeatmaps(CurrentCollection.Value);
 
+        private void triggerRefresh(object sender, NotifyCollectionChangedEventArgs e)
+            => updateBeatmaps(CurrentCollection.Value);
+
         private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
         {
             updateBeatmaps(CurrentCollection.Value);
         }
 
-        public bool CurrentCollectionContains(WorkingBeatmap b) =>
-            beatmapList.Contains(b.BeatmapSetInfo);
+        protected override void Dispose(bool isDisposing)
+        {
+            collectionManager.Collections.CollectionChanged -= triggerRefresh;
+            base.Dispose(isDisposing);
+        }
     }
 }

@@ -3,12 +3,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Mvis.Modules;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.SideBar.Header
 {
-    public class TabHeader : Container
+    public class TabHeader : CompositeDrawable
     {
         private readonly Box highLightBox;
         private readonly Box bgBox;
@@ -25,7 +24,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
             Height = 40;
             RelativeSizeAxes = Axes.X;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 bgBox = new Box
                 {

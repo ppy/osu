@@ -3,7 +3,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis.Modules;
 
 namespace osu.Game.Screens.Mvis.BottomBar
 {

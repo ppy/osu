@@ -40,9 +40,8 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisBgBlur, 0.2f, 0f, 1f);
             Set(MfSetting.MvisEnableStoryboard, true);
             Set(MfSetting.MvisUseOsuLogoVisualisation, false);
-            Set(MfSetting.MvisIdleBgDim, 0.6f, 0f, 1f);
+            Set(MfSetting.MvisIdleBgDim, 0.9f, 0f, 1f);
             Set(MfSetting.MvisEnableBgTriangles, true);
-            Set(MfSetting.MvisEnableSBOverlayProxy, true);
             Set(MfSetting.MvisAdjustMusicWithFreq, true);
             Set(MfSetting.MvisMusicSpeed, 1.0, 0.1, 2.0);
             Set(MfSetting.MvisEnableNightcoreBeat, false);
@@ -62,9 +61,6 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisRed, 0, 0, 255);
             Set(MfSetting.MvisGreen, 0, 0, 255);
             Set(MfSetting.MvisBlue, 0, 0, 255);
-
-            //File Select Filter
-            Set(MfSetting.FileFilter, FileFilterType.All);
         }
     }
 
@@ -80,7 +76,6 @@ namespace osu.Game.Configuration
         MvisIdleBgDim,
         MvisContentAlpha,
         MvisEnableBgTriangles,
-        MvisEnableSBOverlayProxy,
         MvisShowParticles,
         MvisVisualizerAmount,
         MvisBarWidth,
@@ -100,29 +95,18 @@ namespace osu.Game.Configuration
         MvisInterfaceBlue,
         SamplePlaybackGain,
         SongSelectBgBlur,
-        IntroLoadDirectToSongSelect,
-        FileFilter,
+        IntroLoadDirectToSongSelect
     }
 
     public enum MvisBarType
     {
         [Description("基本")]
         Basic,
+
         [Description("圆角")]
         Rounded,
+
         [Description("打砖块")]
         Fall
-    }
-
-    public enum FileFilterType
-    {
-        [Description("皮肤文件")]
-        Skin,
-        [Description("谱面文件")]
-        Beatmap,
-        [Description("回放文件")]
-        Replay,
-        [Description("全部")]
-        All
     }
 }

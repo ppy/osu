@@ -32,10 +32,12 @@ using osuTK.Input;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics;
 using osu.Framework;
+using osu.Game.Screens.Mvis.Collections;
+using osu.Game.Screens.Mvis.Collections.Interface;
 using osu.Game.Users;
-using osu.Game.Screens.Mvis.Modules;
-using osu.Game.Screens.Mvis.Modules.v2;
 using osu.Game.Screens.Mvis.Objects;
+using osu.Game.Screens.Mvis.SideBar;
+using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 using Sidebar = osu.Game.Screens.Mvis.SideBar.Sidebar;
 
@@ -110,8 +112,8 @@ namespace osu.Game.Screens.Mvis
         private SidebarSettingsScrollContainer settingsScroll;
         private CustomColourProvider colourProvider;
         private DependencyContainer dependencies;
-        private SkinnableSprite skinnableForeground;
-        private SkinnableSprite skinnableBbBackground;
+        private FullScreenSkinnableComponent skinnableForeground;
+        private FullScreenSkinnableComponent skinnableBbBackground;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -156,8 +158,7 @@ namespace osu.Game.Screens.Mvis
                             Name = "Gameplay Background Elements Container",
                             Children = new Drawable[]
                             {
-                                bgTriangles = new BgTrianglesContainer(),
-                                sbLoader = new BackgroundStoryBoardLoader()
+                                bgTriangles = new BgTrianglesContainer()
                             }
                         },
                         gameplayContent = new Container
@@ -184,7 +185,7 @@ namespace osu.Game.Screens.Mvis
                         }
                     }
                 },
-                skinnableForeground = new ModifiedSkinnableSprite("MPlayer-foreground", confineMode: ConfineMode.ScaleToFill)
+                skinnableForeground = new FullScreenSkinnableComponent("MPlayer-foreground", confineMode: ConfineMode.ScaleToFill, defaultImplementation: _ => new PlaceHolder())
                 {
                     Name = "前景图",
                     RelativeSizeAxes = Axes.Both,
@@ -210,9 +211,10 @@ namespace osu.Game.Screens.Mvis
                             Name = "Sidebar Container",
                             Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING }
                         },
-                        skinnableBbBackground = new ModifiedSkinnableSprite("MBottomBar-background",
+                        skinnableBbBackground = new FullScreenSkinnableComponent("MBottomBar-background",
                             confineMode: ConfineMode.ScaleToFill,
-                            masking: true)
+                            masking: true,
+                            defaultImplementation: _ => new PlaceHolder())
                         {
                             Name = "底栏背景图",
                             Anchor = Anchor.BottomCentre,
@@ -426,7 +428,8 @@ namespace osu.Game.Screens.Mvis
                     {
                         new MfMvisSection
                         {
-                            Margin = new MarginPadding(0)
+                            Margin = new MarginPadding { Top = -15 },
+                            Padding = new MarginPadding(0)
                         },
                         new SettingsButton
                         {
@@ -482,13 +485,6 @@ namespace osu.Game.Screens.Mvis
                 }
             }, true);
 
-            //collectionHelper.CurrentCollection.BindValueChanged(_ =>
-            //{
-            //    if (PlayFromCollection.Value
-            //            && !collectionHelper.currentCollectionContains(Beatmap.Value))
-            //        collectionHelper.PlayFirstBeatmap();
-            //});
-
             isIdle.BindValueChanged(v =>
             {
                 if (v.NewValue) tryHideOverlays();
@@ -507,27 +503,6 @@ namespace osu.Game.Screens.Mvis
                 }
             }, true);
 
-            sbLoader.NeedToHideTriangles.BindValueChanged(updateBgTriangles, true);
-            sbLoader.State.BindValueChanged(v =>
-            {
-                switch (v.NewValue)
-                {
-                    case StoryboardState.Success:
-                    case StoryboardState.NotLoaded:
-                        loadingSpinner.Hide();
-                        break;
-
-                    case StoryboardState.Loading:
-                        loadingSpinner.Show();
-                        break;
-
-                    case StoryboardState.Failed:
-                        loadingSpinner.FadeColour(Colour4.Red);
-                        break;
-                }
-            }, true);
-
-            sbLoader.StoryboardReplacesBackground.BindValueChanged(_ => applyBackgroundBrightness());
             inputManager = GetContainingInputManager();
 
             progressBar.OnSeek = seekTo;
@@ -576,7 +551,7 @@ namespace osu.Game.Screens.Mvis
         private void seekTo(double position)
         {
             musicController.SeekTo(position);
-            sbLoader.Seek(position);
+            sbLoader?.Seek(position);
         }
 
         protected override void Update()
@@ -612,7 +587,6 @@ namespace osu.Game.Screens.Mvis
 
             //停止beatmapLogo，取消故事版家在任务以及锁定变更
             beatmapLogo.StopResponseOnBeatmapChanges();
-            sbLoader.CancelAllTasks();
             lockChanges.Value = true;
 
             //背景层的动画
@@ -886,7 +860,7 @@ namespace osu.Game.Screens.Mvis
             if (auto)
             {
                 Background?.FadeColour(
-                    sbLoader.StoryboardReplacesBackground.Value ? Color4.Black : OsuColour.Gray(overlaysHidden ? idleBgDim.Value : 0.6f),
+                    (sbLoader?.StoryboardReplacesBackground.Value ?? false) ? Color4.Black : OsuColour.Gray(overlaysHidden ? idleBgDim.Value : 0.6f),
                     duration,
                     Easing.OutQuint);
             }
@@ -910,10 +884,42 @@ namespace osu.Game.Screens.Mvis
             });
 
             if (beatmap != prevBeatmap)
-                sbLoader.UpdateStoryBoardAsync();
+            {
+                sbLoader?.FadeOut(BackgroundStoryBoardLoader.STORYBOARD_FADEOUT_DURATION, Easing.OutQuint).Expire();
+                sbLoader = null;
+                gameplayBackground.Add(sbLoader = new BackgroundStoryBoardLoader(beatmap));
+                reBind();
+            }
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;
+        }
+
+        private void reBind()
+        {
+            sbLoader.NeedToHideTriangles.BindValueChanged(updateBgTriangles, true);
+            sbLoader.State.BindValueChanged(v =>
+            {
+                switch (v.NewValue)
+                {
+                    case StoryboardState.Success:
+                    case StoryboardState.NotLoaded:
+                        loadingSpinner.Hide();
+                        break;
+
+                    case StoryboardState.Loading:
+                        loadingSpinner.Show();
+                        loadingSpinner.FadeColour(Color4.White, 300);
+                        break;
+
+                    case StoryboardState.Failed:
+                        loadingSpinner.Show();
+                        loadingSpinner.FadeColour(Colour4.Red, 300);
+                        break;
+                }
+            }, true);
+
+            sbLoader.StoryboardReplacesBackground.BindValueChanged(_ => applyBackgroundBrightness());
         }
     }
 }

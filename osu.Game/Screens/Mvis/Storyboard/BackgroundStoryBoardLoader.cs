@@ -1,11 +1,9 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
@@ -13,14 +11,12 @@ using osu.Game.Overlays;
 namespace osu.Game.Screens.Mvis.Storyboard
 {
     ///<summary>
-    ///bug:
-    ///快速切换时会有Storyboard Container不消失导致一直在那积累
-    ///故事版会莫名奇妙地报个引用空对象错误
-    ///故事版获取Overlay Proxy时会报错(???)
+    /// 负责故事版的异步加载功能
     ///</summary>
     public class BackgroundStoryBoardLoader : Container<BackgroundStoryboard>
     {
-        private const float duration = 750;
+        public const float STORYBOARD_FADEIN_DURATION = 750;
+        public const float STORYBOARD_FADEOUT_DURATION = STORYBOARD_FADEIN_DURATION / 2;
         private readonly BindableBool enableSb = new BindableBool();
 
         ///<summary>
@@ -36,27 +32,18 @@ namespace osu.Game.Screens.Mvis.Storyboard
         public readonly BindableBool NeedToHideTriangles = new BindableBool();
         public readonly BindableBool StoryboardReplacesBackground = new BindableBool();
 
-        /// <summary>
-        /// 当准备的故事版加载完毕时要调用的Action
-        /// </summary>
-        private Action onComplete;
-
         private StoryboardClock storyboardClock = new StoryboardClock();
-        private BackgroundStoryboard clockContainer;
-        private Task<bool> loadTask;
+        private BackgroundStoryboard currentStoryboard;
 
-        private CancellationTokenSource cancellationTokenSource;
-        private BackgroundStoryboard nextStoryboard;
-
-        [Resolved]
-        private IBindable<WorkingBeatmap> b { get; set; }
+        private readonly WorkingBeatmap currentBeatmap;
 
         [Resolved]
         private MusicController music { get; set; }
 
-        public BackgroundStoryBoardLoader()
+        public BackgroundStoryBoardLoader(WorkingBeatmap working)
         {
             RelativeSizeAxes = Axes.Both;
+            currentBeatmap = working;
         }
 
         [BackgroundDependencyLoader]
@@ -68,6 +55,43 @@ namespace osu.Game.Screens.Mvis.Storyboard
         protected override void LoadComplete()
         {
             enableSb.BindValueChanged(OnEnableSBChanged);
+            UpdateStoryBoardAsync();
+        }
+
+        private Task loadTask;
+
+        private void prepareStoryboard(WorkingBeatmap beatmap)
+        {
+            cancelAllTasks();
+            sbLoaded.Value = false;
+            NeedToHideTriangles.Value = false;
+            StoryboardReplacesBackground.Value = false;
+
+            storyboardClock.IsCoupled = false;
+            storyboardClock.Stop();
+
+            State.Value = StoryboardState.Loading;
+
+            storyboardClock = new StoryboardClock();
+            storyboardClock.ChangeSource(beatmap.Track);
+            Seek(beatmap.Track.CurrentTime);
+
+            loadTask = LoadComponentAsync(
+                currentStoryboard = new BackgroundStoryboard(beatmap)
+                {
+                    RunningClock = storyboardClock,
+                    Alpha = 0.1f
+                },
+                onLoaded: newStoryboard =>
+                {
+                    sbLoaded.Value = true;
+                    State.Value = StoryboardState.Success;
+                    NeedToHideTriangles.Value = beatmap.Storyboard.HasDrawable;
+
+                    Add(newStoryboard);
+
+                    enableSb.TriggerChange();
+                });
         }
 
         public void OnEnableSBChanged(ValueChangedEvent<bool> v)
@@ -75,101 +99,61 @@ namespace osu.Game.Screens.Mvis.Storyboard
             if (v.NewValue)
             {
                 if (!sbLoaded.Value)
-                    UpdateStoryBoardAsync(onComplete);
+                    UpdateStoryBoardAsync();
                 else
                 {
-                    StoryboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
-                    NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
+                    StoryboardReplacesBackground.Value = currentBeatmap.Storyboard.ReplacesBackground && currentBeatmap.Storyboard.HasDrawable;
+                    NeedToHideTriangles.Value = currentBeatmap.Storyboard.HasDrawable;
                 }
 
-                clockContainer?.FadeIn(duration, Easing.OutQuint);
+                currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
             }
             else
             {
-                clockContainer?.FadeOut(duration / 2, Easing.OutQuint);
+                currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
                 StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
                 State.Value = StoryboardState.NotLoaded;
-                CancelAllTasks();
             }
-        }
-
-        public bool LoadStoryboardFor(WorkingBeatmap beatmap)
-        {
-            try
-            {
-                LoadComponentAsync(nextStoryboard, newClockContainer =>
-                {
-                    storyboardClock.ChangeSource(beatmap.Track);
-                    Seek(beatmap.Track.CurrentTime);
-
-                    Add(newClockContainer);
-                    clockContainer = newClockContainer;
-                }, cancellationTokenSource.Token);
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "加载故事版时出现错误。");
-                State.Value = StoryboardState.Failed;
-                return false;
-            }
-
-            return true;
         }
 
         public void Seek(double position) =>
             storyboardClock?.Seek(position);
 
-        public void CancelAllTasks() =>
-            cancellationTokenSource?.Cancel();
-
-        public void UpdateStoryBoardAsync(Action onComplete = null)
+        private void cancelAllTasks()
         {
-            CancelAllTasks();
-            State.Value = StoryboardState.Loading;
-            sbLoaded.Value = false;
-            NeedToHideTriangles.Value = false;
-            StoryboardReplacesBackground.Value = false;
-            nextStoryboard = null;
-            this.onComplete = onComplete;
+            if (loadTask != null)
+            {
+                var b = currentStoryboard;
+                loadTask?.ContinueWith(_ => b?.Expire());
+            }
+        }
 
-            cancellationTokenSource = new CancellationTokenSource();
-
-            storyboardClock.IsCoupled = false;
-            storyboardClock.Stop();
-
-            foreach (var item in this)
-                item.Cleanup(duration);
-
-            if (!enableSb.Value || b == null)
+        public void UpdateStoryBoardAsync()
+        {
+            if (!enableSb.Value)
             {
                 State.Value = StoryboardState.NotLoaded;
                 return;
             }
 
+            if (currentBeatmap == null)
+                throw new InvalidOperationException("currentBeatmap 不能为 null");
+
             Task.Run(async () =>
             {
-                nextStoryboard = new BackgroundStoryboard(b.Value, b.Value.Skin)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RunningClock = storyboardClock = new StoryboardClock(),
-                    Alpha = 0.1f,
-                    OnStoryboardReadyAction = () =>
-                    {
-                        sbLoaded.Value = true;
-                        State.Value = StoryboardState.Success;
-                        NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
+                var task = Task.Run(() => prepareStoryboard(currentBeatmap));
 
-                        enableSb.TriggerChange();
-                        onComplete?.Invoke();
-                        onComplete = null;
-                    }
-                };
+                await task;
+            });
+        }
 
-                loadTask = Task.Run(() => LoadStoryboardFor(b.Value), cancellationTokenSource.Token);
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
 
-                await loadTask;
-            }, cancellationTokenSource.Token);
+            if (isDisposing)
+                cancelAllTasks();
         }
     }
 

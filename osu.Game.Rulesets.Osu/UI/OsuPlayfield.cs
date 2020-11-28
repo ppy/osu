@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -25,8 +26,6 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
-        public readonly Func<DrawableHitObject, double, bool> CheckHittable;
-
         private readonly PlayfieldBorder playfieldBorder;
         private readonly ProxyContainer approachCircles;
         private readonly ProxyContainer spinnerProxies;
@@ -56,7 +55,6 @@ namespace osu.Game.Rulesets.Osu.UI
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
-            CheckHittable = hitPolicy.IsHittable;
 
             var hitWindows = new OsuHitWindows();
 
@@ -66,6 +64,29 @@ namespace osu.Game.Rulesets.Osu.UI
             AddRangeInternal(poolDictionary.Values);
 
             NewResult += onNewResult;
+        }
+
+        protected override void OnNewDrawableHitObject(DrawableHitObject drawable)
+        {
+            ((DrawableOsuHitObject)drawable).CheckHittable = hitPolicy.IsHittable;
+
+            Debug.Assert(!drawable.IsLoaded, $"Already loaded {nameof(DrawableHitObject)} is added to {nameof(OsuPlayfield)}");
+            drawable.OnLoadComplete += onDrawableHitObjectLoaded;
+        }
+
+        private void onDrawableHitObjectLoaded(Drawable drawable)
+        {
+            // note: `Slider`'s `ProxiedLayer` is added when its nested `DrawableHitCircle` is loaded.
+            switch (drawable)
+            {
+                case DrawableSpinner _:
+                    spinnerProxies.Add(drawable.CreateProxy());
+                    break;
+
+                case DrawableHitCircle hitCircle:
+                    approachCircles.Add(hitCircle.ProxiedLayer.CreateProxy());
+                    break;
+            }
         }
 
         private void onJudgmentLoaded(DrawableOsuJudgement judgement)
@@ -78,27 +99,18 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
 
-            registerPool<HitCircle, DrawableHitCircle>(10, 100);
+            RegisterPool<HitCircle, DrawableHitCircle>(10, 100);
 
-            registerPool<Slider, DrawableSlider>(10, 100);
-            registerPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
-            registerPool<SliderTailCircle, DrawableSliderTail>(10, 100);
-            registerPool<SliderTick, DrawableSliderTick>(10, 100);
-            registerPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
+            RegisterPool<Slider, DrawableSlider>(10, 100);
+            RegisterPool<SliderHeadCircle, DrawableSliderHead>(10, 100);
+            RegisterPool<SliderTailCircle, DrawableSliderTail>(10, 100);
+            RegisterPool<SliderTick, DrawableSliderTick>(10, 100);
+            RegisterPool<SliderRepeat, DrawableSliderRepeat>(5, 50);
 
-            registerPool<Spinner, DrawableSpinner>(2, 20);
-            registerPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
-            registerPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
+            RegisterPool<Spinner, DrawableSpinner>(2, 20);
+            RegisterPool<SpinnerTick, DrawableSpinnerTick>(10, 100);
+            RegisterPool<SpinnerBonusTick, DrawableSpinnerBonusTick>(10, 100);
         }
-
-        private void registerPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
-            where TObject : HitObject
-            where TDrawable : DrawableHitObject, new()
-            => RegisterPool<TObject, TDrawable>(CreatePool<TDrawable>(initialSize, maximumSize));
-
-        protected virtual DrawablePool<TDrawable> CreatePool<TDrawable>(int initialSize, int? maximumSize = null)
-            where TDrawable : DrawableHitObject, new()
-            => new DrawableOsuPool<TDrawable>(CheckHittable, OnHitObjectLoaded, initialSize, maximumSize);
 
         protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new OsuHitObjectLifetimeEntry(hitObject);
 
@@ -112,27 +124,6 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             base.OnHitObjectRemoved(hitObject);
             followPoints.RemoveFollowPoints((OsuHitObject)hitObject);
-        }
-
-        public void OnHitObjectLoaded(Drawable drawable)
-        {
-            switch (drawable)
-            {
-                case DrawableSliderHead _:
-                case DrawableSliderTail _:
-                case DrawableSliderTick _:
-                case DrawableSliderRepeat _:
-                case DrawableSpinnerTick _:
-                    break;
-
-                case DrawableSpinner _:
-                    spinnerProxies.Add(drawable.CreateProxy());
-                    break;
-
-                case IDrawableHitObjectWithProxiedApproach approach:
-                    approachCircles.Add(approach.ProxiedLayer.CreateProxy());
-                    break;
-            }
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)

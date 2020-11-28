@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections
         private static readonly SkinInfo random_skin_info = new SkinInfo
         {
             ID = SkinInfo.RANDOM_SKIN,
-            Name = "<Random Skin>",
+            Name = "<随机皮肤>",
         };
 
         private List<SkinInfo> skinItems;

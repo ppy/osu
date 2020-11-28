@@ -1,21 +1,24 @@
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Screens.Mvis.Modules;
+using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.SideBar.Footer
 {
-    public class Footer : Container
+    public class Footer : CompositeDrawable
     {
-        private readonly Box bgBox;
+        [CanBeNull]
+        private Box bgBox;
 
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
-        public Footer()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             Height = 50;
@@ -31,11 +34,11 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
 
             InternalChildren = new Drawable[]
             {
-                bgBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-                new SkinnableSprite("MSidebar-BottomBox", confineMode: ConfineMode.ScaleToFill)
+                new SkinnableComponent(
+                    "MSidebar-BottomBox",
+                    confineMode: ConfineMode.ScaleToFill,
+                    masking: true,
+                    defaultImplementation: _ => createFooterBox())
                 {
                     Name = "侧边栏底部横条",
                     Anchor = Anchor.BottomRight,
@@ -49,11 +52,22 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
             };
         }
 
+        private Box createFooterBox()
+        {
+            bgBox = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = colourProvider.Background5
+            };
+
+            return bgBox;
+        }
+
         protected override void LoadComplete()
         {
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                bgBox.Colour = colourProvider.Background5;
+                bgBox?.FadeColour(colourProvider.Background5);
             }, true);
 
             base.LoadComplete();

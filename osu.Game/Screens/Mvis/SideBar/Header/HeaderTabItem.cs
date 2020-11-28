@@ -4,7 +4,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Modules;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar.Header

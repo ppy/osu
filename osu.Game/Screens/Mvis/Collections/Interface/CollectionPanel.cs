@@ -17,7 +17,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Modules.v2
+namespace osu.Game.Screens.Mvis.Collections.Interface
 {
     public class CollectionPanel : CompositeDrawable
     {
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
-            CornerRadius = 12.5f;
+            CornerRadius = 10f;
             Alpha = 0;
 
             Collection = c;

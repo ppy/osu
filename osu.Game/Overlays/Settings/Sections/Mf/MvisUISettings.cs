@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
-using osu.Game.Screens.Mvis.Modules;
+using osu.Game.Screens.Mvis;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {

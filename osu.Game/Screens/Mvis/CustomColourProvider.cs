@@ -9,7 +9,7 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.Modules
+namespace osu.Game.Screens.Mvis
 {
     ///<summary>
     ///更改自<see cref="OverlayColourProvider"/>

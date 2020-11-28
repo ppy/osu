@@ -16,7 +16,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
-namespace osu.Game.Screens.Mvis.Modules.v2
+namespace osu.Game.Screens.Mvis.Collections.Interface
 {
     public class BeatmapPiece : CompositeDrawable
     {
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Mvis.Modules.v2
         public BeatmapPiece(WorkingBeatmap b)
         {
             Masking = true;
-            CornerRadius = 12.5f;
+            CornerRadius = 10f;
             BorderThickness = 3f;
             RelativeSizeAxes = Axes.X;
             Height = 80;
@@ -126,12 +126,16 @@ namespace osu.Game.Screens.Mvis.Modules.v2
                         new OsuSpriteText
                         {
                             Text = Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20)
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20),
+                            RelativeSizeAxes = Axes.X,
+                            Truncate = true
                         },
                         new OsuSpriteText
                         {
                             Text = Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                            RelativeSizeAxes = Axes.X,
+                            Truncate = true
                         }
                     }
                 },

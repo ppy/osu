@@ -113,8 +113,7 @@ namespace osu.Game.Screens.Menu
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Alpha = 0.5f,
-                                AccentColour = Color4.DarkBlue,
+                                Colour = Color4.DarkBlue,
                                 Size = new Vector2(0.96f)
                             },
                             new Circle

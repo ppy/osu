@@ -442,6 +442,9 @@ namespace osu.Game.Rulesets.Edit
 
         public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 
+        public virtual SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+            new SnapResult(screenSpacePosition, null);
+
         public abstract float GetBeatSnapDistanceAt(double referenceTime);
 
         public abstract float DurationToDistance(double referenceTime, double duration);

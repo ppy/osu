@@ -20,7 +20,6 @@ namespace osu.Game.Tests.Visual.Mvis
         [Cached]
         private IdleTracker idle = new IdleTracker(6000);
 
-        private MvisScreen mvisScreen;
         private DependencyContainer dependencies;
 
         [Test]
@@ -31,7 +30,7 @@ namespace osu.Game.Tests.Visual.Mvis
                 if (Stack.CurrentScreen != null)
                     Stack?.Exit();
 
-                LoadScreen(mvisScreen = new MvisScreen());
+                LoadScreen(new MvisScreen());
             });
         }
 
@@ -44,8 +43,17 @@ namespace osu.Game.Tests.Visual.Mvis
             Add(idle);
             Add(musicController);
 
-            dependencies.Cache(new CollectionManager(LocalStorage));
+            CollectionManager collectionManager;
+            dependencies.Cache(collectionManager = new CollectionManager(LocalStorage));
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+
+            AddStep("Add Collection", () =>
+            {
+                collectionManager.Collections.Add(new BeatmapCollection
+                {
+                    Name = { Value = "Collection" },
+                });
+            });
         }
     }
 }

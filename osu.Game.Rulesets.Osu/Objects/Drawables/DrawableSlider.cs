@@ -19,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
+    public class DrawableSlider : DrawableOsuHitObject
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
@@ -86,18 +86,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Tracking.BindValueChanged(updateSlidingSample);
         }
 
-        protected override void OnApply(HitObject hitObject)
+        protected override void OnApply()
         {
-            base.OnApply(hitObject);
+            base.OnApply();
 
             // Ensure that the version will change after the upcoming BindTo().
             pathVersion.Value = int.MaxValue;
             PathVersion.BindTo(HitObject.Path.Version);
         }
 
-        protected override void OnFree(HitObject hitObject)
+        protected override void OnFree()
         {
-            base.OnFree(hitObject);
+            base.OnFree();
 
             PathVersion.UnbindFrom(HitObject.Path.Version);
         }
