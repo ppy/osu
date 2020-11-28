@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
     {
         protected override string Header => "General";
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, OsuGame game)
         {
             Children = new Drawable[]
