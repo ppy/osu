@@ -93,7 +93,18 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                 {
                                     new SkinnableComponent(
                                         "transparent",
-                                        defaultImplementation: _ => cover = createCover()),
+                                        confineMode: ConfineMode.ScaleToFill,
+                                        masking: true,
+                                        defaultImplementation: _ => cover = createCover())
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        ChildAnchor = Anchor.TopRight,
+                                        ChildOrigin = Anchor.TopRight,
+                                        RelativeSizeAxes = Axes.Both,
+                                        CentreComponent = false,
+                                        OverrideChildAnchor = true,
+                                    },
                                     new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
