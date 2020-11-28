@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,9 +22,12 @@ namespace osu.Game.Screens.Mvis.SideBar
         private CustomColourProvider colourProvider { get; set; }
 
         private readonly List<ISidebarContent> components = new List<ISidebarContent>();
-        private readonly WaveContainer waveContainer;
         private readonly TabHeader header;
         private const float duration = 400;
+        private HeaderTabItem prevTab;
+        private SampleChannel popInSample;
+        private SampleChannel popOutSample;
+        private bool playPopoutSample;
 
         [CanBeNull]
         private Box sidebarBg;
@@ -41,77 +46,56 @@ namespace osu.Game.Screens.Mvis.SideBar
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(0.3f, 1f);
 
-            InternalChild = waveContainer = new WaveContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                header = new TabHeader
                 {
-                    header = new TabHeader(),
-                    contentContainer = new Container
-                    {
-                        Name = "Content",
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true
-                    },
-                    new Footer.Footer()
+                    Depth = float.MinValue
+                },
+                contentContainer = new Container
+                {
+                    Name = "Content",
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true
+                },
+                new Footer.Footer
+                {
+                    Depth = float.MinValue
                 }
             };
         }
 
-        private bool headerShown = true;
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
-            contentContainer.AddRange(new Drawable[]
-            {
-                new SkinnableComponent(
-                    "MSidebar-background",
-                    confineMode: ConfineMode.ScaleToFill,
-                    masking: true,
-                    defaultImplementation: _ => sidebarBg = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background5,
-                        Alpha = 0.5f,
-                        Depth = float.MaxValue
-                    })
+            AddInternal(new SkinnableComponent(
+                "MSidebar-background",
+                confineMode: ConfineMode.ScaleToFill,
+                masking: true,
+                defaultImplementation: _ => sidebarBg = new Box
                 {
-                    Name = "侧边栏背景",
-                    Depth = float.MaxValue,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    ChildAnchor = Anchor.BottomRight,
-                    ChildOrigin = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.Both,
-                    CentreComponent = false,
-                    OverrideChildAnchor = true,
-                },
-                new ShowTabsButton
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Depth = float.MinValue,
-                    Action = () =>
-                    {
-                        if (headerShown)
-                        {
-                            header.MoveToY(-header.DrawHeight, 300, Easing.OutQuint).FadeOut(300);
-                            headerShown = false;
-                        }
-                        else
-                        {
-                            header.FadeIn().MoveToY(0, 300, Easing.OutQuint);
-                            headerShown = true;
-                        }
-                    },
-                    Margin = new MarginPadding(30)
-                }
+                    Colour = colourProvider.Background5,
+                    Alpha = 0.5f,
+                    Depth = float.MaxValue
+                })
+            {
+                Name = "侧边栏背景",
+                Depth = float.MaxValue,
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                ChildAnchor = Anchor.BottomRight,
+                ChildOrigin = Anchor.BottomRight,
+                RelativeSizeAxes = Axes.Both,
+                CentreComponent = false,
+                OverrideChildAnchor = true,
             });
+
+            popInSample = audio.Samples.Get(@"UI/overlay-pop-in");
+            popOutSample = audio.Samples.Get(@"UI/overlay-pop-out");
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                updateWaves();
                 sidebarBg?.FadeColour(colourProvider.Background5);
             }, true);
         }
@@ -121,8 +105,6 @@ namespace osu.Game.Screens.Mvis.SideBar
             CurrentDisplay.BindValueChanged(onCurrentDisplayChanged);
             base.LoadComplete();
         }
-
-        private HeaderTabItem prevTab;
 
         private void onCurrentDisplayChanged(ValueChangedEvent<Drawable> v)
         {
@@ -140,15 +122,6 @@ namespace osu.Game.Screens.Mvis.SideBar
                     break;
                 }
             }
-        }
-
-        private void updateWaves()
-        {
-            //与其他Overlay保持一致
-            waveContainer.FirstWaveColour = colourProvider.Light4;
-            waveContainer.SecondWaveColour = colourProvider.Light3;
-            waveContainer.ThirdWaveColour = colourProvider.Dark4;
-            waveContainer.FourthWaveColour = colourProvider.Dark3;
         }
 
         protected override void UpdateAfterChildren()
@@ -231,16 +204,27 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         protected override void PopOut()
         {
-            waveContainer.Hide();
+            if (playPopoutSample)
+                popOutSample?.Play();
+
+            this.MoveToX(100, 600, Easing.OutQuint)
+                .FadeOut(600 * 0.6f, Easing.OutExpo)
+                .OnComplete(_ => IsHidden = true);
+            contentContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+
             Hiding = true;
-            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InExpo).OnComplete(_ => IsHidden = true);
+            playPopoutSample = true;
         }
 
         protected override void PopIn()
         {
-            waveContainer.Show();
+            popInSample?.Play();
+
+            this.MoveToX(0, 600, Easing.OutQuint)
+                .FadeIn(600 * 0.6f, Easing.OutExpo);
+            contentContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+
             Hiding = false;
-            this.FadeIn(200);
         }
     }
 }

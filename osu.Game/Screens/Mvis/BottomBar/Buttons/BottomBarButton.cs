@@ -15,6 +15,8 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
@@ -37,6 +39,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         protected Box BgBox;
         private Box flashBox;
         private Container content;
+        private IconUsage emptyIcon => new IconUsage();
 
         public Action Action;
         public string TooltipText { get; set; }
@@ -57,6 +60,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
+            Font = OsuFont.GetFont(weight: FontWeight.Black)
         };
 
         protected SpriteIcon SpriteIcon = new SpriteIcon
@@ -66,11 +70,9 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             Size = new Vector2(13),
         };
 
-        public bool NoIcon;
-
         public BottomBarButton()
         {
-            Size = new Vector2(30, 30);
+            Size = new Vector2(30);
         }
 
         [BackgroundDependencyLoader]
@@ -116,10 +118,11 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                             Alpha = 0,
                         }
                     }
-                }
+                },
+                new HoverClickSounds()
             };
 
-            if (!NoIcon)
+            if (!ButtonIcon.Equals(emptyIcon))
                 ContentFillFlow.Add(SpriteIcon);
 
             if (Text != null)

@@ -22,14 +22,11 @@ namespace osu.Game.Screens.Mvis.BottomBar
             Height = 5;
             Alpha = idle_alpha;
 
-            FillColour = colourProvider.Highlight1;
-            BackgroundColour = colourProvider.Light4.Opacity(0.5f);
-
             colourProvider.HueColour.BindValueChanged(_ =>
             {
                 FillColour = colourProvider.Highlight1;
                 BackgroundColour = colourProvider.Light4.Opacity(0.5f);
-            });
+            }, true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -45,6 +42,6 @@ namespace osu.Game.Screens.Mvis.BottomBar
         }
 
         protected override void UpdateValue(float value) =>
-            fill.ResizeWidthTo(value * UsableWidth, 300, Easing.OutQuint);
+            fill.Width = value * UsableWidth;
     }
 }
