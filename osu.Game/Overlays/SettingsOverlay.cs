@@ -23,6 +23,7 @@ namespace osu.Game.Overlays
         {
             new GeneralSection(),
             new GraphicsSection(),
+            new UserInterfaceSection(),
             new GameplaySection(),
             new AudioSection(),
             new SkinSection(),
