@@ -5,6 +5,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
@@ -63,6 +64,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Always show key overlay",
                     Current = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
+                new SettingsSlider<float, TimeSlider>
+                {
+                    LabelText = "Hold-to-confirm activation time",
+                    Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
+                    KeyboardStep = 50
+                },
                 new SettingsCheckbox
                 {
                     LabelText = "Positional hitsounds",
@@ -94,6 +101,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Current = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
                 });
             }
+        }
+
+        private class TimeSlider : OsuSliderBar<float>
+        {
+            public override string TooltipText => Current.Value.ToString("N0") + "ms";
         }
     }
 }
