@@ -95,7 +95,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override Container<T> Content => scrollContentContainer;
 
-        private readonly OsuScrollContainer scrollContainer;
+        private readonly UserTrackingScrollContainer scrollContainer;
         private readonly Container headerBackgroundContainer;
         private readonly MarginPadding originalSectionsMargin;
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
@@ -139,7 +139,7 @@ namespace osu.Game.Graphics.Containers
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
         [NotNull]
-        protected virtual OsuScrollContainer CreateScrollContainer() => new OsuScrollContainer();
+        protected virtual UserTrackingScrollContainer CreateScrollContainer() => new UserTrackingScrollContainer();
 
         [NotNull]
         protected virtual FlowContainer<T> CreateScrollContentContainer() =>
@@ -201,9 +201,9 @@ namespace osu.Game.Graphics.Containers
                 {
                     SelectedSection.Value = Children.LastOrDefault();
                 }
-                else
+                else if (scrollContainer.UserScrolling)
                 {
-                    SelectedSection.Value = Children.TakeWhile(section => diff(section) <= section.Margin.Top).LastOrDefault()
+                    SelectedSection.Value = Children.TakeWhile(section => diff(section) <= 1).LastOrDefault()
                                             ?? Children.FirstOrDefault();
                 }
             }

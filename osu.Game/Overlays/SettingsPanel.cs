@@ -126,6 +126,7 @@ namespace osu.Game.Overlays
                     Action = () =>
                     {
                         SectionsContainer.ScrollTo(section);
+                        SectionsContainer.SelectedSection.Value = section;
                         Sidebar.State = ExpandedState.Contracted;
                     },
                 };
