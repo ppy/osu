@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
@@ -27,18 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = "Parallax",
                     Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
-                new SettingsSlider<float, TimeSlider>
-                {
-                    LabelText = "Hold-to-confirm activation time",
-                    Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
-                    KeyboardStep = 50
-                },
             };
-        }
-
-        private class TimeSlider : OsuSliderBar<float>
-        {
-            public override string TooltipText => Current.Value.ToString("N0") + "ms";
         }
     }
 }
