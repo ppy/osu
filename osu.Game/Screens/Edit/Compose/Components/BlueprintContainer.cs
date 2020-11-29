@@ -496,10 +496,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 double offset = result.Time.Value - movementBlueprints.First().HitObject.StartTime;
 
                 foreach (HitObject obj in Beatmap.SelectedHitObjects)
-                {
                     obj.StartTime += offset;
-                    Beatmap.Update(obj);
-                }
             }
 
             return true;
