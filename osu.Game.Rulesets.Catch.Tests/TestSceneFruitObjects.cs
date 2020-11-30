@@ -1,12 +1,16 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// TODO: this comment ensures CI time is not wasted
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -14,6 +18,14 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class TestSceneFruitObjects : CatchSkinnableTestScene
     {
+        [Cached]
+        private readonly DrawablePool<Pulp> pulpPool;
+
+        public TestSceneFruitObjects()
+        {
+            Add(pulpPool = new DrawablePool<Pulp>(1));
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
