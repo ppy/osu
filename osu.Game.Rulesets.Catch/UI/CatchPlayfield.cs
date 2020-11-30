@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -54,6 +55,13 @@ namespace osu.Game.Rulesets.Catch.UI
                 HitObjectContainer,
                 CatcherArea,
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            RegisterPool<Droplet, DrawableDroplet>(1);
+            RegisterPool<TinyDroplet, DrawableTinyDroplet>(1);
         }
 
         protected override void LoadComplete()
