@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Editing
 
             string hash = handler.CurrentStateHash;
 
-            // save a save without making any changes
+            // undo a change without saving
             handler.RestoreState(-1);
 
             Assert.That(originalHash, Is.EqualTo(handler.CurrentStateHash));
