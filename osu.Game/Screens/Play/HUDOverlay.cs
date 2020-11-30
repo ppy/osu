@@ -273,6 +273,24 @@ namespace osu.Game.Screens.Play
             Progress.BindDrawableRuleset(drawableRuleset);
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat) return false;
+
+            if (e.ShiftPressed)
+            {
+                switch (e.Key)
+                {
+                    case Key.Tab:
+
+
+                        return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
+        }
+
         protected virtual SkinnableAccuracyCounter CreateAccuracyCounter() => new SkinnableAccuracyCounter();
 
         protected virtual SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
