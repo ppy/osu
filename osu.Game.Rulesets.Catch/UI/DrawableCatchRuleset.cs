@@ -55,12 +55,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 case BananaShower shower:
                     return new DrawableBananaShower(shower, CreateDrawableRepresentation);
-
-                case TinyDroplet tiny:
-                    return new DrawableTinyDroplet(tiny);
-
-                case Droplet droplet:
-                    return new DrawableDroplet(droplet);
             }
 
             return null;
