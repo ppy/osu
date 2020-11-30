@@ -282,20 +282,7 @@ namespace osu.Game.Screens.Play
                 switch (e.Key)
                 {
                     case Key.Tab:
-                        switch (configVisibilityMode.Value)
-                        {
-                            case HUDVisibilityMode.Never:
-                                configVisibilityMode.Value = HUDVisibilityMode.HideDuringGameplay;
-                                break;
 
-                            case HUDVisibilityMode.HideDuringGameplay:
-                                configVisibilityMode.Value = HUDVisibilityMode.Always;
-                                break;
-
-                            case HUDVisibilityMode.Always:
-                                configVisibilityMode.Value = HUDVisibilityMode.Never;
-                                break;
-                        }
 
                         return true;
                 }
@@ -375,6 +362,24 @@ namespace osu.Game.Screens.Play
             {
                 case GlobalAction.HoldForHUD:
                     holdingForHUD = true;
+                    updateVisibility();
+                    return true;
+
+                case GlobalAction.ToggleInGameInterface:
+                    switch (configVisibilityMode.Value)
+                    {
+                        case HUDVisibilityMode.Never:
+                            configVisibilityMode.Value = HUDVisibilityMode.HideDuringGameplay;
+                            break;
+
+                        case HUDVisibilityMode.HideDuringGameplay:
+                            configVisibilityMode.Value = HUDVisibilityMode.Always;
+                            break;
+
+                        case HUDVisibilityMode.Always:
+                            configVisibilityMode.Value = HUDVisibilityMode.Never;
+                            break;
+                    }
                     updateVisibility();
                     return true;
             }
