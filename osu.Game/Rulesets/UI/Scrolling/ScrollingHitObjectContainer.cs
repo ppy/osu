@@ -150,16 +150,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        /// <summary>
-        /// Make this <see cref="DrawableHitObject"/> lifetime and layout computed in next update.
-        /// </summary>
-        private void invalidateHitObject(DrawableHitObject hitObject)
-        {
-            // Lifetime computation is delayed until next update because
-            // when the hit object is not pooled this container is not loaded here and `scrollLength` cannot be computed.
-            toComputeLifetime.Add(hitObject);
-            layoutComputed.Remove(hitObject);
-        }
+        protected override void OnAdd(DrawableHitObject drawableHitObject) => onAddRecursive(drawableHitObject);
+
+        protected override void OnRemove(DrawableHitObject drawableHitObject) => onRemoveRecursive(drawableHitObject);
 
         private void onAddRecursive(DrawableHitObject hitObject)
         {
@@ -170,8 +163,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             foreach (var nested in hitObject.NestedHitObjects)
                 onAddRecursive(nested);
         }
-
-        protected override void OnAdd(DrawableHitObject drawableHitObject) => onAddRecursive(drawableHitObject);
 
         private void onRemoveRecursive(DrawableHitObject hitObject)
         {
@@ -184,7 +175,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 onRemoveRecursive(nested);
         }
 
-        protected override void OnRemove(DrawableHitObject drawableHitObject) => onRemoveRecursive(drawableHitObject);
+        /// <summary>
+        /// Make this <see cref="DrawableHitObject"/> lifetime and layout computed in next update.
+        /// </summary>
+        private void invalidateHitObject(DrawableHitObject hitObject)
+        {
+            // Lifetime computation is delayed until next update because
+            // when the hit object is not pooled this container is not loaded here and `scrollLength` cannot be computed.
+            toComputeLifetime.Add(hitObject);
+            layoutComputed.Remove(hitObject);
+        }
 
         private float scrollLength;
 
