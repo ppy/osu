@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
+            comboIndexBindable.BindValueChanged(_ => UpdateComboColour(), true);
 
             updateState(ArmedState.Idle, true);
         }
@@ -530,7 +530,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            updateComboColour();
+            UpdateComboColour();
 
             ApplySkin(skin, allowFallback);
 
@@ -538,7 +538,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 updateState(State.Value, true);
         }
 
-        private void updateComboColour()
+        protected void UpdateComboColour()
         {
             if (!(HitObject is IHasComboInformation combo)) return;
 
