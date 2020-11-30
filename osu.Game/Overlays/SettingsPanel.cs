@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -72,8 +73,8 @@ namespace osu.Game.Overlays
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(2, 1), // over-extend to the left for transitions
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                        Alpha = 0.6f,
+                        Colour = OsuColour.Gray(0.05f),
+                        Alpha = 1,
                     },
                     SectionsContainer = new SettingsSectionsContainer
                     {
@@ -214,7 +215,7 @@ namespace osu.Game.Overlays
                 base.UpdateAfterChildren();
 
                 // no null check because the usage of this class is strict
-                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
+                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y;
             }
         }
     }
