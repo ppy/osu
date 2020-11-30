@@ -25,6 +25,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
             Masking = true;
         }
 
+        protected override void FreeAfterUse()
+        {
+            AccentColour.UnbindAll();
+            base.FreeAfterUse();
+        }
+
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
 
         protected override void LoadComplete()
