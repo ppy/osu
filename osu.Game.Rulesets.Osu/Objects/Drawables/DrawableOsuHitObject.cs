@@ -9,9 +9,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -61,13 +59,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             PositionBindable.BindTo(HitObject.PositionBindable);
             StackHeightBindable.BindTo(HitObject.StackHeightBindable);
             ScaleBindable.BindTo(HitObject.ScaleBindable);
-
-            // Manually set to reduce the number of future alive objects to a bare minimum.
-            LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
-
-            // Arbitrary lifetime end to prevent past objects in idle states remaining alive in non-frame-stable contexts.
-            // An extra 1000ms is added to always overestimate the true lifetime, and a more exact value is set by hit transforms and the following expiry.
-            LifetimeEnd = HitObject.GetEndTime() + HitObject.HitWindows.WindowFor(HitResult.Miss) + 1000;
         }
 
         protected override void OnFree()
