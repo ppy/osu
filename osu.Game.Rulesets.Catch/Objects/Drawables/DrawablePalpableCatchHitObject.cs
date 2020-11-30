@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected readonly Container ScaleContainer;
 
-        protected DrawablePalpableCatchHitObject(CatchHitObject h)
+        protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
             : base(h)
         {
             Origin = Anchor.Centre;
@@ -43,8 +44,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
             });
-
-            IndexInBeatmap.Value = h.IndexInBeatmap;
         }
 
         [BackgroundDependencyLoader]

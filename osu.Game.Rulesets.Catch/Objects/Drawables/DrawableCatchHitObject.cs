@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.UI;
@@ -19,12 +20,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
 
-        protected DrawableCatchHitObject(CatchHitObject hitObject)
+        protected DrawableCatchHitObject([CanBeNull] CatchHitObject hitObject)
             : base(hitObject)
         {
-            if (hitObject != null)
-                XBindable.Value = hitObject.X;
-
             Anchor = Anchor.BottomLeft;
         }
 
