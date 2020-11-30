@@ -64,6 +64,7 @@ namespace osu.Game.Rulesets.Catch.UI
             RegisterPool<TinyDroplet, DrawableTinyDroplet>(1);
             RegisterPool<Fruit, DrawableFruit>(1);
             RegisterPool<Banana, DrawableBanana>(1);
+            RegisterPool<JuiceStream, DrawableJuiceStream>(1);
         }
 
         protected override void LoadComplete()

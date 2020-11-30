@@ -44,9 +44,6 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             switch (h)
             {
-                case JuiceStream stream:
-                    return new DrawableJuiceStream(stream, CreateDrawableRepresentation);
-
                 case BananaShower shower:
                     return new DrawableBananaShower(shower, CreateDrawableRepresentation);
             }
