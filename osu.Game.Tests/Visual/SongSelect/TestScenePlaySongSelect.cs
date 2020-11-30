@@ -688,6 +688,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("unbind beatmap changed", () => Beatmap.ValueChanged -= onChange);
             AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
 
+            // ReSharper disable once AccessToModifiedClosure
             void onChange(ValueChangedEvent<WorkingBeatmap> valueChangedEvent) => changeCount++;
         }
 
