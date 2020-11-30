@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings
         public virtual IEnumerable<string> FilterTerms => new[] { Header };
 
         private const int header_size = 26;
-        private const int header_margin = 25;
+        private const int margin = 20;
         private const int border_size = 2;
 
         public bool MatchingFilter
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Settings
 
         protected SettingsSection()
         {
-            Margin = new MarginPadding { Top = 20 };
+            Margin = new MarginPadding { Top = margin };
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
@@ -46,10 +46,9 @@ namespace osu.Game.Overlays.Settings
             {
                 Margin = new MarginPadding
                 {
-                    Top = header_size + header_margin
+                    Top = header_size
                 },
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 30),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
             };
@@ -70,7 +69,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     Padding = new MarginPadding
                     {
-                        Top = 20 + border_size,
+                        Top = margin + border_size,
                         Bottom = 10,
                     },
                     RelativeSizeAxes = Axes.X,
@@ -82,7 +81,11 @@ namespace osu.Game.Overlays.Settings
                             Font = OsuFont.GetFont(size: header_size),
                             Text = Header,
                             Colour = colours.Yellow,
-                            Margin = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS }
+                            Margin = new MarginPadding
+                            {
+                                Left = SettingsPanel.CONTENT_MARGINS,
+                                Right = SettingsPanel.CONTENT_MARGINS
+                            }
                         },
                         FlowContent
                     }
