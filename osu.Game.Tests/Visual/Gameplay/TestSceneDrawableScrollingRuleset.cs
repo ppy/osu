@@ -90,22 +90,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             assertChildPosition(5);
         }
 
-        private void assertDead(int index) => AddAssert($"hitobject {index} is dead", () => getDrawableHitObject(index) == null);
-
-        private void assertHeight(int index) => AddAssert($"hitobject {index} height", () =>
-        {
-            var d = getDrawableHitObject(index);
-            return d != null && Precision.AlmostEquals(d.DrawHeight, yScale * (float)(d.HitObject.Duration / time_range), 0.1f);
-        });
-
-        private void assertChildPosition(int index) => AddAssert($"hitobject {index} child position", () =>
-        {
-            var d = getDrawableHitObject(index);
-            return d is DrawableTestParentHitObject && Precision.AlmostEquals(
-                d.NestedHitObjects.First().DrawPosition.Y,
-                yScale * (float)((TestParentHitObject)d.HitObject).ChildTimeOffset / time_range, 0.1f);
-        });
-
         [Test]
         public void TestRelativeBeatLengthScaleSingleTimingPoint()
         {
@@ -219,6 +203,22 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private float yScale => drawableRuleset.Playfield.HitObjectContainer.DrawHeight;
+
+        private void assertDead(int index) => AddAssert($"hitobject {index} is dead", () => getDrawableHitObject(index) == null);
+
+        private void assertHeight(int index) => AddAssert($"hitobject {index} height", () =>
+        {
+            var d = getDrawableHitObject(index);
+            return d != null && Precision.AlmostEquals(d.DrawHeight, yScale * (float)(d.HitObject.Duration / time_range), 0.1f);
+        });
+
+        private void assertChildPosition(int index) => AddAssert($"hitobject {index} child position", () =>
+        {
+            var d = getDrawableHitObject(index);
+            return d is DrawableTestParentHitObject && Precision.AlmostEquals(
+                d.NestedHitObjects.First().DrawPosition.Y,
+                yScale * (float)((TestParentHitObject)d.HitObject).ChildTimeOffset / time_range, 0.1f);
+        });
 
         private void assertPosition(int index, float relativeY) => AddAssert($"hitobject {index} at {relativeY}",
             () => Precision.AlmostEquals(getDrawableHitObject(index)?.DrawPosition.Y ?? -1, yScale * relativeY));
