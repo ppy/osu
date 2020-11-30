@@ -55,6 +55,11 @@ namespace osu.Game.Rulesets.Catch.UI
                 HitObjectContainer,
                 CatcherArea,
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             NewResult += onNewResult;
             RevertResult += onRevertResult;
