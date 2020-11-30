@@ -44,12 +44,6 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             switch (h)
             {
-                case Banana banana:
-                    return new DrawableBanana(banana);
-
-                case Fruit fruit:
-                    return new DrawableFruit(fruit);
-
                 case JuiceStream stream:
                     return new DrawableJuiceStream(stream, CreateDrawableRepresentation);
 
