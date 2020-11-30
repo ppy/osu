@@ -302,14 +302,21 @@ namespace osu.Game.Tests.Visual.Gameplay
                 TimeRange.Value = time_range;
             }
 
-            public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h) =>
-                h switch
+            public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h)
+            {
+                switch (h)
                 {
-                    TestPooledHitObject _ => null,
-                    TestPooledParentHitObject _ => null,
-                    TestParentHitObject p => new DrawableTestParentHitObject(p),
-                    _ => new DrawableTestHitObject(h),
-                };
+                    case TestPooledHitObject _:
+                    case TestPooledParentHitObject _:
+                        return null;
+
+                    case TestParentHitObject p:
+                        return new DrawableTestParentHitObject(p);
+
+                    default:
+                        return new DrawableTestHitObject(h);
+                }
+            }
 
             protected override PassThroughInputManager CreateInputManager() => new PassThroughInputManager();
 
