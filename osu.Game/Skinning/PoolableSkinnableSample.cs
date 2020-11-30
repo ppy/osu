@@ -83,6 +83,7 @@ namespace osu.Game.Skinning
             bool wasPlaying = Playing;
 
             sampleContainer.Clear();
+            Sample = null;
 
             var ch = CurrentSkin.GetSample(sampleInfo);
 
