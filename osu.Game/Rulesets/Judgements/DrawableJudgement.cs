@@ -32,9 +32,6 @@ namespace osu.Game.Rulesets.Judgements
 
         private readonly Container aboveHitObjectsContent;
 
-        [Resolved]
-        private ISkinSource skinSource { get; set; }
-
         /// <summary>
         /// Duration of initial fade in.
         /// </summary>
@@ -78,29 +75,6 @@ namespace osu.Game.Rulesets.Judgements
 
         public Drawable GetProxyAboveHitObjectsContent() => aboveHitObjectsContent.CreateProxy();
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            skinSource.SourceChanged += onSkinChanged;
-        }
-
-        private void onSkinChanged()
-        {
-            // on a skin change, the child component will update but not get correctly triggered to play its animation.
-            // we need to trigger a reinitialisation to make things right.
-            currentDrawableType = null;
-
-            PrepareForUse();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (skinSource != null)
-                skinSource.SourceChanged -= onSkinChanged;
-        }
-
         /// <summary>
         /// Apply top-level animations to the current judgement when successfully hit.
         /// If displaying components which require lifetime extensions, manually adjusting <see cref="Drawable.LifetimeEnd"/> is required.
@@ -142,13 +116,14 @@ namespace osu.Game.Rulesets.Judgements
 
             Debug.Assert(Result != null);
 
-            prepareDrawables();
-
             runAnimation();
         }
 
         private void runAnimation()
         {
+            // is a no-op if the drawables are already in a correct state.
+            prepareDrawables();
+
             // undo any transforms applies in ApplyMissAnimations/ApplyHitAnimations to get a sane initial state.
             ApplyTransformsAt(double.MinValue, true);
             ClearTransforms(true);
@@ -203,7 +178,6 @@ namespace osu.Game.Rulesets.Judgements
             if (JudgementBody != null)
                 RemoveInternal(JudgementBody);
 
-            aboveHitObjectsContent.Clear();
             AddInternal(JudgementBody = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ =>
                 CreateDefaultJudgement(type), confineMode: ConfineMode.NoScaling)
             {
@@ -211,14 +185,29 @@ namespace osu.Game.Rulesets.Judgements
                 Origin = Anchor.Centre,
             });
 
-            if (JudgementBody.Drawable is IAnimatableJudgement animatable)
+            JudgementBody.OnSkinChanged += () =>
             {
-                var proxiedContent = animatable.GetAboveHitObjectsProxiedContent();
-                if (proxiedContent != null)
-                    aboveHitObjectsContent.Add(proxiedContent);
-            }
+                // on a skin change, the child component will update but not get correctly triggered to play its animation (or proxy the newly created content).
+                // we need to trigger a reinitialisation to make things right.
+                proxyContent();
+                runAnimation();
+            };
+
+            proxyContent();
 
             currentDrawableType = type;
+
+            void proxyContent()
+            {
+                aboveHitObjectsContent.Clear();
+
+                if (JudgementBody.Drawable is IAnimatableJudgement animatable)
+                {
+                    var proxiedContent = animatable.GetAboveHitObjectsProxiedContent();
+                    if (proxiedContent != null)
+                        aboveHitObjectsContent.Add(proxiedContent);
+                }
+            }
         }
 
         protected virtual Drawable CreateDefaultJudgement(HitResult result) => new DefaultJudgementPiece(result);
