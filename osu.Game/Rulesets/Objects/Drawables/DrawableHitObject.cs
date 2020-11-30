@@ -260,21 +260,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             HitObject.DefaultsApplied += onDefaultsApplied;
 
-            OnApply(hitObject);
+            OnApply();
             HitObjectApplied?.Invoke(this);
 
-            // If not loaded, the state update happens in LoadComplete(). Otherwise, the update is scheduled to allow for lifetime updates.
+            // If not loaded, the state update happens in LoadComplete().
             if (IsLoaded)
             {
-                Scheduler.Add(() =>
-                {
-                    if (Result.IsHit)
-                        updateState(ArmedState.Hit, true);
-                    else if (Result.HasResult)
-                        updateState(ArmedState.Miss, true);
-                    else
-                        updateState(ArmedState.Idle, true);
-                });
+                if (Result.IsHit)
+                    updateState(ArmedState.Hit, true);
+                else if (Result.HasResult)
+                    updateState(ArmedState.Miss, true);
+                else
+                    updateState(ArmedState.Idle, true);
             }
 
             hasHitObjectApplied = true;
@@ -315,7 +312,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             HitObject.DefaultsApplied -= onDefaultsApplied;
 
-            OnFree(HitObject);
+            OnFree();
 
             HitObject = null;
             Result = null;
@@ -340,16 +337,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Invoked for this <see cref="DrawableHitObject"/> to take on any values from a newly-applied <see cref="HitObject"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> being applied.</param>
-        protected virtual void OnApply(HitObject hitObject)
+        protected virtual void OnApply()
         {
         }
 
         /// <summary>
         /// Invoked for this <see cref="DrawableHitObject"/> to revert any values previously taken on from the currently-applied <see cref="HitObject"/>.
         /// </summary>
-        /// <param name="hitObject">The currently-applied <see cref="HitObject"/>.</param>
-        protected virtual void OnFree(HitObject hitObject)
+        protected virtual void OnFree()
         {
         }
 
