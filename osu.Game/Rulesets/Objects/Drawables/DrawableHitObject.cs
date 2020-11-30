@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
+            comboIndexBindable.BindValueChanged(_ => UpdateComboColour(), true);
 
             updateState(ArmedState.Idle, true);
         }
@@ -263,18 +263,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
             OnApply();
             HitObjectApplied?.Invoke(this);
 
-            // If not loaded, the state update happens in LoadComplete(). Otherwise, the update is scheduled to allow for lifetime updates.
+            // If not loaded, the state update happens in LoadComplete().
             if (IsLoaded)
             {
-                Scheduler.Add(() =>
-                {
-                    if (Result.IsHit)
-                        updateState(ArmedState.Hit, true);
-                    else if (Result.HasResult)
-                        updateState(ArmedState.Miss, true);
-                    else
-                        updateState(ArmedState.Idle, true);
-                });
+                if (Result.IsHit)
+                    updateState(ArmedState.Hit, true);
+                else if (Result.HasResult)
+                    updateState(ArmedState.Miss, true);
+                else
+                    updateState(ArmedState.Idle, true);
             }
 
             hasHitObjectApplied = true;
@@ -533,7 +530,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            updateComboColour();
+            UpdateComboColour();
 
             ApplySkin(skin, allowFallback);
 
@@ -541,7 +538,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 updateState(State.Value, true);
         }
 
-        private void updateComboColour()
+        protected void UpdateComboColour()
         {
             if (!(HitObject is IHasComboInformation combo)) return;
 
@@ -714,6 +711,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
+        /// The maximum offset from the end time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> can be judged.
+        /// The time offset of <see cref="Result"/> will be clamped to this value during <see cref="ApplyResult"/>.
+        /// <para>
+        /// Defaults to the miss window of <see cref="HitObject"/>.
+        /// </para>
+        /// </summary>
+        /// <remarks>
+        /// This does not affect the time offset provided to invocations of <see cref="CheckForResult"/>.
+        /// </remarks>
+        protected virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
+
+        /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
@@ -752,14 +761,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.Judgement.MinResult} ... {Result.Judgement.MaxResult}]).");
             }
 
-            // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
-            var endTime = HitObject.GetEndTime();
-
-            Result.TimeOffset = Time.Current - endTime;
-
-            double missWindow = HitObject.HitWindows.WindowFor(HitResult.Miss);
-            if (missWindow > 0)
-                Result.TimeOffset = Math.Min(Result.TimeOffset, missWindow);
+            Result.TimeOffset = Math.Min(MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
@@ -781,8 +783,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Judged)
                 return false;
 
-            var endTime = HitObject.GetEndTime();
-            CheckForResult(userTriggered, Time.Current - endTime);
+            CheckForResult(userTriggered, Time.Current - HitObject.GetEndTime());
 
             return Judged;
         }
