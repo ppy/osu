@@ -23,11 +23,11 @@ namespace osu.Game.Overlays
         {
             new GeneralSection(),
             new GraphicsSection(),
+            new AudioSection(),
+            new InputSection(createSubPanel(new KeyBindingPanel())),
             new UserInterfaceSection(),
             new GameplaySection(),
-            new AudioSection(),
             new SkinSection(),
-            new InputSection(createSubPanel(new KeyBindingPanel())),
             new OnlineSection(),
             new MaintenanceSection(),
             new DebugSection(),
