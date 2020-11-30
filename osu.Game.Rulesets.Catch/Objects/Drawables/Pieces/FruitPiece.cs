@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
@@ -18,8 +20,15 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         /// </summary>
         public const float RADIUS_ADJUST = 1.1f;
 
-        private BorderPiece border;
-        private PalpableCatchHitObject hitObject;
+        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
+        public readonly Bindable<bool> HyperDash = new Bindable<bool>();
+        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
+
+        [CanBeNull]
+        private DrawableCatchHitObject drawableHitObject;
+
+        [CanBeNull]
+        private BorderPiece borderPiece;
 
         public FruitPiece()
         {
@@ -27,31 +36,35 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject)
+        private void load([CanBeNull] DrawableHitObject drawable)
         {
-            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
-            hitObject = drawableCatchObject.HitObject;
+            drawableHitObject = (DrawableCatchHitObject)drawable;
+
+            if (drawable != null)
+                AccentColour.BindTo(drawable.AccentColour);
 
             AddRangeInternal(new Drawable[]
             {
                 new FruitPulpFormation
                 {
-                    VisualRepresentation = { Value = hitObject.VisualRepresentation },
-                    AccentColour = { BindTarget = drawableObject.AccentColour },
+                    VisualRepresentation = { BindTarget = VisualRepresentation },
+                    AccentColour = { BindTarget = AccentColour },
                 },
-                border = new BorderPiece(),
+                borderPiece = new BorderPiece(),
             });
 
-            if (hitObject.HyperDash)
-            {
+            // if it is not part of a DHO, the border is always invisible.
+            if (drawableHitObject != null)
+                AddInternal(borderPiece = new BorderPiece());
+
+            if (HyperDash.Value)
                 AddInternal(new HyperBorderPiece());
-            }
         }
 
         protected override void Update()
         {
-            base.Update();
-            border.Alpha = (float)Math.Clamp((hitObject.StartTime - Time.Current) / 500, 0, 1);
+            if (borderPiece != null && drawableHitObject?.HitObject != null)
+                borderPiece.Alpha = (float)Math.Clamp((drawableHitObject.HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
     }
 
