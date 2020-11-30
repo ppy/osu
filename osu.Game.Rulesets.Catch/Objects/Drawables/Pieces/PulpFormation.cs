@@ -6,7 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Framework.Graphics.Pooling;
 using osuTK;
 using osuTK.Graphics;
 
@@ -14,7 +14,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
     public abstract class PulpFormation : CompositeDrawable
     {
-        protected readonly IBindable<Color4> AccentColour = new Bindable<Color4>();
+        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
+
+        [Resolved(canBeNull: true)]
+        private DrawablePool<Pulp> pulpPool { get; set; }
 
         protected const float LARGE_PULP_3 = 16f * FruitPiece.RADIUS_ADJUST;
         protected const float DISTANCE_FROM_CENTRE_3 = 0.15f;
@@ -33,11 +36,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
             distance * MathF.Sin(angle * MathF.PI / 180),
             distance * MathF.Cos(angle * MathF.PI / 180));
 
-        [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject)
+        protected void Add(Vector2 position, Vector2 size)
         {
-            DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
-            AccentColour.BindTo(drawableCatchObject.AccentColour);
+            var pulp = pulpPool?.Get() ?? new Pulp();
+            pulp.Position = position;
+            pulp.Size = size;
+            pulp.AccentColour.BindTo(AccentColour);
+            AddInternal(pulp);
         }
     }
 }

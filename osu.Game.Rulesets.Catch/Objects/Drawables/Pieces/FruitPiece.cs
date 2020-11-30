@@ -3,9 +3,11 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
@@ -30,9 +32,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
             var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
             hitObject = drawableCatchObject.HitObject;
 
-            AddRangeInternal(new[]
+            AddRangeInternal(new Drawable[]
             {
-                getFruitFor(hitObject.VisualRepresentation),
+                new FruitPulpFormation
+                {
+                    VisualRepresentation = { Value = hitObject.VisualRepresentation },
+                    AccentColour = { BindTarget = drawableObject.AccentColour },
+                },
                 border = new BorderPiece(),
             });
 
@@ -47,28 +53,59 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
             base.Update();
             border.Alpha = (float)Math.Clamp((hitObject.StartTime - Time.Current) / 500, 0, 1);
         }
+    }
 
-        private Drawable getFruitFor(FruitVisualRepresentation representation)
+    internal class FruitPulpFormation : PulpFormation
+    {
+        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
+
+        protected override void LoadComplete()
         {
-            switch (representation)
+            base.LoadComplete();
+            VisualRepresentation.BindValueChanged(setFormation, true);
+        }
+
+        private void setFormation(ValueChangedEvent<FruitVisualRepresentation> visualRepresentation)
+        {
+            ClearInternal();
+
+            switch (visualRepresentation.NewValue)
             {
                 case FruitVisualRepresentation.Pear:
-                    return new PearPiece();
+                    Add(new Vector2(0, -0.33f), new Vector2(SMALL_PULP));
+                    Add(PositionAt(60, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    Add(PositionAt(180, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    Add(PositionAt(300, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    break;
 
                 case FruitVisualRepresentation.Grape:
-                    return new GrapePiece();
+                    Add(new Vector2(0, -0.25f), new Vector2(SMALL_PULP));
+                    Add(PositionAt(0, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    Add(PositionAt(120, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    Add(PositionAt(240, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    break;
 
                 case FruitVisualRepresentation.Pineapple:
-                    return new PineapplePiece();
-
-                case FruitVisualRepresentation.Banana:
-                    return new BananaPiece();
+                    Add(new Vector2(0, -0.3f), new Vector2(SMALL_PULP));
+                    Add(PositionAt(45, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    Add(PositionAt(135, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    Add(PositionAt(225, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    Add(PositionAt(315, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    break;
 
                 case FruitVisualRepresentation.Raspberry:
-                    return new RaspberryPiece();
-            }
+                    Add(new Vector2(0, -0.34f), new Vector2(SMALL_PULP));
+                    Add(PositionAt(0, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    Add(PositionAt(90, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    Add(PositionAt(180, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    Add(PositionAt(270, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    break;
 
-            return Empty();
+                case FruitVisualRepresentation.Banana:
+                    Add(new Vector2(0, -0.3f), new Vector2(SMALL_PULP));
+                    Add(new Vector2(0, 0.05f), new Vector2(LARGE_PULP_4 * 0.8f, LARGE_PULP_4 * 2.5f));
+                    break;
+            }
         }
     }
 }

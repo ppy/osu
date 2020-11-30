@@ -5,12 +5,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
-    public class Pulp : Circle
+    public class Pulp : PoolableDrawable
     {
         public Pulp()
         {
@@ -20,6 +21,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 
             Blending = BlendingParameters.Additive;
             Colour = Color4.White.Opacity(0.9f);
+
+            Masking = true;
         }
 
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
@@ -28,11 +31,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         {
             base.LoadComplete();
 
+            AddInternal(new Box { RelativeSizeAxes = Axes.Both });
+
             AccentColour.BindValueChanged(updateAccentColour, true);
         }
 
         private void updateAccentColour(ValueChangedEvent<Color4> colour)
         {
+            CornerRadius = DrawWidth / 2;
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,

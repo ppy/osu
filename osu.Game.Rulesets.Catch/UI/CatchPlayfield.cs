@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -29,6 +32,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         internal readonly CatcherArea CatcherArea;
 
+        [Cached]
+        private readonly DrawablePool<Pulp> pulpPool;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             // only check the X position; handle all vertical space.
             base.ReceivePositionalInputAt(new Vector2(screenSpacePos.X, ScreenSpaceDrawQuad.Centre.Y));
@@ -50,6 +56,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new[]
             {
+                pulpPool = new DrawablePool<Pulp>(1),
                 explodingFruitContainer,
                 CatcherArea.MovableCatcher.CreateProxiedContent(),
                 HitObjectContainer,
