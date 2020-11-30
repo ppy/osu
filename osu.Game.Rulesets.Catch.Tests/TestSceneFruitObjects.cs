@@ -3,6 +3,8 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osuTK;
@@ -55,9 +57,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         protected virtual DrawableCatchHitObject SetProperties(DrawableCatchHitObject d)
         {
             var hitObject = d.HitObject;
+            hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 0 });
             hitObject.StartTime = 1000000000000;
             hitObject.Scale = 1.5f;
-            hitObject.Samples.Clear(); // otherwise crash due to samples not loaded
 
             d.Anchor = Anchor.Centre;
             d.RelativePositionAxes = Axes.None;
