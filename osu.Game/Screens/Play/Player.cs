@@ -339,7 +339,11 @@ namespace osu.Game.Screens.Play
                         AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         IsCounting = false
                     },
-                    RequestSeek = GameplayClockContainer.Seek,
+                    RequestSeek = time =>
+                    {
+                        GameplayClockContainer.Seek(time);
+                        GameplayClockContainer.Start();
+                    },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },

@@ -53,9 +53,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
-        protected override void OnApply(HitObject hitObject)
+        protected override void OnApply()
         {
-            base.OnApply(hitObject);
+            base.OnApply();
 
             IndexInCurrentComboBindable.BindTo(HitObject.IndexInCurrentComboBindable);
             PositionBindable.BindTo(HitObject.PositionBindable);
@@ -70,9 +70,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             LifetimeEnd = HitObject.GetEndTime() + HitObject.HitWindows.WindowFor(HitResult.Miss) + 1000;
         }
 
-        protected override void OnFree(HitObject hitObject)
+        protected override void OnFree()
         {
-            base.OnFree(hitObject);
+            base.OnFree();
 
             IndexInCurrentComboBindable.UnbindFrom(HitObject.IndexInCurrentComboBindable);
             PositionBindable.UnbindFrom(HitObject.PositionBindable);
