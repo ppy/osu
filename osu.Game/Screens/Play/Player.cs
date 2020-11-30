@@ -676,7 +676,8 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            Background.EnableUserDim.Value = true;
+            Background.EnableGameplayDim.Value = true;
+            Background.EnableUIBlur.Value = false;
             Background.BlurAmount.Value = 0;
 
             // bind component bindables.
@@ -783,7 +784,7 @@ namespace osu.Game.Screens.Play
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
 
-            Background.EnableUserDim.Value = false;
+            Background.EnableGameplayDim.Value = false;
             storyboardReplacesBackground.Value = false;
         }
 

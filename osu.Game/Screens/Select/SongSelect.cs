@@ -35,6 +35,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Collections;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using System.Diagnostics;
@@ -105,7 +106,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog)
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog, OsuConfigManager config)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -518,6 +519,12 @@ namespace osu.Game.Screens.Select
             this.FadeInFromZero(250);
             FilterControl.Activate();
 
+            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
+            {
+                backgroundModeBeatmap.BlurAmount.Value = 1;
+                backgroundModeBeatmap.EnableUIBlur.Value = true;
+            }
+
             ModSelect.SelectedMods.BindTo(selectedMods);
 
             beginLooping();
@@ -679,7 +686,8 @@ namespace osu.Game.Screens.Select
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
+                backgroundModeBeatmap.BlurAmount.Value = 1;
+                backgroundModeBeatmap.EnableUIBlur.Value = true;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
             }
 

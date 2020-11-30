@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToPlayer(Player player)
         {
-            player.Background.EnableUserDim.Value = false;
+            player.Background.EnableGameplayDim.Value = false;
 
             player.DimmableStoryboard.IgnoreUserSettings.Value = true;
 

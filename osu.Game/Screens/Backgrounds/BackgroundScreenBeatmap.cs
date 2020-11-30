@@ -18,23 +18,33 @@ namespace osu.Game.Screens.Backgrounds
     public class BackgroundScreenBeatmap : BackgroundScreen
     {
         /// <summary>
-        /// The amount of blur to apply when full user blur is requested.
+        /// The amount of blur to apply when full gameplay blur is requested.
         /// </summary>
-        public const float USER_BLUR_FACTOR = 25;
+        public const float GAMEPLAY_BLUR_FACTOR = 25;
+
+        /// <summary>
+        /// The amount of blur to apply when full UI blur is requested.
+        /// </summary>
+        public const float UI_BLUR_FACTOR = 25;
 
         protected Background Background;
 
         private WorkingBeatmap beatmap;
 
         /// <summary>
-        /// Whether or not user dim settings should be applied to this Background.
+        /// Whether or not gameplay dim/blur settings should be applied to this Background.
         /// </summary>
-        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
+        public readonly Bindable<bool> EnableGameplayDim = new Bindable<bool>();
+
+        /// <summary>
+        /// Whether or not UI blur settings should be applied to this Background.
+        /// </summary>
+        public readonly Bindable<bool> EnableUIBlur = new Bindable<bool>();
 
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         /// <summary>
-        /// The amount of blur to be applied in addition to user-specified blur.
+        /// The amount of blur to be applied in addition to the game-specified or UI-specified blur.
         /// </summary>
         public readonly Bindable<float> BlurAmount = new BindableFloat();
 
@@ -50,7 +60,8 @@ namespace osu.Game.Screens.Backgrounds
 
             InternalChild = dimmable = CreateFadeContainer();
 
-            dimmable.EnableUserDim.BindTo(EnableUserDim);
+            dimmable.EnableGameplayDim.BindTo(EnableGameplayDim);
+            dimmable.EnableUIBlur.BindTo(EnableUIBlur);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
 
@@ -121,6 +132,11 @@ namespace osu.Game.Screens.Backgrounds
             /// </remarks>
             public readonly Bindable<float> BlurAmount = new BindableFloat();
 
+            /// <summary>
+            /// Whether or not UI blur settings should be applied to this Background.
+            /// </summary>
+            public readonly Bindable<bool> EnableUIBlur = new Bindable<bool>();
+
             public Background Background
             {
                 get => background;
@@ -133,7 +149,8 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
-            private Bindable<double> userBlurLevel { get; set; }
+            private Bindable<double> gameplayBlurLevel { get; set; }
+            private Bindable<double> uiBlurLevel { get; set; }
 
             private Background background;
 
@@ -148,21 +165,25 @@ namespace osu.Game.Screens.Backgrounds
             /// <summary>
             /// As an optimisation, we add the two blur portions to be applied rather than actually applying two separate blurs.
             /// </summary>
-            private Vector2 blurTarget => EnableUserDim.Value
-                ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR)
-                : new Vector2(BlurAmount.Value);
+            private Vector2 blurTarget => EnableGameplayDim.Value
+                ? new Vector2(BlurAmount.Value + (float)gameplayBlurLevel.Value * GAMEPLAY_BLUR_FACTOR)
+                : EnableUIBlur.Value
+                    ? new Vector2(BlurAmount.Value * (float)uiBlurLevel.Value * UI_BLUR_FACTOR)
+                    : new Vector2(BlurAmount.Value);
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
-                userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+                gameplayBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+                uiBlurLevel = config.GetBindable<double>(OsuSetting.MenuBlurLevel);
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                userBlurLevel.ValueChanged += _ => UpdateVisuals();
+                gameplayBlurLevel.ValueChanged += _ => UpdateVisuals();
+                uiBlurLevel.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
             }
 
