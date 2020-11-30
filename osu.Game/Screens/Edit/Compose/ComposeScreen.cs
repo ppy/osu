@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -43,6 +44,21 @@ namespace osu.Game.Screens.Edit.Compose
             if (ruleset == null || composer == null)
                 return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "This beatmap" : $"{ruleset.Description}'s composer");
 
+            return wrapSkinnableContent(composer);
+        }
+
+        protected override Drawable CreateTimelineContent()
+        {
+            if (ruleset == null || composer == null)
+                return base.CreateTimelineContent();
+
+            return wrapSkinnableContent(new TimelineBlueprintContainer(composer));
+        }
+
+        private Drawable wrapSkinnableContent(Drawable content)
+        {
+            Debug.Assert(ruleset != null);
+
             var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
 
             // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
@@ -51,9 +67,7 @@ namespace osu.Game.Screens.Edit.Compose
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
-            return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(composer));
+            return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(content));
         }
-
-        protected override Drawable CreateTimelineContent() => composer == null ? base.CreateTimelineContent() : new TimelineBlueprintContainer(composer);
     }
 }

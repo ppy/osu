@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -16,36 +18,39 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         /// </summary>
         public const float RADIUS_ADJUST = 1.1f;
 
-        private BorderPiece border;
-        private PalpableCatchHitObject hitObject;
+        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
+        public readonly Bindable<bool> HyperDash = new Bindable<bool>();
+
+        [CanBeNull]
+        private DrawableCatchHitObject drawableHitObject;
+
+        [CanBeNull]
+        private BorderPiece borderPiece;
 
         public FruitPiece()
         {
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load([CanBeNull] DrawableHitObject drawable)
         {
-            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
-            hitObject = drawableCatchObject.HitObject;
+            drawableHitObject = (DrawableCatchHitObject)drawable;
 
-            AddRangeInternal(new[]
-            {
-                getFruitFor(hitObject.VisualRepresentation),
-                border = new BorderPiece(),
-            });
+            AddInternal(getFruitFor(VisualRepresentation.Value));
 
-            if (hitObject.HyperDash)
-            {
+            // if it is not part of a DHO, the border is always invisible.
+            if (drawableHitObject != null)
+                AddInternal(borderPiece = new BorderPiece());
+
+            if (HyperDash.Value)
                 AddInternal(new HyperBorderPiece());
-            }
         }
 
         protected override void Update()
         {
-            base.Update();
-            border.Alpha = (float)Math.Clamp((hitObject.StartTime - Time.Current) / 500, 0, 1);
+            if (borderPiece != null && drawableHitObject?.HitObject != null)
+                borderPiece.Alpha = (float)Math.Clamp((drawableHitObject.HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
 
         private Drawable getFruitFor(FruitVisualRepresentation representation)

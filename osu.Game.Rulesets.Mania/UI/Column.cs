@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Mania.UI
             DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)hitObject;
             maniaObject.CheckHittable = hitPolicy.IsHittable;
 
-            HitObjectContainer.Add(hitObject);
+            base.Add(hitObject);
         }
 
         public override bool Remove(DrawableHitObject h)
