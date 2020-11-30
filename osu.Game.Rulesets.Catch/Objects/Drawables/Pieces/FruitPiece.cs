@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 
         private void setFormation(ValueChangedEvent<FruitVisualRepresentation> visualRepresentation)
         {
-            ClearInternal();
+            Clear();
 
             switch (visualRepresentation.NewValue)
             {

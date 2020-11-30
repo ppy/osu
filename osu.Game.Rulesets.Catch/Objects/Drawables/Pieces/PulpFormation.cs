@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
             distance * MathF.Sin(angle * MathF.PI / 180),
             distance * MathF.Cos(angle * MathF.PI / 180));
 
+        protected void Clear() => ClearInternal(false);
+
         protected void Add(Vector2 position, Vector2 size)
         {
             var pulp = pulpPool?.Get() ?? new Pulp();
