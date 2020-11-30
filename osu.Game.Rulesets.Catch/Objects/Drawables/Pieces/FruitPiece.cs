@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
         public readonly Bindable<bool> HyperDash = new Bindable<bool>();
 
-        public BorderPiece Border;
+        public BorderPiece Border { get; private set; }
 
         public FruitPiece()
         {
