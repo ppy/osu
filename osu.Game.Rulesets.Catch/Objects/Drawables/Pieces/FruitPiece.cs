@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
@@ -18,26 +21,36 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
         public readonly Bindable<bool> HyperDash = new Bindable<bool>();
 
-        public BorderPiece Border { get; private set; }
+        [CanBeNull]
+        private DrawableCatchHitObject drawableHitObject;
+
+        [CanBeNull]
+        private BorderPiece borderPiece;
 
         public FruitPiece()
         {
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load([CanBeNull] DrawableHitObject drawable)
         {
-            AddRangeInternal(new[]
-            {
-                getFruitFor(VisualRepresentation.Value),
-                Border = new BorderPiece(),
-            });
+            drawableHitObject = (DrawableCatchHitObject)drawable;
+
+            AddInternal(getFruitFor(VisualRepresentation.Value));
+
+            // if it is not part of a DHO, the border is always invisible.
+            if (drawableHitObject != null)
+                AddInternal(borderPiece = new BorderPiece());
 
             if (HyperDash.Value)
-            {
                 AddInternal(new HyperBorderPiece());
-            }
+        }
+
+        protected override void Update()
+        {
+            if (borderPiece != null && drawableHitObject.HitObject != null)
+                borderPiece.Alpha = (float)Math.Clamp((drawableHitObject.HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
 
         private Drawable getFruitFor(FruitVisualRepresentation representation)
