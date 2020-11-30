@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public void UpdateResult() => base.UpdateResult(true);
 
+        protected override double MaximumJudgementOffset => base.MaximumJudgementOffset * release_window_lenience;
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             Debug.Assert(HitObject.HitWindows != null);
