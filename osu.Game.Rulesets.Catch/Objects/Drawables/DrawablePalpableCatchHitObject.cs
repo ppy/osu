@@ -14,9 +14,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     {
         public new PalpableCatchHitObject HitObject => (PalpableCatchHitObject)base.HitObject;
 
-        public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
+        public readonly Bindable<bool> HyperDash = new Bindable<bool>();
 
-        public Bindable<float> ScaleBindable { get; } = new Bindable<float>(1);
+        public readonly Bindable<float> ScaleBindable = new Bindable<float>(1);
 
         public readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
 
