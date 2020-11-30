@@ -42,7 +42,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             CatcherArea = new CatcherArea(difficulty)
             {
-                CreateDrawableRepresentation = createDrawableRepresentation,
                 ExplodingFruitTarget = explodingFruitContainer,
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.TopLeft,

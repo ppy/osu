@@ -103,7 +103,6 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
-                    CreateDrawableRepresentation = ((DrawableRuleset<CatchHitObject>)catchRuleset.CreateInstance().CreateDrawableRulesetWith(new CatchBeatmap())).CreateDrawableRepresentation
                 },
             });
         }
