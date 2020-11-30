@@ -263,18 +263,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
             OnApply();
             HitObjectApplied?.Invoke(this);
 
-            // If not loaded, the state update happens in LoadComplete(). Otherwise, the update is scheduled to allow for lifetime updates.
+            // If not loaded, the state update happens in LoadComplete().
             if (IsLoaded)
             {
-                Scheduler.Add(() =>
-                {
-                    if (Result.IsHit)
-                        updateState(ArmedState.Hit, true);
-                    else if (Result.HasResult)
-                        updateState(ArmedState.Miss, true);
-                    else
-                        updateState(ArmedState.Idle, true);
-                });
+                if (Result.IsHit)
+                    updateState(ArmedState.Hit, true);
+                else if (Result.HasResult)
+                    updateState(ArmedState.Miss, true);
+                else
+                    updateState(ArmedState.Idle, true);
             }
 
             hasHitObjectApplied = true;
