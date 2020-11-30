@@ -61,6 +61,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.LoadComplete();
 
+            // these subscriptions need to be done post constructor to ensure externally bound components have a chance to populate required fields (ScoreProcessor / ComboAtJudgement in this case).
             NewResult += onNewResult;
             RevertResult += onRevertResult;
         }
