@@ -3,14 +3,20 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableFruit : PalpableDrawableCatchHitObject<Fruit>
+    public class DrawableFruit : DrawablePalpableCatchHitObject
     {
-        public DrawableFruit(Fruit h)
+        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
+
+        protected virtual FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => (FruitVisualRepresentation)(indexInBeatmap % 4);
+
+        public DrawableFruit(CatchHitObject h)
             : base(h)
         {
         }
@@ -18,10 +24,26 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            ScaleContainer.Child = new SkinnableDrawable(
-                new CatchSkinComponent(getComponent(HitObject.VisualRepresentation)), _ => new FruitPiece());
-
             ScaleContainer.Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
+
+            IndexInBeatmap.BindValueChanged(change =>
+            {
+                VisualRepresentation.Value = GetVisualRepresentation(change.NewValue);
+            }, true);
+
+            VisualRepresentation.BindValueChanged(_ => updatePiece());
+            HyperDash.BindValueChanged(_ => updatePiece(), true);
+        }
+
+        private void updatePiece()
+        {
+            ScaleContainer.Child = new SkinnableDrawable(
+                new CatchSkinComponent(getComponent(VisualRepresentation.Value)),
+                _ => new FruitPiece
+                {
+                    VisualRepresentation = { BindTarget = VisualRepresentation },
+                    HyperDash = { BindTarget = HyperDash },
+                });
         }
 
         private CatchSkinComponents getComponent(FruitVisualRepresentation hitObjectVisualRepresentation)
@@ -47,5 +69,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                     throw new ArgumentOutOfRangeException(nameof(hitObjectVisualRepresentation), hitObjectVisualRepresentation, null);
             }
         }
+    }
+
+    public enum FruitVisualRepresentation
+    {
+        Pear,
+        Grape,
+        Pineapple,
+        Raspberry,
+        Banana // banananananannaanana
     }
 }

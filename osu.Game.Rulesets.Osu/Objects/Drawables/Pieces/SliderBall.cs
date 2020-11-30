@@ -248,7 +248,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
 
             private void trackingChanged(ValueChangedEvent<bool> tracking) =>
-                box.FadeTo(tracking.NewValue ? 0.6f : 0.05f, 200, Easing.OutQuint);
+                box.FadeTo(tracking.NewValue ? 0.3f : 0.05f, 200, Easing.OutQuint);
         }
     }
 }

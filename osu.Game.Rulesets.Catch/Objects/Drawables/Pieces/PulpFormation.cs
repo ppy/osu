@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawables
+namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
     public abstract class PulpFormation : CompositeDrawable
     {
