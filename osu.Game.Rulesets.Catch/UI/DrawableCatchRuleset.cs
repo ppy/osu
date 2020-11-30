@@ -8,7 +8,6 @@ using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -40,15 +39,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
-        public override DrawableHitObject<CatchHitObject> CreateDrawableRepresentation(CatchHitObject h)
-        {
-            switch (h)
-            {
-                case BananaShower shower:
-                    return new DrawableBananaShower(shower, CreateDrawableRepresentation);
-            }
-
-            return null;
-        }
+        public override DrawableHitObject<CatchHitObject> CreateDrawableRepresentation(CatchHitObject h) => null;
     }
 }
