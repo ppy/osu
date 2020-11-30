@@ -17,11 +17,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        // The lifetime of a hit object in this will be computed in next update.
+        /// <summary>
+        /// Hit objects which require lifetime computation in the next update call.
+        /// </summary>
         private readonly HashSet<DrawableHitObject> toComputeLifetime = new HashSet<DrawableHitObject>();
 
-        // The layout (length if IHasDuration, and nested object positions) of a hit object *not* in this set will be computed in next updated.
-        // Only objects in `AliveObjects` are considered, to prevent a massive recomputation when scrolling speed or something changes.
+        /// <summary>
+        /// A set containing all <see cref="HitObjectContainer.AliveObjects"/> which have an up-to-date layout.
+        /// </summary>
         private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
 
         [Resolved]
@@ -223,8 +226,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             toComputeLifetime.Clear();
 
-            // An assumption is that this update won't affect lifetime,
-            // but this is satisfied in practice because otherwise the hit object won't be aligned to its `StartTime`.
+            // only AliveObjects need to be considered for layout (reduces overhead in the case of scroll speed changes).
             foreach (var obj in AliveObjects)
             {
                 if (layoutComputed.Contains(obj))
