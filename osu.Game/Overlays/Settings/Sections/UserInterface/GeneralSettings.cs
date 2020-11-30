@@ -21,6 +21,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = "Rotate cursor when dragging",
                     Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
+                new SettingsSlider<float, SizeSlider>
+                {
+                    LabelText = "Menu cursor size",
+                    Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
+                    KeyboardStep = 0.01f
+                },
                 new SettingsCheckbox
                 {
                     LabelText = "Parallax",
