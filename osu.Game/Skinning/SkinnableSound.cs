@@ -40,7 +40,7 @@ namespace osu.Game.Skinning
         private ISampleStore sampleStore { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private IPooledSampleProvider pooledProvider { get; set; }
+        private IPooledSampleProvider samplePool { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="SkinnableSound"/>.
@@ -145,7 +145,7 @@ namespace osu.Game.Skinning
 
             foreach (var s in samples)
             {
-                var sample = pooledProvider?.GetPooledSample(s) ?? new PoolableSkinnableSample(s);
+                var sample = samplePool?.GetPooledSample(s) ?? new PoolableSkinnableSample(s);
                 sample.Looping = Looping;
                 sample.Volume.Value = s.Volume / 100.0;
 
@@ -176,7 +176,7 @@ namespace osu.Game.Skinning
             => SamplesContainer.RemoveAllAdjustments(type);
 
         /// <summary>
-        /// Whether any samples currently playing.
+        /// Whether any samples are currently playing.
         /// </summary>
         public bool IsPlaying => SamplesContainer.Any(s => s.Playing);
 
