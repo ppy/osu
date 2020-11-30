@@ -3,7 +3,9 @@
 
 namespace osu.Game.Utils
 {
+    /// <summary>
     /// Provides a fast stateless function that can be used in randomly-looking visual elements.
+    /// </summary>
     public static class StatelessRNG
     {
         private static ulong mix(ulong x)
@@ -19,7 +21,9 @@ namespace osu.Game.Utils
             }
         }
 
+        /// <summary>
         /// Compute an integer from given seed and series number.
+        /// </summary>
         /// <param name="seed">
         /// The seed value of this random number generator.
         /// </param>
@@ -30,7 +34,9 @@ namespace osu.Game.Utils
         public static ulong Get(int seed, int series = 0) =>
             unchecked(mix(((ulong)(uint)series << 32) | ((uint)seed ^ 0x12345678)));
 
+        /// <summary>
         /// Compute a floating point value between 0 and 1 (excluding 1) from given seed and series number.
+        /// </summary>
         /// <param name="seed">
         /// The seed value of this random number generator.
         /// </param>
