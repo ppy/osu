@@ -21,13 +21,13 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
+using JetBrains.Annotations;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -45,6 +45,50 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [SetUp]
         public void Setup() => Schedule(() => testClock.CurrentTime = 0);
+
+        [TestCase("pooled")]
+        [TestCase("non-pooled")]
+        public void TestHitObjectLifetime(string pooled)
+        {
+            var beatmap = createBeatmap(_ => pooled == "pooled" ? new TestPooledHitObject() : new TestHitObject());
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
+            createTest(beatmap);
+
+            assertPosition(0, 0f);
+            assertDead(3);
+
+            setTime(3 * time_range);
+            assertPosition(3, 0f);
+            assertDead(0);
+
+            setTime(0 * time_range);
+            assertPosition(0, 0f);
+            assertDead(3);
+        }
+
+        [TestCase("pooled")]
+        [TestCase("non-pooled")]
+        public void TestNestedHitObject(string pooled)
+        {
+            var beatmap = createBeatmap(i =>
+            {
+                var h = pooled == "pooled" ? new TestPooledParentHitObject() : new TestParentHitObject();
+                h.Duration = 300;
+                h.ChildTimeOffset = i % 3 * 100;
+                return h;
+            });
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
+            createTest(beatmap);
+
+            assertPosition(0, 0f);
+            assertHeight(0);
+            assertChildPosition(0);
+
+            setTime(5 * time_range);
+            assertPosition(5, 0f);
+            assertHeight(5);
+            assertChildPosition(5);
+        }
 
         [Test]
         public void TestRelativeBeatLengthScaleSingleTimingPoint()
@@ -147,8 +191,37 @@ namespace osu.Game.Tests.Visual.Gameplay
             assertPosition(1, 1);
         }
 
+        /// <summary>
+        /// Get a <see cref="DrawableTestHitObject" /> corresponding to the <paramref name="index"/>'th <see cref="TestHitObject"/>.
+        /// When the hit object is not alive, `null` is returned.
+        /// </summary>
+        [CanBeNull]
+        private DrawableTestHitObject getDrawableHitObject(int index)
+        {
+            var hitObject = drawableRuleset.Beatmap.HitObjects.ElementAt(index);
+            return (DrawableTestHitObject)drawableRuleset.Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(obj => obj.HitObject == hitObject);
+        }
+
+        private float yScale => drawableRuleset.Playfield.HitObjectContainer.DrawHeight;
+
+        private void assertDead(int index) => AddAssert($"hitobject {index} is dead", () => getDrawableHitObject(index) == null);
+
+        private void assertHeight(int index) => AddAssert($"hitobject {index} height", () =>
+        {
+            var d = getDrawableHitObject(index);
+            return d != null && Precision.AlmostEquals(d.DrawHeight, yScale * (float)(d.HitObject.Duration / time_range), 0.1f);
+        });
+
+        private void assertChildPosition(int index) => AddAssert($"hitobject {index} child position", () =>
+        {
+            var d = getDrawableHitObject(index);
+            return d is DrawableTestParentHitObject && Precision.AlmostEquals(
+                d.NestedHitObjects.First().DrawPosition.Y,
+                yScale * (float)((TestParentHitObject)d.HitObject).ChildTimeOffset / time_range, 0.1f);
+        });
+
         private void assertPosition(int index, float relativeY) => AddAssert($"hitobject {index} at {relativeY}",
-            () => Precision.AlmostEquals(drawableRuleset.Playfield.AllHitObjects.ElementAt(index).DrawPosition.Y, drawableRuleset.Playfield.HitObjectContainer.DrawHeight * relativeY));
+            () => Precision.AlmostEquals(getDrawableHitObject(index)?.DrawPosition.Y ?? -1, yScale * relativeY));
 
         private void setTime(double time)
         {
@@ -160,12 +233,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// The hitobjects are spaced <see cref="time_range"/> milliseconds apart.
         /// </summary>
         /// <returns>The <see cref="IBeatmap"/>.</returns>
-        private IBeatmap createBeatmap()
+        private IBeatmap createBeatmap(Func<int, TestHitObject> createAction = null)
         {
-            var beatmap = new Beatmap<HitObject> { BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo } };
+            var beatmap = new Beatmap<TestHitObject> { BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo } };
 
             for (int i = 0; i < 10; i++)
-                beatmap.HitObjects.Add(new HitObject { StartTime = i * time_range });
+            {
+                var h = createAction?.Invoke(i) ?? new TestHitObject();
+                h.StartTime = i * time_range;
+                beatmap.HitObjects.Add(h);
+            }
 
             return beatmap;
         }
@@ -225,7 +302,21 @@ namespace osu.Game.Tests.Visual.Gameplay
                 TimeRange.Value = time_range;
             }
 
-            public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h) => new DrawableTestHitObject(h);
+            public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h)
+            {
+                switch (h)
+                {
+                    case TestPooledHitObject _:
+                    case TestPooledParentHitObject _:
+                        return null;
+
+                    case TestParentHitObject p:
+                        return new DrawableTestParentHitObject(p);
+
+                    default:
+                        return new DrawableTestHitObject(h);
+                }
+            }
 
             protected override PassThroughInputManager CreateInputManager() => new PassThroughInputManager();
 
@@ -265,6 +356,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                         }
                     }
                 });
+
+                RegisterPool<TestPooledHitObject, DrawableTestPooledHitObject>(1);
+                RegisterPool<TestPooledParentHitObject, DrawableTestPooledParentHitObject>(1);
             }
         }
 
@@ -277,30 +371,46 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override bool CanConvert() => true;
 
-            protected override IEnumerable<TestHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
-            {
-                yield return new TestHitObject
-                {
-                    StartTime = original.StartTime,
-                    Duration = (original as IHasDuration)?.Duration ?? 100
-                };
-            }
+            protected override IEnumerable<TestHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken) =>
+                throw new NotImplementedException();
         }
 
         #endregion
 
         #region HitObject
 
-        private class TestHitObject : ConvertHitObject, IHasDuration
+        private class TestHitObject : HitObject, IHasDuration
         {
             public double EndTime => StartTime + Duration;
 
-            public double Duration { get; set; }
+            public double Duration { get; set; } = 100;
+        }
+
+        private class TestPooledHitObject : TestHitObject
+        {
+        }
+
+        private class TestParentHitObject : TestHitObject
+        {
+            public double ChildTimeOffset;
+
+            protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
+            {
+                AddNested(new TestHitObject { StartTime = StartTime + ChildTimeOffset });
+            }
+        }
+
+        private class TestPooledParentHitObject : TestParentHitObject
+        {
+            protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
+            {
+                AddNested(new TestPooledHitObject { StartTime = StartTime + ChildTimeOffset });
+            }
         }
 
         private class DrawableTestHitObject : DrawableHitObject<TestHitObject>
         {
-            public DrawableTestHitObject(TestHitObject hitObject)
+            public DrawableTestHitObject([CanBeNull] TestHitObject hitObject)
                 : base(hitObject)
             {
                 Anchor = Anchor.TopCentre;
@@ -323,6 +433,52 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Colour = Color4.Red
                     }
                 });
+            }
+
+            protected override void Update() => LifetimeEnd = HitObject.EndTime;
+        }
+
+        private class DrawableTestPooledHitObject : DrawableTestHitObject
+        {
+            public DrawableTestPooledHitObject()
+                : base(null)
+            {
+                InternalChildren[0].Colour = Color4.LightSkyBlue;
+                InternalChildren[1].Colour = Color4.Blue;
+            }
+        }
+
+        private class DrawableTestParentHitObject : DrawableTestHitObject
+        {
+            private readonly Container<DrawableHitObject> container;
+
+            public DrawableTestParentHitObject([CanBeNull] TestHitObject hitObject)
+                : base(hitObject)
+            {
+                InternalChildren[0].Colour = Color4.LightYellow;
+                InternalChildren[1].Colour = Color4.Yellow;
+
+                AddInternal(container = new Container<DrawableHitObject>
+                {
+                    RelativeSizeAxes = Axes.Both,
+                });
+            }
+
+            protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject) =>
+                new DrawableTestHitObject((TestHitObject)hitObject);
+
+            protected override void AddNestedHitObject(DrawableHitObject hitObject) => container.Add(hitObject);
+
+            protected override void ClearNestedHitObjects() => container.Clear(false);
+        }
+
+        private class DrawableTestPooledParentHitObject : DrawableTestParentHitObject
+        {
+            public DrawableTestPooledParentHitObject()
+                : base(null)
+            {
+                InternalChildren[0].Colour = Color4.LightSeaGreen;
+                InternalChildren[1].Colour = Color4.Green;
             }
         }
 
