@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -9,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -196,8 +198,38 @@ namespace osu.Game.Graphics.Containers
 
                 float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
                 Func<T, float> diff = section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset;
+                Func<T, float> sectionPos = section => scrollContainer.GetChildPosInContent(section);
+                Func<T, float> visibleSize = section => Math.Min(
+                    sectionPos(section) + section.Height, currentScroll + scrollContainer.DisplayableContent) - Math.Max(sectionPos(section), currentScroll
+                );
+                var sortedByVisible = new List<T>(Children);
+                sortedByVisible.Sort((a, b) => visibleSize(b).CompareTo(visibleSize(a)));
+                T mostVisible = sortedByVisible.FirstOrDefault();
 
-                if (scrollContainer.IsScrolledToEnd())
+                if (mostVisible != null)
+                {
+                    int mostVisibleIndex = IndexOf(mostVisible);
+                    T ch;
+
+                    while (mostVisibleIndex != 0 && Precision.AlmostEquals(visibleSize(ch = Children[mostVisibleIndex - 1]), ch.Height))
+                    {
+                        mostVisibleIndex--;
+                    }
+
+                    SelectedSection.Value = Children[mostVisibleIndex];
+
+                    if (Precision.AlmostBigger(scrollOffset, currentScroll))
+                    {
+                        SelectedSection.Value = Children.FirstOrDefault();
+                    }
+
+                    if (Precision.AlmostBigger(currentScroll, scrollContainer.ScrollableExtent))
+                    {
+                        SelectedSection.Value = Children.LastOrDefault();
+                    }
+                }
+
+                /*if (scrollContainer.IsScrolledToEnd())
                 {
                     SelectedSection.Value = Children.LastOrDefault();
                 }
@@ -205,7 +237,7 @@ namespace osu.Game.Graphics.Containers
                 {
                     SelectedSection.Value = Children.TakeWhile(section => diff(section) <= 0).LastOrDefault()
                                             ?? Children.FirstOrDefault();
-                }
+                }*/
             }
         }
 
