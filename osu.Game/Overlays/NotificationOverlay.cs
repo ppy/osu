@@ -13,6 +13,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -44,8 +45,7 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.6f
+                    Colour = OsuColour.Gray(0.05f),
                 },
                 new OsuScrollContainer
                 {
