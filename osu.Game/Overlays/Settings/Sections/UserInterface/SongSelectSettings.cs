@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Settings.Sections.Gameplay
+namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class SongSelectSettings : SettingsSubsection
     {
