@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected virtual FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => (FruitVisualRepresentation)(indexInBeatmap % 4);
 
-        private FruitPiece fruitPiece;
-
         public DrawableFruit(CatchHitObject h)
             : base(h)
         {
@@ -41,19 +39,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             ScaleContainer.Child = new SkinnableDrawable(
                 new CatchSkinComponent(getComponent(VisualRepresentation.Value)),
-                _ => fruitPiece = new FruitPiece
+                _ => new FruitPiece
                 {
                     VisualRepresentation = { BindTarget = VisualRepresentation },
                     HyperDash = { BindTarget = HyperDash },
                 });
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (fruitPiece != null)
-                fruitPiece.Border.Alpha = (float)Math.Clamp((StartTimeBindable.Value - Time.Current) / 500, 0, 1);
         }
 
         private CatchSkinComponents getComponent(FruitVisualRepresentation hitObjectVisualRepresentation)
