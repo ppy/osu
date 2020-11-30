@@ -11,6 +11,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 
@@ -34,7 +35,13 @@ namespace osu.Game.Skinning
         /// </remarks>
         protected bool PlayWhenZeroVolume => Looping;
 
-        protected readonly AudioContainer<PoolableSkinnableSample> SamplesContainer;
+        /// <summary>
+        /// All raw <see cref="DrawableSamples"/>s contained in this <see cref="SkinnableSound"/>.
+        /// </summary>
+        [NotNull, ItemNotNull]
+        protected IEnumerable<DrawableSample> DrawableSamples => samplesContainer.Select(c => c.Sample).Where(s => s != null);
+
+        private readonly AudioContainer<PoolableSkinnableSample> samplesContainer;
 
         [Resolved]
         private ISampleStore sampleStore { get; set; }
@@ -47,7 +54,7 @@ namespace osu.Game.Skinning
         /// </summary>
         public SkinnableSound()
         {
-            InternalChild = SamplesContainer = new AudioContainer<PoolableSkinnableSample>();
+            InternalChild = samplesContainer = new AudioContainer<PoolableSkinnableSample>();
         }
 
         /// <summary>
@@ -105,7 +112,7 @@ namespace osu.Game.Skinning
 
                 looping = value;
 
-                SamplesContainer.ForEach(c => c.Looping = looping);
+                samplesContainer.ForEach(c => c.Looping = looping);
             }
         }
 
@@ -114,7 +121,7 @@ namespace osu.Game.Skinning
         /// </summary>
         public virtual void Play()
         {
-            SamplesContainer.ForEach(c =>
+            samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
                     c.Play();
@@ -126,7 +133,7 @@ namespace osu.Game.Skinning
         /// </summary>
         public virtual void Stop()
         {
-            SamplesContainer.ForEach(c => c.Stop());
+            samplesContainer.ForEach(c => c.Stop());
         }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
@@ -140,8 +147,8 @@ namespace osu.Game.Skinning
             bool wasPlaying = IsPlaying;
 
             // Remove all pooled samples (return them to the pool), and dispose the rest.
-            SamplesContainer.RemoveAll(s => s.IsInPool);
-            SamplesContainer.Clear();
+            samplesContainer.RemoveAll(s => s.IsInPool);
+            samplesContainer.Clear();
 
             foreach (var s in samples)
             {
@@ -149,7 +156,7 @@ namespace osu.Game.Skinning
                 sample.Looping = Looping;
                 sample.Volume.Value = s.Volume / 100.0;
 
-                SamplesContainer.Add(sample);
+                samplesContainer.Add(sample);
             }
 
             if (wasPlaying)
@@ -158,27 +165,27 @@ namespace osu.Game.Skinning
 
         #region Re-expose AudioContainer
 
-        public BindableNumber<double> Volume => SamplesContainer.Volume;
+        public BindableNumber<double> Volume => samplesContainer.Volume;
 
-        public BindableNumber<double> Balance => SamplesContainer.Balance;
+        public BindableNumber<double> Balance => samplesContainer.Balance;
 
-        public BindableNumber<double> Frequency => SamplesContainer.Frequency;
+        public BindableNumber<double> Frequency => samplesContainer.Frequency;
 
-        public BindableNumber<double> Tempo => SamplesContainer.Tempo;
+        public BindableNumber<double> Tempo => samplesContainer.Tempo;
 
         public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => SamplesContainer.AddAdjustment(type, adjustBindable);
+            => samplesContainer.AddAdjustment(type, adjustBindable);
 
         public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => SamplesContainer.RemoveAdjustment(type, adjustBindable);
+            => samplesContainer.RemoveAdjustment(type, adjustBindable);
 
         public void RemoveAllAdjustments(AdjustableProperty type)
-            => SamplesContainer.RemoveAllAdjustments(type);
+            => samplesContainer.RemoveAllAdjustments(type);
 
         /// <summary>
         /// Whether any samples are currently playing.
         /// </summary>
-        public bool IsPlaying => SamplesContainer.Any(s => s.Playing);
+        public bool IsPlaying => samplesContainer.Any(s => s.Playing);
 
         #endregion
     }
