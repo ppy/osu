@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 
         protected override void Update()
         {
-            if (borderPiece != null && drawableHitObject.HitObject != null)
+            if (borderPiece != null && drawableHitObject?.HitObject != null)
                 borderPiece.Alpha = (float)Math.Clamp((drawableHitObject.HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
 
