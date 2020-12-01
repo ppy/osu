@@ -361,7 +361,6 @@ namespace osu.Game.Screens.Play
                             break;
                     }
 
-                    updateVisibility();
                     return true;
             }
 
