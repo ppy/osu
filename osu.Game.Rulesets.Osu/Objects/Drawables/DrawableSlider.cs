@@ -300,8 +300,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
         }
 
-        public Drawable ProxiedLayer => HeadCircle.ProxiedLayer;
-
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => sliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
         private class DefaultSliderBody : PlaySliderBody
