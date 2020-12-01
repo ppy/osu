@@ -109,6 +109,12 @@ namespace osu.Game.Screens.Edit
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
+            if (Beatmap.Value is DummyWorkingBeatmap)
+            {
+                isNewBeatmap = true;
+                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+            }
+
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
 
@@ -121,12 +127,6 @@ namespace osu.Game.Screens.Edit
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
-
-            if (Beatmap.Value is DummyWorkingBeatmap)
-            {
-                isNewBeatmap = true;
-                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
-            }
 
             try
             {
