@@ -520,10 +520,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             };
 
             public override HitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<string?> suffix = default, Optional<int> volume = default)
-                => With(volume: volume);
-
-            public FileHitSampleInfo With(Optional<string> filename = default, Optional<int> volume = default)
-                => new FileHitSampleInfo(filename.GetOr(Filename), volume.GetOr(Volume));
+                => new FileHitSampleInfo(Filename, volume.GetOr(Volume));
 
             public bool Equals(FileHitSampleInfo? other)
                 => base.Equals(other) && Filename == other.Filename;
