@@ -479,7 +479,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </remarks>
             public readonly bool IsLayered;
 
-            public LegacyHitSampleInfo([NotNull] string name, string? bank = null, int volume = 100, int customSampleBank = 0, bool isLayered = false)
+            public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, int customSampleBank = 0, bool isLayered = false)
                 : base(name, bank, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume)
             {
                 CustomSampleBank = customSampleBank;
