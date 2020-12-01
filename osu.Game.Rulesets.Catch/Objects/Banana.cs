@@ -55,6 +55,11 @@ namespace osu.Game.Rulesets.Catch.Objects
             private static string[] lookupNames { get; } = { "metronomelow", "catch-banana" };
 
             public override IEnumerable<string> LookupNames => lookupNames;
+
+            public BananaHitSampleInfo()
+                : base(string.Empty)
+            {
+            }
         }
     }
 }
