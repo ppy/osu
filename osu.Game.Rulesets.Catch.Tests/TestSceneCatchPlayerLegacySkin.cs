@@ -28,18 +28,12 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public class SkinProvidingPlayer : TestPlayer
         {
+            [Cached(typeof(ISkinSource))]
             private readonly ISkinSource skinSource;
 
             public SkinProvidingPlayer(ISkinSource skinSource)
             {
                 this.skinSource = skinSource;
-            }
-
-            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            {
-                var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-                dependencies.CacheAs(skinSource);
-                return dependencies;
             }
         }
     }
