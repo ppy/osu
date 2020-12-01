@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (h.Samples.Any(s => s.Name == sampleName))
                     continue;
 
-                h.Samples.Add(new HitSampleInfo { Name = sampleName });
+                h.Samples.Add(new HitSampleInfo(sampleName));
             }
 
             EditorBeatmap.EndChange();
