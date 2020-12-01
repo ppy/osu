@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             base.SetUpSteps();
             AddStep("get playfield", () => playfield = Editor.ChildrenOfType<OsuPlayfield>().First());
+            AddStep("seek to first control point", () => EditorClock.Seek(Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.First().Time));
         }
 
         [TestCase(true)]
@@ -66,13 +67,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("start slider placement", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("move to place end", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.185f, 0)));
+            AddStep("move to place end", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.225f, 0)));
 
             AddStep("end slider placement", () => InputManager.Click(MouseButton.Right));
 
             AddStep("enter circle placement mode", () => InputManager.Key(Key.Number2));
 
-            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.20f, 0)));
+            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.235f, 0)));
 
             AddStep("place second object", () => InputManager.Click(MouseButton.Left));
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
 
@@ -20,15 +21,27 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public float DistanceToHyperDash { get; set; }
 
+        public readonly Bindable<bool> HyperDashBindable = new Bindable<bool>();
+
         /// <summary>
         /// Whether this fruit can initiate a hyperdash.
         /// </summary>
-        public bool HyperDash => HyperDashTarget != null;
+        public bool HyperDash => HyperDashBindable.Value;
+
+        private CatchHitObject hyperDashTarget;
 
         /// <summary>
         /// The target fruit if we are to initiate a hyperdash.
         /// </summary>
-        public CatchHitObject HyperDashTarget;
+        public CatchHitObject HyperDashTarget
+        {
+            get => hyperDashTarget;
+            set
+            {
+                hyperDashTarget = value;
+                HyperDashBindable.Value = value != null;
+            }
+        }
 
         Color4 IHasComboInformation.GetComboColour(IReadOnlyList<Color4> comboColours) => comboColours[(IndexInBeatmap + 1) % comboColours.Count];
     }
