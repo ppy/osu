@@ -574,6 +574,31 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestCinemaViaCtrlShiftEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("press ctrl+shift+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("cinema enabled", () => songSelect.Mods.Value.FirstOrDefault() is ModCinema);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
+        }
+
+        [Test]
         public void TestHideSetSelectsCorrectBeatmap()
         {
             int? previousID = null;
