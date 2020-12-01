@@ -115,8 +115,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (firstSample != null)
             {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
-                clone.Name = "sliderslide";
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("sliderslide");
 
                 samplesContainer.Add(slidingSample = new PausableSkinnableSound(clone)
                 {
