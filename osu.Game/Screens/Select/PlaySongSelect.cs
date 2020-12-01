@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
                 if (modType != null)
                     ModSelect.DeselectTypes(new[] { modType }, true);
 
-                if(manualMod != null)
+                if (manualMod != null)
                 {
                     Mods.Value = Mods.Value.Append(manualMod).ToArray();
                     manualMod = null;
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Select
                 manualMod = getActiveAutoMod();
                 var manualModType = manualMod?.GetType();
 
-                if(manualModType != null && manualModType != modType)
+                if (manualModType != null && manualModType != modType)
                 {
                     ModSelect.DeselectTypes(new[] { manualModType }, true);
                 }
