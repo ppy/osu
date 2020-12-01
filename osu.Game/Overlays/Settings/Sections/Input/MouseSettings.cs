@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Handlers.Mouse;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
@@ -18,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly BindableBool rawInputToggle = new BindableBool();
         private Bindable<double> sensitivityBindable = new BindableDouble();
-        private Bindable<string> ignoredInputHandler;
+        private Bindable<string> ignoredInputHandlers;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
@@ -75,20 +76,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     // this is temporary until we support per-handler settings.
                     const string raw_mouse_handler = @"OsuTKRawMouseHandler";
-                    const string standard_mouse_handler = @"OsuTKMouseHandler";
+                    const string osutk_standard_mouse_handler = @"OsuTKMouseHandler";
+                    string standardMouseHandlers = $"{osutk_standard_mouse_handler} {nameof(MouseHandler)}";
 
-                    ignoredInputHandler.Value = enabled.NewValue ? standard_mouse_handler : raw_mouse_handler;
+                    ignoredInputHandlers.Value = enabled.NewValue ? standardMouseHandlers : raw_mouse_handler;
                 };
 
-                ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
-                ignoredInputHandler.ValueChanged += handler =>
+                ignoredInputHandlers = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
+                ignoredInputHandlers.ValueChanged += handler =>
                 {
                     bool raw = !handler.NewValue.Contains("Raw");
                     rawInputToggle.Value = raw;
                     sensitivityBindable.Disabled = !raw;
                 };
 
-                ignoredInputHandler.TriggerChange();
+                ignoredInputHandlers.TriggerChange();
             }
         }
 
