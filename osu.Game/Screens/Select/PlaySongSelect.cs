@@ -131,7 +131,6 @@ namespace osu.Game.Screens.Select
 
         private Mod getActiveAutoMod()
         {
-            
             if (Mods.Value.Any(m => m.GetType() == Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType())) return Ruleset.Value.CreateInstance().GetAutoplayMod();
             else if (Mods.Value.Any(m => m.GetType() == Ruleset.Value.CreateInstance().GetCinemaMod()?.GetType())) return Ruleset.Value.CreateInstance().GetCinemaMod();
             return null;
