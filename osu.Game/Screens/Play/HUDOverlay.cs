@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
+                    Text = $"The score overlay is currently disabled. You can toggle this by pressing {config.LookupKeyBindings(GlobalAction.ToggleInGameInterface)}."
                 });
             }
 
