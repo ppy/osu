@@ -56,6 +56,7 @@ namespace osu.Game.Audio
         /// <summary>
         /// Retrieve all possible filenames that can be used as a source, returned in order of preference (highest first).
         /// </summary>
+        [JsonIgnore]
         public virtual IEnumerable<string> LookupNames
         {
             get
