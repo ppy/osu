@@ -68,7 +68,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
-            new KeyBinding(InputKey.I, GlobalAction.ToggleInGameInterface),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
@@ -146,9 +146,6 @@ namespace osu.Game.Input.Bindings
         [Description("Decrease scroll speed")]
         DecreaseScrollSpeed,
 
-        [Description("Toggle in-game interface")]
-        ToggleInGameInterface,
-
         [Description("Select")]
         Select,
 
@@ -204,5 +201,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Pause / resume replay")]
         TogglePauseReplay,
+
+        [Description("Toggle in-game interface")]
+        ToggleInGameInterface,
     }
 }
