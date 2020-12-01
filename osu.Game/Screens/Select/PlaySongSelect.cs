@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -20,6 +21,7 @@ namespace osu.Game.Screens.Select
     public class PlaySongSelect : SongSelect
     {
         private bool removeAutoModOnResume;
+        private Mod removableMod;
         private OsuScreen player;
 
         [Resolved(CanBeNull = true)]
@@ -50,11 +52,12 @@ namespace osu.Game.Screens.Select
 
             if (removeAutoModOnResume)
             {
-                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType();
+                var modType = removableMod?.GetType();
 
-                if (autoType != null)
-                    ModSelect.DeselectTypes(new[] { autoType }, true);
+                if (modType != null)
+                    ModSelect.DeselectTypes(new[] { modType }, true);
 
+                removableMod = null;
                 removeAutoModOnResume = false;
             }
         }
@@ -81,12 +84,12 @@ namespace osu.Game.Screens.Select
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var auto = (GetContainingInputManager().CurrentState?.Keyboard.ShiftPressed == true) ? Ruleset.Value.CreateInstance().GetCinemaMod() : Ruleset.Value.CreateInstance().GetAutoplayMod();
-                var autoType = auto?.GetType();
+                var mod = (GetContainingInputManager().CurrentState?.Keyboard.ShiftPressed == true) ? Ruleset.Value.CreateInstance().GetCinemaMod() : Ruleset.Value.CreateInstance().GetAutoplayMod();
+                var modType = mod?.GetType();
 
                 var mods = Mods.Value;
 
-                if (autoType == null)
+                if (modType == null)
                 {
                     notifications?.Post(new SimpleNotification
                     {
@@ -95,9 +98,10 @@ namespace osu.Game.Screens.Select
                     return false;
                 }
 
-                if (mods.All(m => m.GetType() != autoType))
+                if (mods.All(m => m.GetType() != modType))
                 {
-                    Mods.Value = mods.Append(auto).ToArray();
+                    Mods.Value = mods.Append(mod).ToArray();
+                    removableMod = mod;
                     removeAutoModOnResume = true;
                 }
             }
