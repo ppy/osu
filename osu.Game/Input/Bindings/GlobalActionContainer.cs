@@ -29,11 +29,11 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Right, GlobalAction.MvisMusicNext),
             new KeyBinding(InputKey.Space, GlobalAction.MvisTogglePause),
             new KeyBinding(InputKey.Tab, GlobalAction.MvisToggleOverlayLock),
-            new KeyBinding(InputKey.Menu, GlobalAction.MvisTogglePlayList),
+            new KeyBinding(InputKey.Slash, GlobalAction.MvisTogglePlayList),
             new KeyBinding(InputKey.L, GlobalAction.MvisToggleTrackLoop),
             new KeyBinding(InputKey.Enter, GlobalAction.MvisOpenInSongSelect),
             new KeyBinding(InputKey.H, GlobalAction.MvisForceLockOverlayChanges),
-            new KeyBinding(InputKey.Slash, GlobalAction.MvisSelectCollection),
+            new KeyBinding(InputKey.Period, GlobalAction.MvisSelectCollection),
         };
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]

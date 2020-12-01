@@ -115,8 +115,8 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             colourProvider.HueColour.BindValueChanged(_ =>
             {
                 var boxColor = ColourInfo.GradientVertical(
-                    colourProvider.Background3,
-                    colourProvider.Background3.Opacity(0));
+                    colourProvider.Background6,
+                    colourProvider.Background6.Opacity(0));
                 topBox?.FadeColour(boxColor);
                 bottomBox?.FadeColour(boxColor);
             }, true);
@@ -128,8 +128,8 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = ColourInfo.GradientVertical(
-                    colourProvider.Background3,
-                    colourProvider.Background3.Opacity(0))
+                    colourProvider.Background6,
+                    colourProvider.Background6.Opacity(0))
             };
 
             return b;

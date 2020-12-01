@@ -2,7 +2,6 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
@@ -13,6 +12,9 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
     {
         [CanBeNull]
         private Box bgBox;
+
+        [CanBeNull]
+        private Box highLightBox;
 
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
@@ -25,12 +27,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Masking = true;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Colour = Colour4.Black.Opacity(0.6f),
-                Radius = 5,
-            };
 
             InternalChildren = new Drawable[]
             {
@@ -38,7 +34,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
                     "MSidebar-BottomBox",
                     confineMode: ConfineMode.ScaleToFill,
                     masking: true,
-                    defaultImplementation: _ => createFooterBox())
+                    defaultImplementation: _ => createDefaultFooter())
                 {
                     Name = "侧边栏底部横条",
                     Anchor = Anchor.BottomRight,
@@ -52,7 +48,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
             };
         }
 
-        private Box createFooterBox()
+        private Drawable createDefaultFooter()
         {
             bgBox = new Box
             {
@@ -60,7 +56,24 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
                 Colour = colourProvider.Background5
             };
 
-            return bgBox;
+            highLightBox = new Box
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 3,
+                Colour = colourProvider.Highlight1
+            };
+
+            var c = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    bgBox,
+                    highLightBox
+                }
+            };
+
+            return c;
         }
 
         protected override void LoadComplete()
@@ -68,6 +81,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
             colourProvider.HueColour.BindValueChanged(_ =>
             {
                 bgBox?.FadeColour(colourProvider.Background5);
+                highLightBox?.FadeColour(colourProvider.Highlight1);
             }, true);
 
             base.LoadComplete();

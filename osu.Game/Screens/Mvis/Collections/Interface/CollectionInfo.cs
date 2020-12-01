@@ -1,14 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
@@ -25,14 +21,10 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        private Container flashBox;
         private OsuSpriteText collectionName;
         private OsuSpriteText collectionBeatmapCount;
         private readonly Bindable<BeatmapCollection> collection = new Bindable<BeatmapCollection>();
         private readonly List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
-
-        [CanBeNull]
-        private BeatmapCover cover;
 
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
@@ -54,11 +46,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                 new SkinnableComponent(
                     "MSidebar-Collection-background",
                     confineMode: ConfineMode.ScaleToFill,
-                    defaultImplementation: _ => bgBox = new Box
-                    {
-                        Colour = colourProvider.Background3,
-                        RelativeSizeAxes = Axes.Both
-                    })
+                    defaultImplementation: _ => new PlaceHolder())
                 {
                     Name = "收藏夹背景",
                     Anchor = Anchor.BottomRight,
@@ -95,7 +83,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                         "transparent",
                                         confineMode: ConfineMode.ScaleToFill,
                                         masking: true,
-                                        defaultImplementation: _ => cover = createCover())
+                                        defaultImplementation: _ => new PlaceHolder())
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
@@ -130,26 +118,6 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                                 Text = "请先选择一个收藏夹!"
                                             }
                                         }
-                                    },
-                                    flashBox = new Container
-                                    {
-                                        AutoSizeAxes = Axes.Y,
-                                        RelativeSizeAxes = Axes.X,
-                                        Y = -1,
-                                        Children = new Drawable[]
-                                        {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 14, //8 + 5 + 1, 8是基础高度，5是额外高度，1是避免一些奇怪的渲染问题
-                                                Alpha = 0.6f
-                                            },
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 9 // 8 + 1
-                                            }
-                                        }
                                     }
                                 }
                             }
@@ -177,30 +145,10 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             };
         }
 
-        private BeatmapCover createCover()
-        {
-            var c = new BeatmapCover(beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First()))
-            {
-                BackgroundBox = false,
-                TimeBeforeWrapperLoad = 0,
-                Colour = ColourInfo.GradientVertical(
-                    Colour4.LightGray,
-                    Colour4.LightGray.Opacity(0)
-                )
-            };
-            return c;
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            colourProvider.HueColour.BindValueChanged(_ =>
-            {
-                bgBox?.FadeColour(colourProvider.Background3);
-
-                flashBox.Colour = isCurrentCollection.Value ? colourProvider.Highlight1 : colourProvider.Light1;
-            }, true);
             collection.BindValueChanged(OnCollectionChanged);
         }
 
@@ -230,18 +178,12 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             collectionName.Text = c.Name.Value;
             collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
-            cover?.UpdateBackground(beatmaps.GetWorkingBeatmap(beatmapSets.FirstOrDefault()?.Beatmaps.First()));
-            flashBox.FlashColour(Colour4.White, 1000, Easing.OutQuint);
-
             refreshBeatmapSetList();
         }
 
         private CancellationTokenSource refreshTaskCancellationToken;
         private Container listContainer;
         private LoadingSpinner loadingSpinner;
-
-        [CanBeNull]
-        private Box bgBox;
 
         private void refreshBeatmapSetList()
         {
@@ -273,10 +215,6 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
 
         public void UpdateCollection(BeatmapCollection collection, bool isCurrent)
         {
-            flashBox.FadeColour(isCurrent
-                ? colourProvider.Highlight1
-                : colourProvider.Light2, 300, Easing.OutQuint);
-
             if (collection != this.collection.Value && beatmapList != null)
             {
                 beatmapList.IsCurrent.UnbindAll();
@@ -292,14 +230,10 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
 
         private void clearInfo()
         {
-            cover?.UpdateBackground(null);
-
             beatmapSets.Clear();
             beatmapList.ClearList();
             collectionName.Text = "未选择收藏夹";
             collectionBeatmapCount.Text = "请先选择一个收藏夹!";
-
-            flashBox.FadeColour(colourProvider.Light2);
         }
     }
 }

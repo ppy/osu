@@ -75,8 +75,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 defaultImplementation: _ => sidebarBg = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                    Alpha = 0.5f,
+                    Colour = colourProvider.Background6,
                     Depth = float.MaxValue
                 })
             {
@@ -96,7 +95,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                sidebarBg?.FadeColour(colourProvider.Background5);
+                sidebarBg?.FadeColour(colourProvider.Background6);
             }, true);
         }
 
@@ -207,8 +206,8 @@ namespace osu.Game.Screens.Mvis.SideBar
             if (playPopoutSample)
                 popOutSample?.Play();
 
-            this.MoveToX(100, 600, Easing.OutQuint)
-                .FadeOut(600 * 0.6f, Easing.OutExpo)
+            this.MoveToX(100, duration + 100, Easing.OutQuint)
+                .FadeOut(duration + 100, Easing.OutQuint)
                 .OnComplete(_ => IsHidden = true);
             contentContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
 
@@ -220,8 +219,8 @@ namespace osu.Game.Screens.Mvis.SideBar
         {
             popInSample?.Play();
 
-            this.MoveToX(0, 600, Easing.OutQuint)
-                .FadeIn(600 * 0.6f, Easing.OutExpo);
+            this.MoveToX(0, duration + 100, Easing.OutQuint)
+                .FadeIn(duration + 100, Easing.OutQuint);
             contentContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
 
             Hiding = false;
