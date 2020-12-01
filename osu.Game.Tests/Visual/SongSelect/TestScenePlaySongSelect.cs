@@ -570,7 +570,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
 
-            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
+            AddAssert("autoplay disabled", () => songSelect.Mods.Value.Count == 0);
         }
 
         [Test]
@@ -595,7 +595,58 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
 
-            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
+            AddAssert("cinema disabled", () => songSelect.Mods.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestAutoplayViaCtrlEnterWithCinema()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            changeMods(Ruleset.Value.CreateInstance().GetCinemaMod());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only AT enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault().GetType() == Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType());
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("only CN enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault().GetType() == Ruleset.Value.CreateInstance().GetCinemaMod()?.GetType());
+        }
+
+        [Test]
+        public void TestCinemaViaCtrlShiftEnterWithAutoplay()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+            changeMods(Ruleset.Value.CreateInstance().GetAutoplayMod());
+
+            AddStep("press ctrl+shift+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only CN enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault().GetType() == Ruleset.Value.CreateInstance().GetCinemaMod()?.GetType());
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("only AT enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault().GetType() == Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType());
         }
 
         [Test]

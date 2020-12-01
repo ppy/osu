@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Select
     {
         private bool removeAutoModOnResume;
         private Mod removableMod;
+        private Mod manualMod;
+
         private OsuScreen player;
 
         [Resolved(CanBeNull = true)]
@@ -57,6 +59,12 @@ namespace osu.Game.Screens.Select
                 if (modType != null)
                     ModSelect.DeselectTypes(new[] { modType }, true);
 
+                if(manualMod != null)
+                {
+                    Mods.Value = Mods.Value.Append(manualMod).ToArray();
+                    manualMod = null;
+                }
+
                 removableMod = null;
                 removeAutoModOnResume = false;
             }
@@ -87,8 +95,6 @@ namespace osu.Game.Screens.Select
                 var mod = (GetContainingInputManager().CurrentState?.Keyboard.ShiftPressed == true) ? Ruleset.Value.CreateInstance().GetCinemaMod() : Ruleset.Value.CreateInstance().GetAutoplayMod();
                 var modType = mod?.GetType();
 
-                var mods = Mods.Value;
-
                 if (modType == null)
                 {
                     notifications?.Post(new SimpleNotification
@@ -97,6 +103,16 @@ namespace osu.Game.Screens.Select
                     });
                     return false;
                 }
+
+                manualMod = getActiveAutoMod();
+                var manualModType = manualMod?.GetType();
+
+                if(manualModType != null && manualModType != modType)
+                {
+                    ModSelect.DeselectTypes(new[] { manualModType }, true);
+                }
+
+                var mods = Mods.Value;
 
                 if (mods.All(m => m.GetType() != modType))
                 {
@@ -111,6 +127,14 @@ namespace osu.Game.Screens.Select
             this.Push(player = new PlayerLoader(() => new Player()));
 
             return true;
+        }
+
+        private Mod getActiveAutoMod()
+        {
+            
+            if (Mods.Value.Any(m => m.GetType() == Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType())) return Ruleset.Value.CreateInstance().GetAutoplayMod();
+            else if (Mods.Value.Any(m => m.GetType() == Ruleset.Value.CreateInstance().GetCinemaMod()?.GetType())) return Ruleset.Value.CreateInstance().GetCinemaMod();
+            return null;
         }
     }
 }
