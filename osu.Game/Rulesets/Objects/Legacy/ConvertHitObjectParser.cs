@@ -496,7 +496,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public bool Equals(LegacyHitSampleInfo? other)
                 => base.Equals(other) && CustomSampleBank == other.CustomSampleBank && IsLayered == other.IsLayered;
 
-            public override bool Equals(object? obj) => Equals((LegacyHitSampleInfo?)obj);
+            public override bool Equals(object? obj)
+                => obj is LegacyHitSampleInfo other && Equals(other);
 
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
         }
@@ -526,7 +527,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 => base.Equals(other) && Filename == other.Filename;
 
             public override bool Equals(object? obj)
-                => Equals((FileHitSampleInfo?)obj);
+                => obj is FileHitSampleInfo other && Equals(other);
 
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Filename);
         }

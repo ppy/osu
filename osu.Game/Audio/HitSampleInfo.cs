@@ -83,7 +83,7 @@ namespace osu.Game.Audio
             => other != null && Name == other.Name && Bank == other.Bank && Suffix == other.Suffix;
 
         public override bool Equals(object? obj)
-            => Equals((HitSampleInfo?)obj);
+            => obj is HitSampleInfo other && Equals(other);
 
         public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix);
     }
