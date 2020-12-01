@@ -127,14 +127,23 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private DrawableCatchHitObject createCaughtFruit(DrawablePalpableCatchHitObject hitObject)
         {
-            return hitObject.HitObject switch
+            switch (hitObject.HitObject)
             {
-                Banana banana => new DrawableBanana(banana),
-                Fruit fruit => new DrawableFruit(fruit),
-                TinyDroplet tiny => new DrawableTinyDroplet(tiny),
-                Droplet droplet => new DrawableDroplet(droplet),
-                _ => null
-            };
+                case Banana banana:
+                    return new DrawableBanana(banana);
+
+                case Fruit fruit:
+                    return new DrawableFruit(fruit);
+
+                case TinyDroplet tiny:
+                    return new DrawableTinyDroplet(tiny);
+
+                case Droplet droplet:
+                    return new DrawableDroplet(droplet);
+
+                default:
+                    return null;
+            }
         }
     }
 }
