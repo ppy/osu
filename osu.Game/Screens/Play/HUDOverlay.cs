@@ -9,7 +9,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -19,7 +18,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -362,6 +360,7 @@ namespace osu.Game.Screens.Play
                             configVisibilityMode.Value = HUDVisibilityMode.Never;
                             break;
                     }
+
                     updateVisibility();
                     return true;
             }
