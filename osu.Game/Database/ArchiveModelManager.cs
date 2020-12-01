@@ -213,6 +213,14 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Import one <typeparamref name="TModel"/> from a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to import files from.</param>
+        /// <param name="filename">The filename of the archive being imported.</param>
+        public async Task Import(Stream stream, string filename)
+            => await Import(new ZipArchiveReader(stream, filename)); // we need to keep around the filename as some model managers (namely SkinManager) use the archive name to populate skin info
+
+        /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
         public Action<IEnumerable<TModel>> PresentImport;

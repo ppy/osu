@@ -395,6 +395,17 @@ namespace osu.Game
             }
         }
 
+        public async Task Import(Stream stream, string filename)
+        {
+            var extension = Path.GetExtension(filename)?.ToLowerInvariant();
+
+            foreach (var importer in fileImporters)
+            {
+                if (importer.HandledExtensions.Contains(extension))
+                    await importer.Import(stream, Path.GetFileNameWithoutExtension(filename));
+            }
+        }
+
         public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);
 
         protected override void Dispose(bool isDisposing)

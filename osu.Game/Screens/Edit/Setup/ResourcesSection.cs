@@ -99,6 +99,8 @@ namespace osu.Game.Screens.Edit.Setup
             return Task.CompletedTask;
         }
 
+        Task ICanAcceptFiles.Import(Stream stream, string filename) => Task.CompletedTask;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
