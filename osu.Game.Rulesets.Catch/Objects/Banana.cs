@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 => other != null;
 
             public override bool Equals(object obj)
-                => Equals((BananaHitSampleInfo)obj);
+                => obj is BananaHitSampleInfo other && Equals(other);
 
             public override int GetHashCode() => lookup_names.GetHashCode();
         }
