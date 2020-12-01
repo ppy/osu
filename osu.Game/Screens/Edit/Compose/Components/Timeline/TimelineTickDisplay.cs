@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
 
         [Resolved]
@@ -43,8 +43,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             beatDivisor.BindValueChanged(_ => invalidateTicks());
 
-            // currently this is the best way to handle any kind of timing changes.
-            changeHandler.OnStateChange += invalidateTicks;
+            if (changeHandler != null)
+                // currently this is the best way to handle any kind of timing changes.
+                changeHandler.OnStateChange += invalidateTicks;
         }
 
         private void invalidateTicks()
