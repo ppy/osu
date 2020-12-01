@@ -121,15 +121,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 Radius = 50,
             };
 
-            directionalGlow1.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = Interpolation.ValueAt(0.4f, objectColour, Color4.White, 0, 1),
-                Roundness = roundness,
-                Radius = 40,
-            };
-
-            directionalGlow2.EdgeEffect = new EdgeEffectParameters
+            directionalGlow1.EdgeEffect = directionalGlow2.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = Interpolation.ValueAt(0.4f, objectColour, Color4.White, 0, 1),

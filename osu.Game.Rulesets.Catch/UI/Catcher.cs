@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (hitLighting.Value)
             {
-                var hitExplosion = hitExplosionPool.Get();
+                HitExplosion hitExplosion = hitExplosionPool.Get();
                 hitExplosion.X = fruit.X;
                 hitExplosion.Scale = new Vector2(fruit.HitObject.Scale);
                 hitExplosion.ObjectColour = fruit.AccentColour.Value;
