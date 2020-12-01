@@ -466,7 +466,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
 #nullable enable
 
-        public class LegacyHitSampleInfo : HitSampleInfo
+        public class LegacyHitSampleInfo : HitSampleInfo, IEquatable<LegacyHitSampleInfo>
         {
             public readonly int CustomSampleBank;
 
@@ -492,9 +492,16 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public LegacyHitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<int> volume = default, Optional<int> customSampleBank = default,
                                             Optional<bool> isLayered = default)
                 => new LegacyHitSampleInfo(name.GetOr(Name), bank.GetOr(Bank), volume.GetOr(Volume), customSampleBank.GetOr(CustomSampleBank), isLayered.GetOr(IsLayered));
+
+            public bool Equals(LegacyHitSampleInfo? other)
+                => base.Equals(other) && CustomSampleBank == other.CustomSampleBank && IsLayered == other.IsLayered;
+
+            public override bool Equals(object? obj) => Equals((LegacyHitSampleInfo?)obj);
+
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
         }
 
-        private class FileHitSampleInfo : LegacyHitSampleInfo
+        private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
         {
             public readonly string Filename;
 
@@ -517,6 +524,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             public FileHitSampleInfo With(Optional<string> filename = default, Optional<int> volume = default)
                 => new FileHitSampleInfo(filename.GetOr(Filename), volume.GetOr(Volume));
+
+            public bool Equals(FileHitSampleInfo? other)
+                => base.Equals(other) && Filename == other.Filename;
+
+            public override bool Equals(object? obj)
+                => Equals((FileHitSampleInfo?)obj);
+
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Filename);
         }
 
 #nullable disable
