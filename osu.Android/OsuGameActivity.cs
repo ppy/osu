@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
@@ -9,7 +10,9 @@ using osu.Framework.Android;
 
 namespace osu.Android
 {
+
     [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false)]
+    [IntentFilter(new[] { Intent.ActionDefault }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable, Intent.CategoryAppFiles }, DataSchemes = new[] { "content" }, DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
     public class OsuGameActivity : AndroidGameActivity
     {
         protected override Framework.Game CreateGame() => new OsuGameAndroid(this);
