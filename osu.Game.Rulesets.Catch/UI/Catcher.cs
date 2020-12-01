@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -107,6 +108,9 @@ namespace osu.Game.Rulesets.Catch.UI
         private float hyperDashTargetPosition;
         private Bindable<bool> hitLighting;
 
+        private DrawablePool<HitExplosion> hitExplosionPool;
+        private Container<HitExplosion> hitExplosionContainer;
+
         public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
         {
             this.trailsTarget = trailsTarget;
@@ -127,6 +131,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new Drawable[]
             {
+                hitExplosionPool = new DrawablePool<HitExplosion>(10),
                 caughtFruitContainer,
                 catcherIdle = new CatcherSprite(CatcherAnimationState.Idle)
                 {
@@ -142,7 +147,12 @@ namespace osu.Game.Rulesets.Catch.UI
                 {
                     Anchor = Anchor.TopCentre,
                     Alpha = 0,
-                }
+                },
+                hitExplosionContainer = new Container<HitExplosion>
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.BottomCentre,
+                },
             };
 
             trails = new CatcherTrailDisplay(this);
@@ -209,11 +219,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (hitLighting.Value)
             {
-                AddInternal(new HitExplosion(fruit)
-                {
-                    X = fruit.X,
-                    Scale = new Vector2(fruit.HitObject.Scale)
-                });
+                var hitExplosion = hitExplosionPool.Get();
+                hitExplosion.X = fruit.X;
+                hitExplosion.Scale = new Vector2(fruit.HitObject.Scale);
+                hitExplosion.ObjectColour = fruit.AccentColour.Value;
+                hitExplosionContainer.Add(hitExplosion);
             }
         }
 
