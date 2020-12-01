@@ -22,9 +22,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             InternalChild = piece = new EditNotePiece { Origin = Anchor.Centre };
         }
 
-        public override void UpdatePosition(SnapResult result)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
-            base.UpdatePosition(result);
+            base.UpdateTimeAndPosition(result);
 
             if (result.Playfield != null)
             {

@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
     {
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
+        public new ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)base.HitObjectContainer;
+
         [Resolved]
         protected IScrollingInfo ScrollingInfo { get; private set; }
 
@@ -27,14 +29,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// Given a position in screen space, return the time within this column.
         /// </summary>
-        public virtual double TimeAtScreenSpacePosition(Vector2 screenSpacePosition) =>
-            ((ScrollingHitObjectContainer)HitObjectContainer).TimeAtScreenSpacePosition(screenSpacePosition);
+        public virtual double TimeAtScreenSpacePosition(Vector2 screenSpacePosition) => HitObjectContainer.TimeAtScreenSpacePosition(screenSpacePosition);
 
         /// <summary>
         /// Given a time, return the screen space position within this column.
         /// </summary>
-        public virtual Vector2 ScreenSpacePositionAtTime(double time)
-            => ((ScrollingHitObjectContainer)HitObjectContainer).ScreenSpacePositionAtTime(time);
+        public virtual Vector2 ScreenSpacePositionAtTime(double time) => HitObjectContainer.ScreenSpacePositionAtTime(time);
 
         protected sealed override HitObjectContainer CreateHitObjectContainer() => new ScrollingHitObjectContainer();
     }
