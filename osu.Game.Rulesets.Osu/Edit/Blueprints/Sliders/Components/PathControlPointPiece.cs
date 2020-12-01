@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private OsuColour colours { get; set; }
 
         private IBindable<Vector2> sliderPosition;
+        private IBindable<float> sliderScale;
         private IBindable<Vector2> controlPointPosition;
 
         public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
@@ -69,13 +70,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(10),
+                            Size = new Vector2(20),
                         },
                         markerRing = new CircularContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(14),
+                            Size = new Vector2(28),
                             Masking = true,
                             BorderThickness = 2,
                             BorderColour = Color4.White,
@@ -101,6 +102,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             controlPointPosition = ControlPoint.Position.GetBoundCopy();
             controlPointPosition.BindValueChanged(_ => updateMarkerDisplay());
+
+            sliderScale = slider.ScaleBindable.GetBoundCopy();
+            sliderScale.BindValueChanged(_ => updateMarkerDisplay());
 
             IsSelected.BindValueChanged(_ => updateMarkerDisplay());
 
@@ -194,6 +198,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 colour = colour.Lighten(1);
 
             marker.Colour = colour;
+            marker.Scale = new Vector2(slider.Scale);
         }
     }
 }
