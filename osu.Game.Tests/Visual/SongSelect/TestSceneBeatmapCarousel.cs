@@ -918,7 +918,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 get
                 {
-                    foreach (var item in ScrollableContent)
+                    foreach (var item in Scroll.Children)
                     {
                         yield return item;
 

@@ -6,11 +6,11 @@ using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Settings.Sections.Graphics
+namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
-    public class UserInterfaceSettings : SettingsSubsection
+    public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "用户界面";
+        protected override string Header => "整体";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -21,6 +21,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "在拖拽时旋转光标",
                     Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
+                },
+                new SettingsSlider<float, SizeSlider>
+                {
+                    LabelText = "菜单光标大小",
+                    Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
+                    KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {

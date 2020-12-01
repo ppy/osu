@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private IEditorChangeHandler changeHandler { get; set; }
 
         [Resolved]
-        private EditorClock editorClock { get; set; }
+        protected EditorClock EditorClock { get; private set; }
 
         [Resolved]
         protected EditorBeatmap Beatmap { get; private set; }
@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (clickedBlueprint == null || SelectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered) != clickedBlueprint)
                 return false;
 
-            editorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
+            EditorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
             return true;
         }
 
@@ -381,7 +381,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                     case SelectionState.Selected:
                         // if the editor is playing, we generally don't want to deselect objects even if outside the selection area.
-                        if (!editorClock.IsRunning && !isValidForSelection())
+                        if (!EditorClock.IsRunning && !isValidForSelection())
                             blueprint.Deselect();
                         break;
                 }
@@ -496,10 +496,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 double offset = result.Time.Value - movementBlueprints.First().HitObject.StartTime;
 
                 foreach (HitObject obj in Beatmap.SelectedHitObjects)
-                {
                     obj.StartTime += offset;
-                    Beatmap.Update(obj);
-                }
             }
 
             return true;

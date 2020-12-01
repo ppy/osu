@@ -134,7 +134,7 @@ namespace osu.Desktop
                     break;
 
                 // SDL2 DesktopWindow
-                case DesktopWindow desktopWindow:
+                case SDL2DesktopWindow desktopWindow:
                     desktopWindow.CursorState |= CursorState.Hidden;
                     desktopWindow.SetIconFromStream(iconStream);
                     desktopWindow.Title = Name;

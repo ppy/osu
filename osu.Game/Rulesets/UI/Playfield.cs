@@ -135,10 +135,8 @@ namespace osu.Game.Rulesets.UI
         /// <param name="h">The DrawableHitObject to add.</param>
         public virtual void Add(DrawableHitObject h)
         {
-            if (h.IsInitialized)
-                throw new InvalidOperationException($"{nameof(Add)} doesn't support {nameof(DrawableHitObject)} reuse. Use pooling instead.");
-
-            onNewDrawableHitObject(h);
+            if (!h.IsInitialized)
+                onNewDrawableHitObject(h);
 
             HitObjectContainer.Add(h);
             OnHitObjectAdded(h.HitObject);
