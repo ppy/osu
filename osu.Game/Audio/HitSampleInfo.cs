@@ -13,7 +13,7 @@ namespace osu.Game.Audio
     /// Describes a gameplay hit sample.
     /// </summary>
     [Serializable]
-    public class HitSampleInfo : ISampleInfo
+    public class HitSampleInfo : ISampleInfo, IEquatable<HitSampleInfo>
     {
         public const string HIT_WHISTLE = @"hitwhistle";
         public const string HIT_FINISH = @"hitfinish";
@@ -77,5 +77,13 @@ namespace osu.Game.Audio
         /// <returns>The new <see cref="HitSampleInfo"/>.</returns>
         public virtual HitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<string?> suffix = default, Optional<int> volume = default)
             => new HitSampleInfo(name.GetOr(Name), bank.GetOr(Bank), suffix.GetOr(Suffix), volume.GetOr(Volume));
+
+        public bool Equals(HitSampleInfo? other)
+            => other != null && Name == other.Name && Bank == other.Bank && Suffix == other.Suffix;
+
+        public override bool Equals(object? obj)
+            => Equals((HitSampleInfo?)obj);
+
+        public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix);
     }
 }
