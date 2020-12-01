@@ -119,8 +119,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (firstSample != null)
             {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
-                clone.Name = "spinnerspin";
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("spinnerspin");
 
                 spinningSample.Samples = new ISampleInfo[] { clone };
                 spinningSample.Frequency.Value = spinning_sample_initial_frequency;

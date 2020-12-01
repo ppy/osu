@@ -57,9 +57,16 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             public override IEnumerable<string> LookupNames => lookup_names;
 
-            public bool Equals(BananaHitSampleInfo other) => true;
+            public BananaHitSampleInfo()
+                : base(string.Empty)
+            {
+            }
 
-            public override bool Equals(object obj) => obj is BananaHitSampleInfo other && Equals(other);
+            public bool Equals(BananaHitSampleInfo other)
+                => other != null;
+
+            public override bool Equals(object obj)
+                => Equals((BananaHitSampleInfo)obj);
 
             public override int GetHashCode() => lookup_names.GetHashCode();
         }
