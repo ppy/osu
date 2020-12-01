@@ -37,7 +37,6 @@ namespace osu.Game.Utils
         {
             unchecked
             {
-                //
                 var combined = ((ulong)(uint)series << 32) | (uint)seed;
                 // The xor operation is to not map (0, 0) to 0.
                 return mix(combined ^ 0x12345678);
