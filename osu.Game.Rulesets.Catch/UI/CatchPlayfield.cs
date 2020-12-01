@@ -60,12 +60,12 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            RegisterPool<Droplet, DrawableDroplet>(1);
-            RegisterPool<TinyDroplet, DrawableTinyDroplet>(1);
-            RegisterPool<Fruit, DrawableFruit>(1);
-            RegisterPool<Banana, DrawableBanana>(1);
-            RegisterPool<JuiceStream, DrawableJuiceStream>(1);
-            RegisterPool<BananaShower, DrawableBananaShower>(1);
+            RegisterPool<Droplet, DrawableDroplet>(50);
+            RegisterPool<TinyDroplet, DrawableTinyDroplet>(50);
+            RegisterPool<Fruit, DrawableFruit>(100);
+            RegisterPool<Banana, DrawableBanana>(100);
+            RegisterPool<JuiceStream, DrawableJuiceStream>(10);
+            RegisterPool<BananaShower, DrawableBananaShower>(2);
         }
 
         protected override void LoadComplete()
