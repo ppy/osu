@@ -28,7 +28,10 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private readonly CircularContainer largeFaint, smallFaint, directionalGrow1, directionalGrow2;
+        private readonly CircularContainer largeFaint;
+        private readonly CircularContainer smallFaint;
+        private readonly CircularContainer directionalGlow1;
+        private readonly CircularContainer directionalGlow2;
 
         public HitExplosion()
         {
@@ -57,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Masking = true,
                     Blending = BlendingParameters.Additive,
                 },
-                directionalGrow1 = new CircularContainer
+                directionalGlow1 = new CircularContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -66,7 +69,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Size = new Vector2(0.01f, initial_height),
                     Blending = BlendingParameters.Additive,
                 },
-                directionalGrow2 = new CircularContainer
+                directionalGlow2 = new CircularContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -91,8 +94,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 .FadeOut(duration * 2);
 
             const float angle_variangle = 15; // should be less than 45
-            directionalGrow1.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
-            directionalGrow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
+            directionalGlow1.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
+            directionalGlow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
 
             this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
             Expire(true);
@@ -118,7 +121,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 Radius = 50,
             };
 
-            directionalGrow1.EdgeEffect = new EdgeEffectParameters
+            directionalGlow1.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = Interpolation.ValueAt(0.4f, objectColour, Color4.White, 0, 1),
@@ -126,7 +129,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 Radius = 40,
             };
 
-            directionalGrow2.EdgeEffect = new EdgeEffectParameters
+            directionalGlow2.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = Interpolation.ValueAt(0.4f, objectColour, Color4.White, 0, 1),
