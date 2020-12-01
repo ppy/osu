@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Select
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                var auto = (GetContainingInputManager().CurrentState?.Keyboard.ShiftPressed == true) ? Ruleset.Value.CreateInstance().GetCinemaMod() : Ruleset.Value.CreateInstance().GetAutoplayMod();
                 var autoType = auto?.GetType();
 
                 var mods = Mods.Value;
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Select
                 {
                     notifications?.Post(new SimpleNotification
                     {
-                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                        Text = "The current ruleset doesn't have an autoplay/cinema mod avalaible!"
                     });
                     return false;
                 }
