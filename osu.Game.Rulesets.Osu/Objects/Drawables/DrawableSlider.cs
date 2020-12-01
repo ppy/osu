@@ -294,6 +294,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Hit:
                     Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
+                    if (sliderBody?.SnakingOut.Value == true)
+                        Body.FadeOut();
                     break;
             }
 
