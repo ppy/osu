@@ -76,10 +76,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     // this is temporary until we support per-handler settings.
                     const string raw_mouse_handler = @"OsuTKRawMouseHandler";
-                    const string osutk_standard_mouse_handler = @"OsuTKMouseHandler";
-                    string standardMouseHandlers = $"{osutk_standard_mouse_handler} {nameof(MouseHandler)}";
+                    const string standard_mouse_handlers = @"OsuTKMouseHandler MouseHandler";
 
-                    ignoredInputHandlers.Value = enabled.NewValue ? standardMouseHandlers : raw_mouse_handler;
+                    ignoredInputHandlers.Value = enabled.NewValue ? standard_mouse_handlers : raw_mouse_handler;
                 };
 
                 ignoredInputHandlers = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
