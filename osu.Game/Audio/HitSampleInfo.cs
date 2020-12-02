@@ -72,13 +72,13 @@ namespace osu.Game.Audio
         /// <summary>
         /// Creates a new <see cref="HitSampleInfo"/> with overridden values.
         /// </summary>
-        /// <param name="name">An optional new sample name.</param>
-        /// <param name="bank">An optional new sample bank.</param>
-        /// <param name="suffix">An optional new lookup suffix.</param>
-        /// <param name="volume">An optional new volume.</param>
+        /// <param name="newName">An optional new sample name.</param>
+        /// <param name="newBank">An optional new sample bank.</param>
+        /// <param name="newSuffix">An optional new lookup suffix.</param>
+        /// <param name="newVolume">An optional new volume.</param>
         /// <returns>The new <see cref="HitSampleInfo"/>.</returns>
-        public virtual HitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<string?> suffix = default, Optional<int> volume = default)
-            => new HitSampleInfo(name.GetOr(Name), bank.GetOr(Bank), suffix.GetOr(Suffix), volume.GetOr(Volume));
+        public virtual HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
+            => new HitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume));
 
         public bool Equals(HitSampleInfo? other)
             => other != null && Name == other.Name && Bank == other.Bank && Suffix == other.Suffix;
