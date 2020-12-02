@@ -147,6 +147,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
+        private Vector2 dragStartPosition;
+
         protected override bool OnDragStart(DragStartEvent e)
         {
             if (RequestSelection == null)
@@ -154,6 +156,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             if (e.Button == MouseButton.Left)
             {
+                dragStartPosition = ControlPoint.Position.Value;
                 changeHandler?.BeginChange();
                 return true;
             }
@@ -178,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     slider.Path.ControlPoints[i].Position.Value -= movementDelta;
             }
             else
-                ControlPoint.Position.Value += e.Delta;
+                ControlPoint.Position.Value = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
         }
 
         protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
