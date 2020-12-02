@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
 
-        public Bindable<int> RandomSeed = new Bindable<int>();
+        public int RandomSeed => HitObject?.RandomSeed ?? 0;
 
         protected DrawableCatchHitObject([CanBeNull] CatchHitObject hitObject)
             : base(hitObject)
@@ -32,14 +32,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// <summary>
         /// Get a random number in range [0,1) based on seed <see cref="RandomSeed"/>.
         /// </summary>
-        public float RandomSingle(int series) => StatelessRNG.NextSingle(RandomSeed.Value, series);
+        public float RandomSingle(int series) => StatelessRNG.NextSingle(RandomSeed, series);
 
         protected override void OnApply()
         {
             base.OnApply();
 
             XBindable.BindTo(HitObject.XBindable);
-            RandomSeed.BindTo(HitObject.RandomSeed);
         }
 
         protected override void OnFree()
@@ -47,7 +46,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             base.OnFree();
 
             XBindable.UnbindFrom(HitObject.XBindable);
-            RandomSeed.UnbindFrom(HitObject.RandomSeed);
         }
 
         public Func<CatchHitObject, bool> CheckPosition;
