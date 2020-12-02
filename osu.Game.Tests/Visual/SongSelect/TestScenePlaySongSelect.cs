@@ -616,11 +616,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
 
-            AddAssert("only AT enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault().GetType() == Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType());
+            AddAssert("only AT enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault()?.GetType() == Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType());
 
             AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
 
-            AddAssert("only CN enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault().GetType() == Ruleset.Value.CreateInstance().GetCinemaMod()?.GetType());
+            AddAssert("only CN enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault()?.GetType() == Ruleset.Value.CreateInstance().GetCinemaMod()?.GetType());
         }
 
         [Test]
@@ -642,11 +642,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
 
-            AddAssert("only CN enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault().GetType() == Ruleset.Value.CreateInstance().GetCinemaMod()?.GetType());
+            AddAssert("only CN enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault()?.GetType() == Ruleset.Value.CreateInstance().GetCinemaMod()?.GetType());
 
             AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
 
-            AddAssert("only AT enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault().GetType() == Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType());
+            AddAssert("only AT enabled", () => songSelect.Mods.Value.Count == 1 && songSelect.Mods.Value.FirstOrDefault()?.GetType() == Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType());
         }
 
         [Test]
