@@ -486,11 +486,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 IsLayered = isLayered;
             }
 
-            public override HitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<string?> suffix = default, Optional<int> volume = default)
+            public sealed override HitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<string?> suffix = default, Optional<int> volume = default)
                 => With(name, bank, volume);
 
-            public LegacyHitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<int> volume = default, Optional<int> customSampleBank = default,
-                                            Optional<bool> isLayered = default)
+            public virtual LegacyHitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<int> volume = default, Optional<int> customSampleBank = default,
+                                                    Optional<bool> isLayered = default)
                 => new LegacyHitSampleInfo(name.GetOr(Name), bank.GetOr(Bank), volume.GetOr(Volume), customSampleBank.GetOr(CustomSampleBank), isLayered.GetOr(IsLayered));
 
             public bool Equals(LegacyHitSampleInfo? other)
@@ -520,7 +520,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 Path.ChangeExtension(Filename, null)
             };
 
-            public override HitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<string?> suffix = default, Optional<int> volume = default)
+            public sealed override LegacyHitSampleInfo With(Optional<string> name = default, Optional<string?> bank = default, Optional<int> volume = default, Optional<int> customSampleBank = default,
+                                                            Optional<bool> isLayered = default)
                 => new FileHitSampleInfo(Filename, volume.GetOr(Volume));
 
             public bool Equals(FileHitSampleInfo? other)
