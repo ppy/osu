@@ -294,13 +294,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Hit:
                     Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
+                    if (sliderBody?.SnakingOut.Value == true)
+                        Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;
             }
 
             this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
         }
-
-        public Drawable ProxiedLayer => HeadCircle.ProxiedLayer;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => sliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
