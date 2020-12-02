@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
-
         protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
 
         protected DrawableCatchHitObject([CanBeNull] CatchHitObject hitObject)
