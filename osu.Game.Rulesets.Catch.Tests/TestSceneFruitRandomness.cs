@@ -12,13 +12,14 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneFruitRandomness : OsuTestScene
     {
-        [Test]
-        public void TestFruitRandomness()
-        {
-            Bindable<int> randomSeed = new Bindable<int>();
+        private readonly Bindable<int> randomSeed = new Bindable<int>();
+        private readonly TestDrawableFruit drawableFruit;
+        private readonly TestDrawableBanana drawableBanana;
 
-            var drawableFruit = new TestDrawableFruit(new Fruit());
-            var drawableBanana = new TestDrawableBanana(new Banana());
+        public TestSceneFruitRandomness()
+        {
+            drawableFruit = new TestDrawableFruit(new Fruit());
+            drawableBanana = new TestDrawableBanana(new Banana());
 
             drawableFruit.RandomSeed.BindTo(randomSeed);
             drawableBanana.RandomSeed.BindTo(randomSeed);
@@ -26,6 +27,12 @@ namespace osu.Game.Rulesets.Catch.Tests
             Add(new TestDrawableCatchHitObjectSpecimen(drawableFruit) { X = -200 });
             Add(new TestDrawableCatchHitObjectSpecimen(drawableBanana));
 
+            AddSliderStep("random seed", 0, 100, 0, x => randomSeed.Value = x);
+        }
+
+        [Test]
+        public void TestFruitRandomness()
+        {
             float fruitRotation = 0;
             float bananaRotation = 0;
             float bananaScale = 0;
@@ -70,8 +77,6 @@ namespace osu.Game.Rulesets.Catch.Tests
             });
 
             AddAssert("random seed is changed", () => randomSeed.Value == 1000);
-
-            AddSliderStep("random seed", 0, 100, 0, x => randomSeed.Value = x);
         }
 
         private class TestDrawableFruit : DrawableFruit
