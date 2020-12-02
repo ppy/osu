@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Bindables;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Tests.Visual;
@@ -12,7 +11,6 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneFruitRandomness : OsuTestScene
     {
-        private readonly Bindable<int> randomSeed = new Bindable<int>();
         private readonly TestDrawableFruit drawableFruit;
         private readonly TestDrawableBanana drawableBanana;
 
@@ -21,27 +19,30 @@ namespace osu.Game.Rulesets.Catch.Tests
             drawableFruit = new TestDrawableFruit(new Fruit());
             drawableBanana = new TestDrawableBanana(new Banana());
 
-            drawableFruit.RandomSeed.BindTo(randomSeed);
-            drawableBanana.RandomSeed.BindTo(randomSeed);
-
             Add(new TestDrawableCatchHitObjectSpecimen(drawableFruit) { X = -200 });
             Add(new TestDrawableCatchHitObjectSpecimen(drawableBanana));
 
-            AddSliderStep("random seed", 0, 100, 0, x => randomSeed.Value = x);
+            AddSliderStep("start time", 500, 600, 0, x =>
+            {
+                drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = x;
+            });
         }
 
         [Test]
         public void TestFruitRandomness()
         {
+            // Use values such that the banana colour changes (2/3 of the integers are okay)
+            const int initial_start_time = 500;
+            const int another_start_time = 501;
+
             float fruitRotation = 0;
             float bananaRotation = 0;
             float bananaScale = 0;
             Color4 bananaColour = new Color4();
 
-            AddStep("set random seed to 0", () =>
+            AddStep("Initialize start time", () =>
             {
-                drawableFruit.HitObject.StartTime = 500;
-                randomSeed.Value = 0;
+                drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = initial_start_time;
 
                 fruitRotation = drawableFruit.InnerRotation;
                 bananaRotation = drawableBanana.InnerRotation;
@@ -49,10 +50,9 @@ namespace osu.Game.Rulesets.Catch.Tests
                 bananaColour = drawableBanana.AccentColour.Value;
             });
 
-            AddStep("change random seed", () =>
+            AddStep("change start time", () =>
             {
-                // Use a seed value such that the banana colour is different (2/3 of the seed values are okay).
-                randomSeed.Value = 10;
+                drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = another_start_time;
             });
 
             AddAssert("fruit rotation is changed", () => drawableFruit.InnerRotation != fruitRotation);
@@ -60,9 +60,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddAssert("banana scale is changed", () => drawableBanana.InnerScale != bananaScale);
             AddAssert("banana colour is changed", () => drawableBanana.AccentColour.Value != bananaColour);
 
-            AddStep("reset random seed", () =>
+            AddStep("reset start time", () =>
             {
-                randomSeed.Value = 0;
+                drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = initial_start_time;
             });
 
             AddAssert("rotation and scale restored", () =>
@@ -70,13 +70,6 @@ namespace osu.Game.Rulesets.Catch.Tests
                 drawableBanana.InnerRotation == bananaRotation &&
                 drawableBanana.InnerScale == bananaScale &&
                 drawableBanana.AccentColour.Value == bananaColour);
-
-            AddStep("change start time", () =>
-            {
-                drawableFruit.HitObject.StartTime = 1000;
-            });
-
-            AddAssert("random seed is changed", () => randomSeed.Value == 1000);
         }
 
         private class TestDrawableFruit : DrawableFruit

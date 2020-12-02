@@ -36,11 +36,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             VisualRepresentation.BindValueChanged(_ => updatePiece());
             HyperDash.BindValueChanged(_ => updatePiece(), true);
+        }
 
-            RandomSeed.BindValueChanged(_ =>
-            {
-                ScaleContainer.Rotation = (RandomSingle(1) - 0.5f) * 40;
-            }, true);
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
+
+            ScaleContainer.Rotation = (RandomSingle(1) - 0.5f) * 40;
         }
 
         private void updatePiece()

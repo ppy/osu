@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         private Color4 getBananaColour()
         {
-            switch (StatelessRNG.NextInt(3, RandomSeed.Value))
+            switch (StatelessRNG.NextInt(3, RandomSeed))
             {
                 default:
                     return new Color4(255, 240, 0, 255);

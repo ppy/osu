@@ -24,11 +24,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             base.LoadComplete();
 
-            RandomSeed.BindValueChanged(_ =>
-            {
-                UpdateComboColour();
-                UpdateInitialTransforms();
-            });
+            // start time affects the random seed which is used to determine the banana colour
+            StartTimeBindable.BindValueChanged(_ => UpdateComboColour());
         }
 
         protected override void UpdateInitialTransforms()
