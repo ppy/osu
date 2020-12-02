@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -12,10 +14,12 @@ namespace osu.Android
 {
 
     [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false)]
-    [IntentFilter(new[] { Intent.ActionDefault }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable, Intent.CategoryAppFiles }, DataSchemes = new[] { "content" }, DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
+    [IntentFilter(new[] { Intent.ActionDefault }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
     public class OsuGameActivity : AndroidGameActivity
     {
-        protected override Framework.Game CreateGame() => new OsuGameAndroid(this);
+        private OsuGameAndroid game;
+
+        protected override Framework.Game CreateGame() => game = new OsuGameAndroid(this);
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -26,8 +30,23 @@ namespace osu.Android
 
             base.OnCreate(savedInstanceState);
 
+            OnNewIntent(Intent);
+
             Window.AddFlags(WindowManagerFlags.Fullscreen);
             Window.AddFlags(WindowManagerFlags.KeepScreenOn);
+        }
+
+        protected override void OnNewIntent(Intent intent)
+        {
+            if (intent.Action == Intent.ActionView)
+            {
+                var filename = intent.Data.Path.Split('/').Last();
+                var stream = ContentResolver.OpenInputStream(intent.Data);
+                if (stream != null)
+                    // intent handler may run before the game has even loaded so we need to wait for the file importers to load before launching import
+                    game.WaitForReady(() => game, _ => Task.Run(() => game.Import(stream, filename))); 
+            }
+            base.OnNewIntent(intent);
         }
     }
 }
