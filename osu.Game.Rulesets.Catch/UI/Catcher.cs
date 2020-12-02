@@ -17,7 +17,6 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -47,14 +46,14 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public const double BASE_SPEED = 1.0;
 
-        public Container ExplodingFruitTarget;
-
-        private readonly Container<DrawablePalpableCatchHitObject> caughtFruitContainer;
-
         [NotNull]
         private readonly Container trailsTarget;
 
         private CatcherTrailDisplay trails;
+
+        private readonly Container droppedObjectTarget;
+
+        private readonly Container<DrawablePalpableCatchHitObject> caughtFruitContainer;
 
         public CatcherAnimationState CurrentState { get; private set; }
 
@@ -107,9 +106,10 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<HitExplosion> hitExplosionPool;
         private readonly Container<HitExplosion> hitExplosionContainer;
 
-        public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] Container trailsTarget, [NotNull] Container droppedObjectTarget, BeatmapDifficulty difficulty = null)
         {
             this.trailsTarget = trailsTarget;
+            this.droppedObjectTarget = droppedObjectTarget;
 
             Origin = Anchor.TopCentre;
 
@@ -369,41 +369,14 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Drop any fruit off the plate.
         /// </summary>
-        public void Drop()
-        {
-            foreach (var f in caughtFruitContainer.ToArray())
-                Drop(f);
-        }
+        public void Drop() => clearPlate(DroppedObjectAnimation.Drop);
 
         /// <summary>
         /// Explode any fruit off the plate.
         /// </summary>
-        public void Explode()
-        {
-            foreach (var f in caughtFruitContainer.ToArray())
-                Explode(f);
-        }
+        public void Explode() => clearPlate(DroppedObjectAnimation.Explode);
 
-        public void Drop(DrawablePalpableCatchHitObject fruit)
-        {
-            removeFromPlateWithTransform(fruit, f =>
-            {
-                f.MoveToY(f.Y + 75, 750, Easing.InSine);
-                f.FadeOut(750);
-            });
-        }
-
-        public void Explode(DrawablePalpableCatchHitObject fruit)
-        {
-            var originalX = fruit.X * Scale.X;
-
-            removeFromPlateWithTransform(fruit, f =>
-            {
-                f.MoveToY(f.Y - 50, 250, Easing.OutSine).Then().MoveToY(f.Y + 50, 500, Easing.InSine);
-                f.MoveToX(f.X + originalX * 6, 1000);
-                f.FadeOut(750);
-            });
-        }
+        public void Explode(DrawablePalpableCatchHitObject caughtObject) => removeFromPlate(caughtObject, DroppedObjectAnimation.Explode);
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
@@ -477,33 +450,67 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCatcher();
         }
 
-        private void removeFromPlateWithTransform(DrawablePalpableCatchHitObject fruit, Action<DrawablePalpableCatchHitObject> action)
+        private void clearPlate(DroppedObjectAnimation animation)
         {
-            if (ExplodingFruitTarget != null)
-            {
-                fruit.Anchor = Anchor.TopLeft;
-                fruit.Position = caughtFruitContainer.ToSpaceOfOtherDrawable(fruit.DrawPosition, ExplodingFruitTarget);
+            var caughtObjects = caughtFruitContainer.Children.ToArray();
+            caughtFruitContainer.Clear(false);
 
-                if (!caughtFruitContainer.Remove(fruit))
-                    // we may have already been removed by a previous operation (due to the weird OnLoadComplete scheduling).
-                    // this avoids a crash on potentially attempting to Add a fruit to ExplodingFruitTarget twice.
-                    return;
+            droppedObjectTarget.AddRange(caughtObjects);
 
-                ExplodingFruitTarget.Add(fruit);
-            }
-
-            var actionTime = Clock.CurrentTime;
-
-            fruit.ApplyCustomUpdateState += onFruitOnApplyCustomUpdateState;
-            onFruitOnApplyCustomUpdateState(fruit, fruit.State.Value);
-
-            void onFruitOnApplyCustomUpdateState(DrawableHitObject o, ArmedState state)
-            {
-                using (fruit.BeginAbsoluteSequence(actionTime))
-                    action(fruit);
-
-                fruit.Expire();
-            }
+            foreach (var caughtObject in caughtObjects)
+                drop(caughtObject, animation);
         }
+
+        private void removeFromPlate(DrawablePalpableCatchHitObject caughtObject, DroppedObjectAnimation animation)
+        {
+            if (!caughtFruitContainer.Remove(caughtObject))
+                throw new InvalidOperationException("Can only drop a caught object on the plate");
+
+            droppedObjectTarget.Add(caughtObject);
+
+            drop(caughtObject, animation);
+        }
+
+        private void drop(Drawable d, DroppedObjectAnimation animation)
+        {
+            var originalX = d.X * Scale.X;
+
+            d.Anchor = Anchor.TopLeft;
+            d.Position = caughtFruitContainer.ToSpaceOfOtherDrawable(d.DrawPosition, droppedObjectTarget);
+
+            animate(d, animation, originalX);
+        }
+
+        private void animate(Drawable d, DroppedObjectAnimation animation, float originalX)
+        {
+            // temporary hack to make sure transforms are not cleared by DHO state update
+            if (!d.IsLoaded)
+            {
+                d.OnLoadComplete += _ => animate(d, animation, originalX);
+                return;
+            }
+
+            switch (animation)
+            {
+                case DroppedObjectAnimation.Drop:
+                    d.MoveToY(d.Y + 75, 750, Easing.InSine);
+                    d.FadeOut(750);
+                    break;
+
+                case DroppedObjectAnimation.Explode:
+                    d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
+                    d.MoveToX(d.X + originalX * 6, 1000);
+                    d.FadeOut(750);
+                    break;
+            }
+
+            d.Expire();
+        }
+    }
+
+    public enum DroppedObjectAnimation
+    {
+        Drop,
+        Explode
     }
 }

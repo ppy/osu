@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(() => new Catcher(new Container())
+            SetContents(() => new Catcher(new Container(), new Container())
             {
                 RelativePositionAxes = Axes.None,
                 Anchor = Anchor.Centre,
