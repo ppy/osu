@@ -108,8 +108,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("change samples", () => slider.HitObject.Samples = new[]
             {
-                new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP },
-                new HitSampleInfo { Name = HitSampleInfo.HIT_WHISTLE },
+                new HitSampleInfo(HitSampleInfo.HIT_CLAP),
+                new HitSampleInfo(HitSampleInfo.HIT_WHISTLE),
             });
 
             AddAssert("head samples updated", () => assertSamples(slider.HitObject.HeadCircle));
@@ -136,15 +136,15 @@ namespace osu.Game.Rulesets.Osu.Tests
                 slider = (DrawableSlider)createSlider(repeats: 1);
 
                 for (int i = 0; i < 2; i++)
-                    slider.HitObject.NodeSamples.Add(new List<HitSampleInfo> { new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH } });
+                    slider.HitObject.NodeSamples.Add(new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_FINISH) });
 
                 Add(slider);
             });
 
             AddStep("change samples", () => slider.HitObject.Samples = new[]
             {
-                new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP },
-                new HitSampleInfo { Name = HitSampleInfo.HIT_WHISTLE },
+                new HitSampleInfo(HitSampleInfo.HIT_CLAP),
+                new HitSampleInfo(HitSampleInfo.HIT_WHISTLE),
             });
 
             AddAssert("head samples not updated", () => assertSamples(slider.HitObject.HeadCircle));

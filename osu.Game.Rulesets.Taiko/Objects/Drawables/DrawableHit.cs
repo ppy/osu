@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (isRimType != rimSamples.Any())
             {
                 if (isRimType)
-                    HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP });
+                    HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_CLAP));
                 else
                 {
                     foreach (var sample in rimSamples)
@@ -125,9 +125,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     if (s.Name != HitSampleInfo.HIT_FINISH)
                         continue;
 
-                    var sClone = s.Clone();
-                    sClone.Name = HitSampleInfo.HIT_WHISTLE;
-                    corrected[i] = sClone;
+                    corrected[i] = s.With(HitSampleInfo.HIT_WHISTLE);
                 }
 
                 return corrected;
