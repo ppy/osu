@@ -49,11 +49,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public Container ExplodingFruitTarget;
 
-        private Container<DrawableHitObject> caughtFruitContainer { get; } = new Container<DrawableHitObject>
-        {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.BottomCentre,
-        };
+        private readonly Container<DrawableHitObject> caughtFruitContainer;
 
         [NotNull]
         private readonly Container trailsTarget;
@@ -92,9 +88,9 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private readonly float catchWidth;
 
-        private CatcherSprite catcherIdle;
-        private CatcherSprite catcherKiai;
-        private CatcherSprite catcherFail;
+        private readonly CatcherSprite catcherIdle;
+        private readonly CatcherSprite catcherKiai;
+        private readonly CatcherSprite catcherFail;
 
         private CatcherSprite currentCatcher;
 
@@ -108,8 +104,8 @@ namespace osu.Game.Rulesets.Catch.UI
         private float hyperDashTargetPosition;
         private Bindable<bool> hitLighting;
 
-        private DrawablePool<HitExplosion> hitExplosionPool;
-        private Container<HitExplosion> hitExplosionContainer;
+        private readonly DrawablePool<HitExplosion> hitExplosionPool;
+        private readonly Container<HitExplosion> hitExplosionContainer;
 
         public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
         {
@@ -122,17 +118,15 @@ namespace osu.Game.Rulesets.Catch.UI
                 Scale = calculateScale(difficulty);
 
             catchWidth = CalculateCatchWidth(Scale);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            hitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
 
             InternalChildren = new Drawable[]
             {
                 hitExplosionPool = new DrawablePool<HitExplosion>(10),
-                caughtFruitContainer,
+                caughtFruitContainer = new Container<DrawableHitObject>
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.BottomCentre,
+                },
                 catcherIdle = new CatcherSprite(CatcherAnimationState.Idle)
                 {
                     Anchor = Anchor.TopCentre,
@@ -154,7 +148,12 @@ namespace osu.Game.Rulesets.Catch.UI
                     Origin = Anchor.BottomCentre,
                 },
             };
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            hitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
             trails = new CatcherTrailDisplay(this);
 
             updateCatcher();
