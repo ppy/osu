@@ -178,7 +178,10 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
 
         protected override void Dispose(bool isDisposing)
         {
-            collectionManager.Collections.CollectionChanged -= triggerRefresh;
+            //单线程下会有概率在这里报System.NullReferenceException
+            if (collectionManager != null)
+                collectionManager.Collections.CollectionChanged -= triggerRefresh;
+
             base.Dispose(isDisposing);
         }
     }

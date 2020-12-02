@@ -152,11 +152,18 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             var resizeDuration = IsHidden ? 0 : duration;
 
-            CurrentDisplay.Value?.FadeOut(resizeDuration / 2, Easing.OutQuint);
+            var lastDisplay = CurrentDisplay.Value;
+            lastDisplay?.FadeOut(resizeDuration / 2, Easing.OutQuint)
+                       .OnComplete(_ => contentContainer.Remove(lastDisplay));
+
+            if (!contentContainer.Contains(d))
+                contentContainer.Add(d);
+
+            //如果某一个侧边栏元素在较短的时间内切换，那么FadeTo(0.01f)可以打断上面的OnComplete
+            d.FadeTo(0.01f).FadeTo(0).Then()
+             .Delay(resizeDuration / 2).FadeIn(resizeDuration / 2);
 
             CurrentDisplay.Value = d;
-
-            d.Delay(resizeDuration / 2).FadeIn(resizeDuration / 2);
 
             this.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), resizeDuration, Easing.OutQuint);
             IsHidden = false;
@@ -168,7 +175,6 @@ namespace osu.Game.Screens.Mvis.SideBar
             {
                 d.Alpha = 0;
                 components.Add(s);
-                contentContainer.Add(d);
                 header.Tabs.Add(new HeaderTabItem(s)
                 {
                     Action = () => ShowComponent(d)
