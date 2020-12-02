@@ -3,10 +3,13 @@
 
 using System;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
@@ -20,11 +23,31 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
 
+        /// <summary>
+        /// The seed value used for visual randomness such as fruit rotation.
+        /// By default, <see cref="HitObject.StartTime"/> truncated to an integer is used.
+        /// </summary>
+        public Bindable<int> RandomSeed = new Bindable<int>();
+
         protected DrawableCatchHitObject([CanBeNull] CatchHitObject hitObject)
             : base(hitObject)
         {
             Anchor = Anchor.BottomLeft;
         }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            StartTimeBindable.BindValueChanged(change =>
+            {
+                RandomSeed.Value = (int)change.NewValue;
+            }, true);
+        }
+
+        /// <summary>
+        /// Get a random number in range [0,1) based on seed <see cref="RandomSeed"/>.
+        /// </summary>
+        public float RandomSingle(int series) => StatelessRNG.NextSingle(RandomSeed.Value, series);
 
         protected override void OnApply()
         {
