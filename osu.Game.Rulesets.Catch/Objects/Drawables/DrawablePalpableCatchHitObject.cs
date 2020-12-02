@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// </summary>
         public virtual bool StaysOnPlate => true;
 
+        public float DisplayRadius => CatchHitObject.OBJECT_RADIUS * HitObject.Scale * ScaleFactor;
+
         protected readonly Container ScaleContainer;
 
         protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
