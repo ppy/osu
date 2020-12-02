@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -42,7 +43,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             CatcherArea = new CatcherArea(difficulty)
             {
-                CreateDrawableRepresentation = createDrawableRepresentation,
                 ExplodingFruitTarget = explodingFruitContainer,
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.TopLeft,
@@ -55,6 +55,17 @@ namespace osu.Game.Rulesets.Catch.UI
                 HitObjectContainer,
                 CatcherArea,
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            RegisterPool<Droplet, DrawableDroplet>(50);
+            RegisterPool<TinyDroplet, DrawableTinyDroplet>(50);
+            RegisterPool<Fruit, DrawableFruit>(100);
+            RegisterPool<Banana, DrawableBanana>(100);
+            RegisterPool<JuiceStream, DrawableJuiceStream>(10);
+            RegisterPool<BananaShower, DrawableBananaShower>(2);
         }
 
         protected override void LoadComplete()

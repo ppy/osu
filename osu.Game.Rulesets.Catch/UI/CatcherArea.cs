@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -20,8 +19,6 @@ namespace osu.Game.Rulesets.Catch.UI
     public class CatcherArea : Container
     {
         public const float CATCHER_SIZE = 106.75f;
-
-        public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> CreateDrawableRepresentation;
 
         public readonly Catcher MovableCatcher;
         private readonly CatchComboDisplay comboDisplay;
@@ -72,7 +69,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (result.IsHit && hitObject is DrawablePalpableCatchHitObject fruit)
             {
                 // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
-                var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
+                var caughtFruit = createCaughtFruit(fruit);
 
                 if (caughtFruit == null) return;
 
@@ -126,6 +123,27 @@ namespace osu.Game.Rulesets.Catch.UI
                 MovableCatcher.X = state.CatcherX.Value;
 
             comboDisplay.X = MovableCatcher.X;
+        }
+
+        private DrawableCatchHitObject createCaughtFruit(DrawablePalpableCatchHitObject hitObject)
+        {
+            switch (hitObject.HitObject)
+            {
+                case Banana banana:
+                    return new DrawableBanana(banana);
+
+                case Fruit fruit:
+                    return new DrawableFruit(fruit);
+
+                case TinyDroplet tiny:
+                    return new DrawableTinyDroplet(tiny);
+
+                case Droplet droplet:
+                    return new DrawableDroplet(droplet);
+
+                default:
+                    return null;
+            }
         }
     }
 }
