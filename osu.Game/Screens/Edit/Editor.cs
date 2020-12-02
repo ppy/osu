@@ -106,14 +106,14 @@ namespace osu.Game.Screens.Edit
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host, OsuConfigManager config)
         {
-            beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
-            beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
-
             if (Beatmap.Value is DummyWorkingBeatmap)
             {
                 isNewBeatmap = true;
                 Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
             }
+
+            beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
+            beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
