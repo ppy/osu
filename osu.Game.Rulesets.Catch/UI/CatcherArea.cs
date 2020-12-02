@@ -87,10 +87,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public void OnRevertResult(DrawableCatchHitObject fruit, JudgementResult result)
             => comboDisplay.OnRevertResult(fruit, result);
 
-        public void OnReleased(CatchAction action)
-        {
-        }
-
         public bool AttemptCatch(CatchHitObject obj)
         {
             return MovableCatcher.AttemptCatch(obj);
