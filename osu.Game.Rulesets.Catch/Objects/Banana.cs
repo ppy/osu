@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -50,11 +51,24 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        private class BananaHitSampleInfo : HitSampleInfo
+        private class BananaHitSampleInfo : HitSampleInfo, IEquatable<BananaHitSampleInfo>
         {
-            private static string[] lookupNames { get; } = { "metronomelow", "catch-banana" };
+            private static readonly string[] lookup_names = { "metronomelow", "catch-banana" };
 
-            public override IEnumerable<string> LookupNames => lookupNames;
+            public override IEnumerable<string> LookupNames => lookup_names;
+
+            public BananaHitSampleInfo()
+                : base(string.Empty)
+            {
+            }
+
+            public bool Equals(BananaHitSampleInfo other)
+                => other != null;
+
+            public override bool Equals(object obj)
+                => obj is BananaHitSampleInfo other && Equals(other);
+
+            public override int GetHashCode() => lookup_names.GetHashCode();
         }
     }
 }
