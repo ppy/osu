@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
@@ -16,7 +17,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected virtual FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => (FruitVisualRepresentation)(indexInBeatmap % 4);
 
-        public DrawableFruit(CatchHitObject h)
+        public DrawableFruit()
+            : this(null)
+        {
+        }
+
+        public DrawableFruit([CanBeNull] Fruit h)
             : base(h)
         {
         }
