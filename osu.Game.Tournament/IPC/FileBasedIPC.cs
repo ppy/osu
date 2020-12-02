@@ -243,7 +243,7 @@ namespace osu.Game.Tournament.IPC
                 string stableInstallPath;
 
                 using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                    stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
+                    stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
 
                 if (ipcFileExistsInDirectory(stableInstallPath))
                     return stableInstallPath;
