@@ -33,7 +33,7 @@ namespace osu.Game.Utils
         /// The series number.
         /// Different values are computed for the same seed in different series.
         /// </param>
-        public static ulong NextUlong(int seed, int series = 0)
+        public static ulong NextULong(int seed, int series = 0)
         {
             unchecked
             {
@@ -60,7 +60,7 @@ namespace osu.Game.Utils
         {
             if (maxValue <= 0) throw new ArgumentOutOfRangeException(nameof(maxValue));
 
-            return (int)(NextUlong(seed, series) % (ulong)maxValue);
+            return (int)(NextULong(seed, series) % (ulong)maxValue);
         }
 
         /// <summary>
@@ -74,6 +74,6 @@ namespace osu.Game.Utils
         /// Different values are computed for the same seed in different series.
         /// </param>
         public static float NextSingle(int seed, int series = 0) =>
-            (float)(NextUlong(seed, series) & ((1 << 24) - 1)) / (1 << 24); // float has 24-bit precision
+            (float)(NextULong(seed, series) & ((1 << 24) - 1)) / (1 << 24); // float has 24-bit precision
     }
 }
