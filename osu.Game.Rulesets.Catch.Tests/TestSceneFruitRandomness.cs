@@ -17,17 +17,14 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             Bindable<int> randomSeed = new Bindable<int>();
 
-            TestDrawableFruit drawableFruit;
-            TestDrawableBanana drawableBanana;
+            var drawableFruit = new TestDrawableFruit(new Fruit());
+            var drawableBanana = new TestDrawableBanana(new Banana());
 
-            Add(new TestDrawableCatchHitObjectSpecimen(drawableFruit = new TestDrawableFruit(new Fruit())
-            {
-                RandomSeed = { BindTarget = randomSeed }
-            }) { X = -200 });
-            Add(new TestDrawableCatchHitObjectSpecimen(drawableBanana = new TestDrawableBanana(new Banana())
-            {
-                RandomSeed = { BindTarget = randomSeed }
-            }));
+            drawableFruit.RandomSeed.BindTo(randomSeed);
+            drawableBanana.RandomSeed.BindTo(randomSeed);
+
+            Add(new TestDrawableCatchHitObjectSpecimen(drawableFruit) { X = -200 });
+            Add(new TestDrawableCatchHitObjectSpecimen(drawableBanana));
 
             float fruitRotation = 0;
             float bananaRotation = 0;
