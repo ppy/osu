@@ -37,8 +37,8 @@ namespace osu.Game.Screens.Edit.Setup
                     Current = new BindableFloat(Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
-                        MinValue = 2,
-                        MaxValue = 7,
+                        MinValue = 0,
+                        MaxValue = 10,
                         Precision = 0.1f,
                     }
                 },
