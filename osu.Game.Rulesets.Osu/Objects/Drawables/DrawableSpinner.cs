@@ -110,8 +110,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (firstSample != null)
             {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
-                clone.Name = "spinnerspin";
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("spinnerspin");
 
                 samplesContainer.Add(spinningSample = new PausableSkinnableSound(clone)
                 {

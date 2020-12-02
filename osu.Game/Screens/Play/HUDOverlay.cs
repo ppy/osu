@@ -9,7 +9,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -19,7 +18,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -181,7 +179,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = @"分数界面已被隐藏! 你可以通过按 Shift+Tab 来恢复."
+                    Text = $"分数界面已被隐藏! 你可以通过按 {config.LookupKeyBindings(GlobalAction.ToggleInGameInterface)} 来恢复."
                 });
             }
 
@@ -273,37 +271,6 @@ namespace osu.Game.Screens.Play
             Progress.BindDrawableRuleset(drawableRuleset);
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Repeat) return false;
-
-            if (e.ShiftPressed)
-            {
-                switch (e.Key)
-                {
-                    case Key.Tab:
-                        switch (configVisibilityMode.Value)
-                        {
-                            case HUDVisibilityMode.Never:
-                                configVisibilityMode.Value = HUDVisibilityMode.HideDuringGameplay;
-                                break;
-
-                            case HUDVisibilityMode.HideDuringGameplay:
-                                configVisibilityMode.Value = HUDVisibilityMode.Always;
-                                break;
-
-                            case HUDVisibilityMode.Always:
-                                configVisibilityMode.Value = HUDVisibilityMode.Never;
-                                break;
-                        }
-
-                        return true;
-                }
-            }
-
-            return base.OnKeyDown(e);
-        }
-
         protected virtual SkinnableAccuracyCounter CreateAccuracyCounter() => new SkinnableAccuracyCounter();
 
         protected virtual SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
@@ -376,6 +343,24 @@ namespace osu.Game.Screens.Play
                 case GlobalAction.HoldForHUD:
                     holdingForHUD = true;
                     updateVisibility();
+                    return true;
+
+                case GlobalAction.ToggleInGameInterface:
+                    switch (configVisibilityMode.Value)
+                    {
+                        case HUDVisibilityMode.Never:
+                            configVisibilityMode.Value = HUDVisibilityMode.HideDuringGameplay;
+                            break;
+
+                        case HUDVisibilityMode.HideDuringGameplay:
+                            configVisibilityMode.Value = HUDVisibilityMode.Always;
+                            break;
+
+                        case HUDVisibilityMode.Always:
+                            configVisibilityMode.Value = HUDVisibilityMode.Never;
+                            break;
+                    }
+
                     return true;
             }
 

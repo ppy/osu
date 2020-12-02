@@ -115,8 +115,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (firstSample != null)
             {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
-                clone.Name = "sliderslide";
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("sliderslide");
 
                 samplesContainer.Add(slidingSample = new PausableSkinnableSound(clone)
                 {
@@ -255,7 +254,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < HitObject.EndTime)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         public override void PlaySamples()
@@ -294,13 +293,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Hit:
                     Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
+                    if (sliderBody?.SnakingOut.Value == true)
+                        Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;
             }
 
             this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
         }
-
-        public Drawable ProxiedLayer => HeadCircle.ProxiedLayer;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => sliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
