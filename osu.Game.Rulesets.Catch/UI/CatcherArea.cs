@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -28,8 +27,6 @@ namespace osu.Game.Rulesets.Catch.UI
             set => MovableCatcher.ExplodingFruitTarget = value;
         }
 
-        private DrawableCatchHitObject lastPlateableFruit;
-
         public CatcherArea(BeatmapDifficulty difficulty = null)
         {
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
@@ -53,19 +50,6 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!result.Type.IsScorable())
                 return;
 
-            void runAfterLoaded(Action action)
-            {
-                if (lastPlateableFruit == null)
-                    return;
-
-                // this is required to make this run after the last caught fruit runs updateState() at least once.
-                // TODO: find a better alternative
-                if (lastPlateableFruit.IsLoaded)
-                    action();
-                else
-                    lastPlateableFruit.OnLoadComplete += _ => action();
-            }
-
             if (result.IsHit && hitObject is DrawablePalpableCatchHitObject fruit)
             {
                 // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
@@ -84,16 +68,15 @@ namespace osu.Game.Rulesets.Catch.UI
                 caughtFruit.LifetimeEnd = double.MaxValue;
 
                 MovableCatcher.PlaceOnPlate(caughtFruit);
-                lastPlateableFruit = caughtFruit;
 
                 if (!fruit.StaysOnPlate)
-                    runAfterLoaded(() => MovableCatcher.Explode(caughtFruit));
+                    MovableCatcher.Explode(caughtFruit);
             }
 
             if (hitObject.HitObject.LastInCombo)
             {
                 if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
-                    runAfterLoaded(() => MovableCatcher.Explode());
+                    MovableCatcher.Explode();
                 else
                     MovableCatcher.Drop();
             }
