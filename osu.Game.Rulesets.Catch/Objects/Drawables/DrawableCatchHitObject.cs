@@ -3,11 +3,9 @@
 
 using System;
 using JetBrains.Annotations;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Utils;
 
@@ -23,25 +21,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
 
-        /// <summary>
-        /// The seed value used for visual randomness such as fruit rotation.
-        /// By default, <see cref="HitObject.StartTime"/> truncated to an integer is used.
-        /// </summary>
         public Bindable<int> RandomSeed = new Bindable<int>();
 
         protected DrawableCatchHitObject([CanBeNull] CatchHitObject hitObject)
             : base(hitObject)
         {
             Anchor = Anchor.BottomLeft;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            StartTimeBindable.BindValueChanged(change =>
-            {
-                RandomSeed.Value = (int)change.NewValue;
-            }, true);
         }
 
         /// <summary>
@@ -54,6 +39,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             base.OnApply();
 
             XBindable.BindTo(HitObject.XBindable);
+            RandomSeed.BindTo(HitObject.RandomSeed);
         }
 
         protected override void OnFree()
@@ -61,6 +47,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             base.OnFree();
 
             XBindable.UnbindFrom(HitObject.XBindable);
+            RandomSeed.UnbindFrom(HitObject.RandomSeed);
         }
 
         public Func<CatchHitObject, bool> CheckPosition;
