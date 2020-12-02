@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public Container ExplodingFruitTarget;
 
-        private readonly Container<DrawableHitObject> caughtFruitContainer;
+        private readonly Container<DrawablePalpableCatchHitObject> caughtFruitContainer;
 
         [NotNull]
         private readonly Container trailsTarget;
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Catch.UI
             InternalChildren = new Drawable[]
             {
                 hitExplosionPool = new DrawablePool<HitExplosion>(10),
-                caughtFruitContainer = new Container<DrawableHitObject>
+                caughtFruitContainer = new Container<DrawablePalpableCatchHitObject>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// Add a caught fruit to the catcher's stack.
         /// </summary>
         /// <param name="fruit">The fruit that was caught.</param>
-        public void PlaceOnPlate(DrawableCatchHitObject fruit)
+        public void PlaceOnPlate(DrawablePalpableCatchHitObject fruit)
         {
             var ourRadius = fruit.DisplayRadius;
             float theirRadius = 0;
@@ -385,7 +385,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 Explode(f);
         }
 
-        public void Drop(DrawableHitObject fruit)
+        public void Drop(DrawablePalpableCatchHitObject fruit)
         {
             removeFromPlateWithTransform(fruit, f =>
             {
@@ -394,7 +394,7 @@ namespace osu.Game.Rulesets.Catch.UI
             });
         }
 
-        public void Explode(DrawableHitObject fruit)
+        public void Explode(DrawablePalpableCatchHitObject fruit)
         {
             var originalX = fruit.X * Scale.X;
 
@@ -478,7 +478,7 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCatcher();
         }
 
-        private void removeFromPlateWithTransform(DrawableHitObject fruit, Action<DrawableHitObject> action)
+        private void removeFromPlateWithTransform(DrawablePalpableCatchHitObject fruit, Action<DrawablePalpableCatchHitObject> action)
         {
             if (ExplodingFruitTarget != null)
             {

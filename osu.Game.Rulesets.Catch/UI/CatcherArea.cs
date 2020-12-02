@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Catch.UI
             comboDisplay.X = MovableCatcher.X;
         }
 
-        private DrawableCatchHitObject createCaughtFruit(DrawablePalpableCatchHitObject hitObject)
+        private DrawablePalpableCatchHitObject createCaughtFruit(DrawablePalpableCatchHitObject hitObject)
         {
             switch (hitObject.HitObject)
             {
