@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
@@ -46,7 +48,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                 new SkinnableComponent(
                     "MSidebar-Collection-background",
                     confineMode: ConfineMode.ScaleToFill,
-                    defaultImplementation: _ => new PlaceHolder())
+                    defaultImplementation: _ => createDefaultBackground())
                 {
                     Name = "收藏夹背景",
                     Anchor = Anchor.BottomRight,
@@ -149,7 +151,23 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         {
             base.LoadComplete();
 
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                bgBox?.FadeColour(colourProvider.Background5);
+            }, true);
+
             collection.BindValueChanged(OnCollectionChanged);
+        }
+
+        private Drawable createDefaultBackground()
+        {
+            bgBox = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = colourProvider.Background5
+            };
+
+            return bgBox;
         }
 
         private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
@@ -184,6 +202,9 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         private CancellationTokenSource refreshTaskCancellationToken;
         private Container listContainer;
         private LoadingSpinner loadingSpinner;
+
+        [CanBeNull]
+        private Box bgBox;
 
         private void refreshBeatmapSetList()
         {
