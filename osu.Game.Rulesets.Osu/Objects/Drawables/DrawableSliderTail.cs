@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,6 +16,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
+        [CanBeNull]
+        public Slider Slider => drawableSlider?.HitObject;
+
         /// <summary>
         /// The judgement text is provided by the <see cref="DrawableSlider"/>.
         /// </summary>
@@ -22,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public bool Tracking { get; set; }
 
+        private DrawableSlider drawableSlider;
         private SkinnableDrawable circlePiece;
         private Container scaleContainer;
 
@@ -57,6 +62,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
 
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
+        }
+
+        protected override void OnParentReceived(DrawableHitObject parent)
+        {
+            base.OnParentReceived(parent);
+
+            drawableSlider = (DrawableSlider)parent;
         }
 
         protected override void UpdateInitialTransforms()

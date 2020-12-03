@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,6 +18,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
+
+        [CanBeNull]
+        public Slider Slider => drawableSlider?.HitObject;
 
         private double animDuration;
 
