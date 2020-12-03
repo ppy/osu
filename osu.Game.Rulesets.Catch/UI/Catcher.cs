@@ -517,40 +517,40 @@ namespace osu.Game.Rulesets.Catch.UI
             drop(caughtObject, animation);
         }
 
-        private void drop(Drawable d, DroppedObjectAnimation animation)
+        private void drop(DrawablePalpableCatchHitObject d, DroppedObjectAnimation animation)
         {
             var originalX = d.X * Scale.X;
+            var startTime = Clock.CurrentTime;
 
             d.Anchor = Anchor.TopLeft;
             d.Position = caughtFruitContainer.ToSpaceOfOtherDrawable(d.DrawPosition, droppedObjectTarget);
 
-            animate(d, animation, originalX);
+            // we cannot just apply the transforms because DHO clears transforms when state is updated
+            d.ApplyCustomUpdateState += (o, state) => animate(o, animation, originalX, startTime);
+            if (d.IsLoaded)
+                animate(d, animation, originalX, startTime);
         }
 
-        private void animate(Drawable d, DroppedObjectAnimation animation, float originalX)
+        private void animate(Drawable d, DroppedObjectAnimation animation, float originalX, double startTime)
         {
-            // temporary hack to make sure transforms are not cleared by DHO state update
-            if (!d.IsLoaded)
+            using (d.BeginAbsoluteSequence(startTime))
             {
-                d.OnLoadComplete += _ => animate(d, animation, originalX);
-                return;
+                switch (animation)
+                {
+                    case DroppedObjectAnimation.Drop:
+                        d.MoveToY(d.Y + 75, 750, Easing.InSine);
+                        d.FadeOut(750);
+                        break;
+
+                    case DroppedObjectAnimation.Explode:
+                        d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
+                        d.MoveToX(d.X + originalX * 6, 1000);
+                        d.FadeOut(750);
+                        break;
+                }
+
+                d.Expire();
             }
-
-            switch (animation)
-            {
-                case DroppedObjectAnimation.Drop:
-                    d.MoveToY(d.Y + 75, 750, Easing.InSine);
-                    d.FadeOut(750);
-                    break;
-
-                case DroppedObjectAnimation.Explode:
-                    d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
-                    d.MoveToX(d.X + originalX * 6, 1000);
-                    d.FadeOut(750);
-                    break;
-            }
-
-            d.Expire();
         }
 
         private enum DroppedObjectAnimation
