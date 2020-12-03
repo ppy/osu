@@ -5,6 +5,7 @@ using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Skinning;
 
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            ScaleContainer.Rotation = (RandomSingle(1) - 0.5f) * 40;
+            ScaleContainer.RotateTo((RandomSingle(1) - 0.5f) * 40);
         }
 
         private void updatePiece()
