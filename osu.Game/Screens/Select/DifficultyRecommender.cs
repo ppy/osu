@@ -93,6 +93,9 @@ namespace osu.Game.Screens.Select
             });
         }
 
+        /// <returns>
+        /// Rulesets ordered by highest recommended star difficulty, except currently selected ruleset first
+        /// </returns>
         private IEnumerable<RulesetInfo> getBestRulesetOrder()
         {
             IEnumerable<RulesetInfo> bestRulesetOrder = recommendedStarDifficulty.OrderByDescending(pair => pair.Value)
