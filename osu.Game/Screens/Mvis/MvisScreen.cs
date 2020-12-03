@@ -902,11 +902,6 @@ namespace osu.Game.Screens.Mvis
                         loadingSpinner.Show();
                         loadingSpinner.FadeColour(Color4.White, 300);
                         break;
-
-                    case StoryboardState.Failed:
-                        loadingSpinner.Show();
-                        loadingSpinner.FadeColour(Colour4.Red, 300);
-                        break;
                 }
             }, true);
 

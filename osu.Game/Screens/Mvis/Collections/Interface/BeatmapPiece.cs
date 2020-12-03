@@ -38,12 +38,10 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         private Box hover;
         private FillFlowContainer maskFillFlow;
         private Box bgBox;
+        private Container content;
 
         public BeatmapPiece(WorkingBeatmap b)
         {
-            Masking = true;
-            CornerRadius = 10f;
-            BorderThickness = 3f;
             RelativeSizeAxes = Axes.X;
             Height = 80;
 
@@ -53,104 +51,113 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRangeInternal(new Drawable[]
+            InternalChild = content = new Container
             {
-                bgBox = new Box
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Masking = true,
+                CornerRadius = 10f,
+                BorderThickness = 3f,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4
-                },
-                new BeatmapCover(Beatmap)
-                {
-                    BackgroundBox = false,
-                    TimeBeforeWrapperLoad = 100,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                },
-                maskBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3.Opacity(0.65f)
-                },
-                maskFillFlow = new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.75f,
-                    Colour = colourProvider.Background4,
-                    Children = new Drawable[]
+                    bgBox = new Box
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.3f,
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.2f,
-                            Colour = ColourInfo.GradientHorizontal(
-                                Colour4.White,
-                                Colour4.White.Opacity(0.5f)
-                            )
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.1f,
-                            Colour = ColourInfo.GradientHorizontal(
-                                Colour4.White.Opacity(0.5f),
-                                Colour4.White.Opacity(0.2f)
-                            )
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.1f,
-                            Colour = ColourInfo.GradientHorizontal(
-                                Colour4.White.Opacity(0.2f),
-                                Colour4.White.Opacity(0)
-                            )
-                        }
-                    }
-                },
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Left = 15 },
-                    Children = new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background4
+                    },
+                    new BeatmapCover(Beatmap)
                     {
-                        new OsuSpriteText
+                        BackgroundBox = false,
+                        TimeBeforeWrapperLoad = 100,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre
+                    },
+                    maskBox = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background3.Opacity(0.65f)
+                    },
+                    maskFillFlow = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.75f,
+                        Colour = colourProvider.Background4,
+                        Children = new Drawable[]
                         {
-                            Text = Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20),
-                            RelativeSizeAxes = Axes.X,
-                            Truncate = true
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                            RelativeSizeAxes = Axes.X,
-                            Truncate = true
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.3f,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.2f,
+                                Colour = ColourInfo.GradientHorizontal(
+                                    Colour4.White,
+                                    Colour4.White.Opacity(0.5f)
+                                )
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.1f,
+                                Colour = ColourInfo.GradientHorizontal(
+                                    Colour4.White.Opacity(0.5f),
+                                    Colour4.White.Opacity(0.2f)
+                                )
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.1f,
+                                Colour = ColourInfo.GradientHorizontal(
+                                    Colour4.White.Opacity(0.2f),
+                                    Colour4.White.Opacity(0)
+                                )
+                            }
                         }
-                    }
-                },
-                flash = new Flash
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-                hover = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.White.Opacity(0.1f),
-                    Alpha = 0
-                },
-                new HoverClickSounds()
-            });
+                    },
+                    new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding { Left = 15 },
+                        Children = new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title,
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist,
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true
+                            }
+                        }
+                    },
+                    flash = new Flash
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    hover = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.White.Opacity(0.1f),
+                        Alpha = 0
+                    },
+                    new HoverClickSounds()
+                }
+            };
 
             Active.BindValueChanged(OnActiveChanged, true);
             colourProvider.HueColour.BindValueChanged(_ =>
@@ -160,12 +167,12 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
 
                 if (Active.Value)
                 {
-                    BorderColour = IsCurrent
+                    content.BorderColour = IsCurrent
                         ? colourProvider.Highlight1
                         : colourProvider.Light2;
                 }
                 else
-                    BorderColour = colourProvider.Background1;
+                    content.BorderColour = colourProvider.Background1;
             });
         }
 
@@ -190,12 +197,12 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                 switch (timingPoint.TimeSignature)
                 {
                     case TimeSignatures.SimpleQuadruple:
-                        if (beatIndex % 4 == 0 || effectPoint.KiaiMode)
+                        if (beatIndex % 4 == 0 && beatIndex / 4 > 0 || effectPoint.KiaiMode)
                             flashBox.FadeOutFromOne(1000);
                         break;
 
                     case TimeSignatures.SimpleTriple:
-                        if (beatIndex % 3 == 0 || effectPoint.KiaiMode)
+                        if (beatIndex % 3 == 0 && beatIndex / 3 > 0 || effectPoint.KiaiMode)
                             flashBox.FadeOutFromOne(1000);
                         break;
                 }
@@ -207,7 +214,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             switch (v.NewValue)
             {
                 case true:
-                    BorderColour = IsCurrent
+                    content.BorderColour = IsCurrent
                         ? colourProvider.Highlight1
                         : colourProvider.Light2;
                     maskBox.FadeOut(500);
@@ -215,7 +222,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                     break;
 
                 case false:
-                    BorderColour = colourProvider.Background1;
+                    content.BorderColour = colourProvider.Background1;
                     maskBox.FadeIn(500);
                     flash.Hide();
                     break;
@@ -248,6 +255,18 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             base.OnHoverLost(e);
 
             hover.FadeOut(250);
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            content.ScaleTo(1f, 1000, Easing.OutElastic);
+            base.OnMouseUp(e);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            content.ScaleTo(0.97f, 2000, Easing.OutQuint);
+            return base.OnMouseDown(e);
         }
     }
 }

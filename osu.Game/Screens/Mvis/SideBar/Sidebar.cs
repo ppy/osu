@@ -55,8 +55,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 contentContainer = new Container
                 {
                     Name = "Content",
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true
+                    RelativeSizeAxes = Axes.Both
                 },
                 new Footer.Footer
                 {

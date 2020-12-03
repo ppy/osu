@@ -172,15 +172,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
 
         private void scrollToCurrent()
         {
-            if (!IsCurrent.Value)
-            {
-                beatmapScroll.ScrollToStart(!firstScroll);
-                firstScroll = false;
-                scrollCache.Validate();
-                return;
-            }
-
-            if (currentPiece == null)
+            if (currentPiece == null || !IsCurrent.Value)
             {
                 firstScroll = false;
                 scrollCache.Validate();

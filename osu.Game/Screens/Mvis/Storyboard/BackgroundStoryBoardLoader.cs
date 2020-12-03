@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         protected override void LoadComplete()
         {
             enableSb.BindValueChanged(OnEnableSBChanged);
-            UpdateStoryBoardAsync();
+            updateStoryBoardAsync();
         }
 
         private Task loadTask;
@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             if (v.NewValue)
             {
                 if (!sbLoaded.Value)
-                    UpdateStoryBoardAsync();
+                    updateStoryBoardAsync();
                 else
                 {
                     StoryboardReplacesBackground.Value = currentBeatmap.Storyboard.ReplacesBackground && currentBeatmap.Storyboard.HasDrawable;
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             }
         }
 
-        public void UpdateStoryBoardAsync()
+        private void updateStoryBoardAsync()
         {
             if (!enableSb.Value)
             {
@@ -161,7 +161,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
     {
         NotLoaded,
         Loading,
-        Failed,
         Success
     }
 }
