@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -151,8 +150,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [Resolved(CanBeNull = true)]
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
 
-        private Container<PausableSkinnableSound> samplesContainer;
-
         /// <summary>
         /// Whether the initialization logic in <see cref="Playfield" /> has applied.
         /// </summary>
@@ -177,7 +174,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             positionGain = mfConfig.GetBindable<float>(MfSetting.SamplePlaybackGain);
 
             // Explicit non-virtual function call.
-            base.AddInternal(samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both });
+            base.AddInternal(Samples = new PausableSkinnableSound());
         }
 
         protected override void LoadAsyncComplete()
@@ -299,6 +296,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
             samplesBindable.CollectionChanged -= onSamplesChanged;
 
+            // Release the samples for other hitobjects to use.
+            Samples.Samples = null;
+
             if (nestedHitObjects.IsValueCreated)
             {
                 foreach (var obj in nestedHitObjects.Value)
@@ -363,9 +363,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         protected virtual void LoadSamples()
         {
-            samplesContainer.Clear();
-            Samples = null;
-
             var samples = GetSamples().ToArray();
 
             if (samples.Length <= 0)
@@ -377,7 +374,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                     + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            samplesContainer.Add(Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s))));
+            Samples.Samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();

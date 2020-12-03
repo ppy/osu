@@ -100,8 +100,14 @@ namespace osu.Game.Screens.Select.Carousel
                 background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                 {
                     RelativeSizeAxes = Axes.Both,
-                }, 300),
-                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 100),
+                }, 300)
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 100)
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
             };
 
             background.DelayedLoadComplete += fadeContentIn;
