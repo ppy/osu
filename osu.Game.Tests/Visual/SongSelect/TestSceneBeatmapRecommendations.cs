@@ -101,6 +101,24 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestCurrentRulesetIsRecommended()
+        {
+            BeatmapSetInfo catchSet = null, mixedSet = null;
+
+            AddStep("create catch beatmapset", () => catchSet = importBeatmapSet(0, new[] { new CatchRuleset().RulesetInfo }));
+            AddStep("create mixed beatmapset", () => mixedSet = importBeatmapSet(1,
+                new[] { new TaikoRuleset().RulesetInfo, new CatchRuleset().RulesetInfo, new ManiaRuleset().RulesetInfo }));
+
+            AddAssert("all sets imported", () => ensureAllBeatmapSetsImported(new[] { catchSet, mixedSet }));
+
+            // Switch to catch
+            presentAndConfirm(() => catchSet, 1);
+
+            // Present mixed difficulty set, expect current ruleset to be selected
+            presentAndConfirm(() => mixedSet, 2);
+        }
+
+        [Test]
         public void TestBestRulesetIsRecommended()
         {
             BeatmapSetInfo osuSet = null, mixedSet = null;
