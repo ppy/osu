@@ -40,7 +40,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 Margin = new MarginPadding(5)
             });
 
-            AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
+            AddInternal(rightClickMessage = new WarningBox("右键以放置/连接比赛"));
 
             LadderInfo.Matches.CollectionChanged += (_, __) => updateMessage();
             updateMessage();
