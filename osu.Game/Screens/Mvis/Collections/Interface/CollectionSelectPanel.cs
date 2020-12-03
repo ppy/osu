@@ -135,6 +135,8 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
 
         public void RefreshCollectionList()
         {
+            if (collectionHelper == null) return;
+
             var oldCollection = collectionHelper.CurrentCollection.Value;
 
             //清空界面
