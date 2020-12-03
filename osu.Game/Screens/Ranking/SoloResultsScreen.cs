@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        public SoloResultsScreen(ScoreInfo score, bool allowRetry = true)
+        public SoloResultsScreen(ScoreInfo score, bool allowRetry)
             : base(score, allowRetry)
         {
         }

@@ -182,11 +182,8 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var baseInfo = base.ApplyTo(hitSampleInfo);
 
-                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy
-                    && legacy.CustomSampleBank == 0)
-                {
-                    legacy.CustomSampleBank = CustomSampleBank;
-                }
+                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
+                    return legacy.With(newCustomSampleBank: CustomSampleBank);
 
                 return baseInfo;
             }

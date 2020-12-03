@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
@@ -14,13 +15,17 @@ namespace osu.Game.Skinning
     {
         protected bool RequestedPlaying { get; private set; }
 
-        public PausableSkinnableSound(ISampleInfo hitSamples)
-            : base(hitSamples)
+        public PausableSkinnableSound()
         {
         }
 
-        public PausableSkinnableSound(IEnumerable<ISampleInfo> hitSamples)
-            : base(hitSamples)
+        public PausableSkinnableSound([NotNull] IEnumerable<ISampleInfo> samples)
+            : base(samples)
+        {
+        }
+
+        public PausableSkinnableSound([NotNull] ISampleInfo sample)
+            : base(sample)
         {
         }
 

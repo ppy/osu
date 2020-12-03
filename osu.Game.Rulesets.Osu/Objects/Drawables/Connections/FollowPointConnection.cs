@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 fp.Alpha = 0;
                 fp.Scale = new Vector2(1.5f * end.Scale);
 
-                fp.AnimationStartTime = fadeInTime;
+                fp.AnimationStartTime.Value = fadeInTime;
 
                 using (fp.BeginAbsoluteSequence(fadeInTime))
                 {
