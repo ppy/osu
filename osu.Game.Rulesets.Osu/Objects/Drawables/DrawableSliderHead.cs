@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -11,13 +13,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderHead : DrawableHitCircle
     {
+        [CanBeNull]
+        public Slider Slider => drawableSlider?.HitObject;
+
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;
 
         private DrawableSlider drawableSlider;
-
-        private Slider slider => drawableSlider?.HitObject;
 
         public DrawableSliderHead()
         {
@@ -58,11 +61,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.Update();
 
-            double completionProgress = Math.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
+            Debug.Assert(Slider != null);
+
+            double completionProgress = Math.Clamp((Time.Current - Slider.StartTime) / Slider.Duration, 0, 1);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!IsHit)
-                Position = slider.CurvePositionAt(completionProgress);
+                Position = Slider.CurvePositionAt(completionProgress);
         }
 
         public Action<double> OnShake;
@@ -71,8 +76,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void updatePosition()
         {
-            if (slider != null)
-                Position = HitObject.Position - slider.Position;
+            if (Slider != null)
+                Position = HitObject.Position - Slider.Position;
         }
     }
 }
