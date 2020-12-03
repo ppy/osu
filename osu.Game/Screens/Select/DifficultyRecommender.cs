@@ -26,6 +26,8 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private Bindable<RulesetInfo> ruleset { get; set; }
 
+        private int storedUserId;
+
         private readonly Dictionary<RulesetInfo, double> recommendedStarDifficulty = new Dictionary<RulesetInfo, double>();
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
@@ -69,13 +71,15 @@ namespace osu.Game.Screens.Select
             return beatmap;
         }
 
-        private void calculateRecommendedDifficulties(bool onlyIfNoPreviousValues = false)
+        private void calculateRecommendedDifficulties()
         {
-            if (recommendedStarDifficulty.Any() && onlyIfNoPreviousValues)
+            if (recommendedStarDifficulty.Any() && api.LocalUser.Value.Id == storedUserId)
                 return;
 
+            storedUserId = api.LocalUser.Value.Id;
+
             // only query API for built-in rulesets
-            rulesets.AvailableRulesets.Where(ruleset => ruleset.ID <= 3).ForEach(rulesetInfo =>
+            rulesets.AvailableRulesets.Where(ruleset => ruleset.ID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID).ForEach(rulesetInfo =>
             {
                 var req = new GetUserRequest(api.LocalUser.Value.Id, rulesetInfo);
 
@@ -117,7 +121,7 @@ namespace osu.Game.Screens.Select
             switch (state.NewValue)
             {
                 case APIState.Online:
-                    calculateRecommendedDifficulties(true);
+                    calculateRecommendedDifficulties();
                     break;
             }
         });
