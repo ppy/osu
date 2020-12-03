@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Specialized;
-using System.Linq;
 using Humanizer;
-using Humanizer.Localisation;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -339,11 +337,8 @@ namespace osu.Game.Screens.Multi.Match.Components
                 ApplyButton.Enabled.Value = hasValidSettings;
             }
 
-            private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e)
-            {
-                double totalLength = Playlist.Select(p => p.Beatmap.Value.Length).Sum();
-                playlistLength.Text = $"Length: {totalLength.Milliseconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour, precision: 2)}";
-            }
+            private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
+                playlistLength.Text = $"Length: {Playlist.GetTotalDuration()}";
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
 
