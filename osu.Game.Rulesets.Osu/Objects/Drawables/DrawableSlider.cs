@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI;
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
-        private Container<PausableSkinnableSound> samplesContainer;
+        private PausableSkinnableSound slidingSample;
 
         public DrawableSlider()
             : this(null)
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
-                samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both }
+                slidingSample = new PausableSkinnableSound { Looping = true }
             };
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
@@ -100,28 +101,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnFree();
 
             PathVersion.UnbindFrom(HitObject.Path.Version);
-        }
 
-        private PausableSkinnableSound slidingSample;
+            slidingSample.Samples = null;
+        }
 
         protected override void LoadSamples()
         {
             base.LoadSamples();
 
-            samplesContainer.Clear();
-            slidingSample = null;
-
             var firstSample = HitObject.Samples.FirstOrDefault();
 
             if (firstSample != null)
             {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
-                clone.Name = "sliderslide";
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("sliderslide");
 
-                samplesContainer.Add(slidingSample = new PausableSkinnableSound(clone)
-                {
-                    Looping = true
-                });
+                slidingSample.Samples = new ISampleInfo[] { clone };
             }
         }
 
@@ -255,7 +249,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < HitObject.EndTime)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         public override void PlaySamples()
@@ -294,13 +288,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Hit:
                     Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
+                    if (sliderBody?.SnakingOut.Value == true)
+                        Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;
             }
 
             this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
         }
-
-        public Drawable ProxiedLayer => HeadCircle.ProxiedLayer;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => sliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 

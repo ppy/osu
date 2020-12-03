@@ -114,9 +114,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                var boxColor = ColourInfo.GradientVertical(
-                    colourProvider.Background3,
-                    colourProvider.Background3.Opacity(0));
+                var boxColor = getMaskBoxColour();
                 topBox?.FadeColour(boxColor);
                 bottomBox?.FadeColour(boxColor);
             }, true);
@@ -127,12 +125,17 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             var b = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = ColourInfo.GradientVertical(
-                    colourProvider.Background3,
-                    colourProvider.Background3.Opacity(0))
+                Colour = getMaskBoxColour()
             };
 
             return b;
+        }
+
+        private ColourInfo getMaskBoxColour()
+        {
+            return ColourInfo.GradientVertical(
+                colourProvider.Background5,
+                colourProvider.Background5.Opacity(0));
         }
 
         protected override void UpdateAfterChildren()
@@ -169,15 +172,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
 
         private void scrollToCurrent()
         {
-            if (!IsCurrent.Value)
-            {
-                beatmapScroll.ScrollToStart(!firstScroll);
-                firstScroll = false;
-                scrollCache.Validate();
-                return;
-            }
-
-            if (currentPiece == null)
+            if (currentPiece == null || !IsCurrent.Value)
             {
                 firstScroll = false;
                 scrollCache.Validate();

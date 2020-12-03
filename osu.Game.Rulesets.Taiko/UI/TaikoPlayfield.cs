@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -37,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private SkinnableDrawable mascot;
 
         private ProxyContainer topLevelHitContainer;
-        private ProxyContainer barlineContainer;
+        private ScrollingHitObjectContainer barlineContainer;
         private Container rightArea;
         private Container leftArea;
 
@@ -83,10 +84,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                barlineContainer = new ProxyContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
+                                barlineContainer = new ScrollingHitObjectContainer(),
                                 new Container
                                 {
                                     Name = "Hit objects",
@@ -159,18 +157,37 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.OnNewResult += OnNewResult;
-            base.Add(h);
-
             switch (h)
             {
                 case DrawableBarLine barline:
-                    barlineContainer.Add(barline.CreateProxy());
+                    barlineContainer.Add(barline);
                     break;
 
                 case DrawableTaikoHitObject taikoObject:
+                    h.OnNewResult += OnNewResult;
                     topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+                    base.Add(h);
                     break;
+
+                default:
+                    throw new ArgumentException($"Unsupported {nameof(DrawableHitObject)} type");
+            }
+        }
+
+        public override bool Remove(DrawableHitObject h)
+        {
+            switch (h)
+            {
+                case DrawableBarLine barline:
+                    return barlineContainer.Remove(barline);
+
+                case DrawableTaikoHitObject _:
+                    h.OnNewResult -= OnNewResult;
+                    // todo: consider tidying of proxied content if required.
+                    return base.Remove(h);
+
+                default:
+                    throw new ArgumentException($"Unsupported {nameof(DrawableHitObject)} type");
             }
         }
 

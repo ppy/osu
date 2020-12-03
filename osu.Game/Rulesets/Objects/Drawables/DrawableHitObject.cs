@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -151,8 +150,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [Resolved(CanBeNull = true)]
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
 
-        private Container<PausableSkinnableSound> samplesContainer;
-
         /// <summary>
         /// Whether the initialization logic in <see cref="Playfield" /> has applied.
         /// </summary>
@@ -177,7 +174,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             positionGain = mfConfig.GetBindable<float>(MfSetting.SamplePlaybackGain);
 
             // Explicit non-virtual function call.
-            base.AddInternal(samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both });
+            base.AddInternal(Samples = new PausableSkinnableSound());
         }
 
         protected override void LoadAsyncComplete()
@@ -192,7 +189,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
+            comboIndexBindable.BindValueChanged(_ => UpdateComboColour(), true);
 
             updateState(ArmedState.Idle, true);
         }
@@ -265,18 +262,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
             OnApply();
             HitObjectApplied?.Invoke(this);
 
-            // If not loaded, the state update happens in LoadComplete(). Otherwise, the update is scheduled to allow for lifetime updates.
+            // If not loaded, the state update happens in LoadComplete().
             if (IsLoaded)
             {
-                Scheduler.Add(() =>
-                {
-                    if (Result.IsHit)
-                        updateState(ArmedState.Hit, true);
-                    else if (Result.HasResult)
-                        updateState(ArmedState.Miss, true);
-                    else
-                        updateState(ArmedState.Idle, true);
-                });
+                if (Result.IsHit)
+                    updateState(ArmedState.Hit, true);
+                else if (Result.HasResult)
+                    updateState(ArmedState.Miss, true);
+                else
+                    updateState(ArmedState.Idle, true);
             }
 
             hasHitObjectApplied = true;
@@ -301,6 +295,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // When a new hitobject is applied, the samples will be cleared before re-populating.
             // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
             samplesBindable.CollectionChanged -= onSamplesChanged;
+
+            // Release the samples for other hitobjects to use.
+            Samples.Samples = null;
 
             if (nestedHitObjects.IsValueCreated)
             {
@@ -366,9 +363,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         protected virtual void LoadSamples()
         {
-            samplesContainer.Clear();
-            Samples = null;
-
             var samples = GetSamples().ToArray();
 
             if (samples.Length <= 0)
@@ -380,7 +374,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                     + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            samplesContainer.Add(Samples = new PausableSkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s))));
+            Samples.Samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
@@ -535,7 +529,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            updateComboColour();
+            UpdateComboColour();
 
             ApplySkin(skin, allowFallback);
 
@@ -543,7 +537,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 updateState(State.Value, true);
         }
 
-        private void updateComboColour()
+        protected void UpdateComboColour()
         {
             if (!(HitObject is IHasComboInformation combo)) return;
 
@@ -716,6 +710,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
+        /// The maximum offset from the end time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> can be judged.
+        /// The time offset of <see cref="Result"/> will be clamped to this value during <see cref="ApplyResult"/>.
+        /// <para>
+        /// Defaults to the miss window of <see cref="HitObject"/>.
+        /// </para>
+        /// </summary>
+        /// <remarks>
+        /// This does not affect the time offset provided to invocations of <see cref="CheckForResult"/>.
+        /// </remarks>
+        protected virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
+
+        /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
@@ -754,14 +760,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.Judgement.MinResult} ... {Result.Judgement.MaxResult}]).");
             }
 
-            // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
-            var endTime = HitObject.GetEndTime();
-
-            Result.TimeOffset = Time.Current - endTime;
-
-            double missWindow = HitObject.HitWindows.WindowFor(HitResult.Miss);
-            if (missWindow > 0)
-                Result.TimeOffset = Math.Min(Result.TimeOffset, missWindow);
+            Result.TimeOffset = Math.Min(MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
@@ -783,8 +782,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Judged)
                 return false;
 
-            var endTime = HitObject.GetEndTime();
-            CheckForResult(userTriggered, Time.Current - endTime);
+            CheckForResult(userTriggered, Time.Current - HitObject.GetEndTime());
 
             return Judged;
         }

@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 
-namespace osu.Game.Overlays.Settings.Sections.Audio
+namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class MainMenuSettings : SettingsSubsection
     {

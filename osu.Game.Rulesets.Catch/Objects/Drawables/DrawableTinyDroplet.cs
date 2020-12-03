@@ -1,21 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using JetBrains.Annotations;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableTinyDroplet : DrawableDroplet
     {
-        public DrawableTinyDroplet(TinyDroplet h)
-            : base(h)
+        protected override float ScaleFactor => base.ScaleFactor / 2;
+
+        public DrawableTinyDroplet()
+            : this(null)
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public DrawableTinyDroplet([CanBeNull] TinyDroplet h)
+            : base(h)
         {
-            ScaleContainer.Scale /= 2;
         }
     }
 }

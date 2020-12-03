@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 
@@ -8,7 +9,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableBanana : DrawableFruit
     {
-        public DrawableBanana(Banana h)
+        protected override FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => FruitVisualRepresentation.Banana;
+
+        public DrawableBanana()
+            : this(null)
+        {
+        }
+
+        public DrawableBanana([CanBeNull] Banana h)
             : base(h)
         {
         }

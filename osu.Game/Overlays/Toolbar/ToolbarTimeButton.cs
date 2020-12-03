@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Toolbar
@@ -21,7 +22,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarTimeButton()
         {
-            Width = 1;
             AutoSizeAxes = Axes.X;
         }
 
@@ -37,8 +37,8 @@ namespace osu.Game.Overlays.Toolbar
             base.LoadComplete();
 
             updateTime();
-            beatmapUpdated.BindValueChanged(_ => updateBeatmaps(), true);
-            beatmapRemoved.BindValueChanged(_ => updateBeatmaps());
+            beatmapUpdated.BindValueChanged(_ => updateBeatmapTooltip(), true);
+            beatmapRemoved.BindValueChanged(_ => updateBeatmapTooltip());
         }
 
         private void updateTime()
@@ -63,9 +63,12 @@ namespace osu.Game.Overlays.Toolbar
             this.Delay(500).Schedule(updateTime);
         }
 
-        private void updateBeatmaps()
-        {
+        private void updateBeatmapTooltip() =>
             TooltipSub = $"你共有{beatmapManager.QueryBeatmapsMinimal(_ => true).ToList().Count}张谱面!";
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            return true;
         }
     }
 }

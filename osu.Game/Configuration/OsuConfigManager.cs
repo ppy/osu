@@ -184,7 +184,7 @@ namespace osu.Game.Configuration
             return new TrackedSettings
             {
                 new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "游戏内鼠标按键", v ? "已禁用" : "已启用", LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))),
-                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD可见度", m.GetDescription(), $"切换: shift-tab快速浏览: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
+                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD可见度", m.GetDescription(), $"切换: {LookupKeyBindings(GlobalAction.ToggleInGameInterface)} 快速预览: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
                 new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "缩放", m.GetDescription())),
                 new TrackedSetting<int>(OsuSetting.Skin, m =>
                 {

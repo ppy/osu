@@ -2,7 +2,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.SideBar.Header
@@ -19,7 +18,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
 
         public TabHeader()
         {
-            OsuScrollContainer scroll;
             Name = "Header";
             Height = 40;
             RelativeSizeAxes = Axes.X;
@@ -31,18 +29,15 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
                     RelativeSizeAxes = Axes.Both,
                     Depth = float.MaxValue
                 },
-                scroll = new OsuScrollContainer(Direction.Horizontal)
+                Tabs = new FillFlowContainer<HeaderTabItem>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = Tabs = new FillFlowContainer<HeaderTabItem>
-                    {
-                        AutoSizeAxes = Axes.X,
-                        RelativeSizeAxes = Axes.Y,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(10, 0),
-                        Margin = new MarginPadding { Right = 50 }
-                    }
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Y,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(10, 0),
+                    Margin = new MarginPadding { Right = 25 }
                 },
                 highLightBox = new Box
                 {
@@ -52,8 +47,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
                     Origin = Anchor.BottomLeft
                 }
             };
-
-            scroll.ScrollContent.Anchor = scroll.ScrollContent.Origin = Anchor.CentreRight;
         }
 
         protected override void LoadComplete()
