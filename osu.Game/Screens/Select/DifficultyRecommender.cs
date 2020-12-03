@@ -99,8 +99,7 @@ namespace osu.Game.Screens.Select
         private IEnumerable<RulesetInfo> getBestRulesetOrder()
         {
             IEnumerable<RulesetInfo> bestRulesetOrder = recommendedStarDifficulty.OrderByDescending(pair => pair.Value)
-                                                                                 .Select(pair => pair.Key)
-                                                                                 .ToList();
+                                                                                 .Select(pair => pair.Key);
 
             List<RulesetInfo> orderedRulesets;
 
