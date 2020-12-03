@@ -27,7 +27,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Whether fallback to default skin should be allowed if the custom skin is missing this resource.
         /// </summary>
-        private bool allowDefaultFallback => allowFallback == null || allowFallback.Invoke(CurrentSkin);
+        protected bool AllowDefaultFallback => allowFallback == null || allowFallback.Invoke(CurrentSkin);
 
         /// <summary>
         /// Create a new <see cref="SkinReloadableDrawable"/>
@@ -58,7 +58,7 @@ namespace osu.Game.Skinning
 
         private void skinChanged()
         {
-            SkinChanged(CurrentSkin, allowDefaultFallback);
+            SkinChanged(CurrentSkin, AllowDefaultFallback);
             OnSkinChanged?.Invoke();
         }
 

@@ -55,12 +55,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 new ExportSkinButton(),
                 new SettingsSlider<float, SizeSlider>
                 {
-                    LabelText = "Menu cursor size",
-                    Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
-                    KeyboardStep = 0.01f
-                },
-                new SettingsSlider<float, SizeSlider>
-                {
                     LabelText = "Gameplay cursor size",
                     Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
@@ -134,11 +128,6 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
                 Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != item.ID).ToArray());
-        }
-
-        private class SizeSlider : OsuSliderBar<float>
-        {
-            public override string TooltipText => Current.Value.ToString(@"0.##x");
         }
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>

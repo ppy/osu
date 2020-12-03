@@ -25,6 +25,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -38,7 +41,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatDivisor.BindValueChanged(_ => tickCache.Invalidate());
+            beatDivisor.BindValueChanged(_ => invalidateTicks());
+
+            if (changeHandler != null)
+                // currently this is the best way to handle any kind of timing changes.
+                changeHandler.OnStateChange += invalidateTicks;
+        }
+
+        private void invalidateTicks()
+        {
+            tickCache.Invalidate();
         }
 
         /// <summary>
@@ -164,6 +176,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 return point;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (changeHandler != null)
+                changeHandler.OnStateChange -= invalidateTicks;
         }
     }
 }
