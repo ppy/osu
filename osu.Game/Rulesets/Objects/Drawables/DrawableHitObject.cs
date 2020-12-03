@@ -453,7 +453,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             state.Value = newState;
 
             if (LifetimeEnd == double.MaxValue && (state.Value != ArmedState.Idle || HitObject.HitWindows == null))
-                Expire();
+                LifetimeEnd = Math.Max(LatestTransformEndTime, HitStateUpdateTime + (Samples?.Length ?? 0));
 
             // apply any custom state overrides
             ApplyCustomUpdateState?.Invoke(this, newState);
