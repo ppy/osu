@@ -230,12 +230,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             foreach (var h in HitObject.NestedHitObjects)
             {
-                var pooledDrawableNested = pooledObjectProvider?.GetPooledDrawableRepresentation(h);
+                var pooledDrawableNested = pooledObjectProvider?.GetPooledDrawableRepresentation(h, this);
                 var drawableNested = pooledDrawableNested
                                      ?? CreateNestedHitObject(h)
                                      ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
 
-                // Invoke the event only if this nested object is just created by `CreateNestedHitObject`.
+                // Only invoke the event for non-pooled DHOs, otherwise the event will be fired by the playfield.
                 if (pooledDrawableNested == null)
                     OnNestedDrawableCreated?.Invoke(drawableNested);
 
@@ -243,10 +243,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 drawableNested.OnRevertResult += onRevertResult;
                 drawableNested.ApplyCustomUpdateState += onApplyCustomUpdateState;
 
+                // ApplyParent() should occur before Apply() in all cases, so it's invoked before the nested DHO is added to the hierarchy below, but after its events are initialised.
+                if (pooledDrawableNested == null)
+                    drawableNested.ApplyParent(this);
+
                 nestedHitObjects.Value.Add(drawableNested);
                 AddNestedHitObject(drawableNested);
-
-                drawableNested.OnParentReceived(this);
             }
 
             StartTimeBindable.BindTo(HitObject.StartTimeBindable);
@@ -347,6 +349,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual void OnFree()
         {
         }
+
+        /// <summary>
+        /// Applies a parenting <see cref="DrawableHitObject"/> to this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="parent">The parenting <see cref="DrawableHitObject"/>.</param>
+        public void ApplyParent(DrawableHitObject parent) => OnParentReceived(parent);
 
         /// <summary>
         /// Invoked when this <see cref="DrawableHitObject"/> receives a new parenting <see cref="DrawableHitObject"/>.
