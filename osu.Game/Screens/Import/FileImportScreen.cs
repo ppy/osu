@@ -13,7 +13,6 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
-using osu.Game.Overlays;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
@@ -22,21 +21,25 @@ namespace osu.Game.Screens.Import
 {
     public class FileImportScreen : OsuScreen
     {
-        private Container contentContainer;
-        private FileSelector fileSelector;
-        private Container fileSelectContainer;
-
         public override bool HideOverlaysOnEnter => true;
 
-        private string defaultPath;
         private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
         private readonly IBindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
+
+        private FileSelector fileSelector;
+        private Container contentContainer;
         private TextFlowContainer currentFileText;
         private OsuScrollContainer fileNameScroll;
-        private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+        private const float duration = 300;
+        private const float button_height = 50;
+        private const float button_vertical_margin = 15;
 
         [Resolved]
         private OsuGameBase gameBase { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage)
@@ -44,8 +47,6 @@ namespace osu.Game.Screens.Import
             storage.GetStorageForDirectory("imports");
             var originalPath = storage.GetFullPath("imports", true);
             string[] fileExtensions = { ".osk", ".osr", ".osz" };
-            defaultPath = originalPath;
-            var directory = currentDirectory.Value?.FullName ?? defaultPath;
 
             InternalChild = contentContainer = new Container
             {
@@ -59,19 +60,13 @@ namespace osu.Game.Screens.Import
                 {
                     new Box
                     {
-                        Colour = overlayColourProvider.Background5,
+                        Colour = colours.GreySeafoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    fileSelectContainer = new Container
+                    fileSelector = new FileSelector(initialPath: originalPath, validFileExtensions: fileExtensions)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.65f,
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
-                        Child = fileSelector = new FileSelector(initialPath: directory, validFileExtensions: fileExtensions)
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        }
+                        Width = 0.65f
                     },
                     new Container
                     {
@@ -79,87 +74,48 @@ namespace osu.Game.Screens.Import
                         Width = 0.35f,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Masking = true,
-                        CornerRadius = 10,
                         Children = new Drawable[]
                         {
-                            new GridContainer
+                            new Box
+                            {
+                                Colour = colours.GreySeafoamDarker,
+                                RelativeSizeAxes = Axes.Both
+                            },
+                            new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RowDimensions = new[]
+                                Padding = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
+                                Child = fileNameScroll = new OsuScrollContainer
                                 {
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Child = currentFileText = new TextFlowContainer(t => t.Font = OsuFont.Default.With(size: 30))
                                     {
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
-                                            Children = new Drawable[]
-                                            {
-                                                new Box
-                                                {
-                                                    Colour = overlayColourProvider.Background3,
-                                                    RelativeSizeAxes = Axes.Both
-                                                },
-                                                fileNameScroll = new OsuScrollContainer
-                                                {
-                                                    Masking = false,
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Child = currentFileText = new TextFlowContainer(t => t.Font = OsuFont.Default.With(size: 30))
-                                                    {
-                                                        AutoSizeAxes = Axes.Y,
-                                                        RelativeSizeAxes = Axes.X,
-                                                        Anchor = Anchor.Centre,
-                                                        Origin = Anchor.Centre,
-                                                        TextAnchor = Anchor.Centre
-                                                    },
-                                                },
-                                            }
-                                        },
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        TextAnchor = Anchor.Centre
                                     },
-                                    new Drawable[]
-                                    {
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Margin = new MarginPadding { Bottom = 15, Top = 15 },
-                                            Children = new Drawable[]
-                                            {
-                                                new FillFlowContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new TriangleButton
-                                                        {
-                                                            Text = "Import",
-                                                            Anchor = Anchor.BottomCentre,
-                                                            Origin = Anchor.BottomCentre,
-                                                            RelativeSizeAxes = Axes.X,
-                                                            Height = 50,
-                                                            Width = 0.9f,
-                                                            Action = () =>
-                                                            {
-                                                                var d = currentFile.Value?.FullName;
-                                                                if (d != null)
-                                                                    startImport(d);
-                                                                else
-                                                                    currentFileText.FlashColour(Color4.Red, 500);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                },
+                            },
+                            new TriangleButton
+                            {
+                                Text = "Import",
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = button_height,
+                                Width = 0.9f,
+                                Margin = new MarginPadding { Vertical = button_vertical_margin },
+                                Action = () =>
+                                {
+                                    var d = currentFile.Value?.FullName;
+                                    if (d != null)
+                                        startImport(d);
+                                    else
+                                        currentFileText.FlashColour(Color4.Red, 500);
                                 }
                             }
                         }
@@ -190,15 +146,14 @@ namespace osu.Game.Screens.Import
 
             contentContainer.FadeOut().Then().ScaleTo(0.95f)
                             .Then()
-                            .ScaleTo(1, 300, Easing.OutQuint)
-                            .FadeIn(300);
+                            .ScaleTo(1, duration, Easing.OutQuint)
+                            .FadeIn(duration);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            contentContainer.ScaleTo(0.95f, 300, Easing.OutQuint)
-                            .FadeOut(300);
-            this.FadeOut(500, Easing.OutExpo);
+            contentContainer.ScaleTo(0.95f, duration, Easing.OutQuint);
+            this.FadeOut(duration, Easing.OutQuint);
 
             return base.OnExiting(next);
         }
@@ -210,8 +165,8 @@ namespace osu.Game.Screens.Import
 
             if (!File.Exists(path))
             {
-                currentFileText.Text = "File not exist";
-                currentFileText.FlashColour(Color4.Red, 500);
+                currentFileText.Text = "No such file";
+                currentFileText.FlashColour(colours.Red, duration);
                 return;
             }
 
