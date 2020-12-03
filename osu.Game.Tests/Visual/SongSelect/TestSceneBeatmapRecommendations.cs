@@ -23,8 +23,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneBeatmapRecommendations : OsuGameTestScene
     {
-        protected override bool UseOnlineAPI => false;
-
         [Resolved]
         private DifficultyRecommender recommender { get; set; }
 
