@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Multi.Components
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged((_, __) => Details.Value = Playlist.GetTotalDuration());
+            Playlist.BindCollectionChanged((_, __) => Details.Value = Playlist.GetTotalDuration(), true);
         }
     }
 }
