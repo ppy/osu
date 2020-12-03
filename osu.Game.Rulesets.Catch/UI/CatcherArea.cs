@@ -45,29 +45,6 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!result.Type.IsScorable())
                 return;
 
-            if (result.IsHit && hitObject is DrawablePalpableCatchHitObject fruit)
-            {
-                // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
-                var caughtFruit = createCaughtFruit(fruit);
-
-                if (caughtFruit == null) return;
-
-                caughtFruit.RelativePositionAxes = Axes.None;
-                caughtFruit.Position = new Vector2(MovableCatcher.ToLocalSpace(hitObject.ScreenSpaceDrawQuad.Centre).X - MovableCatcher.DrawSize.X / 2, 0);
-                caughtFruit.IsOnPlate = true;
-
-                caughtFruit.Anchor = Anchor.TopCentre;
-                caughtFruit.Origin = Anchor.Centre;
-                caughtFruit.Scale *= 0.5f;
-                caughtFruit.LifetimeStart = caughtFruit.HitObject.StartTime;
-                caughtFruit.LifetimeEnd = double.MaxValue;
-
-                MovableCatcher.PlaceOnPlate(caughtFruit);
-
-                if (!fruit.StaysOnPlate)
-                    MovableCatcher.Explode(caughtFruit);
-            }
-
             if (hitObject.HitObject.LastInCombo)
             {
                 if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
@@ -97,27 +74,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 MovableCatcher.X = state.CatcherX.Value;
 
             comboDisplay.X = MovableCatcher.X;
-        }
-
-        private DrawablePalpableCatchHitObject createCaughtFruit(DrawablePalpableCatchHitObject hitObject)
-        {
-            switch (hitObject.HitObject)
-            {
-                case Banana banana:
-                    return new DrawableBanana(banana);
-
-                case Fruit fruit:
-                    return new DrawableFruit(fruit);
-
-                case TinyDroplet tiny:
-                    return new DrawableTinyDroplet(tiny);
-
-                case Droplet droplet:
-                    return new DrawableDroplet(droplet);
-
-                default:
-                    return null;
-            }
         }
     }
 }
