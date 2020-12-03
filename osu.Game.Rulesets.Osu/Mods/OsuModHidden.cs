@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
-        protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner);
+        protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner || hitObject is SpinnerTick);
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
