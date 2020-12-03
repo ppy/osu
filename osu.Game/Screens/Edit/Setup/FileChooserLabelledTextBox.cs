@@ -3,10 +3,12 @@
 
 using System;
 using System.IO;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 
@@ -20,6 +22,9 @@ namespace osu.Game.Screens.Edit.Setup
         public Container Target;
 
         private readonly IBindable<FileInfo> currentFile = new Bindable<FileInfo>();
+
+        [Resolved]
+        private SectionsContainer<SetupSection> sectionsContainer { get; set; }
 
         public FileChooserLabelledTextBox()
         {
@@ -47,14 +52,16 @@ namespace osu.Game.Screens.Edit.Setup
 
         public void DisplayFileChooser()
         {
-            Target.Child = new FileSelector(validFileExtensions: ResourcesSection.AudioExtensions)
+            FileSelector fileSelector;
+
+            Target.Child = fileSelector = new FileSelector(validFileExtensions: ResourcesSection.AudioExtensions)
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 400,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 CurrentFile = { BindTarget = currentFile }
             };
+
+            sectionsContainer.ScrollTo(fileSelector);
         }
 
         internal class FileChooserOsuTextBox : OsuTextBox

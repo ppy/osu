@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Ranking
 
         private readonly bool allowRetry;
 
-        protected ResultsScreen(ScoreInfo score, bool allowRetry = true)
+        protected ResultsScreen(ScoreInfo score, bool allowRetry)
         {
             Score = score;
             this.allowRetry = allowRetry;

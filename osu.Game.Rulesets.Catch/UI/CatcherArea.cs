@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -20,8 +19,6 @@ namespace osu.Game.Rulesets.Catch.UI
     public class CatcherArea : Container
     {
         public const float CATCHER_SIZE = 106.75f;
-
-        public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> CreateDrawableRepresentation;
 
         public readonly Catcher MovableCatcher;
         private readonly CatchComboDisplay comboDisplay;
@@ -51,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        public void OnNewResult(DrawableCatchHitObject fruit, JudgementResult result)
+        public void OnNewResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
             if (!result.Type.IsScorable())
                 return;
@@ -69,15 +66,15 @@ namespace osu.Game.Rulesets.Catch.UI
                     lastPlateableFruit.OnLoadComplete += _ => action();
             }
 
-            if (result.IsHit && fruit.HitObject.CanBePlated)
+            if (result.IsHit && hitObject is DrawablePalpableCatchHitObject fruit)
             {
                 // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
-                var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
+                var caughtFruit = createCaughtFruit(fruit);
 
                 if (caughtFruit == null) return;
 
                 caughtFruit.RelativePositionAxes = Axes.None;
-                caughtFruit.Position = new Vector2(MovableCatcher.ToLocalSpace(fruit.ScreenSpaceDrawQuad.Centre).X - MovableCatcher.DrawSize.X / 2, 0);
+                caughtFruit.Position = new Vector2(MovableCatcher.ToLocalSpace(hitObject.ScreenSpaceDrawQuad.Centre).X - MovableCatcher.DrawSize.X / 2, 0);
                 caughtFruit.IsOnPlate = true;
 
                 caughtFruit.Anchor = Anchor.TopCentre;
@@ -93,7 +90,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     runAfterLoaded(() => MovableCatcher.Explode(caughtFruit));
             }
 
-            if (fruit.HitObject.LastInCombo)
+            if (hitObject.HitObject.LastInCombo)
             {
                 if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
                     runAfterLoaded(() => MovableCatcher.Explode());
@@ -101,7 +98,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     MovableCatcher.Drop();
             }
 
-            comboDisplay.OnNewResult(fruit, result);
+            comboDisplay.OnNewResult(hitObject, result);
         }
 
         public void OnRevertResult(DrawableCatchHitObject fruit, JudgementResult result)
@@ -126,6 +123,27 @@ namespace osu.Game.Rulesets.Catch.UI
                 MovableCatcher.X = state.CatcherX.Value;
 
             comboDisplay.X = MovableCatcher.X;
+        }
+
+        private DrawableCatchHitObject createCaughtFruit(DrawablePalpableCatchHitObject hitObject)
+        {
+            switch (hitObject.HitObject)
+            {
+                case Banana banana:
+                    return new DrawableBanana(banana);
+
+                case Fruit fruit:
+                    return new DrawableFruit(fruit);
+
+                case TinyDroplet tiny:
+                    return new DrawableTinyDroplet(tiny);
+
+                case Droplet droplet:
+                    return new DrawableDroplet(droplet);
+
+                default:
+                    return null;
+            }
         }
     }
 }
