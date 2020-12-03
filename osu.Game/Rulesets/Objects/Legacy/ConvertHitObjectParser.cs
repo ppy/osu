@@ -13,6 +13,7 @@ using JetBrains.Annotations;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -427,62 +428,25 @@ namespace osu.Game.Rulesets.Objects.Legacy
             // Todo: This should return the normal SampleInfos if the specified sample file isn't found, but that's a pretty edge-case scenario
             if (!string.IsNullOrEmpty(bankInfo.Filename))
             {
-                return new List<HitSampleInfo>
-                {
-                    new FileHitSampleInfo
-                    {
-                        Filename = bankInfo.Filename,
-                        Volume = bankInfo.Volume
-                    }
-                };
+                return new List<HitSampleInfo> { new FileHitSampleInfo(bankInfo.Filename, bankInfo.Volume) };
             }
 
             var soundTypes = new List<HitSampleInfo>
             {
-                new LegacyHitSampleInfo
-                {
-                    Bank = bankInfo.Normal,
-                    Name = HitSampleInfo.HIT_NORMAL,
-                    Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank,
+                new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.Normal, bankInfo.Volume, bankInfo.CustomSampleBank,
                     // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
                     // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
-                    IsLayered = type != LegacyHitSoundType.None && !type.HasFlag(LegacyHitSoundType.Normal)
-                }
+                    type != LegacyHitSoundType.None && !type.HasFlag(LegacyHitSoundType.Normal))
             };
 
             if (type.HasFlag(LegacyHitSoundType.Finish))
-            {
-                soundTypes.Add(new LegacyHitSampleInfo
-                {
-                    Bank = bankInfo.Add,
-                    Name = HitSampleInfo.HIT_FINISH,
-                    Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank
-                });
-            }
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, bankInfo.Add, bankInfo.Volume, bankInfo.CustomSampleBank));
 
             if (type.HasFlag(LegacyHitSoundType.Whistle))
-            {
-                soundTypes.Add(new LegacyHitSampleInfo
-                {
-                    Bank = bankInfo.Add,
-                    Name = HitSampleInfo.HIT_WHISTLE,
-                    Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank
-                });
-            }
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_WHISTLE, bankInfo.Add, bankInfo.Volume, bankInfo.CustomSampleBank));
 
             if (type.HasFlag(LegacyHitSoundType.Clap))
-            {
-                soundTypes.Add(new LegacyHitSampleInfo
-                {
-                    Bank = bankInfo.Add,
-                    Name = HitSampleInfo.HIT_CLAP,
-                    Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank
-                });
-            }
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_CLAP, bankInfo.Add, bankInfo.Volume, bankInfo.CustomSampleBank));
 
             return soundTypes;
         }
@@ -500,21 +464,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
 
-        public class LegacyHitSampleInfo : HitSampleInfo
+#nullable enable
+
+        public class LegacyHitSampleInfo : HitSampleInfo, IEquatable<LegacyHitSampleInfo>
         {
-            private int customSampleBank;
-
-            public int CustomSampleBank
-            {
-                get => customSampleBank;
-                set
-                {
-                    customSampleBank = value;
-
-                    if (value >= 2)
-                        Suffix = value.ToString();
-                }
-            }
+            public readonly int CustomSampleBank;
 
             /// <summary>
             /// Whether this hit sample is layered.
@@ -523,18 +477,41 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// Layered hit samples are automatically added in all modes (except osu!mania), but can be disabled
             /// using the <see cref="LegacySkinConfiguration.LegacySetting.LayeredHitSounds"/> skin config option.
             /// </remarks>
-            public bool IsLayered { get; set; }
+            public readonly bool IsLayered;
+
+            public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, int customSampleBank = 0, bool isLayered = false)
+                : base(name, bank, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume)
+            {
+                CustomSampleBank = customSampleBank;
+                IsLayered = isLayered;
+            }
+
+            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
+                => With(newName, newBank, newVolume);
+
+            public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default, Optional<int> newCustomSampleBank = default,
+                                                    Optional<bool> newIsLayered = default)
+                => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newCustomSampleBank.GetOr(CustomSampleBank), newIsLayered.GetOr(IsLayered));
+
+            public bool Equals(LegacyHitSampleInfo? other)
+                => base.Equals(other) && CustomSampleBank == other.CustomSampleBank && IsLayered == other.IsLayered;
+
+            public override bool Equals(object? obj)
+                => obj is LegacyHitSampleInfo other && Equals(other);
+
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
         }
 
-        private class FileHitSampleInfo : LegacyHitSampleInfo
+        private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
         {
-            public string Filename;
+            public readonly string Filename;
 
-            public FileHitSampleInfo()
-            {
-                // Make sure that the LegacyBeatmapSkin does not fall back to the user skin.
+            public FileHitSampleInfo(string filename, int volume)
+                // Force CSS=1 to make sure that the LegacyBeatmapSkin does not fall back to the user skin.
                 // Note that this does not change the lookup names, as they are overridden locally.
-                CustomSampleBank = 1;
+                : base(string.Empty, customSampleBank: 1, volume: volume)
+            {
+                Filename = filename;
             }
 
             public override IEnumerable<string> LookupNames => new[]
@@ -542,6 +519,20 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 Filename,
                 Path.ChangeExtension(Filename, null)
             };
+
+            public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default, Optional<int> newCustomSampleBank = default,
+                                                            Optional<bool> newIsLayered = default)
+                => new FileHitSampleInfo(Filename, newVolume.GetOr(Volume));
+
+            public bool Equals(FileHitSampleInfo? other)
+                => base.Equals(other) && Filename == other.Filename;
+
+            public override bool Equals(object? obj)
+                => obj is FileHitSampleInfo other && Equals(other);
+
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Filename);
         }
+
+#nullable disable
     }
 }

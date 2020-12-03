@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
@@ -42,6 +41,36 @@ namespace osu.Game.Tests.Editing
             Assert.That(handler.CanRedo.Value, Is.True);
 
             Assert.That(stateChangedFired, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TestApplyThenUndoThenApplySameChange()
+        {
+            var (handler, beatmap) = createChangeHandler();
+
+            Assert.That(handler.CanUndo.Value, Is.False);
+            Assert.That(handler.CanRedo.Value, Is.False);
+
+            string originalHash = handler.CurrentStateHash;
+
+            addArbitraryChange(beatmap);
+            handler.SaveState();
+
+            Assert.That(handler.CanUndo.Value, Is.True);
+            Assert.That(handler.CanRedo.Value, Is.False);
+            Assert.That(stateChangedFired, Is.EqualTo(1));
+
+            string hash = handler.CurrentStateHash;
+
+            // undo a change without saving
+            handler.RestoreState(-1);
+
+            Assert.That(originalHash, Is.EqualTo(handler.CurrentStateHash));
+            Assert.That(stateChangedFired, Is.EqualTo(2));
+
+            addArbitraryChange(beatmap);
+            handler.SaveState();
+            Assert.That(hash, Is.EqualTo(handler.CurrentStateHash));
         }
 
         [Test]
@@ -139,7 +168,7 @@ namespace osu.Game.Tests.Editing
 
         private void addArbitraryChange(EditorBeatmap beatmap)
         {
-            beatmap.Add(new HitCircle { StartTime = RNG.Next(0, 100000) });
+            beatmap.Add(new HitCircle { StartTime = 2760 });
         }
     }
 }

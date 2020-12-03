@@ -50,12 +50,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            var dropletSamples = Samples.Select(s => new HitSampleInfo
-            {
-                Bank = s.Bank,
-                Name = @"slidertick",
-                Volume = s.Volume
-            }).ToList();
+            var dropletSamples = Samples.Select(s => s.With(@"slidertick")).ToList();
 
             int nodeIndex = 0;
             SliderEventDescriptor? lastEvent = null;

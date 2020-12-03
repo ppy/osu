@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private IEditorChangeHandler changeHandler { get; set; }
 
         [Resolved]
-        private EditorClock editorClock { get; set; }
+        protected EditorClock EditorClock { get; private set; }
 
         [Resolved]
         protected EditorBeatmap Beatmap { get; private set; }
@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (clickedBlueprint == null || SelectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered) != clickedBlueprint)
                 return false;
 
-            editorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
+            EditorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
             return true;
         }
 
@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Button == MouseButton.Right)
                 return false;
 
-            if (movementBlueprint != null)
+            if (movementBlueprints != null)
             {
                 isDraggingBlueprint = true;
                 changeHandler?.BeginChange();
@@ -299,7 +299,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             SelectionBlueprints.Remove(blueprint);
 
-            if (movementBlueprint == blueprint)
+            if (movementBlueprints?.Contains(blueprint) == true)
                 finishSelectionMovement();
 
             OnBlueprintRemoved(hitObject);
@@ -381,7 +381,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                     case SelectionState.Selected:
                         // if the editor is playing, we generally don't want to deselect objects even if outside the selection area.
-                        if (!editorClock.IsRunning && !isValidForSelection())
+                        if (!EditorClock.IsRunning && !isValidForSelection())
                             blueprint.Deselect();
                         break;
                 }
@@ -424,8 +424,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Selection Movement
 
-        private Vector2? movementBlueprintOriginalPosition;
-        private SelectionBlueprint movementBlueprint;
+        private Vector2[] movementBlueprintOriginalPositions;
+        private SelectionBlueprint[] movementBlueprints;
         private bool isDraggingBlueprint;
 
         /// <summary>
@@ -442,8 +442,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
-            movementBlueprint = SelectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).First();
-            movementBlueprintOriginalPosition = movementBlueprint.ScreenSpaceSelectionPoint; // todo: unsure if correct
+            movementBlueprints = SelectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).ToArray();
+            movementBlueprintOriginalPositions = movementBlueprints.Select(m => m.ScreenSpaceSelectionPoint).ToArray();
         }
 
         /// <summary>
@@ -453,36 +453,50 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a movement was active.</returns>
         private bool moveCurrentSelection(DragEvent e)
         {
-            if (movementBlueprint == null)
+            if (movementBlueprints == null)
                 return false;
 
             if (snapProvider == null)
                 return true;
 
-            Debug.Assert(movementBlueprintOriginalPosition != null);
+            Debug.Assert(movementBlueprintOriginalPositions != null);
 
-            HitObject draggedObject = movementBlueprint.HitObject;
+            Vector2 distanceTravelled = e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+
+            // check for positional snap for every object in selection (for things like object-object snapping)
+            for (var i = 0; i < movementBlueprintOriginalPositions.Length; i++)
+            {
+                var testPosition = movementBlueprintOriginalPositions[i] + distanceTravelled;
+
+                var positionalResult = snapProvider.SnapScreenSpacePositionToValidPosition(testPosition);
+
+                if (positionalResult.ScreenSpacePosition == testPosition) continue;
+
+                // attempt to move the objects, and abort any time based snapping if we can.
+                if (SelectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprints[i], positionalResult.ScreenSpacePosition)))
+                    return true;
+            }
+
+            // if no positional snapping could be performed, try unrestricted snapping from the earliest
+            // hitobject in the selection.
 
             // The final movement position, relative to movementBlueprintOriginalPosition.
-            Vector2 movePosition = movementBlueprintOriginalPosition.Value + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+            Vector2 movePosition = movementBlueprintOriginalPositions.First() + distanceTravelled;
 
             // Retrieve a snapped position.
             var result = snapProvider.SnapScreenSpacePositionToValidTime(movePosition);
 
             // Move the hitobjects.
-            if (!SelectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, result.ScreenSpacePosition)))
+            if (!SelectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprints.First(), result.ScreenSpacePosition)))
                 return true;
 
             if (result.Time.HasValue)
             {
                 // Apply the start time at the newly snapped-to position
-                double offset = result.Time.Value - draggedObject.StartTime;
+                double offset = result.Time.Value - movementBlueprints.First().HitObject.StartTime;
 
                 foreach (HitObject obj in Beatmap.SelectedHitObjects)
-                {
                     obj.StartTime += offset;
-                    Beatmap.Update(obj);
-                }
             }
 
             return true;
@@ -494,11 +508,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>Whether a movement was active.</returns>
         private bool finishSelectionMovement()
         {
-            if (movementBlueprint == null)
+            if (movementBlueprints == null)
                 return false;
 
-            movementBlueprintOriginalPosition = null;
-            movementBlueprint = null;
+            movementBlueprintOriginalPositions = null;
+            movementBlueprints = null;
 
             return true;
         }

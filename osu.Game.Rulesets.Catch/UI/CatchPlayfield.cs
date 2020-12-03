@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -42,7 +43,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             CatcherArea = new CatcherArea(difficulty)
             {
-                CreateDrawableRepresentation = createDrawableRepresentation,
                 ExplodingFruitTarget = explodingFruitContainer,
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.TopLeft,
@@ -57,18 +57,32 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        public bool CheckIfWeCanCatch(CatchHitObject obj) => CatcherArea.AttemptCatch(obj);
-
-        public override void Add(DrawableHitObject h)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            h.OnNewResult += onNewResult;
-            h.OnRevertResult += onRevertResult;
-
-            base.Add(h);
-
-            var fruit = (DrawableCatchHitObject)h;
-            fruit.CheckPosition = CheckIfWeCanCatch;
+            RegisterPool<Droplet, DrawableDroplet>(50);
+            RegisterPool<TinyDroplet, DrawableTinyDroplet>(50);
+            RegisterPool<Fruit, DrawableFruit>(100);
+            RegisterPool<Banana, DrawableBanana>(100);
+            RegisterPool<JuiceStream, DrawableJuiceStream>(10);
+            RegisterPool<BananaShower, DrawableBananaShower>(2);
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // these subscriptions need to be done post constructor to ensure externally bound components have a chance to populate required fields (ScoreProcessor / ComboAtJudgement in this case).
+            NewResult += onNewResult;
+            RevertResult += onRevertResult;
+        }
+
+        protected override void OnNewDrawableHitObject(DrawableHitObject d)
+        {
+            ((DrawableCatchHitObject)d).CheckPosition = checkIfWeCanCatch;
+        }
+
+        private bool checkIfWeCanCatch(CatchHitObject obj) => CatcherArea.AttemptCatch(obj);
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
             => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
