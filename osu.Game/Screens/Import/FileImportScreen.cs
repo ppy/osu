@@ -45,6 +45,7 @@ namespace osu.Game.Screens.Import
             var originalPath = storage.GetFullPath("imports", true);
             string[] fileExtensions = { ".osk", ".osr", ".osz" };
             defaultPath = originalPath;
+            var directory = currentDirectory.Value?.FullName ?? defaultPath;
 
             InternalChild = contentContainer = new Container
             {
@@ -67,6 +68,10 @@ namespace osu.Game.Screens.Import
                         Width = 0.65f,
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
+                        Child = fileSelector = new FileSelector(initialPath: directory, validFileExtensions: fileExtensions)
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }
                     },
                     new Container
                     {
@@ -169,21 +174,9 @@ namespace osu.Game.Screens.Import
             {
                 currentFile.Value = null;
             });
-            currentFile.UnbindBindings();
-            currentDirectory.UnbindBindings();
-
-            fileSelector?.Expire();
-
-            var directory = currentDirectory.Value?.FullName ?? defaultPath;
-            fileSelector = new FileSelector(initialPath: directory, validFileExtensions: fileExtensions)
-            {
-                RelativeSizeAxes = Axes.Both
-            };
 
             currentDirectory.BindTo(fileSelector.CurrentPath);
             currentFile.BindTo(fileSelector.CurrentFile);
-
-            fileSelectContainer.Add(fileSelector);
         }
 
         private void updateFileSelectionText(ValueChangedEvent<FileInfo> v)
