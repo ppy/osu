@@ -245,25 +245,29 @@ namespace osu.Game.Rulesets.Catch.UI
                 catchObjectPosition >= catcherPosition - halfCatchWidth &&
                 catchObjectPosition <= catcherPosition + halfCatchWidth;
 
-            // only update hyperdash state if we are not catching a tiny droplet.
-            if (fruit is TinyDroplet) return validCatch;
-
-            if (validCatch && fruit.HyperDash)
+            // droplet doesn't affect the catcher state
+            if (!(fruit is TinyDroplet))
             {
-                var target = fruit.HyperDashTarget;
-                var timeDifference = target.StartTime - fruit.StartTime;
-                double positionDifference = target.X - catcherPosition;
-                var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
+                if (validCatch && fruit.HyperDash)
+                {
+                    var target = fruit.HyperDashTarget;
+                    var timeDifference = target.StartTime - fruit.StartTime;
+                    double positionDifference = target.X - catcherPosition;
+                    var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
-                SetHyperDashState(Math.Abs(velocity), target.X);
+                    SetHyperDashState(Math.Abs(velocity), target.X);
+                }
+                else
+                    SetHyperDashState();
+
+                if (validCatch)
+                    updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
+                else if (!(fruit is Banana))
+                    updateState(CatcherAnimationState.Fail);
             }
-            else
-                SetHyperDashState();
 
             if (validCatch)
-                updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
-            else if (!(fruit is Banana))
-                updateState(CatcherAnimationState.Fail);
+                placeCaughtObject(fruit);
 
             return validCatch;
         }
@@ -448,6 +452,48 @@ namespace osu.Game.Rulesets.Catch.UI
 
             CurrentState = state;
             updateCatcher();
+        }
+
+        private void placeCaughtObject(PalpableCatchHitObject source)
+        {
+            var caughtObject = createCaughtObject(source);
+            if (caughtObject == null) return;
+
+            caughtObject.RelativePositionAxes = Axes.None;
+            caughtObject.X = source.X - X;
+            caughtObject.IsOnPlate = true;
+
+            caughtObject.Anchor = Anchor.TopCentre;
+            caughtObject.Origin = Anchor.Centre;
+            caughtObject.Scale *= 0.5f;
+            caughtObject.LifetimeStart = source.StartTime;
+            caughtObject.LifetimeEnd = double.MaxValue;
+
+            PlaceOnPlate(caughtObject);
+
+            if (!caughtObject.StaysOnPlate)
+                Explode(caughtObject);
+        }
+
+        private DrawablePalpableCatchHitObject createCaughtObject(PalpableCatchHitObject source)
+        {
+            switch (source)
+            {
+                case Banana banana:
+                    return new DrawableBanana(banana);
+
+                case Fruit fruit:
+                    return new DrawableFruit(fruit);
+
+                case TinyDroplet tiny:
+                    return new DrawableTinyDroplet(tiny);
+
+                case Droplet droplet:
+                    return new DrawableDroplet(droplet);
+
+                default:
+                    return null;
+            }
         }
 
         private void clearPlate(DroppedObjectAnimation animation)
