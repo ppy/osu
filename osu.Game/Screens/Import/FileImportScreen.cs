@@ -188,17 +188,16 @@ namespace osu.Game.Screens.Import
         {
             base.OnEntering(last);
 
-            contentContainer.FadeOut().Then().ScaleTo(0.8f).RotateTo(-15).MoveToX(300)
+            contentContainer.FadeOut().Then().ScaleTo(0.95f)
                             .Then()
-                            .ScaleTo(1, 1500, Easing.OutElastic)
-                            .FadeIn(500)
-                            .MoveToX(0, 500, Easing.OutQuint)
-                            .RotateTo(0, 500, Easing.OutQuint);
+                            .ScaleTo(1, 300, Easing.OutQuint)
+                            .FadeIn(300);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            contentContainer.ScaleTo(0.8f, 500, Easing.OutExpo).RotateTo(-15, 500, Easing.OutExpo).MoveToX(300, 500, Easing.OutQuint).FadeOut(500);
+            contentContainer.ScaleTo(0.95f, 300, Easing.OutQuint)
+                            .FadeOut(300);
             this.FadeOut(500, Easing.OutExpo);
 
             return base.OnExiting(next);
