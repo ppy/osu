@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
@@ -12,6 +13,8 @@ namespace osu.Game.Skinning
 {
     public class PausableSkinnableSound : SkinnableSound
     {
+        public double Length => SamplesContainer.Children.Count == 0 ? 0 : SamplesContainer.Children.Max(sample => sample.Length);
+
         protected bool RequestedPlaying { get; private set; }
 
         public PausableSkinnableSound(ISampleInfo hitSamples)
