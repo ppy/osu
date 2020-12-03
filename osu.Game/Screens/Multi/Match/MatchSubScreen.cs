@@ -57,6 +57,7 @@ namespace osu.Game.Screens.Multi.Match
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
         private OverlinedHeader participantsHeader;
+        private OverlinedHeader playlistHeader;
 
         public MatchSubScreen(Room room)
         {
@@ -135,7 +136,7 @@ namespace osu.Game.Screens.Multi.Match
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Content = new[]
                                                                 {
-                                                                    new Drawable[] { new OverlinedHeader("Playlist"), },
+                                                                    new Drawable[] { playlistHeader = new OverlinedHeader("Playlist"), },
                                                                     new Drawable[]
                                                                     {
                                                                         new DrawableRoomPlaylistWithResults
@@ -243,6 +244,8 @@ namespace osu.Game.Screens.Multi.Match
 
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
+
+            playlist.BindCollectionChanged((_, __) => playlistHeader.Details.Value = playlist.GetTotalDuration(), true);
         }
 
         public override bool OnExiting(IScreen next)
