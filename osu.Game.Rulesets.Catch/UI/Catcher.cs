@@ -552,11 +552,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
             d.Expire();
         }
-    }
 
-    public enum DroppedObjectAnimation
-    {
-        Drop,
-        Explode
+        private enum DroppedObjectAnimation
+        {
+            Drop,
+            Explode
+        }
     }
 }
