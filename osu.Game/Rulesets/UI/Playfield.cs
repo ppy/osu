@@ -359,8 +359,7 @@ namespace osu.Game.Rulesets.UI
                 if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
                     lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
 
-                if (parent != null)
-                    dho.ApplyParent(parent);
+                dho.ParentHitObject = parent;
                 dho.Apply(hitObject, entry);
             });
         }

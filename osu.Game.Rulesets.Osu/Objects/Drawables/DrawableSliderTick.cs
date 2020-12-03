@@ -22,8 +22,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool DisplayResult => false;
 
+        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+
         private SkinnableDrawable scaleContainer;
-        private DrawableSlider drawableSlider;
 
         public DrawableSliderTick()
             : base(null)
@@ -63,18 +64,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
 
-        protected override void OnParentReceived(DrawableHitObject parent)
-        {
-            base.OnParentReceived(parent);
-
-            drawableSlider = (DrawableSlider)parent;
-        }
-
         protected override void OnApply()
         {
             base.OnApply();
 
-            Position = HitObject.Position - drawableSlider.HitObject.Position;
+            Position = HitObject.Position - DrawableSlider.HitObject.Position;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
