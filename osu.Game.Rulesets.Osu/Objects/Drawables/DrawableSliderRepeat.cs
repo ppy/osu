@@ -65,6 +65,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnParentReceived(parent);
 
             drawableSlider = (DrawableSlider)parent;
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
 
             Position = HitObject.Position - drawableSlider.Position;
         }

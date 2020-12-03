@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void OnParentReceived(DrawableHitObject parent)
         {
             base.OnParentReceived(parent);
+
             drawableSpinner = (DrawableSpinner)parent;
         }
 
