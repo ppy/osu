@@ -4,20 +4,19 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderHead : DrawableHitCircle
     {
+        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;
 
-        private DrawableSlider drawableSlider;
-
-        private Slider slider => drawableSlider?.HitObject;
+        private Slider slider => DrawableSlider?.HitObject;
 
         public DrawableSliderHead()
         {
@@ -39,24 +38,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.OnFree();
 
-            pathVersion.UnbindFrom(drawableSlider.PathVersion);
-        }
-
-        protected override void OnParentReceived(DrawableHitObject parent)
-        {
-            base.OnParentReceived(parent);
-
-            drawableSlider = (DrawableSlider)parent;
+            pathVersion.UnbindFrom(DrawableSlider.PathVersion);
         }
 
         protected override void OnApply()
         {
             base.OnApply();
 
-            pathVersion.BindTo(drawableSlider.PathVersion);
+            pathVersion.BindTo(DrawableSlider.PathVersion);
 
-            OnShake = drawableSlider.Shake;
-            CheckHittable = (d, t) => drawableSlider.CheckHittable?.Invoke(d, t) ?? true;
+            OnShake = DrawableSlider.Shake;
+            CheckHittable = (d, t) => DrawableSlider.CheckHittable?.Invoke(d, t) ?? true;
         }
 
         protected override void Update()
