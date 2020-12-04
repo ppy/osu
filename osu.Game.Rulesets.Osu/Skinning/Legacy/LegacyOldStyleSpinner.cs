@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Skinning
+namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     /// <summary>
     /// Legacy skinned spinner with one main spinning layer and a background layer.

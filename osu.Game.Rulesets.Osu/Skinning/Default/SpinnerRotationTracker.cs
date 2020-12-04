@@ -9,10 +9,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Screens.Play;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class SpinnerRotationTracker : CircularContainer
     {

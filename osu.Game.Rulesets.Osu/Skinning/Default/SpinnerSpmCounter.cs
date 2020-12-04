@@ -10,7 +10,7 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class SpinnerSpmCounter : Container
     {

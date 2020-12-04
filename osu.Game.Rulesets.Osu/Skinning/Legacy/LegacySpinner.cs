@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Skinning
+namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public abstract class LegacySpinner : CompositeDrawable
     {

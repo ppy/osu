@@ -3,7 +3,7 @@
 
 using osu.Game.Graphics.Backgrounds;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class TrianglesPiece : Triangles
     {

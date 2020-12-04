@@ -5,12 +5,12 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class NumberPiece : Container
     {

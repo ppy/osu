@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class SpinnerFill : CircularContainer, IHasAccentColour
     {
