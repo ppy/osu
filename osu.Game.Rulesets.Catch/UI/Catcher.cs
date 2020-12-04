@@ -245,29 +245,28 @@ namespace osu.Game.Rulesets.Catch.UI
                 catchObjectPosition >= catcherPosition - halfCatchWidth &&
                 catchObjectPosition <= catcherPosition + halfCatchWidth;
 
-            // droplet doesn't affect the catcher state
-            if (!(fruit is TinyDroplet))
-            {
-                if (validCatch && fruit.HyperDash)
-                {
-                    var target = fruit.HyperDashTarget;
-                    var timeDifference = target.StartTime - fruit.StartTime;
-                    double positionDifference = target.X - catcherPosition;
-                    var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
-
-                    SetHyperDashState(Math.Abs(velocity), target.X);
-                }
-                else
-                    SetHyperDashState();
-
-                if (validCatch)
-                    updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
-                else if (!(fruit is Banana))
-                    updateState(CatcherAnimationState.Fail);
-            }
-
             if (validCatch)
                 placeCaughtObject(fruit);
+
+            // droplet doesn't affect the catcher state
+            if (fruit is TinyDroplet) return validCatch;
+
+            if (validCatch && fruit.HyperDash)
+            {
+                var target = fruit.HyperDashTarget;
+                var timeDifference = target.StartTime - fruit.StartTime;
+                double positionDifference = target.X - catcherPosition;
+                var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
+
+                SetHyperDashState(Math.Abs(velocity), target.X);
+            }
+            else
+                SetHyperDashState();
+
+            if (validCatch)
+                updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
+            else if (!(fruit is Banana))
+                updateState(CatcherAnimationState.Fail);
 
             return validCatch;
         }
