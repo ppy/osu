@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
@@ -44,7 +46,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("add full", () => append(container.ChildSize.Y));
             AddSliderStep("set custom", 0.1f, 1.1f, 0.5f, i => custom = i);
             AddStep("add custom", () => append(container.ChildSize.Y * custom));
+            AddStep("scroll to next", () => container.ScrollTo(container.Children.SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault()));
+            AddStep("scroll to previous", () => container.ScrollTo(
+                container.Children.Reverse().SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault()
+            ));
         }
+
+        private static readonly ColourInfo selected_colour = ColourInfo.GradientVertical(Color4.Yellow, Color4.Gold);
+        private static readonly ColourInfo default_colour = ColourInfo.GradientVertical(Color4.White, Color4.DarkGray);
 
         private TestSection append(float height)
         {
@@ -52,8 +61,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Width = 300,
                 Height = height,
-                Margin = new MarginPadding { Top = 10 },
-                Colour = Color4.Gray
+                Colour = default_colour
             };
             container.Add(rv);
             return rv;
@@ -61,16 +69,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestSection : Box
         {
-            private bool selected;
-
             public bool Selected
             {
-                get => selected;
-                set
-                {
-                    selected = value;
-                    Colour = selected ? Color4.Yellow : Color4.Gray;
-                }
+                set => Colour = value ? selected_colour : default_colour;
             }
         }
     }
