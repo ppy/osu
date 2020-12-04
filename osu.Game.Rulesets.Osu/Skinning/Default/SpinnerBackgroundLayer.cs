@@ -5,9 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Skinning.Default;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class SpinnerBackgroundLayer : SpinnerFill
     {
