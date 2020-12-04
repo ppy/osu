@@ -56,9 +56,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddSliderStep("set custom", 0.1f, 1.1f, 0.5f, i => custom = i);
             AddStep("add custom", () => append(container.ChildSize.Y - header_height * custom));
             AddStep("scroll to previous", () => container.ScrollTo(
-                container.Children.Reverse().SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault()
+                container.Children.Reverse().SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault() ?? container.Children.First()
             ));
-            AddStep("scroll to next", () => container.ScrollTo(container.Children.SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault()));
+            AddStep("scroll to next", () => container.ScrollTo(
+                container.Children.SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault() ?? container.Children.Last()
+            ));
             AddStep("scroll up", () => triggerUserScroll(1));
             AddStep("scroll down", () => triggerUserScroll(-1));
         }
