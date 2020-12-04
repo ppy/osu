@@ -149,7 +149,7 @@ namespace osu.Game.Input.Bindings
         [Description("Select")]
         Select,
 
-        [Description("Quick exit (Hold)")]
+        [Description("Quick exit (hold)")]
         QuickExit,
 
         // Game-wide beatmap music controller keybindings
