@@ -22,6 +22,7 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
+        private Drawable externallyScrolledTo;
 
         public Drawable ExpandableHeader
         {
@@ -135,8 +136,11 @@ namespace osu.Game.Graphics.Containers
             footerHeight = float.NaN;
         }
 
-        public void ScrollTo(Drawable section) =>
+        public void ScrollTo(Drawable section)
+        {
+            externallyScrolledTo = section;
             scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
+        }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
@@ -197,11 +201,15 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
                 float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
-                Func<T, float> diff = section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset;
-                Func<T, float> sectionPos = section => scrollContainer.GetChildPosInContent(section);
-                Func<T, float> visibleSize = section => Math.Min(
-                    sectionPos(section) + section.Height, currentScroll + scrollContainer.DisplayableContent) - Math.Max(sectionPos(section), currentScroll
-                );
+
+                float visibleSize(T section)
+                {
+                    float sectionPosition = scrollContainer.GetChildPosInContent(section) - scrollOffset;
+                    float top = Math.Max(sectionPosition, currentScroll);
+                    float bottom = Math.Min(sectionPosition + section.Height, currentScroll + scrollContainer.DisplayableContent);
+                    return bottom - top;
+                }
+
                 var sortedByVisible = new List<T>(Children);
                 sortedByVisible.Sort((a, b) => visibleSize(b).CompareTo(visibleSize(a)));
                 T mostVisible = sortedByVisible.FirstOrDefault();
@@ -211,33 +219,18 @@ namespace osu.Game.Graphics.Containers
                     int mostVisibleIndex = IndexOf(mostVisible);
                     T ch;
 
-                    while (mostVisibleIndex != 0 && Precision.AlmostEquals(visibleSize(ch = Children[mostVisibleIndex - 1]), ch.Height))
+                    while (mostVisibleIndex != 0 && Precision.AlmostEquals(visibleSize(ch = Children[mostVisibleIndex - 1]), ch.Height, 1))
                     {
                         mostVisibleIndex--;
                     }
 
                     SelectedSection.Value = Children[mostVisibleIndex];
 
-                    if (Precision.AlmostBigger(scrollOffset, currentScroll))
-                    {
-                        SelectedSection.Value = Children.FirstOrDefault();
-                    }
-
                     if (Precision.AlmostBigger(currentScroll, scrollContainer.ScrollableExtent))
                     {
-                        SelectedSection.Value = Children.LastOrDefault();
+                        SelectedSection.Value = (scrollContainer.UserScrolling ? null : externallyScrolledTo as T) ?? Children.LastOrDefault();
                     }
                 }
-
-                /*if (scrollContainer.IsScrolledToEnd())
-                {
-                    SelectedSection.Value = Children.LastOrDefault();
-                }
-                else
-                {
-                    SelectedSection.Value = Children.TakeWhile(section => diff(section) <= 0).LastOrDefault()
-                                            ?? Children.FirstOrDefault();
-                }*/
             }
         }
 
