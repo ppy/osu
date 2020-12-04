@@ -3,7 +3,6 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
@@ -21,6 +20,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // start time affects the random seed which is used to determine the banana colour
+            StartTimeBindable.BindValueChanged(_ => UpdateComboColour());
+        }
+
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
@@ -28,14 +35,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             const float end_scale = 0.6f;
             const float random_scale_range = 1.6f;
 
-            ScaleContainer.ScaleTo(HitObject.Scale * (end_scale + random_scale_range * RNG.NextSingle()))
+            ScaleContainer.ScaleTo(HitObject.Scale * (end_scale + random_scale_range * RandomSingle(3)))
                           .Then().ScaleTo(HitObject.Scale * end_scale, HitObject.TimePreempt);
 
-            ScaleContainer.RotateTo(getRandomAngle())
+            ScaleContainer.RotateTo(getRandomAngle(1))
                           .Then()
-                          .RotateTo(getRandomAngle(), HitObject.TimePreempt);
+                          .RotateTo(getRandomAngle(2), HitObject.TimePreempt);
 
-            float getRandomAngle() => 180 * (RNG.NextSingle() * 2 - 1);
+            float getRandomAngle(int series) => 180 * (RandomSingle(series) * 2 - 1);
         }
 
         public override void PlaySamples()

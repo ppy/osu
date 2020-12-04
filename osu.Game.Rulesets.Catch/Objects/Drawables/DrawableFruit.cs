@@ -5,7 +5,7 @@ using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Utils;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Skinning;
 
@@ -30,8 +30,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            ScaleContainer.Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
-
             IndexInBeatmap.BindValueChanged(change =>
             {
                 VisualRepresentation.Value = GetVisualRepresentation(change.NewValue);
@@ -39,6 +37,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             VisualRepresentation.BindValueChanged(_ => updatePiece());
             HyperDash.BindValueChanged(_ => updatePiece(), true);
+        }
+
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
+
+            ScaleContainer.RotateTo((RandomSingle(1) - 0.5f) * 40);
         }
 
         private void updatePiece()
