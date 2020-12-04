@@ -24,7 +24,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                 RelativeSizeAxes = Axes.Y,
                 Width = 300,
                 Origin = Anchor.Centre,
-                Anchor = Anchor.Centre
+                Anchor = Anchor.Centre,
+                FixedHeader = new Box
+                {
+                    Alpha = 0.5f,
+                    Width = 300,
+                    Height = 100,
+                    Colour = Color4.Red
+                }
             };
             container.SelectedSection.ValueChanged += section =>
             {
@@ -41,6 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestSelection()
         {
             AddStep("clear", () => container.Clear());
+            AddStep("add 1/8th", () => append(container.ChildSize.Y / 8.0f));
             AddStep("add third", () => append(container.ChildSize.Y / 3.0f));
             AddStep("add half", () => append(container.ChildSize.Y / 2.0f));
             AddStep("add full", () => append(container.ChildSize.Y));
