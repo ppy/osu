@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Judgements;
@@ -31,17 +30,12 @@ namespace osu.Game.Rulesets.Catch.Objects
             Samples = samples;
         }
 
-        private Color4? colour;
-
-        Color4 IHasComboInformation.GetComboColour(IReadOnlyList<Color4> comboColours)
-        {
-            // override any external colour changes with banananana
-            return colour ??= getBananaColour();
-        }
+        // override any external colour changes with banananana
+        Color4 IHasComboInformation.GetComboColour(IReadOnlyList<Color4> comboColours) => getBananaColour();
 
         private Color4 getBananaColour()
         {
-            switch (RNG.Next(0, 3))
+            switch (StatelessRNG.NextInt(3, RandomSeed))
             {
                 default:
                     return new Color4(255, 240, 0, 255);
