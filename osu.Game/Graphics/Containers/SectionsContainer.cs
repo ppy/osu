@@ -214,22 +214,22 @@ namespace osu.Game.Graphics.Containers
                 sortedByVisible.Sort((a, b) => visibleSize(b).CompareTo(visibleSize(a)));
                 T mostVisible = sortedByVisible.FirstOrDefault();
 
-                if (mostVisible != null)
+                if (mostVisible == null)
+                    return;
+
+                int mostVisibleIndex = IndexOf(mostVisible);
+                T ch;
+
+                while (mostVisibleIndex != 0 && Precision.AlmostEquals(visibleSize(ch = Children[mostVisibleIndex - 1]), ch.Height, 1))
                 {
-                    int mostVisibleIndex = IndexOf(mostVisible);
-                    T ch;
+                    mostVisibleIndex--;
+                }
 
-                    while (mostVisibleIndex != 0 && Precision.AlmostEquals(visibleSize(ch = Children[mostVisibleIndex - 1]), ch.Height, 1))
-                    {
-                        mostVisibleIndex--;
-                    }
+                SelectedSection.Value = Children[mostVisibleIndex];
 
-                    SelectedSection.Value = Children[mostVisibleIndex];
-
-                    if (Precision.AlmostBigger(currentScroll, scrollContainer.ScrollableExtent))
-                    {
-                        SelectedSection.Value = (scrollContainer.UserScrolling ? null : externallyScrolledTo as T) ?? Children.LastOrDefault();
-                    }
+                if (Precision.AlmostBigger(currentScroll, scrollContainer.ScrollableExtent))
+                {
+                    SelectedSection.Value = (scrollContainer.UserScrolling ? null : externallyScrolledTo as T) ?? Children.LastOrDefault();
                 }
             }
         }
