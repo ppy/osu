@@ -63,16 +63,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         private static readonly ColourInfo selected_colour = ColourInfo.GradientVertical(Color4.Yellow, Color4.Gold);
         private static readonly ColourInfo default_colour = ColourInfo.GradientVertical(Color4.White, Color4.DarkGray);
 
-        private TestSection append(float height)
+        private void append(float height)
         {
-            var rv = new TestSection
+            container.Add(new TestSection
             {
                 Width = 300,
                 Height = height,
                 Colour = default_colour
-            };
-            container.Add(rv);
-            return rv;
+            });
         }
 
         private class TestSection : Box
