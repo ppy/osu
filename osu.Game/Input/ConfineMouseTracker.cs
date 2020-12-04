@@ -18,6 +18,8 @@ namespace osu.Game.Input
     public class ConfineMouseTracker : Component
     {
         private Bindable<ConfineMouseMode> frameworkConfineMode;
+        private Bindable<WindowMode> frameworkWindowMode;
+
         private Bindable<OsuConfineMouseMode> osuConfineMode;
         private IBindable<bool> localUserPlaying;
 
@@ -25,6 +27,9 @@ namespace osu.Game.Input
         private void load(OsuGame game, FrameworkConfigManager frameworkConfigManager, OsuConfigManager osuConfigManager)
         {
             frameworkConfineMode = frameworkConfigManager.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode);
+            frameworkWindowMode = frameworkConfigManager.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            frameworkWindowMode.BindValueChanged(_ => updateConfineMode());
+
             osuConfineMode = osuConfigManager.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode);
             localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
 
@@ -38,14 +43,16 @@ namespace osu.Game.Input
             if (frameworkConfineMode.Disabled)
                 return;
 
+            if (frameworkWindowMode.Value == WindowMode.Fullscreen)
+            {
+                frameworkConfineMode.Value = ConfineMouseMode.Fullscreen;
+                return;
+            }
+
             switch (osuConfineMode.Value)
             {
                 case OsuConfineMouseMode.Never:
                     frameworkConfineMode.Value = ConfineMouseMode.Never;
-                    break;
-
-                case OsuConfineMouseMode.Fullscreen:
-                    frameworkConfineMode.Value = ConfineMouseMode.Fullscreen;
                     break;
 
                 case OsuConfineMouseMode.DuringGameplay:

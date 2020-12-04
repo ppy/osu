@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override CarouselItem GetNextToSelect()
         {
-            if (LastSelected == null)
+            if (LastSelected == null || LastSelected.Filtered.Value)
             {
                 if (GetRecommendedBeatmap?.Invoke(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.Beatmap)) is BeatmapInfo recommended)
                     return Children.OfType<CarouselBeatmap>().First(b => b.Beatmap == recommended);

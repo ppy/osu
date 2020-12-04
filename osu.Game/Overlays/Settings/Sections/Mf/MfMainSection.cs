@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         public MfMainSection()
         {
             Add(new MfSettings());
+            Add(new LocaleSettings());
         }
     }
 }

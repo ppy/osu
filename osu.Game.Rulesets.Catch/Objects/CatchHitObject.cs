@@ -97,6 +97,12 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => ScaleBindable.Value = value;
         }
 
+        /// <summary>
+        /// The seed value used for visual randomness such as fruit rotation.
+        /// The value is <see cref="HitObject.StartTime"/> truncated to an integer.
+        /// </summary>
+        public int RandomSeed => (int)StartTime;
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
