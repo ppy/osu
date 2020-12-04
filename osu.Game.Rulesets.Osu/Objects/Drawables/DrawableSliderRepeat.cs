@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,6 +19,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
+        [CanBeNull]
+        public Slider Slider => DrawableSlider?.HitObject;
+
+        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+
         private double animDuration;
 
         public Drawable CirclePiece { get; private set; }
@@ -25,8 +31,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private ReverseArrowPiece arrow;
 
         public override bool DisplayResult => false;
-
-        private DrawableSlider drawableSlider;
 
         public DrawableSliderRepeat()
             : base(null)
@@ -60,19 +64,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
 
-        protected override void OnParentReceived(DrawableHitObject parent)
+        protected override void OnApply()
         {
-            base.OnParentReceived(parent);
+            base.OnApply();
 
-            drawableSlider = (DrawableSlider)parent;
-
-            Position = HitObject.Position - drawableSlider.Position;
+            Position = HitObject.Position - DrawableSlider.Position;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (HitObject.StartTime <= Time.Current)
-                ApplyResult(r => r.Type = drawableSlider.Tracking.Value ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                ApplyResult(r => r.Type = DrawableSlider.Tracking.Value ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void UpdateInitialTransforms()
@@ -114,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (IsHit) return;
 
             bool isRepeatAtEnd = HitObject.RepeatIndex % 2 == 0;
-            List<Vector2> curve = ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
+            List<Vector2> curve = ((PlaySliderBody)DrawableSlider.Body.Drawable).CurrentCurve;
 
             Position = isRepeatAtEnd ? end : start;
 

@@ -43,6 +43,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public HitObject HitObject { get; private set; }
 
         /// <summary>
+        /// The parenting <see cref="DrawableHitObject"/>, if any.
+        /// </summary>
+        [CanBeNull]
+        protected internal DrawableHitObject ParentHitObject { get; internal set; }
+
+        /// <summary>
         /// The colour used for various elements of this DrawableHitObject.
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
@@ -229,12 +235,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             foreach (var h in HitObject.NestedHitObjects)
             {
-                var pooledDrawableNested = pooledObjectProvider?.GetPooledDrawableRepresentation(h);
+                var pooledDrawableNested = pooledObjectProvider?.GetPooledDrawableRepresentation(h, this);
                 var drawableNested = pooledDrawableNested
                                      ?? CreateNestedHitObject(h)
                                      ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
 
-                // Invoke the event only if this nested object is just created by `CreateNestedHitObject`.
+                // Only invoke the event for non-pooled DHOs, otherwise the event will be fired by the playfield.
                 if (pooledDrawableNested == null)
                     OnNestedDrawableCreated?.Invoke(drawableNested);
 
@@ -242,10 +248,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 drawableNested.OnRevertResult += onRevertResult;
                 drawableNested.ApplyCustomUpdateState += onApplyCustomUpdateState;
 
+                // This is only necessary for non-pooled DHOs. For pooled DHOs, this is handled inside GetPooledDrawableRepresentation().
+                // Must be done before the nested DHO is added to occur before the nested Apply()!
+                drawableNested.ParentHitObject = this;
+
                 nestedHitObjects.Value.Add(drawableNested);
                 AddNestedHitObject(drawableNested);
-
-                drawableNested.OnParentReceived(this);
             }
 
             StartTimeBindable.BindTo(HitObject.StartTimeBindable);
@@ -317,6 +325,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             OnFree();
 
             HitObject = null;
+            ParentHitObject = null;
             Result = null;
             lifetimeEntry = null;
 
@@ -347,14 +356,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Invoked for this <see cref="DrawableHitObject"/> to revert any values previously taken on from the currently-applied <see cref="HitObject"/>.
         /// </summary>
         protected virtual void OnFree()
-        {
-        }
-
-        /// <summary>
-        /// Invoked when this <see cref="DrawableHitObject"/> receives a new parenting <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <param name="parent">The parenting <see cref="DrawableHitObject"/>.</param>
-        protected virtual void OnParentReceived(DrawableHitObject parent)
         {
         }
 
@@ -452,7 +453,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             state.Value = newState;
 
             if (LifetimeEnd == double.MaxValue && (state.Value != ArmedState.Idle || HitObject.HitWindows == null))
-                Expire();
+                LifetimeEnd = Math.Max(LatestTransformEndTime, HitStateUpdateTime + (Samples?.Length ?? 0));
 
             // apply any custom state overrides
             ApplyCustomUpdateState?.Invoke(this, newState);
