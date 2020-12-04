@@ -6,62 +6,51 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
-using osu.Game.Rulesets;
 using osu.Game.Users;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class PaginatedContainer<TModel> : FillFlowContainer
+    public abstract class PaginatedProfileSubsection<TModel> : ProfileSubsection
     {
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        protected RulesetStore Rulesets { get; private set; }
+
         protected int VisiblePages;
         protected int ItemsPerPage;
 
-        protected readonly Bindable<User> User = new Bindable<User>();
-        protected FillFlowContainer ItemsContainer;
-        protected RulesetStore Rulesets;
+        protected FillFlowContainer ItemsContainer { get; private set; }
 
         private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
 
-        private readonly string missingText;
         private ShowMoreButton moreButton;
         private OsuSpriteText missing;
-        private PaginatedContainerHeader header;
+        private readonly string missingText;
 
-        private readonly string headerText;
-        private readonly CounterVisibilityState counterVisibilityState;
-
-        protected PaginatedContainer(Bindable<User> user, string headerText = "", string missingText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        protected PaginatedProfileSubsection(Bindable<User> user, string headerText = "", string missingText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+            : base(user, headerText, counterVisibilityState)
         {
-            this.headerText = headerText;
             this.missingText = missingText;
-            this.counterVisibilityState = counterVisibilityState;
-            User.BindTo(user);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        protected override Drawable CreateContent() => new FillFlowContainer
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
-
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                header = new PaginatedContainerHeader(headerText, counterVisibilityState)
-                {
-                    Alpha = string.IsNullOrEmpty(headerText) ? 0 : 1
-                },
                 ItemsContainer = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
@@ -81,13 +70,14 @@ namespace osu.Game.Overlays.Profile.Sections
                     Font = OsuFont.GetFont(size: 15),
                     Text = missingText,
                     Alpha = 0,
-                },
-            };
+                }
+            }
+        };
 
-            Rulesets = rulesets;
-
-            User.ValueChanged += onUserChanged;
-            User.TriggerChange();
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            User.BindValueChanged(onUserChanged, true);
         }
 
         private void onUserChanged(ValueChangedEvent<User> e)
@@ -124,7 +114,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 moreButton.Hide();
                 moreButton.IsLoading = false;
 
-                if (!string.IsNullOrEmpty(missing.Text))
+                if (!string.IsNullOrEmpty(missingText))
                     missing.Show();
 
                 return;
@@ -142,8 +132,6 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected virtual int GetCount(User user) => 0;
 
-        protected void SetCount(int value) => header.Current.Value = value;
-
         protected virtual void OnItemsReceived(List<TModel> items)
         {
         }
@@ -154,8 +142,9 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
             retrievalRequest?.Cancel();
+            loadCancellation?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }

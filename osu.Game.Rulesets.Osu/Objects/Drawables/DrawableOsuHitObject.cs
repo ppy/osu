@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
@@ -52,9 +51,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
-        protected override void OnApply(HitObject hitObject)
+        protected override void OnApply()
         {
-            base.OnApply(hitObject);
+            base.OnApply();
 
             IndexInCurrentComboBindable.BindTo(HitObject.IndexInCurrentComboBindable);
             PositionBindable.BindTo(HitObject.PositionBindable);
@@ -62,9 +61,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ScaleBindable.BindTo(HitObject.ScaleBindable);
         }
 
-        protected override void OnFree(HitObject hitObject)
+        protected override void OnFree()
         {
-            base.OnFree(hitObject);
+            base.OnFree();
 
             IndexInCurrentComboBindable.UnbindFrom(HitObject.IndexInCurrentComboBindable);
             PositionBindable.UnbindFrom(HitObject.PositionBindable);
@@ -84,14 +83,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ??= GetContainingInputManager() as OsuInputManager;
 
         public virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
-
-        protected override void UpdateInitialTransforms()
-        {
-            base.UpdateInitialTransforms();
-
-            // Manually set to reduce the number of future alive objects to a bare minimum.
-            LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
-        }
 
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.

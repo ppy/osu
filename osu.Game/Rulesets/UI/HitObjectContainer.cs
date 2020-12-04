@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.UI
         {
             Debug.Assert(!drawableMap.ContainsKey(entry));
 
-            var drawable = pooledObjectProvider?.GetPooledDrawableRepresentation(entry.HitObject);
+            var drawable = pooledObjectProvider?.GetPooledDrawableRepresentation(entry.HitObject, null);
             if (drawable == null)
                 throw new InvalidOperationException($"A drawable representation could not be retrieved for hitobject type: {entry.HitObject.GetType().ReadableName()}.");
 
@@ -114,6 +114,7 @@ namespace osu.Game.Rulesets.UI
 
             bindStartTime(drawable);
             AddInternal(drawableMap[entry] = drawable, false);
+            OnAdd(drawable);
 
             HitObjectUsageBegan?.Invoke(entry.HitObject);
         }
@@ -129,6 +130,7 @@ namespace osu.Game.Rulesets.UI
 
             drawableMap.Remove(entry);
 
+            OnRemove(drawable);
             unbindStartTime(drawable);
             RemoveInternal(drawable);
 
@@ -147,10 +149,12 @@ namespace osu.Game.Rulesets.UI
             hitObject.OnRevertResult += onRevertResult;
 
             AddInternal(hitObject);
+            OnAdd(hitObject);
         }
 
         public virtual bool Remove(DrawableHitObject hitObject)
         {
+            OnRemove(hitObject);
             if (!RemoveInternal(hitObject))
                 return false;
 
@@ -177,6 +181,26 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
+
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> is added to this container.
+        /// </summary>
+        /// <remarks>
+        /// This method is not invoked for nested <see cref="DrawableHitObject"/>s.
+        /// </remarks>
+        protected virtual void OnAdd(DrawableHitObject drawableHitObject)
+        {
+        }
+
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> is removed from this container.
+        /// </summary>
+        /// <remarks>
+        /// This method is not invoked for nested <see cref="DrawableHitObject"/>s.
+        /// </remarks>
+        protected virtual void OnRemove(DrawableHitObject drawableHitObject)
+        {
+        }
 
         public virtual void Clear(bool disposeChildren = true)
         {

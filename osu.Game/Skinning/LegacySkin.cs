@@ -371,25 +371,58 @@ namespace osu.Game.Skinning
                 }
 
                 case GameplaySkinComponent<HitResult> resultComponent:
-                    switch (resultComponent.Component)
+                    Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component);
+
+                    // kind of wasteful that we throw this away, but should do for now.
+                    if (createDrawable() != null)
                     {
-                        case HitResult.Miss:
-                            return this.GetAnimation("hit0", true, false);
-
-                        case HitResult.Meh:
-                            return this.GetAnimation("hit50", true, false);
-
-                        case HitResult.Ok:
-                            return this.GetAnimation("hit100", true, false);
-
-                        case HitResult.Great:
-                            return this.GetAnimation("hit300", true, false);
+                        if (Configuration.LegacyVersion > 1)
+                            return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, getParticleTexture(resultComponent.Component));
+                        else
+                            return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
 
                     break;
             }
 
             return this.GetAnimation(component.LookupName, false, false);
+        }
+
+        private Texture getParticleTexture(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Meh:
+                    return GetTexture("particle50");
+
+                case HitResult.Ok:
+                    return GetTexture("particle100");
+
+                case HitResult.Great:
+                    return GetTexture("particle300");
+            }
+
+            return null;
+        }
+
+        private Drawable getJudgementAnimation(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Miss:
+                    return this.GetAnimation("hit0", true, false);
+
+                case HitResult.Meh:
+                    return this.GetAnimation("hit50", true, false);
+
+                case HitResult.Ok:
+                    return this.GetAnimation("hit100", true, false);
+
+                case HitResult.Great:
+                    return this.GetAnimation("hit300", true, false);
+            }
+
+            return null;
         }
 
         public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
