@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Specialized;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -69,6 +70,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             private OsuSpriteText typeLabel;
             private LoadingLayer loadingLayer;
             private DrawableRoomPlaylist playlist;
+            private OsuSpriteText playlistLength;
 
             [Resolved(CanBeNull = true)]
             private IRoomManager manager { get; set; }
@@ -230,6 +232,15 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                             },
                                                                             new Drawable[]
                                                                             {
+                                                                                playlistLength = new OsuSpriteText
+                                                                                {
+                                                                                    Margin = new MarginPadding { Vertical = 5 },
+                                                                                    Colour = colours.Yellow,
+                                                                                    Font = OsuFont.GetFont(size: 12),
+                                                                                }
+                                                                            },
+                                                                            new Drawable[]
+                                                                            {
                                                                                 new PurpleTriangleButton
                                                                                 {
                                                                                     RelativeSizeAxes = Axes.X,
@@ -242,6 +253,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                         RowDimensions = new[]
                                                                         {
                                                                             new Dimension(),
+                                                                            new Dimension(GridSizeMode.AutoSize),
                                                                             new Dimension(GridSizeMode.AutoSize),
                                                                         }
                                                                     }
@@ -315,6 +327,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue, true);
 
                 playlist.Items.BindTo(Playlist);
+                Playlist.BindCollectionChanged(onPlaylistChanged, true);
             }
 
             protected override void Update()
@@ -323,6 +336,9 @@ namespace osu.Game.Screens.Multi.Match.Components
 
                 ApplyButton.Enabled.Value = hasValidSettings;
             }
+
+            private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
+                playlistLength.Text = $"Length: {Playlist.GetTotalDuration()}";
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
 

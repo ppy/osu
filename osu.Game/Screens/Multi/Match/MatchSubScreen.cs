@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Multi.Match
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Content = new[]
                                                                 {
-                                                                    new Drawable[] { new OverlinedHeader("Playlist"), },
+                                                                    new Drawable[] { new OverlinedPlaylistHeader(), },
                                                                     new Drawable[]
                                                                     {
                                                                         new DrawableRoomPlaylistWithResults
