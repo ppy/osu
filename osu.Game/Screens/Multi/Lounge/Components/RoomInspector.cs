@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                     }
                                 }
                             },
-                            new Drawable[] { new OverlinedHeader("Playlist"), },
+                            new Drawable[] { new OverlinedPlaylistHeader(), },
                             new Drawable[]
                             {
                                 new DrawableRoomPlaylist(false, false)

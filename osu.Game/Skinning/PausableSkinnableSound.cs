@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
@@ -13,17 +14,21 @@ namespace osu.Game.Skinning
 {
     public class PausableSkinnableSound : SkinnableSound
     {
-        public double Length => SamplesContainer.Children.Count == 0 ? 0 : SamplesContainer.Children.Max(sample => sample.Length);
+        public double Length => !DrawableSamples.Any() ? 0 : DrawableSamples.Max(sample => sample.Length);
 
         protected bool RequestedPlaying { get; private set; }
 
-        public PausableSkinnableSound(ISampleInfo hitSamples)
-            : base(hitSamples)
+        public PausableSkinnableSound()
         {
         }
 
-        public PausableSkinnableSound(IEnumerable<ISampleInfo> hitSamples)
-            : base(hitSamples)
+        public PausableSkinnableSound([NotNull] IEnumerable<ISampleInfo> samples)
+            : base(samples)
+        {
+        }
+
+        public PausableSkinnableSound([NotNull] ISampleInfo sample)
+            : base(sample)
         {
         }
 

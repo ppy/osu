@@ -92,6 +92,30 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             PassCondition = checkSomeHit
         });
 
+        [Test]
+        public void TestWithSliderReuse() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModHidden(),
+            Autoplay = true,
+            Beatmap = new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new Slider
+                    {
+                        StartTime = 1000,
+                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                    },
+                    new Slider
+                    {
+                        StartTime = 4000,
+                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                    },
+                }
+            },
+            PassCondition = checkSomeHit
+        });
+
         private bool checkSomeHit()
         {
             return Player.ScoreProcessor.JudgedHits >= 4;
