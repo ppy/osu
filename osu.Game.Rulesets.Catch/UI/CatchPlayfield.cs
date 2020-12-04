@@ -36,12 +36,12 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation)
         {
-            var explodingFruitContainer = new Container
+            var droppedObjectContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
             };
 
-            CatcherArea = new CatcherArea(difficulty)
+            CatcherArea = new CatcherArea(droppedObjectContainer, difficulty)
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.TopLeft,
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new[]
             {
-                explodingFruitContainer,
+                droppedObjectContainer,
                 CatcherArea.MovableCatcher.CreateProxiedContent(),
                 HitObjectContainer,
                 CatcherArea,

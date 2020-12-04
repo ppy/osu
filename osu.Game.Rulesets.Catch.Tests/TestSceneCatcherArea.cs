@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -72,14 +73,23 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             circleSize = size;
 
-            SetContents(() => new CatchInputManager(catchRuleset)
+            SetContents(() =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = new TestCatcherArea(new BeatmapDifficulty { CircleSize = size })
+                var droppedObjectContainer = new Container();
+
+                return new CatchInputManager(catchRuleset)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                },
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        droppedObjectContainer,
+                        new TestCatcherArea(droppedObjectContainer, new BeatmapDifficulty { CircleSize = size })
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.TopCentre,
+                        }
+                    }
+                };
             });
         }
 
@@ -91,8 +101,8 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
-                : base(beatmapDifficulty)
+            public TestCatcherArea(Container droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
+                : base(droppedObjectContainer, beatmapDifficulty)
             {
             }
 
