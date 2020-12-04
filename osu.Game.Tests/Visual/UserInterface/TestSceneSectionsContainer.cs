@@ -11,11 +11,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneSectionsContainer : OsuTestScene
+    public class TestSceneSectionsContainer : OsuManualInputManagerTestScene
     {
         private readonly SectionsContainer<TestSection> container;
         private TestSection selectedSection;
         private float custom;
+        private const float header_height = 100;
 
         public TestSceneSectionsContainer()
         {
@@ -29,7 +30,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Alpha = 0.5f,
                     Width = 300,
-                    Height = 100,
+                    Height = header_height,
                     Colour = Color4.Red
                 }
             };
@@ -48,29 +49,65 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestSelection()
         {
             AddStep("clear", () => container.Clear());
-            AddStep("add 1/8th", () => append(container.ChildSize.Y / 8.0f));
-            AddStep("add third", () => append(container.ChildSize.Y / 3.0f));
-            AddStep("add half", () => append(container.ChildSize.Y / 2.0f));
-            AddStep("add full", () => append(container.ChildSize.Y));
+            AddStep("add 1/8th", () => append(1 / 8.0f));
+            AddStep("add third", () => append(1 / 3.0f));
+            AddStep("add half", () => append(1 / 2.0f));
+            AddStep("add full", () => append(1));
             AddSliderStep("set custom", 0.1f, 1.1f, 0.5f, i => custom = i);
-            AddStep("add custom", () => append(container.ChildSize.Y * custom));
-            AddStep("scroll to next", () => container.ScrollTo(container.Children.SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault()));
+            AddStep("add custom", () => append(container.ChildSize.Y - header_height * custom));
             AddStep("scroll to previous", () => container.ScrollTo(
                 container.Children.Reverse().SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault()
             ));
+            AddStep("scroll to next", () => container.ScrollTo(container.Children.SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault()));
+            AddStep("scroll up", () => triggerUserScroll(1));
+            AddStep("scroll down", () => triggerUserScroll(-1));
+        }
+
+        [Test]
+        public void TestCorrectSectionSelected()
+        {
+            const int sections_count = 8;
+            AddStep("clear", () => container.Clear());
+            AddStep("fill with sections", () =>
+            {
+                for (int i = 0; i < sections_count; i++)
+                    append(1 / 4.0f);
+            });
+
+            void step(int scrollIndex)
+            {
+                AddStep($"scroll to section {scrollIndex + 1}", () => container.ScrollTo(container.Children[scrollIndex]));
+                AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[scrollIndex]);
+            }
+
+            for (int i = 1; i < sections_count; i++)
+                step(i);
+            for (int i = sections_count - 2; i >= 0; i--)
+                step(i);
+
+            AddStep("scroll almost to end", () => container.ScrollTo(container.Children[sections_count - 3]));
+            AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[sections_count - 3]);
+            AddStep("scroll down", () => triggerUserScroll(-1));
+            AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[sections_count - 1]);
         }
 
         private static readonly ColourInfo selected_colour = ColourInfo.GradientVertical(Color4.Yellow, Color4.Gold);
         private static readonly ColourInfo default_colour = ColourInfo.GradientVertical(Color4.White, Color4.DarkGray);
 
-        private void append(float height)
+        private void append(float multiplier)
         {
             container.Add(new TestSection
             {
                 Width = 300,
-                Height = height,
+                Height = (container.ChildSize.Y - header_height) * multiplier,
                 Colour = default_colour
             });
+        }
+
+        private void triggerUserScroll(float direction)
+        {
+            InputManager.MoveMouseTo(container);
+            InputManager.ScrollVerticalBy(direction);
         }
 
         private class TestSection : Box
