@@ -9,6 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Container<DrawableSpinnerTick> ticks;
         private SpinnerBonusDisplay bonusDisplay;
-        private Container<PausableSkinnableSound> samplesContainer;
+        private PausableSkinnableSound spinningSample;
 
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
@@ -81,7 +82,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     Y = -120,
                 },
-                samplesContainer = new Container<PausableSkinnableSound> { RelativeSizeAxes = Axes.Both }
+                spinningSample = new PausableSkinnableSound
+                {
+                    Volume = { Value = 0 },
+                    Looping = true,
+                    Frequency = { Value = spinning_sample_initial_frequency }
+                }
             };
 
             PositionBindable.BindValueChanged(pos => Position = pos.NewValue);
@@ -95,30 +101,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             isSpinning.BindValueChanged(updateSpinningSample);
         }
 
-        private PausableSkinnableSound spinningSample;
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+
+            spinningSample.Samples = null;
+        }
 
         protected override void LoadSamples()
         {
             base.LoadSamples();
 
-            samplesContainer.Clear();
-            spinningSample = null;
-
             var firstSample = HitObject.Samples.FirstOrDefault();
 
             if (firstSample != null)
             {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
-                clone.Name = "spinnerspin";
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("spinnerspin");
 
-                samplesContainer.Add(spinningSample = new PausableSkinnableSound(clone)
-                {
-                    Volume = { Value = 0 },
-                    Looping = true,
-                    Frequency = { Value = spinning_sample_initial_frequency }
-                });
+                spinningSample.Samples = new ISampleInfo[] { clone };
+                spinningSample.Frequency.Value = spinning_sample_initial_frequency;
             }
         }
 

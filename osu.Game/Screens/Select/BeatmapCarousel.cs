@@ -909,6 +909,9 @@ namespace osu.Game.Screens.Select
             {
                 // size is determined by the carousel itself, due to not all content necessarily being loaded.
                 ScrollContent.AutoSizeAxes = Axes.None;
+
+                // the scroll container may get pushed off-screen by global screen changes, but we still want panels to display outside of the bounds.
+                Masking = false;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)

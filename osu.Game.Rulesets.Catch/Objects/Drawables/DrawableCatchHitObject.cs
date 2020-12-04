@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
@@ -16,15 +17,20 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
-
         protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
+
+        public int RandomSeed => HitObject?.RandomSeed ?? 0;
 
         protected DrawableCatchHitObject([CanBeNull] CatchHitObject hitObject)
             : base(hitObject)
         {
             Anchor = Anchor.BottomLeft;
         }
+
+        /// <summary>
+        /// Get a random number in range [0,1) based on seed <see cref="RandomSeed"/>.
+        /// </summary>
+        public float RandomSingle(int series) => StatelessRNG.NextSingle(RandomSeed, series);
 
         protected override void OnApply()
         {

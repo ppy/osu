@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -35,26 +36,35 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation)
         {
-            var explodingFruitContainer = new Container
+            var droppedObjectContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
             };
 
-            CatcherArea = new CatcherArea(difficulty)
+            CatcherArea = new CatcherArea(droppedObjectContainer, difficulty)
             {
-                CreateDrawableRepresentation = createDrawableRepresentation,
-                ExplodingFruitTarget = explodingFruitContainer,
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.TopLeft,
             };
 
             InternalChildren = new[]
             {
-                explodingFruitContainer,
+                droppedObjectContainer,
                 CatcherArea.MovableCatcher.CreateProxiedContent(),
                 HitObjectContainer,
                 CatcherArea,
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            RegisterPool<Droplet, DrawableDroplet>(50);
+            RegisterPool<TinyDroplet, DrawableTinyDroplet>(50);
+            RegisterPool<Fruit, DrawableFruit>(100);
+            RegisterPool<Banana, DrawableBanana>(100);
+            RegisterPool<JuiceStream, DrawableJuiceStream>(10);
+            RegisterPool<BananaShower, DrawableBananaShower>(2);
         }
 
         protected override void LoadComplete()
