@@ -192,7 +192,7 @@ namespace osu.Game.Beatmaps.Formats
                 var effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
-                HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo());
+                HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
 
                 // Convert effect flags to the legacy format
                 LegacyEffectFlags effectFlags = LegacyEffectFlags.None;

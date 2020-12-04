@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public TimelineSelectionBlueprintContainer()
             {
-                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
+                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
             }
         }
     }

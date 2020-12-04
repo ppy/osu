@@ -2,23 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderHead : DrawableHitCircle
     {
+        [CanBeNull]
+        public Slider Slider => DrawableSlider?.HitObject;
+
+        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;
-
-        private DrawableSlider drawableSlider;
-
-        private Slider slider => drawableSlider?.HitObject;
 
         public DrawableSliderHead()
         {
@@ -36,34 +37,34 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             pathVersion.BindValueChanged(_ => updatePosition());
         }
 
-        protected override void OnFree(HitObject hitObject)
+        protected override void OnFree()
         {
-            base.OnFree(hitObject);
+            base.OnFree();
 
-            pathVersion.UnbindFrom(drawableSlider.PathVersion);
+            pathVersion.UnbindFrom(DrawableSlider.PathVersion);
         }
 
-        protected override void OnParentReceived(DrawableHitObject parent)
+        protected override void OnApply()
         {
-            base.OnParentReceived(parent);
+            base.OnApply();
 
-            drawableSlider = (DrawableSlider)parent;
+            pathVersion.BindTo(DrawableSlider.PathVersion);
 
-            pathVersion.BindTo(drawableSlider.PathVersion);
-
-            OnShake = drawableSlider.Shake;
-            CheckHittable = (d, t) => drawableSlider.CheckHittable?.Invoke(d, t) ?? true;
+            OnShake = DrawableSlider.Shake;
+            CheckHittable = (d, t) => DrawableSlider.CheckHittable?.Invoke(d, t) ?? true;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            double completionProgress = Math.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
+            Debug.Assert(Slider != null);
+
+            double completionProgress = Math.Clamp((Time.Current - Slider.StartTime) / Slider.Duration, 0, 1);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!IsHit)
-                Position = slider.CurvePositionAt(completionProgress);
+                Position = Slider.CurvePositionAt(completionProgress);
         }
 
         public Action<double> OnShake;
@@ -72,8 +73,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void updatePosition()
         {
-            if (slider != null)
-                Position = HitObject.Position - slider.Position;
+            if (Slider != null)
+                Position = HitObject.Position - Slider.Position;
         }
     }
 }

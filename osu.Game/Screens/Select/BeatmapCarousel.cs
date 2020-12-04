@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
-        private readonly CarouselScrollContainer scroll;
+        protected readonly CarouselScrollContainer Scroll;
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
@@ -112,9 +112,9 @@ namespace osu.Game.Screens.Select
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
 
-            ScrollableContent.Clear(false);
+            Scroll.Clear(false);
             itemsCache.Invalidate();
-            scrollPositionCache.Invalidate();
+            ScrollToSelected();
 
             // apply any pending filter operation that may have been delayed (see applyActiveCriteria's scheduling behaviour when BeatmapSetsLoaded is false).
             FlushPendingFilterOperations();
@@ -130,9 +130,7 @@ namespace osu.Game.Screens.Select
         private readonly List<CarouselItem> visibleItems = new List<CarouselItem>();
 
         private readonly Cached itemsCache = new Cached();
-        private readonly Cached scrollPositionCache = new Cached();
-
-        protected readonly Container<DrawableCarouselItem> ScrollableContent;
+        private PendingScrollOperation pendingScrollOperation = PendingScrollOperation.None;
 
         public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
 
@@ -155,17 +153,12 @@ namespace osu.Game.Screens.Select
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = scroll = new CarouselScrollContainer
+                Children = new Drawable[]
                 {
-                    Masking = false,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    setPool,
+                    Scroll = new CarouselScrollContainer
                     {
-                        setPool,
-                        ScrollableContent = new Container<DrawableCarouselItem>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                        }
+                        RelativeSizeAxes = Axes.Both,
                     }
                 }
             };
@@ -180,7 +173,7 @@ namespace osu.Game.Screens.Select
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
-            RightClickScrollingEnabled.ValueChanged += enabled => scroll.RightMouseScrollbar = enabled.NewValue;
+            RightClickScrollingEnabled.ValueChanged += enabled => Scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
 
             itemUpdated = beatmaps.ItemUpdated.GetBoundCopy();
@@ -421,12 +414,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// The position of the lower visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleBottomBound => scroll.Current + DrawHeight + BleedBottom;
+        private float visibleBottomBound => Scroll.Current + DrawHeight + BleedBottom;
 
         /// <summary>
         /// The position of the upper visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleUpperBound => scroll.Current - BleedTop;
+        private float visibleUpperBound => Scroll.Current - BleedTop;
 
         public void FlushPendingFilterOperations()
         {
@@ -468,8 +461,8 @@ namespace osu.Game.Screens.Select
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
 
-                if (alwaysResetScrollPosition || !scroll.UserScrolling)
-                    ScrollToSelected();
+                if (alwaysResetScrollPosition || !Scroll.UserScrolling)
+                    ScrollToSelected(true);
             }
         }
 
@@ -478,7 +471,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Scroll to the current <see cref="SelectedBeatmap"/>.
         /// </summary>
-        public void ScrollToSelected() => scrollPositionCache.Invalidate();
+        /// <param name="immediate">
+        /// Whether the scroll position should immediately be shifted to the target, delegating animation to visible panels.
+        /// This should be true for operations like filtering - where panels are changing visibility state - to avoid large jumps in animation.
+        /// </param>
+        public void ScrollToSelected(bool immediate = false) =>
+            pendingScrollOperation = immediate ? PendingScrollOperation.Immediate : PendingScrollOperation.Standard;
 
         #region Key / button selection logic
 
@@ -488,12 +486,12 @@ namespace osu.Game.Screens.Select
             {
                 case Key.Left:
                     if (!e.Repeat)
-                        beginRepeatSelection(() => SelectNext(-1, true), e.Key);
+                        beginRepeatSelection(() => SelectNext(-1), e.Key);
                     return true;
 
                 case Key.Right:
                     if (!e.Repeat)
-                        beginRepeatSelection(() => SelectNext(1, true), e.Key);
+                        beginRepeatSelection(() => SelectNext(), e.Key);
                     return true;
             }
 
@@ -580,6 +578,11 @@ namespace osu.Game.Screens.Select
             if (revalidateItems)
                 updateYPositions();
 
+            // if there is a pending scroll action we apply it without animation and transfer the difference in position to the panels.
+            // this is intentionally applied before updating the visible range below, to avoid animating new items (sourced from pool) from locations off-screen, as it looks bad.
+            if (pendingScrollOperation != PendingScrollOperation.None)
+                updateScrollPosition();
+
             // This data is consumed to find the currently displayable range.
             // This is the range we want to keep drawables for, and should exceed the visible range slightly to avoid drawable churn.
             var newDisplayRange = getDisplayRange();
@@ -594,7 +597,7 @@ namespace osu.Game.Screens.Select
                 {
                     var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
 
-                    foreach (var panel in ScrollableContent.Children)
+                    foreach (var panel in Scroll.Children)
                     {
                         if (toDisplay.Remove(panel.Item))
                         {
@@ -620,24 +623,14 @@ namespace osu.Game.Screens.Select
                         panel.Depth = item.CarouselYPosition;
                         panel.Y = item.CarouselYPosition;
 
-                        ScrollableContent.Add(panel);
+                        Scroll.Add(panel);
                     }
-                }
-            }
-
-            // Finally, if the filtered items have changed, animate drawables to their new locations.
-            // This is common if a selected/collapsed state has changed.
-            if (revalidateItems)
-            {
-                foreach (DrawableCarouselItem panel in ScrollableContent.Children)
-                {
-                    panel.MoveToY(panel.Item.CarouselYPosition, 800, Easing.OutQuint);
                 }
             }
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
-            foreach (DrawableCarouselItem item in ScrollableContent.Children)
+            foreach (DrawableCarouselItem item in Scroll.Children)
             {
                 updateItem(item);
 
@@ -668,14 +661,6 @@ namespace osu.Game.Screens.Select
             lastIndex = Math.Clamp(lastIndex + 1, firstIndex, Math.Max(0, visibleItems.Count - 1));
 
             return (firstIndex, lastIndex);
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            if (!scrollPositionCache.IsValid)
-                updateScrollPosition();
         }
 
         private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
@@ -789,7 +774,8 @@ namespace osu.Game.Screens.Select
             }
 
             currentY += visibleHalfHeight;
-            ScrollableContent.Height = currentY;
+
+            Scroll.ScrollContent.Height = currentY;
 
             if (BeatmapSetsLoaded && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
             {
@@ -809,12 +795,31 @@ namespace osu.Game.Screens.Select
                 if (firstScroll)
                 {
                     // reduce movement when first displaying the carousel.
-                    scroll.ScrollTo(scrollTarget.Value - 200, false);
+                    Scroll.ScrollTo(scrollTarget.Value - 200, false);
                     firstScroll = false;
                 }
 
-                scroll.ScrollTo(scrollTarget.Value);
-                scrollPositionCache.Validate();
+                switch (pendingScrollOperation)
+                {
+                    case PendingScrollOperation.Standard:
+                        Scroll.ScrollTo(scrollTarget.Value);
+                        break;
+
+                    case PendingScrollOperation.Immediate:
+                        // in order to simplify animation logic, rather than using the animated version of ScrollTo,
+                        // we take the difference in scroll height and apply to all visible panels.
+                        // this avoids edge cases like when the visible panels is reduced suddenly, causing ScrollContainer
+                        // to enter clamp-special-case mode where it animates completely differently to normal.
+                        float scrollChange = scrollTarget.Value - Scroll.Current;
+
+                        Scroll.ScrollTo(scrollTarget.Value, false);
+
+                        foreach (var i in Scroll.Children)
+                            i.Y += scrollChange;
+                        break;
+                }
+
+                pendingScrollOperation = PendingScrollOperation.None;
             }
         }
 
@@ -844,7 +849,7 @@ namespace osu.Game.Screens.Select
         /// <param name="parent">For nested items, the parent of the item to be updated.</param>
         private void updateItem(DrawableCarouselItem item, DrawableCarouselItem parent = null)
         {
-            Vector2 posInScroll = ScrollableContent.ToLocalSpace(item.Header.ScreenSpaceDrawQuad.Centre);
+            Vector2 posInScroll = Scroll.ScrollContent.ToLocalSpace(item.Header.ScreenSpaceDrawQuad.Centre);
             float itemDrawY = posInScroll.Y - visibleUpperBound;
             float dist = Math.Abs(1f - itemDrawY / visibleHalfHeight);
 
@@ -856,6 +861,13 @@ namespace osu.Game.Screens.Select
             // additional container and setting that container's alpha) such that we can
             // layer alpha transformations on top.
             item.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
+        }
+
+        private enum PendingScrollOperation
+        {
+            None,
+            Standard,
+            Immediate,
         }
 
         /// <summary>
@@ -889,7 +901,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private class CarouselScrollContainer : OsuScrollContainer
+        protected class CarouselScrollContainer : OsuScrollContainer<DrawableCarouselItem>
         {
             private bool rightMouseScrollBlocked;
 
@@ -897,6 +909,15 @@ namespace osu.Game.Screens.Select
             /// Whether the last scroll event was user triggered, directly on the scroll container.
             /// </summary>
             public bool UserScrolling { get; private set; }
+
+            public CarouselScrollContainer()
+            {
+                // size is determined by the carousel itself, due to not all content necessarily being loaded.
+                ScrollContent.AutoSizeAxes = Axes.None;
+
+                // the scroll container may get pushed off-screen by global screen changes, but we still want panels to display outside of the bounds.
+                Masking = false;
+            }
 
             // ReSharper disable once OptionalParameterHierarchyMismatch 2020.3 EAP4 bug. (https://youtrack.jetbrains.com/issue/RSRP-481535?p=RIDER-51910)
             protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
