@@ -266,23 +266,16 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private void runHyperDashStateTransition(bool hyperDashing)
+        public void UpdatePosition(float position)
         {
-            updateTrailVisibility();
+            position = Math.Clamp(position, 0, CatchPlayfield.WIDTH);
 
-            if (hyperDashing)
-            {
-                this.FadeColour(hyperDashColour, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-                this.FadeTo(0.2f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-            }
-            else
-            {
-                this.FadeColour(Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-                this.FadeTo(1f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-            }
+            if (position == X)
+                return;
+
+            Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
+            X = position;
         }
-
-        private void updateTrailVisibility() => trails.DisplayTrail = Dashing || HyperDashing;
 
         public bool OnPressed(CatchAction action)
         {
@@ -322,17 +315,6 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        public void UpdatePosition(float position)
-        {
-            position = Math.Clamp(position, 0, CatchPlayfield.WIDTH);
-
-            if (position == X)
-                return;
-
-            Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
-            X = position;
-        }
-
         /// <summary>
         /// Drop any fruit off the plate.
         /// </summary>
@@ -342,6 +324,24 @@ namespace osu.Game.Rulesets.Catch.UI
         /// Explode all fruit off the plate.
         /// </summary>
         public void Explode() => clearPlate(DroppedObjectAnimation.Explode);
+
+        private void runHyperDashStateTransition(bool hyperDashing)
+        {
+            updateTrailVisibility();
+
+            if (hyperDashing)
+            {
+                this.FadeColour(hyperDashColour, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                this.FadeTo(0.2f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+            }
+            else
+            {
+                this.FadeColour(Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                this.FadeTo(1f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+            }
+        }
+
+        private void updateTrailVisibility() => trails.DisplayTrail = Dashing || HyperDashing;
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
