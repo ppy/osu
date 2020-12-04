@@ -12,7 +12,6 @@ using osu.Framework.Android;
 
 namespace osu.Android
 {
-
     [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false)]
     [IntentFilter(new[] { Intent.ActionDefault }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
     public class OsuGameActivity : AndroidGameActivity
@@ -44,8 +43,9 @@ namespace osu.Android
                 var stream = ContentResolver.OpenInputStream(intent.Data);
                 if (stream != null)
                     // intent handler may run before the game has even loaded so we need to wait for the file importers to load before launching import
-                    game.WaitForReady(() => game, _ => Task.Run(() => game.Import(stream, filename))); 
+                    game.WaitForReady(() => game, _ => Task.Run(() => game.Import(stream, filename)));
             }
+
             base.OnNewIntent(intent);
         }
     }

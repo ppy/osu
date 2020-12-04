@@ -251,8 +251,6 @@ namespace osu.Game.Database
                 notification.State = ProgressNotificationState.Cancelled;
                 Logger.Error(e, $@"Could not import ({filename})", LoggingTarget.Database);
             }
-
-            return;
         }
 
         /// <summary>
