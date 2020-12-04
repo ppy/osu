@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Skinning
+namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacySliderBall : CompositeDrawable
     {

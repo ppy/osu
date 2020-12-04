@@ -4,7 +4,7 @@
 using osu.Framework.Graphics.Lines;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public abstract class DrawableSliderPath : SmoothPath
     {

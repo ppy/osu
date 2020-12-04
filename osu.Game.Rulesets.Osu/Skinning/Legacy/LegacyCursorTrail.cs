@@ -10,7 +10,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
 
-namespace osu.Game.Rulesets.Osu.Skinning
+namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyCursorTrail : CursorTrail
     {

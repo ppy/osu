@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class ApproachCircle : Container
     {

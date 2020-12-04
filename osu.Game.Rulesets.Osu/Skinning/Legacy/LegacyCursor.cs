@@ -3,11 +3,11 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Skinning;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Skinning
+namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyCursor : OsuCursorSprite
     {

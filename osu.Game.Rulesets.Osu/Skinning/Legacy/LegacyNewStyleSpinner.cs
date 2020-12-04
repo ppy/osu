@@ -13,7 +13,7 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Skinning
+namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     /// <summary>
     /// Legacy skinned spinner with two main spinning layers, one fixed overlay and one final spinning overlay.

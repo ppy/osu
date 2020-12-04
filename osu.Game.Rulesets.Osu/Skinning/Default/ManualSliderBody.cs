@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     /// <summary>
     /// A <see cref="SliderBody"/> with the ability to set the drawn vertices manually.

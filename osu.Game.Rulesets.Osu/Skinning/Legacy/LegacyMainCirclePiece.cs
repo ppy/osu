@@ -17,7 +17,7 @@ using osuTK;
 using osuTK.Graphics;
 using static osu.Game.Skinning.LegacySkinConfiguration;
 
-namespace osu.Game.Rulesets.Osu.Skinning
+namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyMainCirclePiece : CompositeDrawable
     {
