@@ -175,55 +175,19 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Calculates the scale of the catcher based off the provided beatmap difficulty.
         /// </summary>
-        private static Vector2 calculateScale(BeatmapDifficulty difficulty)
-            => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+        private static Vector2 calculateScale(BeatmapDifficulty difficulty) => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="scale">The scale of the catcher.</param>
-        internal static float CalculateCatchWidth(Vector2 scale)
-            => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * ALLOWED_CATCH_RANGE;
+        internal static float CalculateCatchWidth(Vector2 scale) => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * ALLOWED_CATCH_RANGE;
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="difficulty">The beatmap difficulty.</param>
-        internal static float CalculateCatchWidth(BeatmapDifficulty difficulty)
-            => CalculateCatchWidth(calculateScale(difficulty));
-
-        /// <summary>
-        /// Add a caught fruit to the catcher's stack.
-        /// </summary>
-        /// <param name="fruit">The fruit that was caught.</param>
-        public void PlaceOnPlate(DrawablePalpableCatchHitObject fruit)
-        {
-            var ourRadius = fruit.DisplayRadius;
-            float theirRadius = 0;
-
-            const float allowance = 10;
-
-            while (caughtFruitContainer.Any(f =>
-                Vector2Extensions.Distance(f.Position, fruit.Position) < (ourRadius + (theirRadius = CatchHitObject.OBJECT_RADIUS / 2)) / (allowance / 2)))
-            {
-                var diff = (ourRadius + theirRadius) / allowance;
-                fruit.X += (RNG.NextSingle() - 0.5f) * diff * 2;
-                fruit.Y -= RNG.NextSingle() * diff;
-            }
-
-            fruit.X = Math.Clamp(fruit.X, -CatcherArea.CATCHER_SIZE / 2, CatcherArea.CATCHER_SIZE / 2);
-
-            caughtFruitContainer.Add(fruit);
-
-            if (hitLighting.Value)
-            {
-                HitExplosion hitExplosion = hitExplosionPool.Get();
-                hitExplosion.X = fruit.X;
-                hitExplosion.Scale = new Vector2(fruit.HitObject.Scale);
-                hitExplosion.ObjectColour = fruit.AccentColour.Value;
-                hitExplosionContainer.Add(hitExplosion);
-            }
-        }
+        internal static float CalculateCatchWidth(BeatmapDifficulty difficulty) => CalculateCatchWidth(calculateScale(difficulty));
 
         /// <summary>
         /// Let the catcher attempt to catch a fruit.
@@ -375,11 +339,9 @@ namespace osu.Game.Rulesets.Catch.UI
         public void Drop() => clearPlate(DroppedObjectAnimation.Drop);
 
         /// <summary>
-        /// Explode any fruit off the plate.
+        /// Explode all fruit off the plate.
         /// </summary>
         public void Explode() => clearPlate(DroppedObjectAnimation.Explode);
-
-        public void Explode(DrawablePalpableCatchHitObject caughtObject) => removeFromPlate(caughtObject, DroppedObjectAnimation.Explode);
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
@@ -456,6 +418,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private void placeCaughtObject(PalpableCatchHitObject source)
         {
             var caughtObject = createCaughtObject(source);
+
             if (caughtObject == null) return;
 
             caughtObject.RelativePositionAxes = Axes.None;
@@ -468,10 +431,43 @@ namespace osu.Game.Rulesets.Catch.UI
             caughtObject.LifetimeStart = source.StartTime;
             caughtObject.LifetimeEnd = double.MaxValue;
 
-            PlaceOnPlate(caughtObject);
+            adjustPositionInStack(caughtObject);
+
+            caughtFruitContainer.Add(caughtObject);
+
+            addLighting(caughtObject);
 
             if (!caughtObject.StaysOnPlate)
-                Explode(caughtObject);
+                removeFromPlate(caughtObject, DroppedObjectAnimation.Explode);
+        }
+
+        private void adjustPositionInStack(DrawablePalpableCatchHitObject caughtObject)
+        {
+            const float radius_div_2 = CatchHitObject.OBJECT_RADIUS / 2;
+            const float allowance = 10;
+
+            float caughtObjectRadius = caughtObject.DisplayRadius;
+
+            while (caughtFruitContainer.Any(f => Vector2Extensions.Distance(f.Position, caughtObject.Position) < (caughtObjectRadius + radius_div_2) / (allowance / 2)))
+            {
+                float diff = (caughtObjectRadius + radius_div_2) / allowance;
+
+                caughtObject.X += (RNG.NextSingle() - 0.5f) * diff * 2;
+                caughtObject.Y -= RNG.NextSingle() * diff;
+            }
+
+            caughtObject.X = Math.Clamp(caughtObject.X, -CatcherArea.CATCHER_SIZE / 2, CatcherArea.CATCHER_SIZE / 2);
+        }
+
+        private void addLighting(DrawablePalpableCatchHitObject caughtObject)
+        {
+            if (!hitLighting.Value) return;
+
+            HitExplosion hitExplosion = hitExplosionPool.Get();
+            hitExplosion.X = caughtObject.X;
+            hitExplosion.Scale = new Vector2(caughtObject.HitObject.Scale);
+            hitExplosion.ObjectColour = caughtObject.AccentColour.Value;
+            hitExplosionContainer.Add(hitExplosion);
         }
 
         private DrawablePalpableCatchHitObject createCaughtObject(PalpableCatchHitObject source)
