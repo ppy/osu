@@ -126,13 +126,15 @@ namespace osu.Game.Screens.Import
             fileNameScroll.ScrollContent.Origin = Anchor.Centre;
 
             currentFile.BindValueChanged(updateFileSelectionText, true);
-            currentDirectory.BindValueChanged(_ =>
-            {
-                currentFile.Value = null;
-            });
+            currentDirectory.BindValueChanged(onCurrentDirectoryChanged);
 
             currentDirectory.BindTo(fileSelector.CurrentPath);
             currentFile.BindTo(fileSelector.CurrentFile);
+        }
+
+        private void onCurrentDirectoryChanged(ValueChangedEvent<DirectoryInfo> v)
+        {
+            currentFile.Value = null;
         }
 
         private void updateFileSelectionText(ValueChangedEvent<FileInfo> v)
