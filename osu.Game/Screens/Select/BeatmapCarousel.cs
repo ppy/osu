@@ -901,32 +901,14 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected class CarouselScrollContainer : OsuScrollContainer<DrawableCarouselItem>
+        protected class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
         {
             private bool rightMouseScrollBlocked;
-
-            /// <summary>
-            /// Whether the last scroll event was user triggered, directly on the scroll container.
-            /// </summary>
-            public bool UserScrolling { get; private set; }
 
             public CarouselScrollContainer()
             {
                 // size is determined by the carousel itself, due to not all content necessarily being loaded.
                 ScrollContent.AutoSizeAxes = Axes.None;
-            }
-
-            // ReSharper disable once OptionalParameterHierarchyMismatch 2020.3 EAP4 bug. (https://youtrack.jetbrains.com/issue/RSRP-481535?p=RIDER-51910)
-            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
-            {
-                UserScrolling = true;
-                base.OnUserScroll(value, animated, distanceDecay);
-            }
-
-            public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
-            {
-                UserScrolling = false;
-                base.ScrollTo(value, animated, distanceDecay);
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
