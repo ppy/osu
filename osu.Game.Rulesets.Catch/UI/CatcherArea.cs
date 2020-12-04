@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public readonly Catcher MovableCatcher;
         private readonly CatchComboDisplay comboDisplay;
 
-        public CatcherArea(BeatmapDifficulty difficulty = null)
+        public CatcherArea(Container droppedObjectContainer, BeatmapDifficulty difficulty = null)
         {
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
             Children = new Drawable[]
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Margin = new MarginPadding { Bottom = 350f },
                     X = CatchPlayfield.CENTER_X
                 },
-                MovableCatcher = new Catcher(this, this, difficulty) { X = CatchPlayfield.CENTER_X },
+                MovableCatcher = new Catcher(this, droppedObjectContainer, difficulty) { X = CatchPlayfield.CENTER_X },
             };
         }
 
