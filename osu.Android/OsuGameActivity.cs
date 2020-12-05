@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Net;
 using Android.OS;
 using Android.Provider;
 using Android.Views;
@@ -13,7 +14,7 @@ using osu.Framework.Android;
 namespace osu.Android
 {
     [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false)]
-    [IntentFilter(new[] { Intent.ActionDefault }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
+    [IntentFilter(new[] { Intent.ActionDefault, Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault }, DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
     public class OsuGameActivity : AndroidGameActivity
     {
         private OsuGameAndroid game;
@@ -37,19 +38,29 @@ namespace osu.Android
 
         protected override void OnNewIntent(Intent intent)
         {
-            if (intent.Action == Intent.ActionView)
+            if (intent.Action == Intent.ActionDefault)
             {
-                var cursor = ContentResolver.Query(intent.Data, null, null, null);
-                var filename_column = cursor.GetColumnIndex(OpenableColumns.DisplayName);
-                cursor.MoveToFirst();
-
-                var stream = ContentResolver.OpenInputStream(intent.Data);
-                if (stream != null)
-                    // intent handler may run before the game has even loaded so we need to wait for the file importers to load before launching import
-                    game.WaitForReady(() => game, _ => Task.Run(() => game.Import(stream, cursor.GetString(filename_column))));
+                if (intent.Scheme == ContentResolver.SchemeContent)
+                        handleImportFromUri(intent.Data);
             }
 
-            base.OnNewIntent(intent);
+            if (intent.Action == Intent.ActionSend)
+            {
+                var content = intent.ClipData.GetItemAt(0);
+                handleImportFromUri(content.Uri);
+            }
+        }
+
+        private void handleImportFromUri(Uri uri)
+        {
+            var cursor = ContentResolver.Query(uri, null, null, null);
+            var filename_column = cursor.GetColumnIndex(OpenableColumns.DisplayName);
+            cursor.MoveToFirst();
+
+            var stream = ContentResolver.OpenInputStream(uri);
+            if (stream != null)
+                // intent handler may run before the game has even loaded so we need to wait for the file importers to load before launching import
+                game.WaitForReady(() => game, _ => Task.Run(() => game.Import(stream, cursor.GetString(filename_column))));
         }
     }
 }
