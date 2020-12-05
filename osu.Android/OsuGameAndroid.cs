@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
+using System.Threading.Tasks;
 using Android.App;
 using Android.OS;
 using osu.Framework.Allocation;
@@ -64,6 +66,13 @@ namespace osu.Android
                 return new Version(packageInfo.VersionName);
             }
         }
+
+        /// <summary>
+        /// Schedules a file to be imported once the game is loaded.
+        /// </summary>
+        /// <param name="stream">A stream to the file to import.</param>
+        /// <param name="filename">The filename of the file to import.</param>
+        public void ScheduleImport(Stream stream, string filename) => WaitForReady(() => this, _ => Task.Run(() => Import(stream, filename)));
 
         protected override void LoadComplete()
         {

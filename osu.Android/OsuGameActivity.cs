@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -38,10 +37,9 @@ namespace osu.Android
 
         protected override void OnNewIntent(Intent intent)
         {
-            if (intent.Action == Intent.ActionDefault)
+            if (intent.Action == Intent.ActionDefault && intent.Scheme == ContentResolver.SchemeContent)
             {
-                if (intent.Scheme == ContentResolver.SchemeContent)
-                        handleImportFromUri(intent.Data);
+                handleImportFromUri(intent.Data);
             }
 
             if (intent.Action == Intent.ActionSend)
@@ -53,14 +51,13 @@ namespace osu.Android
 
         private void handleImportFromUri(Uri uri)
         {
-            var cursor = ContentResolver.Query(uri, null, null, null);
+            var cursor = ContentResolver.Query(uri, new[] { OpenableColumns.DisplayName }, null, null);
             var filename_column = cursor.GetColumnIndex(OpenableColumns.DisplayName);
             cursor.MoveToFirst();
 
             var stream = ContentResolver.OpenInputStream(uri);
             if (stream != null)
-                // intent handler may run before the game has even loaded so we need to wait for the file importers to load before launching import
-                game.WaitForReady(() => game, _ => Task.Run(() => game.Import(stream, cursor.GetString(filename_column))));
+                game.ScheduleImport(stream, cursor.GetString(filename_column));
         }
     }
 }
