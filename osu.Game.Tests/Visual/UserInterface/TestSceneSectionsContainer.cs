@@ -14,7 +14,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     public class TestSceneSectionsContainer : OsuManualInputManagerTestScene
     {
         private readonly SectionsContainer<TestSection> container;
-        private TestSection selectedSection;
         private float custom;
         private const float header_height = 100;
 
@@ -36,11 +35,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
             container.SelectedSection.ValueChanged += section =>
             {
-                if (selectedSection != null)
-                    selectedSection.Selected = false;
-                selectedSection = section.NewValue;
-                if (selectedSection != null)
-                    selectedSection.Selected = true;
+                if (section.OldValue != null)
+                    section.OldValue.Selected = false;
+                if (section.NewValue != null)
+                    section.NewValue.Selected = true;
             };
             Add(container);
         }
