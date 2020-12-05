@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
-        private Drawable externallyScrolledTo;
+        private Drawable lastClickedSection;
 
         public Drawable ExpandableHeader
         {
@@ -138,7 +138,7 @@ namespace osu.Game.Graphics.Containers
 
         public void ScrollTo(Drawable section)
         {
-            externallyScrolledTo = section;
+            lastClickedSection = section;
             scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
         }
 
@@ -188,6 +188,9 @@ namespace osu.Game.Graphics.Containers
             if (currentScroll != lastKnownScroll)
             {
                 lastKnownScroll = currentScroll;
+                // reset last clicked section because user started scrolling themselves
+                if (scrollContainer.UserScrolling)
+                    lastClickedSection = null;
 
                 if (ExpandableHeader != null && FixedHeader != null)
                 {
@@ -229,7 +232,7 @@ namespace osu.Game.Graphics.Containers
 
                 if (Precision.AlmostBigger(currentScroll, scrollContainer.ScrollableExtent))
                 {
-                    SelectedSection.Value = (scrollContainer.UserScrolling ? null : externallyScrolledTo as T) ?? Children.LastOrDefault();
+                    SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
                 }
             }
         }
