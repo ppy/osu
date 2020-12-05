@@ -205,7 +205,7 @@ namespace osu.Game.Graphics.Containers
 
                 float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
 
-                float visibleSize(T section)
+                float visibleHeight(T section)
                 {
                     float sectionPosition = scrollContainer.GetChildPosInContent(section) - scrollOffset;
                     float top = Math.Max(sectionPosition, currentScroll);
@@ -214,19 +214,33 @@ namespace osu.Game.Graphics.Containers
                 }
 
                 var sortedByVisible = new List<T>(Children);
-                sortedByVisible.Sort((a, b) => visibleSize(b).CompareTo(visibleSize(a)));
+                sortedByVisible.Sort((a, b) => visibleHeight(b).CompareTo(visibleHeight(a)));
                 T mostVisible = sortedByVisible.FirstOrDefault();
 
                 if (mostVisible == null)
                     return;
 
                 int mostVisibleIndex = IndexOf(mostVisible);
-                T ch;
 
-                while (mostVisibleIndex != 0 && Precision.AlmostEquals(visibleSize(ch = Children[mostVisibleIndex - 1]), ch.Height, 1))
+                bool usePreviousSection()
                 {
-                    mostVisibleIndex--;
+                    if (mostVisibleIndex == 0)
+                        return false;
+
+                    T sectionBefore = Children[mostVisibleIndex - 1];
+                    // consider the section user wants to see smaller than it actually is to lower the visibility requirement
+                    // this makes the section get selected sooner when scrolling upwards, to match it already getting selected sooner when scrolling downwards
+                    float sectionHeight = sectionBefore.Height * (lastClickedSection as T == sectionBefore ? 0.8f : 1.0f);
+
+                    bool moreVisible = Precision.AlmostBigger(visibleHeight(sectionBefore), visibleHeight(Children[mostVisibleIndex]), 1);
+                    bool completelyVisible = Precision.AlmostBigger(visibleHeight(sectionBefore), sectionHeight, 1);
+
+                    return moreVisible || completelyVisible;
                 }
+
+                // we want to use 100% visible previous sections instead because otherwise small sections sandwiched between large section would never get selected
+                while (usePreviousSection())
+                    mostVisibleIndex--;
 
                 SelectedSection.Value = Children[mostVisibleIndex];
 

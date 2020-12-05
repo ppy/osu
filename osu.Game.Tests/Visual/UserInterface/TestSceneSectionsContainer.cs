@@ -66,12 +66,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestCorrectSectionSelected()
         {
-            const int sections_count = 8;
+            const int sections_count = 10;
             AddStep("clear", () => container.Clear());
             AddStep("fill with sections", () =>
             {
                 for (int i = 0; i < sections_count; i++)
-                    append(1 / 4.0f);
+                    append((1 + i % 2) / 6.0f); // alternate between big and small sections
             });
 
             void step(int scrollIndex)
