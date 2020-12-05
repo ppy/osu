@@ -28,37 +28,26 @@ namespace osu.Game.Input
         {
             frameworkConfineMode = frameworkConfigManager.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode);
             frameworkWindowMode = frameworkConfigManager.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
-            frameworkWindowMode.BindValueChanged(_ => updateGameConfineMode());
+            frameworkWindowMode.BindValueChanged(_ => updateConfineMode());
 
             osuConfineMode = osuConfigManager.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode);
             localUserPlaying = game.LocalUserPlaying.GetBoundCopy();
 
-            osuConfineMode.ValueChanged += _ => updateFrameworkConfineMode();
-            localUserPlaying.BindValueChanged(_ => updateFrameworkConfineMode(), true);
+            osuConfineMode.ValueChanged += _ => updateConfineMode();
+            localUserPlaying.BindValueChanged(_ => updateConfineMode(), true);
         }
 
-        private LeasedBindable<OsuConfineMouseMode> leasedOsuConfineMode;
-
-        private void updateGameConfineMode()
-        {
-            if (frameworkWindowMode.Value == WindowMode.Fullscreen && leasedOsuConfineMode == null)
-            {
-                leasedOsuConfineMode = osuConfineMode.BeginLease(true);
-                leasedOsuConfineMode.Value = OsuConfineMouseMode.Always;
-            }
-
-            if (frameworkWindowMode.Value != WindowMode.Fullscreen && leasedOsuConfineMode != null)
-            {
-                leasedOsuConfineMode.Return();
-                leasedOsuConfineMode = null;
-            }
-        }
-
-        private void updateFrameworkConfineMode()
+        private void updateConfineMode()
         {
             // confine mode is unavailable on some platforms
             if (frameworkConfineMode.Disabled)
                 return;
+
+            if (frameworkWindowMode.Value == WindowMode.Fullscreen)
+            {
+                frameworkConfineMode.Value = ConfineMouseMode.Fullscreen;
+                return;
+            }
 
             switch (osuConfineMode.Value)
             {

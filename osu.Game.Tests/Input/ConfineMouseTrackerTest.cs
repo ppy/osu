@@ -28,8 +28,6 @@ namespace osu.Game.Tests.Input
             setWindowModeTo(windowMode);
             setGameSideModeTo(OsuConfineMouseMode.Never);
 
-            gameSideConfineModeDisabled(false);
-
             setLocalUserPlayingTo(false);
             frameworkSideModeIs(ConfineMouseMode.Never);
 
@@ -43,8 +41,6 @@ namespace osu.Game.Tests.Input
         {
             setWindowModeTo(windowMode);
             setGameSideModeTo(OsuConfineMouseMode.DuringGameplay);
-
-            gameSideConfineModeDisabled(false);
 
             setLocalUserPlayingTo(false);
             frameworkSideModeIs(ConfineMouseMode.Never);
@@ -60,8 +56,6 @@ namespace osu.Game.Tests.Input
             setWindowModeTo(windowMode);
             setGameSideModeTo(OsuConfineMouseMode.Always);
 
-            gameSideConfineModeDisabled(false);
-
             setLocalUserPlayingTo(false);
             frameworkSideModeIs(ConfineMouseMode.Always);
 
@@ -75,20 +69,18 @@ namespace osu.Game.Tests.Input
             setGameSideModeTo(OsuConfineMouseMode.Never);
 
             setWindowModeTo(WindowMode.Fullscreen);
-            gameSideConfineModeDisabled(true);
 
             setLocalUserPlayingTo(false);
-            frameworkSideModeIs(ConfineMouseMode.Always);
+            frameworkSideModeIs(ConfineMouseMode.Fullscreen);
 
             setLocalUserPlayingTo(true);
-            frameworkSideModeIs(ConfineMouseMode.Always);
+            frameworkSideModeIs(ConfineMouseMode.Fullscreen);
 
             setWindowModeTo(WindowMode.Windowed);
 
             // old state is restored
             gameSideModeIs(OsuConfineMouseMode.Never);
             frameworkSideModeIs(ConfineMouseMode.Never);
-            gameSideConfineModeDisabled(false);
         }
 
         private void setWindowModeTo(WindowMode mode)
@@ -106,9 +98,5 @@ namespace osu.Game.Tests.Input
 
         private void frameworkSideModeIs(ConfineMouseMode mode)
             => AddAssert($"mode is {mode} framework-side", () => frameworkConfigManager.Get<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode) == mode);
-
-        private void gameSideConfineModeDisabled(bool disabled)
-            => AddAssert($"game-side confine mode {(disabled ? "disabled" : "enabled")}",
-                () => Game.LocalConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode).Disabled == disabled);
     }
 }
