@@ -483,7 +483,7 @@ namespace osu.Game
         /// <param name="retrieveInstance">A function to retrieve a (potentially not-yet-constructed) target instance.</param>
         /// <param name="action">The action to perform on the instance when load is confirmed.</param>
         /// <typeparam name="T">The type of the target instance.</typeparam>
-        public void WaitForReady<T>(Func<T> retrieveInstance, Action<T> action)
+        protected void WaitForReady<T>(Func<T> retrieveInstance, Action<T> action)
             where T : Drawable
         {
             var instance = retrieveInstance();
