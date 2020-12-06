@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
@@ -60,6 +61,25 @@ namespace osu.Game.Screens.Select.Carousel
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            // position updates should not occur if the item is filtered away.
+            // this avoids panels flying across the screen only to be eventually off-screen or faded out.
+            if (!Item.Visible)
+                return;
+
+            float targetY = Item.CarouselYPosition;
+
+            if (Precision.AlmostEquals(targetY, Y))
+                Y = targetY;
+            else
+                // algorithm for this is taken from ScrollContainer.
+                // while it doesn't necessarily need to match 1:1, as we are emulating scroll in some cases this feels most correct.
+                Y = (float)Interpolation.Lerp(targetY, Y, Math.Exp(-0.01 * Time.Elapsed));
+        }
+
         protected override void UpdateItem()
         {
             base.UpdateItem();
@@ -80,8 +100,14 @@ namespace osu.Game.Screens.Select.Carousel
                 background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                 {
                     RelativeSizeAxes = Axes.Both,
-                }, 300),
-                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 100),
+                }, 300)
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 100)
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
             };
 
             background.DelayedLoadComplete += fadeContentIn;

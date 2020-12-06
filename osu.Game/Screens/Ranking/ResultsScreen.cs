@@ -16,6 +16,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
@@ -57,7 +58,7 @@ namespace osu.Game.Screens.Ranking
 
         private readonly bool allowRetry;
 
-        protected ResultsScreen(ScoreInfo score, bool allowRetry = true)
+        protected ResultsScreen(ScoreInfo score, bool allowRetry)
         {
             Score = score;
             this.allowRetry = allowRetry;
@@ -149,7 +150,12 @@ namespace osu.Game.Screens.Ranking
             };
 
             if (Score != null)
-                ScorePanelList.AddScore(Score, true);
+            {
+                // only show flair / animation when arriving after watching a play that isn't autoplay.
+                bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
+
+                ScorePanelList.AddScore(Score, shouldFlair);
+            }
 
             if (player != null && allowRetry)
             {

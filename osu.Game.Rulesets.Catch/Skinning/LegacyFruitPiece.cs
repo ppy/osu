@@ -19,7 +19,8 @@ namespace osu.Game.Rulesets.Catch.Skinning
     {
         private readonly string lookupName;
 
-        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly Bindable<bool> hyperDash = new Bindable<bool>();
         private Sprite colouredSprite;
 
         public LegacyFruitPiece(string lookupName)
@@ -31,9 +32,10 @@ namespace osu.Game.Rulesets.Catch.Skinning
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject, ISkinSource skin)
         {
-            DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
+            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
 
             accentColour.BindTo(drawableCatchObject.AccentColour);
+            hyperDash.BindTo(drawableCatchObject.HyperDash);
 
             InternalChildren = new Drawable[]
             {
@@ -51,9 +53,9 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 },
             };
 
-            if (drawableCatchObject.HitObject.HyperDash)
+            if (hyperDash.Value)
             {
-                var hyperDash = new Sprite
+                var hyperDashOverlay = new Sprite
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -67,7 +69,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
                              Catcher.DEFAULT_HYPER_DASH_COLOUR,
                 };
 
-                AddInternal(hyperDash);
+                AddInternal(hyperDashOverlay);
             }
         }
 

@@ -43,10 +43,10 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             return false;
         }
 
-        public override void UpdatePosition(SnapResult result)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
             piece.Position = ToLocalSpace(result.ScreenSpacePosition);
-            base.UpdatePosition(result);
+            base.UpdateTimeAndPosition(result);
         }
     }
 }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +15,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, ITrackSnaking
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
+
+        [CanBeNull]
+        public Slider Slider => DrawableSlider?.HitObject;
+
+        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         /// <summary>
         /// The judgement text is provided by the <see cref="DrawableSlider"/>.
