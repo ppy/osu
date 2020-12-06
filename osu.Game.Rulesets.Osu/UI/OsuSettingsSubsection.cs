@@ -43,41 +43,41 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsSlider<float, FramerateSlider>
                 {
-                    LabelText = "Autoplay framerate",
+                    LabelText = "回放帧率",
                     Current = config.GetBindable<float>(OsuRulesetSetting.ReplayFramerate),
                     KeyboardStep = 30f
                 },
                 new SettingsEnumDropdown<OsuDanceMover>
                 {
-                    LabelText = "Dance mover",
+                    LabelText = "Dance移动方式",
                     Current = config.GetBindable<OsuDanceMover>(OsuRulesetSetting.DanceMover)
                 },
                 new SettingsSlider<float, AngleSlider>
                 {
-                    LabelText = "Angle Offset",
+                    LabelText = "角度偏移",
                     Current = config.GetBindable<float>(OsuRulesetSetting.AngleOffset),
                     KeyboardStep = 1f / 18f
                 },
                 new SettingsSlider<float, MultiplierSlider>
                 {
-                    LabelText = "Jump Multiplier",
+                    LabelText = "跳跃倍率(Jump Multiplier)",
                     Current = config.GetBindable<float>(OsuRulesetSetting.JumpMulti),
                     KeyboardStep = 1f / 12f
                 },
                 new SettingsSlider<float, MultiplierSlider>
                 {
-                    LabelText = "Next Jump Multiplier",
+                    LabelText = "下一跳倍率(Next Jump Multiplier)",
                     Current = config.GetBindable<float>(OsuRulesetSetting.NextJumpMulti),
                     KeyboardStep = 1f / 12f
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Skip Stack Angles",
+                    LabelText = "跳过堆叠角度(Skip Stack Angles)",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SkipStackAngles)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Bounce off borders",
+                    LabelText = "遇到边界时反弹",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.BorderBounce)
                 },
                 new SettingsEnumDropdown<PlayfieldBorderStyle>
