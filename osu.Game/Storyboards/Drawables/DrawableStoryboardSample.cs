@@ -37,8 +37,8 @@ namespace osu.Game.Storyboards.Drawables
 
             foreach (var mod in mods.Value.OfType<IApplicableToSample>())
             {
-                foreach (var sample in SamplesContainer)
-                    mod.ApplyToSample(sample.Sample);
+                foreach (var sample in DrawableSamples)
+                    mod.ApplyToSample(sample);
             }
         }
 

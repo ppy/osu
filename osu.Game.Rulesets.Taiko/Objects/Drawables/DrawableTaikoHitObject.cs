@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (isStrong.Value != strongSamples.Any())
             {
                 if (isStrong.Value)
-                    HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH });
+                    HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_FINISH));
                 else
                 {
                     foreach (var sample in strongSamples)

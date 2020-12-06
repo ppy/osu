@@ -104,9 +104,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
-        protected override void OnFree(HitObject hitObject)
+        protected override void OnFree()
         {
-            base.OnFree(hitObject);
+            base.OnFree();
 
             spinningSample.Samples = null;
         }
@@ -119,8 +119,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (firstSample != null)
             {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample);
-                clone.Name = "spinnerspin";
+                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("spinnerspin");
 
                 spinningSample.Samples = new ISampleInfo[] { clone };
                 spinningSample.Frequency.Value = spinning_sample_initial_frequency;

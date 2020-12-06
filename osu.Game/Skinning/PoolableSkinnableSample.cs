@@ -83,6 +83,7 @@ namespace osu.Game.Skinning
             bool wasPlaying = Playing;
 
             sampleContainer.Clear();
+            Sample = null;
 
             var ch = CurrentSkin.GetSample(sampleInfo);
 
@@ -138,6 +139,8 @@ namespace osu.Game.Skinning
             }
         }
 
+        #region Re-expose AudioContainer
+
         public BindableNumber<double> Volume => sampleContainer.Volume;
 
         public BindableNumber<double> Balance => sampleContainer.Balance;
@@ -159,5 +162,7 @@ namespace osu.Game.Skinning
         public IBindable<double> AggregateFrequency => sampleContainer.AggregateFrequency;
 
         public IBindable<double> AggregateTempo => sampleContainer.AggregateTempo;
+
+        #endregion
     }
 }

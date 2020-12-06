@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -25,18 +26,22 @@ namespace osu.Game.Rulesets.Judgements
 
         public DrawableHitObject JudgedObject { get; private set; }
 
-        protected Container JudgementBody { get; private set; }
+        public override bool RemoveCompletedTransforms => false;
 
-        private SkinnableDrawable skinnableJudgement;
+        protected SkinnableDrawable JudgementBody { get; private set; }
+
+        private readonly Container aboveHitObjectsContent;
 
         /// <summary>
         /// Duration of initial fade in.
         /// </summary>
+        [Obsolete("Apply any animations manually via ApplyHitAnimations / ApplyMissAnimations. Defaults were moved inside skinned components.")]
         protected virtual double FadeInDuration => 100;
 
         /// <summary>
         /// Duration to wait until fade out begins. Defaults to <see cref="FadeInDuration"/>.
         /// </summary>
+        [Obsolete("Apply any animations manually via ApplyHitAnimations / ApplyMissAnimations. Defaults were moved inside skinned components.")]
         protected virtual double FadeOutDelay => FadeInDuration;
 
         /// <summary>
@@ -54,6 +59,12 @@ namespace osu.Game.Rulesets.Judgements
         {
             Size = new Vector2(judgement_size);
             Origin = Anchor.Centre;
+
+            AddInternal(aboveHitObjectsContent = new Container
+            {
+                Depth = float.MinValue,
+                RelativeSizeAxes = Axes.Both
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -62,10 +73,11 @@ namespace osu.Game.Rulesets.Judgements
             prepareDrawables();
         }
 
+        public Drawable GetProxyAboveHitObjectsContent() => aboveHitObjectsContent.CreateProxy();
+
         /// <summary>
         /// Apply top-level animations to the current judgement when successfully hit.
-        /// Generally used for fading, defaulting to a simple fade out based on <see cref="FadeOutDelay"/>.
-        /// This will be used to calculate the lifetime of the judgement.
+        /// If displaying components which require lifetime extensions, manually adjusting <see cref="Drawable.LifetimeEnd"/> is required.
         /// </summary>
         /// <remarks>
         /// For animating the actual "default skin" judgement itself, it is recommended to use <see cref="CreateDefaultJudgement"/>.
@@ -73,13 +85,11 @@ namespace osu.Game.Rulesets.Judgements
         /// </remarks>
         protected virtual void ApplyHitAnimations()
         {
-            this.Delay(FadeOutDelay).FadeOut(400);
         }
 
         /// <summary>
         /// Apply top-level animations to the current judgement when missed.
-        /// Generally used for fading, defaulting to a simple fade out based on <see cref="FadeOutDelay"/>.
-        /// This will be used to calculate the lifetime of the judgement.
+        /// If displaying components which require lifetime extensions, manually adjusting <see cref="Drawable.LifetimeEnd"/> is required.
         /// </summary>
         /// <remarks>
         /// For animating the actual "default skin" judgement itself, it is recommended to use <see cref="CreateDefaultJudgement"/>.
@@ -87,7 +97,6 @@ namespace osu.Game.Rulesets.Judgements
         /// </remarks>
         protected virtual void ApplyMissAnimations()
         {
-            this.Delay(600).FadeOut(200);
         }
 
         /// <summary>
@@ -107,34 +116,52 @@ namespace osu.Game.Rulesets.Judgements
 
             Debug.Assert(Result != null);
 
+            runAnimation();
+        }
+
+        private void runAnimation()
+        {
+            // is a no-op if the drawables are already in a correct state.
             prepareDrawables();
 
-            // not sure if this should remain going forward.
-            skinnableJudgement.ResetAnimation();
+            // undo any transforms applies in ApplyMissAnimations/ApplyHitAnimations to get a sane initial state.
+            ApplyTransformsAt(double.MinValue, true);
+            ClearTransforms(true);
 
-            this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
+            LifetimeStart = Result.TimeAbsolute;
 
-            switch (Result.Type)
+            using (BeginAbsoluteSequence(Result.TimeAbsolute, true))
             {
-                case HitResult.None:
-                    break;
+                // not sure if this should remain going forward.
+                JudgementBody.ResetAnimation();
 
-                case HitResult.Miss:
-                    ApplyMissAnimations();
-                    break;
+                switch (Result.Type)
+                {
+                    case HitResult.None:
+                        break;
 
-                default:
-                    ApplyHitAnimations();
-                    break;
-            }
+                    case HitResult.Miss:
+                        ApplyMissAnimations();
+                        break;
 
-            if (skinnableJudgement.Drawable is IAnimatableJudgement animatable)
-            {
-                using (BeginAbsoluteSequence(Result.TimeAbsolute))
+                    default:
+                        ApplyHitAnimations();
+                        break;
+                }
+
+                if (JudgementBody.Drawable is IAnimatableJudgement animatable)
+                {
+                    var drawableAnimation = (Drawable)animatable;
+
                     animatable.PlayAnimation();
-            }
 
-            Expire(true);
+                    // a derived version of DrawableJudgement may be proposing a lifetime.
+                    // if not adjusted (or the skinned portion requires greater bounds than calculated) use the skinned source's lifetime.
+                    double lastTransformTime = drawableAnimation.LatestTransformEndTime;
+                    if (LifetimeEnd == double.MaxValue || lastTransformTime > LifetimeEnd)
+                        LifetimeEnd = lastTransformTime;
+                }
+            }
         }
 
         private HitResult? currentDrawableType;
@@ -151,16 +178,36 @@ namespace osu.Game.Rulesets.Judgements
             if (JudgementBody != null)
                 RemoveInternal(JudgementBody);
 
-            AddInternal(JudgementBody = new Container
+            AddInternal(JudgementBody = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ =>
+                CreateDefaultJudgement(type), confineMode: ConfineMode.NoScaling)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Child = skinnableJudgement = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ =>
-                    CreateDefaultJudgement(type), confineMode: ConfineMode.NoScaling)
             });
 
+            JudgementBody.OnSkinChanged += () =>
+            {
+                // on a skin change, the child component will update but not get correctly triggered to play its animation (or proxy the newly created content).
+                // we need to trigger a reinitialisation to make things right.
+                proxyContent();
+                runAnimation();
+            };
+
+            proxyContent();
+
             currentDrawableType = type;
+
+            void proxyContent()
+            {
+                aboveHitObjectsContent.Clear();
+
+                if (JudgementBody.Drawable is IAnimatableJudgement animatable)
+                {
+                    var proxiedContent = animatable.GetAboveHitObjectsProxiedContent();
+                    if (proxiedContent != null)
+                        aboveHitObjectsContent.Add(proxiedContent);
+                }
+            }
         }
 
         protected virtual Drawable CreateDefaultJudgement(HitResult result) => new DefaultJudgementPiece(result);

@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using osuTK;
+using System.Diagnostics;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -120,6 +121,16 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
+        private void onNewDrawableHitObject(DrawableHitObject d)
+        {
+            d.OnNestedDrawableCreated += onNewDrawableHitObject;
+
+            OnNewDrawableHitObject(d);
+
+            Debug.Assert(!d.IsInitialized);
+            d.IsInitialized = true;
+        }
+
         /// <summary>
         /// Performs post-processing tasks (if any) after all DrawableHitObjects are loaded into this Playfield.
         /// </summary>
@@ -131,6 +142,9 @@ namespace osu.Game.Rulesets.UI
         /// <param name="h">The DrawableHitObject to add.</param>
         public virtual void Add(DrawableHitObject h)
         {
+            if (!h.IsInitialized)
+                onNewDrawableHitObject(h);
+
             HitObjectContainer.Add(h);
             OnHitObjectAdded(h.HitObject);
         }
@@ -161,6 +175,17 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="hitObject">The removed <see cref="HitObject"/>.</param>
         protected virtual void OnHitObjectRemoved(HitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Invoked before a new <see cref="DrawableHitObject"/> is added to this <see cref="Playfield"/>.
+        /// It is invoked only once even if the drawable is pooled and used multiple times for different <see cref="HitObject"/>s.
+        /// </summary>
+        /// <remarks>
+        /// This is also invoked for nested <see cref="DrawableHitObject"/>s.
+        /// </remarks>
+        protected virtual void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
         {
         }
 
@@ -305,7 +330,7 @@ namespace osu.Game.Rulesets.UI
             AddInternal(pool);
         }
 
-        DrawableHitObject IPooledHitObjectProvider.GetPooledDrawableRepresentation(HitObject hitObject)
+        DrawableHitObject IPooledHitObjectProvider.GetPooledDrawableRepresentation(HitObject hitObject, DrawableHitObject parent)
         {
             var lookupType = hitObject.GetType();
 
@@ -328,10 +353,12 @@ namespace osu.Game.Rulesets.UI
             {
                 var dho = (DrawableHitObject)d;
 
-                // If this is the first time this DHO is being used (not loaded), then apply the DHO mods.
-                // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                if (!dho.IsLoaded)
+                if (!dho.IsInitialized)
                 {
+                    onNewDrawableHitObject(dho);
+
+                    // If this is the first time this DHO is being used, then apply the DHO mods.
+                    // This is done before Apply() so that the state is updated once when the hitobject is applied.
                     foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
                         m.ApplyToDrawableHitObjects(dho.Yield());
                 }
@@ -339,6 +366,7 @@ namespace osu.Game.Rulesets.UI
                 if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
                     lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
 
+                dho.ParentHitObject = parent;
                 dho.Apply(hitObject, entry);
             });
         }

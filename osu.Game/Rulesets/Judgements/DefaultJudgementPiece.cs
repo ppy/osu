@@ -47,18 +47,18 @@ namespace osu.Game.Rulesets.Judgements
 
         public virtual void PlayAnimation()
         {
-            this.RotateTo(0);
-            this.MoveTo(Vector2.Zero);
-
             switch (Result)
             {
                 case HitResult.Miss:
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
+                    this.MoveTo(Vector2.Zero);
                     this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
 
+                    this.RotateTo(0);
                     this.RotateTo(40, 800, Easing.InQuint);
+
                     break;
 
                 default:
@@ -66,6 +66,10 @@ namespace osu.Game.Rulesets.Judgements
                     this.ScaleTo(1, 500, Easing.OutElastic);
                     break;
             }
+
+            this.FadeOutFromOne(800);
         }
+
+        public Drawable GetAboveHitObjectsProxiedContent() => null;
     }
 }
