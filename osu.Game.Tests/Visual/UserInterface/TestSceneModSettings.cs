@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
             AddStep("open Customisation", () => modSelect.CustomiseButton.Click());
             AddStep("deselect mod", () => modSelect.SelectMod(testCustomisableMod));
-            AddAssert("controls hidden", () => modSelect.ModSettingsContainer.Alpha == 0);
+            AddAssert("controls hidden", () => modSelect.ModSettingsContainer.State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -72,11 +72,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             createModSelect();
             openModSelect();
 
-            AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.Alpha == 0);
+            AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.State.Value == Visibility.Hidden);
             AddStep("select mod", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
-            AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
+            AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.State.Value == Visibility.Visible);
             AddStep("deselect mod", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
-            AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.Alpha == 0);
+            AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("change mod settings menu width to full screen", () => modSelect.SetModSettingsWidth(1.0f));
             AddStep("select cm2", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
-            AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
+            AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.State.Value == Visibility.Visible);
             AddStep("hover over mod behind settings menu", () => InputManager.MoveMouseTo(modSelect.GetModButton(testCustomisableMod)));
             AddAssert("Mod is not considered hovered over", () => !modSelect.GetModButton(testCustomisableMod).IsHovered);
             AddStep("left click mod", () => InputManager.Click(MouseButton.Left));
@@ -153,7 +153,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestModSelectOverlay : ModSelectOverlay
         {
-            public new Container ModSettingsContainer => base.ModSettingsContainer;
+            public new VisibilityContainer ModSettingsContainer => base.ModSettingsContainer;
             public new TriangleButton CustomiseButton => base.CustomiseButton;
 
             public bool ButtonsLoaded => ModSectionsContainer.Children.All(c => c.ModIconsLoaded);
