@@ -193,6 +193,8 @@ namespace osu.Game.Overlays.Mf.Sections
             t.AddLink("从osu/rulesets目录读取自定义游戏模式 → pr8607[Merged]", "https://github.com/ppy/osu/pull/8607");
             t.NewParagraph();
             t.AddLink("Mvis播放器 → 基于EVAST9919/lazer-m-vis", "https://github.com/EVAST9919/lazer-m-vis");
+            t.NewParagraph();
+            t.AddLink("osu!CursorDance → TechnoJo4/osu", "https://github.com/TechnoJo4/osu");
 
             return t;
         }

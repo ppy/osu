@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
@@ -40,12 +41,66 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "光标轨迹",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
+                new SettingsSlider<float, FramerateSlider>
+                {
+                    LabelText = "Autoplay framerate",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.ReplayFramerate),
+                    KeyboardStep = 30f
+                },
+                new SettingsEnumDropdown<OsuDanceMover>
+                {
+                    LabelText = "Dance mover",
+                    Current = config.GetBindable<OsuDanceMover>(OsuRulesetSetting.DanceMover)
+                },
+                new SettingsSlider<float, AngleSlider>
+                {
+                    LabelText = "Angle Offset",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.AngleOffset),
+                    KeyboardStep = 1f / 18f
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "Jump Multiplier",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.JumpMulti),
+                    KeyboardStep = 1f / 12f
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "Next Jump Multiplier",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.NextJumpMulti),
+                    KeyboardStep = 1f / 12f
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Skip Stack Angles",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.SkipStackAngles)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Bounce off borders",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.BorderBounce)
+                },
                 new SettingsEnumDropdown<PlayfieldBorderStyle>
                 {
                     LabelText = "游玩区域边框风格",
                     Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
             };
+        }
+
+        private class MultiplierSlider : OsuSliderBar<float>
+        {
+            public override string TooltipText => Current.Value.ToString("N3") + "x";
+        }
+
+        private class AngleSlider : OsuSliderBar<float>
+        {
+            public override string TooltipText => (Current.Value * 180).ToString("N2") + "deg";
+        }
+
+        private class FramerateSlider : OsuSliderBar<float>
+        {
+            public override string TooltipText => Current.Value.ToString("N0") + "fps";
         }
     }
 }
