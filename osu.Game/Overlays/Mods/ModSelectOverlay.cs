@@ -237,7 +237,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 Width = 180,
                                                 Text = "Customisation",
-                                                Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
+                                                Action = () => ModSettingsContainer.ToggleVisibility(),
                                                 Enabled = { Value = false },
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
@@ -430,7 +430,7 @@ namespace osu.Game.Overlays.Mods
 
                 DeselectTypes(selectedMod.IncompatibleMods, true);
 
-                if (selectedMod.RequiresConfiguration) ModSettingsContainer.Alpha = 1;
+                if (selectedMod.RequiresConfiguration) ModSettingsContainer.Show();
             }
             else
             {

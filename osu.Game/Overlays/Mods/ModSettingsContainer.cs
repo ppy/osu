@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSettingsContainer : Container
+    public class ModSettingsContainer : VisibilityContainer
     {
         public readonly IBindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -26,6 +26,8 @@ namespace osu.Game.Overlays.Mods
         private readonly Bindable<bool> hasSettingsForSelection = new Bindable<bool>();
 
         private readonly FillFlowContainer<ModControlSection> modSettingsContent;
+
+        private const double transition_duration = 200;
 
         public ModSettingsContainer()
         {
@@ -80,5 +82,15 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
         protected override bool OnHover(HoverEvent e) => true;
+
+        protected override void PopIn()
+        {
+            this.FadeIn(transition_duration, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut(transition_duration, Easing.OutQuint);
+        }
     }
 }
