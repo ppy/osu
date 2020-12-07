@@ -34,18 +34,16 @@ namespace osu.Game.Tournament.IO
             else
                 Migrate(UnderlyingStorage.GetStorageForDirectory(default_tournament));
 
-            CurrentTournament = new Bindable<string>(storageConfig.Get<string>(StorageConfig.CurrentTournament));
+            CurrentTournament = storageConfig.GetBindable<string>(StorageConfig.CurrentTournament);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
 
-            CurrentTournament.BindValueChanged(updateTournament, false);
+            CurrentTournament.BindValueChanged(updateTournament);
         }
 
         private void updateTournament(ValueChangedEvent<string> newTournament)
         {
             ChangeTargetStorage(allTournaments.GetStorageForDirectory(newTournament.NewValue));
             Logger.Log("Changing tournament storage: " + GetFullPath(string.Empty));
-            storageConfig.Set(StorageConfig.CurrentTournament, newTournament.NewValue);
-            storageConfig.Save();
         }
 
         public IEnumerable<string> ListTournaments() => allTournaments.GetDirectories(string.Empty);
