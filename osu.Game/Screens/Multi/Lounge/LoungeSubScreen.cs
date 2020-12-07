@@ -48,7 +48,6 @@ namespace osu.Game.Screens.Multi.Lounge
 
             InternalChildren = new Drawable[]
             {
-                Filter = new FilterControl { Depth = -1 },
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -78,6 +77,11 @@ namespace osu.Game.Screens.Multi.Lounge
                             Width = 0.45f,
                         },
                     },
+                },
+                Filter = new TimeshiftFilterControl
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 80,
                 },
             };
 
