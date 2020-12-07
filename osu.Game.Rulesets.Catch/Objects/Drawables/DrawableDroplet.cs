@@ -28,10 +28,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             ScaleContainer.Child = new SkinnableDrawable(
                 new CatchSkinComponent(CatchSkinComponents.Droplet),
-                _ => new DropletPiece
-                {
-                    HyperDash = { BindTarget = HyperDash },
-                });
+                _ => new DropletPiece());
         }
 
         protected override void UpdateInitialTransforms()
