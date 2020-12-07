@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
@@ -127,7 +128,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                         // zip files differ because different compression or encoder.
                         Assert.AreNotEqual(hashBefore, hashFile(temp));
 
-                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -184,7 +185,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
                         }
 
-                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -235,7 +236,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
                         }
 
-                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -351,7 +352,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     // this will trigger purging of the existing beatmap (online set id match) but should rollback due to broken osu.
                     try
                     {
-                        await manager.Import(breakTemp);
+                        await manager.Import(new ImportTask(breakTemp));
                     }
                     catch
                     {
@@ -614,7 +615,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
                         }
 
-                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -667,7 +668,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                             zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
                         }
 
-                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
 
                         ensureLoaded(osu);
 
@@ -821,7 +822,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var manager = osu.Dependencies.Get<BeatmapManager>();
 
-            var importedSet = await manager.Import(temp);
+            var importedSet = await manager.Import(new ImportTask(temp));
 
             ensureLoaded(osu);
 
