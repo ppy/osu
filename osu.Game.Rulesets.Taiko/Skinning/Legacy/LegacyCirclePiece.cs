@@ -12,7 +12,7 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Taiko.Skinning
+namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
     {

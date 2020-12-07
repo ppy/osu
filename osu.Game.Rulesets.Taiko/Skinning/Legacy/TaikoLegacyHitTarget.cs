@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Rulesets.Taiko.Skinning
+namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class TaikoLegacyHitTarget : CompositeDrawable
     {

@@ -5,15 +5,15 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Backgrounds;
-using osuTK.Graphics;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
     /// <summary>
     /// A circle piece which is used uniformly through osu!taiko to visualise hitobjects.

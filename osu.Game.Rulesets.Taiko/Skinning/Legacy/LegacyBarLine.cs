@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Rulesets.Taiko.Skinning
+namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class LegacyBarLine : Sprite
     {

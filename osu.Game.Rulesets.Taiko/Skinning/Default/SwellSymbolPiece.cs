@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osuTK;
 
-namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
     public class SwellCirclePiece : CirclePiece
     {

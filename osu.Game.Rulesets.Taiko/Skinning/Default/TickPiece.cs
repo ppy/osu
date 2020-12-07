@@ -3,11 +3,11 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
 
-namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
     public class TickPiece : CompositeDrawable
     {
