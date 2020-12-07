@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 
-namespace osu.Game.Rulesets.Mania.Skinning
+namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class HitTargetInsetContainer : Container
     {

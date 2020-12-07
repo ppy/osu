@@ -12,7 +12,7 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Mania.Skinning
+namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class LegacyColumnBackground : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
