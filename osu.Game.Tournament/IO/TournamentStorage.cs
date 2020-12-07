@@ -29,10 +29,10 @@ namespace osu.Game.Tournament.IO
 
             if (storage.Exists("tournament.ini"))
             {
-                ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(storageConfig.Get<string>(StorageConfig.CurrentTournament)));
+                ChangeTargetStorage(allTournaments.GetStorageForDirectory(storageConfig.Get<string>(StorageConfig.CurrentTournament)));
             }
             else
-                Migrate(UnderlyingStorage.GetStorageForDirectory(default_tournament));
+                Migrate(allTournaments.GetStorageForDirectory(default_tournament));
 
             CurrentTournament = storageConfig.GetBindable<string>(StorageConfig.CurrentTournament);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
