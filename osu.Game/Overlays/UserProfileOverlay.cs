@@ -134,6 +134,11 @@ namespace osu.Game.Overlays
         {
             Header.User.Value = user;
 
+            SpectateSection spectateSection = new SpectateSection();
+            spectateSection.User.Value = user;
+            sectionsContainer.Add(spectateSection);
+            tabs.AddItem(spectateSection);
+
             if (user.ProfileOrder != null)
             {
                 foreach (string id in user.ProfileOrder)
