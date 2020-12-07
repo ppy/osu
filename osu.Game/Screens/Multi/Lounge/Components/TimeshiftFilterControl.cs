@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Overlays.SearchableList;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
