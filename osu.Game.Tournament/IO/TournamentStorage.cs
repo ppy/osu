@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IO;
 using System.IO;
+using System.Collections.Generic;
 using osu.Game.Tournament.Configuration;
 
 namespace osu.Game.Tournament.IO
@@ -13,12 +15,15 @@ namespace osu.Game.Tournament.IO
     {
         private const string default_tournament = "default";
         private readonly Storage storage;
+        private readonly Storage allTournaments;
         private readonly TournamentStorageManager storageConfig;
+        public readonly Bindable<string> CurrentTournament;
 
         public TournamentStorage(Storage storage)
             : base(storage.GetStorageForDirectory("tournaments"), string.Empty)
         {
             this.storage = storage;
+            allTournaments = UnderlyingStorage;
 
             storageConfig = new TournamentStorageManager(storage);
 
@@ -29,8 +34,21 @@ namespace osu.Game.Tournament.IO
             else
                 Migrate(UnderlyingStorage.GetStorageForDirectory(default_tournament));
 
+            CurrentTournament = new Bindable<string>(storageConfig.Get<string>(StorageConfig.CurrentTournament));
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
+
+            CurrentTournament.BindValueChanged(updateTournament, false);
         }
+
+        private void updateTournament(ValueChangedEvent<string> newTournament)
+        {
+            ChangeTargetStorage(allTournaments.GetStorageForDirectory(newTournament.NewValue));
+            Logger.Log("Changing tournament storage: " + GetFullPath(string.Empty));
+            storageConfig.Set(StorageConfig.CurrentTournament, newTournament.NewValue);
+            storageConfig.Save();
+        }
+
+        public IEnumerable<string> ListTournaments() => allTournaments.GetDirectories(string.Empty);
 
         public override void Migrate(Storage newStorage)
         {

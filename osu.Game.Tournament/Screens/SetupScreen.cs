@@ -9,8 +9,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Tournament.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -39,6 +41,9 @@ namespace osu.Game.Tournament.Screens
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
@@ -70,6 +75,7 @@ namespace osu.Game.Tournament.Screens
         private void reload()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
+            var tourneyStorage = storage as TournamentStorage;
             fillFlow.Children = new Drawable[]
             {
                 new ActionableInfo
@@ -110,6 +116,13 @@ namespace osu.Game.Tournament.Screens
                     Description = "Decides what stats are displayed and which ranks are retrieved for players.",
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
+                },
+                new LabelledDropdown<string>
+                {
+                    Label = "Current tournament",
+                    Description = "Changes the background videos and bracket to match the selected tournament. This requires a restart after selecting to apply changes.",
+                    Items = tourneyStorage?.ListTournaments(),
+                    Current = tourneyStorage?.CurrentTournament,
                 },
                 resolution = new ResolutionSelector
                 {
