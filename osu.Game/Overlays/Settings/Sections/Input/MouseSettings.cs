@@ -33,9 +33,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             configSensitivity.BindValueChanged(val => sensitivityBindable.Value = val.NewValue);
             sensitivityBindable.BindValueChanged(val => configSensitivity.Value = val.NewValue);
 
-            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
-            windowMode.BindValueChanged(mode => confineMouseModeSetting.Alpha = mode.NewValue == WindowMode.Fullscreen ? 0 : 1);
-
             Children = new Drawable[]
             {
                 new SettingsCheckbox
@@ -69,6 +66,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
+
+            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            windowMode.BindValueChanged(mode => confineMouseModeSetting.Alpha = mode.NewValue == WindowMode.Fullscreen ? 0 : 1, true);
 
             if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
             {
