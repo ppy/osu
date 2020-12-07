@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
-namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
     public class ElongatedCirclePiece : CirclePiece
     {

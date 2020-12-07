@@ -9,7 +9,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
     public class RimHitCirclePiece : CirclePiece
     {

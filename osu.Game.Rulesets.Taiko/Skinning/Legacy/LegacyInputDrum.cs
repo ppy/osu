@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Taiko.Audio;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Rulesets.Taiko.Skinning
+namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     /// <summary>
     /// A component of the playfield that captures input and displays input as a drum.

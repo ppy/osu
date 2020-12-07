@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Taiko.Skinning
+namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class LegacyHitExplosion : CompositeDrawable
     {
