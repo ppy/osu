@@ -6,7 +6,7 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Skinning;
+using osu.Game.Rulesets.Taiko.Skinning.Legacy;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Skinning

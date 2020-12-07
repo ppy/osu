@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSettingsContainer : Container
+    public class ModSettingsContainer : VisibilityContainer
     {
         public readonly IBindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -27,26 +27,40 @@ namespace osu.Game.Overlays.Mods
 
         private readonly FillFlowContainer<ModControlSection> modSettingsContent;
 
+        private readonly Container content;
+
+        private const double transition_duration = 400;
+
         public ModSettingsContainer()
         {
-            Children = new Drawable[]
+            RelativeSizeAxes = Axes.Both;
+
+            Child = content = new Container
             {
-                new Box
+                Masking = true,
+                CornerRadius = 10,
+                RelativeSizeAxes = Axes.Both,
+                RelativePositionAxes = Axes.Both,
+                X = 1,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0, 0, 0, 192)
-                },
-                new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = modSettingsContent = new FillFlowContainer<ModControlSection>
+                    new Box
                     {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 10f),
-                        Padding = new MarginPadding(20),
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = new Color4(0, 0, 0, 192)
+                    },
+                    new OsuScrollContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Child = modSettingsContent = new FillFlowContainer<ModControlSection>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 10f),
+                            Padding = new MarginPadding(20),
+                        }
                     }
                 }
             };
@@ -80,5 +94,17 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
         protected override bool OnHover(HoverEvent e) => true;
+
+        protected override void PopIn()
+        {
+            this.FadeIn(transition_duration, Easing.OutQuint);
+            content.MoveToX(0, transition_duration, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut(transition_duration, Easing.OutQuint);
+            content.MoveToX(1, transition_duration, Easing.OutQuint);
+        }
     }
 }
