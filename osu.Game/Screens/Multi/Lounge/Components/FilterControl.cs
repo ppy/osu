@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private readonly SearchTextBox search;
         private readonly PageTabControl<RoomStatusFilter> tabs;
 
-        public FilterControl()
+        protected FilterControl()
         {
             InternalChildren = new Drawable[]
             {
