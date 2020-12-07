@@ -42,16 +42,14 @@ namespace osu.Game.Tournament.Screens
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        [Resolved]
-        private Storage storage { get; set; }
-
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 
         private Bindable<Size> windowSize;
+        private TournamentStorage storage;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig)
+        private void load(FrameworkConfigManager frameworkConfig, Storage storage)
         {
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
 
@@ -66,6 +64,7 @@ namespace osu.Game.Tournament.Screens
 
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
             stableInfo.OnStableInfoSaved += () => Schedule(reload);
+            this.storage = (TournamentStorage)storage;
             reload();
         }
 
@@ -75,7 +74,6 @@ namespace osu.Game.Tournament.Screens
         private void reload()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
-            var tourneyStorage = storage as TournamentStorage;
             fillFlow.Children = new Drawable[]
             {
                 new ActionableInfo
@@ -121,8 +119,8 @@ namespace osu.Game.Tournament.Screens
                 {
                     Label = "Current tournament",
                     Description = "Changes the background videos and bracket to match the selected tournament. This requires a restart to apply changes.",
-                    Items = tourneyStorage?.ListTournaments(),
-                    Current = tourneyStorage?.CurrentTournament,
+                    Items = storage.ListTournaments(),
+                    Current = storage.CurrentTournament,
                 },
                 resolution = new ResolutionSelector
                 {
