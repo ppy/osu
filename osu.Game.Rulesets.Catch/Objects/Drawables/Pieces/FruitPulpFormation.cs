@@ -52,11 +52,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
                     Add(PositionAt(180, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
                     Add(PositionAt(270, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
                     break;
-
-                case FruitVisualRepresentation.Banana:
-                    Add(new Vector2(0, -0.3f), new Vector2(SMALL_PULP));
-                    Add(new Vector2(0, 0.05f), new Vector2(LARGE_PULP_4 * 0.8f, LARGE_PULP_4 * 2.5f));
-                    break;
             }
         }
     }

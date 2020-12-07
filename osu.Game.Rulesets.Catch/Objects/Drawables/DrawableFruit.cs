@@ -14,8 +14,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     {
         public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
 
-        protected virtual FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => (FruitVisualRepresentation)(indexInBeatmap % 4);
-
         public DrawableFruit()
             : this(null)
         {
@@ -31,11 +29,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             IndexInBeatmap.BindValueChanged(change =>
             {
-                VisualRepresentation.Value = GetVisualRepresentation(change.NewValue);
+                VisualRepresentation.Value = (FruitVisualRepresentation)(change.NewValue % 4);
             }, true);
 
             ScaleContainer.Child = new SkinnableDrawable(
-                new CatchSkinComponent(this is DrawableBanana ? CatchSkinComponents.Banana : CatchSkinComponents.Fruit),
+                new CatchSkinComponent(CatchSkinComponents.Fruit),
                 _ => new FruitPiece());
         }
 
@@ -53,6 +51,5 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         Grape,
         Pineapple,
         Raspberry,
-        Banana // banananananannaanana
     }
 }
