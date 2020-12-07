@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class Banana : Fruit, IHasComboInformation
+    public class Banana : PalpableCatchHitObject, IHasComboInformation
     {
         /// <summary>
         /// Index of banana in current shower.
