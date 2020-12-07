@@ -120,7 +120,7 @@ namespace osu.Game.Tournament.Screens
                 new LabelledDropdown<string>
                 {
                     Label = "Current tournament",
-                    Description = "Changes the background videos and bracket to match the selected tournament. This requires a restart after selecting to apply changes.",
+                    Description = "Changes the background videos and bracket to match the selected tournament. This requires a restart to apply changes.",
                     Items = tourneyStorage?.ListTournaments(),
                     Current = tourneyStorage?.CurrentTournament,
                 },
