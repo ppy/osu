@@ -15,5 +15,17 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// </summary>
         /// <param name="state">The state of the room.</param>
         Task RoomStateChanged(MultiplayerRoomState state);
+
+        /// <summary>
+        /// Signals that a user has joined the room.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        Task UserJoined(MultiplayerRoomUser user);
+
+        /// <summary>
+        /// Signals that a user has left the room.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        Task UserLeft(MultiplayerRoomUser user);
     }
 }
