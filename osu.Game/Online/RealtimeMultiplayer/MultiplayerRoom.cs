@@ -26,16 +26,25 @@ namespace osu.Game.Online.RealtimeMultiplayer
             }
         }
 
-        public void Join(int user)
+        public MultiplayerRoomUser Join(int userId)
         {
-            lock (writeLock)
-                users.Add(new MultiplayerRoomUser(user));
+            var user = new MultiplayerRoomUser(userId);
+            lock (writeLock) users.Add(user);
+            return user;
         }
 
-        public void Leave(int user)
+        public MultiplayerRoomUser Leave(int userId)
         {
             lock (writeLock)
-                users.RemoveAll(u => u.UserID == user);
+            {
+                var user = users.Find(u => u.UserID == userId);
+
+                if (user == null)
+                    return null;
+
+                users.Remove(user);
+                return user;
+            }
         }
     }
 }
