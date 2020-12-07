@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
         private readonly string[] lookupNames =
         {
-            "fruit-pear", "fruit-grapes", "fruit-apple", "fruit-orange", "fruit-bananas"
+            "fruit-pear", "fruit-grapes", "fruit-apple", "fruit-orange"
         };
 
         protected override void LoadComplete()

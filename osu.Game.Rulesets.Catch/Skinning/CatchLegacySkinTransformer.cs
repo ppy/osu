@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
                 case CatchSkinComponents.Banana:
                     if (GetTexture("fruit-bananas") != null)
-                        return new LegacyFruitPiece();
+                        return new LegacyBananaPiece();
 
                     break;
 
