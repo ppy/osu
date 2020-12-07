@@ -1,17 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using JetBrains.Annotations;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
-    internal class FruitPiece : CompositeDrawable
+    internal class FruitPiece : CatchHitObjectPiece
     {
         /// <summary>
         /// Because we're adding a border around the fruit, we need to scale down some.
@@ -19,38 +14,36 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
         public const float RADIUS_ADJUST = 1.1f;
 
         public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
-        public readonly Bindable<bool> HyperDash = new Bindable<bool>();
-
-        [CanBeNull]
-        private DrawableCatchHitObject drawableHitObject;
-
-        [CanBeNull]
-        private BorderPiece borderPiece;
 
         public FruitPiece()
         {
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load([CanBeNull] DrawableHitObject drawable)
+        protected override void LoadComplete()
         {
-            drawableHitObject = (DrawableCatchHitObject)drawable;
+            base.LoadComplete();
+
+            if (DrawableHitObject != null)
+            {
+                var fruit = (DrawableFruit)DrawableHitObject;
+                VisualRepresentation.BindTo(fruit.VisualRepresentation);
+            }
+
+            VisualRepresentation.BindValueChanged(_ => recreateChildren(), true);
+        }
+
+        private void recreateChildren()
+        {
+            ClearInternal();
 
             AddInternal(getFruitFor(VisualRepresentation.Value));
 
-            // if it is not part of a DHO, the border is always invisible.
-            if (drawableHitObject != null)
-                AddInternal(borderPiece = new BorderPiece());
+            if (DrawableHitObject != null)
+                AddInternal(BorderPiece = new BorderPiece());
 
             if (HyperDash.Value)
-                AddInternal(new HyperBorderPiece());
-        }
-
-        protected override void Update()
-        {
-            if (borderPiece != null && drawableHitObject?.HitObject != null)
-                borderPiece.Alpha = (float)Math.Clamp((drawableHitObject.HitObject.StartTime - Time.Current) / 500, 0, 1);
+                AddInternal(HyperBorderPiece = new HyperBorderPiece());
         }
 
         private Drawable getFruitFor(FruitVisualRepresentation representation)
@@ -65,9 +58,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 
                 case FruitVisualRepresentation.Pineapple:
                     return new PineapplePiece();
-
-                case FruitVisualRepresentation.Banana:
-                    return new BananaPiece();
 
                 case FruitVisualRepresentation.Raspberry:
                     return new RaspberryPiece();

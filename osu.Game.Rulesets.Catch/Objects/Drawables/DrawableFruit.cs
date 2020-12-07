@@ -36,11 +36,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             ScaleContainer.Child = new SkinnableDrawable(
                 new CatchSkinComponent(this is DrawableBanana ? CatchSkinComponents.Banana : CatchSkinComponents.Fruit),
-                _ => new FruitPiece
-                {
-                    VisualRepresentation = { BindTarget = VisualRepresentation },
-                    HyperDash = { BindTarget = HyperDash },
-                });
+                _ => new FruitPiece());
         }
 
         protected override void UpdateInitialTransforms()
