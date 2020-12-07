@@ -3,10 +3,11 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Catch.Objects;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
     public class BorderPiece : Circle
     {
