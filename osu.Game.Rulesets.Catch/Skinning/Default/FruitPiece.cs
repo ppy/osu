@@ -7,9 +7,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
     internal class FruitPiece : CompositeDrawable
     {

@@ -9,7 +9,7 @@ using osuTK;
 using osuTK.Graphics;
 using static osu.Game.Skinning.LegacySkinConfiguration;
 
-namespace osu.Game.Rulesets.Catch.Skinning
+namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public class CatchLegacySkinTransformer : LegacySkinTransformer
     {

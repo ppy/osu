@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osuTK;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
     public class GrapePiece : PulpFormation
     {
