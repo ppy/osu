@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected override void OnFocus(FocusEvent e)
         {
-            Filter.Search.TakeFocus();
+            Filter.TakeFocus();
         }
 
         public override void OnEntering(IScreen last)
@@ -136,19 +136,19 @@ namespace osu.Game.Screens.Multi.Lounge
 
         private void onReturning()
         {
-            Filter.Search.HoldFocus = true;
+            Filter.HoldFocus = true;
         }
 
         public override bool OnExiting(IScreen next)
         {
-            Filter.Search.HoldFocus = false;
+            Filter.HoldFocus = false;
             return base.OnExiting(next);
         }
 
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
-            Filter.Search.HoldFocus = false;
+            Filter.HoldFocus = false;
         }
 
         private void joinRequested(Room room)
