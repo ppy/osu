@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Rulesets.Osu.Skinning
+namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class OsuLegacySkinTransformer : LegacySkinTransformer
     {
