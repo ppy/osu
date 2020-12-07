@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             };
 
             windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
-            windowMode.BindValueChanged(mode => confineMouseModeSetting.Alpha = mode.NewValue == WindowMode.Fullscreen ? 0 : 1);
+            windowMode.BindValueChanged(mode => confineMouseModeSetting.Alpha = mode.NewValue == WindowMode.Fullscreen ? 0 : 1, true);
 
             if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
             {
