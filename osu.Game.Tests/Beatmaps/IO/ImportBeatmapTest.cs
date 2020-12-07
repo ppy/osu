@@ -70,6 +70,42 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public async Task TestImportThenDeleteFromStream()
+        {
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var tempPath = TestResources.GetTestBeatmapForImport();
+
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    BeatmapSetInfo importedSet;
+
+                    using (var stream = File.OpenRead(tempPath))
+                    {
+                        importedSet = await manager.Import(new ImportTask(stream, Path.GetFileName(tempPath)));
+                        ensureLoaded(osu);
+                    }
+
+                    Assert.IsTrue(File.Exists(tempPath), "Stream source file somehow went missing");
+                    File.Delete(tempPath);
+
+                    var imported = manager.GetAllUsableBeatmapSets().Find(beatmapSet => beatmapSet.ID == importedSet.ID);
+
+                    deleteBeatmapSet(imported, osu);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
         public async Task TestImportThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
