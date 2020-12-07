@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -70,22 +69,5 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 Ruleset = ruleset.Value
             };
         }
-    }
-
-    public enum RoomStatusFilter
-    {
-        Open,
-
-        [Description("Recently Ended")]
-        Ended,
-        Participated,
-        Owned,
-    }
-
-    public enum RoomCategoryFilter
-    {
-        Any,
-        Normal,
-        Spotlight
     }
 }
