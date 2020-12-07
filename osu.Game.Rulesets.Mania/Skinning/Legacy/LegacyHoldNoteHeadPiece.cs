@@ -4,7 +4,7 @@
 using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
 
-namespace osu.Game.Rulesets.Mania.Skinning
+namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class LegacyHoldNoteHeadPiece : LegacyNotePiece
     {

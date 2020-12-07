@@ -5,16 +5,17 @@ using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Layout;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
+using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Mania.Skinning.Default
 {
     /// <summary>
     /// Represents length-wise portion of a hold note.

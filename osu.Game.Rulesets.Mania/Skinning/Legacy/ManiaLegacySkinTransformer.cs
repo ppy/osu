@@ -2,19 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Graphics;
-using osu.Framework.Bindables;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Skinning;
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
-namespace osu.Game.Rulesets.Mania.Skinning
+namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class ManiaLegacySkinTransformer : LegacySkinTransformer
     {

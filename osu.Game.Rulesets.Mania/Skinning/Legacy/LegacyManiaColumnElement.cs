@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Skinning;
 
-namespace osu.Game.Rulesets.Mania.Skinning
+namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     /// <summary>
     /// A <see cref="CompositeDrawable"/> which is placed somewhere within a <see cref="Column"/>.
