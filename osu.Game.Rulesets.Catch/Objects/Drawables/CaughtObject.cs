@@ -12,6 +12,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
+    /// <summary>
+    /// Represents a <see cref="PalpableCatchHitObject"/> caught by the catcher.
+    /// </summary>
     [Cached(typeof(IHasCatchObjectState))]
     public abstract class CaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
