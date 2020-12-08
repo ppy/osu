@@ -9,7 +9,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableBanana : DrawablePalpableCatchHitObject
+    public class DrawableBanana : DrawablePalpableHasCatchHitObject
     {
         public DrawableBanana()
             : this(null)

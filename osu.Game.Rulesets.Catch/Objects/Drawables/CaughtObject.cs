@@ -12,12 +12,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    [Cached(typeof(CaughtObject))]
-    public abstract class CaughtObject : SkinnableDrawable
+    [Cached(typeof(IHasCatchObjectState))]
+    public abstract class CaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
-        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
-
         public CatchHitObject HitObject { get; private set; }
+        public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
+        public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
 
         /// <summary>
         /// Whether this hit object should stay on the catcher plate when the object is caught by the catcher.
@@ -36,30 +36,31 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
         }
 
-        public virtual void CopyFrom(DrawablePalpableCatchHitObject drawableObject)
+        public virtual void CopyFrom(IHasCatchObjectState objectState)
         {
-            HitObject = drawableObject.HitObject;
-            Scale = drawableObject.Scale / 2;
-            Rotation = drawableObject.Rotation;
-            AccentColour.Value = drawableObject.AccentColour.Value;
+            HitObject = objectState.HitObject;
+            Scale = objectState.Scale;
+            Rotation = objectState.Rotation;
+            AccentColour.Value = objectState.AccentColour.Value;
+            HyperDash.Value = objectState.HyperDash.Value;
         }
     }
 
-    public class CaughtFruit : CaughtObject
+    public class CaughtFruit : CaughtObject, IHasFruitState
     {
-        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
+        public Bindable<FruitVisualRepresentation> VisualRepresentation { get; } = new Bindable<FruitVisualRepresentation>();
 
         public CaughtFruit()
             : base(CatchSkinComponents.Fruit, _ => new FruitPiece())
         {
         }
 
-        public override void CopyFrom(DrawablePalpableCatchHitObject drawableObject)
+        public override void CopyFrom(IHasCatchObjectState objectState)
         {
-            base.CopyFrom(drawableObject);
+            base.CopyFrom(objectState);
 
-            var drawableFruit = (DrawableFruit)drawableObject;
-            VisualRepresentation.Value = drawableFruit.VisualRepresentation.Value;
+            var fruitState = (IHasFruitState)objectState;
+            VisualRepresentation.Value = fruitState.VisualRepresentation.Value;
         }
     }
 
