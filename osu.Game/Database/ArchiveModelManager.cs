@@ -192,7 +192,7 @@ namespace osu.Game.Database
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.
         /// </summary>
-        /// <param name="task">The archive location on disk.</param>
+        /// <param name="task">The <see cref="ImportTask"/> containing data about the <typeparamref name="TModel"/> to import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
         internal async Task<TModel> Import(ImportTask task, CancellationToken cancellationToken = default)
