@@ -23,6 +23,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// Transfer the host of the currently joined room to another user in the room.
         /// </summary>
         /// <param name="userId">The new user which is to become host.</param>
+        /// <exception cref="NotHostException">A user other than the current host is attempting to transfer host.</exception>
         Task TransferHost(long userId);
 
         /// <summary>
@@ -41,6 +42,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// <summary>
         /// As the host of a room, start the match.
         /// </summary>
+        /// <exception cref="NotHostException">A user other than the current host is attempting to start the game.</exception>
         Task StartMatch();
     }
 }
