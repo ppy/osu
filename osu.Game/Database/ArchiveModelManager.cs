@@ -21,9 +21,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
-using SharpCompress.Common;
 using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Database
@@ -114,10 +112,19 @@ namespace osu.Game.Database
 
             PostNotification?.Invoke(notification);
 
-            return Import(notification, paths);
+            return Import(notification, paths.Select(p => new ImportTask(p)).ToArray());
         }
 
-        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
+        public Task Import(Stream stream, string filename)
+        {
+            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
+
+            PostNotification?.Invoke(notification);
+
+            return Import(notification, new ImportTask(stream, filename));
+        }
+
+        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             notification.Progress = 0;
             notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
@@ -126,13 +133,13 @@ namespace osu.Game.Database
 
             var imported = new List<TModel>();
 
-            await Task.WhenAll(paths.Select(async path =>
+            await Task.WhenAll(tasks.Select(async task =>
             {
                 notification.CancellationToken.ThrowIfCancellationRequested();
 
                 try
                 {
-                    var model = await Import(path, notification.CancellationToken);
+                    var model = await Import(task, notification.CancellationToken);
 
                     lock (imported)
                     {
@@ -140,8 +147,8 @@ namespace osu.Game.Database
                             imported.Add(model);
                         current++;
 
-                        notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
-                        notification.Progress = (float)current / paths.Length;
+                        notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
+                        notification.Progress = (float)current / tasks.Length;
                     }
                 }
                 catch (TaskCanceledException)
@@ -150,7 +157,7 @@ namespace osu.Game.Database
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})", LoggingTarget.Database);
+                    Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
                 }
             }));
 
@@ -183,16 +190,17 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
+        /// Note that this bypasses the UI flow and should only be used for special cases or testing.
         /// </summary>
-        /// <param name="path">The archive location on disk.</param>
+        /// <param name="task">The <see cref="ImportTask"/> containing data about the <typeparamref name="TModel"/> to import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        public async Task<TModel> Import(string path, CancellationToken cancellationToken = default)
+        internal async Task<TModel> Import(ImportTask task, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             TModel import;
-            using (ArchiveReader reader = getReaderFrom(path))
+            using (ArchiveReader reader = task.GetReader())
                 import = await Import(reader, cancellationToken);
 
             // We may or may not want to delete the file depending on where it is stored.
@@ -201,12 +209,12 @@ namespace osu.Game.Database
             // TODO: Add a check to prevent files from storage to be deleted.
             try
             {
-                if (import != null && File.Exists(path) && ShouldDeleteArchive(path))
-                    File.Delete(path);
+                if (import != null && File.Exists(task.Path) && ShouldDeleteArchive(task.Path))
+                    File.Delete(task.Path);
             }
             catch (Exception e)
             {
-                LogForModel(import, $@"Could not delete original file after import ({Path.GetFileName(path)})", e);
+                LogForModel(import, $@"Could not delete original file after import ({task})", e);
             }
 
             return import;
@@ -726,23 +734,6 @@ namespace osu.Game.Database
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
         protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
-
-        /// <summary>
-        /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
-        /// </summary>
-        /// <param name="path">A file or folder path resolving the archive content.</param>
-        /// <returns>A reader giving access to the archive's content.</returns>
-        private ArchiveReader getReaderFrom(string path)
-        {
-            if (ZipUtils.IsZipArchive(path))
-                return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), Path.GetFileName(path));
-            if (Directory.Exists(path))
-                return new LegacyDirectoryArchiveReader(path);
-            if (File.Exists(path))
-                return new LegacyFileArchiveReader(path);
-
-            throw new InvalidFormatException($"{path} is not a valid archive");
-        }
 
         #region Event handling / delaying
 
