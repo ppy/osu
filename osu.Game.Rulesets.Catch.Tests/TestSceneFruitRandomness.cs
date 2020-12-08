@@ -11,13 +11,13 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneFruitRandomness : OsuTestScene
     {
-        private readonly TestDrawableFruit drawableFruit;
-        private readonly TestDrawableBanana drawableBanana;
+        private readonly DrawableFruit drawableFruit;
+        private readonly DrawableBanana drawableBanana;
 
         public TestSceneFruitRandomness()
         {
-            drawableFruit = new TestDrawableFruit(new Fruit());
-            drawableBanana = new TestDrawableBanana(new Banana());
+            drawableFruit = new DrawableFruit(new Fruit());
+            drawableBanana = new DrawableBanana(new Banana());
 
             Add(new TestDrawableCatchHitObjectSpecimen(drawableFruit) { X = -200 });
             Add(new TestDrawableCatchHitObjectSpecimen(drawableBanana));
@@ -44,9 +44,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = initial_start_time;
 
-                fruitRotation = drawableFruit.InnerRotation;
-                bananaRotation = drawableBanana.InnerRotation;
-                bananaScale = drawableBanana.InnerScale;
+                fruitRotation = drawableFruit.Rotation;
+                bananaRotation = drawableBanana.Rotation;
+                bananaScale = drawableBanana.Scale.X;
                 bananaColour = drawableBanana.AccentColour.Value;
             });
 
@@ -55,9 +55,9 @@ namespace osu.Game.Rulesets.Catch.Tests
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = another_start_time;
             });
 
-            AddAssert("fruit rotation is changed", () => drawableFruit.InnerRotation != fruitRotation);
-            AddAssert("banana rotation is changed", () => drawableBanana.InnerRotation != bananaRotation);
-            AddAssert("banana scale is changed", () => drawableBanana.InnerScale != bananaScale);
+            AddAssert("fruit rotation is changed", () => drawableFruit.Rotation != fruitRotation);
+            AddAssert("banana rotation is changed", () => drawableBanana.Rotation != bananaRotation);
+            AddAssert("banana scale is changed", () => drawableBanana.Scale.X != bananaScale);
             AddAssert("banana colour is changed", () => drawableBanana.AccentColour.Value != bananaColour);
 
             AddStep("reset start time", () =>
@@ -66,31 +66,10 @@ namespace osu.Game.Rulesets.Catch.Tests
             });
 
             AddAssert("rotation and scale restored", () =>
-                drawableFruit.InnerRotation == fruitRotation &&
-                drawableBanana.InnerRotation == bananaRotation &&
-                drawableBanana.InnerScale == bananaScale &&
+                drawableFruit.Rotation == fruitRotation &&
+                drawableBanana.Rotation == bananaRotation &&
+                drawableBanana.Scale.X == bananaScale &&
                 drawableBanana.AccentColour.Value == bananaColour);
-        }
-
-        private class TestDrawableFruit : DrawableFruit
-        {
-            public float InnerRotation => ScaleContainer.Rotation;
-
-            public TestDrawableFruit(Fruit h)
-                : base(h)
-            {
-            }
-        }
-
-        private class TestDrawableBanana : DrawableBanana
-        {
-            public float InnerRotation => ScaleContainer.Rotation;
-            public float InnerScale => ScaleContainer.Scale.X;
-
-            public TestDrawableBanana(Banana h)
-                : base(h)
-            {
-            }
         }
     }
 }
