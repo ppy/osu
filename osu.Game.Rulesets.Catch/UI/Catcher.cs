@@ -14,6 +14,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
@@ -210,6 +211,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result)
         {
+            var catchResult = (CatchJudgementResult)result;
+            catchResult.CatcherAnimationState = CurrentState;
+
             if (!(drawableObject.HitObject is PalpableCatchHitObject hitObject)) return;
 
             if (result.IsHit)
@@ -238,6 +242,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnRevertResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
+            var catchResult = (CatchJudgementResult)result;
+            updateState(catchResult.CatcherAnimationState);
         }
 
         /// <summary>
