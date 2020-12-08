@@ -53,7 +53,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         Task LoadRequested();
 
         /// <summary>
-        /// Signals that a match has started. All loaded users' clients should now start gameplay as soon as possible.
+        /// Signals that a match has started. All user in the <see cref="MultiplayerUserState.Loaded"/> state should begin gameplay as soon as possible.
         /// </summary>
         Task MatchStarted();
 
