@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace osu.Game.Online.RealtimeMultiplayer
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// Perform an update on this room in a thread-safe manner.
         /// </summary>
         /// <param name="action">The action to perform.</param>
-        public void PerformUpdate(Action<MultiplayerRoom> action)
+        public void PerformUpdate([InstantHandle] Action<MultiplayerRoom> action)
         {
             lock (writeLock) action(this);
         }
