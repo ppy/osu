@@ -10,10 +10,24 @@ namespace osu.Game.Online.RealtimeMultiplayer
     /// </summary>
     public enum MultiplayerRoomState
     {
+        /// <summary>
+        /// The room is open and accepting new players.
+        /// </summary>
         Open,
+
+        /// <summary>
+        /// A game start has been triggered but players have not finished loading.
+        /// </summary>
         WaitingForLoad,
+
+        /// <summary>
+        /// A game is currently ongoing.
+        /// </summary>
         Playing,
-        WaitingForResults,
+
+        /// <summary>
+        /// The room has been disbanded and closed.
+        /// </summary>
         Closed
     }
 }
