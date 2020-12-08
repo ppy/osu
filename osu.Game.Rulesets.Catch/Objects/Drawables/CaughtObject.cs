@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     [Cached(typeof(IHasCatchObjectState))]
     public abstract class CaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
-        public CatchHitObject HitObject { get; private set; }
+        public PalpableCatchHitObject HitObject { get; private set; }
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
 
@@ -29,7 +29,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         protected CaughtObject(CatchSkinComponents skinComponent, Func<ISkinComponent, Drawable> defaultImplementation)
             : base(new CatchSkinComponent(skinComponent), defaultImplementation)
         {
-            Anchor = Anchor.TopCentre;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.None;
@@ -43,6 +42,17 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Rotation = objectState.Rotation;
             AccentColour.Value = objectState.AccentColour.Value;
             HyperDash.Value = objectState.HyperDash.Value;
+        }
+
+        protected override void FreeAfterUse()
+        {
+            ClearTransforms();
+
+            Alpha = 1;
+            LifetimeStart = double.MinValue;
+            LifetimeEnd = double.MaxValue;
+
+            base.FreeAfterUse();
         }
     }
 
