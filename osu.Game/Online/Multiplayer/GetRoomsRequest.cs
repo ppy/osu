@@ -11,24 +11,24 @@ namespace osu.Game.Online.Multiplayer
 {
     public class GetRoomsRequest : APIRequest<List<Room>>
     {
-        private readonly RoomStatusFilter statusFilter;
-        private readonly RoomCategoryFilter categoryFilter;
+        private readonly RoomStatusFilter status;
+        private readonly string category;
 
-        public GetRoomsRequest(RoomStatusFilter statusFilter, RoomCategoryFilter categoryFilter)
+        public GetRoomsRequest(RoomStatusFilter status, string category)
         {
-            this.statusFilter = statusFilter;
-            this.categoryFilter = categoryFilter;
+            this.status = status;
+            this.category = category;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
 
-            if (statusFilter != RoomStatusFilter.Open)
-                req.AddParameter("mode", statusFilter.ToString().Underscore().ToLowerInvariant());
+            if (status != RoomStatusFilter.Open)
+                req.AddParameter("mode", status.ToString().Underscore().ToLowerInvariant());
 
-            if (categoryFilter != RoomCategoryFilter.Any)
-                req.AddParameter("category", categoryFilter.ToString().Underscore().ToLowerInvariant());
+            if (!string.IsNullOrEmpty(category))
+                req.AddParameter("category", category);
 
             return req;
         }
