@@ -274,7 +274,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
 
             caughtFruitContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            droppedObjectTarget.RemoveAll(d => (d as DrawableCatchHitObject)?.HitObject == drawableObject.HitObject);
+            droppedObjectTarget.RemoveAll(d => (d as CaughtObject)?.HitObject == drawableObject.HitObject);
             hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
         }
 
