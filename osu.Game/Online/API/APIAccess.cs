@@ -270,7 +270,7 @@ namespace osu.Game.Online.API
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error occurred while handling an API request.");
+                Logger.Error(ex, "处理API请求时出现了问题。");
                 return false;
             }
         }
