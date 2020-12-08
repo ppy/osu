@@ -7,6 +7,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
+    /// <summary>
+    /// Provides a visual state of a <see cref="PalpableCatchHitObject"/>.
+    /// </summary>
     public interface IHasCatchObjectState
     {
         PalpableCatchHitObject HitObject { get; }
@@ -17,6 +20,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         Vector2 Scale { get; }
     }
 
+    /// <summary>
+    /// Provides a visual state of a <see cref="Fruit"/>.
+    /// </summary>
     public interface IHasFruitState : IHasCatchObjectState
     {
         Bindable<FruitVisualRepresentation> VisualRepresentation { get; }
