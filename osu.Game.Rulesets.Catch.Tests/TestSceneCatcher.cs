@@ -57,6 +57,24 @@ namespace osu.Game.Rulesets.Catch.Tests
         });
 
         [Test]
+        public void TestCatcherStateRevert()
+        {
+            DrawableCatchHitObject drawableObject = null;
+            JudgementResult result = null;
+            AddStep("catch kiai fruit", () =>
+            {
+                drawableObject = createDrawableObject(new TestKiaiFruit());
+                result = attemptCatch(drawableObject);
+            });
+            checkState(CatcherAnimationState.Kiai);
+            AddStep("revert result", () =>
+            {
+                catcher.OnRevertResult(drawableObject, result);
+            });
+            checkState(CatcherAnimationState.Idle);
+        }
+
+        [Test]
         public void TestCatcherCatchWidth()
         {
             var halfWidth = Catcher.CalculateCatchWidth(new BeatmapDifficulty { CircleSize = 0 }) / 2;
@@ -170,17 +188,19 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void attemptCatch(CatchHitObject hitObject, int count = 1)
         {
-            hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-
             for (var i = 0; i < count; i++)
+                attemptCatch(createDrawableObject(hitObject));
+        }
+
+        private JudgementResult attemptCatch(DrawableCatchHitObject drawableObject)
+        {
+            drawableObject.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            var result = new CatchJudgementResult(drawableObject.HitObject, drawableObject.HitObject.CreateJudgement())
             {
-                var drawableObject = createDrawableObject(hitObject);
-                var result = new JudgementResult(hitObject, new CatchJudgement())
-                {
-                    Type = catcher.CanCatch(hitObject) ? HitResult.Great : HitResult.Miss
-                };
-                catcher.OnNewResult(drawableObject, result);
-            }
+                Type = catcher.CanCatch(drawableObject.HitObject) ? HitResult.Great : HitResult.Miss
+            };
+            catcher.OnNewResult(drawableObject, result);
+            return result;
         }
 
         private DrawableCatchHitObject createDrawableObject(CatchHitObject hitObject)
