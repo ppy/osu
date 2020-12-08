@@ -15,6 +15,8 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         public MultiplayerRoomState State { get; set; }
 
+        public MultiplayerRoomSettings Settings { get; set; }
+
         private List<MultiplayerRoomUser> users = new List<MultiplayerRoomUser>();
 
         public IReadOnlyList<MultiplayerRoomUser> Users
