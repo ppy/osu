@@ -135,6 +135,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
+                                                                        LengthLimit = 100
                                                                     },
                                                                 },
                                                                 new Section("Duration")
