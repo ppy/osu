@@ -57,7 +57,36 @@ namespace osu.Game.Rulesets.Catch.Tests
         });
 
         [Test]
-        public void TestCatcherStateRevert()
+        public void TestCatcherHyperStateReverted()
+        {
+            DrawableCatchHitObject drawableObject1 = null;
+            DrawableCatchHitObject drawableObject2 = null;
+            JudgementResult result1 = null;
+            JudgementResult result2 = null;
+            AddStep("catch hyper fruit", () =>
+            {
+                drawableObject1 = createDrawableObject(new Fruit { HyperDashTarget = new Fruit { X = 100 } });
+                result1 = attemptCatch(drawableObject1);
+            });
+            AddStep("catch normal fruit", () =>
+            {
+                drawableObject2 = createDrawableObject(new Fruit());
+                result2 = attemptCatch(drawableObject2);
+            });
+            AddStep("revert second result", () =>
+            {
+                catcher.OnRevertResult(drawableObject2, result2);
+            });
+            checkHyperDash(true);
+            AddStep("revert first result", () =>
+            {
+                catcher.OnRevertResult(drawableObject1, result1);
+            });
+            checkHyperDash(false);
+        }
+
+        [Test]
+        public void TestCatcherAnimationStateReverted()
         {
             DrawableCatchHitObject drawableObject = null;
             JudgementResult result = null;
