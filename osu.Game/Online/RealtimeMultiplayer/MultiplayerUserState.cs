@@ -13,6 +13,10 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// <summary>
         /// The user has marked themselves as ready to participate and should be considered for the next game start.
         /// </summary>
+        /// <remarks>
+        /// Clients in this state will receive gameplay channel messages.
+        /// As a client the only thing to look for in this state is a <see cref="IMultiplayerClient.LoadRequested"/> call.
+        /// </remarks>
         Ready,
 
         /// <summary>

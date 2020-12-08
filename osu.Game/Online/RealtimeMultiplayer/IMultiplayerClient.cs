@@ -48,7 +48,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         Task UserStateChanged(long userId, MultiplayerUserState state);
 
         /// <summary>
-        /// Signals that a match is to be started. Users in the <see cref="MultiplayerUserState.Ready"/> state should begin loading gameplay at this point.
+        /// Signals that a match is to be started. This will *only* be sent to clients which are to begin loading at this point.
         /// </summary>
         Task LoadRequested();
 
