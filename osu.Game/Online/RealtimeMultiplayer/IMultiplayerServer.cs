@@ -30,5 +30,12 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// </summary>
         /// <param name="settings">The new settings to apply.</param>
         Task ChangeSettings(MultiplayerRoomSettings settings);
+
+        /// <summary>
+        /// Change the local user state in the currently joined room.
+        /// </summary>
+        /// <param name="newState">The proposed new state.</param>
+        /// <exception cref="InvalidStateChange">If the state change requested is not valid, given the previous state or room state.</exception>
+        Task ChangeState(MultiplayerUserState newState);
     }
 }

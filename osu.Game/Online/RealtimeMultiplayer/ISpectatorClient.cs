@@ -39,5 +39,12 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// </summary>
         /// <param name="newSettings">The updated room settings.</param>
         Task SettingsChanged(MultiplayerRoomSettings newSettings);
+
+        /// <summary>
+        /// Signals that a user in this room changed their state.
+        /// </summary>
+        /// <param name="userId">The ID of the user performing a state change.</param>
+        /// <param name="state">The new state of the user.</param>
+        Task UserStateChanged(long userId, MultiplayerUserState state);
     }
 }
