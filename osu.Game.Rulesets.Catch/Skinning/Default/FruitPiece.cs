@@ -16,6 +16,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
         public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
 
+        protected override BorderPiece BorderPiece { get; }
+        protected override HyperBorderPiece HyperBorderPiece { get; }
+
         public FruitPiece()
         {
             RelativeSizeAxes = Axes.Both;
