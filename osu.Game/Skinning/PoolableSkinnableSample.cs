@@ -102,7 +102,7 @@ namespace osu.Game.Skinning
             sampleContainer.Add(Sample = new DrawableSample(ch) { Looping = Looping });
 
             // Start playback internally for the new sample if the previous one was playing beforehand.
-            if (wasPlaying)
+            if (wasPlaying && Looping)
                 Play();
         }
 

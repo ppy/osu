@@ -1,24 +1,23 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
-using osu.Game.Overlays.SearchableList;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class FilterControl : SearchableListFilterControl<RoomStatusFilter, RoomCategoryFilter>
+    public abstract class FilterControl : CompositeDrawable
     {
-        protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
-        protected override RoomStatusFilter DefaultTab => RoomStatusFilter.Open;
-        protected override RoomCategoryFilter DefaultCategory => RoomCategoryFilter.Any;
-
-        protected override float ContentHorizontalPadding => base.ContentHorizontalPadding + OsuScreen.HORIZONTAL_OVERFLOW_PADDING;
+        protected const float VERTICAL_PADDING = 10;
+        protected const float HORIZONTAL_PADDING = 80;
 
         [Resolved(CanBeNull = true)]
         private Bindable<FilterCriteria> filter { get; set; }
@@ -26,66 +25,109 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        public FilterControl()
+        private readonly Box tabStrip;
+        private readonly SearchTextBox search;
+        private readonly PageTabControl<RoomStatusFilter> tabs;
+
+        protected FilterControl()
         {
-            DisplayStyleControl.Hide();
+            InternalChildren = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Alpha = 0.25f,
+                },
+                tabStrip = new Box
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 1,
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding
+                    {
+                        Top = VERTICAL_PADDING,
+                        Horizontal = HORIZONTAL_PADDING
+                    },
+                    Children = new Drawable[]
+                    {
+                        search = new FilterSearchTextBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                        },
+                        tabs = new PageTabControl<RoomStatusFilter>
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                        },
+                    }
+                }
+            };
+
+            tabs.Current.Value = RoomStatusFilter.Open;
+            tabs.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             filter ??= new Bindable<FilterCriteria>();
+            tabStrip.Colour = colours.Yellow;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ruleset.BindValueChanged(_ => updateFilter());
-            Search.Current.BindValueChanged(_ => scheduleUpdateFilter());
-            Dropdown.Current.BindValueChanged(_ => updateFilter());
-            Tabs.Current.BindValueChanged(_ => updateFilter(), true);
+            search.Current.BindValueChanged(_ => updateFilterDebounced());
+            ruleset.BindValueChanged(_ => UpdateFilter());
+            tabs.Current.BindValueChanged(_ => UpdateFilter(), true);
         }
 
         private ScheduledDelegate scheduledFilterUpdate;
 
-        private void scheduleUpdateFilter()
+        private void updateFilterDebounced()
         {
             scheduledFilterUpdate?.Cancel();
-            scheduledFilterUpdate = Scheduler.AddDelayed(updateFilter, 200);
+            scheduledFilterUpdate = Scheduler.AddDelayed(UpdateFilter, 200);
         }
 
-        private void updateFilter()
+        protected void UpdateFilter()
         {
             scheduledFilterUpdate?.Cancel();
 
-            if (filter == null)
-                return;
+            var criteria = CreateCriteria();
+            criteria.SearchString = search.Current.Value;
+            criteria.Status = tabs.Current.Value;
+            criteria.Ruleset = ruleset.Value;
 
-            filter.Value = new FilterCriteria
+            filter.Value = criteria;
+        }
+
+        protected virtual FilterCriteria CreateCriteria() => new FilterCriteria();
+
+        public bool HoldFocus
+        {
+            get => search.HoldFocus;
+            set => search.HoldFocus = value;
+        }
+
+        public void TakeFocus() => search.TakeFocus();
+
+        private class FilterSearchTextBox : SearchTextBox
+        {
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                SearchString = Search.Current.Value ?? string.Empty,
-                StatusFilter = Tabs.Current.Value,
-                RoomCategoryFilter = Dropdown.Current.Value,
-                Ruleset = ruleset.Value
-            };
+                BackgroundUnfocused = OsuColour.Gray(0.06f);
+                BackgroundFocused = OsuColour.Gray(0.12f);
+            }
         }
-    }
-
-    public enum RoomStatusFilter
-    {
-        Open,
-
-        [Description("Recently Ended")]
-        Ended,
-        Participated,
-        Owned,
-    }
-
-    public enum RoomCategoryFilter
-    {
-        Any,
-        Normal,
-        Spotlight
     }
 }
