@@ -2,14 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Overlays.SearchableList
+namespace osu.Game.Graphics.UserInterface
 {
     public class SlimEnumDropdown<T> : OsuEnumDropdown<T>
         where T : struct, Enum
