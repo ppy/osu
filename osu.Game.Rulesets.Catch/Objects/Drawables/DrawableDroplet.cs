@@ -11,8 +11,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableDroplet : DrawablePalpableCatchHitObject
     {
-        public override bool StaysOnPlate => false;
-
         public DrawableDroplet()
             : this(null)
         {

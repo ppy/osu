@@ -21,6 +21,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         [CanBeNull]
         protected DrawableHitObject DrawableHitObject { get; private set; }
 
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        protected CaughtObject CaughtObject { get; private set; }
+
         /// <summary>
         /// A part of this piece that will be faded out while falling in the playfield.
         /// </summary>
@@ -45,6 +49,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
                 HyperDash.BindTo(hitObject.HyperDash);
             }
 
+            if (CaughtObject != null)
+                AccentColour.BindTo(CaughtObject.AccentColour);
+
             HyperDash.BindValueChanged(hyper =>
             {
                 if (HyperBorderPiece != null)
@@ -54,8 +61,13 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
         protected override void Update()
         {
-            if (BorderPiece != null && DrawableHitObject?.HitObject != null)
-                BorderPiece.Alpha = (float)Math.Clamp((DrawableHitObject.HitObject.StartTime - Time.Current) / 500, 0, 1);
+            if (BorderPiece != null)
+            {
+                if (DrawableHitObject?.HitObject != null)
+                    BorderPiece.Alpha = (float)Math.Clamp((DrawableHitObject.HitObject.StartTime - Time.Current) / 500, 0, 1);
+                else
+                    BorderPiece.Alpha = 0;
+            }
         }
     }
 }

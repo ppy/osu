@@ -24,11 +24,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// </summary>
         protected virtual float ScaleFactor => 1;
 
-        /// <summary>
-        /// Whether this hit object should stay on the catcher plate when the object is caught by the catcher.
-        /// </summary>
-        public virtual bool StaysOnPlate => true;
-
         public float DisplayRadius => CatchHitObject.OBJECT_RADIUS * HitObject.Scale * ScaleFactor;
 
         protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
@@ -43,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             XBindable.BindValueChanged(x =>
             {
-                if (!IsOnPlate) X = x.NewValue;
+                X = x.NewValue;
             }, true);
 
             ScaleBindable.BindValueChanged(scale =>

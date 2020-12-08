@@ -19,6 +19,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             if (fruit != null)
                 VisualRepresentation.BindTo(fruit.VisualRepresentation);
 
+            var caughtFruit = (CaughtFruit)CaughtObject;
+            if (caughtFruit != null)
+                VisualRepresentation.BindTo(caughtFruit.VisualRepresentation);
+
             VisualRepresentation.BindValueChanged(visual => setTexture(visual.NewValue), true);
         }
 

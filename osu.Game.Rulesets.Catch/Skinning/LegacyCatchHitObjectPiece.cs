@@ -33,6 +33,10 @@ namespace osu.Game.Rulesets.Catch.Skinning
         [CanBeNull]
         protected DrawableHitObject DrawableHitObject { get; private set; }
 
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        protected CaughtObject CaughtObject { get; private set; }
+
         protected LegacyCatchHitObjectPiece()
         {
             RelativeSizeAxes = Axes.Both;
@@ -72,6 +76,9 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 AccentColour.BindTo(hitObject.AccentColour);
                 HyperDash.BindTo(hitObject.HyperDash);
             }
+
+            if (CaughtObject != null)
+                AccentColour.BindTo(CaughtObject.AccentColour);
 
             hyperSprite.Colour = Skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value ??
                                  Skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
