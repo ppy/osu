@@ -213,6 +213,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             var catchResult = (CatchJudgementResult)result;
             catchResult.CatcherAnimationState = CurrentState;
+            catchResult.CatcherHyperDash = HyperDashing;
 
             if (!(drawableObject.HitObject is PalpableCatchHitObject hitObject)) return;
 
@@ -243,7 +244,17 @@ namespace osu.Game.Rulesets.Catch.UI
         public void OnRevertResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
             var catchResult = (CatchJudgementResult)result;
-            updateState(catchResult.CatcherAnimationState);
+
+            if (CurrentState != catchResult.CatcherAnimationState)
+                updateState(catchResult.CatcherAnimationState);
+
+            if (HyperDashing != catchResult.CatcherHyperDash)
+            {
+                if (catchResult.CatcherHyperDash)
+                    SetHyperDashState(2);
+                else
+                    SetHyperDashState();
+            }
         }
 
         /// <summary>

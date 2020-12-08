@@ -15,6 +15,11 @@ namespace osu.Game.Rulesets.Catch.Judgements
         /// </summary>
         public CatcherAnimationState CatcherAnimationState;
 
+        /// <summary>
+        /// Whether the catcher was hyper dashing prior to this judgement.
+        /// </summary>
+        public bool CatcherHyperDash;
+
         public CatchJudgementResult([NotNull] HitObject hitObject, [NotNull] Judgement judgement)
             : base(hitObject, judgement)
         {
