@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 
@@ -25,12 +27,17 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// <summary>
         /// All currently enforced game settings for this room.
         /// </summary>
-        public MultiplayerRoomSettings Settings { get; set; }
+        public MultiplayerRoomSettings Settings { get; set; } = MultiplayerRoomSettings.Empty();
 
         /// <summary>
         /// All users currently in this room.
         /// </summary>
         public List<MultiplayerRoomUser> Users { get; set; } = new List<MultiplayerRoomUser>();
+
+        /// <summary>
+        /// The host of this room, in control of changing room settings.
+        /// </summary>
+        public MultiplayerRoomUser? Host { get; set; }
 
         private object writeLock = new object();
 
