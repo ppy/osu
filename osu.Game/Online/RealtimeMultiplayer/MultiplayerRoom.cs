@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.RealtimeMultiplayer
 {
+    /// <summary>
+    /// A multiplayer room.
+    /// </summary>
     [Serializable]
     public class MultiplayerRoom
     {
@@ -24,49 +27,12 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// </summary>
         public MultiplayerRoomSettings Settings { get; set; }
 
-        private List<MultiplayerRoomUser> users = new List<MultiplayerRoomUser>();
+        /// <summary>
+        /// All users currently in this room.
+        /// </summary>
+        public List<MultiplayerRoomUser> Users { get; set; } = new List<MultiplayerRoomUser>();
 
         private object writeLock = new object();
-
-        /// <summary>
-        /// All users which are currently in this room, in any state.
-        /// </summary>
-        public IReadOnlyList<MultiplayerRoomUser> Users
-        {
-            get
-            {
-                lock (writeLock)
-                    return users.ToArray();
-            }
-        }
-
-        /// <summary>
-        /// Join a new user to this room.
-        /// </summary>
-        public MultiplayerRoomUser Join(int userId)
-        {
-            var user = new MultiplayerRoomUser(userId);
-            PerformUpdate(_ => users.Add(user));
-            return user;
-        }
-
-        /// <summary>
-        /// Remove a user from this room.
-        /// </summary>
-        public MultiplayerRoomUser Leave(int userId)
-        {
-            MultiplayerRoomUser user = null;
-
-            PerformUpdate(_ =>
-            {
-                user = users.Find(u => u.UserID == userId);
-
-                if (user != null)
-                    users.Remove(user);
-            });
-
-            return user;
-        }
 
         /// <summary>
         /// Perform an update on this room in a thread-safe manner.
