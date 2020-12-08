@@ -27,5 +27,11 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// </summary>
         /// <param name="user">The user.</param>
         Task UserLeft(MultiplayerRoomUser user);
+
+        /// <summary>
+        /// Signals that the settings for this room have changed.
+        /// </summary>
+        /// <param name="newSettings">The updated room settings.</param>
+        Task SettingsChanged(MultiplayerRoomSettings newSettings);
     }
 }
