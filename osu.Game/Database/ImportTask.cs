@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Utils;
@@ -21,7 +23,7 @@ namespace osu.Game.Database
         /// <summary>
         /// An optional stream which provides the file content.
         /// </summary>
-        public Stream Stream { get; }
+        public Stream? Stream { get; }
 
         /// <summary>
         /// Construct a new import task from a path (on a local filesystem).
