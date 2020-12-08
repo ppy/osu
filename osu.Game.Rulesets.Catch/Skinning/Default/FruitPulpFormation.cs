@@ -25,33 +25,33 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
             switch (visualRepresentation.NewValue)
             {
                 case FruitVisualRepresentation.Pear:
-                    Add(new Vector2(0, -0.33f), new Vector2(SMALL_PULP));
-                    Add(PositionAt(60, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
-                    Add(PositionAt(180, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
-                    Add(PositionAt(300, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    AddPulp(new Vector2(0, -0.33f), new Vector2(SMALL_PULP));
+                    AddPulp(PositionAt(60, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    AddPulp(PositionAt(180, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    AddPulp(PositionAt(300, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
                     break;
 
                 case FruitVisualRepresentation.Grape:
-                    Add(new Vector2(0, -0.25f), new Vector2(SMALL_PULP));
-                    Add(PositionAt(0, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
-                    Add(PositionAt(120, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
-                    Add(PositionAt(240, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    AddPulp(new Vector2(0, -0.25f), new Vector2(SMALL_PULP));
+                    AddPulp(PositionAt(0, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    AddPulp(PositionAt(120, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
+                    AddPulp(PositionAt(240, DISTANCE_FROM_CENTRE_3), new Vector2(LARGE_PULP_3));
                     break;
 
                 case FruitVisualRepresentation.Pineapple:
-                    Add(new Vector2(0, -0.3f), new Vector2(SMALL_PULP));
-                    Add(PositionAt(45, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
-                    Add(PositionAt(135, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
-                    Add(PositionAt(225, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
-                    Add(PositionAt(315, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    AddPulp(new Vector2(0, -0.3f), new Vector2(SMALL_PULP));
+                    AddPulp(PositionAt(45, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    AddPulp(PositionAt(135, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    AddPulp(PositionAt(225, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    AddPulp(PositionAt(315, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
                     break;
 
                 case FruitVisualRepresentation.Raspberry:
-                    Add(new Vector2(0, -0.34f), new Vector2(SMALL_PULP));
-                    Add(PositionAt(0, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
-                    Add(PositionAt(90, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
-                    Add(PositionAt(180, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
-                    Add(PositionAt(270, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    AddPulp(new Vector2(0, -0.34f), new Vector2(SMALL_PULP));
+                    AddPulp(PositionAt(0, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    AddPulp(PositionAt(90, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    AddPulp(PositionAt(180, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
+                    AddPulp(PositionAt(270, DISTANCE_FROM_CENTRE_4), new Vector2(LARGE_PULP_4));
                     break;
             }
         }

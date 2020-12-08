@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
     {
         public BananaPulpFormation()
         {
-            Add(new Vector2(0, -0.3f), new Vector2(SMALL_PULP));
-            Add(new Vector2(0, 0.05f), new Vector2(LARGE_PULP_4 * 0.8f, LARGE_PULP_4 * 2.5f));
+            AddPulp(new Vector2(0, -0.3f), new Vector2(SMALL_PULP));
+            AddPulp(new Vector2(0, 0.05f), new Vector2(LARGE_PULP_4 * 0.8f, LARGE_PULP_4 * 2.5f));
         }
     }
 }

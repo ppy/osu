@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
         protected const float SMALL_PULP = LARGE_PULP_3 / 2;
 
-        private int numPulps;
+        private int pulpsInUse;
 
         protected PulpFormation()
         {
@@ -35,21 +35,22 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
         protected void Clear()
         {
-            for (; numPulps > 0; numPulps--)
-                InternalChildren[numPulps - 1].Alpha = 0;
+            for (int i = 0; i < pulpsInUse; i++)
+                InternalChildren[i].Alpha = 0;
+            pulpsInUse = 0;
         }
 
-        protected void Add(Vector2 position, Vector2 size)
+        protected void AddPulp(Vector2 position, Vector2 size)
         {
-            if (numPulps == InternalChildren.Count)
+            if (pulpsInUse == InternalChildren.Count)
                 AddInternal(new Pulp { AccentColour = { BindTarget = AccentColour } });
 
-            var pulp = InternalChildren[numPulps];
+            var pulp = InternalChildren[pulpsInUse];
             pulp.Position = position;
             pulp.Size = size;
             pulp.Alpha = 1;
 
-            numPulps++;
+            pulpsInUse++;
         }
     }
 }
