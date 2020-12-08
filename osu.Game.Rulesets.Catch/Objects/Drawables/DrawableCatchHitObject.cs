@@ -5,7 +5,9 @@ using System;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Utils;
 
@@ -51,6 +53,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public bool IsOnPlate;
 
         public override bool RemoveWhenNotAlive => IsOnPlate;
+
+        protected override JudgementResult CreateResult(Judgement judgement) => new CatchJudgementResult(HitObject, judgement);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
