@@ -17,7 +17,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// <summary>
         /// The ID of the room, used for database persistence.
         /// </summary>
-        public long RoomID { get; set; }
+        public readonly long RoomID;
 
         /// <summary>
         /// The current state of the room (ie. whether it is in progress or otherwise).
@@ -40,6 +40,11 @@ namespace osu.Game.Online.RealtimeMultiplayer
         public MultiplayerRoomUser? Host { get; set; }
 
         private object writeLock = new object();
+
+        public MultiplayerRoom(in long roomId)
+        {
+            RoomID = roomId;
+        }
 
         /// <summary>
         /// Perform an update on this room in a thread-safe manner.
