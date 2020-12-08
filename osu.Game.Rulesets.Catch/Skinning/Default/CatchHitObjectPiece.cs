@@ -18,10 +18,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         public readonly Bindable<bool> HyperDash = new Bindable<bool>();
 
         [Resolved(canBeNull: true)]
-        private DrawableHitObject drawableHitObject { get; set; }
-
         [CanBeNull]
-        protected DrawablePalpableCatchHitObject DrawableHitObject => (DrawablePalpableCatchHitObject)drawableHitObject;
+        protected DrawableHitObject DrawableHitObject { get; private set; }
 
         [CanBeNull]
         protected BorderPiece BorderPiece;
@@ -33,10 +31,12 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         {
             base.LoadComplete();
 
-            if (DrawableHitObject != null)
+            var hitObject = (DrawablePalpableCatchHitObject)DrawableHitObject;
+
+            if (hitObject != null)
             {
-                AccentColour.BindTo(DrawableHitObject.AccentColour);
-                HyperDash.BindTo(DrawableHitObject.HyperDash);
+                AccentColour.BindTo(hitObject.AccentColour);
+                HyperDash.BindTo(hitObject.HyperDash);
             }
 
             HyperDash.BindValueChanged(hyper =>

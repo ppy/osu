@@ -27,15 +27,11 @@ namespace osu.Game.Rulesets.Catch.Skinning
         private readonly Sprite hyperSprite;
 
         [Resolved]
-        private ISkinSource skin { get; set; }
-
-        protected ISkinSource Skin => skin;
+        protected ISkinSource Skin { get; private set; }
 
         [Resolved(canBeNull: true)]
-        private DrawableHitObject drawableHitObject { get; set; }
-
         [CanBeNull]
-        protected DrawablePalpableCatchHitObject DrawableHitObject => (DrawablePalpableCatchHitObject)drawableHitObject;
+        protected DrawableHitObject DrawableHitObject { get; private set; }
 
         protected LegacyCatchHitObjectPiece()
         {
@@ -69,10 +65,12 @@ namespace osu.Game.Rulesets.Catch.Skinning
         {
             base.LoadComplete();
 
-            if (DrawableHitObject != null)
+            var hitObject = (DrawablePalpableCatchHitObject)DrawableHitObject;
+
+            if (hitObject != null)
             {
-                AccentColour.BindTo(DrawableHitObject.AccentColour);
-                HyperDash.BindTo(DrawableHitObject.HyperDash);
+                AccentColour.BindTo(hitObject.AccentColour);
+                HyperDash.BindTo(hitObject.HyperDash);
             }
 
             hyperSprite.Colour = Skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value ??
