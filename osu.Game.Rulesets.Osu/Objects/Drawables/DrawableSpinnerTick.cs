@@ -1,13 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Rulesets.Objects.Drawables;
-
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSpinnerTick : DrawableOsuHitObject
     {
         public override bool DisplayResult => false;
+
+        protected DrawableSpinner DrawableSpinner => (DrawableSpinner)ParentHitObject;
 
         public DrawableSpinnerTick()
             : base(null)
@@ -19,15 +19,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
         }
 
-        private DrawableSpinner drawableSpinner;
-
-        protected override void OnParentReceived(DrawableHitObject parent)
-        {
-            base.OnParentReceived(parent);
-            drawableSpinner = (DrawableSpinner)parent;
-        }
-
-        protected override double MaximumJudgementOffset => drawableSpinner.HitObject.Duration;
+        protected override double MaximumJudgementOffset => DrawableSpinner.HitObject.Duration;
 
         /// <summary>
         /// Apply a judgement result.
