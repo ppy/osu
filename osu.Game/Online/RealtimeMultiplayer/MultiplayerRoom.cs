@@ -9,8 +9,6 @@ namespace osu.Game.Online.RealtimeMultiplayer
     [Serializable]
     public class MultiplayerRoom
     {
-        private object writeLock = new object();
-
         public long RoomID { get; set; }
 
         public MultiplayerRoomState State { get; set; }
@@ -31,22 +29,34 @@ namespace osu.Game.Online.RealtimeMultiplayer
         public MultiplayerRoomUser Join(int userId)
         {
             var user = new MultiplayerRoomUser(userId);
-            lock (writeLock) users.Add(user);
+            PerformUpdate(_ => users.Add(user));
             return user;
         }
 
         public MultiplayerRoomUser Leave(int userId)
         {
-            lock (writeLock)
+            MultiplayerRoomUser user = null;
+
+            PerformUpdate(_ =>
             {
-                var user = users.Find(u => u.UserID == userId);
+                user = users.Find(u => u.UserID == userId);
 
-                if (user == null)
-                    return null;
+                if (user != null)
+                    users.Remove(user);
+            });
 
-                users.Remove(user);
-                return user;
-            }
+            return user;
+        }
+
+        private object writeLock = new object();
+
+        /// <summary>
+        /// Perform an update on this room in a thread-safe manner.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        public void PerformUpdate(Action<MultiplayerRoom> action)
+        {
+            lock (writeLock) action(this);
         }
     }
 }
