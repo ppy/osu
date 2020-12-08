@@ -7,13 +7,16 @@ namespace osu.Game.Overlays.Rankings
     {
         public RankingsSortTabControl()
         {
-            Title = "Show";
+            Title = "显示";
         }
     }
 
     public enum RankingsSortCriteria
     {
+        [Description("所有")]
         All,
+
+        [Description("仅好友")]
         Friends
     }
 }

@@ -20,6 +20,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Bindable<double> sensitivityBindable = new BindableDouble();
         private Bindable<string> ignoredInputHandlers;
 
+        private Bindable<WindowMode> windowMode;
+        private SettingsEnumDropdown<OsuConfineMouseMode> confineMouseModeSetting;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
         {
@@ -47,7 +50,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = "将光标绝对映射至窗口中",
                     Current = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
                 },
-                new SettingsEnumDropdown<OsuConfineMouseMode>
+                confineMouseModeSetting = new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
                     LabelText = "光标边界( 将光标限制在窗口中 )",
                     Current = osuConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode)
@@ -63,6 +66,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
+
+            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            windowMode.BindValueChanged(mode => confineMouseModeSetting.Alpha = mode.NewValue == WindowMode.Fullscreen ? 0 : 1, true);
 
             if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
             {

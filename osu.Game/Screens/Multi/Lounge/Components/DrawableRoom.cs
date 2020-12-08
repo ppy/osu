@@ -241,7 +241,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+            new OsuMenuItem("创建一个相同的房间", MenuItemType.Standard, () =>
             {
                 multiplayer?.CreateRoom(Room.CreateCopy());
             })

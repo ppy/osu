@@ -14,9 +14,11 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -190,11 +192,9 @@ namespace osu.Game.Rulesets.Catch.UI
         internal static float CalculateCatchWidth(BeatmapDifficulty difficulty) => CalculateCatchWidth(calculateScale(difficulty));
 
         /// <summary>
-        /// Let the catcher attempt to catch a fruit.
+        /// Determine if this catcher can catch a <see cref="CatchHitObject"/> in the current position.
         /// </summary>
-        /// <param name="hitObject">The fruit to catch.</param>
-        /// <returns>Whether the catch is possible.</returns>
-        public bool AttemptCatch(CatchHitObject hitObject)
+        public bool CanCatch(CatchHitObject hitObject)
         {
             if (!(hitObject is PalpableCatchHitObject fruit))
                 return false;
@@ -205,21 +205,29 @@ namespace osu.Game.Rulesets.Catch.UI
             var catchObjectPosition = fruit.X;
             var catcherPosition = Position.X;
 
-            var validCatch =
-                catchObjectPosition >= catcherPosition - halfCatchWidth &&
-                catchObjectPosition <= catcherPosition + halfCatchWidth;
+            return catchObjectPosition >= catcherPosition - halfCatchWidth &&
+                   catchObjectPosition <= catcherPosition + halfCatchWidth;
+        }
 
-            if (validCatch)
-                placeCaughtObject(fruit);
+        public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result)
+        {
+            var catchResult = (CatchJudgementResult)result;
+            catchResult.CatcherAnimationState = CurrentState;
+            catchResult.CatcherHyperDash = HyperDashing;
+
+            if (!(drawableObject.HitObject is PalpableCatchHitObject hitObject)) return;
+
+            if (result.IsHit)
+                placeCaughtObject(hitObject);
 
             // droplet doesn't affect the catcher state
-            if (fruit is TinyDroplet) return validCatch;
+            if (hitObject is TinyDroplet) return;
 
-            if (validCatch && fruit.HyperDash)
+            if (result.IsHit && hitObject.HyperDash)
             {
-                var target = fruit.HyperDashTarget;
-                var timeDifference = target.StartTime - fruit.StartTime;
-                double positionDifference = target.X - catcherPosition;
+                var target = hitObject.HyperDashTarget;
+                var timeDifference = target.StartTime - hitObject.StartTime;
+                double positionDifference = target.X - X;
                 var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
                 SetHyperDashState(Math.Abs(velocity), target.X);
@@ -227,12 +235,30 @@ namespace osu.Game.Rulesets.Catch.UI
             else
                 SetHyperDashState();
 
-            if (validCatch)
-                updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
-            else if (!(fruit is Banana))
+            if (result.IsHit)
+                updateState(hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
+            else if (!(hitObject is Banana))
                 updateState(CatcherAnimationState.Fail);
+        }
 
-            return validCatch;
+        public void OnRevertResult(DrawableCatchHitObject drawableObject, JudgementResult result)
+        {
+            var catchResult = (CatchJudgementResult)result;
+
+            if (CurrentState != catchResult.CatcherAnimationState)
+                updateState(catchResult.CatcherAnimationState);
+
+            if (HyperDashing != catchResult.CatcherHyperDash)
+            {
+                if (catchResult.CatcherHyperDash)
+                    SetHyperDashState(2);
+                else
+                    SetHyperDashState();
+            }
+
+            caughtFruitContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
+            droppedObjectTarget.RemoveAll(d => (d as DrawableCatchHitObject)?.HitObject == drawableObject.HitObject);
+            hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
         }
 
         /// <summary>
@@ -464,6 +490,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!hitLighting.Value) return;
 
             HitExplosion hitExplosion = hitExplosionPool.Get();
+            hitExplosion.HitObject = caughtObject.HitObject;
             hitExplosion.X = caughtObject.X;
             hitExplosion.Scale = new Vector2(caughtObject.HitObject.Scale);
             hitExplosion.ObjectColour = caughtObject.AccentColour.Value;
