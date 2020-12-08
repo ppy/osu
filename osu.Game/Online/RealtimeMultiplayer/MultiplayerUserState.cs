@@ -5,7 +5,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
 {
     public enum MultiplayerUserState
     {
-        Watching,
+        Idle,
         Ready,
         Playing,
         Results,
