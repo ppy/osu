@@ -183,72 +183,82 @@ namespace osu.Game.Graphics.Containers
                 updateSectionsMargin();
             }
 
-            float currentScroll = scrollContainer.Current;
+            if (scrollContainer.Current == lastKnownScroll)
+                return;
 
-            if (currentScroll != lastKnownScroll)
+            lastKnownScroll = scrollContainer.Current;
+
+            if (ExpandableHeader != null && FixedHeader != null)
             {
-                lastKnownScroll = currentScroll;
-                // reset last clicked section because user started scrolling themselves
-                if (scrollContainer.UserScrolling)
-                    lastClickedSection = null;
+                float offset = Math.Min(ExpandableHeader.LayoutSize.Y, scrollContainer.Current);
 
-                if (ExpandableHeader != null && FixedHeader != null)
-                {
-                    float offset = Math.Min(ExpandableHeader.LayoutSize.Y, currentScroll);
-
-                    ExpandableHeader.Y = -offset;
-                    FixedHeader.Y = -offset + ExpandableHeader.LayoutSize.Y;
-                }
-
-                headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
-                headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
-
-                float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
-
-                float visibleHeight(T section)
-                {
-                    float sectionPosition = scrollContainer.GetChildPosInContent(section) - scrollOffset;
-                    float top = Math.Max(sectionPosition, currentScroll);
-                    float bottom = Math.Min(sectionPosition + section.Height, currentScroll + scrollContainer.DisplayableContent);
-                    return bottom - top;
-                }
-
-                var sortedByVisible = new List<T>(Children);
-                sortedByVisible.Sort((a, b) => visibleHeight(b).CompareTo(visibleHeight(a)));
-                T mostVisible = sortedByVisible.FirstOrDefault();
-
-                if (mostVisible == null)
-                    return;
-
-                int mostVisibleIndex = IndexOf(mostVisible);
-
-                bool usePreviousSection()
-                {
-                    if (mostVisibleIndex == 0)
-                        return false;
-
-                    T sectionBefore = Children[mostVisibleIndex - 1];
-                    // consider the section user wants to see smaller than it actually is to lower the visibility requirement
-                    // this makes the section get selected sooner when scrolling upwards, to match it already getting selected sooner when scrolling downwards
-                    float sectionHeight = sectionBefore.Height * (lastClickedSection as T == sectionBefore ? 0.8f : 1.0f);
-
-                    bool moreVisible = Precision.AlmostBigger(visibleHeight(sectionBefore), visibleHeight(Children[mostVisibleIndex]), 1);
-                    bool completelyVisible = Precision.AlmostBigger(visibleHeight(sectionBefore), sectionHeight, 1);
-
-                    return moreVisible || completelyVisible;
-                }
-
-                // we want to use 100% visible previous sections instead because otherwise small sections sandwiched between large section would never get selected
-                while (usePreviousSection())
-                    mostVisibleIndex--;
-
-                SelectedSection.Value = Children[mostVisibleIndex];
-
-                if (Precision.AlmostBigger(currentScroll, scrollContainer.ScrollableExtent))
-                {
-                    SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
-                }
+                ExpandableHeader.Y = -offset;
+                FixedHeader.Y = -offset + ExpandableHeader.LayoutSize.Y;
             }
+
+            headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
+            headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
+
+            selectMostVisible();
+        }
+
+        /// <summary>
+        /// Changes <see cref="SelectedSection"/> to currently most visible section
+        /// </summary>
+        private void selectMostVisible()
+        {
+            // reset last clicked section because user started scrolling themselves
+            if (scrollContainer.UserScrolling)
+                lastClickedSection = null;
+
+            // we are scrolled all the way to the bottom
+            // select the section user clicked for or the very last section
+            if (Precision.AlmostBigger(scrollContainer.Current, scrollContainer.ScrollableExtent))
+            {
+                SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
+                return;
+            }
+
+            var sortedByVisibility = new List<T>(Children);
+            sortedByVisibility.Sort((a, b) => visibleHeight(b).CompareTo(visibleHeight(a)));
+            T mostVisible = sortedByVisibility.FirstOrDefault();
+
+            if (mostVisible == null)
+                return;
+
+            int mostVisibleIndex = IndexOf(mostVisible);
+            while (isPreviousMoreVisible(mostVisibleIndex))
+                mostVisibleIndex--;
+
+            SelectedSection.Value = Children[mostVisibleIndex];
+        }
+
+        /// <returns>true if previous section is more visible than one at <paramref name="sectionIndex"/></returns>
+        private bool isPreviousMoreVisible(int sectionIndex)
+        {
+            if (sectionIndex == 0)
+                return false;
+
+            T sectionBefore = Children[sectionIndex - 1];
+            // consider the section user wants to see smaller than it actually is to lower the visibility requirement
+            // this makes the section get selected sooner when scrolling upwards, to match it already getting selected sooner when scrolling downwards
+            float sectionHeight = sectionBefore.Height * (lastClickedSection as T == sectionBefore ? 0.8f : 1.0f);
+
+            bool moreVisible = Precision.AlmostBigger(visibleHeight(sectionBefore), visibleHeight(Children[sectionIndex]), 1);
+            bool completelyVisible = Precision.AlmostBigger(visibleHeight(sectionBefore), sectionHeight, 1);
+
+            return moreVisible || completelyVisible;
+        }
+
+        private float visibleHeight(T section)
+        {
+            float currentScroll = scrollContainer.Current;
+            float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
+            float sectionPosition = scrollContainer.GetChildPosInContent(section) - scrollOffset;
+
+            float top = Math.Max(sectionPosition, currentScroll);
+            float bottom = Math.Min(sectionPosition + section.Height, currentScroll + scrollContainer.DisplayableContent);
+            return bottom - top;
         }
 
         private void updateSectionsMargin()
