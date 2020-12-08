@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
@@ -10,11 +9,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
     internal class LegacyFruitPiece : LegacyCatchHitObjectPiece
     {
         public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
-
-        private readonly string[] lookupNames =
-        {
-            "fruit-pear", "fruit-grapes", "fruit-apple", "fruit-orange"
-        };
 
         protected override void LoadComplete()
         {
@@ -30,10 +24,24 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         private void setTexture(FruitVisualRepresentation visualRepresentation)
         {
-            Texture texture = Skin.GetTexture(lookupNames[(int)visualRepresentation]);
-            Texture overlayTexture = Skin.GetTexture(lookupNames[(int)visualRepresentation] + "-overlay");
+            switch (visualRepresentation)
+            {
+                case FruitVisualRepresentation.Pear:
+                    SetTexture(Skin.GetTexture("fruit-pear"), Skin.GetTexture("fruit-pear-overlay"));
+                    break;
 
-            SetTexture(texture, overlayTexture);
+                case FruitVisualRepresentation.Grape:
+                    SetTexture(Skin.GetTexture("fruit-grapes"), Skin.GetTexture("fruit-grapes-overlay"));
+                    break;
+
+                case FruitVisualRepresentation.Pineapple:
+                    SetTexture(Skin.GetTexture("fruit-apple"), Skin.GetTexture("fruit-apple-overlay"));
+                    break;
+
+                case FruitVisualRepresentation.Raspberry:
+                    SetTexture(Skin.GetTexture("fruit-orange"), Skin.GetTexture("fruit-orange-overlay"));
+                    break;
+            }
         }
     }
 }
