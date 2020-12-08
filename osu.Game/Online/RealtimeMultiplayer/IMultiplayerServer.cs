@@ -37,5 +37,10 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// <param name="newState">The proposed new state.</param>
         /// <exception cref="InvalidStateChange">If the state change requested is not valid, given the previous state or room state.</exception>
         Task ChangeState(MultiplayerUserState newState);
+
+        /// <summary>
+        /// As the host of a room, start the match.
+        /// </summary>
+        Task StartMatch();
     }
 }
