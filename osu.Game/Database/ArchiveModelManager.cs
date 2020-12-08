@@ -218,48 +218,7 @@ namespace osu.Game.Database
             }
 
             return import;
-        }
-
-        /// <summary>
-        /// Import one <typeparamref name="TModel"/> from a <see cref="Stream"/>.
-        /// </summary>
-        /// <param name="stream">The stream to import files from.</param>
-        /// <param name="filename">The filename of the archive being imported.</param>
-        public async Task Import(Stream stream, string filename)
-        {
-            var notification = new ProgressNotification
-            {
-                Progress = 0,
-                State = ProgressNotificationState.Active,
-                Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...",
-            };
-
-            PostNotification.Invoke(notification);
-
-            try
-            {
-                // we need to keep around the filename as some model managers (namely SkinManager) use the archive name to populate skin info
-                var imported = await Import(new ZipArchiveReader(stream, filename), notification.CancellationToken);
-
-                notification.CompletionText = $"Imported {imported}! Click to view.";
-                notification.CompletionClickAction += () =>
-                {
-                    PresentImport?.Invoke(new[] { imported });
-                    return true;
-                };
-                notification.State = ProgressNotificationState.Completed;
-            }
-            catch (TaskCanceledException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
-                notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(e, $@"Could not import ({filename})", LoggingTarget.Database);
-            }
-        }
+        }        
 
         /// <summary>
         /// Fired when the user requests to view the resulting import.
