@@ -5,7 +5,6 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
@@ -21,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
 
         /// <summary>
-        /// The multiplicative factor applied to <see cref="ScaleContainer"/> scale relative to <see cref="HitObject"/> scale.
+        /// The multiplicative factor applied to <see cref="Drawable.Scale"/> relative to <see cref="HitObject"/> scale.
         /// </summary>
         protected virtual float ScaleFactor => 1;
 
@@ -32,20 +31,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public float DisplayRadius => CatchHitObject.OBJECT_RADIUS * HitObject.Scale * ScaleFactor;
 
-        protected readonly Container ScaleContainer;
-
         protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
             : base(h)
         {
             Origin = Anchor.Centre;
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
-
-            AddInternal(ScaleContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-            });
         }
 
         [BackgroundDependencyLoader]
@@ -58,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             ScaleBindable.BindValueChanged(scale =>
             {
-                ScaleContainer.Scale = new Vector2(scale.NewValue * ScaleFactor);
+                Scale = new Vector2(scale.NewValue * ScaleFactor);
             }, true);
 
             IndexInBeatmap.BindValueChanged(_ => UpdateComboColour());

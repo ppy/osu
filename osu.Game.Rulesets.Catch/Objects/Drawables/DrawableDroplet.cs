@@ -26,9 +26,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            ScaleContainer.Child = new SkinnableDrawable(
+            AddInternal(new SkinnableDrawable(
                 new CatchSkinComponent(CatchSkinComponents.Droplet),
-                _ => new DropletPiece());
+                _ => new DropletPiece()));
         }
 
         protected override void UpdateInitialTransforms()
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             float startRotation = RandomSingle(1) * 20;
             double duration = HitObject.TimePreempt + 2000;
 
-            ScaleContainer.RotateTo(startRotation).RotateTo(startRotation + 720, duration);
+            this.RotateTo(startRotation).RotateTo(startRotation + 720, duration);
         }
     }
 }
