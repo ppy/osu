@@ -215,10 +215,19 @@ namespace osu.Game.Rulesets.Catch.UI
             catchResult.CatcherAnimationState = CurrentState;
             catchResult.CatcherHyperDash = HyperDashing;
 
-            if (!(drawableObject.HitObject is PalpableCatchHitObject hitObject)) return;
+            if (!(drawableObject is DrawablePalpableCatchHitObject palpableObject)) return;
+
+            var hitObject = palpableObject.HitObject;
 
             if (result.IsHit)
-                placeCaughtObject(hitObject);
+            {
+                var positionInStack = computePositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplayRadius);
+
+                placeCaughtObject(hitObject, positionInStack);
+
+                if (hitLighting.Value)
+                    addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
+            }
 
             // droplet doesn't affect the catcher state
             if (hitObject is TinyDroplet) return;
@@ -441,16 +450,14 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCatcher();
         }
 
-        private void placeCaughtObject(PalpableCatchHitObject source)
+        private void placeCaughtObject(PalpableCatchHitObject source, Vector2 position)
         {
             var caughtObject = createCaughtObject(source);
 
             if (caughtObject == null) return;
 
-            var positionInStack = computePositionInStack(new Vector2(source.X - X, 0), caughtObject.DisplayRadius);
-
             caughtObject.RelativePositionAxes = Axes.None;
-            caughtObject.Position = positionInStack;
+            caughtObject.Position = position;
             caughtObject.IsOnPlate = true;
 
             caughtObject.Anchor = Anchor.TopCentre;
@@ -460,8 +467,6 @@ namespace osu.Game.Rulesets.Catch.UI
             caughtObject.LifetimeEnd = double.MaxValue;
 
             caughtFruitContainer.Add(caughtObject);
-
-            addLighting(caughtObject);
 
             if (!caughtObject.StaysOnPlate)
                 removeFromPlate(caughtObject, DroppedObjectAnimation.Explode);
@@ -485,15 +490,13 @@ namespace osu.Game.Rulesets.Catch.UI
             return position;
         }
 
-        private void addLighting(DrawablePalpableCatchHitObject caughtObject)
+        private void addLighting(CatchHitObject hitObject, float x, Color4 colour)
         {
-            if (!hitLighting.Value) return;
-
             HitExplosion hitExplosion = hitExplosionPool.Get();
-            hitExplosion.HitObject = caughtObject.HitObject;
-            hitExplosion.X = caughtObject.X;
-            hitExplosion.Scale = new Vector2(caughtObject.HitObject.Scale);
-            hitExplosion.ObjectColour = caughtObject.AccentColour.Value;
+            hitExplosion.HitObject = hitObject;
+            hitExplosion.X = x;
+            hitExplosion.Scale = new Vector2(hitObject.Scale);
+            hitExplosion.ObjectColour = colour;
             hitExplosionContainer.Add(hitExplosion);
         }
 
