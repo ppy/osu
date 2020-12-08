@@ -1,6 +1,3 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using System.Threading.Tasks;
 
 namespace osu.Game.Online.RealtimeMultiplayer
@@ -14,8 +11,8 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// Request to join a multiplayer room.
         /// </summary>
         /// <param name="roomId">The databased room ID.</param>
-        /// <returns>Whether the room could be joined.</returns>
-        Task<bool> JoinRoom(long roomId);
+        /// <exception cref="UserAlreadyInMultiplayerRoom">If the user is already in the requested (or another) room.</exception>
+        Task JoinRoom(long roomId);
 
         /// <summary>
         /// Request to leave the currently joined room.
