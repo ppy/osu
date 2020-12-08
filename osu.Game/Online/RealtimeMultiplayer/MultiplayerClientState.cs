@@ -5,11 +5,11 @@ namespace osu.Game.Online.RealtimeMultiplayer
 {
     public class MultiplayerClientState
     {
+        public long CurrentRoomID { get; set; }
+
         public MultiplayerClientState(in long roomId)
         {
             CurrentRoomID = roomId;
         }
-
-        public long CurrentRoomID { get; }
     }
 }
