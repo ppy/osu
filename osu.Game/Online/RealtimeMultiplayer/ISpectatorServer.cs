@@ -20,7 +20,6 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// <summary>
         /// Request to leave the currently joined room.
         /// </summary>
-        /// <param name="roomId">The databased room ID.</param>
-        Task LeaveRoom(long roomId);
+        Task LeaveRoom();
     }
 }
