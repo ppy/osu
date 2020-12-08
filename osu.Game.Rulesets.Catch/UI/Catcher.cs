@@ -258,6 +258,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtFruitContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
             droppedObjectTarget.RemoveAll(d => (d as DrawableCatchHitObject)?.HitObject == drawableObject.HitObject);
+            hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
         }
 
         /// <summary>
@@ -489,6 +490,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!hitLighting.Value) return;
 
             HitExplosion hitExplosion = hitExplosionPool.Get();
+            hitExplosion.HitObject = caughtObject.HitObject;
             hitExplosion.X = caughtObject.X;
             hitExplosion.Scale = new Vector2(caughtObject.HitObject.Scale);
             hitExplosion.ObjectColour = caughtObject.AccentColour.Value;
