@@ -464,7 +464,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (caughtObject == null) return;
 
-            caughtObject.CopyFrom(drawableObject);
+            caughtObject.CopyStateFrom(drawableObject);
             caughtObject.Anchor = Anchor.TopCentre;
             caughtObject.Position = position;
             caughtObject.Scale /= 2;
@@ -525,7 +525,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             var droppedObject = getCaughtObject(caughtObject.HitObject);
 
-            droppedObject.CopyFrom(caughtObject);
+            droppedObject.CopyStateFrom(caughtObject);
             droppedObject.Anchor = Anchor.TopLeft;
             droppedObject.Position = caughtFruitContainer.ToSpaceOfOtherDrawable(caughtObject.DrawPosition, droppedObjectTarget);
 
