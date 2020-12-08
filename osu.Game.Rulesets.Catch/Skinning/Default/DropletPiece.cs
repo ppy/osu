@@ -9,6 +9,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
     public class DropletPiece : CatchHitObjectPiece
     {
+        protected override HyperBorderPiece HyperBorderPiece { get; }
+
         public DropletPiece()
         {
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS / 2);

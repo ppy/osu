@@ -7,6 +7,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
     public class BananaPiece : CatchHitObjectPiece
     {
+        protected override BorderPiece BorderPiece { get; }
+
         public BananaPiece()
         {
             RelativeSizeAxes = Axes.Both;
