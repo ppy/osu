@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -12,8 +13,11 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -169,7 +173,32 @@ namespace osu.Game.Rulesets.Catch.Tests
             hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             for (var i = 0; i < count; i++)
-                catcher.AttemptCatch(hitObject);
+            {
+                var drawableObject = createDrawableObject(hitObject);
+                var result = new JudgementResult(hitObject, new CatchJudgement())
+                {
+                    Type = catcher.CanCatch(hitObject) ? HitResult.Great : HitResult.Miss
+                };
+                catcher.OnNewResult(drawableObject, result);
+            }
+        }
+
+        private DrawableCatchHitObject createDrawableObject(CatchHitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case Banana banana:
+                    return new DrawableBanana(banana);
+
+                case Droplet droplet:
+                    return new DrawableDroplet(droplet);
+
+                case Fruit fruit:
+                    return new DrawableFruit(fruit);
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(hitObject));
+            }
         }
 
         public class TestCatcher : Catcher
