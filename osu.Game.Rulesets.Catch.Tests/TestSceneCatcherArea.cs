@@ -73,7 +73,10 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             SetContents(() =>
             {
-                var droppedObjectContainer = new Container();
+                var droppedObjectContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                };
 
                 return new CatchInputManager(catchRuleset)
                 {
