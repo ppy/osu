@@ -36,11 +36,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         {
             base.LoadComplete();
 
-            if (DrawableHitObject != null)
-            {
-                var fruit = (DrawableFruit)DrawableHitObject;
+            var fruit = (DrawableFruit)DrawableHitObject;
+
+            if (fruit != null)
                 VisualRepresentation.BindTo(fruit.VisualRepresentation);
-            }
         }
     }
 }
