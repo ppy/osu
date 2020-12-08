@@ -12,7 +12,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// </summary>
         /// <param name="roomId">The databased room ID.</param>
         /// <exception cref="UserAlreadyInMultiplayerRoom">If the user is already in the requested (or another) room.</exception>
-        Task JoinRoom(long roomId);
+        Task<MultiplayerRoom> JoinRoom(long roomId);
 
         /// <summary>
         /// Request to leave the currently joined room.
