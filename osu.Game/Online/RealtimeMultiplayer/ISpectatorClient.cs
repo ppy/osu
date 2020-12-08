@@ -29,6 +29,12 @@ namespace osu.Game.Online.RealtimeMultiplayer
         Task UserLeft(MultiplayerRoomUser user);
 
         /// <summary>
+        /// Signal that the host of the room has changed.
+        /// </summary>
+        /// <param name="userId">The user ID of the new host.</param>
+        Task HostChanged(long userId);
+
+        /// <summary>
         /// Signals that the settings for this room have changed.
         /// </summary>
         /// <param name="newSettings">The updated room settings.</param>
