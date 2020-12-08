@@ -447,8 +447,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (caughtObject == null) return;
 
+            var positionInStack = computePositionInStack(new Vector2(source.X - X, 0), caughtObject.DisplayRadius);
+
             caughtObject.RelativePositionAxes = Axes.None;
-            caughtObject.X = source.X - X;
+            caughtObject.Position = positionInStack;
             caughtObject.IsOnPlate = true;
 
             caughtObject.Anchor = Anchor.TopCentre;
@@ -456,8 +458,6 @@ namespace osu.Game.Rulesets.Catch.UI
             caughtObject.Scale *= 0.5f;
             caughtObject.LifetimeStart = source.StartTime;
             caughtObject.LifetimeEnd = double.MaxValue;
-
-            adjustPositionInStack(caughtObject);
 
             caughtFruitContainer.Add(caughtObject);
 
@@ -467,22 +467,22 @@ namespace osu.Game.Rulesets.Catch.UI
                 removeFromPlate(caughtObject, DroppedObjectAnimation.Explode);
         }
 
-        private void adjustPositionInStack(DrawablePalpableCatchHitObject caughtObject)
+        private Vector2 computePositionInStack(Vector2 position, float displayRadius)
         {
             const float radius_div_2 = CatchHitObject.OBJECT_RADIUS / 2;
             const float allowance = 10;
 
-            float caughtObjectRadius = caughtObject.DisplayRadius;
-
-            while (caughtFruitContainer.Any(f => Vector2Extensions.Distance(f.Position, caughtObject.Position) < (caughtObjectRadius + radius_div_2) / (allowance / 2)))
+            while (caughtFruitContainer.Any(f => Vector2Extensions.Distance(f.Position, position) < (displayRadius + radius_div_2) / (allowance / 2)))
             {
-                float diff = (caughtObjectRadius + radius_div_2) / allowance;
+                float diff = (displayRadius + radius_div_2) / allowance;
 
-                caughtObject.X += (RNG.NextSingle() - 0.5f) * diff * 2;
-                caughtObject.Y -= RNG.NextSingle() * diff;
+                position.X += (RNG.NextSingle() - 0.5f) * diff * 2;
+                position.Y -= RNG.NextSingle() * diff;
             }
 
-            caughtObject.X = Math.Clamp(caughtObject.X, -CatcherArea.CATCHER_SIZE / 2, CatcherArea.CATCHER_SIZE / 2);
+            position.X = Math.Clamp(position.X, -CatcherArea.CATCHER_SIZE / 2, CatcherArea.CATCHER_SIZE / 2);
+
+            return position;
         }
 
         private void addLighting(DrawablePalpableCatchHitObject caughtObject)
