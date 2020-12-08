@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public class TestCatcher : Catcher
         {
-            public IEnumerable<DrawablePalpableCatchHitObject> CaughtObjects => this.ChildrenOfType<DrawablePalpableCatchHitObject>();
+            public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
             public TestCatcher(Container trailsTarget, Container droppedObjectTarget, BeatmapDifficulty difficulty)
                 : base(trailsTarget, droppedObjectTarget, difficulty)

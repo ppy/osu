@@ -43,6 +43,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
             if (fruit != null)
                 VisualRepresentation.BindTo(fruit.VisualRepresentation);
+
+            var caughtFruit = (CaughtFruit)CaughtObject;
+            if (caughtFruit != null)
+                VisualRepresentation.BindTo(caughtFruit.VisualRepresentation);
         }
     }
 }
