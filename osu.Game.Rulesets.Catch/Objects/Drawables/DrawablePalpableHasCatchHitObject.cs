@@ -6,18 +6,22 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject
+    [Cached(typeof(IHasCatchObjectState))]
+    public abstract class DrawablePalpableHasCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
     {
         public new PalpableCatchHitObject HitObject => (PalpableCatchHitObject)base.HitObject;
 
-        public readonly Bindable<bool> HyperDash = new Bindable<bool>();
+        Bindable<Color4> IHasCatchObjectState.AccentColour => AccentColour;
 
-        public readonly Bindable<float> ScaleBindable = new Bindable<float>(1);
+        public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
 
-        public readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
+        public Bindable<float> ScaleBindable { get; } = new Bindable<float>(1);
+
+        public Bindable<int> IndexInBeatmap { get; } = new Bindable<int>();
 
         /// <summary>
         /// The multiplicative factor applied to <see cref="Drawable.Scale"/> relative to <see cref="HitObject"/> scale.
@@ -26,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public float DisplayRadius => CatchHitObject.OBJECT_RADIUS * HitObject.Scale * ScaleFactor;
 
-        protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
+        protected DrawablePalpableHasCatchHitObject([CanBeNull] CatchHitObject h)
             : base(h)
         {
             Origin = Anchor.Centre;

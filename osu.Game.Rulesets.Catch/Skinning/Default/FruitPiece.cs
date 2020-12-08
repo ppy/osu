@@ -39,14 +39,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         {
             base.LoadComplete();
 
-            var fruit = (DrawableFruit)DrawableHitObject;
-
-            if (fruit != null)
-                VisualRepresentation.BindTo(fruit.VisualRepresentation);
-
-            var caughtFruit = (CaughtFruit)CaughtObject;
-            if (caughtFruit != null)
-                VisualRepresentation.BindTo(caughtFruit.VisualRepresentation);
+            var fruitState = (IHasFruitState)ObjectState;
+            VisualRepresentation.BindTo(fruitState.VisualRepresentation);
         }
     }
 }
