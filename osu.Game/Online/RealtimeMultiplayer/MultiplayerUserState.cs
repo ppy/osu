@@ -7,6 +7,8 @@ namespace osu.Game.Online.RealtimeMultiplayer
     {
         Idle,
         Ready,
+        WaitingForLoad,
+        Loaded,
         Playing,
         Results,
     }
