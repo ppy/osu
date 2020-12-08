@@ -26,17 +26,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            HyperDash.BindValueChanged(_ => updatePiece(), true);
-        }
-
-        private void updatePiece()
-        {
             ScaleContainer.Child = new SkinnableDrawable(
                 new CatchSkinComponent(CatchSkinComponents.Droplet),
-                _ => new DropletPiece
-                {
-                    HyperDash = { BindTarget = HyperDash }
-                });
+                _ => new DropletPiece());
         }
 
         protected override void UpdateInitialTransforms()

@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
-using osuTK;
 using osuTK.Graphics;
 using static osu.Game.Skinning.LegacySkinConfiguration;
 
@@ -40,20 +38,21 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
             switch (catchSkinComponent.Component)
             {
-                case CatchSkinComponents.FruitApple:
-                case CatchSkinComponents.FruitBananas:
-                case CatchSkinComponents.FruitOrange:
-                case CatchSkinComponents.FruitGrapes:
-                case CatchSkinComponents.FruitPear:
-                    var lookupName = catchSkinComponent.Component.ToString().Kebaberize();
-                    if (GetTexture(lookupName) != null)
-                        return new LegacyFruitPiece(lookupName);
+                case CatchSkinComponents.Fruit:
+                    if (GetTexture("fruit-pear") != null)
+                        return new LegacyFruitPiece();
+
+                    break;
+
+                case CatchSkinComponents.Banana:
+                    if (GetTexture("fruit-bananas") != null)
+                        return new LegacyBananaPiece();
 
                     break;
 
                 case CatchSkinComponents.Droplet:
                     if (GetTexture("fruit-drop") != null)
-                        return new LegacyFruitPiece("fruit-drop") { Scale = new Vector2(0.8f) };
+                        return new LegacyDropletPiece();
 
                     break;
 
