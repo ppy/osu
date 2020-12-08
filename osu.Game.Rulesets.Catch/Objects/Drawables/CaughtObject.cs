@@ -38,7 +38,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
         }
 
-        public virtual void CopyFrom(IHasCatchObjectState objectState)
+        /// <summary>
+        /// Copies the hit object visual state from another <see cref="IHasCatchObjectState"/> object.
+        /// </summary>
+        public virtual void CopyStateFrom(IHasCatchObjectState objectState)
         {
             HitObject = objectState.HitObject;
             Scale = objectState.Scale;
@@ -68,9 +71,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
         }
 
-        public override void CopyFrom(IHasCatchObjectState objectState)
+        public override void CopyStateFrom(IHasCatchObjectState objectState)
         {
-            base.CopyFrom(objectState);
+            base.CopyStateFrom(objectState);
 
             var fruitState = (IHasFruitState)objectState;
             VisualRepresentation.Value = fruitState.VisualRepresentation.Value;
