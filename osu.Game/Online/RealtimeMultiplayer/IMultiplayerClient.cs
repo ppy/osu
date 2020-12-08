@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace osu.Game.Online.RealtimeMultiplayer
 {
     /// <summary>
-    /// An interface defining a spectator client instance.
+    /// An interface defining a multiplayer client instance.
     /// </summary>
     public interface IMultiplayerClient
     {
