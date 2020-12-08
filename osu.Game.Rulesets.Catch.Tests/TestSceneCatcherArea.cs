@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -58,7 +57,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 Schedule(() =>
                 {
-                    area.OnNewResult(drawable, new JudgementResult(fruit, new CatchJudgement())
+                    area.OnNewResult(drawable, new CatchJudgementResult(fruit, new CatchJudgement())
                     {
                         Type = area.MovableCatcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss
                     });
