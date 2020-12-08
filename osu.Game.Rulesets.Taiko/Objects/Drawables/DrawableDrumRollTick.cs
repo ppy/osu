@@ -4,7 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables

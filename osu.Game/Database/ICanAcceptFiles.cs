@@ -19,11 +19,10 @@ namespace osu.Game.Database
         Task Import(params string[] paths);
 
         /// <summary>
-        /// Import the specified stream.
+        /// Import the provided stream as a simple item.
         /// </summary>
-        /// <param name="stream">The stream to import files from.</param>
+        /// <param name="stream">The stream to import files from. Should be in a supported archive format.</param>
         /// <param name="filename">The filename of the archive being imported.</param>
-        /// <returns></returns>
         Task Import(Stream stream, string filename);
 
         /// <summary>

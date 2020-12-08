@@ -18,7 +18,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly BindableBool rawInputToggle = new BindableBool();
         private Bindable<double> sensitivityBindable = new BindableDouble();
-        private Bindable<string> ignoredInputHandler;
+        private Bindable<string> ignoredInputHandlers;
+
+        private Bindable<WindowMode> windowMode;
+        private SettingsEnumDropdown<OsuConfineMouseMode> confineMouseModeSetting;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
@@ -47,7 +50,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = "Map absolute input to window",
                     Current = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
                 },
-                new SettingsEnumDropdown<OsuConfineMouseMode>
+                confineMouseModeSetting = new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
                     LabelText = "Confine mouse cursor to window",
                     Current = osuConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode)
@@ -64,6 +67,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 },
             };
 
+            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            windowMode.BindValueChanged(mode => confineMouseModeSetting.Alpha = mode.NewValue == WindowMode.Fullscreen ? 0 : 1, true);
+
             if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
             {
                 rawInputToggle.Disabled = true;
@@ -75,20 +81,20 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     // this is temporary until we support per-handler settings.
                     const string raw_mouse_handler = @"OsuTKRawMouseHandler";
-                    const string standard_mouse_handler = @"OsuTKMouseHandler";
+                    const string standard_mouse_handlers = @"OsuTKMouseHandler MouseHandler";
 
-                    ignoredInputHandler.Value = enabled.NewValue ? standard_mouse_handler : raw_mouse_handler;
+                    ignoredInputHandlers.Value = enabled.NewValue ? standard_mouse_handlers : raw_mouse_handler;
                 };
 
-                ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
-                ignoredInputHandler.ValueChanged += handler =>
+                ignoredInputHandlers = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
+                ignoredInputHandlers.ValueChanged += handler =>
                 {
                     bool raw = !handler.NewValue.Contains("Raw");
                     rawInputToggle.Value = raw;
                     sensitivityBindable.Disabled = !raw;
                 };
 
-                ignoredInputHandler.TriggerChange();
+                ignoredInputHandlers.TriggerChange();
             }
         }
 
