@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -12,8 +13,11 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -51,6 +55,53 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
         });
+
+        [Test]
+        public void TestCatcherHyperStateReverted()
+        {
+            DrawableCatchHitObject drawableObject1 = null;
+            DrawableCatchHitObject drawableObject2 = null;
+            JudgementResult result1 = null;
+            JudgementResult result2 = null;
+            AddStep("catch hyper fruit", () =>
+            {
+                drawableObject1 = createDrawableObject(new Fruit { HyperDashTarget = new Fruit { X = 100 } });
+                result1 = attemptCatch(drawableObject1);
+            });
+            AddStep("catch normal fruit", () =>
+            {
+                drawableObject2 = createDrawableObject(new Fruit());
+                result2 = attemptCatch(drawableObject2);
+            });
+            AddStep("revert second result", () =>
+            {
+                catcher.OnRevertResult(drawableObject2, result2);
+            });
+            checkHyperDash(true);
+            AddStep("revert first result", () =>
+            {
+                catcher.OnRevertResult(drawableObject1, result1);
+            });
+            checkHyperDash(false);
+        }
+
+        [Test]
+        public void TestCatcherAnimationStateReverted()
+        {
+            DrawableCatchHitObject drawableObject = null;
+            JudgementResult result = null;
+            AddStep("catch kiai fruit", () =>
+            {
+                drawableObject = createDrawableObject(new TestKiaiFruit());
+                result = attemptCatch(drawableObject);
+            });
+            checkState(CatcherAnimationState.Kiai);
+            AddStep("revert result", () =>
+            {
+                catcher.OnRevertResult(drawableObject, result);
+            });
+            checkState(CatcherAnimationState.Idle);
+        }
 
         [Test]
         public void TestCatcherCatchWidth()
@@ -166,10 +217,37 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void attemptCatch(CatchHitObject hitObject, int count = 1)
         {
-            hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-
             for (var i = 0; i < count; i++)
-                catcher.AttemptCatch(hitObject);
+                attemptCatch(createDrawableObject(hitObject));
+        }
+
+        private JudgementResult attemptCatch(DrawableCatchHitObject drawableObject)
+        {
+            drawableObject.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            var result = new CatchJudgementResult(drawableObject.HitObject, drawableObject.HitObject.CreateJudgement())
+            {
+                Type = catcher.CanCatch(drawableObject.HitObject) ? HitResult.Great : HitResult.Miss
+            };
+            catcher.OnNewResult(drawableObject, result);
+            return result;
+        }
+
+        private DrawableCatchHitObject createDrawableObject(CatchHitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case Banana banana:
+                    return new DrawableBanana(banana);
+
+                case Droplet droplet:
+                    return new DrawableDroplet(droplet);
+
+                case Fruit fruit:
+                    return new DrawableFruit(fruit);
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(hitObject));
+            }
         }
 
         public class TestCatcher : Catcher
