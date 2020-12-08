@@ -218,7 +218,7 @@ namespace osu.Game.Database
             }
 
             return import;
-        }        
+        }
 
         /// <summary>
         /// Fired when the user requests to view the resulting import.

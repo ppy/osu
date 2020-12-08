@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -57,7 +58,7 @@ namespace osu.Android
 
             var stream = ContentResolver.OpenInputStream(uri);
             if (stream != null)
-                game.ScheduleImport(stream, cursor.GetString(filename_column));
+                Task.Factory.StartNew(() => game.Import(stream, cursor.GetString(filename_column)), TaskCreationOptions.LongRunning);
         }
     }
 }

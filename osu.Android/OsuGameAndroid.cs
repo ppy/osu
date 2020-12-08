@@ -67,12 +67,11 @@ namespace osu.Android
             }
         }
 
-        /// <summary>
-        /// Schedules a file to be imported once the game is loaded.
-        /// </summary>
-        /// <param name="stream">A stream to the file to import.</param>
-        /// <param name="filename">The filename of the file to import.</param>
-        public void ScheduleImport(Stream stream, string filename) => WaitForReady(() => this, _ => Task.Run(() => Import(stream, filename)));
+        public override Task Import(Stream stream, string filename)
+        {
+            WaitForReady(() => this, _ => Task.Run(() => base.Import(stream, filename)));
+            return Task.CompletedTask;
+        }
 
         protected override void LoadComplete()
         {
