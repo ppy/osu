@@ -38,14 +38,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             base.OnApply();
 
-            XBindable.BindTo(HitObject.XBindable);
+            XBindable.BindTo(HitObject.EffectiveXBindable);
         }
 
         protected override void OnFree()
         {
             base.OnFree();
 
-            XBindable.UnbindFrom(HitObject.XBindable);
+            XBindable.UnbindFrom(HitObject.EffectiveXBindable);
         }
 
         public Func<CatchHitObject, bool> CheckPosition;
