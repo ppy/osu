@@ -11,7 +11,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// Request to join a multiplayer room.
         /// </summary>
         /// <param name="roomId">The databased room ID.</param>
-        /// <exception cref="UserAlreadyInMultiplayerRoom">If the user is already in the requested (or another) room.</exception>
+        /// <exception cref="AlreadyInRoomException">If the user is already in the requested (or another) room.</exception>
         Task<MultiplayerRoom> JoinRoom(long roomId);
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// Change the local user state in the currently joined room.
         /// </summary>
         /// <param name="newState">The proposed new state.</param>
-        /// <exception cref="InvalidStateChange">If the state change requested is not valid, given the previous state or room state.</exception>
+        /// <exception cref="InvalidStateChangeException">If the state change requested is not valid, given the previous state or room state.</exception>
         /// <exception cref="NotJoinedRoomException">If the user is not in a room.</exception>
         Task ChangeState(MultiplayerUserState newState);
 
