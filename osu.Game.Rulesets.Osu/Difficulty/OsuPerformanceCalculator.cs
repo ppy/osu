@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // Scale the aim value with accuracy and OD
-            aimValue *= .975 + Math.Pow(Attributes.OverallDifficulty, 2) / 1500 + 200 * (accuracy - 1) * Math.Pow(1 / Attributes.OverallDifficulty, 2);
+            aimValue *= Math.Max(0, .975 + Math.Pow(Attributes.OverallDifficulty, 2) / 1500 + 200 * (accuracy - 1) * Math.Pow(1 / Math.Max(8, Attributes.OverallDifficulty), 2));
 
             return aimValue;
         }
@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
             // Scale the speed value with accuracy and OD
-            speedValue *= .95 + Math.Pow(Attributes.OverallDifficulty, 2) / 750 + 200 * (accuracy - 1) * Math.Pow(1 / Attributes.OverallDifficulty, 2);
+            speedValue *= Math.Max(0, .95 + Math.Pow(Attributes.OverallDifficulty, 2) / 750 + 200 * (accuracy - 1) * Math.Pow(1 / Math.Max(8, Attributes.OverallDifficulty), 2));
 
             return speedValue;
         }
