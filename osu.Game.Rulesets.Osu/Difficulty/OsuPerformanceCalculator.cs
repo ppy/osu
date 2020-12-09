@@ -126,6 +126,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
               aimValue *= 0.5 + Math.Pow(Math.Sin(2.5 * (accuracy - .8) * Math.PI), 2) / 2;
             else
               aimValue *= accuracy * (.5 / .8);
+            // It is important to also consider accuracy difficulty when doing that
+            aimValue *= 0.975 + Math.Pow(Attributes.OverallDifficulty, 2) / 2000;
 
             return aimValue;
         }
@@ -161,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else
               speedValue *= accuracy * (.5 / .8);
             // It is important to also consider accuracy difficulty when doing that
-            speedValue *= 0.96 + Math.Pow(Attributes.OverallDifficulty, 2) / 1600;
+            speedValue *= 0.95 + Math.Pow(Attributes.OverallDifficulty, 2) / 1000;
 
             return speedValue;
         }
