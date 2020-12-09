@@ -11,7 +11,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
     [Serializable]
     public class MultiplayerRoomUser : IEquatable<MultiplayerRoomUser>
     {
-        public readonly long UserID;
+        public readonly int UserID;
 
         public MultiplayerUserState State { get; set; } = MultiplayerUserState.Idle;
 
