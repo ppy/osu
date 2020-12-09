@@ -16,22 +16,26 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public const float OBJECT_RADIUS = 64;
 
-        // This value is after XOffset applied.
-        public readonly Bindable<float> XBindable = new Bindable<float>();
+        public readonly Bindable<float> OriginalXBindable = new Bindable<float>();
 
-        // This value is before XOffset applied.
-        private float originalX;
+        public float OriginalX
+        {
+            get => OriginalXBindable.Value;
+            set => OriginalXBindable.Value = value;
+        }
 
         /// <summary>
         /// The horizontal position of the fruit between 0 and <see cref="CatchPlayfield.WIDTH"/>.
         /// </summary>
         public float X
         {
-            // TODO: I don't like this asymmetry.
-            get => XBindable.Value;
-            // originalX is set by `XBindable.BindValueChanged`
-            set => XBindable.Value = value + xOffset;
+            get => EffectiveX;
+            set => OriginalXBindable.Value = value;
         }
+
+        public readonly Bindable<float> EffectiveXBindable = new Bindable<float>();
+
+        public float EffectiveX => EffectiveXBindable.Value;
 
         private float xOffset;
 
@@ -40,11 +44,10 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         internal float XOffset
         {
-            get => xOffset;
             set
             {
                 xOffset = value;
-                XBindable.Value = originalX + xOffset;
+                EffectiveXBindable.Value = OriginalX + xOffset;
             }
         }
 
@@ -116,7 +119,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         protected CatchHitObject()
         {
-            XBindable.BindValueChanged(x => originalX = x.NewValue - xOffset);
+            OriginalXBindable.BindValueChanged(change => EffectiveXBindable.Value = change.NewValue + xOffset);
         }
     }
 }
