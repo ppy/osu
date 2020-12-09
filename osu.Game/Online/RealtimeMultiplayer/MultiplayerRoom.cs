@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace osu.Game.Online.RealtimeMultiplayer
 {
@@ -41,6 +42,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         private object writeLock = new object();
 
+        [JsonConstructor]
         public MultiplayerRoom(in long roomId)
         {
             RoomID = roomId;
