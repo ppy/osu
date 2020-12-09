@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Contains caught objects on the plate.
         /// </summary>
-        private readonly Container<CaughtObject> caughtFruitContainer;
+        private readonly Container<CaughtObject> caughtObjectContainer;
 
         /// <summary>
         /// Contains objects dropped from the plate.
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 caughtBananaPool = new DrawablePool<CaughtBanana>(100),
                 // less capacity is needed compared to fruit because droplet is not stacked
                 caughtDropletPool = new DrawablePool<CaughtDroplet>(25),
-                caughtFruitContainer = new Container<CaughtObject>
+                caughtObjectContainer = new Container<CaughtObject>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
@@ -186,7 +186,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Creates proxied content to be displayed beneath hitobjects.
         /// </summary>
-        public Drawable CreateProxiedContent() => caughtFruitContainer.CreateProxy();
+        public Drawable CreateProxiedContent() => caughtObjectContainer.CreateProxy();
 
         /// <summary>
         /// Calculates the scale of the catcher based off the provided beatmap difficulty.
@@ -279,7 +279,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
             }
 
-            caughtFruitContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
+            caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
             droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
             hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
         }
@@ -475,7 +475,7 @@ namespace osu.Game.Rulesets.Catch.UI
             caughtObject.Position = position;
             caughtObject.Scale /= 2;
 
-            caughtFruitContainer.Add(caughtObject);
+            caughtObjectContainer.Add(caughtObject);
 
             if (!caughtObject.StaysOnPlate)
                 removeFromPlate(caughtObject, DroppedObjectAnimation.Explode);
@@ -486,7 +486,7 @@ namespace osu.Game.Rulesets.Catch.UI
             const float radius_div_2 = CatchHitObject.OBJECT_RADIUS / 2;
             const float allowance = 10;
 
-            while (caughtFruitContainer.Any(f => Vector2Extensions.Distance(f.Position, position) < (displayRadius + radius_div_2) / (allowance / 2)))
+            while (caughtObjectContainer.Any(f => Vector2Extensions.Distance(f.Position, position) < (displayRadius + radius_div_2) / (allowance / 2)))
             {
                 float diff = (displayRadius + radius_div_2) / allowance;
 
@@ -533,17 +533,17 @@ namespace osu.Game.Rulesets.Catch.UI
 
             droppedObject.CopyStateFrom(caughtObject);
             droppedObject.Anchor = Anchor.TopLeft;
-            droppedObject.Position = caughtFruitContainer.ToSpaceOfOtherDrawable(caughtObject.DrawPosition, droppedObjectTarget);
+            droppedObject.Position = caughtObjectContainer.ToSpaceOfOtherDrawable(caughtObject.DrawPosition, droppedObjectTarget);
 
             return droppedObject;
         }
 
         private void clearPlate(DroppedObjectAnimation animation)
         {
-            var caughtObjects = caughtFruitContainer.Children.ToArray();
+            var caughtObjects = caughtObjectContainer.Children.ToArray();
             var droppedObjects = caughtObjects.Select(getDroppedObject).ToArray();
 
-            caughtFruitContainer.Clear(false);
+            caughtObjectContainer.Clear(false);
 
             droppedObjectTarget.AddRange(droppedObjects);
 
@@ -555,7 +555,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             var droppedObject = getDroppedObject(caughtObject);
 
-            if (!caughtFruitContainer.Remove(caughtObject))
+            if (!caughtObjectContainer.Remove(caughtObject))
                 throw new InvalidOperationException("Can only drop a caught object on the plate");
 
             droppedObjectTarget.Add(droppedObject);
@@ -573,7 +573,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     break;
 
                 case DroppedObjectAnimation.Explode:
-                    var originalX = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtFruitContainer).X * Scale.X;
+                    var originalX = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtObjectContainer).X * Scale.X;
                     d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
                     d.MoveToX(d.X + originalX * 6, 1000);
                     d.FadeOut(750);
