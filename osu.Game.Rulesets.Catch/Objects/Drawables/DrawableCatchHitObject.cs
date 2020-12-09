@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         protected override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
+        protected override float SamplePlaybackPosition => HitObject.EffectiveX / CatchPlayfield.WIDTH;
 
         public int RandomSeed => HitObject?.RandomSeed ?? 0;
 
