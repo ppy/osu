@@ -5,10 +5,10 @@ using System;
 
 namespace osu.Game.Online.RealtimeMultiplayer
 {
-    public class InvalidStateChange : Exception
+    public class AlreadyInRoomException : Exception
     {
-        public InvalidStateChange(MultiplayerUserState oldState, MultiplayerUserState newState)
-            : base($"Cannot change from {oldState} to {newState}")
+        public AlreadyInRoomException()
+            : base("This user is already in a multiplayer room.")
         {
         }
     }
