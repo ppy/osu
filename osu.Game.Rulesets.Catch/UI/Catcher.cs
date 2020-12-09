@@ -555,7 +555,7 @@ namespace osu.Game.Rulesets.Catch.UI
             var droppedObject = getDroppedObject(caughtObject);
 
             if (!caughtObjectContainer.Remove(caughtObject))
-                throw new InvalidOperationException("Can only drop a caught object on the plate");
+                throw new InvalidOperationException("Can only drop objects that were previously caught on the plate");
 
             droppedObjectTarget.Add(droppedObject);
 
