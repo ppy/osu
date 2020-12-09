@@ -67,12 +67,6 @@ namespace osu.Android
             }
         }
 
-        public override Task Import(Stream stream, string filename)
-        {
-            WaitForReady(() => this, _ => Task.Run(() => base.Import(stream, filename)));
-            return Task.CompletedTask;
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
