@@ -50,5 +50,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// Request a lock on this room to perform a thread-safe update.
         /// </summary>
         public LockUntilDisposal LockForUpdate() => new LockUntilDisposal(writeLock);
+
+        public override string ToString() => $"RoomID:{RoomID} Host:{Host?.UserID} Users:{Users.Count} State:{State} Settings: [{Settings}]";
     }
 }
