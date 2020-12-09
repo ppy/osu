@@ -2,13 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Runtime.Serialization;
+using Microsoft.AspNetCore.SignalR;
 
 namespace osu.Game.Online.RealtimeMultiplayer
 {
-    public class AlreadyInRoomException : Exception
+    [Serializable]
+    public class AlreadyInRoomException : HubException
     {
         public AlreadyInRoomException()
             : base("This user is already in a multiplayer room.")
+        {
+        }
+
+        protected AlreadyInRoomException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }
