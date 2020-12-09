@@ -68,12 +68,29 @@ namespace osu.Game.Tests.Online
             Assert.That(converted.FinalRate.Value, Is.EqualTo(0.25));
         }
 
+        [Test]
+        public void TestDeserialiseDifficultyAdjustModWithExtendedLimits()
+        {
+            var apiMod = new APIMod(new TestModDifficultyAdjust
+            {
+                OverallDifficulty = { Value = 11 },
+                ExtendedLimits = { Value = true }
+            });
+
+            var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+            var converted = (TestModDifficultyAdjust)deserialised.ToMod(new TestRuleset());
+
+            Assert.That(converted.ExtendedLimits.Value, Is.True);
+            Assert.That(converted.OverallDifficulty.Value, Is.EqualTo(11));
+        }
+
         private class TestRuleset : Ruleset
         {
             public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[]
             {
                 new TestMod(),
                 new TestModTimeRamp(),
+                new TestModDifficultyAdjust()
             };
 
             public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new System.NotImplementedException();
@@ -134,6 +151,10 @@ namespace osu.Game.Tests.Online
                 Default = true,
                 Value = true
             };
+        }
+
+        private class TestModDifficultyAdjust : ModDifficultyAdjust
+        {
         }
     }
 }
