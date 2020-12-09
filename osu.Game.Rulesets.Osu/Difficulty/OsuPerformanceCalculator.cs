@@ -123,9 +123,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Scale the aim value with accuracy _alot_
             if (accuracy > .8)
-              aimValue *= 0.5 + Math.Pow(Math.Sin(2.5 * (accuracy - .8) * Math.PI), 2) / 2;
+                aimValue *= 0.5 + Math.Pow(Math.Sin(2.5 * (accuracy - .8) * Math.PI), 2) / 2;
             else
-              aimValue *= accuracy * (.5 / .8);
+                aimValue *= accuracy * (.5 / .8);
             // It is important to also consider accuracy difficulty when doing that
             aimValue *= 0.975 + Math.Pow(Attributes.OverallDifficulty, 2) / 2000;
 
@@ -159,9 +159,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Scale the speed value with accuracy _alot_
             if (accuracy > .8)
-              speedValue *= 0.5 + Math.Pow(Math.Sin(2.5 * (accuracy - .8) * Math.PI), 2) / 2;
+                speedValue *= 0.5 + Math.Pow(Math.Sin(2.5 * (accuracy - .8) * Math.PI), 2) / 2;
             else
-              speedValue *= accuracy * (.5 / .8);
+                speedValue *= accuracy * (.5 / .8);
             // It is important to also consider accuracy difficulty when doing that
             speedValue *= 0.95 + Math.Pow(Attributes.OverallDifficulty, 2) / 1000;
 
