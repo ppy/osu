@@ -540,8 +540,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void clearPlate(DroppedObjectAnimation animation)
         {
-            var caughtObjects = caughtObjectContainer.Children.ToArray();
-            var droppedObjects = caughtObjects.Select(getDroppedObject).ToArray();
+            var droppedObjects = caughtObjectContainer.Children.Select(getDroppedObject).ToArray();
 
             caughtObjectContainer.Clear(false);
 
