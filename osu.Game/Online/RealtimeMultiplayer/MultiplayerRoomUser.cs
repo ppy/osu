@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using Newtonsoft.Json;
 using osu.Game.Users;
 
 namespace osu.Game.Online.RealtimeMultiplayer
@@ -17,6 +18,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         public User? User { get; set; }
 
+        [JsonConstructor]
         public MultiplayerRoomUser(in int userId)
         {
             UserID = userId;
