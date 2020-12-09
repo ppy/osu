@@ -24,7 +24,5 @@ namespace osu.Game.Online.RealtimeMultiplayer
         public bool Equals(MultiplayerRoomSettings other) => BeatmapID == other.BeatmapID && Mods.SequenceEqual(other.Mods) && RulesetID == other.RulesetID;
 
         public override string ToString() => $"Beatmap:{BeatmapID} Mods:{string.Join(',', Mods)} Ruleset:{RulesetID}";
-
-        public static MultiplayerRoomSettings Empty() => new MultiplayerRoomSettings();
     }
 }

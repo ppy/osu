@@ -27,7 +27,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// <summary>
         /// All currently enforced game settings for this room.
         /// </summary>
-        public MultiplayerRoomSettings Settings { get; set; } = MultiplayerRoomSettings.Empty();
+        public MultiplayerRoomSettings Settings { get; set; } = new MultiplayerRoomSettings();
 
         /// <summary>
         /// All users currently in this room.
