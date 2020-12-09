@@ -14,7 +14,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// Request to join a multiplayer room.
         /// </summary>
         /// <param name="roomId">The databased room ID.</param>
-        /// <exception cref="AlreadyInRoomException">If the user is already in the requested (or another) room.</exception>
+        /// <exception cref="InvalidStateException">If the user is already in the requested (or another) room.</exception>
         Task<MultiplayerRoom> JoinRoom(long roomId);
 
         /// <summary>
@@ -52,6 +52,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// </summary>
         /// <exception cref="NotHostException">A user other than the current host is attempting to start the game.</exception>
         /// <exception cref="NotJoinedRoomException">If the user is not in a room.</exception>
+        /// <exception cref="InvalidStateException">If an attempt to start the game occurs when the game's (or users') state disallows it.</exception>
         Task StartMatch();
     }
 }
