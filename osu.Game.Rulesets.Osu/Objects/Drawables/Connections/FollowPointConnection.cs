@@ -110,8 +110,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             double startTime = start.GetEndTime();
             double duration = end.StartTime - startTime;
 
+            // For now, adjust the pre-empt for approach rates > 10.
+            double preempt = PREEMPT * Math.Min(1, start.TimePreempt / 450);
+
             fadeOutTime = startTime + fraction * duration;
-            fadeInTime = fadeOutTime - PREEMPT;
+            fadeInTime = fadeOutTime - preempt;
         }
     }
 }

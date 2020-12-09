@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -113,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
-            TimeFadeIn = 400; // as per osu-stable
+            TimeFadeIn = 400 * Math.Min(1, TimePreempt / 450);
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
