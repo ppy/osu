@@ -53,9 +53,15 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private CatcherTrailDisplay trails;
 
-        private readonly Container droppedObjectTarget;
-
+        /// <summary>
+        /// Contains caught objects on the plate.
+        /// </summary>
         private readonly Container<CaughtObject> caughtFruitContainer;
+
+        /// <summary>
+        /// Contains objects dropped from the plate.
+        /// </summary>
+        private readonly Container<CaughtObject> droppedObjectTarget;
 
         public CatcherAnimationState CurrentState { get; private set; }
 
@@ -112,7 +118,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
         private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
 
-        public Catcher([NotNull] Container trailsTarget, [NotNull] Container droppedObjectTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] Container trailsTarget, [NotNull] Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty = null)
         {
             this.trailsTarget = trailsTarget;
             this.droppedObjectTarget = droppedObjectTarget;
@@ -274,7 +280,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
 
             caughtFruitContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            droppedObjectTarget.RemoveAll(d => (d as CaughtObject)?.HitObject == drawableObject.HitObject);
+            droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
             hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
         }
 
