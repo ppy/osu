@@ -19,12 +19,4 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         float Rotation { get; }
         Vector2 Scale { get; }
     }
-
-    /// <summary>
-    /// Provides a visual state of a <see cref="Fruit"/>.
-    /// </summary>
-    public interface IHasFruitState : IHasCatchObjectState
-    {
-        Bindable<FruitVisualRepresentation> VisualRepresentation { get; }
-    }
 }

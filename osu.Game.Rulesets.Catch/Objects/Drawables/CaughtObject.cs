@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -59,42 +58,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             LifetimeEnd = double.MaxValue;
 
             base.FreeAfterUse();
-        }
-    }
-
-    public class CaughtFruit : CaughtObject, IHasFruitState
-    {
-        public Bindable<FruitVisualRepresentation> VisualRepresentation { get; } = new Bindable<FruitVisualRepresentation>();
-
-        public CaughtFruit()
-            : base(CatchSkinComponents.Fruit, _ => new FruitPiece())
-        {
-        }
-
-        public override void CopyStateFrom(IHasCatchObjectState objectState)
-        {
-            base.CopyStateFrom(objectState);
-
-            var fruitState = (IHasFruitState)objectState;
-            VisualRepresentation.Value = fruitState.VisualRepresentation.Value;
-        }
-    }
-
-    public class CaughtBanana : CaughtObject
-    {
-        public CaughtBanana()
-            : base(CatchSkinComponents.Banana, _ => new BananaPiece())
-        {
-        }
-    }
-
-    public class CaughtDroplet : CaughtObject
-    {
-        public override bool StaysOnPlate => false;
-
-        public CaughtDroplet()
-            : base(CatchSkinComponents.Droplet, _ => new DropletPiece())
-        {
         }
     }
 }
