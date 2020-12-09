@@ -52,6 +52,7 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Users;
+using System.IO;
 
 namespace osu.Game
 {
@@ -424,6 +425,12 @@ namespace osu.Game
                         break;
                 }
             }, validScreens: new[] { typeof(PlaySongSelect) });
+        }
+
+        public override Task Import(Stream stream, string filename)
+        {
+            WaitForReady(() => this, _ => Task.Run(() => base.Import(stream, filename)));
+            return Task.CompletedTask;
         }
 
         protected virtual Loader CreateLoader() => new Loader();
