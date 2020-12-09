@@ -11,7 +11,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     [Cached(typeof(IHasCatchObjectState))]
-    public abstract class DrawablePalpableHasCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
+    public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
     {
         public new PalpableCatchHitObject HitObject => (PalpableCatchHitObject)base.HitObject;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public float DisplayRadius => CatchHitObject.OBJECT_RADIUS * HitObject.Scale * ScaleFactor;
 
-        protected DrawablePalpableHasCatchHitObject([CanBeNull] CatchHitObject h)
+        protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
             : base(h)
         {
             Origin = Anchor.Centre;

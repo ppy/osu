@@ -10,7 +10,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableFruit : DrawablePalpableHasCatchHitObject, IHasFruitState
+    public class DrawableFruit : DrawablePalpableCatchHitObject, IHasFruitState
     {
         public Bindable<FruitVisualRepresentation> VisualRepresentation { get; } = new Bindable<FruitVisualRepresentation>();
 

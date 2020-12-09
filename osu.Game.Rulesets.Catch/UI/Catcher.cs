@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Catch.UI
             catchResult.CatcherAnimationState = CurrentState;
             catchResult.CatcherHyperDash = HyperDashing;
 
-            if (!(drawableObject is DrawablePalpableHasCatchHitObject palpableObject)) return;
+            if (!(drawableObject is DrawablePalpableCatchHitObject palpableObject)) return;
 
             var hitObject = palpableObject.HitObject;
 
@@ -458,7 +458,7 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCatcher();
         }
 
-        private void placeCaughtObject(DrawablePalpableHasCatchHitObject drawableObject, Vector2 position)
+        private void placeCaughtObject(DrawablePalpableCatchHitObject drawableObject, Vector2 position)
         {
             var caughtObject = getCaughtObject(drawableObject.HitObject);
 
