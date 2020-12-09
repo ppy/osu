@@ -52,10 +52,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         protected override void FreeAfterUse()
         {
             ClearTransforms();
-
             Alpha = 1;
-            LifetimeStart = double.MinValue;
-            LifetimeEnd = double.MaxValue;
 
             base.FreeAfterUse();
         }
