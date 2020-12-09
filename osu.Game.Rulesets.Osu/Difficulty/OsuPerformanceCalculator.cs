@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                 : 0.0);
             }
 
-            // Scale the aim value with accuracy _alot_
+            // Scale the aim value with accuracy _a lot_
             if (accuracy > .8)
                 aimValue *= 0.5 + Math.Pow(Math.Sin(2.5 * (accuracy - .8) * Math.PI), 2) / 2;
             else
@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
-            // Scale the speed value with accuracy _alot_
+            // Scale the speed value with accuracy _a lot_
             if (accuracy > .8)
                 speedValue *= 0.5 + Math.Pow(Math.Sin(2.5 * (accuracy - .8) * Math.PI), 2) / 2;
             else
