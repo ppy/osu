@@ -32,16 +32,16 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 VisualRepresentation.Value = (FruitVisualRepresentation)(change.NewValue % 4);
             }, true);
 
-            AddInternal(new SkinnableDrawable(
+            ScalingContainer.Child = new SkinnableDrawable(
                 new CatchSkinComponent(CatchSkinComponents.Fruit),
-                _ => new FruitPiece()));
+                _ => new FruitPiece());
         }
 
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
 
-            this.RotateTo((RandomSingle(1) - 0.5f) * 40);
+            ScalingContainer.RotateTo((RandomSingle(1) - 0.5f) * 40);
         }
     }
 

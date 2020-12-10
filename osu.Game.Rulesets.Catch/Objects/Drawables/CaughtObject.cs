@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
 
+        float IHasCatchObjectState.Scale => Scale.X;
+
         /// <summary>
         /// Whether this hit object should stay on the catcher plate when the object is caught by the catcher.
         /// </summary>
@@ -43,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public virtual void CopyStateFrom(IHasCatchObjectState objectState)
         {
             HitObject = objectState.HitObject;
-            Scale = objectState.Scale;
+            Scale = new Vector2(objectState.Scale);
             Rotation = objectState.Rotation;
             AccentColour.Value = objectState.AccentColour.Value;
             HyperDash.Value = objectState.HyperDash.Value;

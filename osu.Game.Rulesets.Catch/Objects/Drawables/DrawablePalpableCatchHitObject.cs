@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 
@@ -30,11 +31,27 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public float DisplayRadius => CatchHitObject.OBJECT_RADIUS * HitObject.Scale * ScaleFactor;
 
+        /// <summary>
+        /// The container internal transforms (such as scaling based on the circle size) are applied to.
+        /// </summary>
+        protected readonly Container ScalingContainer;
+
+        float IHasCatchObjectState.Scale => HitObject.Scale * ScaleFactor;
+
+        float IHasCatchObjectState.Rotation => ScalingContainer.Rotation;
+
         protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
             : base(h)
         {
             Origin = Anchor.Centre;
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
+
+            AddInternal(ScalingContainer = new Container
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2)
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -47,7 +64,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             ScaleBindable.BindValueChanged(scale =>
             {
-                Scale = new Vector2(scale.NewValue * ScaleFactor);
+                ScalingContainer.Scale = new Vector2(scale.NewValue * ScaleFactor);
+                Size = ScalingContainer.Size * ScalingContainer.Scale;
             }, true);
 
             IndexInBeatmap.BindValueChanged(_ => UpdateComboColour());
