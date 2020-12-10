@@ -12,10 +12,7 @@ cd mfosu
 git clone https://github.com/MATRIX-feather/osu.git
 git clone https://github.com/MATRIX-feather/osu-framework.git
 
-cd osu
-git checkout dev-m-locale
-
-cd ../osu-framework
+cd osu-framework
 
 git checkout locale
 cd ../osu
