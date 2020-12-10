@@ -2,7 +2,7 @@
   <img width="500px" src="assets/lazer.png">
 </p>
 
-# 如何完整克隆本项目:
+# 如何完整克隆本项目(需要bash):
 
 ```bash
 #!/bin/bash
