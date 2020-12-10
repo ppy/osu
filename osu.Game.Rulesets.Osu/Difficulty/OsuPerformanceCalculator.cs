@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 multiplier *= 0.90;
 
             if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 0.95;
+                multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
 
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
@@ -156,10 +156,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
-            // Scale the speed value with accuracy _slightly_
-            speedValue *= 0.02 + accuracy;
-            // It is important to also consider accuracy difficulty when doing that
-            speedValue *= 0.96 + Math.Pow(Attributes.OverallDifficulty, 2) / 1600;
+            // Scale the speed value with accuracy and OD
+            speedValue *= (.95 + Math.Pow(Attributes.OverallDifficulty, 2) / 750) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
+            // Scale the speed value with # of 50s to punish doubletapping.
+            speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0.5 * countMeh : countMeh - totalHits / 500.0 * 0.5);
 
             return speedValue;
         }
