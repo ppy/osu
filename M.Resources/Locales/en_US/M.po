@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-10 18:57+0800\n"
+"PO-Revision-Date: 2020-12-10 22:33+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -157,6 +157,15 @@ msgstr "Blue"
 msgid "使用原版频谱效果"
 msgstr "Use menu visualizer"
 
+msgid "基本"
+msgstr "Basic"
+
+msgid "圆角"
+msgstr ""
+
+msgid "打砖块"
+msgstr ""
+
 # 设置 - 故事版
 msgid "启用故事版/背景视频"
 msgstr "Enable storyboard/video"
@@ -171,7 +180,7 @@ msgstr "Enable Mf Custom UI"
 msgid "禁用以获得接近原版lazer提供的界面体验"
 msgstr "Disable if you want to get closer experience to the original lazer"
 
-msgid "启用三角形动画"
+msgid "启用三角形粒子动画"
 msgstr "Enable Triangles"
 
 msgid "启用Sayobot功能"
@@ -196,7 +205,7 @@ msgid "仅在开场样式为\"略过开场\"时生效"
 msgstr "Only takes effect when the intro is \"略过开场\""
 
 # Mf-osu 设置 - 语言环境
-msgid "语言环境(Locale)"
+msgid "语言环境(LOCALE)"
 msgstr "Locale"
 
 # Mf-osu 设置 - 入口
@@ -209,3 +218,67 @@ msgstr "Open settings menu"
 # 主菜单
 msgid "游玩"
 msgstr "play"
+
+msgid "osu!编辑器"
+msgstr "osu!editor"
+
+msgid "谱面列表"
+msgstr "osu!direct"
+
+# 游戏
+msgid "Windowed"
+msgstr "Windowed"
+
+msgid "Borderless"
+msgstr "Borderless"
+
+msgid "Fullscreen"
+msgstr "Fullscreen"
+
+msgid "Single thread"
+msgstr "Single thread"
+
+msgid "Multithreaded"
+msgstr "Multithreaded"
+
+msgid "SCREEN RESOLUTION"
+msgstr "SCREEN RESOLUTION"
+
+msgid "SCREEN MODE"
+msgstr "SCREEN MODE"
+
+msgid "2x refresh rate"
+msgstr "2x refresh rate"
+
+msgid "4x refresh rate"
+msgstr "4x refresh rate"
+
+msgid "8x refresh rate"
+msgstr "8x refresh rate"
+
+msgid "Unlimited"
+msgstr "Unlimited"
+
+msgid "Frame Limiter"
+msgstr "Frame Limiter"
+
+msgid "VSync"
+msgstr "VSync"
+
+msgid "谱面信息"
+msgstr ""
+
+msgid "本地排行"
+msgstr ""
+
+msgid "国内/区内排行"
+msgstr ""
+
+msgid "全球排行"
+msgstr ""
+
+msgid "好友排行"
+msgstr ""
+
+msgid "返回"
+msgstr "Back"
