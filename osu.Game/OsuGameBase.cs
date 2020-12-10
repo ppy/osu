@@ -40,6 +40,7 @@ using osu.Game.Skinning;
 using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
+using osu.Game.Locale;
 
 namespace osu.Game
 {
@@ -306,6 +307,8 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
+
+            Add(new MLocaleManager());
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
