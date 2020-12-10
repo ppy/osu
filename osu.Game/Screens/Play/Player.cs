@@ -339,7 +339,11 @@ namespace osu.Game.Screens.Play
                         AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         IsCounting = false
                     },
-                    RequestSeek = GameplayClockContainer.Seek,
+                    RequestSeek = time =>
+                    {
+                        GameplayClockContainer.Seek(time);
+                        GameplayClockContainer.Start();
+                    },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
@@ -545,7 +549,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score);
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true);
 
         #region Fail Logic
 

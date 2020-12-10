@@ -644,6 +644,55 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestChangingRulesetOnMultiRulesetBeatmap()
+        {
+            int changeCount = 0;
+
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, false));
+            AddStep("bind beatmap changed", () =>
+            {
+                Beatmap.ValueChanged += onChange;
+                changeCount = 0;
+            });
+
+            changeRuleset(0);
+
+            createSongSelect();
+
+            AddStep("import multi-ruleset map", () =>
+            {
+                var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
+                manager.Import(createTestBeatmapSet(usableRulesets)).Wait();
+            });
+
+            int previousSetID = 0;
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
+
+            AddStep("record set ID", () => previousSetID = Beatmap.Value.BeatmapSetInfo.ID);
+            AddAssert("selection changed once", () => changeCount == 1);
+
+            AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
+
+            changeRuleset(3);
+
+            AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
+
+            AddUntilStep("selection changed", () => changeCount > 1);
+
+            AddAssert("Selected beatmap still same set", () => Beatmap.Value.BeatmapSetInfo.ID == previousSetID);
+            AddAssert("Selected beatmap is mania", () => Beatmap.Value.BeatmapInfo.Ruleset.ID == 3);
+
+            AddAssert("selection changed only fired twice", () => changeCount == 2);
+
+            AddStep("unbind beatmap changed", () => Beatmap.ValueChanged -= onChange);
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
+
+            // ReSharper disable once AccessToModifiedClosure
+            void onChange(ValueChangedEvent<WorkingBeatmap> valueChangedEvent) => changeCount++;
+        }
+
+        [Test]
         public void TestDifficultyIconSelectingForDifferentRuleset()
         {
             changeRuleset(0);
