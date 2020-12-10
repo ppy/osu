@@ -34,6 +34,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\M.Resources\M.Resources.csproj" />
-    <ProjectReference Include="\data\Projects\mfosu\osu-framework\osu.Framework\osu.Framework.csproj" />
+    <ProjectReference Include="..\..\osu-framework\osu.Framework\osu.Framework.csproj" />
   </ItemGroup>
 </Project>

@@ -16,7 +16,11 @@
       "osu.Game.Tournament.Tests\\osu.Game.Tournament.Tests.csproj",
       "osu.Game.Tournament\\osu.Game.Tournament.csproj",
       "osu.Game\\osu.Game.csproj",
-      "M.Resources\\M.Resources.csproj"
+      "M.Resources\\M.Resources.csproj",
+      "../osu-framework/osu.Framework/osu.Framework.csproj",
+      "../osu-framework/osu.Framework/osu.Framework.NativeLibs.csproj",
+      "../osu-framework/osu.Framework/osu.Framework.csproj",
+      "../osu-framework/osu.Framework/osu.Framework.NativeLibs.csproj"
     ]
   }
 }
