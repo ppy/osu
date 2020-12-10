@@ -93,7 +93,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= lengthBonus;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            aimValue *= Math.Pow(0.97, countMiss);
+            if (countMiss > 0)
+                aimValue *= .97 * Math.Pow(1 - Math.Pow((double)countMiss / (double)totalHits, .775), Math.Pow(countMiss, .75));
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
@@ -139,7 +140,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= lengthBonus;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            speedValue *= Math.Pow(0.97, countMiss);
+            if (countMiss > 0)
+                speedValue *= .97 * Math.Pow(1 - Math.Pow((double)countMiss / (double)totalHits, .775), Math.Pow(countMiss, 1));
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
