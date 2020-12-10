@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -71,8 +72,9 @@ namespace osu.Game.Screens.Play
         }
 
         private bool readyForPush =>
+            !playerConsumed
             // don't push unless the player is completely loaded
-            player?.LoadState == LoadState.Ready
+            && player?.LoadState == LoadState.Ready
             // don't push if the user is hovering one of the panes, unless they are idle.
             && (IsHovered || idleTracker.IsIdle.Value)
             // don't push if the user is dragging a slider or otherwise.
@@ -83,6 +85,11 @@ namespace osu.Game.Screens.Play
         private readonly Func<Player> createPlayer;
 
         private Player player;
+
+        /// <summary>
+        /// Whether the curent player instance has been consumed via <see cref="consumePlayer"/>.
+        /// </summary>
+        private bool playerConsumed;
 
         private LogoTrackingContainer content;
 
@@ -191,7 +198,11 @@ namespace osu.Game.Screens.Play
         {
             base.OnResuming(last);
 
+            // prepare for a retry.
+            player = null;
+            playerConsumed = false;
             cancelLoad();
+
             contentIn();
         }
 
@@ -276,9 +287,10 @@ namespace osu.Game.Screens.Play
 
         private Player consumePlayer()
         {
-            var consumed = player;
-            player = null;
-            return consumed;
+            Debug.Assert(!playerConsumed);
+
+            playerConsumed = true;
+            return player;
         }
 
         private void prepareNewPlayer()
@@ -395,7 +407,7 @@ namespace osu.Game.Screens.Play
             if (isDisposing)
             {
                 // if the player never got pushed, we should explicitly dispose it.
-                DisposalTask = LoadTask?.ContinueWith(_ => player.Dispose());
+                DisposalTask = LoadTask?.ContinueWith(_ => player?.Dispose());
             }
         }
 
