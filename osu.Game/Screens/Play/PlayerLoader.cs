@@ -274,6 +274,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private Player consumePlayer()
+        {
+            var consumed = player;
+            player = null;
+            return consumed;
+        }
+
         private void prepareNewPlayer()
         {
             if (!this.IsCurrentScreen())
@@ -331,6 +338,8 @@ namespace osu.Game.Screens.Play
                 scheduledPushPlayer = Scheduler.AddDelayed(() =>
                 {
                     contentOut();
+                // ensure that once we have reached this "point of no return", readyForPush will be false for all future checks (until a new player instance is prepared).
+                var consumedPlayer = consumePlayer();
 
                     TransformSequence<PlayerLoader> pushSequence = this.Delay(250);
 
@@ -362,8 +371,6 @@ namespace osu.Game.Screens.Play
                         // Note that this may change if the player we load requested a re-run.
                         ValidForResume = false;
 
-                        if (player.LoadedBeatmapSuccessfully)
-                            this.Push(player);
                         else
                             this.Exit();
                     });
@@ -373,6 +380,8 @@ namespace osu.Game.Screens.Play
             {
                 Schedule(pushWhenLoaded);
             }
+                    if (consumedPlayer.LoadedBeatmapSuccessfully)
+                        this.Push(consumedPlayer);
         }
 
         private void cancelLoad()
