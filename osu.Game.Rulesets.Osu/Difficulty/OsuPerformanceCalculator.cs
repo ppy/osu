@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= 0.5 + accuracy / 2.0;
             // It is important to also consider accuracy difficulty when doing that
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
-            
+
             return aimValue;
         }
 
