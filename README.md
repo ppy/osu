@@ -2,6 +2,33 @@
   <img width="500px" src="assets/lazer.png">
 </p>
 
+# 如何完整克隆本项目:
+
+```bash
+#!/bin/bash
+mkdir mfosu
+cd mfosu
+
+git clone https://github.com/MATRIX-feather/osu.git
+git clone https://github.com/MATRIX-feather/osu-framework.git
+
+cd osu
+git checkout dev-framework-locale
+
+cd ../osu-framework
+
+git checkout locale
+cd ../osu
+
+dotnet run --project osu.Desktop -c Release
+```
+
+# 更改翻译
+编辑`M.Resources/Locales/<语言代码>/M.po`，完成后保存即可。
+
+# 创建翻译
+使用`Poedit`打开`M.Resources/Locales/M.pot`，然后将创建的翻译放在`Locales/<语言代码>/下`
+
 # osu!
 
 [![Build status](https://ci.appveyor.com/api/projects/status/u2p01nx7l6og8buh?svg=true)](https://ci.appveyor.com/project/peppy/osu)
