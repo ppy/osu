@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (result.IsHit)
             {
-                var positionInStack = computePositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplayRadius);
+                var positionInStack = computePositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplaySize.X / 2);
 
                 placeCaughtObject(palpableObject, positionInStack);
 

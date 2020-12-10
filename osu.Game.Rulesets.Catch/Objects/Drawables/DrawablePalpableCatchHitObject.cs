@@ -29,16 +29,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// </summary>
         protected virtual float ScaleFactor => 1;
 
-        public float DisplayRadius => CatchHitObject.OBJECT_RADIUS * HitObject.Scale * ScaleFactor;
-
         /// <summary>
         /// The container internal transforms (such as scaling based on the circle size) are applied to.
         /// </summary>
         protected readonly Container ScalingContainer;
 
-        float IHasCatchObjectState.Scale => HitObject.Scale * ScaleFactor;
+        public Vector2 DisplaySize => ScalingContainer.Size * ScalingContainer.Scale;
 
-        float IHasCatchObjectState.Rotation => ScalingContainer.Rotation;
+        public float DisplayRotation => ScalingContainer.Rotation;
 
         protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
             : base(h)
@@ -65,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             ScaleBindable.BindValueChanged(scale =>
             {
                 ScalingContainer.Scale = new Vector2(scale.NewValue * ScaleFactor);
-                Size = ScalingContainer.Size * ScalingContainer.Scale;
+                Size = DisplaySize;
             }, true);
 
             IndexInBeatmap.BindValueChanged(_ => UpdateComboColour());
