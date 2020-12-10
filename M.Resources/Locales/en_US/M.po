@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-10 22:33+0800\n"
+"PO-Revision-Date: 2020-12-11 01:12+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -29,8 +29,8 @@ msgstr "{0} Song(s)"
 msgid "等{0}首歌曲"
 msgstr "...+{0} Song(s)"
 
-msgid "收藏夹"
-msgstr "Collection"
+msgid "收藏夹选择"
+msgstr "Select collection"
 
 msgid "播放器设置"
 msgstr "Player Settings"
@@ -170,6 +170,16 @@ msgstr ""
 msgid "启用故事版/背景视频"
 msgstr "Enable storyboard/video"
 
+msgid "故事版"
+msgstr "Storyboard"
+
+# Mf-osu 设置 - 入口
+msgid "Mf-osu自定义选项"
+msgstr "Mf-osu custom settings"
+
+msgid "在这里调整Mf-osu的额外设置!"
+msgstr "Tweak extra settings here!"
+
 # Mf-osu 设置 - 整体
 msgid "整体"
 msgstr "General"
@@ -206,14 +216,17 @@ msgstr "Only takes effect when the intro is \"略过开场\""
 
 # Mf-osu 设置 - 语言环境
 msgid "语言环境(LOCALE)"
-msgstr "Locale"
+msgstr "LOCALE"
 
 # Mf-osu 设置 - 入口
-msgid "Mf-osu选项"
-msgstr "Mf-osu settings"
+msgid "MF-OSU选项"
+msgstr "MF-OSU OPTIONS"
 
 msgid "打开选项菜单"
 msgstr "Open settings menu"
+
+msgid "更改Mf-osu的设置"
+msgstr "Change Mf-osu settings"
 
 # 主菜单
 msgid "游玩"
@@ -224,6 +237,53 @@ msgstr "osu!editor"
 
 msgid "谱面列表"
 msgstr "osu!direct"
+
+msgid "单人游戏"
+msgstr "solo"
+
+msgid "多人游戏"
+msgstr "multi"
+
+msgid "排名"
+msgstr "charts"
+
+msgid "一个神秘的按钮"
+msgstr "TOP SECRET"
+
+msgid "关于Mf-osu"
+msgstr "About Mf-osu"
+
+# Mvis设置Section标题
+msgid "Mvis播放器"
+msgstr "Mvis Player"
+
+msgid "文件导入"
+msgstr "File import"
+
+# 文件导入界面
+msgid "计算机"
+msgstr "Computer"
+
+msgid "当前目录"
+msgstr "Current directory"
+
+msgid "请选择一个文件"
+msgstr "Please select one first!"
+
+msgid "刷新文件列表"
+msgstr "Refresh"
+
+msgid "导入该文件"
+msgstr "Import"
+
+msgid "本地"
+msgstr "local"
+
+msgid "发行版"
+msgstr "release"
+
+msgid "调试版"
+msgstr "debug"
 
 # 游戏
 msgid "Windowed"
@@ -259,26 +319,153 @@ msgstr "8x refresh rate"
 msgid "Unlimited"
 msgstr "Unlimited"
 
-msgid "Frame Limiter"
-msgstr "Frame Limiter"
+msgid "FRAME LIMITER"
+msgstr ""
+
+msgid "DEBUG LOGS"
+msgstr ""
+
+msgid "visible"
+msgstr ""
+
+msgid "hidden"
+msgstr ""
 
 msgid "VSync"
 msgstr "VSync"
 
-msgid "谱面信息"
-msgstr ""
-
-msgid "本地排行"
-msgstr ""
-
-msgid "国内/区内排行"
-msgstr ""
-
-msgid "全球排行"
-msgstr ""
-
-msgid "好友排行"
-msgstr ""
-
 msgid "返回"
 msgstr "Back"
+
+msgid "谱面信息"
+msgstr "Details"
+
+msgid "本地排行"
+msgstr "Local"
+
+msgid "国内/区内排行"
+msgstr "Country/Region"
+
+msgid "全球排行"
+msgstr "Global"
+
+msgid "好友排行"
+msgstr "Friend"
+
+msgid "已选择的Mods"
+msgstr "Selected Mods"
+
+# 歌曲选择界面 - FilterControl
+msgid "分类依据"
+msgstr "Sort by"
+
+msgid "艺术家"
+msgstr "Artist"
+
+msgid "作图者"
+msgstr "Mapper:"
+
+msgid "BPM"
+msgstr "BPM"
+
+msgid "添加日期"
+msgstr "Date Added"
+
+msgid "难度"
+msgstr "Difficulty"
+
+msgid "长度"
+msgstr "Length"
+
+msgid "所有谱面"
+msgstr "All beatmaps"
+
+msgid "管理收藏夹"
+msgstr "Manage collections"
+
+msgid "显示转谱"
+msgstr "Show converted"
+
+msgid "取得的成绩"
+msgstr "Rank Archived"
+
+msgid "标题"
+msgstr "Title"
+
+# 歌曲选择 - BeatmapLeaderBoard
+msgid "这里还没有成绩!"
+msgstr "No records yet!"
+
+msgid "查看在线排行"
+msgstr "View online leaderboards"
+
+# ??? - BeatmapDetails
+msgid "圆圈大小"
+msgstr "Circle Size"
+
+msgid "掉血速度"
+msgstr "HP Drain"
+
+msgid "整体难度"
+msgstr "Accuracy"
+
+msgid "缩圈速度"
+msgstr "Approach Rate"
+
+msgid "难度星级"
+msgstr "Star Difficulty"
+
+msgid "评分情况"
+msgstr "User Rating"
+
+msgid "评分分布"
+msgstr "Rating Spread"
+
+msgid "失败点"
+msgstr "Points of Failure"
+
+msgid "难度描述"
+msgstr "Description"
+
+msgid "标签"
+msgstr "Tags"
+
+msgid "来源"
+msgstr "Source"
+
+# 歌曲选择 - Footer
+msgid "游戏Mods"
+msgstr "mods"
+
+msgid "随机选择"
+msgstr "random"
+
+msgid "撤销随机"
+msgstr "rewind"
+
+msgid "设置"
+msgstr "settings"
+
+msgid "在Mvis中打开"
+msgstr "Open in Mvis"
+
+msgid "编辑"
+msgstr "Edit"
+
+msgid "细节"
+msgstr "Details..."
+
+msgid "隐藏"
+msgstr "Hide"
+
+msgid "展开"
+msgstr "Expand"
+
+msgid "收藏夹"
+msgstr "Collection"
+
+msgid "删除"
+msgstr "Delete..."
+
+#~ msgid "Frame Limiter"
+#~ msgstr "Frame Limiter"

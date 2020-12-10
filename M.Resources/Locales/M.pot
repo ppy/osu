@@ -17,7 +17,7 @@ msgstr ""
 msgid "M-vis播放器"
 msgstr ""
 
-# 播放器界面
+# Mvis播放器界面
 msgid "未选择收藏夹"
 msgstr ""
 
@@ -30,7 +30,7 @@ msgstr ""
 msgid "等{0}首歌曲"
 msgstr ""
 
-msgid "收藏夹"
+msgid "收藏夹选择"
 msgstr ""
 
 msgid "播放器设置"
@@ -170,9 +170,15 @@ msgid "启用故事版/背景视频"
 msgstr ""
 
 msgid "故事版"
-magstr ""
+msgstr ""
 
 # Mf-osu 设置 - 整体
+msgid "Mf-osu自定义选项"
+msgstr ""
+
+msgid "在这里调整Mf-osu的额外设置!"
+msgstr ""
+
 msgid "整体"
 msgstr ""
 
@@ -208,10 +214,13 @@ msgid "语言环境(LOCALE)"
 msgstr ""
 
 # Mf-osu 设置 - 入口
-msgid "Mf-osu选项"
+msgid "MF-OSU选项"
 msgstr ""
 
 msgid "打开选项菜单"
+msgstr ""
+
+msgid "更改Mf-osu的设置"
 msgstr ""
 
 # 主菜单
@@ -224,7 +233,53 @@ msgstr ""
 msgid "谱面列表"
 msgstr ""
 
-# 游戏
+msgid "单人游戏"
+msgstr ""
+
+msgid "多人游戏"
+msgstr ""
+
+msgid "排名"
+msgstr ""
+
+msgid "一个神秘的按钮"
+msgstr ""
+
+msgid "关于Mf-osu"
+msgstr ""
+
+msgid "Mvis播放器"
+msgstr ""
+
+msgid "文件导入"
+msgstr ""
+
+# 文件导入界面
+msgid "计算机"
+msgstr ""
+
+msgid "当前目录"
+msgstr ""
+
+msgid "请选择一个文件"
+msgstr ""
+
+msgid "刷新文件列表"
+msgstr ""
+
+msgid "导入该文件"
+msgstr ""
+
+# 杂项
+msgid "本地"
+msgstr ""
+
+msgid "发行版"
+msgstr ""
+
+msgid "调试版"
+msgstr ""
+
 msgid "Windowed"
 msgstr ""
 
@@ -258,12 +313,25 @@ msgstr ""
 msgid "Unlimited"
 msgstr ""
 
-msgid "Frame Limiter"
+msgid "FRAME LIMITER"
+msgstr ""
+
+msgid "DEBUG LOGS"
+msgstr ""
+
+msgid "visible"
+msgstr ""
+
+msgid "hidden"
 msgstr ""
 
 msgid "VSync"
 msgstr ""
 
+msgid "返回"
+msgstr ""
+
+# 歌曲选择 - BeatmapDetailAreaTabItem
 msgid "谱面信息"
 msgstr ""
 
@@ -279,5 +347,118 @@ msgstr ""
 msgid "好友排行"
 msgstr ""
 
-msgid "返回"
+msgid "已选择的Mods"
+msgstr ""
+
+# 歌曲选择界面 - FilterControl
+msgid "分类依据"
+msgstr ""
+
+msgid "艺术家"
+msgstr ""
+
+msgid "作图者"
+msgstr ""
+
+msgid "BPM"
+msgstr ""
+
+msgid "添加日期"
+msgstr ""
+
+msgid "难度"
+msgstr ""
+
+msgid "长度"
+msgstr ""
+
+msgid "所有谱面"
+msgstr ""
+
+msgid "管理收藏夹"
+msgstr ""
+
+msgid "显示转谱"
+msgstr ""
+
+msgid "取得的成绩"
+msgstr ""
+
+msgid "标题"
+msgstr ""
+
+# 歌曲选择 - BeatmapLeaderBoard
+msgid "这里还没有成绩!"
+msgstr ""
+
+msgid "查看在线排行"
+msgstr ""
+
+# ??? - BeatmapDetails
+msgid "圆圈大小"
+msgstr ""
+
+msgid "掉血速度"
+msgstr ""
+
+msgid "整体难度"
+msgstr ""
+
+msgid "缩圈速度"
+msgstr ""
+
+msgid "难度星级"
+msgstr ""
+
+msgid "评分情况"
+msgstr ""
+
+msgid "评分分布"
+msgstr ""
+
+msgid "失败点"
+msgstr ""
+
+msgid "难度描述"
+msgstr ""
+
+msgid "标签"
+msgstr ""
+
+msgid "来源"
+msgstr ""
+
+# 歌曲选择 - Footer
+msgid "游戏Mods"
+msgstr ""
+
+msgid "随机选择"
+msgstr ""
+
+msgid "撤销随机"
+msgstr ""
+
+msgid "设置"
+msgstr ""
+
+msgid "在Mvis中打开"
+msgstr ""
+
+# 歌曲选择 - 杂项
+msgid "编辑"
+msgstr ""
+
+msgid "细节"
+msgstr ""
+
+msgid "隐藏"
+msgstr ""
+
+msgid "展开"
+msgstr ""
+
+msgid "收藏夹"
+msgstr ""
+
+msgid "删除"
 msgstr ""
