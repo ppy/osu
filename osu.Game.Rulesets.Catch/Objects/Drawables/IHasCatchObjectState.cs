@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         Bindable<Color4> AccentColour { get; }
         Bindable<bool> HyperDash { get; }
 
-        float Rotation { get; }
-        float Scale { get; }
+        Vector2 DisplaySize { get; }
+        float DisplayRotation { get; }
     }
 }
