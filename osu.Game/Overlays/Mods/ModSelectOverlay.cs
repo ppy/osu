@@ -158,37 +158,57 @@ namespace osu.Game.Overlays.Mods
                         },
                         new Drawable[]
                         {
-                            // Body
-                            new OsuScrollContainer
+                            new Container
                             {
-                                ScrollbarVisible = false,
-                                Origin = Anchor.TopCentre,
-                                Anchor = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding
+                                Children = new Drawable[]
                                 {
-                                    Vertical = 10,
-                                    Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
-                                },
-                                Child = ModSectionsContainer = new FillFlowContainer<ModSection>
-                                {
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Spacing = new Vector2(0f, 10f),
-                                    Width = content_width,
-                                    LayoutDuration = 200,
-                                    LayoutEasing = Easing.OutQuint,
-                                    Children = new ModSection[]
+                                    // Body
+                                    new OsuScrollContainer
                                     {
-                                        new DifficultyReductionSection { Action = modButtonPressed },
-                                        new DifficultyIncreaseSection { Action = modButtonPressed },
-                                        new AutomationSection { Action = modButtonPressed },
-                                        new ConversionSection { Action = modButtonPressed },
-                                        new FunSection { Action = modButtonPressed },
-                                    }
-                                },
+                                        ScrollbarVisible = false,
+                                        Origin = Anchor.TopCentre,
+                                        Anchor = Anchor.TopCentre,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding
+                                        {
+                                            Vertical = 10,
+                                            Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
+                                        },
+                                        Children = new Drawable[]
+                                        {
+                                            ModSectionsContainer = new FillFlowContainer<ModSection>
+                                            {
+                                                Origin = Anchor.TopCentre,
+                                                Anchor = Anchor.TopCentre,
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Spacing = new Vector2(0f, 10f),
+                                                Width = content_width,
+                                                LayoutDuration = 200,
+                                                LayoutEasing = Easing.OutQuint,
+                                                Children = new ModSection[]
+                                                {
+                                                    new DifficultyReductionSection { Action = modButtonPressed },
+                                                    new DifficultyIncreaseSection { Action = modButtonPressed },
+                                                    new AutomationSection { Action = modButtonPressed },
+                                                    new ConversionSection { Action = modButtonPressed },
+                                                    new FunSection { Action = modButtonPressed },
+                                                }
+                                            },
+                                        }
+                                    },
+                                    ModSettingsContainer = new ModSettingsContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Anchor = Anchor.BottomRight,
+                                        Origin = Anchor.BottomRight,
+                                        Width = 0.3f,
+                                        Alpha = 0,
+                                        Padding = new MarginPadding(30),
+                                        SelectedMods = { BindTarget = SelectedMods },
+                                    },
+                                }
                             },
                         },
                         new Drawable[]
@@ -237,7 +257,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 Width = 180,
                                                 Text = "Customisation",
-                                                Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
+                                                Action = () => ModSettingsContainer.ToggleVisibility(),
                                                 Enabled = { Value = false },
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
@@ -281,16 +301,6 @@ namespace osu.Game.Overlays.Mods
                         },
                     },
                 },
-                ModSettingsContainer = new ModSettingsContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Width = 0.25f,
-                    Alpha = 0,
-                    X = -100,
-                    SelectedMods = { BindTarget = SelectedMods },
-                }
             };
 
             ((IBindable<bool>)CustomiseButton.Enabled).BindTo(ModSettingsContainer.HasSettingsForSelection);
@@ -430,7 +440,7 @@ namespace osu.Game.Overlays.Mods
 
                 DeselectTypes(selectedMod.IncompatibleMods, true);
 
-                if (selectedMod.RequiresConfiguration) ModSettingsContainer.Alpha = 1;
+                if (selectedMod.RequiresConfiguration) ModSettingsContainer.Show();
             }
             else
             {

@@ -261,9 +261,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 });
             }
 
-            protected override void OnApply(HitObject hitObject)
+            protected override void OnApply()
             {
-                base.OnApply(hitObject);
+                base.OnApply();
                 Position = new Vector2(RNG.Next(-200, 200), RNG.Next(-200, 200));
             }
 

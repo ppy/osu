@@ -23,10 +23,11 @@ namespace osu.Game.Overlays
         {
             new GeneralSection(),
             new GraphicsSection(),
-            new GameplaySection(),
             new AudioSection(),
-            new SkinSection(),
             new InputSection(createSubPanel(new KeyBindingPanel())),
+            new UserInterfaceSection(),
+            new GameplaySection(),
+            new SkinSection(),
             new OnlineSection(),
             new MaintenanceSection(),
             new DebugSection(),
@@ -61,7 +62,6 @@ namespace osu.Game.Overlays
             switch (state.NewValue)
             {
                 case Visibility.Visible:
-                    Background.FadeTo(0.9f, 300, Easing.OutQuint);
                     Sidebar?.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeOut(300, Easing.OutQuint);
@@ -69,7 +69,6 @@ namespace osu.Game.Overlays
                     break;
 
                 case Visibility.Hidden:
-                    Background.FadeTo(0.6f, 500, Easing.OutQuint);
                     Sidebar?.FadeColour(Color4.White, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeIn(500, Easing.OutQuint);

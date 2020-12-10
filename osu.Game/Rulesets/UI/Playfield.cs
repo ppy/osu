@@ -8,19 +8,24 @@ using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Skinning;
 using osuTK;
+using System.Diagnostics;
 
 namespace osu.Game.Rulesets.UI
 {
     [Cached(typeof(IPooledHitObjectProvider))]
-    public abstract class Playfield : CompositeDrawable, IPooledHitObjectProvider
+    [Cached(typeof(IPooledSampleProvider))]
+    public abstract class Playfield : CompositeDrawable, IPooledHitObjectProvider, IPooledSampleProvider
     {
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
@@ -80,6 +85,12 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
+        [Resolved(CanBeNull = true)]
+        private IReadOnlyList<Mod> mods { get; set; }
+
+        [Resolved]
+        private ISampleStore sampleStore { get; set; }
+
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
@@ -96,9 +107,6 @@ namespace osu.Game.Rulesets.UI
             }));
         }
 
-        [Resolved(CanBeNull = true)]
-        private IReadOnlyList<Mod> mods { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -113,6 +121,16 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
+        private void onNewDrawableHitObject(DrawableHitObject d)
+        {
+            d.OnNestedDrawableCreated += onNewDrawableHitObject;
+
+            OnNewDrawableHitObject(d);
+
+            Debug.Assert(!d.IsInitialized);
+            d.IsInitialized = true;
+        }
+
         /// <summary>
         /// Performs post-processing tasks (if any) after all DrawableHitObjects are loaded into this Playfield.
         /// </summary>
@@ -124,6 +142,9 @@ namespace osu.Game.Rulesets.UI
         /// <param name="h">The DrawableHitObject to add.</param>
         public virtual void Add(DrawableHitObject h)
         {
+            if (!h.IsInitialized)
+                onNewDrawableHitObject(h);
+
             HitObjectContainer.Add(h);
             OnHitObjectAdded(h.HitObject);
         }
@@ -154,6 +175,17 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="hitObject">The removed <see cref="HitObject"/>.</param>
         protected virtual void OnHitObjectRemoved(HitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Invoked before a new <see cref="DrawableHitObject"/> is added to this <see cref="Playfield"/>.
+        /// It is invoked only once even if the drawable is pooled and used multiple times for different <see cref="HitObject"/>s.
+        /// </summary>
+        /// <remarks>
+        /// This is also invoked for nested <see cref="DrawableHitObject"/>s.
+        /// </remarks>
+        protected virtual void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
         {
         }
 
@@ -298,7 +330,7 @@ namespace osu.Game.Rulesets.UI
             AddInternal(pool);
         }
 
-        DrawableHitObject IPooledHitObjectProvider.GetPooledDrawableRepresentation(HitObject hitObject)
+        DrawableHitObject IPooledHitObjectProvider.GetPooledDrawableRepresentation(HitObject hitObject, DrawableHitObject parent)
         {
             var lookupType = hitObject.GetType();
 
@@ -321,10 +353,12 @@ namespace osu.Game.Rulesets.UI
             {
                 var dho = (DrawableHitObject)d;
 
-                // If this is the first time this DHO is being used (not loaded), then apply the DHO mods.
-                // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                if (!dho.IsLoaded)
+                if (!dho.IsInitialized)
                 {
+                    onNewDrawableHitObject(dho);
+
+                    // If this is the first time this DHO is being used, then apply the DHO mods.
+                    // This is done before Apply() so that the state is updated once when the hitobject is applied.
                     foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
                         m.ApplyToDrawableHitObjects(dho.Yield());
                 }
@@ -332,8 +366,32 @@ namespace osu.Game.Rulesets.UI
                 if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
                     lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
 
+                dho.ParentHitObject = parent;
                 dho.Apply(hitObject, entry);
             });
+        }
+
+        private readonly Dictionary<ISampleInfo, DrawablePool<PoolableSkinnableSample>> samplePools = new Dictionary<ISampleInfo, DrawablePool<PoolableSkinnableSample>>();
+
+        public PoolableSkinnableSample GetPooledSample(ISampleInfo sampleInfo)
+        {
+            if (!samplePools.TryGetValue(sampleInfo, out var existingPool))
+                AddInternal(samplePools[sampleInfo] = existingPool = new DrawableSamplePool(sampleInfo, 1));
+
+            return existingPool.Get();
+        }
+
+        private class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
+        {
+            private readonly ISampleInfo sampleInfo;
+
+            public DrawableSamplePool(ISampleInfo sampleInfo, int initialSize, int? maximumSize = null)
+                : base(initialSize, maximumSize)
+            {
+                this.sampleInfo = sampleInfo;
+            }
+
+            protected override PoolableSkinnableSample CreateNewDrawable() => base.CreateNewDrawable().With(d => d.Apply(sampleInfo));
         }
 
         #endregion
