@@ -191,14 +191,13 @@ namespace osu.Game.Screens.Play
         {
             base.OnResuming(last);
 
+            cancelLoad();
             contentIn();
         }
 
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
-
-            cancelLoad();
 
             BackgroundBrightnessReduction = false;
 
