@@ -154,13 +154,16 @@ namespace osu.Game.Screens.Play
 
         public void Start()
         {
-            // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
-            // This accounts for the audio clock source potentially taking time to enter a completely stopped state
-            Seek(GameplayClock.CurrentTime);
-            adjustableClock.Start();
-            IsPaused.Value = false;
+            if (!adjustableClock.IsRunning)
+            {
+                // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
+                // This accounts for the audio clock source potentially taking time to enter a completely stopped state
+                Seek(GameplayClock.CurrentTime);
 
             this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
+                adjustableClock.Start();
+            }
+            IsPaused.Value = false;
         }
 
         /// <summary>
