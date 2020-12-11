@@ -16,7 +16,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
     {
         public int BeatmapID { get; set; }
 
-        public int? RulesetID { get; set; }
+        public int RulesetID { get; set; }
 
         public string Name { get; set; } = "Unnamed room";
 
