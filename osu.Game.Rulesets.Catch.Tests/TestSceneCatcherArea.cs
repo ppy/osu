@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -58,10 +57,9 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 Schedule(() =>
                 {
-                    bool caught = area.AttemptCatch(fruit);
-                    area.OnNewResult(drawable, new JudgementResult(fruit, new CatchJudgement())
+                    area.OnNewResult(drawable, new CatchJudgementResult(fruit, new CatchJudgement())
                     {
-                        Type = caught ? HitResult.Great : HitResult.Miss
+                        Type = area.MovableCatcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss
                     });
 
                     drawable.Expire();
@@ -75,7 +73,10 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             SetContents(() =>
             {
-                var droppedObjectContainer = new Container();
+                var droppedObjectContainer = new Container<CaughtObject>
+                {
+                    RelativeSizeAxes = Axes.Both
+                };
 
                 return new CatchInputManager(catchRuleset)
                 {
@@ -101,7 +102,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(Container droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
+            public TestCatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
                 : base(droppedObjectContainer, beatmapDifficulty)
             {
             }
