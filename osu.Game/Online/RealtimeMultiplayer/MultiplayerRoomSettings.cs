@@ -14,7 +14,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
     [Serializable]
     public class MultiplayerRoomSettings : IEquatable<MultiplayerRoomSettings>
     {
-        public int? BeatmapID { get; set; }
+        public int BeatmapID { get; set; }
 
         public int? RulesetID { get; set; }
 
