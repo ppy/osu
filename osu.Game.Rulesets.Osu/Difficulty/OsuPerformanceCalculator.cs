@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (countMiss > 0)
-                aimValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / (double)totalHits, 0.775), countMiss);
+                aimValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), countMiss);
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (countMiss > 0)
-                speedValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / (double)totalHits, 0.775), countMiss);
+                speedValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), countMiss);
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
