@@ -7,32 +7,36 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject
+    [Cached(typeof(IHasCatchObjectState))]
+    public abstract class DrawablePalpableCatchHitObject : DrawableCatchHitObject, IHasCatchObjectState
     {
         public new PalpableCatchHitObject HitObject => (PalpableCatchHitObject)base.HitObject;
 
-        public readonly Bindable<bool> HyperDash = new Bindable<bool>();
+        Bindable<Color4> IHasCatchObjectState.AccentColour => AccentColour;
 
-        public readonly Bindable<float> ScaleBindable = new Bindable<float>(1);
+        public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
 
-        public readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
+        public Bindable<float> ScaleBindable { get; } = new Bindable<float>(1);
+
+        public Bindable<int> IndexInBeatmap { get; } = new Bindable<int>();
 
         /// <summary>
-        /// The multiplicative factor applied to <see cref="ScaleContainer"/> scale relative to <see cref="HitObject"/> scale.
+        /// The multiplicative factor applied to <see cref="Drawable.Scale"/> relative to <see cref="HitObject"/> scale.
         /// </summary>
         protected virtual float ScaleFactor => 1;
 
         /// <summary>
-        /// Whether this hit object should stay on the catcher plate when the object is caught by the catcher.
+        /// The container internal transforms (such as scaling based on the circle size) are applied to.
         /// </summary>
-        public virtual bool StaysOnPlate => true;
+        protected readonly Container ScalingContainer;
 
-        public float DisplayRadius => CatchHitObject.OBJECT_RADIUS * HitObject.Scale * ScaleFactor;
+        public Vector2 DisplaySize => ScalingContainer.Size * ScalingContainer.Scale;
 
-        protected readonly Container ScaleContainer;
+        public float DisplayRotation => ScalingContainer.Rotation;
 
         protected DrawablePalpableCatchHitObject([CanBeNull] CatchHitObject h)
             : base(h)
@@ -40,11 +44,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Origin = Anchor.Centre;
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
 
-            AddInternal(ScaleContainer = new Container
+            AddInternal(ScalingContainer = new Container
             {
-                RelativeSizeAxes = Axes.Both,
-                Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2)
             });
         }
 
@@ -53,12 +57,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             XBindable.BindValueChanged(x =>
             {
-                if (!IsOnPlate) X = x.NewValue;
+                X = x.NewValue;
             }, true);
 
             ScaleBindable.BindValueChanged(scale =>
             {
-                ScaleContainer.Scale = new Vector2(scale.NewValue * ScaleFactor);
+                ScalingContainer.Scale = new Vector2(scale.NewValue * ScaleFactor);
+                Size = DisplaySize;
             }, true);
 
             IndexInBeatmap.BindValueChanged(_ => UpdateComboColour());
