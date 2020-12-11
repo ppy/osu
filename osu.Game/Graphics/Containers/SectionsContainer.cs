@@ -220,34 +220,42 @@ namespace osu.Game.Graphics.Containers
             }
 
             var sortedByVisibility = new List<T>(Children);
-            sortedByVisibility.Sort((a, b) => visibleHeight(b).CompareTo(visibleHeight(a)));
-            T mostVisible = sortedByVisibility.FirstOrDefault();
-
-            if (mostVisible == null)
-                return;
-
-            int mostVisibleIndex = IndexOf(mostVisible);
-            while (isPreviousMoreVisible(mostVisibleIndex))
-                mostVisibleIndex--;
-
-            SelectedSection.Value = Children[mostVisibleIndex];
+            sortedByVisibility.Sort(compareVisibility);
+            SelectedSection.Value = sortedByVisibility.FirstOrDefault();
         }
 
-        /// <returns>true if previous section is more visible than one at <paramref name="sectionIndex"/></returns>
-        private bool isPreviousMoreVisible(int sectionIndex)
+        private int compareVisibility(T a, T b)
         {
-            if (sectionIndex == 0)
-                return false;
-
-            T sectionBefore = Children[sectionIndex - 1];
-            // consider the section user wants to see smaller than it actually is to lower the visibility requirement
+            // note: the decision to prioritize higher sections and differentiate scroll direction
+            // comes from the fact that our scroll target is the top of the screen
+            //
+            // if this is ever not the case, this comparison should be rewritten
+            float aIndex = IndexOf(a);
+            float bIndex = IndexOf(b);
+            float aVisibleHeight = visibleHeight(a);
+            float bVisibleHeight = visibleHeight(b);
+            // visibility requirement is lower (only 80%) for the section user clicked for
             // this makes the section get selected sooner when scrolling upwards, to match it already getting selected sooner when scrolling downwards
-            float sectionHeight = sectionBefore.Height * (lastClickedSection as T == sectionBefore ? 0.8f : 1.0f);
+            bool aAllVisible = Precision.AlmostBigger(aVisibleHeight / a.Height, lastClickedSection as T == a ? 0.8f : 1.0f);
+            bool bAllVisible = Precision.AlmostBigger(bVisibleHeight / b.Height, lastClickedSection as T == b ? 0.8f : 1.0f);
 
-            bool moreVisible = Precision.AlmostBigger(visibleHeight(sectionBefore), visibleHeight(Children[sectionIndex]), 1);
-            bool completelyVisible = Precision.AlmostBigger(visibleHeight(sectionBefore), sectionHeight, 1);
+            // if one is all visible while the other isn't
+            if (aAllVisible != bAllVisible)
+            {
+                // don't make the 100% visible section sort earlier in the list if it's not already a higher section
+                // this is so we don't select a small section as soon as it gets on screen (only unwanted while scrolling downwards)
+                if (aAllVisible && aIndex < bIndex)
+                    return -1;
+                if (bAllVisible && bIndex < aIndex)
+                    return 1;
+            }
 
-            return moreVisible || completelyVisible;
+            // if both are all visible - prioritize higher sections
+            if (aAllVisible && bAllVisible)
+                return IndexOf(a).CompareTo(IndexOf(b));
+
+            // if neither are all visible - just compare which is more visible
+            return bVisibleHeight.CompareTo(aVisibleHeight);
         }
 
         private float visibleHeight(T section)
