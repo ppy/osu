@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 multiplier *= 0.90;
 
             if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 0.95;
+                multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
 
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
@@ -99,16 +99,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.MaxCombo > 0)
                 aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
-            double approachRateFactor = 1.0;
-
+            double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += 0.3 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor += 0.4 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
-            {
-                approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
-            }
+                approachRateFactor += 0.1 * (8.0 - Attributes.ApproachRate);
 
-            aimValue *= approachRateFactor;
+            aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
@@ -137,8 +134,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.SpeedStrain / 0.0675) - 4.0, 3.0) / 100000.0;
 
             // Longer maps are worth more
-            speedValue *= 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
-                          (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
+                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+            speedValue *= lengthBonus;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             speedValue *= Math.Pow(0.97, countMiss);
@@ -147,11 +145,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.MaxCombo > 0)
                 speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
-            double approachRateFactor = 1.0;
+            double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += 0.3 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor += 0.4 * (Attributes.ApproachRate - 10.33);
 
-            speedValue *= approachRateFactor;
+            speedValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
 
             if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
