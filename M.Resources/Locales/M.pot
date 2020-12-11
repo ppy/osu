@@ -13,11 +13,18 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Language: zh_CN\n"
 
+# 设置界面
+msgid "设置"
+msgstr ""
+
 # Mvis设置Section标题
 msgid "M-vis播放器"
 msgstr ""
 
 # Mvis播放器界面
+msgid "选择该谱面"
+msgstr ""
+
 msgid "未选择收藏夹"
 msgstr ""
 
@@ -25,9 +32,6 @@ msgid "请先选择一个收藏夹!"
 msgstr ""
 
 msgid "{0}首歌曲"
-msgstr ""
-
-msgid "等{0}首歌曲"
 msgstr ""
 
 msgid "收藏夹选择"
@@ -271,6 +275,12 @@ msgid "导入该文件"
 msgstr ""
 
 # 杂项
+msgid "游客"
+msgstr ""
+
+msgid "输入以搜索"
+msgstr ""
+
 msgid "本地"
 msgstr ""
 
@@ -360,6 +370,9 @@ msgstr ""
 msgid "作图者"
 msgstr ""
 
+msgid "作图者："
+msgstr ""
+
 msgid "BPM"
 msgstr ""
 
@@ -438,10 +451,31 @@ msgstr ""
 msgid "撤销随机"
 msgstr ""
 
-msgid "设置"
+msgid "选项"
 msgstr ""
 
 msgid "在Mvis中打开"
+msgstr ""
+
+msgid "管理"
+msgstr ""
+
+msgid "所有难度"
+msgstr ""
+
+msgid "从"
+msgstr ""
+
+msgid "未玩过的谱面中移除"
+msgstr ""
+
+msgid "清除"
+msgstr ""
+
+msgid "所有本地成绩"
+msgstr ""
+
+msgid "该谱面"
 msgstr ""
 
 # 歌曲选择 - 杂项
@@ -461,4 +495,117 @@ msgid "收藏夹"
 msgstr ""
 
 msgid "删除"
+msgstr ""
+
+# 收藏夹
+msgid "创建新的收藏夹"
+msgstr ""
+
+# DialogOverlay
+msgid "是否删除"
+msgstr ""
+
+msgid "是的,我确定"
+msgstr ""
+
+msgid "不是...是我点错了><!"
+msgstr ""
+
+msgid "是否要清理所有本地成绩?"
+msgstr ""
+
+msgid "是的,抹除这些黑历史"
+msgstr ""
+
+msgid "我需要再想想"
+msgstr ""
+
+msgid "你确定吗?"
+msgstr ""
+
+msgid "让我再想想> <"
+msgstr ""
+
+msgid "你将要离开osu!并在浏览器中打开以下链接:"
+msgstr ""
+
+# 用户登录
+msgid "别来无恙, {0} !"
+msgstr ""
+
+msgid "欢迎回来"
+msgstr ""
+
+msgid "在线"
+msgstr ""
+
+msgid "请勿打扰"
+msgstr ""
+
+msgid "隐身"
+msgstr ""
+
+msgid "登出"
+msgstr ""
+
+# BeatmapSetOverlay
+msgid "提交日期 "
+msgstr ""
+
+msgid "计入排名于 "
+msgstr ""
+
+msgid "下载"
+msgstr ""
+
+msgid "不带视频"
+msgstr ""
+
+msgid "描述"
+msgstr ""
+
+msgid "流派"
+msgstr ""
+
+msgid "语言"
+msgstr ""
+
+msgid "成功率"
+msgstr ""
+
+msgid "达成于 {0}"
+msgstr ""
+
+msgid "总分"
+msgstr ""
+
+msgid "准确率"
+msgstr ""
+
+msgid "最大连击"
+msgstr ""
+
+msgid "分数"
+msgstr ""
+
+msgid "玩家"
+msgstr ""
+
+# 评论
+msgid "评论"
+msgstr ""
+
+msgid "排序方法"
+msgstr ""
+
+msgid "最新"
+msgstr ""
+
+msgid "最旧"
+msgstr ""
+
+msgid "热门"
+msgstr ""
+
+msgid "显示已删除的评论"
 msgstr ""

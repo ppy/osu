@@ -158,6 +158,7 @@ namespace osu.Game.Screens.Play
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Margin = new MarginPadding { Top = 15 },
+                                    UseLegacyUnicode = true
                                 },
                                 new OsuSpriteText
                                 {
@@ -165,6 +166,7 @@ namespace osu.Game.Screens.Play
                                     Font = OsuFont.GetFont(size: 26, italics: true),
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
+                                    UseLegacyUnicode = true
                                 },
                                 new Container
                                 {

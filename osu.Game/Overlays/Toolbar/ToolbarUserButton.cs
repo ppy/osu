@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Users;
@@ -65,12 +66,12 @@ namespace osu.Game.Overlays.Toolbar
             switch (state.NewValue)
             {
                 default:
-                    Text = @"游客";
+                    Text = "游客";
                     avatar.User = new User();
                     break;
 
                 case APIState.Online:
-                    Text = $"别来无恙, {api.LocalUser.Value.Username} !";
+                    DrawableText.Text = new LocalisedString("别来无恙, {0} !", api.LocalUser.Value.Username);
                     avatar.User = api.LocalUser.Value;
                     break;
             }

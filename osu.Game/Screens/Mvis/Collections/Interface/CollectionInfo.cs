@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
@@ -194,7 +195,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             }
 
             collectionName.Text = c.Name.Value;
-            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
+            collectionBeatmapCount.Text = new LocalisedString("{0}首歌曲", beatmapSets.Count);
 
             refreshBeatmapSetList();
         }

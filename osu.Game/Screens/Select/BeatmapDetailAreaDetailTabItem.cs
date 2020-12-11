@@ -5,6 +5,6 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapDetailAreaDetailTabItem : BeatmapDetailAreaTabItem
     {
-        public override string Name => "谱面信息";
+        public override string Name => "细节";
     }
 }

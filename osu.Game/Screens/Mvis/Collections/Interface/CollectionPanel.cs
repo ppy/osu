@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
@@ -162,7 +163,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                 : ActiveState.Disabled;
 
             collectionName.Text = Collection.Name.Value;
-            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
+            collectionBeatmapCount.Text = new LocalisedString("{0}首歌曲", beatmapSets.Count);
 
             State.BindValueChanged(OnStateChanged, true);
 
@@ -335,7 +336,6 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                     TooltipContainer t = Children.Last() as TooltipContainer;
                     int remaining = beatmapSetList.Count - limit;
 
-                    t.TooltipText += $" 等{remaining}首歌曲";
                     t.AddRange(new Drawable[]
                     {
                         new Box
