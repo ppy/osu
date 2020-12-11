@@ -13,10 +13,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     public interface IHasCatchObjectState
     {
         PalpableCatchHitObject HitObject { get; }
+
         Bindable<Color4> AccentColour { get; }
+
         Bindable<bool> HyperDash { get; }
 
         Vector2 DisplaySize { get; }
+
         float DisplayRotation { get; }
     }
 }
