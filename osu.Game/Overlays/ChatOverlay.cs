@@ -62,6 +62,8 @@ namespace osu.Game.Overlays
         private Box chatBackground;
         private Box tabBackground;
 
+        private ClickableContainer closeAllTabsButton;
+
         public Bindable<float> ChatHeight { get; set; }
 
         private Container channelSelectionContainer;
@@ -179,6 +181,16 @@ namespace osu.Game.Overlays
                                     d.OnRequestLeave = channelManager.LeaveChannel;
                                     d.IsSwitchable = true;
                                 }),
+                                closeAllTabsButton = new CloseAllTabsButton
+                                {
+                                    Margin = new MarginPadding { Right = 20 },
+                                    Origin = Anchor.CentreRight,
+                                    Anchor = Anchor.CentreRight,
+                                    Action = delegate
+                                    {
+                                        channelManager.LeaveAllChannels();
+                                    },
+                                },
                             }
                         },
                     },
@@ -397,9 +409,23 @@ namespace osu.Game.Overlays
                 case NotifyCollectionChangedAction.Add:
                     foreach (Channel channel in args.NewItems.Cast<Channel>())
                         ChannelTabControl.AddChannel(channel);
+
+                    if (closeAllTabsButton.Alpha == 0)
+                    {
+                        closeAllTabsButton.FadeIn(200);
+                    }
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
+                    if (channelManager.JoinedChannels.Count == 0)
+                    {
+                        ChannelTabControl.RemoveAllTabs();
+                        loadedChannels.Clear();
+                        currentChannelContainer.Clear(false);
+                        closeAllTabsButton.FadeOut(200);
+                        break;
+                    }
+
                     foreach (Channel channel in args.OldItems.Cast<Channel>())
                     {
                         ChannelTabControl.RemoveChannel(channel);
