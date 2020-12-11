@@ -96,10 +96,10 @@ namespace osu.Game.Screens.Play
 
             GameplayClock.IsPaused.BindTo(IsPaused);
 
-            IsPaused.BindValueChanged(onPaused);
+            IsPaused.BindValueChanged(onPauseChanged);
         }
 
-        private void onPaused(ValueChangedEvent<bool> isPaused)
+        private void onPauseChanged(ValueChangedEvent<bool> isPaused)
         {
             if (isPaused.NewValue)
                 this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => adjustableClock.Stop());
