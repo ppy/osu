@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -118,7 +120,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Ok : HitResult.Great;
 
-            Hit hit = new Hit { IsStrong = true };
+            Hit hit = new Hit
+            {
+                IsStrong = true,
+                Samples = createSamples(strong: true)
+            };
             var h = new DrawableTestHit(hit, kiai: kiai) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
 
             DrawableRuleset.Playfield.Add(h);
@@ -166,6 +172,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
                 IsStrong = strong,
+                Samples = createSamples(strong: strong),
                 Duration = duration,
                 TickRate = 8,
             };
@@ -183,7 +190,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             Hit h = new Hit
             {
                 StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
-                IsStrong = strong
+                IsStrong = strong,
+                Samples = createSamples(HitType.Centre, strong)
             };
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -196,12 +204,27 @@ namespace osu.Game.Rulesets.Taiko.Tests
             Hit h = new Hit
             {
                 StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
-                IsStrong = strong
+                IsStrong = strong,
+                Samples = createSamples(HitType.Rim, strong)
             };
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             DrawableRuleset.Playfield.Add(new DrawableHit(h));
+        }
+
+        // TODO: can be removed if a better way of handling colour/strong type and samples is developed
+        private IList<HitSampleInfo> createSamples(HitType? hitType = null, bool strong = false)
+        {
+            var samples = new List<HitSampleInfo>();
+
+            if (hitType == HitType.Rim)
+                samples.Add(new HitSampleInfo(HitSampleInfo.HIT_CLAP));
+
+            if (strong)
+                samples.Add(new HitSampleInfo(HitSampleInfo.HIT_FINISH));
+
+            return samples;
         }
     }
 }
