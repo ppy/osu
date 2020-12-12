@@ -429,8 +429,9 @@ namespace osu.Game
 
         public override Task Import(Stream stream, string filename)
         {
-            WaitForReady(() => this, _ => Task.Run(() => base.Import(stream, filename)));
-            return Task.CompletedTask;
+            var importTask = new Task(async () => await base.Import(stream, filename));
+            WaitForReady(() => this, _ => importTask.Start());
+            return importTask;
         }
 
         protected virtual Loader CreateLoader() => new Loader();
