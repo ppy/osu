@@ -225,10 +225,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
 
             toComputeLifetime.Clear();
+        }
 
-            // only AliveObjects need to be considered for layout (reduces overhead in the case of scroll speed changes).
+        protected override void UpdateAfterChildrenLife()
+        {
+            base.UpdateAfterChildrenLife();
+
+            // We need to calculate hit object positions (including nested hit objects) as soon as possible after lifetimes
+            // to prevent hit objects displayed in a wrong position for one frame.
+            // Only AliveObjects need to be considered for layout (reduces overhead in the case of scroll speed changes).
             foreach (var obj in AliveObjects)
             {
+                updatePosition(obj, Time.Current);
+
                 if (layoutComputed.Contains(obj))
                     continue;
 
@@ -291,15 +300,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 // Nested hitobjects don't need to scroll, but they do need accurate positions
                 updatePosition(obj, hitObject.HitObject.StartTime);
             }
-        }
-
-        protected override void UpdateAfterChildrenLife()
-        {
-            base.UpdateAfterChildrenLife();
-
-            // We need to calculate hitobject positions as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            foreach (var obj in AliveObjects)
-                updatePosition(obj, Time.Current);
         }
 
         private void updatePosition(DrawableHitObject hitObject, double currentTime)

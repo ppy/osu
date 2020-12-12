@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Select
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"不是..是我点错了><!",
+                    Text = @"不是...是我点错了><!",
                 },
             };
         }

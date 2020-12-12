@@ -5,10 +5,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
@@ -84,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
         private void updateColor() => preview.UpdateColor(iR.Value, iG.Value, iB.Value);
 
-        private class ColourPreviewer : Container, IHasTooltip
+        private class ColourPreviewer : Container
         {
             private readonly CustomColourProvider provider = new CustomColourProvider(0, 0, 0);
             private Box bg6;
@@ -97,21 +99,20 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             private Box l4;
             private Box l3;
             private Box c2;
-
-            public string TooltipText { get; private set; }
+            private OsuSpriteText hueText;
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Height = 50;
+                Height = 75;
                 RelativeSizeAxes = Axes.X;
                 Padding = new MarginPadding { Horizontal = 15 };
                 InternalChildren = new Drawable[]
                 {
                     new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Height = 0.5f,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 25,
                         Children = new Drawable[]
                         {
                             bg5 = new Box
@@ -143,8 +144,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     },
                     new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Height = 0.5f,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 25,
                         Margin = new MarginPadding { Top = 25 },
                         Children = new Drawable[]
                         {
@@ -174,6 +175,25 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                                 Width = 0.2f
                             },
                         }
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 25,
+                        Margin = new MarginPadding { Top = 50 },
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Black
+                            },
+                            hueText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre
+                            }
+                        }
                     }
                 };
             }
@@ -194,7 +214,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 l3.Colour = provider.Light3;
                 c2.Colour = provider.Content2;
 
-                TooltipText = $"色相(Hue): {(provider.HueColour.Value * 360):#0.00}";
+                hueText.Text = new LocalisedString("色相(Hue): {0}", (provider.HueColour.Value * 360).ToString("#0.00"));
             }
         }
     }

@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             fields.Children = new Drawable[]
             {
-                new Field("作图者 ", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
+                new Field("作图者：", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
                 new Field("提交日期 ", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },

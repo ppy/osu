@@ -115,6 +115,7 @@ namespace osu.Game.Overlays
                                     Font = OsuFont.GetFont(size: 25, italics: true),
                                     Colour = Color4.White,
                                     Text = @"什么东西都没有呢(´・ω・`)",
+                                    UseLegacyUnicode = true
                                 },
                                 artist = new OsuSpriteText
                                 {
@@ -124,6 +125,7 @@ namespace osu.Game.Overlays
                                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true),
                                     Colour = Color4.White,
                                     Text = @"去下几张图吧",
+                                    UseLegacyUnicode = true
                                 },
                                 new Container
                                 {

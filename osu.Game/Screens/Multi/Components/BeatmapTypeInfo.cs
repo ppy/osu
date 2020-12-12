@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Multi.Components
 
             if (beatmap != null)
             {
-                beatmapAuthor.AddText("作图者 ", s => s.Colour = OsuColour.Gray(0.8f));
+                beatmapAuthor.AddText("作图者：", s => s.Colour = OsuColour.Gray(0.8f));
                 beatmapAuthor.AddUserLink(beatmap.Value.Metadata.Author);
             }
         }

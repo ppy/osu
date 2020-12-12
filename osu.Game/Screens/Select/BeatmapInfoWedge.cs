@@ -187,8 +187,8 @@ namespace osu.Game.Screens.Select
 
                 RelativeSizeAxes = Axes.Both;
 
-                titleBinding = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
-                artistBinding = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
+                titleBinding = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)), true);
+                artistBinding = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)), true);
 
                 Children = new Drawable[]
                 {
@@ -288,12 +288,14 @@ namespace osu.Game.Screens.Select
                                 Font = OsuFont.GetFont(size: 28, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
+                                UseLegacyUnicode = true
                             },
                             ArtistLabel = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 17, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
+                                UseLegacyUnicode = true
                             },
                             MapperContainer = new FillFlowContainer
                             {

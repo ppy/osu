@@ -24,13 +24,13 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
 using System.Linq;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
 
@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Osu
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
+                        new MultiMod(new OsuModAutoplay(), new OsuModCinema(), new OsuModDance()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
                         new OsuModSpunOut(),

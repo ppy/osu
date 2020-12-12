@@ -40,6 +40,7 @@ using osu.Game.Skinning;
 using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
+using osu.Game.Locale;
 
 namespace osu.Game
 {
@@ -306,6 +307,8 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
+
+            Add(new MLocaleManager());
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
@@ -397,6 +400,17 @@ namespace osu.Game
             {
                 if (importer.HandledExtensions.Contains(extension))
                     await importer.Import(paths);
+            }
+        }
+
+        public async Task Import(Stream stream, string filename)
+        {
+            var extension = Path.GetExtension(filename)?.ToLowerInvariant();
+
+            foreach (var importer in fileImporters)
+            {
+                if (importer.HandledExtensions.Contains(extension))
+                    await importer.Import(stream, Path.GetFileNameWithoutExtension(filename));
             }
         }
 

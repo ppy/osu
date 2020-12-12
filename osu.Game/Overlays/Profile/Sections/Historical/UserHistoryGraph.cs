@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         /// <summary>
         /// Text describing the value being plotted on the graph, which will be displayed as a prefix to the value in the <see cref="HistoryGraphTooltip"/>.
         /// </summary>
-        public string TooltipCounterName { get; set; } = "Plays";
+        public string TooltipCounterName { get; set; } = "游玩次数: ";
 
         protected override float GetDataPointHeight(long playCount) => playCount;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             return new TooltipDisplayContent
             {
                 Count = playCount.ToString("N0"),
-                Date = date.ToString("MMMM yyyy")
+                Date = date.ToString("yyyy MMMM")
             };
         }
 
