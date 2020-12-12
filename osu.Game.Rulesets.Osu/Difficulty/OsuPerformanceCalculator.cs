@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private readonly int countHitCircles;
         private readonly int countSliders;
+        private readonly int countSpinners;
         private readonly int beatmapMaxCombo;
 
         private Mod[] mods;
@@ -59,6 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
             countSliders = Beatmap.HitObjects.Count(h => h is Slider);
+            countSpinners = Beatmap.HitObjects.Count(h => h is Spinner);
 
             beatmapMaxCombo = Beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
@@ -84,12 +86,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 2.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
-            if (mods.Any(m => m is OsuModNoFail))
-                multiplier *= 0.90;
-
-            if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 0.95;
-
             // guess the number of misses + slider breaks from combo
             double comboBasedMissCount;
 
@@ -110,6 +106,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             effectiveMissCount = Math.Max(countMiss, comboBasedMissCount);
+
+            if (mods.Any(m => m is OsuModNoFail))
+                multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
+
+            if (mods.Any(m => m is OsuModSpunOut))
+                multiplier *= 1.0 - Math.Pow(countSpinners / totalHits, 0.85);
 
             double aimValue = computeAimValue();
             double tapValue = computeTapValue();
