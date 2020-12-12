@@ -106,13 +106,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Ok : HitResult.Great;
 
-            var cpi = new ControlPointInfo();
-            cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
-
             Hit hit = new Hit();
-            hit.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
+            var h = new DrawableTestHit(hit, kiai: kiai) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
 
             DrawableRuleset.Playfield.Add(h);
 
@@ -123,13 +118,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Ok : HitResult.Great;
 
-            var cpi = new ControlPointInfo();
-            cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
-
             Hit hit = new Hit { IsStrong = true };
-            hit.ApplyDefaults(cpi, new BeatmapDifficulty());
-
-            var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
+            var h = new DrawableTestHit(hit, kiai: kiai) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
 
             DrawableRuleset.Playfield.Add(h);
 
