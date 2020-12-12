@@ -25,9 +25,6 @@ using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 
-using System;
-using osu.Game.Input.Bindings;
-
 namespace osu.Game.Overlays
 {
     public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
@@ -335,17 +332,6 @@ namespace osu.Game.Overlays
             if (channel != null)
                 ChannelTabControl.Current.Value = channel;
         }
-
-        private void selectChannelSelectorTab()
-        {
-            int i = 0;
-            var channel = ChannelTabControl.Items
-                                           .Where(tab => (tab is ChannelSelectorTabItem.ChannelSelectorTabChannel))
-                                           .ElementAtOrDefault(i);
-            if (channel != null)
-                ChannelTabControl.Current.Value = channel;
-        }
-
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.AltPressed)
@@ -369,6 +355,7 @@ namespace osu.Game.Overlays
                         return true;
                 }
             }
+
             if (e.ControlPressed)
             {
                 switch (e.Key)
@@ -376,8 +363,9 @@ namespace osu.Game.Overlays
                     case Key.W:
                         channelManager.LeaveChannel(channelManager.CurrentChannel.Value);
                         return true;
+
                     case Key.T:
-                        selectChannelSelectorTab();
+                        ChannelTabControl.SelectChannelSelectorTab();
                         return true;
                 }
             }
@@ -417,7 +405,6 @@ namespace osu.Game.Overlays
 
         private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
