@@ -6,7 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using MathNet.Numerics.Distributions;
 
-namespace osu.Game.Rulesets.Difficulty.Utils
+namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 {
     /// <summary>
     /// approximate poisson binomial CDF defined by miss probabilities
@@ -37,6 +37,9 @@ namespace osu.Game.Rulesets.Difficulty.Utils
 
         public double Cdf(double count)
         {
+            if (sigma == 0)
+                return 1;
+
             double k = (count + 0.5 - mu) / sigma;
 
             double result = Normal.CDF(0, 1, k) + v * (1 - k * k) * Normal.PDF(0, 1, k);

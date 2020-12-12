@@ -33,15 +33,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            IList<double> aimComboSr = aim.ComboStarRatings;
-            IList<double> aimMissCounts = aim.MissCounts;
-
-            IList<double> speedComboSr = speed.ComboStarRatings;
-            IList<double> speedMissCounts = speed.MissCounts;
-
-            const double miss_sr_increment = OsuSkill.MISS_STAR_RATING_INCREMENT_MULTIPLIER;
-            const double miss_sr_exponent = OsuSkill.MISS_STAR_RATING_INCREMENT_EXPONENT;
-
             double aimRating = aim.Difficulty;
             double speedRating = speed.Difficulty;
             double starRating = star_rating_scale_factor * (aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2);
@@ -58,14 +49,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
-                MissStarRatingIncrement = miss_sr_increment,
-                MissStarRatingExponent = miss_sr_exponent,
                 AimStrain = aimRating,
-                AimComboStarRatings = aimComboSr,
-                AimMissCounts = aimMissCounts,
+                AimComboStarRatings = aim.ComboStarRatings,
+                AimMissCounts = aim.MissCounts,
                 SpeedStrain = speedRating,
-                SpeedComboStarRatings = speedComboSr,
-                SpeedMissCounts = speedMissCounts,
+                SpeedComboStarRatings = speed.ComboStarRatings,
+                SpeedMissCounts = speed.MissCounts,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo,

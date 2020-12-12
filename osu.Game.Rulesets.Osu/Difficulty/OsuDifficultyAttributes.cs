@@ -2,22 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Difficulty;
-using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
-        public double MissStarRatingIncrement;
-        public double MissStarRatingExponent;
-
         public double AimStrain;
-        public IList<double> AimComboStarRatings;
-        public IList<double> AimMissCounts;
+        public double[] AimComboStarRatings;
+        public double[] AimMissCounts;
 
         public double SpeedStrain;
-        public IList<double> SpeedComboStarRatings;
-        public IList<double> SpeedMissCounts;
+        public double[] SpeedComboStarRatings;
+        public double[] SpeedMissCounts;
 
         public double ApproachRate;
         public double OverallDifficulty;

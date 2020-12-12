@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using MathNet.Numerics.Interpolation;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -86,86 +88,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return totalValue;
         }
 
-        private double interpComboStarRating(IList<double> values, double scoreCombo, double mapCombo)
+        private double comboStarRating(double[] comboDifficulties)
         {
-            if (mapCombo == 0)
-            {
-                return values.Last();
-            }
-
-            double comboRatio = scoreCombo / mapCombo;
-            double pos = Math.Min(comboRatio * (values.Count), values.Count);
-            int i = (int)pos;
-
-            if (i == values.Count)
-            {
-                return values.Last();
-            }
-
-            if (pos <= 0)
-            {
-                return 0;
-            }
-
-            double ub = values[i];
-            double lb = i == 0 ? 0 : values[i - 1];
-
-            double t = pos - i;
-            double ret = lb * (1 - t) + ub * t;
-
-            return ret;
+            return LinearSpline.InterpolateSorted(OsuSkill.COMBO_PERCENTAGES, comboDifficulties).Interpolate(scoreMaxCombo / (double)beatmapMaxCombo);
         }
 
-        // get star rating corresponding to miss count in miss count list
-        private double missStarRating(double sr, int i) => sr * (1 - Math.Pow((i + 1), Attributes.MissStarRatingExponent) * Attributes.MissStarRatingIncrement);
-
-        private double interpMissCountStarRating(double sr, IList<double> values, int missCount)
+        private double missCountStarRating(double[] missCounts, double difficulty)
         {
-            double t;
-
-            if (missCount == 0)
-            {
-                // zero misses, return SR
-                return sr;
-            }
-
-            if (missCount < values[0])
-            {
-                t = missCount / values[0];
-
-                return sr * (1 - t) + missStarRating(sr, 0) * t;
-            }
-
-            for (int i = 0; i < values.Count; ++i)
-            {
-                if (missCount == values[i])
-                {
-                    if (i < values.Count - 1 && missCount == values[i + 1])
-                    {
-                        // if there are duplicates, take the lowest SR that can achieve miss count
-                        continue;
-                    }
-
-                    return missStarRating(sr, i);
-                }
-
-                if (i < values.Count - 1 && missCount < values[i + 1])
-                {
-                    t = (missCount - values[i]) / (values[i + 1] - values[i]);
-
-                    return missStarRating(sr, i) * (1 - t) + missStarRating(sr, i + 1) * t;
-                }
-            }
-
-            // more misses than max evaluated, interpolate to zero
-            t = (missCount - values.Last()) / (beatmapMaxCombo - values.Last());
-            return missStarRating(sr, values.Count - 1) * (1 - t);
+            double missCountMultiplier = (countMiss == 0) ? 1 : LinearSpline.InterpolateSorted(missCounts, OsuSkill.MISS_STAR_RATING_MULTIPLIERS).Interpolate(countMiss);
+            return difficulty * missCountMultiplier;
         }
 
         private double computeAimValue(Dictionary<string, double> categoryRatings = null)
         {
-            double aimComboStarRating = interpComboStarRating(Attributes.AimComboStarRatings, scoreMaxCombo, beatmapMaxCombo);
-            double aimMissCountStarRating = interpMissCountStarRating(Attributes.AimComboStarRatings.Last(), Attributes.AimMissCounts, countMiss);
+            double aimComboStarRating = comboStarRating(Attributes.AimComboStarRatings);
+            double aimMissCountStarRating = missCountStarRating(Attributes.AimMissCounts, Attributes.AimComboStarRatings.Last());
+
             double rawAim = Math.Pow(aimComboStarRating, combo_weight) * Math.Pow(aimMissCountStarRating, 1 - combo_weight);
 
             if (mods.Any(m => m is OsuModTouchDevice))
@@ -218,8 +156,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue(Dictionary<string, double> categoryRatings = null)
         {
-            double speedComboStarRating = interpComboStarRating(Attributes.SpeedComboStarRatings, scoreMaxCombo, beatmapMaxCombo);
-            double speedMissCountStarRating = interpMissCountStarRating(Attributes.SpeedComboStarRatings.Last(), Attributes.SpeedMissCounts, countMiss);
+            double speedComboStarRating = comboStarRating(Attributes.SpeedComboStarRatings);
+            double speedMissCountStarRating = missCountStarRating(Attributes.SpeedMissCounts, Attributes.SpeedComboStarRatings.Last());
+
             double rawSpeed = Math.Pow(speedComboStarRating, combo_weight) * Math.Pow(speedMissCountStarRating, 1 - combo_weight);
 
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
