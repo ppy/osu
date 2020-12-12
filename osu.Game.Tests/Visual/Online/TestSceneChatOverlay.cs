@@ -208,6 +208,20 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
 
+        [Test]
+        public void TestCloseAllButton()
+        {
+            AddStep("Join 2 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
+
+            // Clicking button should close all channels
+            AddStep("Close all channels", () => clickDrawable(chatOverlay.CloseAllButton));
+            AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
+        }
+
         private void pressChannelHotkey(int number)
         {
             var channelKey = Key.Number0 + number;
@@ -262,6 +276,8 @@ namespace osu.Game.Tests.Visual.Online
             protected override ChannelTabControl CreateChannelTabControl() => new TestTabControl();
 
             public IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => ((TestTabControl)ChannelTabControl).TabMap;
+
+            public new CloseAllTabsButton CloseAllButton => base.CloseAllButton
         }
 
         private class TestTabControl : ChannelTabControl

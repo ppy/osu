@@ -62,7 +62,7 @@ namespace osu.Game.Overlays
         private Box chatBackground;
         private Box tabBackground;
 
-        private ClickableContainer closeAllTabsButton;
+        protected ClickableContainer CloseAllButton;
 
         public Bindable<float> ChatHeight { get; set; }
 
@@ -181,7 +181,7 @@ namespace osu.Game.Overlays
                                     d.OnRequestLeave = channelManager.LeaveChannel;
                                     d.IsSwitchable = true;
                                 }),
-                                closeAllTabsButton = new CloseAllTabsButton
+                                CloseAllButton = new CloseAllTabsButton
                                 {
                                     Margin = new MarginPadding { Right = 20 },
                                     Origin = Anchor.CentreRight,
@@ -410,9 +410,9 @@ namespace osu.Game.Overlays
                     foreach (Channel channel in args.NewItems.Cast<Channel>())
                         ChannelTabControl.AddChannel(channel);
 
-                    if (closeAllTabsButton.Alpha == 0)
+                    if (CloseAllButton.Alpha == 0)
                     {
-                        closeAllTabsButton.FadeIn(200);
+                        CloseAllButton.FadeIn(200);
                     }
 
                     break;
@@ -423,7 +423,7 @@ namespace osu.Game.Overlays
                         ChannelTabControl.RemoveAllTabs();
                         loadedChannels.Clear();
                         currentChannelContainer.Clear(false);
-                        closeAllTabsButton.FadeOut(200);
+                        CloseAllButton.FadeOut(200);
                         break;
                     }
 
