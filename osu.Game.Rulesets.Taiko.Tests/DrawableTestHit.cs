@@ -13,12 +13,15 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         public readonly HitResult Type;
 
-        public DrawableTestHit(Hit hit, HitResult type = HitResult.Great)
+        public DrawableTestHit(Hit hit, HitResult type = HitResult.Great, bool kiai = false)
             : base(hit)
         {
             Type = type;
 
-            HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            var controlPoints = new ControlPointInfo();
+            controlPoints.Add(0, new EffectControlPoint { KiaiMode = kiai });
+
+            HitObject.ApplyDefaults(controlPoints, new BeatmapDifficulty());
         }
 
         protected override void UpdateInitialTransforms()
