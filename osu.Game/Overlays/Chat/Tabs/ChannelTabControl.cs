@@ -91,11 +91,13 @@ namespace osu.Game.Overlays.Chat.Tabs
         public void RemoveAllTabs()
         {
             SwitchTabOnRemove = false; // Temporarily disabling auto-switch while removing tabs
+
             foreach (TabItem<Channel> tab in AllTabs)
             {
                 if (!(tab is ChannelSelectorTabItem))
                     RemoveTabItem(tab);
             }
+
             SwitchTabOnRemove = true;
             SelectTab(selectorTab);
         }

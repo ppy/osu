@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
@@ -20,11 +19,13 @@ namespace osu.Game.Overlays.Chat
 
             Children = new Drawable[]
             {
-                text = new OsuSpriteText() {
+                text = new OsuSpriteText
+                {
                     Text = "Close All"
                 }
             };
         }
+
         protected override bool OnHover(HoverEvent e)
         {
             text.FadeColour(Color4.Red, 200, Easing.OutQuint);

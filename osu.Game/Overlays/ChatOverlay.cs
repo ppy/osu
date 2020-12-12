@@ -414,6 +414,7 @@ namespace osu.Game.Overlays
                     {
                         closeAllTabsButton.FadeIn(200);
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Remove:

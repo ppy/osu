@@ -425,6 +425,7 @@ namespace osu.Game.Online.Chat
                     channel.Joined.Value = false;
                 }
             }
+
             joinedChannels.Clear();
         }
 
