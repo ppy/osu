@@ -579,7 +579,6 @@ namespace osu.Game.Screens.Select
                 updateYPositions();
 
             // if there is a pending scroll action we apply it without animation and transfer the difference in position to the panels.
-            // this is intentionally applied before updating the visible range below, to avoid animating new items (sourced from pool) from locations off-screen, as it looks bad.
             if (pendingScrollOperation != PendingScrollOperation.None)
                 updateScrollPosition();
 
@@ -618,27 +617,29 @@ namespace osu.Game.Screens.Select
                     // Add those items within the previously found index range that should be displayed.
                     foreach (var item in toDisplay)
                     {
-                        var panel = setPool.Get(p => p.Item = item);
+                        var panel = setPool.Get();
 
+                        panel.Item = item;
                         panel.Depth = item.CarouselYPosition;
-                        panel.Y = item.CarouselYPosition;
+                        panel.UpdateY();
 
                         Scroll.Add(panel);
                     }
                 }
             }
 
+            // Update Y positions for the non-drawable models
+            foreach (var set in beatmapSets)
+                set.UpdateYPosition(Time.Elapsed);
+
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
-            foreach (DrawableCarouselItem item in Scroll.Children)
+            foreach (var set in Scroll.Children)
             {
-                updateItem(item);
+                updateItem(set);
 
-                if (item is DrawableCarouselBeatmapSet set)
-                {
-                    foreach (var diff in set.DrawableBeatmaps)
-                        updateItem(diff, item);
-                }
+                foreach (var diff in set.DrawableBeatmaps)
+                    updateItem(diff, set);
             }
         }
 
@@ -729,21 +730,21 @@ namespace osu.Game.Screens.Select
         {
             visibleItems.Clear();
 
-            float currentY = visibleHalfHeight;
+            float currentY = visibleHalfHeight - BleedTop;
 
             scrollTarget = null;
 
             foreach (CarouselItem item in root.Children)
             {
-                if (item.Filtered.Value)
-                    continue;
-
                 switch (item)
                 {
                     case CarouselBeatmapSet set:
                     {
-                        visibleItems.Add(set);
                         set.CarouselYPosition = currentY;
+                        if (item.Filtered.Value)
+                            continue;
+
+                        visibleItems.Add(set);
 
                         if (item.State.Value == CarouselItemState.Selected)
                         {
@@ -773,7 +774,7 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            currentY += visibleHalfHeight;
+            currentY += visibleHalfHeight - BleedBottom;
 
             Scroll.ScrollContent.Height = currentY;
 
@@ -814,8 +815,12 @@ namespace osu.Game.Screens.Select
 
                         Scroll.ScrollTo(scrollTarget.Value, false);
 
+                        foreach (var set in beatmapSets)
+                            set.YPosition += scrollChange;
+
                         foreach (var i in Scroll.Children)
-                            i.Y += scrollChange;
+                            i.UpdateY();
+
                         break;
                 }
 
@@ -901,7 +906,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected class CarouselScrollContainer : OsuScrollContainer<DrawableCarouselItem>
+        protected class CarouselScrollContainer : OsuScrollContainer<DrawableCarouselBeatmapSet>
         {
             private bool rightMouseScrollBlocked;
 

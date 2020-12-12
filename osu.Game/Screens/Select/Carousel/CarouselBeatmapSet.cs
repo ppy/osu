@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
 
@@ -41,6 +42,26 @@ namespace osu.Game.Screens.Select.Carousel
                       .Where(b => !b.Hidden)
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
+        }
+
+        public float YPosition;
+
+        public void UpdateYPosition(double elapsed)
+        {
+            if (YPosition == default)
+            {
+                YPosition = CarouselYPosition;
+                return;
+            }
+
+            float targetY = CarouselYPosition;
+
+            if (Precision.AlmostEquals(targetY, YPosition))
+                YPosition = targetY;
+            else
+                // algorithm for this is taken from ScrollContainer.
+                // while it doesn't necessarily need to match 1:1, as we are emulating scroll in some cases this feels most correct.
+                YPosition = (float)Interpolation.Lerp(targetY, YPosition, Math.Exp(-0.01 * elapsed));
         }
 
         protected override CarouselItem GetNextToSelect()
