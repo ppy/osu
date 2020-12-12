@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     break;
 
                 case 6:
-                    PlayfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_HEIGHT), 500);
+                    PlayfieldContainer.Delay(delay).ResizeTo(new Vector2(1, DEFAULT_PLAYFIELD_CONTAINER_HEIGHT), 500);
                     break;
             }
         }
