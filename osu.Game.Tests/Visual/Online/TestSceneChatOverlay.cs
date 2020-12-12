@@ -277,7 +277,7 @@ namespace osu.Game.Tests.Visual.Online
 
             public IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => ((TestTabControl)ChannelTabControl).TabMap;
 
-            public new CloseAllTabsButton CloseAllButton => base.CloseAllButton
+            public new CloseAllTabsButton CloseAllButton => base.CloseAllButton;
         }
 
         private class TestTabControl : ChannelTabControl
