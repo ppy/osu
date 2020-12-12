@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 multiplier *= 0.90;
 
             if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 0.95;
+                multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
 
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();

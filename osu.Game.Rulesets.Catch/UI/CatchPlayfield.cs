@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation)
         {
-            var droppedObjectContainer = new Container
+            var droppedObjectContainer = new Container<CaughtObject>
             {
                 RelativeSizeAxes = Axes.Both,
             };

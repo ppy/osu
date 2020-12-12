@@ -11,8 +11,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableDroplet : DrawablePalpableCatchHitObject
     {
-        public override bool StaysOnPlate => false;
-
         public DrawableDroplet()
             : this(null)
         {
@@ -26,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            ScaleContainer.Child = new SkinnableDrawable(
+            ScalingContainer.Child = new SkinnableDrawable(
                 new CatchSkinComponent(CatchSkinComponents.Droplet),
                 _ => new DropletPiece());
         }
@@ -39,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             float startRotation = RandomSingle(1) * 20;
             double duration = HitObject.TimePreempt + 2000;
 
-            ScaleContainer.RotateTo(startRotation).RotateTo(startRotation + 720, duration);
+            ScalingContainer.RotateTo(startRotation).RotateTo(startRotation + 720, duration);
         }
     }
 }
