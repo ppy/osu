@@ -96,6 +96,11 @@ namespace osu.Game.Overlays.Chat.Tabs
             selectorTab.Active.Value = false;
         }
 
+        public void SelectChannelSelectorTab() 
+        {
+            SelectTab(selectorTab);
+        }
+
         protected override TabFillFlowContainer CreateTabFlow() => new ChannelTabFillFlowContainer
         {
             Direction = FillDirection.Full,
