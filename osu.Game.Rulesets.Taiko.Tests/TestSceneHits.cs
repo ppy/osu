@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
@@ -9,7 +10,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             var cpi = new ControlPointInfo();
             cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
 
-            Hit hit = new Hit();
+            Hit hit = new Hit { IsStrong = true };
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             DrawableRuleset.Playfield.Add(h);
 
             ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
-            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new HitObject(), new TaikoStrongJudgement()) { Type = HitResult.Great });
+            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h.NestedHitObjects.Single(), new JudgementResult(new HitObject(), new TaikoStrongJudgement()) { Type = HitResult.Great });
         }
 
         private void addMissJudgement()
@@ -209,16 +209,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             DrawableRuleset.Playfield.Add(new DrawableHit(h));
-        }
-
-        private class TestStrongNestedHit : DrawableStrongNestedHit
-        {
-            public TestStrongNestedHit(DrawableHitObject mainObject)
-                : base(new StrongHitObject { StartTime = mainObject.HitObject.StartTime }, mainObject)
-            {
-            }
-
-            public override bool OnPressed(TaikoAction action) => false;
         }
     }
 }
