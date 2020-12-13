@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Taiko.Judgements;
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     /// <summary>
-    /// Used as a nested hitobject to provide <see cref="TaikoStrongJudgement"/>s for <see cref="DrawableTaikoHitObject"/>s.
+    /// Used as a nested hitobject to provide <see cref="TaikoStrongJudgement"/>s for <see cref="DrawableTaikoStrongHitObject{TObject, TNested}"/>s.
     /// </summary>
     public abstract class DrawableStrongNestedHit : DrawableTaikoHitObject
     {
