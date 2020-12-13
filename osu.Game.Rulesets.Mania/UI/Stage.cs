@@ -101,13 +101,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        judgements = new JudgementContainer<DrawableManiaJudgement>
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Y = HIT_TARGET_POSITION + 150,
-                        },
+                        judgements = new DrawableManiaJudgementAdjustmentContainer(HIT_TARGET_POSITION),
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
                 }
