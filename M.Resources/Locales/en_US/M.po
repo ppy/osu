@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-13 18:15+0800\n"
+"PO-Revision-Date: 2020-12-13 19:05+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -253,9 +253,6 @@ msgstr "ranking"
 
 msgid "一个神秘的按钮"
 msgstr "TOP SECRET"
-
-msgid "关于Mf-osu"
-msgstr "About Mf-osu"
 
 # Mvis设置Section标题
 msgid "Mvis播放器"
@@ -730,6 +727,79 @@ msgstr "Top"
 
 msgid "显示已删除的评论"
 msgstr "Show deleted"
+
+# Toolbar
+msgid "来玩{0}"
+msgstr "play some {0}"
+
+msgid "osu!已经运行了 {0}。"
+msgstr "osu! has been running for {0}."
+
+msgid "你共有{0}张谱面!"
+msgstr "You have {0} beatmaps in total!"
+
+msgid "在这里更改osu!的设置"
+msgstr "change the way osu! behaves"
+
+msgid "主页"
+msgstr "home"
+
+msgid "返回主菜单"
+msgstr "return to the main menu"
+
+msgid "我"
+msgstr "me"
+
+msgid "长得很好看(=・ω・=)"
+msgstr "looks pretty nice owo"
+
+msgid "关于Mf-osu"
+msgstr "About Mf-osu"
+
+msgid "这是基于osu!lazer的一个分支版本,祝游玩愉快(｡･ω･)ﾉﾞ"
+msgstr "Forked from ppy/osu. Have fun!"
+
+msgid "新闻"
+msgstr "news"
+
+msgid "看看社区上都发生了什么"
+msgstr "get up-to-date on community happenings"
+
+msgid "更新日志"
+msgstr "changelog"
+
+msgid "追踪最新的开发进度!"
+msgstr "track recent dev updates in the osu! ecosystem"
+
+msgid "看看谁是最强osu!玩家"
+msgstr "find out who's the best right now"
+
+msgid "看看有没有什么新的谱面"
+msgstr "browse for the new beatmaps"
+
+msgid "聊天"
+msgstr "chat"
+
+msgid "和世界各地的人实时交流"
+msgstr "join the real-time discussion"
+
+msgid "看板"
+msgstr "dashboard"
+
+msgid "在这里查看好友和其他的信息"
+msgstr "view your friends and other information"
+
+msgid "音乐"
+msgstr "music"
+
+msgid "管理当前正在播放的音乐"
+msgstr "manage the currently playing track"
+
+msgid "通知"
+msgstr "notifications"
+
+msgid "等待着您~"
+msgstr "waiting for 'ya"
 
 #~ msgid "等{0}首歌曲"
 #~ msgstr "...+{0} Song(s)"

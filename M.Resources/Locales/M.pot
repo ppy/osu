@@ -249,9 +249,6 @@ msgstr ""
 msgid "一个神秘的按钮"
 msgstr ""
 
-msgid "关于Mf-osu"
-msgstr ""
-
 msgid "Mvis播放器"
 msgstr ""
 
@@ -715,4 +712,78 @@ msgid "热门"
 msgstr ""
 
 msgid "显示已删除的评论"
+msgstr ""
+
+# Toolbar
+msgid "来玩{0}"
+msgstr ""
+
+msgid "osu!已经运行了 {0}。"
+msgstr ""
+
+msgid "你共有{0}张谱面!"
+msgstr ""
+
+msgid "在这里更改osu!的设置"
+msgstr ""
+
+msgid "主页"
+msgstr ""
+
+msgid "返回主菜单"
+msgstr ""
+
+msgid "我"
+msgstr ""
+
+msgid "长得很好看(=・ω・=)"
+msgstr ""
+
+# OverlayHeaders
+msgid "关于Mf-osu"
+msgstr ""
+
+msgid "这是基于osu!lazer的一个分支版本,祝游玩愉快(｡･ω･)ﾉﾞ"
+msgstr ""
+
+msgid "新闻"
+msgstr ""
+
+msgid "看看社区上都发生了什么"
+msgstr ""
+
+msgid "更新日志"
+msgstr ""
+
+msgid "追踪最新的开发进度!"
+msgstr ""
+
+msgid "看看谁是最强osu!玩家"
+msgstr ""
+
+msgid "看看有没有什么新的谱面"
+msgstr ""
+
+msgid "聊天"
+msgstr ""
+
+msgid "和世界各地的人实时交流"
+msgstr ""
+
+msgid "看板"
+msgstr ""
+
+msgid "在这里查看好友和其他的信息"
+msgstr ""
+
+msgid "音乐"
+msgstr ""
+
+msgid "管理当前正在播放的音乐"
+msgstr ""
+
+msgid "通知"
+msgstr ""
+
+msgid "等待着您~"
 msgstr ""
