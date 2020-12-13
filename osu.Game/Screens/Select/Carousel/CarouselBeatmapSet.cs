@@ -45,13 +45,24 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         public float YPosition;
+        private double durationNotBulkUpdated;
 
-        public void UpdateYPosition(double elapsed)
+        public void UpdateYPosition(double elapsed, bool isBulkUpdate)
         {
             if (YPosition == default)
             {
                 YPosition = CarouselYPosition;
                 return;
+            }
+
+            if (isBulkUpdate)
+            {
+                elapsed -= durationNotBulkUpdated;
+                durationNotBulkUpdated = 0;
+            }
+            else
+            {
+                durationNotBulkUpdated += elapsed;
             }
 
             float targetY = CarouselYPosition;

@@ -567,6 +567,9 @@ namespace osu.Game.Screens.Select
 
         #endregion
 
+        private double timeSinceLastModelUpdate;
+        private const int model_updates_per_second = 10;
+
         protected override void Update()
         {
             base.Update();
@@ -631,8 +634,23 @@ namespace osu.Game.Screens.Select
             // Update Y positions for the non-drawable models
             if (Clock != null)
             {
-                foreach (var set in beatmapSets)
-                    set.UpdateYPosition(Time.Elapsed);
+                if (timeSinceLastModelUpdate + Time.Elapsed > 1000.0 / model_updates_per_second)
+                {
+                    foreach (var set in beatmapSets)
+                        set.UpdateYPosition(timeSinceLastModelUpdate + Time.Elapsed, true);
+
+                    timeSinceLastModelUpdate = 0;
+                }
+                else
+                {
+                    foreach (var d in Scroll.Children)
+                    {
+                        var set = d.Item as CarouselBeatmapSet;
+                        set?.UpdateYPosition(Time.Elapsed, false);
+                    }
+
+                    timeSinceLastModelUpdate += Time.Elapsed;
+                }
             }
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
