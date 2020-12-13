@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="osu! SDL" type="DotNetProject" factoryName=".NET Project" folderName="osu!" activateToolWindowBeforeRun="false">
+  <configuration default="false" name="osu! (legacy osuTK)" type="DotNetProject" factoryName=".NET Project" folderName="osu!" activateToolWindowBeforeRun="false">
     <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/netcoreapp3.1/osu!.dll" />
-    <option name="PROGRAM_PARAMETERS" value="--sdl" />
+    <option name="PROGRAM_PARAMETERS" value="--tk" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/netcoreapp3.1" />
     <option name="PASS_PARENT_ENVS" value="1" />
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
