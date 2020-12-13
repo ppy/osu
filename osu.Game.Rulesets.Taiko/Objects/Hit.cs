@@ -17,5 +17,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
             get => TypeBindable.Value;
             set => TypeBindable.Value = value;
         }
+
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+
+        public class StrongNestedHit : StrongNestedHitObject
+        {
+        }
     }
 }

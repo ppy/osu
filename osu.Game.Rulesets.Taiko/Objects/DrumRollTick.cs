@@ -28,5 +28,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public override Judgement CreateJudgement() => new TaikoDrumRollTickJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+
+        public class StrongNestedHit : StrongNestedHitObject
+        {
+        }
     }
 }
