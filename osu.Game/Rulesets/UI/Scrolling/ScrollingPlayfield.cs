@@ -18,8 +18,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         [Resolved]
         protected IScrollingInfo ScrollingInfo { get; private set; }
-
-        protected ISkinSource CurrentSkin;
+        protected ISkinSource CurrentSkin { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
