@@ -7,28 +7,26 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestBarLineApplication : HitObjectApplicationTestScene
+    public class TestSceneBarLineApplication : HitObjectApplicationTestScene
     {
         [Test]
         public void TestApplyNewBarLine()
         {
-            DrawableBarLine barLine = null;
-
-            AddHitObject(() => barLine = new DrawableBarLine(PrepareObject(new BarLine
+            DrawableBarLine barLine = new DrawableBarLine(PrepareObject(new BarLine
             {
                 StartTime = 400,
                 Major = true
-            })));
+            }));
 
-            RemoveHitObject(() => barLine);
+            AddHitObject(barLine);
+            RemoveHitObject(barLine);
 
             AddStep("apply new bar line", () => barLine.Apply(PrepareObject(new BarLine
             {
                 StartTime = 200,
                 Major = false
             }), null));
-
-            AddHitObject(() => barLine);
+            AddHitObject(barLine);
         }
     }
 }

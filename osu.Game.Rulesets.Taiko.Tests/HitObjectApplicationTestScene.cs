@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
@@ -37,11 +36,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Clock = new FramedClock(new StopwatchClock())
             });
 
-        protected void AddHitObject(Func<DrawableHitObject> hitObject)
-            => AddStep("add to SHOC", () => hitObjectContainer.Add(hitObject.Invoke()));
+        protected void AddHitObject(DrawableHitObject hitObject)
+            => AddStep("add to SHOC", () => hitObjectContainer.Add(hitObject));
 
-        protected void RemoveHitObject(Func<DrawableHitObject> hitObject)
-            => AddStep("remove from SHOC", () => hitObjectContainer.Remove(hitObject.Invoke()));
+        protected void RemoveHitObject(DrawableHitObject hitObject)
+            => AddStep("remove from SHOC", () => hitObjectContainer.Remove(hitObject));
 
         protected TObject PrepareObject<TObject>(TObject hitObject)
             where TObject : TaikoHitObject
