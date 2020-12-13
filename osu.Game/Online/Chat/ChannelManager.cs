@@ -435,14 +435,13 @@ namespace osu.Game.Online.Chat
             }
         }
 
-
         public void JoinLastClosedChannel()
         {
-            if(joinedChannels.Count == 0)
+            if(closedChannels.Count == 0)
                 return;
-            Channel lastClosedChannel = joinedChannels[joinedChannels.Count - 1];
+            Channel lastClosedChannel = closedChannels[closedChannels.Count - 1];
             JoinChannel(lastClosedChannel);
-            joinedChannels.Remove(lastClosedChannel);
+            closedChannels.Remove(lastClosedChannel);
         }
 
         private long lastMessageId;
