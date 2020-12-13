@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Content.X = DrawHeight / 2;
         }
 
-        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongHit(StrongNestedHitObject hitObject) => new StrongNestedHit(hitObject, this);
 
         private void updateColour()
         {
@@ -164,8 +164,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private class StrongNestedHit : DrawableStrongNestedHit
         {
-            public StrongNestedHit(StrongHitObject strong, DrawableDrumRoll drumRoll)
-                : base(strong, drumRoll)
+            public StrongNestedHit(StrongNestedHitObject nestedHit, DrawableDrumRoll drumRoll)
+                : base(nestedHit, drumRoll)
             {
             }
 

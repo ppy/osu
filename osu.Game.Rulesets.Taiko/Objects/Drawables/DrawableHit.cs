@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongHit(StrongNestedHitObject hitObject) => new StrongNestedHit(hitObject, this);
 
         private class StrongNestedHit : DrawableStrongNestedHit
         {
@@ -240,8 +240,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             public new DrawableHit MainObject => (DrawableHit)base.MainObject;
 
-            public StrongNestedHit(StrongHitObject strong, DrawableHit hit)
-                : base(strong, hit)
+            public StrongNestedHit(StrongNestedHitObject nestedHit, DrawableHit hit)
+                : base(nestedHit, hit)
             {
             }
 
