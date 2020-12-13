@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             switch (hitObject)
             {
                 case StrongNestedHitObject strong:
-                    return CreateStrongHit(strong);
+                    return CreateStrongNestedHit(strong);
             }
 
             return base.CreateNestedHitObject(hitObject);
@@ -105,6 +105,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         /// <param name="hitObject">The strong hitobject.</param>
         /// <returns>The strong hitobject handler.</returns>
-        protected abstract DrawableStrongNestedHit CreateStrongHit(StrongNestedHitObject hitObject);
+        protected abstract DrawableStrongNestedHit CreateStrongNestedHit(StrongNestedHitObject hitObject);
     }
 }
