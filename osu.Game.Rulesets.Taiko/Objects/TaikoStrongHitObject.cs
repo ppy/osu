@@ -36,7 +36,14 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.CreateNestedHitObjects(cancellationToken);
 
             if (IsStrong)
-                AddNested(new StrongNestedHitObject { StartTime = this.GetEndTime() });
+                AddNested(CreateStrongNestedHit(this.GetEndTime()));
         }
+
+        /// <summary>
+        /// Creates a <see cref="StrongNestedHitObject"/> representing a second hit on this object.
+        /// This is only called if <see cref="IsStrong"/> is true.
+        /// </summary>
+        /// <param name="startTime">The start time of the nested hit.</param>
+        protected abstract StrongNestedHitObject CreateStrongNestedHit(double startTime);
     }
 }

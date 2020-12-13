@@ -109,6 +109,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+
+        public class StrongNestedHit : StrongNestedHitObject
+        {
+        }
+
         #region LegacyBeatmapEncoder
 
         double IHasDistance.Distance => Duration * Velocity;
