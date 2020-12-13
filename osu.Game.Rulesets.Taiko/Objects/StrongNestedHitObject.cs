@@ -7,6 +7,10 @@ using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
+    /// <summary>
+    /// Base type for nested strong hits.
+    /// Used by <see cref="TaikoStrongHitObject"/>s to represent their strong bonus scoring portions.
+    /// </summary>
     public abstract class StrongNestedHitObject : TaikoHitObject
     {
         public override Judgement CreateJudgement() => new TaikoStrongJudgement();
