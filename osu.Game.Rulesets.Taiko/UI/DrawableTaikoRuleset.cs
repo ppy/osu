@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(new DrawableBarLine(bar)));
+            new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar));
 
             FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Scroller), _ => Empty())
             {

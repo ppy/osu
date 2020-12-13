@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Major = major
             };
 
-            DrawableRuleset.Playfield.Add(new DrawableBarLine(bl));
+            DrawableRuleset.Playfield.Add(bl);
         }
 
         private void addSwell(double duration = default_duration)
