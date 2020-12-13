@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-11 17:30+0800\n"
+"PO-Revision-Date: 2020-12-13 17:17+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -554,6 +554,98 @@ msgstr "Appear offline"
 
 msgid "登出"
 msgstr "Sign out"
+
+msgid "账号"
+msgstr "Account"
+
+msgid "用户名"
+msgstr "Username"
+
+msgid "密码"
+msgstr "Password"
+
+msgid "记住用户名"
+msgstr "Remember username"
+
+msgid "自动登录"
+msgstr "Remember password"
+
+msgid "登录"
+msgstr "Sign in"
+
+msgid "注册"
+msgstr "Register"
+
+msgid "正在连接至服务器..."
+msgstr "Attempting to connect... "
+
+msgid "连接失败，将尝试重新连接..."
+msgstr "Connection is failing, will attempt to reconnect... "
+
+msgid "取消连接"
+msgstr "cancel"
+
+# 用户注册
+msgid "新用户注册"
+msgstr "New Player Registration"
+
+msgid "让我们开始吧!"
+msgstr "let's get you started"
+
+msgid "创建一个账号!"
+msgstr "Let's create an account!"
+
+msgid "Warning! 警告！"
+msgstr "Warning!"
+
+msgid "你是{0}吗？"
+msgstr "Are you {0} ?"
+
+msgid "osu!决不允许玩家多开账号！"
+msgstr "osu! has a policy of one account per person!"
+
+msgid "请注意开小号可能会导致永久封禁！"
+msgstr ""
+"Please be aware that creating more than one account per person may result in "
+"permanent deactivation of accounts."
+
+msgid "需要更多信息?请访问我们的"
+msgstr "Need further assistance? Contact us via our "
+
+msgid "帮助中心"
+msgstr "support system"
+
+msgid "我没法登录自己的账号!"
+msgstr "Help, I can't access my account!"
+
+msgid "我是为别人注册的"
+msgstr "I understand. This account isn't for me."
+
+msgid "让我们创建一个账号!"
+msgstr "Let's create an account!"
+
+msgid "邮箱地址"
+msgstr "Email address"
+
+msgid "这将会公开显示在你的个人界面上,请勿填写不良信息"
+msgstr "This will be your public presence. No profanity, no impersonation."
+
+msgid "也不要填写你自己的个人信息!"
+msgstr "Avoid exposing your own personal details, too!"
+
+msgid "这将会用作发送通知和密码重置."
+msgstr ""
+"Will be used for notifications, account verification and in the case you "
+"forget your password. No spam, ever."
+
+msgid "请确保这些信息正确!"
+msgstr "Make sure to get it right!"
+
+msgid "密码要求至少长8个字符"
+msgstr "At least 8 characters long"
+
+msgid "Something happened... but we're not sure what."
+msgstr ""
 
 # BeatmapSetOverlay
 msgid "提交日期 "

@@ -548,6 +548,94 @@ msgstr ""
 msgid "登出"
 msgstr ""
 
+msgid "账号"
+msgstr ""
+
+msgid "用户名"
+msgstr ""
+
+msgid "密码"
+msgstr ""
+
+msgid "记住用户名"
+msgstr ""
+
+msgid "自动登录"
+msgstr ""
+
+msgid "登录"
+msgstr ""
+
+msgid "注册"
+msgstr ""
+
+msgid "正在连接至服务器..."
+msgstr ""
+
+msgid "连接失败，将尝试重新连接..."
+msgstr ""
+
+msgid "取消连接"
+msgstr ""
+
+# 用户注册
+msgid "新用户注册"
+msgstr ""
+
+msgid "让我们开始吧!"
+msgstr ""
+
+msgid "创建一个账号!"
+msgstr ""
+
+msgid "Warning! 警告！"
+msgstr ""
+
+msgid "你是{0}吗？"
+msgstr ""
+
+msgid "osu!决不允许玩家多开账号！"
+msgstr ""
+
+msgid "请注意开小号可能会导致永久封禁！"
+msgstr ""
+
+msgid "需要更多信息?请访问我们的"
+msgstr ""
+
+msgid "帮助中心"
+msgstr ""
+
+msgid "我没法登录自己的账号!"
+msgstr ""
+
+msgid "我是为别人注册的"
+msgstr ""
+
+msgid "让我们创建一个账号!"
+msgstr ""
+
+msgid "邮箱地址"
+msgstr ""
+
+msgid "这将会公开显示在你的个人界面上,请勿填写不良信息"
+msgstr ""
+
+msgid "也不要填写你自己的个人信息!"
+msgstr ""
+
+msgid "这将会用作发送通知和密码重置."
+msgstr ""
+
+msgid "请确保这些信息正确!"
+msgstr ""
+
+msgid "密码要求至少长8个字符"
+msgstr ""
+
+msgid "Something happened... but we're not sure what."
+msgstr ""
+
 # BeatmapSetOverlay
 msgid "提交日期 "
 msgstr ""

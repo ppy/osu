@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             Origin = Anchor.TopCentre,
                             TextAnchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
-                            Text = state.NewValue == APIState.Failing ? "连接失败，将尝试重新连接... " : "正在连接至服务器... ",
+                            Text = state.NewValue == APIState.Failing ? "连接失败，将尝试重新连接..." : "正在连接至服务器...",
                             Margin = new MarginPadding { Top = 10, Bottom = 10 },
                         },
                     };

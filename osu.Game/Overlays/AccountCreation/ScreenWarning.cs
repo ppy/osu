@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -96,13 +97,13 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         new SettingsButton
                         {
-                            Text = "我没法登陆自己的账号!",
-                            Margin = new MarginPadding { Top = 50 },
+                            Text = "我没法登录自己的账号!",
+                            Margin = new MarginPadding { Top = 25 },
                             Action = () => game?.OpenUrlExternally(help_centre_url)
                         },
                         new DangerousSettingsButton
                         {
-                            Text = "我是为别人注册的.",
+                            Text = "我是为别人注册的",
                             Action = () => this.Push(new ScreenEntry())
                         },
                         furtherAssistance = new LinkFlowContainer(cp => cp.Font = cp.Font.With(size: 16))
@@ -116,17 +117,19 @@ namespace osu.Game.Overlays.AccountCreation
                 }
             };
 
-            multiAccountExplanationText.AddText("你是");
-            multiAccountExplanationText.AddText(api.ProvidedUsername, cp => cp.Colour = colours.BlueLight);
-            multiAccountExplanationText.AddText("吗? osu! 绝不允许玩家");
-            multiAccountExplanationText.AddText("多开账号!", cp => cp.Colour = colours.Yellow);
-            multiAccountExplanationText.AddText("请注意开小号可能会导致");
-            multiAccountExplanationText.AddText("永久封禁!", cp => cp.Colour = colours.Yellow);
-            //multiAccountExplanationText.AddText(".");
+            multiAccountExplanationText.AddText(new OsuSpriteText
+            {
+                Text = new LocalisedString("你是{0}吗？", api.ProvidedUsername)
+            });
+            multiAccountExplanationText.AddText("osu!决不允许玩家多开账号！", cp => cp.Colour = colours.Yellow);
+            multiAccountExplanationText.AddText("请注意开小号可能会导致永久封禁！", cp =>
+            {
+                cp.Colour = colours.Yellow;
+                cp.RelativeSizeAxes = Axes.X;
+            });
 
-            furtherAssistance.AddText("需要更多信息? 请访问我们的");
+            furtherAssistance.AddText("需要更多信息?请访问我们的");
             furtherAssistance.AddLink("帮助中心", help_centre_url);
-            furtherAssistance.AddText(".");
         }
     }
 }
