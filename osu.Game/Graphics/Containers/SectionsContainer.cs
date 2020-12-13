@@ -252,7 +252,7 @@ namespace osu.Game.Graphics.Containers
 
             // if both are all visible - prioritize higher sections
             if (aAllVisible && bAllVisible)
-                return IndexOf(a).CompareTo(IndexOf(b));
+                return aIndex.CompareTo(bIndex);
 
             // if neither are all visible - just compare which is more visible
             return bVisibleHeight.CompareTo(aVisibleHeight);
