@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
@@ -18,10 +19,21 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Resolved]
         protected IScrollingInfo ScrollingInfo { get; private set; }
 
+        protected ISkinSource CurrentSkin;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ISkinSource skin)
         {
             Direction.BindTo(ScrollingInfo.Direction);
+            CurrentSkin = skin;
+
+            skin.SourceChanged += OnSkinChanged;
+            OnSkinChanged();
+        }
+
+        protected virtual void OnSkinChanged()
+        {
+
         }
 
         /// <summary>

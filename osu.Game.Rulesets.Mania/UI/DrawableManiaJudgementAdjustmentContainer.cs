@@ -8,16 +8,33 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class DrawableManiaJudgementAdjustmentContainer : JudgementContainer<DrawableManiaJudgement>
     {
-        private float scorePosition => 0;
-        public DrawableManiaJudgementAdjustmentContainer(float hitTargetPosition)
+        private float hitTargetPosition = 110;
+        private float scorePosition;
+
+        public float HitTargetPosition
+        {
+            get => hitTargetPosition;
+            set
+            {
+                hitTargetPosition = value;
+                Y = value + scorePosition + 150;
+            }
+        }
+
+        public float ScorePosition
+        {
+            set
+            {
+                scorePosition = value;
+                Y = hitTargetPosition + value + 150;
+            }
+        }
+
+        public DrawableManiaJudgementAdjustmentContainer()
         {
             Anchor = Anchor.TopCentre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
-            Y = hitTargetPosition + 150;
         }
-
-        public DrawableManiaJudgementAdjustmentContainer()
-            : this(110) { }
     }
 }

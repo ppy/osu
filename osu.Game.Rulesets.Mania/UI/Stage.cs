@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public IReadOnlyList<Column> Columns => columnFlow.Content;
         private readonly ColumnFlow<Column> columnFlow;
 
-        private readonly JudgementContainer<DrawableManiaJudgement> judgements;
+        private DrawableManiaJudgementAdjustmentContainer judgements;
         private readonly DrawablePool<DrawableManiaJudgement> judgementPool;
 
         private readonly Drawable barLineContainer;
@@ -101,7 +102,10 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        judgements = new DrawableManiaJudgementAdjustmentContainer(HIT_TARGET_POSITION),
+                        judgements = new DrawableManiaJudgementAdjustmentContainer()
+                        {
+                            HitTargetPosition = HIT_TARGET_POSITION,
+                        },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
                 }
@@ -173,6 +177,13 @@ namespace osu.Game.Rulesets.Mania.UI
                 j.Anchor = Anchor.Centre;
                 j.Origin = Anchor.Centre;
             }));
+        }
+
+        protected override void OnSkinChanged()
+        {
+            judgements.ScorePosition = CurrentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                                   new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ScorePosition))
+                                               ?.Value ?? 0;
         }
 
         protected override void Update()
