@@ -9,7 +9,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
+    public class DrawableDrumRollTick : DrawableTaikoStrongHitObject<DrumRollTick>
     {
         /// <summary>
         /// The hit type corresponding to the <see cref="TaikoAction"/> that the user pressed to hit this <see cref="DrawableDrumRollTick"/>.

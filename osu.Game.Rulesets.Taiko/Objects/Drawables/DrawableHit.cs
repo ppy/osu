@@ -16,7 +16,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableHit : DrawableTaikoHitObject<Hit>
+    public class DrawableHit : DrawableTaikoStrongHitObject<Hit>
     {
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
