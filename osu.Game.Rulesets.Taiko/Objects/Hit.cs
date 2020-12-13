@@ -5,7 +5,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class Hit : TaikoHitObject
+    public class Hit : TaikoStrongHitObject
     {
         public readonly Bindable<HitType> TypeBindable = new Bindable<HitType>();
 
