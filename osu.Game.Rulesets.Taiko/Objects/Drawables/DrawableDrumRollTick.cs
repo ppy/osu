@@ -9,7 +9,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRollTick : DrawableTaikoStrongHitObject<DrumRollTick>
+    public class DrawableDrumRollTick : DrawableTaikoStrongHitObject<DrumRollTick, DrumRollTick.StrongNestedHit>
     {
         /// <summary>
         /// The hit type corresponding to the <see cref="TaikoAction"/> that the user pressed to hit this <see cref="DrawableDrumRollTick"/>.
@@ -61,11 +61,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return UpdateResult(true);
         }
 
-        protected override DrawableStrongNestedHit CreateStrongNestedHit(StrongNestedHitObject hitObject) => new StrongNestedHit(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongNestedHit(DrumRollTick.StrongNestedHit hitObject) => new StrongNestedHit(hitObject, this);
 
         private class StrongNestedHit : DrawableStrongNestedHit
         {
-            public StrongNestedHit(StrongNestedHitObject nestedHit, DrawableDrumRollTick tick)
+            public StrongNestedHit(DrumRollTick.StrongNestedHit nestedHit, DrawableDrumRollTick tick)
                 : base(nestedHit, tick)
             {
             }
