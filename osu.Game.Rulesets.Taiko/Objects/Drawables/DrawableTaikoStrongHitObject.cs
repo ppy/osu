@@ -12,8 +12,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoStrongHitObject<TObject> : DrawableTaikoHitObject<TObject>
+    public abstract class DrawableTaikoStrongHitObject<TObject, TStrongNestedObject> : DrawableTaikoHitObject<TObject>
         where TObject : TaikoStrongHitObject
+        where TStrongNestedObject : StrongNestedHitObject
     {
         private readonly Bindable<bool> isStrong;
 
@@ -92,7 +93,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             switch (hitObject)
             {
-                case StrongNestedHitObject strong:
+                case TStrongNestedObject strong:
                     return CreateStrongNestedHit(strong);
             }
 
@@ -105,6 +106,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         /// <param name="hitObject">The strong hitobject.</param>
         /// <returns>The strong hitobject handler.</returns>
-        protected abstract DrawableStrongNestedHit CreateStrongNestedHit(StrongNestedHitObject hitObject);
+        protected abstract DrawableStrongNestedHit CreateStrongNestedHit(TStrongNestedObject hitObject);
     }
 }
