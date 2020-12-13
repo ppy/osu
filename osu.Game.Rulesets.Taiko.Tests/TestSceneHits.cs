@@ -145,9 +145,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void addBarLine(bool major, double delay = scroll_time)
         {
-            BarLine bl = new BarLine { StartTime = DrawableRuleset.Playfield.Time.Current + delay };
+            BarLine bl = new BarLine
+            {
+                StartTime = DrawableRuleset.Playfield.Time.Current + delay,
+                Major = major
+            };
 
-            DrawableRuleset.Playfield.Add(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
+            DrawableRuleset.Playfield.Add(new DrawableBarLine(bl));
         }
 
         private void addSwell(double duration = default_duration)
