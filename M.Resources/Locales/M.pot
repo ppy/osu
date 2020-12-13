@@ -360,6 +360,25 @@ msgstr ""
 msgid "已选择的Mods"
 msgstr ""
 
+# 歌曲选择 - Mods
+msgid "游戏Mods提供了多种多样的游玩方式"
+msgstr ""
+
+msgid "有一些会对您的分数等产生影响,还有一些仅供娱乐"
+msgstr ""
+
+msgid "重置"
+msgstr ""
+
+msgid "自定义"
+msgstr ""
+
+msgid "关闭"
+msgstr ""
+
+msgid "分数倍率:"
+msgstr ""
+
 # 歌曲选择界面 - FilterControl
 msgid "分类依据"
 msgstr ""

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-13 17:17+0800\n"
+"PO-Revision-Date: 2020-12-13 18:15+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -365,6 +365,28 @@ msgstr "Friend"
 
 msgid "已选择的Mods"
 msgstr "Selected Mods"
+
+# 歌曲选择 - Mods
+msgid "游戏Mods提供了多种多样的游玩方式"
+msgstr ""
+"Mods provide different ways to enjoy gameplay. Some have an effect on the "
+"score you can achieve during ranked play."
+
+# 歌曲选择 - Mods
+msgid "有一些会对您的分数等产生影响,还有一些仅供娱乐"
+msgstr "Others are just for fun."
+
+msgid "重置"
+msgstr "Deselect All"
+
+msgid "自定义"
+msgstr "Customisation"
+
+msgid "关闭"
+msgstr "Close"
+
+msgid "分数倍率:"
+msgstr "Score Multiplier:"
 
 # 歌曲选择界面 - FilterControl
 msgid "分类依据"
