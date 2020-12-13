@@ -181,9 +181,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void OnSkinChanged()
         {
-            judgements.ScorePosition = CurrentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                                                   new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ScorePosition))
-                                               ?.Value ?? 0;
+            judgements.ScorePosition = CurrentSkin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ScorePosition)
+                                                   ?.Value ?? 0;
         }
 
         protected override void Update()
