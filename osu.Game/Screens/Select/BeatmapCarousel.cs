@@ -629,8 +629,11 @@ namespace osu.Game.Screens.Select
             }
 
             // Update Y positions for the non-drawable models
-            foreach (var set in beatmapSets)
-                set.UpdateYPosition(Time.Elapsed);
+            if (Clock != null)
+            {
+                foreach (var set in beatmapSets)
+                    set.UpdateYPosition(Time.Elapsed);
+            }
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
