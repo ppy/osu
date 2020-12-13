@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestCorrectSectionSelected()
         {
-            const int sections_count = 10;
+            const int sections_count = 11;
             AddStep("clear", () => container.Clear());
             AddStep("fill with sections", () =>
             {
@@ -85,8 +85,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             for (int i = sections_count - 2; i >= 0; i--)
                 step(i);
 
-            AddStep("scroll almost to end", () => container.ScrollTo(container.Children[sections_count - 3]));
-            AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[sections_count - 3]);
+            AddStep("scroll almost to end", () => container.ScrollTo(container.Children[sections_count - 2]));
+            AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[sections_count - 2]);
             AddStep("scroll down", () => triggerUserScroll(-1));
             AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[sections_count - 1]);
         }
