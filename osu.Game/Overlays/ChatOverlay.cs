@@ -357,6 +357,20 @@ namespace osu.Game.Overlays
                 }
             }
 
+            if (e.ControlPressed)
+            {
+                switch (e.Key)
+                {
+                    case Key.W:
+                        channelManager.LeaveChannel(channelManager.CurrentChannel.Value);
+                        return true;
+
+                    case Key.T:
+                        ChannelTabControl.SelectChannelSelectorTab();
+                        return true;
+                }
+            }
+
             return base.OnKeyDown(e);
         }
 
