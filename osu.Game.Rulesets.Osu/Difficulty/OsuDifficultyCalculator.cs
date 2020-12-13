@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 0.0675;
+        private const double star_rating_scale_factor = 0.975;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -29,12 +29,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
+            var aim = (OsuSkill)skills[0];
+            var speed = (OsuSkill)skills[1];
+
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
 
-            double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
-            double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
+            double aimRating = aim.Difficulty;
+            double speedRating = speed.Difficulty;
+            double starRating = star_rating_scale_factor * (aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2);
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
@@ -55,7 +58,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StarRating = starRating,
                 Mods = mods,
                 AimStrain = aimRating,
+                AimComboStarRatings = aim.ComboStarRatings,
+                AimMissCounts = aim.MissCounts,
                 SpeedStrain = speedRating,
+                SpeedComboStarRatings = speed.ComboStarRatings,
+                SpeedMissCounts = speed.MissCounts,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo,

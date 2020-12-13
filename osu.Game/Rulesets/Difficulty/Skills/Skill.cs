@@ -16,7 +16,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class Skill
     {
         /// <summary>
-        /// The peak strain for each <see cref="DifficultyCalculator.SectionLength"/> section of the beatmap.
+        /// The length of each strain section.
+        /// </summary>
+        protected virtual int SectionLength => 400;
+
+        /// <summary>
+        /// The peak strain for each <see cref="SectionLength"/> section of the beatmap.
         /// </summary>
         public IReadOnlyList<double> StrainPeaks => strainPeaks;
 
@@ -47,20 +52,37 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected double CurrentStrain { get; private set; } = 1;
 
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
+        private double currentSectionEnd;
 
         private readonly List<double> strainPeaks = new List<double>();
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        public void Process(DifficultyHitObject current)
+        public virtual void Process(DifficultyHitObject current)
         {
+            var sectionLength = current.ClockRate * SectionLength;
+            if (currentSectionEnd == 0)
+                currentSectionEnd = Math.Ceiling(current.StartTime / sectionLength) * sectionLength;
+
+            while (current.BaseObject.StartTime > currentSectionEnd)
+            {
+                SaveCurrentPeak();
+                StartNewSectionFrom(currentSectionEnd);
+                currentSectionEnd += sectionLength;
+            }
+
             CurrentStrain *= strainDecay(current.DeltaTime);
             CurrentStrain += StrainValueOf(current) * SkillMultiplier;
 
             currentSectionPeak = Math.Max(CurrentStrain, currentSectionPeak);
 
             Previous.Push(current);
+        }
+
+        public virtual void Calculate()
+        {
+            SaveCurrentPeak();
         }
 
         /// <summary>
