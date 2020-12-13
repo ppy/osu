@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public IReadOnlyList<Column> Columns => columnFlow.Content;
         private readonly ColumnFlow<Column> columnFlow;
 
-        private JudgementContainer<DrawableManiaJudgement> judgements;
+        private readonly JudgementContainer<DrawableManiaJudgement> judgements;
         private readonly DrawablePool<DrawableManiaJudgement> judgementPool;
 
         private readonly Drawable barLineContainer;
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        judgements = new JudgementContainer<DrawableManiaJudgement>()
+                        judgements = new JudgementContainer<DrawableManiaJudgement>
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
