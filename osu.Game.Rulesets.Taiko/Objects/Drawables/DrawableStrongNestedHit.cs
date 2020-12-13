@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public readonly DrawableHitObject MainObject;
 
-        protected DrawableStrongNestedHit(StrongHitObject strong, DrawableHitObject mainObject)
-            : base(strong)
+        protected DrawableStrongNestedHit(StrongNestedHitObject nestedHit, DrawableHitObject mainObject)
+            : base(nestedHit)
         {
             MainObject = mainObject;
         }

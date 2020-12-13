@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class StrongHitObject : TaikoHitObject
+    public class StrongNestedHitObject : TaikoHitObject
     {
         public override Judgement CreateJudgement() => new TaikoStrongJudgement();
 

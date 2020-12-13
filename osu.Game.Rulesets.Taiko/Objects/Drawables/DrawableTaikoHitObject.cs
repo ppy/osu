@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             switch (hitObject)
             {
-                case StrongHitObject strong:
+                case StrongNestedHitObject strong:
                     return CreateStrongHit(strong);
             }
 
@@ -221,11 +221,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected abstract SkinnableDrawable CreateMainPiece();
 
         /// <summary>
-        /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongHitObject"/>.
+        /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongNestedHitObject"/>.
         /// This is only invoked if <see cref="TaikoHitObject.IsStrong"/> is true for <see cref="HitObject"/>.
         /// </summary>
         /// <param name="hitObject">The strong hitobject.</param>
         /// <returns>The strong hitobject handler.</returns>
-        protected virtual DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => null;
+        protected virtual DrawableStrongNestedHit CreateStrongHit(StrongNestedHitObject hitObject) => null;
     }
 }

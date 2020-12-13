@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.CreateNestedHitObjects(cancellationToken);
 
             if (IsStrong)
-                AddNested(new StrongHitObject { StartTime = this.GetEndTime() });
+                AddNested(new StrongNestedHitObject { StartTime = this.GetEndTime() });
         }
 
         public override Judgement CreateJudgement() => new TaikoJudgement();
