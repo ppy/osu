@@ -33,6 +33,19 @@ namespace osu.Game.Online.Chat
         private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
+        // Prototype for keeping a list of closed channels in an
+        // order so we can figure out the reverse order of how channels
+        // were close
+        // Bindable list supports an insert at indexc function and a
+        // remove function. If the list re-indexes after each remove (I can
+        // check the behaviour of the C# List System.Collections.Generic library to confirm this, since that
+        // library appears to be what is used underneath), then I can just always add at the end
+        // of the list and always remove index 0 (if size > 0)
+        // A stack exchange post indicates that List remove will decrement all the
+        // indeces after the node we removed
+
+        private readonly BindableList<Channel> closedChannels = new BindableList<Channel>();
+
         /// <summary>
         /// The currently opened channel
         /// </summary>
@@ -47,6 +60,11 @@ namespace osu.Game.Online.Chat
         /// The channels available for the player to join
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
+
+        /// <summary>
+        /// The channels available for the player to join
+        /// </summary>
+        public IBindableList<Channel> ClosedChannels => ClosedChannels;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -407,12 +425,24 @@ namespace osu.Game.Online.Chat
                 CurrentChannel.Value = null;
 
             joinedChannels.Remove(channel);
+            // insert at the end of the list
+            closedChannels.Insert(closedChannels.Count, channel);
 
             if (channel.Joined.Value)
             {
                 api.Queue(new LeaveChannelRequest(channel));
                 channel.Joined.Value = false;
             }
+        }
+
+
+        public void JoinLastClosedChannel()
+        {
+            if(joinedChannels.Count == 0)
+                return;
+            Channel lastClosedChannel = joinedChannels[joinedChannels.Count - 1];
+            JoinChannel(lastClosedChannel);
+            joinedChannels.Remove(lastClosedChannel);
         }
 
         private long lastMessageId;
