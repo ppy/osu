@@ -25,7 +25,7 @@ using System.Linq;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Edit;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Taiko.Skinning;
+using osu.Game.Rulesets.Taiko.Skinning.Legacy;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 
