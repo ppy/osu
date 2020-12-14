@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class DrumRollTick : TaikoStrongHitObject
+    public class DrumRollTick : TaikoStrongableHitObject
     {
         /// <summary>
         /// Whether this is the first (initial) tick of the slider.

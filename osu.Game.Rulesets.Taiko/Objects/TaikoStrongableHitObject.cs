@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
     /// <summary>
     /// Base class for taiko hitobjects that can become strong (large).
     /// </summary>
-    public abstract class TaikoStrongHitObject : TaikoHitObject
+    public abstract class TaikoStrongableHitObject : TaikoHitObject
     {
         /// <summary>
         /// Scale multiplier for a strong drawable taiko hit object.

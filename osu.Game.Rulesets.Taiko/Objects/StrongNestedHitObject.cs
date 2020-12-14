@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     /// <summary>
     /// Base type for nested strong hits.
-    /// Used by <see cref="TaikoStrongHitObject"/>s to represent their strong bonus scoring portions.
+    /// Used by <see cref="TaikoStrongableHitObject"/>s to represent their strong bonus scoring portions.
     /// </summary>
     public abstract class StrongNestedHitObject : TaikoHitObject
     {

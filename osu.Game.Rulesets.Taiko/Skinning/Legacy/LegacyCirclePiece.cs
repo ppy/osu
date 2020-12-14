@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 const string normal_hit = "taikohit";
                 const string big_hit = "taikobig";
 
-                string prefix = ((drawableHitObject.HitObject as TaikoStrongHitObject)?.IsStrong ?? false) ? big_hit : normal_hit;
+                string prefix = ((drawableHitObject.HitObject as TaikoStrongableHitObject)?.IsStrong ?? false) ? big_hit : normal_hit;
 
                 return skin.GetAnimation($"{prefix}{lookup}", true, false) ??
                        // fallback to regular size if "big" version doesn't exist.
