@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -107,6 +106,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
+                            Y = HIT_TARGET_POSITION + 150
                         },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
@@ -179,12 +179,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 j.Anchor = Anchor.Centre;
                 j.Origin = Anchor.Centre;
             }));
-        }
-
-        protected override void OnSkinChanged()
-        {
-            judgements.Y = CurrentSkin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ScorePosition)
-                                                   ?.Value ?? HIT_TARGET_POSITION + 150;
         }
 
         protected override void Update()

@@ -20,20 +20,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         [Resolved]
         protected IScrollingInfo ScrollingInfo { get; private set; }
-        protected ISkinSource CurrentSkin { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
             Direction.BindTo(ScrollingInfo.Direction);
-            CurrentSkin = skin;
-
-            skin.SourceChanged += OnSkinChanged;
-            OnSkinChanged();
-        }
-
-        protected virtual void OnSkinChanged()
-        {
         }
 
         /// <summary>
