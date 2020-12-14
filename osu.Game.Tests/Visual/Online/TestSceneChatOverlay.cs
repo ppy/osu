@@ -212,11 +212,11 @@ namespace osu.Game.Tests.Visual.Online
         // already been reopened
         private void pressControlShiftT()
         {
-            InputManager.PressKey(Key.ControlLeft);
-            InputManager.PressKey(Key.ShiftLeft);
-            InputManager.Key(Key.T);
-            InputManager.ReleaseKey(Key.ControlLeft);
-            InputManager.ReleaseKey(Key.ShiftLeft);
+            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
+            AddStep("Press and hold Shift", () => InputManager.PressKey(Key.ShiftLeft));
+            AddStep("Press T", () => InputManager.Key(Key.T));
+            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
+            AddStep("Release Shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
         }
 
         public void TestCtrlShiftTShortcut1()
@@ -233,7 +233,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
             AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
 
-            AddStep("Press Control-Shift-T", () => pressControlShiftT());
+            pressControlShiftT();
 
             // Channel 2 should now be open again
             AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
@@ -258,19 +258,19 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("channel 1 closed", () => !channelManager.JoinedChannels.Contains(channel1));
             AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
 
-            AddStep("Press Control-Shift-T", () => pressControlShiftT());
+            pressControlShiftT();
             // Channel 1 should now be open again. Channel 2 should not
             AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
             AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
 
-            AddStep("Press Control-Shift-T", () => pressControlShiftT());
+            pressControlShiftT();
 
             // Both Channel 1 and Channel 2 should be open
             AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
             AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
 
             // Processing this again should have not effect
-            AddStep("Press Control-Shift-T", () => pressControlShiftT());
+            pressControlShiftT();
             AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
             AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
 
@@ -279,12 +279,10 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Click channel 2 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
 
             // Both channel 1 and channel 2 should be open
-            AddStep("Press Control-Shift-T", () => pressControlShiftT());
+            pressControlShiftT();
             AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
             AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
         }
-
-
 
         private void pressChannelHotkey(int number)
         {
