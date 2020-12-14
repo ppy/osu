@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Android.App;
@@ -31,13 +32,18 @@ namespace osu.Android
 
             base.OnCreate(savedInstanceState);
 
-            OnNewIntent(Intent);
+            // OnNewIntent() only fires for an activity if it's *re-launched* while it's on top of the activity stack.
+            // on first launch we still have to fire manually.
+            // reference: https://developer.android.com/reference/android/app/Activity#onNewIntent(android.content.Intent)
+            handleIntent(Intent);
 
             Window.AddFlags(WindowManagerFlags.Fullscreen);
             Window.AddFlags(WindowManagerFlags.KeepScreenOn);
         }
 
-        protected override void OnNewIntent(Intent intent)
+        protected override void OnNewIntent(Intent intent) => handleIntent(intent);
+
+        private void handleIntent(Intent intent)
         {
             switch (intent.Action)
             {
