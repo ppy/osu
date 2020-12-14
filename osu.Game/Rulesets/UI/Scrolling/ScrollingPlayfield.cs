@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected IScrollingInfo ScrollingInfo { get; private set; }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load()
         {
             Direction.BindTo(ScrollingInfo.Direction);
         }
