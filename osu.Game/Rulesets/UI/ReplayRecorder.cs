@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.UI
 
             inputManager = GetContainingInputManager();
 
-            spectatorStreaming?.BeginPlaying(gameplayBeatmap);
+            spectatorStreaming?.BeginPlaying(gameplayBeatmap, target);
         }
 
         protected override void Dispose(bool isDisposing)
