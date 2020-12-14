@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Play
 
             // after an initial delay, start the debounced load check.
             // this will continue to execute even after resuming back on restart.
-            Scheduler.Add(new ScheduledDelegate(pushWhenLoaded, 1800, 0));
+            Scheduler.Add(new ScheduledDelegate(pushWhenLoaded, Clock.CurrentTime + 1800, 0));
 
             showMuteWarningIfNeeded();
         }
