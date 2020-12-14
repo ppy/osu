@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             selectorTab.Active.Value = false;
         }
 
-        public void SelectChannelSelectorTab() 
+        public void SelectChannelSelectorTab()
         {
             SelectTab(selectorTab);
         }
