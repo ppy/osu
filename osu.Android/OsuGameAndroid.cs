@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
-using System.Threading.Tasks;
 using Android.App;
 using Android.OS;
 using osu.Framework.Allocation;
