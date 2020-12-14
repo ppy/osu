@@ -4,8 +4,8 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
-using osu.Game.Rulesets.Scoring;
+using System.Linq;
+using Newtonsoft.Json;
 using osu.Game.Scoring;
 
 namespace osu.Game.Online.Spectator
@@ -17,7 +17,7 @@ namespace osu.Game.Online.Spectator
 
         public int MaxCombo { get; set; }
 
-        public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
+        public StatisticPair[] Statistics { get; set; }
 
         /// <summary>
         /// Construct header summary information from a point-in-time reference to a score which is actively being played.
@@ -28,8 +28,15 @@ namespace osu.Game.Online.Spectator
             Combo = score.Combo;
             MaxCombo = score.MaxCombo;
 
-            foreach (var kvp in score.Statistics)
-                Statistics[kvp.Key] = kvp.Value;
+            Statistics = score.Statistics.Select(kvp => new StatisticPair(kvp.Key, kvp.Value)).ToArray();
+        }
+
+        [JsonConstructor]
+        public FrameHeader(int combo, int maxCombo, StatisticPair[] statistics)
+        {
+            Combo = combo;
+            MaxCombo = maxCombo;
+            Statistics = statistics;
         }
     }
 }
