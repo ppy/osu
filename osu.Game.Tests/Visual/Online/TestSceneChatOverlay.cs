@@ -255,8 +255,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
             AddStep("Click channel 1 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
 
-            AddAssert("channel 1 closed", () => !channelManager.JoinedChannels.Contains(channel1));
-            AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+            AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any();
 
             pressControlShiftT();
             // Channel 1 should now be open again. Channel 2 should not
