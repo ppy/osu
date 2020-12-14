@@ -219,6 +219,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Release Shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
         }
 
+        [Test]
         public void TestCtrlShiftTShortcut1()
         {
             AddStep("Join 2 channels", () =>
@@ -239,6 +240,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
         }
 
+        [Test]
         public void TestCtrlShiftTShortcut2()
         {
             AddStep("Join 2 channels", () =>
