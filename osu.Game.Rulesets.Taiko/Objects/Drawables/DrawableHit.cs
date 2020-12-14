@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Allocation;
+using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
@@ -36,29 +36,51 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool pressHandledThisFrame;
 
-        private readonly Bindable<HitType> type;
+        private readonly Bindable<HitType> type = new Bindable<HitType>();
 
-        public DrawableHit(Hit hit)
-            : base(hit)
+        public DrawableHit()
+            : this(null)
         {
-            type = HitObject.TypeBindable.GetBoundCopy();
-            FillMode = FillMode.Fit;
-
-            updateActionsFromType();
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public DrawableHit([CanBeNull] Hit hit)
+            : base(hit)
         {
+            FillMode = FillMode.Fit;
+        }
+
+        protected override void OnApply()
+        {
+            type.BindTo(HitObject.TypeBindable);
             type.BindValueChanged(_ =>
             {
                 updateActionsFromType();
 
-                // will overwrite samples, should only be called on change.
+                // will overwrite samples, should only be called on subsequent changes
+                // after the initial application.
                 updateSamplesFromTypeChange();
 
                 RecreatePieces();
             });
+
+            // action update also has to happen immediately on application.
+            updateActionsFromType();
+
+            base.OnApply();
+        }
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+
+            type.UnbindFrom(HitObject.TypeBindable);
+            type.UnbindEvents();
+
+            UnproxyContent();
+
+            HitActions = null;
+            HitAction = null;
+            validActionPressed = pressHandledThisFrame = false;
         }
 
         private HitSampleInfo[] getRimSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
