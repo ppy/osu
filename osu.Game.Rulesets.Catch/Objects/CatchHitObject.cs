@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -31,14 +30,11 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => OriginalXBindable.Value = value;
         }
 
-        /// <summary>
-        /// The horizontal position of the fruit between 0 and <see cref="CatchPlayfield.WIDTH"/>.
-        /// </summary>
+        float IHasXPosition.X => OriginalX;
+
         public float X
         {
-            [Obsolete("Use EffectiveX instead")]
-            get => EffectiveX;
-            set => OriginalXBindable.Value = value;
+            set => OriginalX = value;
         }
 
         public readonly Bindable<float> EffectiveXBindable = new Bindable<float>();
