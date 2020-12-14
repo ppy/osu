@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         public ChannelTabControl()
         {
-            Padding = new MarginPadding { Left = 50 };
+            Padding = new MarginPadding { Left = 50, Right = 100 };
 
             TabContainer.Spacing = new Vector2(-SHEAR_WIDTH, 0);
             TabContainer.Masking = false;
@@ -82,6 +82,24 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             if (SelectedTab == null)
                 SelectTab(selectorTab);
+        }
+
+        /// <summary>
+        /// Removes all channels from the ChannelTabControl, and selects the
+        /// selector tab
+        /// </summary>
+        public void RemoveAllTabs()
+        {
+            SwitchTabOnRemove = false; // Temporarily disabling auto-switch while removing tabs
+
+            foreach (TabItem<Channel> tab in AllTabs)
+            {
+                if (!(tab is ChannelSelectorTabItem))
+                    RemoveTabItem(tab);
+            }
+
+            SwitchTabOnRemove = true;
+            SelectTab(selectorTab);
         }
 
         protected override void SelectTab(TabItem<Channel> tab)

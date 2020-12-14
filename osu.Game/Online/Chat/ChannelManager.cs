@@ -415,6 +415,20 @@ namespace osu.Game.Online.Chat
             }
         }
 
+        public void LeaveAllChannels()
+        {
+            foreach (Channel channel in joinedChannels)
+            {
+                if (channel.Joined.Value)
+                {
+                    api.Queue(new LeaveChannelRequest(channel));
+                    channel.Joined.Value = false;
+                }
+            }
+
+            joinedChannels.Clear();
+        }
+
         private long lastMessageId;
 
         private bool channelsInitialised;
