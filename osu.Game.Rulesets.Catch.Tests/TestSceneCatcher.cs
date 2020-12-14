@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             JudgementResult result2 = null;
             AddStep("catch hyper fruit", () =>
             {
-                attemptCatch(new Fruit { HyperDashTarget = new Fruit { OriginalX = 100 } }, out drawableObject1, out result1);
+                attemptCatch(new Fruit { HyperDashTarget = new Fruit { X = 100 } }, out drawableObject1, out result1);
             });
             AddStep("catch normal fruit", () =>
             {
@@ -107,14 +107,14 @@ namespace osu.Game.Rulesets.Catch.Tests
             var halfWidth = Catcher.CalculateCatchWidth(new BeatmapDifficulty { CircleSize = 0 }) / 2;
             AddStep("catch fruit", () =>
             {
-                attemptCatch(new Fruit { OriginalX = -halfWidth + 1 });
-                attemptCatch(new Fruit { OriginalX = halfWidth - 1 });
+                attemptCatch(new Fruit { X = -halfWidth + 1 });
+                attemptCatch(new Fruit { X = halfWidth - 1 });
             });
             checkPlate(2);
             AddStep("miss fruit", () =>
             {
-                attemptCatch(new Fruit { OriginalX = -halfWidth - 1 });
-                attemptCatch(new Fruit { OriginalX = halfWidth + 1 });
+                attemptCatch(new Fruit { X = -halfWidth - 1 });
+                attemptCatch(new Fruit { X = halfWidth + 1 });
             });
             checkPlate(2);
         }
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestFruitChangesCatcherState()
         {
-            AddStep("miss fruit", () => attemptCatch(new Fruit { OriginalX = 100 }));
+            AddStep("miss fruit", () => attemptCatch(new Fruit { X = 100 }));
             checkState(CatcherAnimationState.Fail);
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             checkState(CatcherAnimationState.Idle);
@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("catch hyper fruit", () => attemptCatch(new Fruit
             {
-                HyperDashTarget = new Fruit { OriginalX = 100 }
+                HyperDashTarget = new Fruit { X = 100 }
             }));
             checkHyperDash(true);
             AddStep("catch normal fruit", () => attemptCatch(new Fruit()));
@@ -147,10 +147,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("catch hyper kiai fruit", () => attemptCatch(new TestKiaiFruit
             {
-                HyperDashTarget = new Fruit { OriginalX = 100 }
+                HyperDashTarget = new Fruit { X = 100 }
             }));
             AddStep("catch tiny droplet", () => attemptCatch(new TinyDroplet()));
-            AddStep("miss tiny droplet", () => attemptCatch(new TinyDroplet { OriginalX = 100 }));
+            AddStep("miss tiny droplet", () => attemptCatch(new TinyDroplet { X = 100 }));
             // catcher state and hyper dash state is preserved
             checkState(CatcherAnimationState.Kiai);
             checkHyperDash(true);
@@ -161,9 +161,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("catch hyper kiai fruit", () => attemptCatch(new TestKiaiFruit
             {
-                HyperDashTarget = new Fruit { OriginalX = 100 }
+                HyperDashTarget = new Fruit { X = 100 }
             }));
-            AddStep("miss banana", () => attemptCatch(new Banana { OriginalX = 100 }));
+            AddStep("miss banana", () => attemptCatch(new Banana { X = 100 }));
             // catcher state is preserved but hyper dash state is reset
             checkState(CatcherAnimationState.Kiai);
             checkHyperDash(false);

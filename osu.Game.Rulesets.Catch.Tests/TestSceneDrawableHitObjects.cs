@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 var fruit = new Fruit
                 {
-                    OriginalX = getXCoords(hit),
+                    X = getXCoords(hit),
                     LastInCombo = i % 4 == 0,
                     StartTime = playfieldTime + 800 + (200 * i)
                 };
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             var juice = new JuiceStream
             {
-                OriginalX = xCoords,
+                X = xCoords,
                 StartTime = playfieldTime + 1000,
                 Path = new SliderPath(PathType.Linear, new[]
                 {
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 var banana = new Banana
                 {
-                    OriginalX = getXCoords(hit),
+                    X = getXCoords(hit),
                     LastInCombo = i % 4 == 0,
                     StartTime = playfieldTime + 800 + (200 * i)
                 };
