@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -69,9 +70,21 @@ namespace osu.Android
             var filenameColumn = cursor.GetColumnIndex(OpenableColumns.DisplayName);
 
             var stream = ContentResolver.OpenInputStream(uri);
+            string filename = cursor.GetString(filenameColumn);
 
             if (stream != null)
-                Task.Factory.StartNew(() => game.Import(stream, cursor.GetString(filenameColumn)), TaskCreationOptions.LongRunning);
+                Task.Factory.StartNew(() => runImport(stream, filename), TaskCreationOptions.LongRunning);
+        }
+
+        private Task runImport(Stream stream, string filename)
+        {
+            // SharpCompress requires archive streams to be seekable, which the stream opened by
+            // OpenInputStream() seems to not necessarily be.
+            // copy to an arbitrary-access memory stream to be able to proceed with the import.
+            var copy = new MemoryStream();
+            stream.CopyTo(copy);
+
+            return game.Import(copy, filename);
         }
     }
 }
