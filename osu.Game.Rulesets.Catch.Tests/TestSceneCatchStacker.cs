@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 beatmap.HitObjects.Add(new Fruit
                 {
-                    X = (0.5f + i / 2048f * (i % 10 - 5)) * CatchPlayfield.WIDTH,
+                    OriginalX = (0.5f + i / 2048f * (i % 10 - 5)) * CatchPlayfield.WIDTH,
                     StartTime = i * 100,
                     NewCombo = i % 8 == 0
                 });
