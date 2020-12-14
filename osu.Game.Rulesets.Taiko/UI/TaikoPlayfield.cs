@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -38,9 +39,14 @@ namespace osu.Game.Rulesets.Taiko.UI
         private SkinnableDrawable mascot;
 
         private ProxyContainer topLevelHitContainer;
-        private ScrollingHitObjectContainer barlineContainer;
         private Container rightArea;
         private Container leftArea;
+
+        /// <remarks>
+        /// <see cref="Playfield.AddNested"/> is purposefully not called on this to prevent i.e. being able to interact
+        /// with bar lines in the editor.
+        /// </remarks>
+        private BarLinePlayfield barLinePlayfield;
 
         private Container hitTargetOffsetContent;
 
@@ -84,7 +90,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                barlineContainer = new ScrollingHitObjectContainer(),
+                                barLinePlayfield = new BarLinePlayfield(),
                                 new Container
                                 {
                                     Name = "Hit objects",
@@ -155,12 +161,50 @@ namespace osu.Game.Rulesets.Taiko.UI
             mascot.Scale = new Vector2(DrawHeight / DEFAULT_HEIGHT);
         }
 
+        #region Pooling support
+
+        public override void Add(HitObject h)
+        {
+            switch (h)
+            {
+                case BarLine barLine:
+                    barLinePlayfield.Add(barLine);
+                    break;
+
+                case TaikoHitObject taikoHitObject:
+                    base.Add(taikoHitObject);
+                    break;
+
+                default:
+                    throw new ArgumentException($"Unsupported {nameof(HitObject)} type: {h.GetType()}");
+            }
+        }
+
+        public override bool Remove(HitObject h)
+        {
+            switch (h)
+            {
+                case BarLine barLine:
+                    return barLinePlayfield.Remove(barLine);
+
+                case TaikoHitObject taikoHitObject:
+                    return base.Remove(taikoHitObject);
+
+                default:
+                    throw new ArgumentException($"Unsupported {nameof(HitObject)} type: {h.GetType()}");
+            }
+        }
+
+        #endregion
+
+        #region Non-pooling support
+
         public override void Add(DrawableHitObject h)
         {
             switch (h)
             {
-                case DrawableBarLine barline:
-                    barlineContainer.Add(barline);
+                case DrawableBarLine barLine:
+                    barLinePlayfield.Add(barLine);
                     break;
 
                 case DrawableTaikoHitObject taikoObject:
@@ -170,7 +214,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
 
                 default:
-                    throw new ArgumentException($"Unsupported {nameof(DrawableHitObject)} type");
+                    throw new ArgumentException($"Unsupported {nameof(DrawableHitObject)} type: {h.GetType()}");
             }
         }
 
@@ -178,8 +222,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             switch (h)
             {
-                case DrawableBarLine barline:
-                    return barlineContainer.Remove(barline);
+                case DrawableBarLine barLine:
+                    return barLinePlayfield.Remove(barLine);
 
                 case DrawableTaikoHitObject _:
                     h.OnNewResult -= OnNewResult;
@@ -187,9 +231,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                     return base.Remove(h);
 
                 default:
-                    throw new ArgumentException($"Unsupported {nameof(DrawableHitObject)} type");
+                    throw new ArgumentException($"Unsupported {nameof(DrawableHitObject)} type: {h.GetType()}");
             }
         }
+
+        #endregion
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
