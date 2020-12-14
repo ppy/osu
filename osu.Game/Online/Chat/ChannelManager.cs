@@ -419,7 +419,7 @@ namespace osu.Game.Online.Chat
 
             // Prevent the closedChannel list from exceeding the max size
             // by removing the oldest element
-            if(closedChannels.Count >= closedChannelsMaxSize)
+            if (closedChannels.Count >= closedChannelsMaxSize)
             {
                 closedChannels.Remove(closedChannels[0]);
             }
@@ -435,15 +435,15 @@ namespace osu.Game.Online.Chat
         }
 
 
-        
+
         /// <summary>
         /// Opens the most recently closed channel that has not
         /// already been reopened
-        /// Works similarly to reopening last closed tab on a web browser.
+        /// Works similarly to reopening the last closed tab on a web browser.
         /// </summary>
         public void JoinLastClosedChannel()
         {
-            if(closedChannels.Count <= 0)
+            if (closedChannels.Count <= 0)
             {
                 return;
             }
@@ -452,7 +452,7 @@ namespace osu.Game.Online.Chat
             closedChannels.Remove(lastClosedChannel);
             // If the user already joined the channel, try the next
             // channel in the list
-            if(joinedChannels.IndexOf(lastClosedChannel) >= 0)
+            if (joinedChannels.IndexOf(lastClosedChannel) >= 0)
             {
                 JoinLastClosedChannel();
             }
