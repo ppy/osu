@@ -157,14 +157,14 @@ namespace osu.Game.Screens.Play
                 PrepareReplay();
         }
 
-        private Replay recordingReplay;
+        private Score recordingScore;
 
         /// <summary>
         /// Run any recording / playback setup for replays.
         /// </summary>
         protected virtual void PrepareReplay()
         {
-            DrawableRuleset.SetRecordTarget(recordingReplay = new Replay());
+            DrawableRuleset.SetRecordTarget(recordingScore = new Score { Replay = new Replay() });
         }
 
         [BackgroundDependencyLoader(true)]
@@ -758,9 +758,9 @@ namespace osu.Game.Screens.Play
 
             var score = new Score { ScoreInfo = CreateScore() };
 
-            if (recordingReplay?.Frames.Count > 0)
+            if (recordingScore?.Replay.Frames.Count > 0)
             {
-                score.Replay = recordingReplay;
+                score.Replay = recordingScore.Replay;
 
                 using (var stream = new MemoryStream())
                 {
