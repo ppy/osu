@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.UI
             return false;
         }
 
-        public override void SetRecordTarget(Replay recordingReplay)
+        public sealed override void SetRecordTarget(Replay recordingReplay)
         {
             if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
