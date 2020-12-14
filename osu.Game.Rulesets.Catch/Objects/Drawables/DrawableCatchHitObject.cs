@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
-        public readonly Bindable<float> XBindable = new Bindable<float>();
+        public readonly Bindable<float> EffectiveXBindable = new Bindable<float>();
 
         protected override double InitialLifetimeOffset => HitObject.TimePreempt;
 
@@ -38,14 +38,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             base.OnApply();
 
-            XBindable.BindTo(HitObject.EffectiveXBindable);
+            EffectiveXBindable.BindTo(HitObject.EffectiveXBindable);
         }
 
         protected override void OnFree()
         {
             base.OnFree();
 
-            XBindable.UnbindFrom(HitObject.EffectiveXBindable);
+            EffectiveXBindable.UnbindFrom(HitObject.EffectiveXBindable);
         }
 
         public Func<CatchHitObject, bool> CheckPosition;
