@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRoll : DrawableTaikoStrongHitObject<DrumRoll, DrumRoll.StrongNestedHit>
+    public class DrawableDrumRoll : DrawableTaikoStrongableHitObject<DrumRoll, DrumRoll.StrongNestedHit>
     {
         /// <summary>
         /// Number of rolling hits required to reach the dark/final colour.

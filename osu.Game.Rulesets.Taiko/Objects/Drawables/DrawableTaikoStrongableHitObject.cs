@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoStrongHitObject<TObject, TStrongNestedObject> : DrawableTaikoHitObject<TObject>
+    public abstract class DrawableTaikoStrongableHitObject<TObject, TStrongNestedObject> : DrawableTaikoHitObject<TObject>
         where TObject : TaikoStrongableHitObject
         where TStrongNestedObject : StrongNestedHitObject
     {
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
-        protected DrawableTaikoStrongHitObject(TObject hitObject)
+        protected DrawableTaikoStrongableHitObject(TObject hitObject)
             : base(hitObject)
         {
             isStrong = HitObject.IsStrongBindable.GetBoundCopy();
