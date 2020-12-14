@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Content.X = DrawHeight / 2;
         }
 
-        protected override DrawableStrongNestedHit CreateStrongNestedHit(DrumRoll.StrongNestedHit hitObject) => new StrongNestedHit(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongNestedHit(DrumRoll.StrongNestedHit hitObject) => new StrongNestedHit(hitObject);
 
         private void updateColour(double fadeDuration = 0)
         {
@@ -176,17 +176,24 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private class StrongNestedHit : DrawableStrongNestedHit
         {
-            public StrongNestedHit(DrumRoll.StrongNestedHit nestedHit, DrawableDrumRoll drumRoll)
-                : base(nestedHit, drumRoll)
+            public new DrawableDrumRoll ParentHitObject => (DrawableDrumRoll)base.ParentHitObject;
+
+            public StrongNestedHit()
+                : this(null)
+            {
+            }
+
+            public StrongNestedHit([CanBeNull] DrumRoll.StrongNestedHit nestedHit)
+                : base(nestedHit)
             {
             }
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
-                if (!MainObject.Judged)
+                if (!ParentHitObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = MainObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
             }
 
             public override bool OnPressed(TaikoAction action) => false;
