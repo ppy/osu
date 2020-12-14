@@ -38,27 +38,38 @@ namespace osu.Android
 
         protected override void OnNewIntent(Intent intent)
         {
-            if (intent.Action == Intent.ActionDefault && intent.Scheme == ContentResolver.SchemeContent)
+            switch (intent.Action)
             {
-                handleImportFromUri(intent.Data);
-            }
+                case Intent.ActionDefault:
+                    if (intent.Scheme == ContentResolver.SchemeContent)
+                        handleImportFromUri(intent.Data);
+                    break;
 
-            if (intent.Action == Intent.ActionSend)
-            {
-                var content = intent.ClipData.GetItemAt(0);
-                handleImportFromUri(content.Uri);
+                case Intent.ActionSend:
+                {
+                    var content = intent.ClipData?.GetItemAt(0);
+                    if (content != null)
+                        handleImportFromUri(content.Uri);
+                    break;
+                }
             }
         }
 
         private void handleImportFromUri(Uri uri)
         {
-            var cursor = ContentResolver.Query(uri, new[] { OpenableColumns.DisplayName }, null, null);
-            var filename_column = cursor.GetColumnIndex(OpenableColumns.DisplayName);
+            var cursor = ContentResolver?.Query(uri, new[] { OpenableColumns.DisplayName }, null, null);
+
+            if (cursor == null)
+                return;
+
             cursor.MoveToFirst();
 
+            var filenameColumn = cursor.GetColumnIndex(OpenableColumns.DisplayName);
+
             var stream = ContentResolver.OpenInputStream(uri);
+
             if (stream != null)
-                Task.Factory.StartNew(() => game.Import(stream, cursor.GetString(filename_column)), TaskCreationOptions.LongRunning);
+                Task.Factory.StartNew(() => game.Import(stream, cursor.GetString(filenameColumn)), TaskCreationOptions.LongRunning);
         }
     }
 }
