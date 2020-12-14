@@ -207,6 +207,62 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Click normal close button", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
+        
+        private void pressControlW()
+        {
+            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
+            AddStep("Press W", () => InputManager.Key(Key.W));
+            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
+        }
+
+        
+        public void TestCtrlWShortcut()
+        {
+            AddStep("Join 2 channels", () => 
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
+
+            // Want to close channel 2
+            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+
+            pressControlW();
+            
+            // Channel 2 should be closed
+            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+
+            // Want to close channel 1
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            pressControlW();
+
+            // Channel 1 and channel 2 should be closed
+            AddAssert("channel 1 closed", () => !channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+        }
+
+        private void pressControlT()
+        {
+            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
+            AddStep("Press T", () => InputManager.Key(Key.T));
+            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
+        }
+
+        public void TestCtrlTShortcut()
+        {
+            AddStep("Join 2 channels", () => 
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
+
+            // Want to join another channel
+            pressControlT();
+            // Selector should be visible
+            AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+        }
 
         private void pressChannelHotkey(int number)
         {
