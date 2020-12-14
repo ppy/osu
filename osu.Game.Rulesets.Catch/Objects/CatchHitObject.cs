@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         /// <remarks>
         /// This value is the original value specified in the beatmap, not affected by beatmap processing.
+        /// It should be used instead of <see cref="EffectiveX"/> when working on a beatmap, not a gameplay.
         /// </remarks>
         public float OriginalX
         {
@@ -32,6 +33,9 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         float IHasXPosition.X => OriginalX;
 
+        /// <summary>
+        /// An alias of <see cref="OriginalX"/> setter.
+        /// </summary>
         public float X
         {
             set => OriginalX = value;
