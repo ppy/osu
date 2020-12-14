@@ -228,8 +228,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             // Close channel 2
-            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Click channel 2 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+            AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
             AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
             AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
 
@@ -249,12 +248,8 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             // Close channels 1 and channel 2
-            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Click channel 2 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
-
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
-            AddStep("Click channel 1 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
-
+            AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
+            AddStep("Leave channel 1", () => channelManager.LeaveChannel(channel1));
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
 
             pressControlShiftT();
@@ -274,8 +269,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
 
             // Close channel 2 again
-            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Click channel 2 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+            AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
 
             // Both channel 1 and channel 2 should be open
             pressControlShiftT();
