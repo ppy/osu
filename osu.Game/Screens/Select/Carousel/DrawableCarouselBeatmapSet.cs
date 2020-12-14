@@ -22,6 +22,18 @@ namespace osu.Game.Screens.Select.Carousel
     {
         public const float HEIGHT = MAX_HEIGHT;
 
+        public static float YLerp(float targetY, float currentY, double elapsed)
+        {
+            if (elapsed > 2000)
+                return targetY;
+            if (elapsed < 0)
+                return currentY;
+
+            // algorithm for this is taken from ScrollContainer.
+            // while it doesn't necessarily need to match 1:1, as we are emulating scroll in some cases this feels most correct.
+            return (float)Interpolation.Lerp(targetY, currentY, Math.Exp(-0.01 * elapsed));
+        }
+
         private Action<BeatmapSetInfo> restoreHiddenRequested;
         private Action<int> viewDetails;
 
@@ -65,19 +77,9 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Update();
 
-            // position updates should not occur if the item is filtered away.
-            // this avoids panels flying across the screen only to be eventually off-screen or faded out.
-            if (!Item.Visible)
-                return;
-
             float targetY = Item.CarouselYPosition;
 
-            if (Precision.AlmostEquals(targetY, Y))
-                Y = targetY;
-            else
-                // algorithm for this is taken from ScrollContainer.
-                // while it doesn't necessarily need to match 1:1, as we are emulating scroll in some cases this feels most correct.
-                Y = (float)Interpolation.Lerp(targetY, Y, Math.Exp(-0.01 * Time.Elapsed));
+            Y = Precision.AlmostEquals(targetY, Y) ? targetY : YLerp(targetY, Y, Time.Elapsed);
         }
 
         protected override void UpdateItem()

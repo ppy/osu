@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Select.Carousel
         /// </summary>
         public float CarouselYPosition;
 
+        public float ExpectedYPosition;
+
         public readonly BindableBool Filtered = new BindableBool();
 
         public readonly Bindable<CarouselItemState> State = new Bindable<CarouselItemState>(CarouselItemState.NotSelected);

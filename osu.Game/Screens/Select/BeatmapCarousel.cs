@@ -592,6 +592,7 @@ namespace osu.Game.Screens.Select
             if (revalidateItems || newDisplayRange != displayedRange)
             {
                 displayedRange = newDisplayRange;
+                double elapsed = timeSinceLastYUpdate - Clock.CurrentTime;
 
                 if (visibleItems.Count > 0)
                 {
@@ -621,7 +622,7 @@ namespace osu.Game.Screens.Select
                         var panel = setPool.Get(p => p.Item = item);
 
                         panel.Depth = item.CarouselYPosition;
-                        panel.Y = item.CarouselYPosition;
+                        panel.Y = DrawableCarouselBeatmapSet.YLerp(item.CarouselYPosition, item.ExpectedYPosition, elapsed);
 
                         Scroll.Add(panel);
                     }
@@ -720,6 +721,7 @@ namespace osu.Game.Screens.Select
         }
 
         private const float panel_padding = 5;
+        private double timeSinceLastYUpdate;
 
         /// <summary>
         /// Computes the target Y positions for every item in the carousel.
@@ -729,21 +731,25 @@ namespace osu.Game.Screens.Select
         {
             visibleItems.Clear();
 
-            float currentY = visibleHalfHeight;
+            float currentY = visibleHalfHeight - BleedTop;
 
             scrollTarget = null;
 
+            double elapsed = Clock.CurrentTime - timeSinceLastYUpdate;
+
             foreach (CarouselItem item in root.Children)
             {
-                if (item.Filtered.Value)
-                    continue;
-
                 switch (item)
                 {
                     case CarouselBeatmapSet set:
                     {
-                        visibleItems.Add(set);
+                        set.ExpectedYPosition = timeSinceLastYUpdate == default ? currentY : DrawableCarouselBeatmapSet.YLerp(set.CarouselYPosition, set.ExpectedYPosition, elapsed);
                         set.CarouselYPosition = currentY;
+
+                        if (item.Filtered.Value)
+                            continue;
+
+                        visibleItems.Add(set);
 
                         if (item.State.Value == CarouselItemState.Selected)
                         {
@@ -773,7 +779,7 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            currentY += visibleHalfHeight;
+            currentY += visibleHalfHeight - BleedBottom;
 
             Scroll.ScrollContent.Height = currentY;
 
@@ -784,6 +790,7 @@ namespace osu.Game.Screens.Select
             }
 
             itemsCache.Validate();
+            timeSinceLastYUpdate = Clock.CurrentTime;
         }
 
         private bool firstScroll = true;
@@ -813,6 +820,9 @@ namespace osu.Game.Screens.Select
                         float scrollChange = scrollTarget.Value - Scroll.Current;
 
                         Scroll.ScrollTo(scrollTarget.Value, false);
+
+                        foreach (var i in root.Children)
+                            i.ExpectedYPosition += scrollChange;
 
                         foreach (var i in Scroll.Children)
                             i.Y += scrollChange;
