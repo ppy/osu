@@ -57,7 +57,9 @@ namespace osu.Android
 
         private void handleImportFromUri(Uri uri)
         {
-            var cursor = ContentResolver?.Query(uri, new[] { OpenableColumns.DisplayName }, null, null);
+            // there are more performant overloads of this method, but this one is the most backwards-compatible
+            // (dates back to API 1).
+            var cursor = ContentResolver?.Query(uri, null, null, null, null);
 
             if (cursor == null)
                 return;
