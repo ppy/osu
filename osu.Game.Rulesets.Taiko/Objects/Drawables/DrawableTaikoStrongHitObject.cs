@@ -13,7 +13,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public abstract class DrawableTaikoStrongHitObject<TObject, TStrongNestedObject> : DrawableTaikoHitObject<TObject>
-        where TObject : TaikoStrongHitObject
+        where TObject : TaikoStrongableHitObject
         where TStrongNestedObject : StrongNestedHitObject
     {
         private readonly Bindable<bool> isStrong;
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.RecreatePieces();
             if (HitObject.IsStrong)
-                Size = BaseSize = new Vector2(TaikoStrongHitObject.DEFAULT_STRONG_SIZE);
+                Size = BaseSize = new Vector2(TaikoStrongableHitObject.DEFAULT_STRONG_SIZE);
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         /// <summary>
         /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongNestedHitObject"/>.
-        /// This is only invoked if <see cref="TaikoStrongHitObject.IsStrong"/> is true for <see cref="HitObject"/>.
+        /// This is only invoked if <see cref="TaikoStrongableHitObject.IsStrong"/> is true for <see cref="HitObject"/>.
         /// </summary>
         /// <param name="hitObject">The strong hitobject.</param>
         /// <returns>The strong hitobject handler.</returns>
