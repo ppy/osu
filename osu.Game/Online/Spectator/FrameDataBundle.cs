@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Game.Replays.Legacy;
 using osu.Game.Scoring;
 
@@ -21,6 +22,13 @@ namespace osu.Game.Online.Spectator
         {
             Frames = frames;
             Header = new FrameHeader(score);
+        }
+
+        [JsonConstructor]
+        public FrameDataBundle(FrameHeader header, IEnumerable<LegacyReplayFrame> frames)
+        {
+            Header = header;
+            Frames = frames;
         }
     }
 }
