@@ -359,9 +359,9 @@ namespace osu.Game.Overlays
 
             if (e.ControlPressed)
             {
-                if(e.ShiftPressed)
+                if (e.ShiftPressed)
                 {
-                    switch(e.Key)
+                    switch (e.Key)
                     {
                         case Key.T:
                             channelManager.JoinLastClosedChannel();
