@@ -207,12 +207,14 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Click normal close button", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
+        
         private void pressControlW()
         {
             AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
             AddStep("Press W", () => InputManager.Key(Key.W));
             AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
         }
+        
         [Test]
         public void TestCtrlWShortcut()
         {
