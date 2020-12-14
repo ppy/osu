@@ -40,7 +40,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             Y = scorePosition ?? 0;
 
             if (animation != null)
-                InternalChild = animation;
+            {
+                InternalChild = animation.With(d =>
+                {
+                    d.Anchor = Anchor.Centre;
+                    d.Origin = Anchor.Centre;
+                });
+            }
         }
 
         public void PlayAnimation()
