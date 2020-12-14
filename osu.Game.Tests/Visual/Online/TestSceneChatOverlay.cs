@@ -214,8 +214,8 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Press W", () => InputManager.Key(Key.W));
             AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
         }
-
         
+        [Test]
         public void TestCtrlWShortcut()
         {
             AddStep("Join 2 channels", () => 
@@ -250,6 +250,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
         }
 
+        [Test]
         public void TestCtrlTShortcut()
         {
             AddStep("Join 2 channels", () => 
