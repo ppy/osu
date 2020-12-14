@@ -219,6 +219,70 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Release Shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
         }
 
+        public void TestCtrlShiftTShortcut1()
+        {
+            AddStep("Join 2 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
+
+            // Close channel 2
+            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Click channel 2 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+
+            pressControlShiftT();
+
+            // Channel 2 should now be open again
+            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
+        }
+
+        public void TestCtrlShiftTShortcut2()
+        {
+            AddStep("Join 2 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
+
+            // Close channels 1 and channel 2
+            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Click channel 2 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+            AddStep("Click channel 1 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
+
+            AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
+
+            pressControlShiftT();
+            // Channel 1 should now be open again. Channel 2 should not
+            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+
+            pressControlShiftT();
+
+            // Both Channel 1 and Channel 2 should be open
+            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
+
+            // Processing this again should have not effect
+            pressControlShiftT();
+            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
+
+            // Close channel 2 again
+            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Click channel 2 close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+
+            // Both channel 1 and channel 2 should be open
+            pressControlShiftT();
+            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
+        }
+
         private void pressChannelHotkey(int number)
         {
             var channelKey = Key.Number0 + number;
