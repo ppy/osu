@@ -33,14 +33,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         float IHasXPosition.X => OriginalX;
 
-        /// <summary>
-        /// An alias of <see cref="OriginalX"/> setter.
-        /// </summary>
-        public float X
-        {
-            set => OriginalX = value;
-        }
-
         public readonly Bindable<float> EffectiveXBindable = new Bindable<float>();
 
         /// <summary>
