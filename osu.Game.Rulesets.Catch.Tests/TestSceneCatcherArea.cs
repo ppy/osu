@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             AddStep("catch fruit last in combo", () => attemptCatch(new Fruit { LastInCombo = true }));
             AddStep("catch kiai fruit", () => attemptCatch(new TestSceneCatcher.TestKiaiFruit()));
-            AddStep("miss last in combo", () => attemptCatch(new Fruit { OriginalX = 100, LastInCombo = true }));
+            AddStep("miss last in combo", () => attemptCatch(new Fruit { X = 100, LastInCombo = true }));
         }
 
         private void attemptCatch(Fruit fruit)

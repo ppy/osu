@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 beatmap.HitObjects.Add(new JuiceStream
                 {
-                    OriginalX = CatchPlayfield.CENTER_X - width / 2,
+                    X = CatchPlayfield.CENTER_X - width / 2,
                     Path = new SliderPath(PathType.Linear, new[]
                     {
                         Vector2.Zero,

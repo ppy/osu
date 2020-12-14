@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                         {
                             StartTime = 1000,
                             Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(0, -192) }),
-                            OriginalX = CatchPlayfield.WIDTH / 2
+                            X = CatchPlayfield.WIDTH / 2
                         }
                     }
                 },

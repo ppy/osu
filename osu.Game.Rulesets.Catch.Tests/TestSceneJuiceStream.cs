@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 new JuiceStream
                 {
-                    OriginalX = CatchPlayfield.CENTER_X,
+                    X = CatchPlayfield.CENTER_X,
                     Path = new SliderPath(PathType.Linear, new[]
                     {
                         Vector2.Zero,
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 },
                 new Banana
                 {
-                    OriginalX = CatchPlayfield.CENTER_X,
+                    X = CatchPlayfield.CENTER_X,
                     StartTime = 1000,
                     NewCombo = true
                 }

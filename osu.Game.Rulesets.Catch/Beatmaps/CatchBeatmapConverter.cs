@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         Path = curveData.Path,
                         NodeSamples = curveData.NodeSamples,
                         RepeatCount = curveData.RepeatCount,
-                        OriginalX = positionData?.X ?? 0,
+                        X = positionData?.X ?? 0,
                         NewCombo = comboData?.NewCombo ?? false,
                         ComboOffset = comboData?.ComboOffset ?? 0,
                         LegacyLastTickOffset = (obj as IHasLegacyLastTickOffset)?.LegacyLastTickOffset ?? 0
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         Samples = obj.Samples,
                         NewCombo = comboData?.NewCombo ?? false,
                         ComboOffset = comboData?.ComboOffset ?? 0,
-                        OriginalX = positionData?.X ?? 0
+                        X = positionData?.X ?? 0
                     }.Yield();
             }
         }
