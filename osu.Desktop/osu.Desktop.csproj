@@ -24,12 +24,12 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="System.IO.Packaging" Version="4.7.0" />
+    <PackageReference Include="System.IO.Packaging" Version="5.0.0" />
     <PackageReference Include="ppy.squirrel.windows" Version="1.9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.6" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
-    <PackageReference Include="DiscordRichPresence" Version="1.0.150" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="DiscordRichPresence" Version="1.0.169" />
     <!-- .NET 3.1 SDK seems to cause issues with a runtime specification. This will likely be resolved in .NET 5. -->
     <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />

@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
@@ -17,53 +19,69 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             base.LoadComplete();
 
-            foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
-                AddStep($"show {rep}", () => SetContents(() => createDrawableFruit(rep)));
+            AddStep("show pear", () => SetContents(() => createDrawableFruit(0)));
+            AddStep("show grape", () => SetContents(() => createDrawableFruit(1)));
+            AddStep("show pineapple / apple", () => SetContents(() => createDrawableFruit(2)));
+            AddStep("show raspberry / orange", () => SetContents(() => createDrawableFruit(3)));
+
+            AddStep("show banana", () => SetContents(createDrawableBanana));
 
             AddStep("show droplet", () => SetContents(() => createDrawableDroplet()));
             AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
 
-            foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
-                AddStep($"show hyperdash {rep}", () => SetContents(() => createDrawableFruit(rep, true)));
+            AddStep("show hyperdash pear", () => SetContents(() => createDrawableFruit(0, true)));
+            AddStep("show hyperdash grape", () => SetContents(() => createDrawableFruit(1, true)));
+            AddStep("show hyperdash pineapple / apple", () => SetContents(() => createDrawableFruit(2, true)));
+            AddStep("show hyperdash raspberry / orange", () => SetContents(() => createDrawableFruit(3, true)));
 
             AddStep("show hyperdash droplet", () => SetContents(() => createDrawableDroplet(true)));
         }
 
-        private Drawable createDrawableFruit(FruitVisualRepresentation rep, bool hyperdash = false) =>
-            setProperties(new DrawableFruit(new TestCatchFruit(rep)), hyperdash);
+        private Drawable createDrawableFruit(int indexInBeatmap, bool hyperdash = false) =>
+            new TestDrawableCatchHitObjectSpecimen(new DrawableFruit(new Fruit
+            {
+                IndexInBeatmap = indexInBeatmap,
+                HyperDashBindable = { Value = hyperdash }
+            }));
 
-        private Drawable createDrawableDroplet(bool hyperdash = false) => setProperties(new DrawableDroplet(new Droplet()), hyperdash);
+        private Drawable createDrawableBanana() =>
+            new TestDrawableCatchHitObjectSpecimen(new DrawableBanana(new Banana()));
 
-        private Drawable createDrawableTinyDroplet() => setProperties(new DrawableTinyDroplet(new TinyDroplet()));
+        private Drawable createDrawableDroplet(bool hyperdash = false) =>
+            new TestDrawableCatchHitObjectSpecimen(new DrawableDroplet(new Droplet
+            {
+                HyperDashBindable = { Value = hyperdash }
+            }));
 
-        private DrawableCatchHitObject setProperties(DrawableCatchHitObject d, bool hyperdash = false)
+        private Drawable createDrawableTinyDroplet() => new TestDrawableCatchHitObjectSpecimen(new DrawableTinyDroplet(new TinyDroplet()));
+    }
+
+    public class TestDrawableCatchHitObjectSpecimen : CompositeDrawable
+    {
+        public readonly ManualClock ManualClock;
+
+        public TestDrawableCatchHitObjectSpecimen(DrawableCatchHitObject d)
         {
-            var hitObject = d.HitObject;
-            hitObject.StartTime = 1000000000000;
-            hitObject.Scale = 1.5f;
+            AutoSizeAxes = Axes.Both;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
 
-            if (hyperdash)
-                ((PalpableCatchHitObject)hitObject).HyperDashTarget = new Banana();
+            ManualClock = new ManualClock();
+            Clock = new FramedClock(ManualClock);
+
+            var hitObject = d.HitObject;
+            hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            hitObject.Scale = 1.5f;
+            hitObject.StartTime = 500;
 
             d.Anchor = Anchor.Centre;
-            d.RelativePositionAxes = Axes.None;
-            d.Position = Vector2.Zero;
             d.HitObjectApplied += _ =>
             {
                 d.LifetimeStart = double.NegativeInfinity;
                 d.LifetimeEnd = double.PositiveInfinity;
             };
-            return d;
-        }
 
-        public class TestCatchFruit : Fruit
-        {
-            public TestCatchFruit(FruitVisualRepresentation rep)
-            {
-                VisualRepresentation = rep;
-            }
-
-            public override FruitVisualRepresentation VisualRepresentation { get; }
+            InternalChild = d;
         }
     }
 }

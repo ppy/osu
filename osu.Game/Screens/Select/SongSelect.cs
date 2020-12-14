@@ -376,7 +376,7 @@ namespace osu.Game.Screens.Select
             if (selectionChangedDebounce?.Completed == false)
             {
                 selectionChangedDebounce.RunTask();
-                selectionChangedDebounce.Cancel(); // cancel the already scheduled task.
+                selectionChangedDebounce?.Cancel(); // cancel the already scheduled task.
                 selectionChangedDebounce = null;
             }
 
@@ -465,17 +465,28 @@ namespace osu.Game.Screens.Select
 
             void run()
             {
+                // clear pending task immediately to track any potential nested debounce operation.
+                selectionChangedDebounce = null;
+
                 Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
 
                 if (transferRulesetValue())
                 {
                     Mods.Value = Array.Empty<Mod>();
 
-                    // transferRulesetValue() may trigger a refilter. If the current selection does not match the new ruleset, we want to switch away from it.
+                    // transferRulesetValue() may trigger a re-filter. If the current selection does not match the new ruleset, we want to switch away from it.
                     // The default logic on WorkingBeatmap change is to switch to a matching ruleset (see workingBeatmapChanged()), but we don't want that here.
                     // We perform an early selection attempt and clear out the beatmap selection to avoid a second ruleset change (revert).
                     if (beatmap != null && !Carousel.SelectBeatmap(beatmap, false))
                         beatmap = null;
+                }
+
+                if (selectionChangedDebounce != null)
+                {
+                    // a new nested operation was started; switch to it for further selection.
+                    // this avoids having two separate debounces trigger from the same source.
+                    selectionChangedDebounce.RunTask();
+                    return;
                 }
 
                 // We may be arriving here due to another component changing the bindable Beatmap.

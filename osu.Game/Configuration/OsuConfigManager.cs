@@ -184,7 +184,7 @@ namespace osu.Game.Configuration
             return new TrackedSettings
             {
                 new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled", LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))),
-                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription(), $"cycle: shift-tab quick view: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
+                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription(), $"cycle: {LookupKeyBindings(GlobalAction.ToggleInGameInterface)} quick view: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
                 new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
                 new TrackedSetting<int>(OsuSetting.Skin, m =>
                 {
