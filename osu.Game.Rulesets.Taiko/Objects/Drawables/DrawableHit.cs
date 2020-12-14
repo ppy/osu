@@ -250,32 +250,37 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override DrawableStrongNestedHit CreateStrongNestedHit(Hit.StrongNestedHit hitObject) => new StrongNestedHit(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongNestedHit(Hit.StrongNestedHit hitObject) => new StrongNestedHit(hitObject);
 
         private class StrongNestedHit : DrawableStrongNestedHit
         {
+            public new DrawableHit ParentHitObject => (DrawableHit)base.ParentHitObject;
+
             /// <summary>
             /// The lenience for the second key press.
             /// This does not adjust by map difficulty in ScoreV2 yet.
             /// </summary>
             private const double second_hit_window = 30;
 
-            public new DrawableHit MainObject => (DrawableHit)base.MainObject;
+            public StrongNestedHit()
+                : this(null)
+            {
+            }
 
-            public StrongNestedHit(Hit.StrongNestedHit nestedHit, DrawableHit hit)
-                : base(nestedHit, hit)
+            public StrongNestedHit([CanBeNull] Hit.StrongNestedHit nestedHit)
+                : base(nestedHit)
             {
             }
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
-                if (!MainObject.Result.HasResult)
+                if (!ParentHitObject.Result.HasResult)
                 {
                     base.CheckForResult(userTriggered, timeOffset);
                     return;
                 }
 
-                if (!MainObject.Result.IsHit)
+                if (!ParentHitObject.Result.IsHit)
                 {
                     ApplyResult(r => r.Type = r.Judgement.MinResult);
                     return;
@@ -283,27 +288,27 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!userTriggered)
                 {
-                    if (timeOffset - MainObject.Result.TimeOffset > second_hit_window)
+                    if (timeOffset - ParentHitObject.Result.TimeOffset > second_hit_window)
                         ApplyResult(r => r.Type = r.Judgement.MinResult);
                     return;
                 }
 
-                if (Math.Abs(timeOffset - MainObject.Result.TimeOffset) <= second_hit_window)
+                if (Math.Abs(timeOffset - ParentHitObject.Result.TimeOffset) <= second_hit_window)
                     ApplyResult(r => r.Type = r.Judgement.MaxResult);
             }
 
             public override bool OnPressed(TaikoAction action)
             {
                 // Don't process actions until the main hitobject is hit
-                if (!MainObject.IsHit)
+                if (!ParentHitObject.IsHit)
                     return false;
 
                 // Don't process actions if the pressed button was released
-                if (MainObject.HitAction == null)
+                if (ParentHitObject.HitAction == null)
                     return false;
 
                 // Don't handle invalid hit action presses
-                if (!MainObject.HitActions.Contains(action))
+                if (!ParentHitObject.HitActions.Contains(action))
                     return false;
 
                 return UpdateResult(true);
