@@ -33,18 +33,14 @@ namespace osu.Game.Online.Chat
         private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
-        // Prototype for keeping a list of closed channels in an
-        // order so we can figure out the reverse order of how channels
-        // were close
-        // Bindable list supports an insert at indexc function and a
-        // remove function. If the list re-indexes after each remove (I can
-        // check the behaviour of the C# List System.Collections.Generic library to confirm this, since that
-        // library appears to be what is used underneath), then I can just always add at the end
-        // of the list and always remove index 0 (if size > 0)
-        // A stack exchange post indicates that List remove will decrement all the
-        // indeces after the node we removed
 
+        // Keeps a list of closed channels. More recently closed channels appear at higher indeces
         private readonly BindableList<Channel> closedChannels = new BindableList<Channel>();
+
+        // For efficiency purposes, this constant bounds the number of closed channels we store.
+        // This number is somewhat arbitrary; future developers are free to modify it.
+        // Must be a positive number.
+        private const int closedChannelsMaxSize = 50;
 
         /// <summary>
         /// The currently opened channel
@@ -60,11 +56,6 @@ namespace osu.Game.Online.Chat
         /// The channels available for the player to join
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
-
-        /// <summary>
-        /// The channels available for the player to join
-        /// </summary>
-        public IBindableList<Channel> ClosedChannels => ClosedChannels;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -425,7 +416,15 @@ namespace osu.Game.Online.Chat
                 CurrentChannel.Value = null;
 
             joinedChannels.Remove(channel);
-            // insert at the end of the list
+
+            // Prevent the closedChannel list from exceeding the max size
+            // by removing the oldest element
+            if(closedChannels.Count >= closedChannelsMaxSize)
+            {
+                closedChannels.Remove(closedChannels[0]);
+            }
+
+            // insert at the end of the closedChannels list
             closedChannels.Insert(closedChannels.Count, channel);
 
             if (channel.Joined.Value)
@@ -435,13 +434,32 @@ namespace osu.Game.Online.Chat
             }
         }
 
+
+        
+        /// <summary>
+        /// Opens the most recently closed channel that has not
+        /// already been reopened
+        /// Works similarly to reopening last closed tab on a web browser.
+        /// </summary>
         public void JoinLastClosedChannel()
         {
-            if(closedChannels.Count == 0)
+            if(closedChannels.Count <= 0)
+            {
                 return;
+            }
+
             Channel lastClosedChannel = closedChannels[closedChannels.Count - 1];
-            JoinChannel(lastClosedChannel);
             closedChannels.Remove(lastClosedChannel);
+            // If the user already joined the channel, try the next
+            // channel in the list
+            if(joinedChannels.IndexOf(lastClosedChannel) >= 0)
+            {
+                JoinLastClosedChannel();
+            }
+            else
+            {
+                JoinChannel(lastClosedChannel);
+            }
         }
 
         private long lastMessageId;
