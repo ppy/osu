@@ -420,7 +420,7 @@ namespace osu.Game.Online.Chat
             // by removing the oldest element
             if (closedChannels.Count >= closed_channels_max_size)
             {
-                closedChannels.Remove(closedChannels[0]);
+                closedChannels.RemoveAt(0);
             }
 
             // insert at the end of the closedChannels list
@@ -445,8 +445,7 @@ namespace osu.Game.Online.Chat
                 return;
             }
 
-            // equivalent to Channel lastClosedChannel = closedChannels[closedChannels.Count - 1];
-            Channel lastClosedChannel = closedChannels[^1];
+            Channel lastClosedChannel = closedChannels.Last();
 
             closedChannels.Remove(lastClosedChannel);
 
