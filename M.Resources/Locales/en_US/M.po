@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-13 19:05+0800\n"
+"PO-Revision-Date: 2020-12-14 19:13+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -15,6 +15,398 @@ msgstr ""
 
 msgid "设置"
 msgstr "settings"
+
+msgid "恢复为默认值"
+msgstr "revert to default"
+
+msgid "以原语言显示歌曲信息"
+msgstr "Prefer metadata in original language"
+
+msgid "更新"
+msgstr "Update"
+
+msgid "更新频道"
+msgstr "Release stream"
+
+msgid "打开osu!文件夹"
+msgstr "Open osu! folder"
+
+msgid "数据迁移"
+msgstr "Change folder location"
+
+msgid "图形"
+msgstr "Graphics"
+
+msgid "渲染"
+msgstr "Renderer"
+
+msgid "帧数限制"
+msgstr "Frame limiter"
+
+msgid "渲染(运行)模式"
+msgstr "Threading mode"
+
+msgid "显示FPS"
+msgstr "Show FPS"
+
+msgid "显示"
+msgstr "Display"
+
+msgid "窗口模式"
+msgstr "Screen mode"
+
+msgid "界面缩放"
+msgstr "UI Scaling"
+
+msgid "屏幕缩放"
+msgstr "Screen Scaling"
+
+msgid "关"
+msgstr "Off"
+
+msgid "所有元素"
+msgstr "Everything"
+
+msgid "Overlay除外"
+msgstr "Excluding overlays"
+
+msgid "仅游戏内界面"
+msgstr "Gameplay"
+
+msgid "细节设置"
+msgstr "Detail Settings"
+
+# 设置 - 故事版
+msgid "故事版 / 背景视频"
+msgstr "Storyboard / Video"
+
+msgid "击打闪光"
+msgstr "Hit Lighting"
+
+msgid "截图格式"
+msgstr "Screenshot format"
+
+msgid "PNG (无损)"
+msgstr "PNG (lossless)"
+
+msgid "JPG (适合网络传输)"
+msgstr "JPG (web-friendly)"
+
+msgid "在截图中显示光标"
+msgstr "Show menu cursor in screenshots"
+
+msgid "输出设备"
+msgstr "Devices"
+
+msgid "默认"
+msgstr "Default"
+
+# 设置 - 音频
+msgid "音量"
+msgstr "Audio"
+
+msgid "整体 (失去焦点时)"
+msgstr "Master (window inactive)"
+
+msgid "音效"
+msgstr "Effect"
+
+msgid "偏移量调整"
+msgstr "Offset Adjustment"
+
+msgid "音频偏移量"
+msgstr "Audio offset"
+
+msgid "设置向导"
+msgstr "Offset wizard"
+
+msgid "输入"
+msgstr "Input"
+
+msgid "鼠标"
+msgstr "Mouse"
+
+msgid "绝对输入"
+msgstr "Raw input"
+
+msgid "光标灵敏度"
+msgstr "Cursor sensitivity"
+
+msgid "将光标绝对映射至窗口中"
+msgstr "Map absolute input to window"
+
+msgid "光标边界"
+msgstr "Confine mouse cursor to window"
+
+msgid "禁用"
+msgstr "Disabled"
+
+msgid "游戏时启用"
+msgstr "During Gameplay"
+
+msgid "启用"
+msgstr "Enabled"
+
+msgid "在游玩时禁用鼠标滚轮"
+msgstr "Disable mouse wheel during gameplay"
+
+msgid "在游玩时禁用鼠标按键"
+msgstr "Disable mouse buttons during gameplay"
+
+msgid "键盘"
+msgstr "Keyboard"
+
+msgid "按键设置"
+msgstr "Key configuration"
+
+msgid "键位设置"
+msgstr "key configuration"
+
+msgid "自定义键位!"
+msgstr "Customise your keys!"
+
+msgid "用户界面"
+msgstr "User Interface"
+
+msgid "在拖拽时旋转光标"
+msgstr "Rotate cursor when dragging"
+
+msgid "菜单光标大小"
+msgstr "Menu cursor size"
+
+msgid "视差效果"
+msgstr "Parallax"
+
+msgid "\"按压以确认\"激活时间"
+msgstr "Hold-to-confirm activation time"
+
+# 设置 - UI
+msgid "主界面"
+msgstr "Main menu"
+
+msgid "开场语音"
+msgstr "Interface voices"
+
+msgid "osu!主题音乐"
+msgstr "osu! music theme"
+
+msgid "开场样式"
+msgstr "Intro sequence"
+
+msgid "圆周"
+msgstr "Circles"
+
+msgid "怀旧"
+msgstr "Welcome"
+
+msgid "三角"
+msgstr "Triangles"
+
+msgid "圆周(中文)"
+msgstr "Circles (Chinese)"
+
+msgid "三角(中文)"
+msgstr "Triangles (Chinese)"
+
+msgid "略过开场"
+msgstr "Skipped"
+
+msgid "随机"
+msgstr "Random"
+
+msgid "背景来源(需要osu!supporter)"
+msgstr "Background source"
+
+msgid "皮肤"
+msgstr "Skin"
+
+msgid "谱面"
+msgstr "Beatmap"
+
+msgid "季节背景"
+msgstr "Seasonal backgrounds"
+
+msgid "总是显示"
+msgstr "Always"
+
+msgid "只在对应季节显示"
+msgstr "Somtimes"
+
+msgid "右键鼠标拖拽列表"
+msgstr "Right mouse drage to obsulute scroll"
+
+msgid "显示星级，从"
+msgstr "Display beatmaps from"
+
+#| msgid "分数"
+msgid "到"
+msgstr "Up to"
+
+msgid "{0} 星"
+msgstr "{0} stars"
+
+msgid "无限制"
+msgstr "Unlimited"
+
+msgid "随机选择算法"
+msgstr "Random select algorithm"
+
+msgid "永不重复"
+msgstr "Never repeat"
+
+msgid "游戏内"
+msgstr "Gameplay"
+
+msgid "在休息时段使背景变量"
+msgstr "Lighten playfield during breaks"
+
+msgid "分数计界面显示模式"
+msgstr "HUD overlay visibility mode"
+
+msgid "从不显示"
+msgstr "Never"
+
+msgid "在非游玩时段显示"
+msgstr "Hide during gameplay"
+
+msgid "显示难度分布图"
+msgstr "Show diffifulty graph on progress bar"
+
+msgid "即使你无法失败，也显示分数计界面"
+msgstr "Show health even when you can't fail"
+
+msgid "生命值低时游戏区域泛红"
+msgstr "Fade playfield to red then health is low"
+
+msgid "总是显示按键表示框"
+msgstr "Always show key overlay"
+
+msgid "立体音效"
+msgstr "Positional hitsounds"
+
+msgid "在第一次断连时播放音效"
+msgstr "Always play first combo break sound"
+
+msgid "分数计类型"
+msgstr "Score meter type"
+
+msgid "不显示"
+msgstr "None"
+
+msgid "误差 (左侧)"
+msgstr "Hit Error (left)"
+
+msgid "误差 (右侧)"
+msgstr "Hit Error (right)"
+
+msgid "误差 (底部)"
+msgstr "Hit Error (bottom)"
+
+msgid "误差 (左右侧)"
+msgstr "Hit Error (left+right)"
+
+msgid "颜色 (左侧)"
+msgstr "Colour (left)"
+
+msgid "颜色 (右侧)"
+msgstr "Colour (right)"
+
+msgid "颜色 (左右侧)"
+msgstr "Colour (left+right)"
+
+msgid "颜色 (底部)"
+msgstr "Colour (bottom)"
+
+msgid "分数显示模式"
+msgstr "Score display mode"
+
+msgid "标准"
+msgstr "Standardised"
+
+msgid "经典"
+msgstr "Classic"
+
+msgid "当视觉效果Mods启用时,增强第一个物件的可见度"
+msgstr "Increase visibility of first object when visual impairment mods are enabled"
+
+# Ruleset翻译应当由Ruleset自己设定
+msgid "Ruleset翻译应当由Ruleset自己设定"
+msgstr ""
+
+msgid "导出已选中的皮肤"
+msgstr "Export selected skin"
+
+msgid "游戏内光标大小"
+msgstr "Gameplay corsor size"
+
+msgid "根据谱面调整光标大小"
+msgstr "Adjust gameplay cursor size based on current beatmap"
+
+msgid "使用谱面自带音效"
+msgstr "Beatmap hitsounds"
+
+msgid "使用谱面自带皮肤"
+msgstr "Beatmap skins"
+
+msgid "网络"
+msgstr "Web"
+
+msgid "在打开外部链接前确认"
+msgstr "Warn about opening external links"
+
+msgid "下图时倾向于不带视频"
+msgstr "Prefer downloads without video"
+
+msgid "旁观时自动下图"
+msgstr "Automatically download beatmaps when spectating"
+
+msgid "维护"
+msgstr "Maintenance"
+
+msgid "从stable中导入谱面"
+msgstr "Import beatmaps from stable"
+
+msgid "删除所有谱面"
+msgstr "Delete ALL beatmaps"
+
+msgid "从stable中导入分数"
+msgstr "Import scores from stable"
+
+msgid "删除所有分数"
+msgstr "Delete ALL scores"
+
+msgid "从stable中导入皮肤"
+msgstr "Import skins from stable"
+
+msgid "删除所有皮肤"
+msgstr "Delete ALL skins"
+
+msgid "从stable导入收藏夹"
+msgstr "Import collections from stable"
+
+msgid "删除所有收藏夹"
+msgstr "Delete ALL collections"
+
+msgid "恢复所有已隐藏的谱面"
+msgstr "Restore all hidden beatmaps"
+
+msgid "恢复所有已删除的谱面"
+msgstr "Restore all recently delected beatmaps"
+
+msgid "调试"
+msgstr "Debug"
+
+msgid "在左下角显示调试日志"
+msgstr "Show log overlay"
+
+msgid "绕过front-to-back渲染检查"
+msgstr "Bypass front-to-back render pass"
+
+msgid "内存"
+msgstr "Memory"
+
+msgid "清理所有缓存"
+msgstr "Clear all caches"
 
 # Mvis设置Section标题
 msgid "M-vis播放器"
@@ -105,8 +497,8 @@ msgid "调整播放速度时也同时调整音调"
 msgstr "Adjust pitch"
 
 msgid ""
-"请注意: 播放速度调整暂不支持故事版音频, 调整故事版音频请手动前往歌曲选择添加"
-"加速/减速mod"
+"请注意: 播放速度调整暂不支持故事版音频, 调整故事版音频请手动前往歌曲选择添加加速/"
+"减速mod"
 msgstr "Does not support storyboard audio now, please manually set DT/HT mod"
 
 msgid "夜核节拍器"
@@ -200,8 +592,7 @@ msgstr "Enable Triangles"
 msgid "启用Sayobot功能"
 msgstr "Enable Sayobot functions"
 
-msgid ""
-"这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成或正在进行中的请求"
+msgid "这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成或正在进行中的请求"
 msgstr ""
 "This will affect all chart previews, covers, and the function of downloading "
 "beatmaps, but will not affect completed or ongoing requests"
@@ -366,8 +757,8 @@ msgstr "Selected Mods"
 # 歌曲选择 - Mods
 msgid "游戏Mods提供了多种多样的游玩方式"
 msgstr ""
-"Mods provide different ways to enjoy gameplay. Some have an effect on the "
-"score you can achieve during ranked play."
+"Mods provide different ways to enjoy gameplay. Some have an effect on the score "
+"you can achieve during ranked play."
 
 # 歌曲选择 - Mods
 msgid "有一些会对您的分数等产生影响,还有一些仅供娱乐"
@@ -552,8 +943,7 @@ msgid "让我再想想> <"
 msgstr "No! Abort mission!"
 
 msgid "你将要离开osu!并在浏览器中打开以下链接:"
-msgstr ""
-"You are about to leave osu! and open the following link in a web browser:"
+msgstr "You are about to leave osu! and open the following link in a web browser:"
 
 # 用户登录
 msgid "别来无恙, {0} !"
@@ -654,8 +1044,8 @@ msgstr "Avoid exposing your own personal details, too!"
 
 msgid "这将会用作发送通知和密码重置."
 msgstr ""
-"Will be used for notifications, account verification and in the case you "
-"forget your password. No spam, ever."
+"Will be used for notifications, account verification and in the case you forget "
+"your password. No spam, ever."
 
 msgid "请确保这些信息正确!"
 msgstr "Make sure to get it right!"
