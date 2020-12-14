@@ -165,6 +165,8 @@ namespace osu.Game.Screens.Play
         protected virtual void PrepareReplay()
         {
             DrawableRuleset.SetRecordTarget(recordingScore = new Score { Replay = new Replay() });
+
+            ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(recordingScore.ScoreInfo);
         }
 
         [BackgroundDependencyLoader(true)]
