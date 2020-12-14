@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
                     case JuiceStream juiceStream:
                         // Todo: BUG!! Stable used the last control point as the final position of the path, but it should use the computed path instead.
-                        lastPosition = juiceStream.X + juiceStream.Path.ControlPoints[^1].Position.Value.X;
+                        lastPosition = juiceStream.OriginalX + juiceStream.Path.ControlPoints[^1].Position.Value.X;
 
                         // Todo: BUG!! Stable attempted to use the end time of the stream, but referenced it too early in execution and used the start time instead.
                         lastStartTime = juiceStream.StartTime;
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             catchObject.XOffset = 0;
 
                             if (catchObject is TinyDroplet)
-                                catchObject.XOffset = Math.Clamp(rng.Next(-20, 20), -catchObject.X, CatchPlayfield.WIDTH - catchObject.X);
+                                catchObject.XOffset = Math.Clamp(rng.Next(-20, 20), -catchObject.OriginalX, CatchPlayfield.WIDTH - catchObject.OriginalX);
                             else if (catchObject is Droplet)
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                         }
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
         {
-            float offsetPosition = hitObject.X;
+            float offsetPosition = hitObject.OriginalX;
             double startTime = hitObject.StartTime;
 
             if (lastPosition == null)
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             if (positionDiff == 0)
             {
                 applyRandomOffset(ref offsetPosition, timeDiff / 4d, rng);
-                hitObject.XOffset = offsetPosition - hitObject.X;
+                hitObject.XOffset = offsetPosition - hitObject.OriginalX;
                 return;
             }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             if (Math.Abs(positionDiff) < timeDiff / 3)
                 applyOffset(ref offsetPosition, positionDiff);
 
-            hitObject.XOffset = offsetPosition - hitObject.X;
+            hitObject.XOffset = offsetPosition - hitObject.OriginalX;
 
             lastPosition = offsetPosition;
             lastStartTime = startTime;
@@ -230,9 +230,9 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 currentObject.HyperDashTarget = null;
                 currentObject.DistanceToHyperDash = 0;
 
-                int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
+                int thisDirection = nextObject.EffectiveX > currentObject.EffectiveX ? 1 : -1;
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
-                double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
+                double distanceToNext = Math.Abs(nextObject.EffectiveX - currentObject.EffectiveX) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
                 float distanceToHyper = (float)(timeToNext * Catcher.BASE_SPEED - distanceToNext);
 
                 if (distanceToHyper < 0)
