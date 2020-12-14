@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         private float xOffset;
 
         /// <summary>
-        /// A random offset applied to the horizontal value, set by the <see cref="CatchBeatmapProcessor"/>.
+        /// A random offset applied to the horizontal position, set by the <see cref="CatchBeatmapProcessor"/>.
         /// </summary>
         internal float XOffset
         {
