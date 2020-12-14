@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
@@ -16,7 +17,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         public HitType JudgementType;
 
-        public DrawableDrumRollTick(DrumRollTick tick)
+        public DrawableDrumRollTick()
+            : this(null)
+        {
+        }
+
+        public DrawableDrumRollTick([CanBeNull] DrumRollTick tick)
             : base(tick)
         {
             FillMode = FillMode.Fit;
