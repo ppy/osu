@@ -32,7 +32,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         protected virtual void OnSkinChanged()
         {
-
         }
 
         /// <summary>
