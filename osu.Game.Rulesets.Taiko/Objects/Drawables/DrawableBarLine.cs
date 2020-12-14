@@ -111,13 +111,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            major.BindValueChanged(majorChanged => updateMajor(majorChanged.NewValue), true);
+            major.BindValueChanged(updateMajor);
         }
 
-        private void updateMajor(bool major)
+        private void updateMajor(ValueChangedEvent<bool> major)
         {
-            line.Alpha = major ? 1f : 0.75f;
-            triangleContainer.Alpha = major ? 1 : 0;
+            line.Alpha = major.NewValue ? 1f : 0.75f;
+            triangleContainer.Alpha = major.NewValue ? 1 : 0;
         }
 
         protected override void OnApply()
