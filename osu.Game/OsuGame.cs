@@ -429,8 +429,11 @@ namespace osu.Game
 
         public override Task Import(Stream stream, string filename)
         {
+            // encapsulate task as we don't want to begin the import process until in a ready state.
             var importTask = new Task(async () => await base.Import(stream, filename));
+
             waitForReady(() => this, _ => importTask.Start());
+
             return importTask;
         }
 
