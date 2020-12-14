@@ -268,7 +268,7 @@ namespace osu.Game
                 case LinkAction.OpenEditorTimestamp:
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
-                    WaitForReady(() => notifications, _ => notifications.Post(new SimpleNotification
+                    waitForReady(() => notifications, _ => notifications.Post(new SimpleNotification
                     {
                         Text = @"This link type is not yet supported!",
                         Icon = FontAwesome.Solid.LifeRing,
@@ -289,7 +289,7 @@ namespace osu.Game
             }
         });
 
-        public void OpenUrlExternally(string url) => WaitForReady(() => externalLinkOpener, _ =>
+        public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
         {
             if (url.StartsWith('/'))
                 url = $"{API.Endpoint}{url}";
@@ -301,7 +301,7 @@ namespace osu.Game
         /// Open a specific channel in chat.
         /// </summary>
         /// <param name="channel">The channel to display.</param>
-        public void ShowChannel(string channel) => WaitForReady(() => channelManager, _ =>
+        public void ShowChannel(string channel) => waitForReady(() => channelManager, _ =>
         {
             try
             {
@@ -317,19 +317,19 @@ namespace osu.Game
         /// Show a beatmap set as an overlay.
         /// </summary>
         /// <param name="setId">The set to display.</param>
-        public void ShowBeatmapSet(int setId) => WaitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmapSet(setId));
+        public void ShowBeatmapSet(int setId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmapSet(setId));
 
         /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="userId">The user to display.</param>
-        public void ShowUser(int userId) => WaitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
+        public void ShowUser(int userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.
         /// </summary>
         /// <param name="beatmapId">The beatmap to show.</param>
-        public void ShowBeatmap(int beatmapId) => WaitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
+        public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
 
         /// <summary>
         /// Present a beatmap at song select immediately.
@@ -430,7 +430,7 @@ namespace osu.Game
         public override Task Import(Stream stream, string filename)
         {
             var importTask = new Task(async () => await base.Import(stream, filename));
-            WaitForReady(() => this, _ => importTask.Start());
+            waitForReady(() => this, _ => importTask.Start());
             return importTask;
         }
 
@@ -491,13 +491,13 @@ namespace osu.Game
         /// <param name="retrieveInstance">A function to retrieve a (potentially not-yet-constructed) target instance.</param>
         /// <param name="action">The action to perform on the instance when load is confirmed.</param>
         /// <typeparam name="T">The type of the target instance.</typeparam>
-        protected void WaitForReady<T>(Func<T> retrieveInstance, Action<T> action)
+        private void waitForReady<T>(Func<T> retrieveInstance, Action<T> action)
             where T : Drawable
         {
             var instance = retrieveInstance();
 
             if (ScreenStack == null || ScreenStack.CurrentScreen is StartupScreen || instance?.IsLoaded != true)
-                Schedule(() => WaitForReady(retrieveInstance, action));
+                Schedule(() => waitForReady(retrieveInstance, action));
             else
                 action(instance);
         }
