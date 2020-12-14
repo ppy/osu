@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Catch.UI
             var halfCatchWidth = catchWidth * 0.5f;
 
             // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
-            var catchObjectPosition = fruit.X;
+            var catchObjectPosition = fruit.EffectiveX;
             var catcherPosition = Position.X;
 
             return catchObjectPosition >= catcherPosition - halfCatchWidth &&
@@ -250,10 +250,10 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 var target = hitObject.HyperDashTarget;
                 var timeDifference = target.StartTime - hitObject.StartTime;
-                double positionDifference = target.X - X;
+                double positionDifference = target.EffectiveX - X;
                 var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
-                SetHyperDashState(Math.Abs(velocity), target.X);
+                SetHyperDashState(Math.Abs(velocity), target.EffectiveX);
             }
             else
                 SetHyperDashState();

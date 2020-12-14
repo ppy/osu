@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void attemptCatch(Fruit fruit)
         {
-            fruit.X += catcher.X;
+            fruit.X = fruit.OriginalX + catcher.X;
             fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty
             {
                 CircleSize = circleSize
