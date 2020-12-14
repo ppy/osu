@@ -332,6 +332,7 @@ namespace osu.Game.Overlays
             if (channel != null)
                 ChannelTabControl.Current.Value = channel;
         }
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.AltPressed)
