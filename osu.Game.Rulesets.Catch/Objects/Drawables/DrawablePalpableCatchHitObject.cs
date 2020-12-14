@@ -55,10 +55,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            EffectiveXBindable.BindValueChanged(x =>
-            {
-                X = x.NewValue;
-            }, true);
+            OriginalXBindable.BindValueChanged(_ => X = OriginalXBindable.Value + XOffsetBindable.Value);
+            XOffsetBindable.BindValueChanged(_ => X = OriginalXBindable.Value + XOffsetBindable.Value, true);
 
             ScaleBindable.BindValueChanged(scale =>
             {
