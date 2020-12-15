@@ -359,15 +359,27 @@ namespace osu.Game.Overlays
 
             if (e.ControlPressed)
             {
-                switch (e.Key)
+                if (e.ShiftPressed)
                 {
-                    case Key.W:
-                        channelManager.LeaveChannel(channelManager.CurrentChannel.Value);
-                        return true;
+                    switch (e.Key)
+                    {
+                        case Key.T:
+                            channelManager.JoinLastClosedChannel();
+                            return true;
+                    }
+                }
+                else
+                {
+                    switch (e.Key)
+                    {
+                        case Key.W:
+                            channelManager.LeaveChannel(channelManager.CurrentChannel.Value);
+                            return true;
 
-                    case Key.T:
-                        ChannelTabControl.SelectChannelSelectorTab();
-                        return true;
+                        case Key.T:
+                            ChannelTabControl.SelectChannelSelectorTab();
+                            return true;
+                    }
                 }
             }
 
