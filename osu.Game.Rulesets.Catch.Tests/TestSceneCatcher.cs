@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -12,8 +13,12 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -24,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        private Container droppedObjectContainer;
+        private Container<CaughtObject> droppedObjectContainer;
 
         private TestCatcher catcher;
 
@@ -37,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
 
             var trailContainer = new Container();
-            droppedObjectContainer = new Container();
+            droppedObjectContainer = new Container<CaughtObject>();
             catcher = new TestCatcher(trailContainer, droppedObjectContainer, difficulty);
 
             Child = new Container
@@ -51,6 +56,50 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
         });
+
+        [Test]
+        public void TestCatcherHyperStateReverted()
+        {
+            DrawableCatchHitObject drawableObject1 = null;
+            DrawableCatchHitObject drawableObject2 = null;
+            JudgementResult result1 = null;
+            JudgementResult result2 = null;
+            AddStep("catch hyper fruit", () =>
+            {
+                attemptCatch(new Fruit { HyperDashTarget = new Fruit { X = 100 } }, out drawableObject1, out result1);
+            });
+            AddStep("catch normal fruit", () =>
+            {
+                attemptCatch(new Fruit(), out drawableObject2, out result2);
+            });
+            AddStep("revert second result", () =>
+            {
+                catcher.OnRevertResult(drawableObject2, result2);
+            });
+            checkHyperDash(true);
+            AddStep("revert first result", () =>
+            {
+                catcher.OnRevertResult(drawableObject1, result1);
+            });
+            checkHyperDash(false);
+        }
+
+        [Test]
+        public void TestCatcherAnimationStateReverted()
+        {
+            DrawableCatchHitObject drawableObject = null;
+            JudgementResult result = null;
+            AddStep("catch kiai fruit", () =>
+            {
+                attemptCatch(new TestKiaiFruit(), out drawableObject, out result);
+            });
+            checkState(CatcherAnimationState.Kiai);
+            AddStep("revert result", () =>
+            {
+                catcher.OnRevertResult(drawableObject, result);
+            });
+            checkState(CatcherAnimationState.Idle);
+        }
 
         [Test]
         public void TestCatcherCatchWidth()
@@ -149,13 +198,22 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddAssert("fruits are dropped", () => !catcher.CaughtObjects.Any() && droppedObjectContainer.Count == 10);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestHitLighting(bool enabled)
+        [Test]
+        public void TestHitLightingColour()
         {
-            AddStep($"{(enabled ? "enable" : "disable")} hit lighting", () => config.Set(OsuSetting.HitLighting, enabled));
+            var fruitColour = SkinConfiguration.DefaultComboColours[1];
+            AddStep("enable hit lighting", () => config.Set(OsuSetting.HitLighting, true));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
-            AddAssert("check hit lighting", () => catcher.ChildrenOfType<HitExplosion>().Any() == enabled);
+            AddAssert("correct hit lighting colour", () =>
+                catcher.ChildrenOfType<HitExplosion>().First()?.ObjectColour == fruitColour);
+        }
+
+        [Test]
+        public void TestHitLightingDisabled()
+        {
+            AddStep("disable hit lighting", () => config.Set(OsuSetting.HitLighting, false));
+            AddStep("catch fruit", () => attemptCatch(new Fruit()));
+            AddAssert("no hit lighting", () => !catcher.ChildrenOfType<HitExplosion>().Any());
         }
 
         private void checkPlate(int count) => AddAssert($"{count} objects on the plate", () => catcher.CaughtObjects.Count() == count);
@@ -166,17 +224,60 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void attemptCatch(CatchHitObject hitObject, int count = 1)
         {
-            hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-
             for (var i = 0; i < count; i++)
-                catcher.AttemptCatch(hitObject);
+                attemptCatch(hitObject, out _, out _);
+        }
+
+        private void attemptCatch(CatchHitObject hitObject, out DrawableCatchHitObject drawableObject, out JudgementResult result)
+        {
+            hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            drawableObject = createDrawableObject(hitObject);
+            result = createResult(hitObject);
+            applyResult(drawableObject, result);
+        }
+
+        private void applyResult(DrawableCatchHitObject drawableObject, JudgementResult result)
+        {
+            // Load DHO to set colour of hit explosion correctly
+            Add(drawableObject);
+            drawableObject.OnLoadComplete += _ =>
+            {
+                catcher.OnNewResult(drawableObject, result);
+                drawableObject.Expire();
+            };
+        }
+
+        private JudgementResult createResult(CatchHitObject hitObject)
+        {
+            return new CatchJudgementResult(hitObject, hitObject.CreateJudgement())
+            {
+                Type = catcher.CanCatch(hitObject) ? HitResult.Great : HitResult.Miss
+            };
+        }
+
+        private DrawableCatchHitObject createDrawableObject(CatchHitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case Banana banana:
+                    return new DrawableBanana(banana);
+
+                case Droplet droplet:
+                    return new DrawableDroplet(droplet);
+
+                case Fruit fruit:
+                    return new DrawableFruit(fruit);
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(hitObject));
+            }
         }
 
         public class TestCatcher : Catcher
         {
-            public IEnumerable<DrawablePalpableCatchHitObject> CaughtObjects => this.ChildrenOfType<DrawablePalpableCatchHitObject>();
+            public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
-            public TestCatcher(Container trailsTarget, Container droppedObjectTarget, BeatmapDifficulty difficulty)
+            public TestCatcher(Container trailsTarget, Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty)
                 : base(trailsTarget, droppedObjectTarget, difficulty)
             {
             }

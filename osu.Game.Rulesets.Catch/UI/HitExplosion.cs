@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Catch.Objects;
 using osuTK;
 using osuTK.Graphics;
 
@@ -15,6 +16,7 @@ namespace osu.Game.Rulesets.Catch.UI
     public class HitExplosion : PoolableDrawable
     {
         private Color4 objectColour;
+        public CatchHitObject HitObject;
 
         public Color4 ObjectColour
         {

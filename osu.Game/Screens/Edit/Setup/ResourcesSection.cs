@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -98,6 +99,8 @@ namespace osu.Game.Screens.Edit.Setup
             });
             return Task.CompletedTask;
         }
+
+        Task ICanAcceptFiles.Import(Stream stream, string filename) => throw new NotImplementedException();
 
         protected override void LoadComplete()
         {

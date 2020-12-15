@@ -13,7 +13,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 foreach (var t in ticks)
                 {
-                    if (!t.IsHit)
+                    if (!t.Result.HasResult)
                     {
                         nextTick = t;
                         break;
@@ -208,7 +208,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         continue;
                     }
 
-                    tick.TriggerResult(false);
+                    if (!tick.Result.HasResult)
+                        tick.TriggerResult(false);
                 }
 
                 ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult);
