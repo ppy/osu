@@ -240,45 +240,44 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
         }
 
-        [Test]
-        public void TestCtrlShiftTShortcut2()
-        {
-            AddStep("Join 2 channels", () =>
-            {
-                channelManager.JoinChannel(channel1);
-                channelManager.JoinChannel(channel2);
-            });
+        // [Test]
+        // public void TestCtrlShiftTShortcut2()
+        // {
+        //     AddStep("Join 2 channels", () =>
+        //     {
+        //         channelManager.JoinChannel(channel1);
+        //         channelManager.JoinChannel(channel2);
+        //     });
 
-            // Close channels 1 and channel 2
-            AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
-            AddStep("Leave channel 1", () => channelManager.LeaveChannel(channel1));
-            AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
+        //     // Close channels 1 and channel 2
+        //     AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
+        //     AddStep("Leave channel 1", () => channelManager.LeaveChannel(channel1));
+        //     AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
 
-            pressControlShiftT();
-            // Channel 1 should now be open again. Channel 2 should not
-            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
-            AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+        //     pressControlShiftT();
+        //     // Channel 1 should now be open again. Channel 2 should not
+        //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+        //     AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
 
-            pressControlShiftT();
+        //     pressControlShiftT();
 
-            // Both Channel 1 and Channel 2 should be open
-            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
-            AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
+        //     // Both Channel 1 and Channel 2 should be open
+        //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+        //     AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
 
-            // Processing this again should have not effect
-            pressControlShiftT();
-            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
-            AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
+        //     // Processing this again should have not effect
+        //     pressControlShiftT();
+        //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+        //     AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
 
-            // Close channel 2 again
-            AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
+        //     // Close channel 2 again
+        //     AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
 
-            // Both channel 1 and channel 2 should be open
-            pressControlShiftT();
-            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
-            AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
-        }
-
+        //     // Both channel 1 and channel 2 should be open
+        //     pressControlShiftT();
+        //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+        //     AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
+        // }
         private void pressChannelHotkey(int number)
         {
             var channelKey = Key.Number0 + number;
