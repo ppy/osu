@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Import
         private TextFlowContainer currentFileText;
         private OsuScrollContainer fileNameScroll;
 
+        private TriangleButton importButton;
+
         private const float duration = 300;
         private const float button_height = 50;
         private const float button_vertical_margin = 15;
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Import
                                     },
                                 },
                             },
-                            new TriangleButton
+                            importButton = new TriangleButton
                             {
                                 Text = "Import",
                                 Anchor = Anchor.BottomCentre,
@@ -109,14 +111,7 @@ namespace osu.Game.Screens.Import
                                 Height = button_height,
                                 Width = 0.9f,
                                 Margin = new MarginPadding { Vertical = button_vertical_margin },
-                                Action = () =>
-                                {
-                                    var d = currentFile.Value?.FullName;
-                                    if (d != null)
-                                        startImport(d);
-                                    else
-                                        currentFileText.FlashColour(Color4.Red, 500);
-                                }
+                                Action = () => startImport(currentFile.Value?.FullName)
                             }
                         }
                     }
@@ -125,21 +120,22 @@ namespace osu.Game.Screens.Import
             fileNameScroll.ScrollContent.Anchor = Anchor.Centre;
             fileNameScroll.ScrollContent.Origin = Anchor.Centre;
 
-            currentFile.BindValueChanged(updateFileSelectionText, true);
-            currentDirectory.BindValueChanged(onCurrentDirectoryChanged);
+            currentFile.BindValueChanged(fileChanged, true);
+            currentDirectory.BindValueChanged(directoryChanged);
 
             currentDirectory.BindTo(fileSelector.CurrentPath);
             currentFile.BindTo(fileSelector.CurrentFile);
         }
 
-        private void onCurrentDirectoryChanged(ValueChangedEvent<DirectoryInfo> v)
+        private void directoryChanged(ValueChangedEvent<DirectoryInfo> v)
         {
             currentFile.Value = null;
         }
 
-        private void updateFileSelectionText(ValueChangedEvent<FileInfo> v)
+        private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
         {
-            currentFileText.Text = v.NewValue?.Name ?? "Select a file";
+            importButton.Enabled.Value = selectedFile.NewValue != null;
+            currentFileText.Text = selectedFile.NewValue?.Name ?? "Select a file";
         }
 
         public override void OnEntering(IScreen last)
