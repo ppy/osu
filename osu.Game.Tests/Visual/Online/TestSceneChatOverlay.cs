@@ -210,35 +210,36 @@ namespace osu.Game.Tests.Visual.Online
 
         // Control-Shift-T should reopen the most recently closed tab that has not
         // already been reopened
-        // private void pressControlShiftT()
-        // {
-        //     AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
-        //     AddStep("Press and hold Shift", () => InputManager.PressKey(Key.ShiftLeft));
-        //     AddStep("Press T", () => InputManager.Key(Key.T));
-        //     AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
-        //     AddStep("Release Shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
-        // }
+        private void pressControlShiftT()
+        {
+            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
+            AddStep("Press and hold Shift", () => InputManager.PressKey(Key.ShiftLeft));
+            AddStep("Press T", () => InputManager.Key(Key.T));
+            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
+            AddStep("Release Shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+        }
 
-        // [Test]
-        // public void TestCtrlShiftTShortcut1()
-        // {
-        //     AddStep("Join 2 channels", () =>
-        //     {
-        //         channelManager.JoinChannel(channel1);
-        //         channelManager.JoinChannel(channel2);
-        //     });
+        [Test]
+        public void TestCtrlShiftTShortcut1()
+        {
+            AddStep("Join 2 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
 
-        //     // Close channel 2
-        //     AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
-        //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
-        //     AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+            // Close channel 2
+            AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
+            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
 
-        //     pressControlShiftT();
+            pressControlShiftT();
 
-        //     // Channel 2 should now be open again
-        //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
-        //     AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
-        // }
+            // Channel 2 should now be open again
+            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
+        }
+
         // [Test]
         // public void TestCtrlShiftTShortcut2()
         // {
@@ -247,31 +248,30 @@ namespace osu.Game.Tests.Visual.Online
         //         channelManager.JoinChannel(channel1);
         //         channelManager.JoinChannel(channel2);
         //     });
-
+        //
         //     // Close channels 1 and channel 2
         //     AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
         //     AddStep("Leave channel 1", () => channelManager.LeaveChannel(channel1));
         //     AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
-
+        //
         //     pressControlShiftT();
         //     // Channel 1 should now be open again. Channel 2 should not
         //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
         //     AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
-
+        //
         //     pressControlShiftT();
-
+        //
         //     // Both Channel 1 and Channel 2 should be open
         //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
         //     AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
-
+        //
         //     // Processing this again should have not effect
         //     pressControlShiftT();
         //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
         //     AddAssert("channel 2 open", () => channelManager.JoinedChannels.Contains(channel2));
-
+        //
         //     // Close channel 2 again
         //     AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
-
         //     // Both channel 1 and channel 2 should be open
         //     pressControlShiftT();
         //     AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
