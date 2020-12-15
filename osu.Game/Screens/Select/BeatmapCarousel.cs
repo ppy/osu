@@ -592,6 +592,7 @@ namespace osu.Game.Screens.Select
             if (revalidateItems || newDisplayRange != displayedRange)
             {
                 displayedRange = newDisplayRange;
+                // we need to know how much it has been since last Y update so that manual scrolling looks fine
                 double elapsed = timeSinceLastYUpdate - Clock.CurrentTime;
 
                 if (visibleItems.Count > 0)
@@ -622,6 +623,7 @@ namespace osu.Game.Screens.Select
                         var panel = setPool.Get(p => p.Item = item);
 
                         panel.Depth = item.CarouselYPosition;
+                        // place the panel at current Y by accounting for the time the panel has spent not updated yet
                         panel.Y = DrawableCarouselBeatmapSet.YLerp(item.CarouselYPosition, item.ExpectedYPosition, elapsed);
 
                         Scroll.Add(panel);
@@ -731,6 +733,7 @@ namespace osu.Game.Screens.Select
         {
             visibleItems.Clear();
 
+            // visibleHalfHeight includes BleedTop, but Scroll screenspace doesn't, so we remove it here
             float currentY = visibleHalfHeight - BleedTop;
 
             scrollTarget = null;
@@ -743,6 +746,7 @@ namespace osu.Game.Screens.Select
                 {
                     case CarouselBeatmapSet set:
                     {
+                        // find the current Y position even for filtered sets. This looks better for when the set becomes visible again as it then needs a good direction to travel from
                         set.ExpectedYPosition = timeSinceLastYUpdate == default ? currentY : DrawableCarouselBeatmapSet.YLerp(set.CarouselYPosition, set.ExpectedYPosition, elapsed);
                         set.CarouselYPosition = currentY;
 
@@ -779,6 +783,7 @@ namespace osu.Game.Screens.Select
                 }
             }
 
+            // same as before, we remove BleedBottom because it's not in Scroll screenspace
             currentY += visibleHalfHeight - BleedBottom;
 
             Scroll.ScrollContent.Height = currentY;
@@ -821,6 +826,8 @@ namespace osu.Game.Screens.Select
 
                         Scroll.ScrollTo(scrollTarget.Value, false);
 
+                        // because this is an immediate scroll, which is only done during filter changes, iterating over all beatmapsets is fine
+                        // scrollChange is added to ExpectedYPosition because we would expect all panels to be shifted by the scrolled amount
                         foreach (var i in root.Children)
                             i.ExpectedYPosition += scrollChange;
 
