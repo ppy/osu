@@ -4,6 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Screens;
+using osu.Game.Screens.Import;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
@@ -11,8 +13,8 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
     {
         protected override string Header => "General";
 
-        [BackgroundDependencyLoader]
-        private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig)
+        [BackgroundDependencyLoader(true)]
+        private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, OsuGame game)
         {
             Children = new Drawable[]
             {
@@ -27,6 +29,11 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                     Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
                 }
             };
+            Add(new SettingsButton
+            {
+                Text = "Import files",
+                Action = () => game?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
+            });
         }
     }
 }
