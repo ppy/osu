@@ -2,113 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Scoring;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
-    public class InGameScoreContainer : FillFlowContainer<InGameScoreItem>
-    {
-        /// <summary>
-        /// Whether to declare a new position for un-positioned players.
-        /// Must be disabled for online leaderboards with top 50 scores only.
-        /// </summary>
-        public bool DeclareNewPosition = true;
-
-        public InGameScoreContainer()
-        {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(2.5f);
-            LayoutDuration = 500;
-            LayoutEasing = Easing.OutQuint;
-        }
-
-        /// <summary>
-        /// Adds a real-time player score item whose score is updated via a <see cref="BindableDouble"/>.
-        /// </summary>
-        /// <param name="currentScore">The bindable current score of the player.</param>
-        /// <param name="user">The player user.</param>
-        /// <returns>Returns the drawable score item of that player.</returns>
-        public InGameScoreItem AddRealTimePlayer(BindableDouble currentScore, User user = null)
-        {
-            if (currentScore == null)
-                return null;
-
-            var scoreItem = addScore(currentScore.Value, user);
-            currentScore.ValueChanged += s => scoreItem.TotalScore = s.NewValue;
-
-            return scoreItem;
-        }
-
-        /// <summary>
-        /// Adds a score item based off a <see cref="ScoreInfo"/> with an initial position.
-        /// </summary>
-        /// <param name="score">The score info to use for this item.</param>
-        /// <param name="initialPosition">The initial position of this item.</param>
-        /// <returns>Returns the drawable score item of that player.</returns>
-        public InGameScoreItem AddScore(ScoreInfo score, int? initialPosition = null) => score != null ? addScore(score.TotalScore, score.User, initialPosition) : null;
-
-        private int maxPosition => this.Max(i => this.Any(item => item.InitialPosition.HasValue) ? i.InitialPosition : i.ScorePosition) ?? 0;
-
-        private InGameScoreItem addScore(double totalScore, User user = null, int? position = null)
-        {
-            var scoreItem = new InGameScoreItem(position)
-            {
-                User = user,
-                TotalScore = totalScore,
-                OnScoreChange = updateScores,
-            };
-
-            Add(scoreItem);
-            SetLayoutPosition(scoreItem, position ?? maxPosition + 1);
-
-            reorderPositions();
-
-            return scoreItem;
-        }
-
-        private void reorderPositions()
-        {
-            var orderedByScore = this.OrderByDescending(i => i.TotalScore).ToList();
-            var orderedPositions = this.Select(i => this.Any(item => item.InitialPosition.HasValue) ? i.InitialPosition : i.ScorePosition).OrderByDescending(p => p.HasValue).ThenBy(p => p).ToList();
-
-            for (int i = 0; i < Count; i++)
-            {
-                int newPosition = orderedPositions[i] ?? maxPosition + 1;
-
-                SetLayoutPosition(orderedByScore[i], newPosition);
-                orderedByScore[i].ScorePosition = DeclareNewPosition ? newPosition : orderedPositions[i];
-            }
-        }
-
-        private void updateScores()
-        {
-            var orderedByScore = this.OrderByDescending(i => i.TotalScore).ToList();
-            var orderedPositions = this.Select(i => this.Any(item => item.InitialPosition.HasValue) ? i.InitialPosition : i.ScorePosition).OrderByDescending(p => p.HasValue).ThenBy(p => p).ToList();
-
-            for (int i = 0; i < Count; i++)
-            {
-                int newPosition = orderedPositions[i] ?? maxPosition + 1;
-
-                SetLayoutPosition(orderedByScore[i], newPosition);
-                orderedByScore[i].ScorePosition = DeclareNewPosition ? newPosition : orderedPositions[i];
-            }
-        }
-    }
-
-    public class InGameScoreItem : CompositeDrawable
+    public class GameplayLeaderboardScore : CompositeDrawable
     {
         private readonly OsuSpriteText positionText, positionSymbol, userString;
         private readonly GlowingSpriteText scoreText;
@@ -159,7 +65,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public InGameScoreItem(int? initialPosition)
+        public GameplayLeaderboardScore(int? initialPosition)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
