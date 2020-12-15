@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public readonly Catcher MovableCatcher;
         private readonly CatchComboDisplay comboDisplay;
 
-        public CatcherArea(Container droppedObjectContainer, BeatmapDifficulty difficulty = null)
+        public CatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty difficulty = null)
         {
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
             Children = new Drawable[]
@@ -42,6 +41,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnNewResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
+            MovableCatcher.OnNewResult(hitObject, result);
+
             if (!result.Type.IsScorable())
                 return;
 
@@ -56,12 +57,10 @@ namespace osu.Game.Rulesets.Catch.UI
             comboDisplay.OnNewResult(hitObject, result);
         }
 
-        public void OnRevertResult(DrawableCatchHitObject fruit, JudgementResult result)
-            => comboDisplay.OnRevertResult(fruit, result);
-
-        public bool AttemptCatch(CatchHitObject obj)
+        public void OnRevertResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
-            return MovableCatcher.AttemptCatch(obj);
+            comboDisplay.OnRevertResult(hitObject, result);
+            MovableCatcher.OnRevertResult(hitObject, result);
         }
 
         protected override void UpdateAfterChildren()

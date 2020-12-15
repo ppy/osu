@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     }
                 };
 
-                hoc.Add(new DrawableBarLineMajor(createBarLineAtCurrentTime(true))
+                hoc.Add(new DrawableBarLine(createBarLineAtCurrentTime(true))
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

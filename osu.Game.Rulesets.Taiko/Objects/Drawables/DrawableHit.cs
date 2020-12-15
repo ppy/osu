@@ -11,12 +11,12 @@ using osu.Framework.Graphics;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableHit : DrawableTaikoHitObject<Hit>
+    public class DrawableHit : DrawableTaikoStrongableHitObject<Hit, Hit.StrongNestedHit>
     {
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongNestedHit(Hit.StrongNestedHit hitObject) => new StrongNestedHit(hitObject, this);
 
         private class StrongNestedHit : DrawableStrongNestedHit
         {
@@ -240,8 +240,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             public new DrawableHit MainObject => (DrawableHit)base.MainObject;
 
-            public StrongNestedHit(StrongHitObject strong, DrawableHit hit)
-                : base(strong, hit)
+            public StrongNestedHit(Hit.StrongNestedHit nestedHit, DrawableHit hit)
+                : base(nestedHit, hit)
             {
             }
 
