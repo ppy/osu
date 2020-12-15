@@ -233,6 +233,8 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
             AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
 
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
             pressControlShiftT();
 
             // Channel 2 should now be open again
