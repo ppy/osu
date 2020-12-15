@@ -22,7 +22,6 @@ namespace osu.Game.Screens.Play.HUD
         public Action OnScoreChange;
 
         private int? scorePosition;
-        public int? InitialPosition;
 
         public int? ScorePosition
         {
@@ -65,7 +64,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        public GameplayLeaderboardScore(int? initialPosition)
+        public GameplayLeaderboardScore()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -125,8 +124,6 @@ namespace osu.Game.Screens.Play.HUD
                     },
                 },
             };
-
-            InitialPosition = ScorePosition = initialPosition;
         }
 
         [BackgroundDependencyLoader]
