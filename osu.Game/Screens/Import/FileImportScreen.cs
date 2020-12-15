@@ -119,6 +119,22 @@ namespace osu.Game.Screens.Import
             fileSelector.CurrentPath.BindValueChanged(directoryChanged);
         }
 
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            contentContainer.ScaleTo(0.95f).ScaleTo(1, duration, Easing.OutQuint);
+            this.FadeInFromZero(duration);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            contentContainer.ScaleTo(0.95f, duration, Easing.OutQuint);
+            this.FadeOut(duration, Easing.OutQuint);
+
+            return base.OnExiting(next);
+        }
+
         private void directoryChanged(ValueChangedEvent<DirectoryInfo> _)
         {
             // this should probably be done by the selector itself, but let's do it here for now.
@@ -129,24 +145,6 @@ namespace osu.Game.Screens.Import
         {
             importButton.Enabled.Value = selectedFile.NewValue != null;
             currentFileText.Text = selectedFile.NewValue?.Name ?? "Select a file";
-        }
-
-        public override void OnEntering(IScreen last)
-        {
-            base.OnEntering(last);
-
-            contentContainer.FadeOut().Then().ScaleTo(0.95f)
-                            .Then()
-                            .ScaleTo(1, duration, Easing.OutQuint)
-                            .FadeIn(duration);
-        }
-
-        public override bool OnExiting(IScreen next)
-        {
-            contentContainer.ScaleTo(0.95f, duration, Easing.OutQuint);
-            this.FadeOut(duration, Easing.OutQuint);
-
-            return base.OnExiting(next);
         }
 
         private void startImport(string path)
