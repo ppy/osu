@@ -20,12 +20,6 @@ namespace osu.Game.Screens.Play
     public class InGameScoreContainer : FillFlowContainer<InGameScoreItem>
     {
         /// <summary>
-        /// Called once an item's score has changed.
-        /// Useful for doing calculations on what score to show or hide next. (scrolling system)
-        /// </summary>
-        public Action OnScoreChange;
-
-        /// <summary>
         /// Whether to declare a new position for un-positioned players.
         /// Must be disabled for online leaderboards with top 50 scores only.
         /// </summary>
@@ -101,9 +95,16 @@ namespace osu.Game.Screens.Play
 
         private void updateScores()
         {
-            reorderPositions();
+            var orderedByScore = this.OrderByDescending(i => i.TotalScore).ToList();
+            var orderedPositions = this.Select(i => this.Any(item => item.InitialPosition.HasValue) ? i.InitialPosition : i.ScorePosition).OrderByDescending(p => p.HasValue).ThenBy(p => p).ToList();
 
-            OnScoreChange?.Invoke();
+            for (int i = 0; i < Count; i++)
+            {
+                int newPosition = orderedPositions[i] ?? maxPosition + 1;
+
+                SetLayoutPosition(orderedByScore[i], newPosition);
+                orderedByScore[i].ScorePosition = DeclareNewPosition ? newPosition : orderedPositions[i];
+            }
         }
     }
 
