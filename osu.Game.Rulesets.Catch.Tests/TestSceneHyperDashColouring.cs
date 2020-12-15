@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddStep("create hyper-dashing catcher", () =>
             {
-                Child = setupSkinHierarchy(catcherArea = new CatcherArea(new Container())
+                Child = setupSkinHierarchy(catcherArea = new CatcherArea(new Container<CaughtObject>())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

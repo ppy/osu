@@ -102,13 +102,13 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
                         if (hit.Type == HitType.Centre)
                         {
-                            actions = h.IsStrong
+                            actions = hit.IsStrong
                                 ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
                                 : new[] { hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre };
                         }
                         else
                         {
-                            actions = h.IsStrong
+                            actions = hit.IsStrong
                                 ? new[] { TaikoAction.LeftRim, TaikoAction.RightRim }
                                 : new[] { hitButton ? TaikoAction.LeftRim : TaikoAction.RightRim };
                         }
