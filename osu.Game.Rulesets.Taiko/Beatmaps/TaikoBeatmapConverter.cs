@@ -65,8 +65,8 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 converted.HitObjects = converted.HitObjects.GroupBy(t => t.StartTime).Select(x =>
                 {
                     TaikoHitObject first = x.First();
-                    if (x.Skip(1).Any() && first.CanBeStrong)
-                        first.IsStrong = true;
+                    if (x.Skip(1).Any() && first is TaikoStrongableHitObject strong)
+                        strong.IsStrong = true;
                     return first;
                 }).ToList();
             }

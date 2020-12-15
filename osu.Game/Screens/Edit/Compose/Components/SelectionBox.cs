@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     Anchor = Anchor.TopCentre,
                     Y = -separation,
-                    HandleDrag = e => OnRotation?.Invoke(e.Delta.X),
+                    HandleDrag = e => OnRotation?.Invoke(convertDragEventToAngleOfRotation(e)),
                     OperationStarted = operationStarted,
                     OperationEnded = operationEnded
                 }
@@ -241,6 +241,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         });
 
         private int activeOperations;
+
+        private float convertDragEventToAngleOfRotation(DragEvent e)
+        {
+            // Adjust coordinate system to the center of SelectionBox
+            float startAngle = MathF.Atan2(e.LastMousePosition.Y - DrawHeight / 2, e.LastMousePosition.X - DrawWidth / 2);
+            float endAngle = MathF.Atan2(e.MousePosition.Y - DrawHeight / 2, e.MousePosition.X - DrawWidth / 2);
+
+            return (endAngle - startAngle) * 180 / MathF.PI;
+        }
 
         private void operationEnded()
         {
