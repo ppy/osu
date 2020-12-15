@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            major.BindValueChanged(updateMajor);
+            major.BindValueChanged(updateMajor, true);
         }
 
         private void updateMajor(ValueChangedEvent<bool> major)
