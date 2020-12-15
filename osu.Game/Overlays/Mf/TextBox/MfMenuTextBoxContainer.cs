@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Mf.TextBox
             Origin = Anchor.TopCentre;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Children = new[]
+            InternalChildren = new[]
             {
                 new Box
                 {
