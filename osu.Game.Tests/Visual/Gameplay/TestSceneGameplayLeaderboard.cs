@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 playerScore.Value = 1222333;
             });
 
-            AddStep("add player user", () => leaderboard.AddRealTimePlayer(playerScore, new User { Username = "You" }));
+            AddStep("add player user", () => leaderboard.AddPlayer(playerScore, new User { Username = "You" }));
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
         }
 
@@ -49,8 +49,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             var player2Score = new BindableDouble(1234567);
             var player3Score = new BindableDouble(1111111);
 
-            AddStep("add player 2", () => leaderboard.AddRealTimePlayer(player2Score, new User { Username = "Player 2" }));
-            AddStep("add player 3", () => leaderboard.AddRealTimePlayer(player3Score, new User { Username = "Player 3" }));
+            AddStep("add player 2", () => leaderboard.AddPlayer(player2Score, new User { Username = "Player 2" }));
+            AddStep("add player 3", () => leaderboard.AddPlayer(player3Score, new User { Username = "Player 3" }));
 
             AddAssert("is player 2 position #1", () => leaderboard.CheckPositionByUsername("Player 2", 1));
             AddAssert("is player position #2", () => leaderboard.CheckPositionByUsername("You", 2));
