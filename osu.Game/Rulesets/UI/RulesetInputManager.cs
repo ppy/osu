@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,20 +18,28 @@ using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
 using osuTK.Input;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
-using JoystickState = osu.Framework.Input.States.JoystickState;
-using KeyboardState = osu.Framework.Input.States.KeyboardState;
-using MouseState = osu.Framework.Input.States.MouseState;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
-        protected override InputState CreateInitialState()
+        private ReplayRecorder recorder;
+
+        public ReplayRecorder Recorder
         {
-            var state = base.CreateInitialState();
-            return new RulesetInputManagerInputState<T>(state.Mouse, state.Keyboard, state.Joystick);
+            set
+            {
+                if (recorder != null)
+                    throw new InvalidOperationException("Cannot attach more than one recorder");
+
+                recorder = value;
+
+                KeyBindingContainer.Add(recorder);
+            }
         }
+
+        protected override InputState CreateInitialState() => new RulesetInputManagerInputState<T>(base.CreateInitialState());
 
         protected readonly KeyBindingContainer<T> KeyBindingContainer;
 
@@ -127,7 +136,11 @@ namespace osu.Game.Rulesets.UI
             KeyBindingContainer.Add(receptor);
 
             keyCounter.SetReceptor(receptor);
-            keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings.Select(b => b.GetAction<T>()).Distinct().Select(b => new KeyCounterAction<T>(b)));
+            keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings
+                                                   .Select(b => b.GetAction<T>())
+                                                   .Distinct()
+                                                   .OrderBy(action => action)
+                                                   .Select(action => new KeyCounterAction<T>(action)));
         }
 
         public class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
@@ -137,14 +150,18 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            public bool OnPressed(T action) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnPressed(action));
+            public bool OnPressed(T action) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnPressed(action, Clock.Rate >= 0));
 
-            public bool OnReleased(T action) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnReleased(action));
+            public void OnReleased(T action)
+            {
+                foreach (var c in Target.Children.OfType<KeyCounterAction<T>>())
+                    c.OnReleased(action, Clock.Rate >= 0);
+            }
         }
 
         #endregion
 
-        protected virtual RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+        protected virtual KeyBindingContainer<T> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new RulesetKeyBindingContainer(ruleset, variant, unique);
 
         public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
@@ -164,6 +181,11 @@ namespace osu.Game.Rulesets.UI
         ReplayInputHandler ReplayInputHandler { get; set; }
     }
 
+    public interface IHasRecordingHandler
+    {
+        public ReplayRecorder Recorder { set; }
+    }
+
     /// <summary>
     /// Supports attaching a <see cref="KeyCounterDisplay"/>.
     /// Keys will be populated automatically and a receptor will be injected inside.
@@ -178,8 +200,8 @@ namespace osu.Game.Rulesets.UI
     {
         public ReplayState<T> LastReplayState;
 
-        public RulesetInputManagerInputState(MouseState mouse = null, KeyboardState keyboard = null, JoystickState joystick = null)
-            : base(mouse, keyboard, joystick)
+        public RulesetInputManagerInputState(InputState state = null)
+            : base(state)
         {
         }
     }

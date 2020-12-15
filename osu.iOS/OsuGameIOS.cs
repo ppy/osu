@@ -4,11 +4,14 @@
 using System;
 using Foundation;
 using osu.Game;
+using osu.Game.Updater;
 
 namespace osu.iOS
 {
     public class OsuGameIOS : OsuGame
     {
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
+
+        protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
     }
 }

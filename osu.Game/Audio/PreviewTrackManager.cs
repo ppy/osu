@@ -11,6 +11,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Audio
@@ -19,13 +20,15 @@ namespace osu.Game.Audio
     {
         private readonly BindableDouble muteBindable = new BindableDouble();
 
-        private AudioManager audio;
+        [Resolved]
+        private AudioManager audio { get; set; }
+
         private PreviewTrackStore trackStore;
 
-        private TrackManagerPreviewTrack current;
+        protected TrackManagerPreviewTrack CurrentTrack;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             // this is a temporary solution to get around muting ourselves.
             // todo: update this once we have a BackgroundTrackManager or similar.
@@ -33,8 +36,6 @@ namespace osu.Game.Audio
 
             audio.AddItem(trackStore);
             trackStore.AddAdjustment(AdjustableProperty.Volume, audio.VolumeTrack);
-
-            this.audio = audio;
         }
 
         /// <summary>
@@ -46,18 +47,21 @@ namespace osu.Game.Audio
         {
             var track = CreatePreviewTrack(beatmapSetInfo, trackStore);
 
-            track.Started += () =>
+            track.Started += () => Schedule(() =>
             {
-                current?.Stop();
-                current = track;
+                CurrentTrack?.Stop();
+                CurrentTrack = track;
                 audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
-            };
+            });
 
-            track.Stopped += () =>
+            track.Stopped += () => Schedule(() =>
             {
-                current = null;
+                if (CurrentTrack != track)
+                    return;
+
+                CurrentTrack = null;
                 audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
-            };
+            });
 
             return track;
         }
@@ -73,20 +77,22 @@ namespace osu.Game.Audio
         /// <param name="source">The <see cref="IPreviewTrackOwner"/> which may be the owner of the <see cref="PreviewTrack"/>.</param>
         public void StopAnyPlaying(IPreviewTrackOwner source)
         {
-            if (current == null || current.Owner != source)
+            if (CurrentTrack == null || (CurrentTrack.Owner != null && CurrentTrack.Owner != source))
                 return;
 
-            current.Stop();
-            current = null;
+            CurrentTrack.Stop();
+            // CurrentTrack should not be set to null here as it will result in incorrect handling in the track.Stopped callback above.
         }
 
         /// <summary>
         /// Creates the <see cref="TrackManagerPreviewTrack"/>.
         /// </summary>
-        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
+        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) =>
+            new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
-        protected class TrackManagerPreviewTrack : PreviewTrack
+        public class TrackManagerPreviewTrack : PreviewTrack
         {
+            [Resolved(canBeNull: true)]
             public IPreviewTrackOwner Owner { get; private set; }
 
             private readonly BeatmapSetInfo beatmapSetInfo;
@@ -98,10 +104,10 @@ namespace osu.Game.Audio
                 this.trackManager = trackManager;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(IPreviewTrackOwner owner)
+            protected override void LoadComplete()
             {
-                Owner = owner;
+                base.LoadComplete();
+                Logger.Log($"A {nameof(PreviewTrack)} was created without a containing {nameof(IPreviewTrackOwner)}. An owner should be added for correct behaviour.");
             }
 
             protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");

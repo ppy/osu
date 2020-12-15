@@ -1,70 +1,133 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Overlays.SearchableList;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class FilterControl : SearchableListFilterControl<PrimaryFilter, SecondaryFilter>
+    public abstract class FilterControl : CompositeDrawable
     {
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
-        protected override PrimaryFilter DefaultTab => PrimaryFilter.Open;
-        protected override SecondaryFilter DefaultCategory => SecondaryFilter.Public;
-
-        protected override float ContentHorizontalPadding => base.ContentHorizontalPadding + OsuScreen.HORIZONTAL_OVERFLOW_PADDING;
+        protected const float VERTICAL_PADDING = 10;
+        protected const float HORIZONTAL_PADDING = 80;
 
         [Resolved(CanBeNull = true)]
         private Bindable<FilterCriteria> filter { get; set; }
 
-        public FilterControl()
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        private readonly Box tabStrip;
+        private readonly SearchTextBox search;
+        private readonly PageTabControl<RoomStatusFilter> tabs;
+
+        protected FilterControl()
         {
-            DisplayStyleControl.Hide();
+            InternalChildren = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Alpha = 0.25f,
+                },
+                tabStrip = new Box
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 1,
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding
+                    {
+                        Top = VERTICAL_PADDING,
+                        Horizontal = HORIZONTAL_PADDING
+                    },
+                    Children = new Drawable[]
+                    {
+                        search = new FilterSearchTextBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                        },
+                        tabs = new PageTabControl<RoomStatusFilter>
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                        },
+                    }
+                }
+            };
+
+            tabs.Current.Value = RoomStatusFilter.Open;
+            tabs.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
-            if (filter == null)
-                filter = new Bindable<FilterCriteria>();
+            filter ??= new Bindable<FilterCriteria>();
+            tabStrip.Colour = colours.Yellow;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Search.Current.BindValueChanged(_ => updateFilter());
-            Tabs.Current.BindValueChanged(_ => updateFilter(), true);
+            search.Current.BindValueChanged(_ => updateFilterDebounced());
+            ruleset.BindValueChanged(_ => UpdateFilter());
+            tabs.Current.BindValueChanged(_ => UpdateFilter(), true);
         }
 
-        private void updateFilter()
+        private ScheduledDelegate scheduledFilterUpdate;
+
+        private void updateFilterDebounced()
         {
-            filter.Value = new FilterCriteria
-            {
-                SearchString = Search.Current.Value ?? string.Empty,
-                PrimaryFilter = Tabs.Current.Value,
-                SecondaryFilter = DisplayStyleControl.Dropdown.Current.Value
-            };
+            scheduledFilterUpdate?.Cancel();
+            scheduledFilterUpdate = Scheduler.AddDelayed(UpdateFilter, 200);
         }
-    }
 
-    public enum PrimaryFilter
-    {
-        Open,
+        protected void UpdateFilter()
+        {
+            scheduledFilterUpdate?.Cancel();
 
-        [Description("Recently Ended")]
-        RecentlyEnded,
-        Participated,
-        Owned,
-    }
+            var criteria = CreateCriteria();
+            criteria.SearchString = search.Current.Value;
+            criteria.Status = tabs.Current.Value;
+            criteria.Ruleset = ruleset.Value;
 
-    public enum SecondaryFilter
-    {
-        Public,
-        //Private,
+            filter.Value = criteria;
+        }
+
+        protected virtual FilterCriteria CreateCriteria() => new FilterCriteria();
+
+        public bool HoldFocus
+        {
+            get => search.HoldFocus;
+            set => search.HoldFocus = value;
+        }
+
+        public void TakeFocus() => search.TakeFocus();
+
+        private class FilterSearchTextBox : SearchTextBox
+        {
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = OsuColour.Gray(0.06f);
+                BackgroundFocused = OsuColour.Gray(0.12f);
+            }
+        }
     }
 }

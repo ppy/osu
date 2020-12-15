@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -18,6 +19,18 @@ namespace osu.Game.Skinning
         /// </summary>
         public Drawable Drawable { get; private set; }
 
+        /// <summary>
+        /// Whether the drawable component should be centered in available space.
+        /// Defaults to true.
+        /// </summary>
+        public bool CentreComponent { get; set; } = true;
+
+        public new Axes AutoSizeAxes
+        {
+            get => base.AutoSizeAxes;
+            set => base.AutoSizeAxes = value;
+        }
+
         private readonly ISkinComponent component;
 
         private readonly ConfineMode confineMode;
@@ -29,13 +42,13 @@ namespace osu.Game.Skinning
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
         /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
         /// <param name="confineMode">How (if at all) the <see cref="Drawable"/> should be resize to fit within our own bounds.</param>
-        public SkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
+        public SkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
             : this(component, allowFallback, confineMode)
         {
             createDefault = defaultImplementation;
         }
 
-        protected SkinnableDrawable(ISkinComponent component, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
+        protected SkinnableDrawable(ISkinComponent component, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
             : base(allowFallback)
         {
             this.component = component;
@@ -43,6 +56,11 @@ namespace osu.Game.Skinning
 
             RelativeSizeAxes = Axes.Both;
         }
+
+        /// <summary>
+        /// Seeks to the 0-th frame if the content of this <see cref="SkinnableDrawable"/> is an <see cref="IFramedAnimation"/>.
+        /// </summary>
+        public void ResetAnimation() => (Drawable as IFramedAnimation)?.GotoFrame(0);
 
         private readonly Func<ISkinComponent, Drawable> createDefault;
 
@@ -72,8 +90,13 @@ namespace osu.Game.Skinning
             if (Drawable != null)
             {
                 scaling.Invalidate();
-                Drawable.Origin = Anchor.Centre;
-                Drawable.Anchor = Anchor.Centre;
+
+                if (CentreComponent)
+                {
+                    Drawable.Origin = Anchor.Centre;
+                    Drawable.Anchor = Anchor.Centre;
+                }
+
                 InternalChild = Drawable;
             }
             else
@@ -92,20 +115,13 @@ namespace osu.Game.Skinning
 
                     switch (confineMode)
                     {
-                        case ConfineMode.NoScaling:
-                            return;
-
-                        case ConfineMode.ScaleDownToFit:
-                            if (Drawable.DrawSize.X <= DrawSize.X && Drawable.DrawSize.Y <= DrawSize.Y)
-                                return;
-
+                        case ConfineMode.ScaleToFit:
+                            Drawable.RelativeSizeAxes = Axes.Both;
+                            Drawable.Size = Vector2.One;
+                            Drawable.Scale = Vector2.One;
+                            Drawable.FillMode = FillMode.Fit;
                             break;
                     }
-
-                    Drawable.RelativeSizeAxes = Axes.Both;
-                    Drawable.Size = Vector2.One;
-                    Drawable.Scale = Vector2.One;
-                    Drawable.FillMode = FillMode.Fit;
                 }
                 finally
                 {
@@ -121,7 +137,6 @@ namespace osu.Game.Skinning
         /// Don't apply any scaling. This allows the user element to be of any size, exceeding specified bounds.
         /// </summary>
         NoScaling,
-        ScaleDownToFit,
         ScaleToFit,
     }
 }

@@ -25,8 +25,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class NowPlayingOverlay : OsuFocusedOverlayContainer
+    public class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/music";
+        public string Title => "now playing";
+        public string Description => "manage the currently playing track";
+
         private const float player_height = 130;
         private const float transition_length = 800;
         private const float progress_height = 10;
@@ -58,6 +62,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         public NowPlayingOverlay()
         {
             Width = 400;
@@ -65,7 +72,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Children = new Drawable[]
             {
@@ -81,7 +88,6 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.X,
                             Y = player_height + 10,
-                            OrderChanged = musicController.ChangeBeatmapSetPosition
                         },
                         playerContainer = new Container
                         {
@@ -138,7 +144,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = () => musicController.PrevTrack(),
+                                                    Action = () => musicController.PreviousTrack(),
                                                     Icon = FontAwesome.Solid.StepBackward,
                                                 },
                                                 playButton = new MusicIconButton
@@ -169,12 +175,13 @@ namespace osu.Game.Overlays
                                         },
                                     }
                                 },
-                                progressBar = new ProgressBar
+                                progressBar = new HoverableProgressBar
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.BottomCentre,
-                                    Height = progress_height,
+                                    Height = progress_height / 2,
                                     FillColour = colours.Yellow,
+                                    BackgroundColour = colours.YellowDarker.Opacity(0.5f),
                                     OnSeek = musicController.SeekTo
                                 }
                             },
@@ -182,13 +189,14 @@ namespace osu.Game.Overlays
                     }
                 }
             };
-
-            playlist.State.ValueChanged += s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
+            playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
 
             beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
 
@@ -230,9 +238,9 @@ namespace osu.Game.Overlays
                 pendingBeatmapSwitch = null;
             }
 
-            var track = beatmap.Value?.TrackLoaded ?? false ? beatmap.Value.Track : null;
+            var track = musicController.CurrentTrack;
 
-            if (track?.IsDummyDevice == false)
+            if (!track.IsDummyDevice)
             {
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
@@ -257,7 +265,7 @@ namespace osu.Game.Overlays
                 // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
                 Task.Run(() =>
                 {
-                    if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
+                    if (beatmap?.Beatmap == null) // this is not needed if a placeholder exists
                     {
                         title.Text = @"Nothing to play";
                         artist.Text = @"Nothing to play";
@@ -300,7 +308,6 @@ namespace osu.Game.Overlays
             if (disabled)
                 playlist.Hide();
 
-            playButton.Enabled.Value = !disabled;
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;
@@ -385,21 +392,35 @@ namespace osu.Game.Overlays
                 return true;
             }
 
-            protected override bool OnDrag(DragEvent e)
+            protected override void OnDrag(DragEvent e)
             {
                 Vector2 change = e.MousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-                change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
+                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.7f) / change.Length;
 
                 this.MoveTo(change);
-                return true;
             }
 
-            protected override bool OnDragEnd(DragEndEvent e)
+            protected override void OnDragEnd(DragEndEvent e)
             {
                 this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-                return base.OnDragEnd(e);
+                base.OnDragEnd(e);
+            }
+        }
+
+        private class HoverableProgressBar : ProgressBar
+        {
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.ResizeHeightTo(progress_height, 500, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                this.ResizeHeightTo(progress_height / 2, 500, Easing.OutQuint);
+                base.OnHoverLost(e);
             }
         }
     }

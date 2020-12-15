@@ -11,7 +11,7 @@ using osu.Game.Online.API;
 namespace osu.Game.Online
 {
     /// <summary>
-    /// A component which tracks a <see cref="TModel"/> through potential download/import/deletion.
+    /// A component which tracks a <typeparamref name="TModel"/> through potential download/import/deletion.
     /// </summary>
     public abstract class DownloadTrackingComposite<TModel, TModelManager> : CompositeDrawable
         where TModel : class, IEquatable<TModel>
@@ -19,51 +19,74 @@ namespace osu.Game.Online
     {
         protected readonly Bindable<TModel> Model = new Bindable<TModel>();
 
-        private TModelManager manager;
+        [Resolved(CanBeNull = true)]
+        private TModelManager manager { get; set; }
 
         /// <summary>
-        /// Holds the current download state of the <see cref="TModel"/>, whether is has already been downloaded, is in progress, or is not downloaded.
+        /// Holds the current download state of the <typeparamref name="TModel"/>, whether is has already been downloaded, is in progress, or is not downloaded.
         /// </summary>
         protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
-        protected readonly Bindable<double> Progress = new Bindable<double>();
+        protected readonly BindableNumber<double> Progress = new BindableNumber<double> { MinValue = 0, MaxValue = 1 };
 
         protected DownloadTrackingComposite(TModel model = null)
         {
             Model.Value = model;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(TModelManager manager)
-        {
-            this.manager = manager;
+        private IBindable<WeakReference<TModel>> managedUpdated;
+        private IBindable<WeakReference<TModel>> managerRemoved;
+        private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> managerDownloadBegan;
+        private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> managerDownloadFailed;
 
+        [BackgroundDependencyLoader(true)]
+        private void load()
+        {
             Model.BindValueChanged(modelInfo =>
             {
                 if (modelInfo.NewValue == null)
                     attachDownload(null);
-                else if (manager.IsAvailableLocally(modelInfo.NewValue))
+                else if (manager?.IsAvailableLocally(modelInfo.NewValue) == true)
                     State.Value = DownloadState.LocallyAvailable;
                 else
-                    attachDownload(manager.GetExistingDownload(modelInfo.NewValue));
+                    attachDownload(manager?.GetExistingDownload(modelInfo.NewValue));
             }, true);
 
-            manager.DownloadBegan += downloadBegan;
-            manager.DownloadFailed += downloadFailed;
-            manager.ItemAdded += itemAdded;
-            manager.ItemRemoved += itemRemoved;
+            if (manager == null)
+                return;
+
+            managerDownloadBegan = manager.DownloadBegan.GetBoundCopy();
+            managerDownloadBegan.BindValueChanged(downloadBegan);
+            managerDownloadFailed = manager.DownloadFailed.GetBoundCopy();
+            managerDownloadFailed.BindValueChanged(downloadFailed);
+            managedUpdated = manager.ItemUpdated.GetBoundCopy();
+            managedUpdated.BindValueChanged(itemUpdated);
+            managerRemoved = manager.ItemRemoved.GetBoundCopy();
+            managerRemoved.BindValueChanged(itemRemoved);
         }
 
-        private void downloadBegan(ArchiveDownloadRequest<TModel> request)
+        private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<TModel>>> weakRequest)
         {
-            if (request.Model.Equals(Model.Value))
-                attachDownload(request);
+            if (weakRequest.NewValue.TryGetTarget(out var request))
+            {
+                Schedule(() =>
+                {
+                    if (request.Model.Equals(Model.Value))
+                        attachDownload(request);
+                });
+            }
         }
 
-        private void downloadFailed(ArchiveDownloadRequest<TModel> request)
+        private void downloadFailed(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<TModel>>> weakRequest)
         {
-            if (request.Model.Equals(Model.Value))
-                attachDownload(null);
+            if (weakRequest.NewValue.TryGetTarget(out var request))
+            {
+                Schedule(() =>
+                {
+                    if (request.Model.Equals(Model.Value))
+                        attachDownload(null);
+                });
+            }
         }
 
         private ArchiveDownloadRequest<TModel> attachedRequest;
@@ -108,9 +131,17 @@ namespace osu.Game.Online
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void itemAdded(TModel s) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
+        private void itemUpdated(ValueChangedEvent<WeakReference<TModel>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var item))
+                setDownloadStateFromManager(item, DownloadState.LocallyAvailable);
+        }
 
-        private void itemRemoved(TModel s) => setDownloadStateFromManager(s, DownloadState.NotDownloaded);
+        private void itemRemoved(ValueChangedEvent<WeakReference<TModel>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var item))
+                setDownloadStateFromManager(item, DownloadState.NotDownloaded);
+        }
 
         private void setDownloadStateFromManager(TModel s, DownloadState state) => Schedule(() =>
         {
@@ -125,14 +156,6 @@ namespace osu.Game.Online
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
-            if (manager != null)
-            {
-                manager.DownloadBegan -= downloadBegan;
-                manager.DownloadFailed -= downloadFailed;
-                manager.ItemAdded -= itemAdded;
-                manager.ItemRemoved -= itemRemoved;
-            }
 
             State.UnbindAll();
 

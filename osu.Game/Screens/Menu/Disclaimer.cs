@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Menu
         private readonly OsuScreen nextScreen;
 
         private readonly Bindable<User> currentUser = new Bindable<User>();
+        private FillFlowContainer fill;
 
         public Disclaimer(OsuScreen nextScreen = null)
         {
@@ -41,8 +42,11 @@ namespace osu.Game.Screens.Menu
             ValidForResume = false;
         }
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load(OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
@@ -50,16 +54,16 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Icon = FontAwesome.Solid.Flask,
                     Size = new Vector2(icon_size),
                     Y = icon_y,
                 },
-                new FillFlowContainer
+                fill = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Y = icon_y + icon_size,
+                    Y = icon_y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     Children = new Drawable[]
@@ -72,6 +76,8 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Spacing = new Vector2(0, 2),
+                            LayoutDuration = 2000,
+                            LayoutEasing = Easing.OutQuint
                         },
                         supportFlow = new LinkFlowContainer
                         {
@@ -87,35 +93,30 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            textFlow.AddText("This is an ", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
-            textFlow.AddText("early development build", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
-
-            textFlow.AddParagraph("Things may not work as expected", t => t.Font = t.Font.With(size: 20));
-            textFlow.NewParagraph();
-
-            Action<SpriteText> format = t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
-
-            textFlow.AddParagraph("Detailed bug reports are welcomed via github issues.", format);
-            textFlow.NewParagraph();
-
-            textFlow.AddText("Visit ", format);
-            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters: format);
-            textFlow.AddText(" to help out or follow progress!", format);
+            textFlow.AddText("This project is an ongoing ", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Light));
+            textFlow.AddText("work in progress", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.SemiBold));
 
             textFlow.NewParagraph();
+
+            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
+
+            textFlow.AddParagraph(getRandomTip(), t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold));
             textFlow.NewParagraph();
+
             textFlow.NewParagraph();
 
             iconColour = colours.Yellow;
 
-            currentUser.BindTo(api.LocalUser);
+            // manually transfer the user once, but only do the final bind in LoadComplete to avoid thread woes (API scheduler could run while this screen is still loading).
+            // the manual transfer is here to ensure all text content is loaded ahead of time as this is very early in the game load process and we want to avoid stutters.
+            currentUser.Value = api.LocalUser.Value;
             currentUser.BindValueChanged(e =>
             {
                 supportFlow.Children.ForEach(d => d.FadeOut().Expire());
 
                 if (e.NewValue.IsSupporter)
                 {
-                    supportFlow.AddText("Thank you for supporting osu!", format);
+                    supportFlow.AddText("Eternal thanks to you for supporting osu!", format);
                 }
                 else
                 {
@@ -126,7 +127,7 @@ namespace osu.Game.Screens.Menu
 
                 heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
-                    t.Padding = new MarginPadding { Left = 5 };
+                    t.Padding = new MarginPadding { Left = 5, Top = 3 };
                     t.Font = t.Font.With(size: 12);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
@@ -140,31 +141,41 @@ namespace osu.Game.Screens.Menu
             }, true);
         }
 
-        private void animateHeart()
-        {
-            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
             if (nextScreen != null)
                 LoadComponentAsync(nextScreen);
+
+            currentUser.BindTo(api.LocalUser);
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            icon.Delay(1000).FadeColour(iconColour, 200, Easing.OutQuint);
-            icon.Delay(1000)
-                .MoveToY(icon_y * 1.1f, 160, Easing.OutCirc)
-                .RotateTo(-10, 160, Easing.OutCirc)
-                .Then()
-                .MoveToY(icon_y, 160, Easing.InCirc)
-                .RotateTo(0, 160, Easing.InCirc);
+            icon.RotateTo(10);
+            icon.FadeOut();
+            icon.ScaleTo(0.5f);
+
+            icon.Delay(500).FadeIn(500).ScaleTo(1, 500, Easing.OutQuint);
+
+            using (BeginDelayedSequence(3000, true))
+            {
+                icon.FadeColour(iconColour, 200, Easing.OutQuint);
+                icon.MoveToY(icon_y * 1.3f, 500, Easing.OutCirc)
+                    .RotateTo(-360, 520, Easing.OutQuint)
+                    .Then()
+                    .MoveToY(icon_y, 160, Easing.InQuart)
+                    .FadeColour(Color4.White, 160);
+
+                fill.Delay(520 + 160).MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
+            }
 
             supportFlow.FadeOut().Delay(2000).FadeIn(500);
+            double delay = 500;
+            foreach (var c in textFlow.Children)
+                c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
 
             animateHeart();
 
@@ -173,7 +184,41 @@ namespace osu.Game.Screens.Menu
                 .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d => this.Push(nextScreen));
+                .Finally(d =>
+                {
+                    if (nextScreen != null)
+                        this.Push(nextScreen);
+                });
+        }
+
+        private string getRandomTip()
+        {
+            string[] tips =
+            {
+                "You can press Ctrl-T anywhere in the game to toggle the toolbar!",
+                "You can press Ctrl-O anywhere in the game to access options!",
+                "All settings are dynamic and take effect in real-time. Try pausing and changing the skin while playing!",
+                "New features are coming online every update. Make sure to stay up-to-date!",
+                "If you find the UI too large or small, try adjusting UI scale in settings!",
+                "Try adjusting the \"Screen Scaling\" mode to change your gameplay or UI area, even in fullscreen!",
+                "For now, osu!direct is available to all users on lazer. You can access it anywhere using Ctrl-D!",
+                "Seeking in replays is available by dragging on the difficulty bar at the bottom of the screen!",
+                "Multithreading support means that even with low \"FPS\" your input and judgements will be accurate!",
+                "Try scrolling down in the mod select panel to find a bunch of new fun mods!",
+                "Most of the web content (profiles, rankings, etc.) are available natively in-game from the icons on the toolbar!",
+                "Get more details, hide or delete a beatmap by right-clicking on its panel at song select!",
+                "All delete operations are temporary until exiting. Restore accidentally deleted content from the maintenance settings!",
+                "Check out the \"timeshift\" multiplayer system, which has local permanent leaderboards and playlist support!",
+                "Toggle advanced frame / thread statistics with Ctrl-F11!",
+                "Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2!",
+            };
+
+            return tips[RNG.Next(0, tips.Length)];
+        }
+
+        private void animateHeart()
+        {
+            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }

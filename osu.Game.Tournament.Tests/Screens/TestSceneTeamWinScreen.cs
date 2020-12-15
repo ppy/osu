@@ -3,26 +3,20 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.TeamWin;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneTeamWinScreen : LadderTestScene
+    public class TestSceneTeamWinScreen : TournamentTestScene
     {
-        [Cached]
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            var match = new TournamentMatch();
-            match.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "USA");
-            match.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "JPN");
+            var match = Ladder.CurrentMatch.Value;
+
             match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
-            currentMatch.Value = match;
+            match.Completed.Value = true;
 
             Add(new TeamWinScreen
             {

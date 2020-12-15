@@ -1,9 +1,7 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -35,10 +33,6 @@ namespace osu.Game.Screens.Play
             {
                 breaks = value;
 
-                // reset index in case the new breaks list is smaller than last one
-                isBreakTime.Value = false;
-                CurrentBreakIndex = 0;
-
                 if (IsLoaded)
                     initializeBreaks();
             }
@@ -46,24 +40,17 @@ namespace osu.Game.Screens.Play
 
         public override bool RemoveCompletedTransforms => false;
 
-        /// <summary>
-        /// Whether the gameplay is currently in a break.
-        /// </summary>
-        public IBindable<bool> IsBreakTime => isBreakTime;
-
-        protected int CurrentBreakIndex;
-
-        private readonly BindableBool isBreakTime = new BindableBool();
-
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
         private readonly RemainingTimeCounter remainingTimeCounter;
-        private readonly BreakInfo info;
         private readonly BreakArrows breakArrows;
 
-        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor = null)
+        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
         {
             RelativeSizeAxes = Axes.Both;
+
+            BreakInfo info;
+
             Child = fadeContainer = new Container
             {
                 Alpha = 0,
@@ -114,13 +101,11 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            if (scoreProcessor != null) bindProcessor(scoreProcessor);
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock)
-        {
-            if (clock != null) Clock = clock;
+            if (scoreProcessor != null)
+            {
+                info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
+                info.GradeDisplay.Current.BindTo(scoreProcessor.Rank);
+            }
         }
 
         protected override void LoadComplete()
@@ -129,40 +114,12 @@ namespace osu.Game.Screens.Play
             initializeBreaks();
         }
 
-        protected override void Update()
-        {
-            base.Update();
-            updateBreakTimeBindable();
-        }
-
-        private void updateBreakTimeBindable()
-        {
-            if (breaks == null || breaks.Count == 0)
-                return;
-
-            var time = Clock.CurrentTime;
-
-            if (time > breaks[CurrentBreakIndex].EndTime)
-            {
-                while (time > breaks[CurrentBreakIndex].EndTime && CurrentBreakIndex < breaks.Count - 1)
-                    CurrentBreakIndex++;
-            }
-            else
-            {
-                while (time < breaks[CurrentBreakIndex].StartTime && CurrentBreakIndex > 0)
-                    CurrentBreakIndex--;
-            }
-
-            var currentBreak = breaks[CurrentBreakIndex];
-            isBreakTime.Value = currentBreak.HasEffect && currentBreak.Contains(time);
-        }
-
         private void initializeBreaks()
         {
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
 
-            if (breaks == null) return; //we need breaks.
+            if (breaks == null) return; // we need breaks.
 
             foreach (var b in breaks)
             {
@@ -193,12 +150,6 @@ namespace osu.Game.Screens.Play
                     }
                 }
             }
-        }
-
-        private void bindProcessor(ScoreProcessor processor)
-        {
-            info.AccuracyDisplay.Current.BindTo(processor.Accuracy);
-            info.GradeDisplay.Current.BindTo(processor.Rank);
         }
     }
 }

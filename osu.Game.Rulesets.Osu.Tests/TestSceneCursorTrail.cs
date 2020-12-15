@@ -8,10 +8,11 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing.Input;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Osu.Skinning;
+using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
@@ -79,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();
 
-            public Texture GetTexture(string componentName)
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
                 switch (componentName)
                 {
@@ -101,7 +102,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 
-            public event Action SourceChanged;
+            public event Action SourceChanged
+            {
+                add { }
+                remove { }
+            }
         }
 
         private class MovingCursorInputManager : ManualInputManager

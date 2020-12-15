@@ -9,10 +9,10 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Users
 {
-    public class User
+    public class User : IEquatable<User>
     {
         [JsonProperty(@"id")]
-        public long Id = 1;
+        public int Id = 1;
 
         [JsonProperty(@"join_date")]
         public DateTimeOffset JoinDate;
@@ -26,9 +26,9 @@ namespace osu.Game.Users
         [JsonProperty(@"country")]
         public Country Country;
 
-        public Bindable<UserStatus> Status = new Bindable<UserStatus>();
+        public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        public IBindable<UserActivity> Activity = new Bindable<UserActivity>();
+        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         //public Team Team;
 
@@ -69,6 +69,9 @@ namespace osu.Game.Users
         [JsonProperty(@"support_level")]
         public int SupportLevel;
 
+        [JsonProperty(@"current_mode_rank")]
+        public int? CurrentModeRank;
+
         [JsonProperty(@"is_gmt")]
         public bool IsGMT;
 
@@ -77,6 +80,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"is_bng")]
         public bool IsBNG;
+
+        [JsonProperty(@"is_bot")]
+        public bool IsBot;
 
         [JsonProperty(@"is_active")]
         public bool Active;
@@ -105,9 +111,6 @@ namespace osu.Game.Users
         [JsonProperty(@"twitter")]
         public string Twitter;
 
-        [JsonProperty(@"lastfm")]
-        public string Lastfm;
-
         [JsonProperty(@"skype")]
         public string Skype;
 
@@ -123,10 +126,31 @@ namespace osu.Game.Users
         [JsonProperty(@"follower_count")]
         public int FollowerCount;
 
+        [JsonProperty(@"favourite_beatmapset_count")]
+        public int FavouriteBeatmapsetCount;
+
+        [JsonProperty(@"graveyard_beatmapset_count")]
+        public int GraveyardBeatmapsetCount;
+
+        [JsonProperty(@"loved_beatmapset_count")]
+        public int LovedBeatmapsetCount;
+
+        [JsonProperty(@"ranked_and_approved_beatmapset_count")]
+        public int RankedAndApprovedBeatmapsetCount;
+
+        [JsonProperty(@"unranked_beatmapset_count")]
+        public int UnrankedBeatmapsetCount;
+
+        [JsonProperty(@"scores_first_count")]
+        public int ScoresFirstCount;
+
+        [JsonProperty(@"beatmap_playcounts_count")]
+        public int BeatmapPlaycountsCount;
+
         [JsonProperty]
         private string[] playstyle
         {
-            set { PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray(); }
+            set => PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray();
         }
 
         public PlayStyle[] PlayStyles;
@@ -149,8 +173,27 @@ namespace osu.Game.Users
             public int Available;
         }
 
+        private UserStatistics statistics;
+
         [JsonProperty(@"statistics")]
-        public UserStatistics Statistics;
+        public UserStatistics Statistics
+        {
+            get => statistics ??= new UserStatistics();
+            set
+            {
+                if (statistics != null)
+                    // we may already have rank history populated
+                    value.RankHistory = statistics.RankHistory;
+
+                statistics = value;
+            }
+        }
+
+        [JsonProperty(@"rank_history")]
+        private RankHistoryData rankHistory
+        {
+            set => statistics.RankHistory = value;
+        }
 
         public class RankHistoryData
         {
@@ -159,12 +202,6 @@ namespace osu.Game.Users
 
             [JsonProperty(@"data")]
             public int[] Data;
-        }
-
-        [JsonProperty(@"rankHistory")]
-        private RankHistoryData rankHistory
-        {
-            set => Statistics.RankHistory = value;
         }
 
         [JsonProperty("badges")]
@@ -180,6 +217,21 @@ namespace osu.Game.Users
 
             [JsonProperty("achievement_id")]
             public int ID;
+        }
+
+        [JsonProperty("monthly_playcounts")]
+        public UserHistoryCount[] MonthlyPlaycounts;
+
+        [JsonProperty("replays_watched_counts")]
+        public UserHistoryCount[] ReplaysWatchedCounts;
+
+        public class UserHistoryCount
+        {
+            [JsonProperty("start_date")]
+            public DateTime Date;
+
+            [JsonProperty("count")]
+            public long Count;
         }
 
         public override string ToString() => Username;
@@ -207,6 +259,14 @@ namespace osu.Game.Users
 
             [Description("Touch Screen")]
             Touch,
+        }
+
+        public bool Equals(User other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id == other.Id;
         }
     }
 }

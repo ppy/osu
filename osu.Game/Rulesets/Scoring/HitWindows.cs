@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 
@@ -29,6 +31,18 @@ namespace osu.Game.Rulesets.Scoring
         private double ok;
         private double meh;
         private double miss;
+
+        /// <summary>
+        /// An empty <see cref="HitWindows"/> with only <see cref="HitResult.Miss"/> and <see cref="HitResult.Perfect"/>.
+        /// No time values are provided (meaning instantaneous hit or miss).
+        /// </summary>
+        public static HitWindows Empty => new EmptyHitWindows();
+
+        public HitWindows()
+        {
+            Debug.Assert(GetRanges().Any(r => r.Result == HitResult.Miss), $"{nameof(GetRanges)} should always contain {nameof(HitResult.Miss)}");
+            Debug.Assert(GetRanges().Any(r => r.Result != HitResult.Miss), $"{nameof(GetRanges)} should always contain at least one result type other than {nameof(HitResult.Miss)}.");
+        }
 
         /// <summary>
         /// Retrieves the <see cref="HitResult"/> with the largest hit window that produces a successful hit.
@@ -151,7 +165,7 @@ namespace osu.Game.Rulesets.Scoring
                     return miss;
 
                 default:
-                    throw new ArgumentException(nameof(result));
+                    throw new ArgumentException("Unknown enum member", nameof(result));
             }
         }
 
@@ -168,6 +182,29 @@ namespace osu.Game.Rulesets.Scoring
         /// Defaults are provided but can be overridden to customise for a ruleset.
         /// </summary>
         protected virtual DifficultyRange[] GetRanges() => base_ranges;
+
+        public class EmptyHitWindows : HitWindows
+        {
+            private static readonly DifficultyRange[] ranges =
+            {
+                new DifficultyRange(HitResult.Perfect, 0, 0, 0),
+                new DifficultyRange(HitResult.Miss, 0, 0, 0),
+            };
+
+            public override bool IsHitResultAllowed(HitResult result)
+            {
+                switch (result)
+                {
+                    case HitResult.Perfect:
+                    case HitResult.Miss:
+                        return true;
+                }
+
+                return false;
+            }
+
+            protected override DifficultyRange[] GetRanges() => ranges;
+        }
     }
 
     public struct DifficultyRange

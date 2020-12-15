@@ -15,9 +15,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Models;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -28,7 +26,7 @@ namespace osu.Game.Tournament.Components
         private readonly string mods;
 
         private const float horizontal_padding = 10;
-        private const float vertical_padding = 5;
+        private const float vertical_padding = 10;
 
         public const float HEIGHT = 50;
 
@@ -51,7 +49,6 @@ namespace osu.Game.Tournament.Components
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(ladder.CurrentMatch);
 
-            CornerRadius = HEIGHT / 2;
             Masking = true;
 
             AddRangeInternal(new Drawable[]
@@ -70,52 +67,47 @@ namespace osu.Game.Tournament.Components
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding(vertical_padding),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Padding = new MarginPadding(15),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        new TournamentSpriteText
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
                             Text = new LocalisedString((
                                 $"{Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist} - {Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title}",
                                 $"{Beatmap.Metadata.Artist} - {Beatmap.Metadata.Title}")),
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
+                            Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                         },
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Padding = new MarginPadding(vertical_padding),
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                new TournamentSpriteText
                                 {
                                     Text = "mapper",
                                     Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Regular, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
                                 },
-                                new OsuSpriteText
+                                new TournamentSpriteText
                                 {
                                     Text = Beatmap.Metadata.AuthorString,
                                     Padding = new MarginPadding { Right = 20 },
-                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Bold, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
-                                new OsuSpriteText
+                                new TournamentSpriteText
                                 {
                                     Text = "difficulty",
                                     Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Regular, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
                                 },
-                                new OsuSpriteText
+                                new TournamentSpriteText
                                 {
                                     Text = Beatmap.Version,
-                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Bold, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
                             }
                         }
@@ -131,14 +123,24 @@ namespace osu.Game.Tournament.Components
             });
 
             if (!string.IsNullOrEmpty(mods))
-                AddInternal(new Sprite
+            {
+                AddInternal(new Container
                 {
-                    Texture = textures.Get($"mods/{mods}"),
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 60,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding(20),
-                    Scale = new Vector2(0.5f)
+                    Margin = new MarginPadding(10),
+                    Child = new Sprite
+                    {
+                        FillMode = FillMode.Fit,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Texture = textures.Get($"mods/{mods}"),
+                    }
                 });
+            }
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch> match)
@@ -168,16 +170,7 @@ namespace osu.Game.Tournament.Components
 
                 BorderThickness = 6;
 
-                switch (found.Team)
-                {
-                    case TeamColour.Red:
-                        BorderColour = Color4.Red;
-                        break;
-
-                    case TeamColour.Blue:
-                        BorderColour = Color4.Blue;
-                        break;
-                }
+                BorderColour = TournamentGame.GetTeamColour(found.Team);
 
                 switch (found.Type)
                 {

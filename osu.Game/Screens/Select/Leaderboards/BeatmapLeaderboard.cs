@@ -20,6 +20,9 @@ namespace osu.Game.Screens.Select.Leaderboards
     {
         public Action<ScoreInfo> ScoreSelected;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         private BeatmapInfo beatmap;
 
         public BeatmapInfo Beatmap
@@ -38,6 +41,8 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         private bool filterMods;
+
+        private IBindable<WeakReference<ScoreInfo>> itemRemoved;
 
         /// <summary>
         /// Whether to apply the game's currently selected mods as a filter when retrieving scores.
@@ -77,7 +82,18 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (filterMods)
                     UpdateScores();
             };
+
+            itemRemoved = scoreManager.ItemRemoved.GetBoundCopy();
+            itemRemoved.BindValueChanged(onScoreRemoved);
         }
+
+        protected override void Reset()
+        {
+            base.Reset();
+            TopScore = null;
+        }
+
+        private void onScoreRemoved(ValueChangedEvent<WeakReference<ScoreInfo>> score) => Schedule(RefreshScores);
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
@@ -141,12 +157,21 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var req = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope, requestMods);
 
-            req.Success += r => scoresCallback?.Invoke(r.Scores);
+            req.Success += r =>
+            {
+                scoresCallback?.Invoke(r.Scores.Select(s => s.CreateScoreInfo(rulesets)));
+                TopScore = r.UserScore?.CreateScoreInfo(rulesets);
+            };
 
             return req;
         }
 
-        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index)
+        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope)
+        {
+            Action = () => ScoreSelected?.Invoke(model)
+        };
+
+        protected override LeaderboardScore CreateDrawableTopScore(ScoreInfo model) => new LeaderboardScore(model, model.Position, false)
         {
             Action = () => ScoreSelected?.Invoke(model)
         };

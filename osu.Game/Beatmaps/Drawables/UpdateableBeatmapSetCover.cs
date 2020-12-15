@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
@@ -50,7 +49,7 @@ namespace osu.Game.Beatmaps.Drawables
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.1f)),
+                Colour = OsuColour.Gray(0.2f),
             };
         }
 
@@ -68,19 +67,18 @@ namespace osu.Game.Beatmaps.Drawables
 
             if (beatmapSet != null)
             {
-                BeatmapSetCover cover;
-
-                Add(displayedCover = new DelayedLoadWrapper(
-                    cover = new BeatmapSetCover(beatmapSet, coverType)
+                Add(displayedCover = new DelayedLoadUnloadWrapper(() =>
+                {
+                    var cover = new BeatmapSetCover(beatmapSet, coverType)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fill,
-                    })
-                );
-
-                cover.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
+                    };
+                    cover.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
+                    return cover;
+                }));
             }
         }
     }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
@@ -13,6 +14,8 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class DimmableStoryboard : UserDimContainer
     {
+        public Container OverlayLayerContainer { get; private set; }
+
         private readonly Storyboard storyboard;
         private DrawableStoryboard drawableStoryboard;
 
@@ -24,6 +27,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
+            Add(OverlayLayerContainer = new Container());
+
             initializeStoryboard(false);
         }
 
@@ -33,23 +38,28 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
         }
 
-        protected override bool ShowDimContent => ShowStoryboard.Value && DimLevel < 1;
+        protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowStoryboard.Value && DimLevel < 1);
 
         private void initializeStoryboard(bool async)
         {
             if (drawableStoryboard != null)
                 return;
 
-            if (!ShowStoryboard.Value)
+            if (!ShowStoryboard.Value && !IgnoreUserSettings.Value)
                 return;
 
             drawableStoryboard = storyboard.CreateDrawable();
-            drawableStoryboard.Masking = true;
 
             if (async)
-                LoadComponentAsync(drawableStoryboard, Add);
+                LoadComponentAsync(drawableStoryboard, onStoryboardCreated);
             else
-                Add(drawableStoryboard);
+                onStoryboardCreated(drawableStoryboard);
+        }
+
+        private void onStoryboardCreated(DrawableStoryboard storyboard)
+        {
+            Add(storyboard);
+            OverlayLayerContainer.Add(storyboard.OverlayLayer.CreateProxy());
         }
     }
 }

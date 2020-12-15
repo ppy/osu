@@ -16,7 +16,14 @@ namespace osu.Game.Database
     public abstract class MutableDatabaseBackedStore<T> : DatabaseBackedStore
         where T : class, IHasPrimaryKey, ISoftDelete
     {
-        public event Action<T> ItemAdded;
+        /// <summary>
+        /// Fired when an item was added or updated.
+        /// </summary>
+        public event Action<T> ItemUpdated;
+
+        /// <summary>
+        /// Fired when an item was removed.
+        /// </summary>
         public event Action<T> ItemRemoved;
 
         protected MutableDatabaseBackedStore(IDatabaseContextFactory contextFactory, Storage storage = null)
@@ -30,7 +37,7 @@ namespace osu.Game.Database
         public IQueryable<T> ConsumableItems => AddIncludesForConsumption(ContextFactory.Get().Set<T>());
 
         /// <summary>
-        /// Add a <see cref="T"/> to the database.
+        /// Add a <typeparamref name="T"/> to the database.
         /// </summary>
         /// <param name="item">The item to add.</param>
         public void Add(T item)
@@ -41,11 +48,11 @@ namespace osu.Game.Database
                 context.Attach(item);
             }
 
-            ItemAdded?.Invoke(item);
+            ItemUpdated?.Invoke(item);
         }
 
         /// <summary>
-        /// Update a <see cref="T"/> in the database.
+        /// Update a <typeparamref name="T"/> in the database.
         /// </summary>
         /// <param name="item">The item to update.</param>
         public void Update(T item)
@@ -53,12 +60,11 @@ namespace osu.Game.Database
             using (var usage = ContextFactory.GetForWrite())
                 usage.Context.Update(item);
 
-            ItemRemoved?.Invoke(item);
-            ItemAdded?.Invoke(item);
+            ItemUpdated?.Invoke(item);
         }
 
         /// <summary>
-        /// Delete a <see cref="T"/> from the database.
+        /// Delete a <typeparamref name="T"/> from the database.
         /// </summary>
         /// <param name="item">The item to delete.</param>
         public bool Delete(T item)
@@ -77,7 +83,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Restore a <see cref="T"/> from a deleted state.
+        /// Restore a <typeparamref name="T"/> from a deleted state.
         /// </summary>
         /// <param name="item">The item to undelete.</param>
         public bool Undelete(T item)
@@ -91,7 +97,7 @@ namespace osu.Game.Database
                 item.DeletePending = false;
             }
 
-            ItemAdded?.Invoke(item);
+            ItemUpdated?.Invoke(item);
             return true;
         }
 

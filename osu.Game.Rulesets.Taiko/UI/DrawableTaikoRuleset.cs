@@ -3,12 +3,11 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Framework.Input;
@@ -18,16 +17,20 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public class DrawableTaikoRuleset : DrawableScrollingRuleset<TaikoHitObject>
     {
+        private SkinnableDrawable scroller;
+
         protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public DrawableTaikoRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableTaikoRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
@@ -37,10 +40,22 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            new BarLineGenerator(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar.Major ? new DrawableBarLineMajor(bar) : new DrawableBarLine(bar)));
+            new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar));
+
+            FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Scroller), _ => Empty())
+            {
+                RelativeSizeAxes = Axes.X,
+                Depth = float.MaxValue
+            });
         }
 
-        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            var playfieldScreen = Playfield.ScreenSpaceDrawQuad;
+            scroller.Height = ToLocalSpace(playfieldScreen.TopLeft + new Vector2(0, playfieldScreen.Height / 20)).Y;
+        }
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
 
@@ -52,11 +67,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             switch (h)
             {
-                case CentreHit centreHit:
-                    return new DrawableCentreHit(centreHit);
-
-                case RimHit rimHit:
-                    return new DrawableRimHit(rimHit);
+                case Hit hit:
+                    return new DrawableHit(hit);
 
                 case DrumRoll drumRoll:
                     return new DrawableDrumRoll(drumRoll);
@@ -69,5 +81,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
+
+        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new TaikoReplayRecorder(replay);
     }
 }

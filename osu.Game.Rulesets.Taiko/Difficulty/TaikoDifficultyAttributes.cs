@@ -7,7 +7,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyAttributes : DifficultyAttributes
     {
+        public double StaminaStrain;
+        public double RhythmStrain;
+        public double ColourStrain;
+        public double ApproachRate;
         public double GreatHitWindow;
-        public int MaxCombo;
     }
 }

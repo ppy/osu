@@ -1,31 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Overlays.AccountCreation;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneAccountCreationOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ErrorTextFlowContainer),
-            typeof(AccountCreationBackground),
-            typeof(ScreenEntry),
-            typeof(ScreenWarning),
-            typeof(ScreenWelcome),
-            typeof(AccountCreationScreen),
-        };
-
         private readonly Container userPanelArea;
+
+        private Bindable<User> localUser;
 
         public TestSceneAccountCreationOverlay()
         {
@@ -47,12 +36,14 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        private void load()
         {
-            api.Logout();
-            api.LocalUser.BindValueChanged(user => { userPanelArea.Child = new UserPanel(user.NewValue) { Width = 200 }; }, true);
+            API.Logout();
 
-            AddStep("logout", api.Logout);
+            localUser = API.LocalUser.GetBoundCopy();
+            localUser.BindValueChanged(user => { userPanelArea.Child = new UserGridPanel(user.NewValue) { Width = 200 }; }, true);
+
+            AddStep("logout", API.Logout);
         }
     }
 }
