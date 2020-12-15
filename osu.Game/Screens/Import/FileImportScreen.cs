@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Import
         private const float button_vertical_margin = 15;
 
         [Resolved]
-        private OsuGameBase gameBase { get; set; }
+        private OsuGameBase game { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -46,7 +47,6 @@ namespace osu.Game.Screens.Import
         {
             storage.GetStorageForDirectory("imports");
             var originalPath = storage.GetFullPath("imports", true);
-            string[] fileExtensions = { ".osk", ".osr", ".osz" };
 
             InternalChild = contentContainer = new Container
             {
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Import
                         Colour = colours.GreySeafoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    fileSelector = new FileSelector(initialPath: originalPath, validFileExtensions: fileExtensions)
+                    fileSelector = new FileSelector(originalPath, game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.65f
@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Import
 
             string[] paths = { path };
 
-            Task.Factory.StartNew(() => gameBase.Import(paths), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() => game.Import(paths), TaskCreationOptions.LongRunning);
         }
     }
 }
