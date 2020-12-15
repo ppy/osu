@@ -6,6 +6,7 @@ using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -210,7 +211,7 @@ namespace osu.Game.Screens.Play
                             },
                             scoreText = new GlowingSpriteText
                             {
-                                GlowColour = OsuColour.FromHex(@"83ccfa"),
+                                GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                                 Font = OsuFont.Numeric.With(size: 14),
                             }
                         }

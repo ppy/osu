@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK;
@@ -16,12 +15,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneInGameLeaderboard : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(InGameLeaderboard),
-            typeof(InGameScoreContainer),
-        };
-
         private readonly TestInGameLeaderboard leaderboard;
         private readonly BindableDouble playerScore;
 
@@ -35,16 +28,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                 RelativeSizeAxes = Axes.X,
                 PlayerCurrentScore = { BindTarget = playerScore = new BindableDouble(1222333) }
             });
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("reset leaderboard", () =>
+            {
+                leaderboard.ClearScores();
+                playerScore.Value = 1222333;
+            });
 
             AddStep("add player user", () => leaderboard.PlayerUser = new User { Username = "You" });
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
-            leaderboard.ClearScores();
-            playerScore.Value = 1222333;
         }
 
         [Test]
