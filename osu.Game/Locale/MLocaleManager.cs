@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using JetBrains.Annotations;
 using M.Resources;
+using NGettext;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -17,6 +18,7 @@ namespace osu.Game.Locale
         private LocalisationManager localeManager { get; set; }
 
         private IBindable<string> localeString = new Bindable<string>();
+        private ICatalog current;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config)
@@ -46,7 +48,11 @@ namespace osu.Game.Locale
                 throw new ArgumentNullException($"stream");
             }
 
-            localeManager.SetCatalog(stream);
+            if (current != null)
+                localeManager.RemoveCatalog(current);
+
+            current = localeManager.CreateCatalog(stream);
+            localeManager.AddCatalog(current);
         }
 
         [CanBeNull]

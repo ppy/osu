@@ -22,9 +22,6 @@ namespace osu.Game.Overlays.Toolbar
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
-        [Resolved]
-        private LocalisationManager localisationManager { get; set; }
-
         public ToolbarTimeButton()
         {
             AutoSizeAxes = Axes.X;

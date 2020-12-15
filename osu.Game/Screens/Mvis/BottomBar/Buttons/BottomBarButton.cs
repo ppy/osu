@@ -52,11 +52,11 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
         public string Text
         {
-            get => spriteText.Text;
-            set => spriteText.Text = value;
+            get => SpriteText.Text;
+            set => SpriteText.Text = value;
         }
 
-        private readonly OsuSpriteText spriteText = new OsuSpriteText
+        protected readonly OsuSpriteText SpriteText = new OsuSpriteText
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                 ContentFillFlow.Add(SpriteIcon);
 
             if (Text != null)
-                ContentFillFlow.Add(spriteText);
+                ContentFillFlow.Add(SpriteText);
 
             // From OsuAnimatedButton
             if (AutoSizeAxes != Axes.None)
