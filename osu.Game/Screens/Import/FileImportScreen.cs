@@ -154,17 +154,17 @@ namespace osu.Game.Screens.Import
             if (string.IsNullOrEmpty(path))
                 return;
 
-            Task.Factory.StartNew(async () => await game.Import(path), TaskCreationOptions.LongRunning)
-                .ContinueWith(_ =>
-                {
-                    // some files will be deleted after successful import, so we want to refresh the view.
+            Task.Factory.StartNew(async () =>
+            {
+                await game.Import(path);
 
-                    Schedule(() =>
-                    {
-                        // should probably be exposed as a refresh method.
-                        fileSelector.CurrentPath.TriggerChange();
-                    });
+                // some files will be deleted after successful import, so we want to refresh the view.
+                Schedule(() =>
+                {
+                    // should probably be exposed as a refresh method.
+                    fileSelector.CurrentPath.TriggerChange();
                 });
+            }, TaskCreationOptions.LongRunning);
         }
     }
 }
