@@ -4,8 +4,8 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Timing;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -15,22 +15,29 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private MusicController musicController = new MusicController();
 
-        public TestSceneNowPlayingOverlay()
-        {
-            Clock = new FramedClock();
+        private NowPlayingOverlay nowPlayingOverlay;
 
-            var np = new NowPlayingOverlay
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+
+            nowPlayingOverlay = new NowPlayingOverlay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre
             };
 
             Add(musicController);
-            Add(np);
+            Add(nowPlayingOverlay);
+        }
 
-            AddStep(@"show", () => np.Show());
+        [Test]
+        public void TestShowHideDisable()
+        {
+            AddStep(@"show", () => nowPlayingOverlay.Show());
             AddToggleStep(@"toggle beatmap lock", state => Beatmap.Disabled = state);
-            AddStep(@"show", () => np.Hide());
+            AddStep(@"hide", () => nowPlayingOverlay.Hide());
         }
     }
 }

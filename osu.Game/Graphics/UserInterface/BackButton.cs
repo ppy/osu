@@ -10,13 +10,13 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class BackButton : VisibilityContainer, IKeyBindingHandler<GlobalAction>
+    public class BackButton : VisibilityContainer
     {
         public Action Action;
 
         private readonly TwoLayerButton button;
 
-        public BackButton()
+        public BackButton(Receptor receptor = null)
         {
             Size = TwoLayerButton.SIZE_EXTENDED;
 
@@ -28,6 +28,14 @@ namespace osu.Game.Graphics.UserInterface
                 Icon = OsuIcon.LeftCircle,
                 Action = () => Action?.Invoke()
             };
+
+            if (receptor == null)
+            {
+                // if a receptor wasn't provided, create our own locally.
+                Add(receptor = new Receptor());
+            }
+
+            receptor.OnBackPressed = () => button.Click();
         }
 
         [BackgroundDependencyLoader]
@@ -36,19 +44,6 @@ namespace osu.Game.Graphics.UserInterface
             button.BackgroundColour = colours.Pink;
             button.HoverColour = colours.PinkDark;
         }
-
-        public bool OnPressed(GlobalAction action)
-        {
-            if (action == GlobalAction.Back)
-            {
-                Action?.Invoke();
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
 
         protected override void PopIn()
         {
@@ -60,6 +55,27 @@ namespace osu.Game.Graphics.UserInterface
         {
             button.MoveToX(-TwoLayerButton.SIZE_EXTENDED.X / 2, 400, Easing.OutQuint);
             button.FadeOut(400, Easing.OutQuint);
+        }
+
+        public class Receptor : Drawable, IKeyBindingHandler<GlobalAction>
+        {
+            public Action OnBackPressed;
+
+            public bool OnPressed(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        OnBackPressed?.Invoke();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public void OnReleased(GlobalAction action)
+            {
+            }
         }
     }
 }

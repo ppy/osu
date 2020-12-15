@@ -274,6 +274,96 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
+        public void TestMarkdownFormatLinkWithInlineTitle()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "I haven't seen [this link format](https://osu.ppy.sh \"osu!\") before..." });
+
+            Assert.AreEqual("I haven't seen this link format before...", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(15, result.Links[0].Index);
+            Assert.AreEqual(16, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatLinkWithInlineTitleAndEscapedQuotes()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "I haven't seen [this link format](https://osu.ppy.sh \"inner quote \\\" just to confuse \") before..." });
+
+            Assert.AreEqual("I haven't seen this link format before...", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(15, result.Links[0].Index);
+            Assert.AreEqual(16, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatLinkWithUrlInTextAndInlineTitle()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "I haven't seen [https://osu.ppy.sh](https://osu.ppy.sh \"https://osu.ppy.sh\") before..." });
+
+            Assert.AreEqual("I haven't seen https://osu.ppy.sh before...", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(15, result.Links[0].Index);
+            Assert.AreEqual(18, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatLinkWithUrlAndTextInTitle()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "I haven't seen [oh no, text here! https://osu.ppy.sh](https://osu.ppy.sh) before..." });
+
+            Assert.AreEqual("I haven't seen oh no, text here! https://osu.ppy.sh before...", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(15, result.Links[0].Index);
+            Assert.AreEqual(36, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatLinkWithMisleadingUrlInText()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "I haven't seen [https://google.com](https://osu.ppy.sh) before..." });
+
+            Assert.AreEqual("I haven't seen https://google.com before...", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(15, result.Links[0].Index);
+            Assert.AreEqual(18, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatLinkThatContractsIntoLargerLink()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "super broken https://[osu.ppy](https://reddit.com).sh/" });
+
+            Assert.AreEqual("super broken https://osu.ppy.sh/", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://reddit.com", result.Links[0].Url);
+            Assert.AreEqual(21, result.Links[0].Index);
+            Assert.AreEqual(7, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatLinkDirectlyNextToRawLink()
+        {
+            // the raw link has a port at the end of it, so that the raw link regex terminates at the port and doesn't consume display text from the formatted one
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "https://localhost:8080[https://osu.ppy.sh](https://osu.ppy.sh) should be two links" });
+
+            Assert.AreEqual("https://localhost:8080https://osu.ppy.sh should be two links", result.DisplayContent);
+            Assert.AreEqual(2, result.Links.Count);
+
+            Assert.AreEqual("https://localhost:8080", result.Links[0].Url);
+            Assert.AreEqual(0, result.Links[0].Index);
+            Assert.AreEqual(22, result.Links[0].Length);
+
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[1].Url);
+            Assert.AreEqual(22, result.Links[1].Index);
+            Assert.AreEqual(18, result.Links[1].Length);
+        }
+
+        [Test]
         public void TestChannelLink()
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is an #english and #japanese." });
@@ -338,22 +428,27 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual(5, result.Links.Count);
 
             Link f = result.Links.Find(l => l.Url == "https://osu.ppy.sh/wiki/wiki links");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(44, f.Index);
             Assert.AreEqual(10, f.Length);
 
             f = result.Links.Find(l => l.Url == "http://www.simple-test.com");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(10, f.Index);
             Assert.AreEqual(11, f.Length);
 
             f = result.Links.Find(l => l.Url == "http://google.com");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(97, f.Index);
             Assert.AreEqual(4, f.Length);
 
             f = result.Links.Find(l => l.Url == "https://osu.ppy.sh");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(78, f.Index);
             Assert.AreEqual(18, f.Length);
 
             f = result.Links.Find(l => l.Url == "\uD83D\uDE12");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(101, f.Index);
             Assert.AreEqual(3, f.Length);
         }

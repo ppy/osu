@@ -1,21 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public class BarLineGenerator
+    public class BarLineGenerator<TBarLine>
+        where TBarLine : class, IBarLine, new()
     {
         /// <summary>
         /// The generated bar lines.
         /// </summary>
-        public readonly List<BarLine> BarLines = new List<BarLine>();
+        public readonly List<TBarLine> BarLines = new List<TBarLine>();
 
         /// <summary>
         /// Constructs and generates bar lines for provided beatmap.
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Objects
                 return;
 
             HitObject lastObject = beatmap.HitObjects.Last();
-            double lastHitTime = 1 + ((lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime);
+            double lastHitTime = 1 + lastObject.GetEndTime();
 
             var timingPoints = beatmap.ControlPointInfo.TimingPoints;
 
@@ -46,7 +47,17 @@ namespace osu.Game.Rulesets.Objects
 
                 for (double t = currentTimingPoint.Time; Precision.DefinitelyBigger(endTime, t); t += barLength, currentBeat++)
                 {
-                    BarLines.Add(new BarLine
+                    var roundedTime = Math.Round(t, MidpointRounding.AwayFromZero);
+
+                    // in the case of some bar lengths, rounding errors can cause t to be slightly less than
+                    // the expected whole number value due to floating point inaccuracies.
+                    // if this is the case, apply rounding.
+                    if (Precision.AlmostEquals(t, roundedTime))
+                    {
+                        t = roundedTime;
+                    }
+
+                    BarLines.Add(new TBarLine
                     {
                         StartTime = t,
                         Major = currentBeat % (int)currentTimingPoint.TimeSignature == 0

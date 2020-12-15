@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Flashlight";
         public override string Acronym => "FL";
-        public override IconUsage Icon => OsuIcon.ModFlashlight;
+        public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
         public override bool Ranked => true;
@@ -47,9 +47,25 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             Combo.BindTo(scoreProcessor.Combo);
+
+            // Default value of ScoreProcessor's Rank in Flashlight Mod should be SS+
+            scoreProcessor.Rank.Value = ScoreRank.XH;
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
+        {
+            switch (rank)
+            {
+                case ScoreRank.X:
+                    return ScoreRank.XH;
+
+                case ScoreRank.S:
+                    return ScoreRank.SH;
+
+                default:
+                    return rank;
+            }
+        }
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
@@ -91,6 +107,9 @@ namespace osu.Game.Rulesets.Mods
                 {
                     foreach (var breakPeriod in Breaks)
                     {
+                        if (!breakPeriod.HasEffect)
+                            continue;
+
                         if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
 
                         this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);

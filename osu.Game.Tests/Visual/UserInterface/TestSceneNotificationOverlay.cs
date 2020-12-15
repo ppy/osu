@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -18,16 +17,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneNotificationOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(NotificationSection),
-            typeof(SimpleNotification),
-            typeof(ProgressNotification),
-            typeof(ProgressCompletionNotification),
-            typeof(IHasCompletionTarget),
-            typeof(Notification)
-        };
-
         private NotificationOverlay notificationOverlay;
 
         private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
@@ -67,9 +56,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddRepeatStep(@"add many simple", sendManyNotifications, 3);
 
-            AddWaitStep("wait some", 5);
-
-            checkProgressingCount(0);
+            waitForCompletion();
 
             AddStep(@"progress #3", sendUploadProgress);
 
@@ -77,9 +64,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             checkDisplayedCount(33);
 
-            AddWaitStep("wait some", 10);
-
-            checkProgressingCount(0);
+            waitForCompletion();
         }
 
         [Test]
@@ -109,9 +94,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep(@"background progress #1", sendBackgroundUploadProgress);
 
-            AddWaitStep("wait some", 5);
+            checkProgressingCount(1);
 
-            checkProgressingCount(0);
+            waitForCompletion();
 
             checkDisplayedCount(2);
 
@@ -189,6 +174,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void setState(Visibility state) => AddStep(state.ToString(), () => notificationOverlay.State.Value = state);
 
         private void checkProgressingCount(int expected) => AddAssert($"progressing count is {expected}", () => progressingNotifications.Count == expected);
+
+        private void waitForCompletion() => AddUntilStep("wait for notification progress completion", () => progressingNotifications.Count == 0);
 
         private void sendBarrage()
         {

@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Framework.Bindables;
@@ -17,30 +18,35 @@ namespace osu.Game.Rulesets.UI
 {
     public class ModIcon : Container, IHasTooltip
     {
-        public readonly BindableBool Highlighted = new BindableBool();
+        public readonly BindableBool Selected = new BindableBool();
 
         private readonly SpriteIcon modIcon;
+        private readonly SpriteText modAcronym;
         private readonly SpriteIcon background;
 
         private const float size = 80;
 
-        public IconUsage Icon
-        {
-            get => modIcon.Icon;
-            set => modIcon.Icon = value;
-        }
-
         private readonly ModType type;
 
-        public virtual string TooltipText { get; }
+        public virtual string TooltipText => mod.IconTooltip;
+
+        private Mod mod;
+
+        public Mod Mod
+        {
+            get => mod;
+            set
+            {
+                mod = value;
+                updateMod(value);
+            }
+        }
 
         public ModIcon(Mod mod)
         {
-            if (mod == null) throw new ArgumentNullException(nameof(mod));
+            this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
 
             type = mod.Type;
-
-            TooltipText = mod.Name;
 
             Size = new Vector2(size);
 
@@ -54,15 +60,43 @@ namespace osu.Game.Rulesets.UI
                     Icon = OsuIcon.ModBg,
                     Shadow = true,
                 },
+                modAcronym = new OsuSpriteText
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Colour = OsuColour.Gray(84),
+                    Alpha = 0,
+                    Font = OsuFont.Numeric.With(null, 22f),
+                    UseFullGlyphHeight = false,
+                    Text = mod.Acronym
+                },
                 modIcon = new SpriteIcon
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
-                    Size = new Vector2(size - 35),
-                    Icon = mod.Icon
+                    Size = new Vector2(45),
+                    Icon = FontAwesome.Solid.Question
                 },
             };
+
+            updateMod(mod);
+        }
+
+        private void updateMod(Mod value)
+        {
+            modAcronym.Text = value.Acronym;
+            modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
+
+            if (value.Icon is null)
+            {
+                modIcon.FadeOut();
+                modAcronym.FadeIn();
+                return;
+            }
+
+            modIcon.FadeIn();
+            modAcronym.FadeOut();
         }
 
         private Color4 backgroundColour;
@@ -98,13 +132,19 @@ namespace osu.Game.Rulesets.UI
                     backgroundColour = colours.Pink;
                     highlightedColour = colours.PinkLight;
                     break;
+
+                case ModType.System:
+                    backgroundColour = colours.Gray6;
+                    highlightedColour = colours.Gray7;
+                    modIcon.Colour = colours.Yellow;
+                    break;
             }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Highlighted.BindValueChanged(highlighted => background.Colour = highlighted.NewValue ? highlightedColour : backgroundColour, true);
+            Selected.BindValueChanged(selected => background.Colour = selected.NewValue ? highlightedColour : backgroundColour, true);
         }
     }
 }

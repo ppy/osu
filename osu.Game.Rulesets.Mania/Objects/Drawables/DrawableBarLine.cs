@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -14,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// Visualises a <see cref="BarLine"/>. Although this derives DrawableManiaHitObject,
     /// this does not handle input/sound like a normal hit object.
     /// </summary>
-    public class DrawableBarLine : DrawableHitObject<BarLine>
+    public class DrawableBarLine : DrawableManiaHitObject<BarLine>
     {
         /// <summary>
         /// Height of major bar line triangles.
@@ -72,8 +70,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
-        {
-        }
+        protected override void UpdateStartTimeStateTransforms() => this.FadeOut(150);
     }
 }

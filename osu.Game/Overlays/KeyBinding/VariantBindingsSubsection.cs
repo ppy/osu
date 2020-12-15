@@ -7,8 +7,7 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class VariantBindingsSubsection : KeyBindingsSubsection
     {
-        protected override string Header => variantName;
-        private readonly string variantName;
+        protected override string Header { get; }
 
         public VariantBindingsSubsection(RulesetInfo ruleset, int variant)
             : base(variant)
@@ -17,7 +16,7 @@ namespace osu.Game.Overlays.KeyBinding
 
             var rulesetInstance = ruleset.CreateInstance();
 
-            variantName = rulesetInstance.GetVariantName(variant);
+            Header = rulesetInstance.GetVariantName(variant);
             Defaults = rulesetInstance.GetDefaultKeyBindings(variant);
         }
     }

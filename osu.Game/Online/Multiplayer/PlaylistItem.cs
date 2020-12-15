@@ -1,17 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public class PlaylistItem
+    public class PlaylistItem : IEquatable<PlaylistItem>
     {
         [JsonProperty("id")]
         public int ID { get; set; }
@@ -23,71 +24,71 @@ namespace osu.Game.Online.Multiplayer
         public int RulesetID { get; set; }
 
         [JsonIgnore]
-        public BeatmapInfo Beatmap
-        {
-            get => beatmap;
-            set
-            {
-                beatmap = value;
-                BeatmapID = value?.OnlineBeatmapID ?? 0;
-            }
-        }
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         [JsonIgnore]
-        public RulesetInfo Ruleset { get; set; }
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         [JsonIgnore]
-        public readonly List<Mod> AllowedMods = new List<Mod>();
+        public readonly BindableList<Mod> AllowedMods = new BindableList<Mod>();
 
         [JsonIgnore]
-        public readonly List<Mod> RequiredMods = new List<Mod>();
+        public readonly BindableList<Mod> RequiredMods = new BindableList<Mod>();
 
         [JsonProperty("beatmap")]
-        private APIBeatmap apiBeatmap { get; set; }
+        private APIPlaylistBeatmap apiBeatmap { get; set; }
+
+        private APIMod[] allowedModsBacking;
 
         [JsonProperty("allowed_mods")]
         private APIMod[] allowedMods
         {
-            get => AllowedMods.Select(m => new APIMod { Acronym = m.Acronym }).ToArray();
-            set => _allowedMods = value;
+            get => AllowedMods.Select(m => new APIMod(m)).ToArray();
+            set => allowedModsBacking = value;
         }
+
+        private APIMod[] requiredModsBacking;
 
         [JsonProperty("required_mods")]
         private APIMod[] requiredMods
         {
-            get => RequiredMods.Select(m => new APIMod { Acronym = m.Acronym }).ToArray();
-            set => _requiredMods = value;
+            get => RequiredMods.Select(m => new APIMod(m)).ToArray();
+            set => requiredModsBacking = value;
         }
 
-        private BeatmapInfo beatmap;
-        private APIMod[] _allowedMods;
-        private APIMod[] _requiredMods;
+        public PlaylistItem()
+        {
+            Beatmap.BindValueChanged(beatmap => BeatmapID = beatmap.NewValue?.OnlineBeatmapID ?? 0);
+            Ruleset.BindValueChanged(ruleset => RulesetID = ruleset.NewValue?.ID ?? 0);
+        }
 
         public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
         {
-            // If we don't have an api beatmap, the request occurred as a result of room creation, so we can query the local beatmap instead
-            // Todo: Is this a bug? Room creation only returns the beatmap ID
-            Beatmap = apiBeatmap == null ? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == BeatmapID) : apiBeatmap.ToBeatmap(rulesets);
-            Ruleset = rulesets.GetRuleset(RulesetID);
+            Beatmap.Value = apiBeatmap.ToBeatmap(rulesets);
+            Ruleset.Value = rulesets.GetRuleset(RulesetID);
 
-            if (_allowedMods != null)
+            Ruleset rulesetInstance = Ruleset.Value.CreateInstance();
+
+            if (allowedModsBacking != null)
             {
                 AllowedMods.Clear();
-                AllowedMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => _allowedMods.Any(m => m.Acronym == mod.Acronym)));
+                AllowedMods.AddRange(allowedModsBacking.Select(m => m.ToMod(rulesetInstance)));
 
-                _allowedMods = null;
+                allowedModsBacking = null;
             }
 
-            if (_requiredMods != null)
+            if (requiredModsBacking != null)
             {
                 RequiredMods.Clear();
-                RequiredMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => _requiredMods.Any(m => m.Acronym == mod.Acronym)));
+                RequiredMods.AddRange(requiredModsBacking.Select(m => m.ToMod(rulesetInstance)));
 
-                _requiredMods = null;
+                requiredModsBacking = null;
             }
         }
 
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeapiBeatmap() => false;
+
+        public bool Equals(PlaylistItem other) => ID == other?.ID && BeatmapID == other.BeatmapID && RulesetID == other.RulesetID;
     }
 }

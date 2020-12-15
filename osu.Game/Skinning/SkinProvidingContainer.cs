@@ -7,6 +7,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 
@@ -47,13 +48,13 @@ namespace osu.Game.Skinning
             return fallbackSource?.GetDrawableComponent(component);
         }
 
-        public Texture GetTexture(string componentName)
+        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
             Texture sourceTexture;
-            if (AllowTextureLookup(componentName) && (sourceTexture = skin?.GetTexture(componentName)) != null)
+            if (AllowTextureLookup(componentName) && (sourceTexture = skin?.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
                 return sourceTexture;
 
-            return fallbackSource.GetTexture(componentName);
+            return fallbackSource?.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
         public SampleChannel GetSample(ISampleInfo sampleInfo)

@@ -3,10 +3,13 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
 
 namespace osu.Game.Rulesets
 {
+    [ExcludeFromDynamicCompile]
     public class RulesetInfo : IEquatable<RulesetInfo>
     {
         public int? ID { get; set; }
@@ -15,16 +18,35 @@ namespace osu.Game.Rulesets
 
         public string ShortName { get; set; }
 
-        public string InstantiationInfo { get; set; }
+        private string instantiationInfo;
+
+        public string InstantiationInfo
+        {
+            get => instantiationInfo;
+            set => instantiationInfo = abbreviateInstantiationInfo(value);
+        }
+
+        private string abbreviateInstantiationInfo(string value)
+        {
+            // exclude version onwards, matching only on namespace and type.
+            // this is mainly to allow for new versions of already loaded rulesets to "upgrade" from old.
+            return string.Join(',', value.Split(',').Take(2));
+        }
 
         [JsonIgnore]
         public bool Available { get; set; }
 
+        // TODO: this should probably be moved to RulesetStore.
         public virtual Ruleset CreateInstance()
         {
             if (!Available) return null;
 
-            return (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo), this);
+            var ruleset = (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
+
+            // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
+            ruleset.RulesetInfo = this;
+
+            return ruleset;
         }
 
         public bool Equals(RulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
@@ -44,6 +66,6 @@ namespace osu.Game.Rulesets
             }
         }
 
-        public override string ToString() => $"{Name} ({ShortName}) ID: {ID}";
+        public override string ToString() => Name ?? $"{Name} ({ShortName}) ID: {ID}";
     }
 }

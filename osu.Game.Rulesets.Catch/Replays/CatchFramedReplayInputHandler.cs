@@ -3,8 +3,9 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Input.StateChanges;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Replays
         {
         }
 
-        protected override bool IsImportant(CatchReplayFrame frame) => frame.Position > 0;
+        protected override bool IsImportant(CatchReplayFrame frame) => frame.Actions.Any();
 
         protected float? Position
         {
@@ -34,28 +35,15 @@ namespace osu.Game.Rulesets.Catch.Replays
             }
         }
 
-        public override List<IInput> GetPendingInputs()
+        public override void CollectPendingInputs(List<IInput> inputs)
         {
-            if (!Position.HasValue) return new List<IInput>();
+            if (!Position.HasValue) return;
 
-            var actions = new List<CatchAction>();
-
-            if (CurrentFrame.Dashing)
-                actions.Add(CatchAction.Dash);
-
-            if (Position.Value > CurrentFrame.Position)
-                actions.Add(CatchAction.MoveRight);
-            else if (Position.Value < CurrentFrame.Position)
-                actions.Add(CatchAction.MoveLeft);
-
-            return new List<IInput>
+            inputs.Add(new CatchReplayState
             {
-                new CatchReplayState
-                {
-                    PressedActions = actions,
-                    CatcherX = Position.Value
-                },
-            };
+                PressedActions = CurrentFrame?.Actions ?? new List<CatchAction>(),
+                CatcherX = Position.Value
+            });
         }
 
         public class CatchReplayState : ReplayState<CatchAction>

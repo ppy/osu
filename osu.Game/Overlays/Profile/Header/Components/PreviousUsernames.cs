@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osuTK;
 
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         new Drawable[]
                         {
                             hoverIcon = new HoverIconContainer(),
-                            header = new SpriteText
+                            header = new OsuSpriteText
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,

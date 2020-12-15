@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play
     /// <summary>
     /// An overlay which can be used to require further user actions before gameplay is resumed.
     /// </summary>
-    public abstract class ResumeOverlay : OverlayContainer
+    public abstract class ResumeOverlay : VisibilityContainer
     {
         public CursorContainer GameplayCursor { get; set; }
 
@@ -28,8 +28,6 @@ namespace osu.Game.Screens.Play
         public virtual CursorContainer LocalCursor => null;
 
         protected const float TRANSITION_TIME = 500;
-
-        protected override bool BlockPositionalInput => false;
 
         protected abstract string Message { get; }
 

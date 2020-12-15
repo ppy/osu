@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly DrawableRuleset<TObject> drawableRuleset;
 
         [Resolved]
-        private IEditorBeatmap<TObject> beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; }
 
         public DrawableEditRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
         {
@@ -40,29 +39,44 @@ namespace osu.Game.Rulesets.Edit
             Playfield.DisplayJudgements.Value = false;
         }
 
+        [Resolved(canBeNull: true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             beatmap.HitObjectAdded += addHitObject;
             beatmap.HitObjectRemoved += removeHitObject;
+
+            if (changeHandler != null)
+            {
+                // for now only regenerate replay on a finalised state change, not HitObjectUpdated.
+                changeHandler.OnStateChange += updateReplay;
+            }
+            else
+            {
+                beatmap.HitObjectUpdated += _ => updateReplay();
+            }
         }
+
+        private void updateReplay() => drawableRuleset.RegenerateAutoplay();
 
         private void addHitObject(HitObject hitObject)
         {
-            var drawableObject = drawableRuleset.CreateDrawableRepresentation((TObject)hitObject);
-
-            drawableRuleset.Playfield.Add(drawableObject);
+            drawableRuleset.AddHitObject((TObject)hitObject);
             drawableRuleset.Playfield.PostProcess();
         }
 
         private void removeHitObject(HitObject hitObject)
         {
-            var drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
-
-            drawableRuleset.Playfield.Remove(drawableObject);
+            drawableRuleset.RemoveHitObject((TObject)hitObject);
             drawableRuleset.Playfield.PostProcess();
         }
+
+        public override bool PropagatePositionalInputSubTree => false;
+
+        public override bool PropagateNonPositionalInputSubTree => false;
 
         public PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => drawableRuleset.CreatePlayfieldAdjustmentContainer();
 

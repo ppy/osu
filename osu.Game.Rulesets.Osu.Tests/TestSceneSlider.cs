@@ -1,10 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -21,45 +19,16 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSlider : SkinnableTestScene
+    public class TestSceneSlider : OsuSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Slider),
-            typeof(SliderTick),
-            typeof(SliderTailCircle),
-            typeof(SliderBall),
-            typeof(SliderBody),
-            typeof(SnakingSliderBody),
-            typeof(DrawableSlider),
-            typeof(DrawableSliderTick),
-            typeof(DrawableSliderTail),
-            typeof(DrawableSliderHead),
-            typeof(DrawableRepeatPoint),
-            typeof(DrawableOsuHitObject)
-        };
-
-        private Container content;
-
-        protected override Container<Drawable> Content
-        {
-            get
-            {
-                if (content == null)
-                    base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
-
-                return content;
-            }
-        }
-
         private int depthIndex;
 
-        public TestSceneSlider()
+        [Test]
+        public void TestVariousSliders()
         {
             AddStep("Big Single", () => SetContents(() => testSimpleBig()));
             AddStep("Medium Single", () => SetContents(() => testSimpleMedium()));
@@ -111,6 +80,83 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Distance Overflow 1 Repeat", () => SetContents(() => testDistanceOverflow(1)));
         }
 
+        [Test]
+        public void TestChangeStackHeight()
+        {
+            DrawableSlider slider = null;
+
+            AddStep("create slider", () =>
+            {
+                slider = (DrawableSlider)createSlider(repeats: 1);
+                Add(slider);
+            });
+
+            AddStep("change stack height", () => slider.HitObject.StackHeight = 10);
+            AddAssert("body positioned correctly", () => slider.Position == slider.HitObject.StackedPosition);
+        }
+
+        [Test]
+        public void TestChangeSamplesWithNoNodeSamples()
+        {
+            DrawableSlider slider = null;
+
+            AddStep("create slider", () =>
+            {
+                slider = (DrawableSlider)createSlider(repeats: 1);
+                Add(slider);
+            });
+
+            AddStep("change samples", () => slider.HitObject.Samples = new[]
+            {
+                new HitSampleInfo(HitSampleInfo.HIT_CLAP),
+                new HitSampleInfo(HitSampleInfo.HIT_WHISTLE),
+            });
+
+            AddAssert("head samples updated", () => assertSamples(slider.HitObject.HeadCircle));
+            AddAssert("tick samples not updated", () => slider.HitObject.NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
+            AddAssert("repeat samples updated", () => slider.HitObject.NestedHitObjects.OfType<SliderRepeat>().All(assertSamples));
+            AddAssert("tail has no samples", () => slider.HitObject.TailCircle.Samples.Count == 0);
+
+            static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
+
+            static bool assertSamples(HitObject hitObject)
+            {
+                return hitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP)
+                       && hitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+            }
+        }
+
+        [Test]
+        public void TestChangeSamplesWithNodeSamples()
+        {
+            DrawableSlider slider = null;
+
+            AddStep("create slider", () =>
+            {
+                slider = (DrawableSlider)createSlider(repeats: 1);
+
+                for (int i = 0; i < 2; i++)
+                    slider.HitObject.NodeSamples.Add(new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_FINISH) });
+
+                Add(slider);
+            });
+
+            AddStep("change samples", () => slider.HitObject.Samples = new[]
+            {
+                new HitSampleInfo(HitSampleInfo.HIT_CLAP),
+                new HitSampleInfo(HitSampleInfo.HIT_WHISTLE),
+            });
+
+            AddAssert("head samples not updated", () => assertSamples(slider.HitObject.HeadCircle));
+            AddAssert("tick samples not updated", () => slider.HitObject.NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
+            AddAssert("repeat samples not updated", () => slider.HitObject.NestedHitObjects.OfType<SliderRepeat>().All(assertSamples));
+            AddAssert("tail has no samples", () => slider.HitObject.TailCircle.Samples.Count == 0);
+
+            static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
+
+            static bool assertSamples(HitObject hitObject) => hitObject.Samples.All(s => s.Name != HitSampleInfo.HIT_CLAP && s.Name != HitSampleInfo.HIT_WHISTLE);
+        }
+
         private Drawable testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
 
         private Drawable testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(2, repeats: repeats, stackHeight: 10);
@@ -119,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
+                StartTime = Time.Current + time_offset,
                 Position = new Vector2(239, 176),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
@@ -128,7 +174,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(52, -34)
                 }, 700),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats),
                 StackHeight = 10
             };
 
@@ -141,25 +186,28 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable testSlowSpeed() => createSlider(speedMultiplier: 0.5);
 
-        private Drawable testShortSlowSpeed(int repeats = 0) => createSlider(distance: 100, repeats: repeats, speedMultiplier: 0.5);
+        private Drawable testShortSlowSpeed(int repeats = 0) => createSlider(distance: max_length / 4, repeats: repeats, speedMultiplier: 0.5);
 
         private Drawable testHighSpeed(int repeats = 0) => createSlider(repeats: repeats, speedMultiplier: 15);
 
-        private Drawable testShortHighSpeed(int repeats = 0) => createSlider(distance: 100, repeats: repeats, speedMultiplier: 15);
+        private Drawable testShortHighSpeed(int repeats = 0) => createSlider(distance: max_length / 4, repeats: repeats, speedMultiplier: 15);
 
-        private Drawable createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0)
+        private const double time_offset = 1500;
+
+        private const float max_length = 200;
+
+        private Drawable createSlider(float circleSize = 2, float distance = max_length, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0)
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-(distance / 2), 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(0, -(distance / 2)),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(distance, 0),
+                    new Vector2(0, distance),
                 }, distance),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats),
                 StackHeight = stackHeight
             };
 
@@ -170,16 +218,15 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-200, 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(-max_length / 2, 0),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(200, 200),
-                    new Vector2(400, 0)
-                }, 600),
+                    new Vector2(max_length / 2, max_length / 2),
+                    new Vector2(max_length, 0)
+                }, max_length * 1.5f),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats)
             };
 
             return createDrawable(slider, 2, 3);
@@ -191,19 +238,18 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-200, 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(-max_length / 2, 0),
                 Path = new SliderPath(PathType.Linear, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(150, 75),
-                    new Vector2(200, 0),
-                    new Vector2(300, -200),
-                    new Vector2(400, 0),
-                    new Vector2(430, 0)
+                    new Vector2(max_length * 0.375f, max_length * 0.18f),
+                    new Vector2(max_length / 2, 0),
+                    new Vector2(max_length * 0.75f, -max_length / 2),
+                    new Vector2(max_length * 0.95f, 0),
+                    new Vector2(max_length, 0)
                 }),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats)
             };
 
             return createDrawable(slider, 2, 3);
@@ -215,18 +261,17 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-200, 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(-max_length / 2, 0),
                 Path = new SliderPath(PathType.Bezier, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(150, 75),
-                    new Vector2(200, 100),
-                    new Vector2(300, -200),
-                    new Vector2(430, 0)
+                    new Vector2(max_length * 0.375f, max_length * 0.18f),
+                    new Vector2(max_length / 2, max_length / 4),
+                    new Vector2(max_length * 0.75f, -max_length / 2),
+                    new Vector2(max_length, 0)
                 }),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats)
             };
 
             return createDrawable(slider, 2, 3);
@@ -238,19 +283,18 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
+                StartTime = Time.Current + time_offset,
                 Position = new Vector2(0, 0),
                 Path = new SliderPath(PathType.Linear, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(-200, 0),
+                    new Vector2(-max_length / 2, 0),
                     new Vector2(0, 0),
-                    new Vector2(0, -200),
-                    new Vector2(-200, -200),
-                    new Vector2(0, -200)
+                    new Vector2(0, -max_length / 2),
+                    new Vector2(-max_length / 2, -max_length / 2),
+                    new Vector2(0, -max_length / 2)
                 }),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats)
             };
 
             return createDrawable(slider, 2, 3);
@@ -260,20 +304,20 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable createCatmull(int repeats = 0)
         {
-            var repeatSamples = new List<List<HitSampleInfo>>();
+            var repeatSamples = new List<IList<HitSampleInfo>>();
             for (int i = 0; i < repeats; i++)
                 repeatSamples.Add(new List<HitSampleInfo>());
 
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-100, 0),
+                StartTime = Time.Current + time_offset,
+                Position = new Vector2(-max_length / 4, 0),
                 Path = new SliderPath(PathType.Catmull, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(50, -50),
-                    new Vector2(150, 50),
-                    new Vector2(200, 0)
+                    new Vector2(max_length * 0.125f, max_length * 0.125f),
+                    new Vector2(max_length * 0.375f, max_length * 0.125f),
+                    new Vector2(max_length / 2, 0)
                 }),
                 RepeatCount = repeats,
                 NodeSamples = repeatSamples
@@ -282,28 +326,16 @@ namespace osu.Game.Rulesets.Osu.Tests
             return createDrawable(slider, 3, 1);
         }
 
-        private List<List<HitSampleInfo>> createEmptySamples(int repeats)
-        {
-            var repeatSamples = new List<List<HitSampleInfo>>();
-            for (int i = 0; i < repeats; i++)
-                repeatSamples.Add(new List<HitSampleInfo>());
-            return repeatSamples;
-        }
-
         private Drawable createDrawable(Slider slider, float circleSize, double speedMultiplier)
         {
             var cpi = new ControlPointInfo();
-            cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
+            cpi.Add(0, new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
             slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
-            var drawable = new DrawableSlider(slider)
-            {
-                Anchor = Anchor.Centre,
-                Depth = depthIndex++
-            };
+            var drawable = CreateDrawableSlider(slider);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             drawable.OnNewResult += onNewResult;
@@ -311,12 +343,17 @@ namespace osu.Game.Rulesets.Osu.Tests
             return drawable;
         }
 
+        protected virtual DrawableSlider CreateDrawableSlider(Slider slider) => new DrawableSlider(slider)
+        {
+            Anchor = Anchor.Centre,
+            Depth = depthIndex++
+        };
+
         private float judgementOffsetDirection = 1;
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            var osuObject = judgedObject as DrawableOsuHitObject;
-            if (osuObject == null)
+            if (!(judgedObject is DrawableOsuHitObject osuObject))
                 return;
 
             OsuSpriteText text;

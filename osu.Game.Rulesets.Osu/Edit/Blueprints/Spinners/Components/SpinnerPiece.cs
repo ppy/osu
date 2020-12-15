@@ -7,22 +7,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 {
-    public class SpinnerPiece : HitObjectPiece
+    public class SpinnerPiece : BlueprintPiece<Spinner>
     {
-        private readonly Spinner spinner;
         private readonly CircularContainer circle;
         private readonly RingPiece ring;
 
-        public SpinnerPiece(Spinner spinner)
-            : base(spinner)
+        public SpinnerPiece()
         {
-            this.spinner = spinner;
-
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Both;
@@ -38,27 +34,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
                     Alpha = 0.5f,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
-                ring = new RingPiece
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                }
+                ring = new RingPiece()
             };
-
-            ring.Scale = new Vector2(spinner.Scale);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
-
-            PositionBindable.BindValueChanged(_ => updatePosition(), true);
-            StackHeightBindable.BindValueChanged(_ => updatePosition());
-            ScaleBindable.BindValueChanged(scale => ring.Scale = new Vector2(scale.NewValue), true);
         }
 
-        private void updatePosition() => Position = spinner.Position;
+        public override void UpdateFrom(Spinner hitObject)
+        {
+            base.UpdateFrom(hitObject);
+
+            ring.Scale = new Vector2(hitObject.Scale);
+        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => circle.ReceivePositionalInputAt(screenSpacePos);
     }

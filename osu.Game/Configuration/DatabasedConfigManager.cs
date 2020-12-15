@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -9,8 +10,8 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Configuration
 {
-    public abstract class DatabasedConfigManager<T> : ConfigManager<T>
-        where T : struct
+    public abstract class DatabasedConfigManager<TLookup> : ConfigManager<TLookup>
+        where TLookup : struct, Enum
     {
         private readonly SettingsStore settings;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Configuration
         protected override void PerformLoad()
         {
             databasedSettings = settings.Query(ruleset?.ID, variant);
-            legacySettingsExist = databasedSettings.Any(s => int.TryParse(s.Key, out var _));
+            legacySettingsExist = databasedSettings.Any(s => int.TryParse(s.Key, out _));
         }
 
         protected override bool PerformSave()
@@ -53,7 +54,7 @@ namespace osu.Game.Configuration
 
         private readonly List<DatabasedSetting> dirtySettings = new List<DatabasedSetting>();
 
-        protected override void AddBindable<TBindable>(T lookup, Bindable<TBindable> bindable)
+        protected override void AddBindable<TBindable>(TLookup lookup, Bindable<TBindable> bindable)
         {
             base.AddBindable(lookup, bindable);
 

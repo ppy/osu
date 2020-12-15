@@ -57,6 +57,15 @@ namespace osu.Game.Overlays.Mods
                 }).ToArray();
 
                 modsLoadCts?.Cancel();
+
+                if (modContainers.Length == 0)
+                {
+                    ModIconsLoaded = true;
+                    headerLabel.Hide();
+                    Hide();
+                    return;
+                }
+
                 ModIconsLoaded = false;
 
                 LoadComponentsAsync(modContainers, c =>
@@ -67,24 +76,17 @@ namespace osu.Game.Overlays.Mods
 
                 buttons = modContainers.OfType<ModButton>().ToArray();
 
-                if (value.Any())
-                {
-                    headerLabel.FadeIn(200);
-                    this.FadeIn(200);
-                }
-                else
-                {
-                    // transition here looks weird as mods instantly disappear.
-                    headerLabel.Hide();
-                    Hide();
-                }
+                headerLabel.FadeIn(200);
+                this.FadeIn(200);
             }
         }
 
-        private ModButton[] buttons = { };
+        private ModButton[] buttons = Array.Empty<ModButton>();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.ControlPressed) return false;
+
             if (ToggleKeys != null)
             {
                 var index = Array.IndexOf(ToggleKeys, e.Key);
@@ -112,6 +114,7 @@ namespace osu.Game.Overlays.Mods
                 if (selected == null) continue;
 
                 foreach (var type in modTypes)
+                {
                     if (type.IsInstanceOfType(selected))
                     {
                         if (immediate)
@@ -119,6 +122,7 @@ namespace osu.Game.Overlays.Mods
                         else
                             Scheduler.AddDelayed(button.Deselect, delay += 50);
                     }
+                }
             }
         }
 
@@ -130,7 +134,7 @@ namespace osu.Game.Overlays.Mods
         {
             foreach (var button in buttons)
             {
-                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m)));
+                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t == m.GetType()));
 
                 if (i >= 0)
                     button.SelectAt(i);
@@ -158,13 +162,14 @@ namespace osu.Game.Overlays.Mods
                 },
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Spacing = new Vector2(50f, 0f),
                     Margin = new MarginPadding
                     {
-                        Top = 6,
+                        Top = 20,
                     },
                     AlwaysPresent = true
                 },

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
@@ -14,10 +15,10 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
-        public Storyboard Storyboard { get; private set; }
+        [Cached]
+        public Storyboard Storyboard { get; }
 
-        private readonly Container<DrawableStoryboardLayer> content;
-        protected override Container<DrawableStoryboardLayer> Content => content;
+        protected override Container<DrawableStoryboardLayer> Content { get; }
 
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
 
@@ -49,9 +50,9 @@ namespace osu.Game.Storyboards.Drawables
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AddInternal(content = new Container<DrawableStoryboardLayer>
+            AddInternal(Content = new Container<DrawableStoryboardLayer>
             {
-                Size = new Vector2(640, 480),
+                RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
@@ -73,10 +74,12 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
+        public DrawableStoryboardLayer OverlayLayer => Children.Single(layer => layer.Name == "Overlay");
+
         private void updateLayerVisibility()
         {
             foreach (var layer in Children)
-                layer.Enabled = passing ? layer.Layer.EnabledWhenPassing : layer.Layer.EnabledWhenFailing;
+                layer.Enabled = passing ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
         }
     }
 }

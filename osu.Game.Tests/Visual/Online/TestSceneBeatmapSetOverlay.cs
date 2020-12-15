@@ -6,8 +6,6 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Overlays.BeatmapSet.Buttons;
-using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using System;
@@ -21,43 +19,15 @@ namespace osu.Game.Tests.Visual.Online
     {
         private readonly TestBeatmapSetOverlay overlay;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Header),
-            typeof(ScoreTable),
-            typeof(ScoreTableRowBackground),
-            typeof(DrawableTopScore),
-            typeof(ScoresContainer),
-            typeof(AuthorInfo),
-            typeof(BasicStats),
-            typeof(BeatmapPicker),
-            typeof(Details),
-            typeof(HeaderDownloadButton),
-            typeof(FavouriteButton),
-            typeof(Header),
-            typeof(HeaderButton),
-            typeof(Info),
-            typeof(PreviewButton),
-            typeof(SuccessRate),
-            typeof(BeatmapAvailability),
-        };
-
-        protected override bool RequiresAPIAccess => true;
-
-        private RulesetInfo taikoRuleset;
-        private RulesetInfo maniaRuleset;
+        protected override bool UseOnlineAPI => true;
 
         public TestSceneBeatmapSetOverlay()
         {
             Add(overlay = new TestBeatmapSetOverlay());
         }
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
-            taikoRuleset = rulesets.GetRuleset(1);
-            maniaRuleset = rulesets.GetRuleset(3);
-        }
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         [Test]
         public void TestLoading()
@@ -111,7 +81,7 @@ namespace osu.Game.Tests.Visual.Online
                             StarDifficulty = 9.99,
                             Version = @"TEST",
                             Length = 456000,
-                            Ruleset = maniaRuleset,
+                            Ruleset = rulesets.GetRuleset(3),
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 1,
@@ -189,7 +159,7 @@ namespace osu.Game.Tests.Visual.Online
                             StarDifficulty = 5.67,
                             Version = @"ANOTHER TEST",
                             Length = 123000,
-                            Ruleset = taikoRuleset,
+                            Ruleset = rulesets.GetRuleset(1),
                             BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 9,
@@ -215,6 +185,54 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             downloadAssert(false);
+        }
+
+        [Test]
+        public void TestMultipleRulesets()
+        {
+            AddStep("show multiple rulesets beatmap", () =>
+            {
+                var beatmaps = new List<BeatmapInfo>();
+
+                foreach (var ruleset in rulesets.AvailableRulesets.Skip(1))
+                {
+                    beatmaps.Add(new BeatmapInfo
+                    {
+                        Version = ruleset.Name,
+                        Ruleset = ruleset,
+                        BaseDifficulty = new BeatmapDifficulty(),
+                        OnlineInfo = new BeatmapOnlineInfo(),
+                        Metrics = new BeatmapMetrics
+                        {
+                            Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                            Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                        },
+                    });
+                }
+
+                overlay.ShowBeatmapSet(new BeatmapSetInfo
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        Title = @"multiple rulesets beatmap",
+                        Artist = @"none",
+                        Author = new User
+                        {
+                            Username = "BanchoBot",
+                            Id = 3,
+                        }
+                    },
+                    OnlineInfo = new BeatmapSetOnlineInfo
+                    {
+                        Covers = new BeatmapSetOnlineCovers(),
+                    },
+                    Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() },
+                    Beatmaps = beatmaps
+                });
+            });
+
+            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.Header.RulesetSelector.Current.Value)));
+            AddAssert("left-most beatmap selected", () => overlay.Header.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
         }
 
         [Test]
@@ -281,12 +299,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void downloadAssert(bool shown)
         {
-            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.DownloadButtonsVisible == shown);
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.DownloadButtonsVisible == shown);
         }
 
         private class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
-            public bool DownloadButtonsVisible => Header.DownloadButtonsVisible;
+            public new Header Header => base.Header;
         }
     }
 }

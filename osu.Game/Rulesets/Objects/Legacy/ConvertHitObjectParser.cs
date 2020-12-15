@@ -10,7 +10,10 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps.Legacy;
+using osu.Game.Skinning;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -46,89 +49,41 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             double startTime = Parsing.ParseDouble(split[2]) + Offset;
 
-            ConvertHitObjectType type = (ConvertHitObjectType)Parsing.ParseInt(split[3]);
+            LegacyHitObjectType type = (LegacyHitObjectType)Parsing.ParseInt(split[3]);
 
-            int comboOffset = (int)(type & ConvertHitObjectType.ComboOffset) >> 4;
-            type &= ~ConvertHitObjectType.ComboOffset;
+            int comboOffset = (int)(type & LegacyHitObjectType.ComboOffset) >> 4;
+            type &= ~LegacyHitObjectType.ComboOffset;
 
-            bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
-            type &= ~ConvertHitObjectType.NewCombo;
+            bool combo = type.HasFlag(LegacyHitObjectType.NewCombo);
+            type &= ~LegacyHitObjectType.NewCombo;
 
-            var soundType = (LegacySoundType)Parsing.ParseInt(split[4]);
+            var soundType = (LegacyHitSoundType)Parsing.ParseInt(split[4]);
             var bankInfo = new SampleBankInfo();
 
             HitObject result = null;
 
-            if (type.HasFlag(ConvertHitObjectType.Circle))
+            if (type.HasFlag(LegacyHitObjectType.Circle))
             {
                 result = CreateHit(pos, combo, comboOffset);
 
                 if (split.Length > 5)
                     readCustomSampleBanks(split[5], bankInfo);
             }
-            else if (type.HasFlag(ConvertHitObjectType.Slider))
+            else if (type.HasFlag(LegacyHitObjectType.Slider))
             {
-                PathType pathType = PathType.Catmull;
                 double? length = null;
-
-                string[] pointSplit = split[5].Split('|');
-
-                int pointCount = 1;
-                foreach (var t in pointSplit)
-                    if (t.Length > 1)
-                        pointCount++;
-
-                var points = new Vector2[pointCount];
-
-                int pointIndex = 1;
-
-                foreach (string t in pointSplit)
-                {
-                    if (t.Length == 1)
-                    {
-                        switch (t)
-                        {
-                            case @"C":
-                                pathType = PathType.Catmull;
-                                break;
-
-                            case @"B":
-                                pathType = PathType.Bezier;
-                                break;
-
-                            case @"L":
-                                pathType = PathType.Linear;
-                                break;
-
-                            case @"P":
-                                pathType = PathType.PerfectCurve;
-                                break;
-                        }
-
-                        continue;
-                    }
-
-                    string[] temp = t.Split(':');
-                    points[pointIndex++] = new Vector2((int)Parsing.ParseDouble(temp[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(temp[1], Parsing.MAX_COORDINATE_VALUE)) - pos;
-                }
-
-                // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
-
-                if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
-                    pathType = PathType.Linear;
 
                 int repeatCount = Parsing.ParseInt(split[6]);
 
                 if (repeatCount > 9000)
-                    throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
+                    throw new FormatException(@"Repeat count is way too high");
 
                 // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
                 repeatCount = Math.Max(0, repeatCount - 1);
 
                 if (split.Length > 7)
                 {
-                    length = Math.Max(0, Parsing.ParseDouble(split[7]));
+                    length = Math.Max(0, Parsing.ParseDouble(split[7], Parsing.MAX_COORDINATE_VALUE));
                     if (length == 0)
                         length = null;
                 }
@@ -160,7 +115,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 // Populate node sound types with the default hit object sound type
-                var nodeSoundTypes = new List<LegacySoundType>();
+                var nodeSoundTypes = new List<LegacyHitSoundType>();
                 for (int i = 0; i < nodes; i++)
                     nodeSoundTypes.Add(soundType);
 
@@ -174,32 +129,28 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         if (i >= adds.Length)
                             break;
 
-                        int sound;
-                        int.TryParse(adds[i], out sound);
-                        nodeSoundTypes[i] = (LegacySoundType)sound;
+                        int.TryParse(adds[i], out var sound);
+                        nodeSoundTypes[i] = (LegacyHitSoundType)sound;
                     }
                 }
 
                 // Generate the final per-node samples
-                var nodeSamples = new List<List<HitSampleInfo>>(nodes);
+                var nodeSamples = new List<IList<HitSampleInfo>>(nodes);
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                result = CreateSlider(pos, combo, comboOffset, points, length, pathType, repeatCount, nodeSamples);
-
-                // The samples are played when the slider ends, which is the last node
-                result.Samples = nodeSamples[nodeSamples.Count - 1];
+                result = CreateSlider(pos, combo, comboOffset, convertPathString(split[5], pos), length, repeatCount, nodeSamples);
             }
-            else if (type.HasFlag(ConvertHitObjectType.Spinner))
+            else if (type.HasFlag(LegacyHitObjectType.Spinner))
             {
-                double endTime = Math.Max(startTime, Parsing.ParseDouble(split[5]) + Offset);
+                double duration = Math.Max(0, Parsing.ParseDouble(split[5]) + Offset - startTime);
 
-                result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, endTime);
+                result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, duration);
 
                 if (split.Length > 6)
                     readCustomSampleBanks(split[6], bankInfo);
             }
-            else if (type.HasFlag(ConvertHitObjectType.Hold))
+            else if (type.HasFlag(LegacyHitObjectType.Hold))
             {
                 // Note: Hold is generated by BMS converts
 
@@ -209,10 +160,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 {
                     string[] ss = split[5].Split(':');
                     endTime = Math.Max(startTime, Parsing.ParseDouble(ss[0]));
-                    readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
+                    readCustomSampleBanks(string.Join(':', ss.Skip(1)), bankInfo);
                 }
 
-                result = CreateHold(pos, combo, comboOffset, endTime + Offset);
+                result = CreateHold(pos, combo, comboOffset, endTime + Offset - startTime);
             }
 
             if (result == null)
@@ -235,8 +186,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            var bank = (LegacyBeatmapDecoder.LegacySampleBank)Parsing.ParseInt(split[0]);
-            var addbank = (LegacyBeatmapDecoder.LegacySampleBank)Parsing.ParseInt(split[1]);
+            var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
+            var addbank = (LegacySampleBank)Parsing.ParseInt(split[1]);
 
             string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
@@ -257,6 +208,179 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
 
+        private PathType convertPathType(string input)
+        {
+            switch (input[0])
+            {
+                default:
+                case 'C':
+                    return PathType.Catmull;
+
+                case 'B':
+                    return PathType.Bezier;
+
+                case 'L':
+                    return PathType.Linear;
+
+                case 'P':
+                    return PathType.PerfectCurve;
+            }
+        }
+
+        /// <summary>
+        /// Converts a given point string into a set of path control points.
+        /// </summary>
+        /// <remarks>
+        /// A point string takes the form: X|1:1|2:2|2:2|3:3|Y|1:1|2:2.
+        /// This has three segments:
+        /// <list type="number">
+        ///     <item>
+        ///         <description>X: { (1,1), (2,2) } (implicit segment)</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>X: { (2,2), (3,3) } (implicit segment)</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Y: { (3,3), (1,1), (2, 2) } (explicit segment)</description>
+        ///     </item>
+        /// </list>
+        /// </remarks>
+        /// <param name="pointString">The point string.</param>
+        /// <param name="offset">The positional offset to apply to the control points.</param>
+        /// <returns>All control points in the resultant path.</returns>
+        private PathControlPoint[] convertPathString(string pointString, Vector2 offset)
+        {
+            // This code takes on the responsibility of handling explicit segments of the path ("X" & "Y" from above). Implicit segments are handled by calls to convertPoints().
+            string[] pointSplit = pointString.Split('|');
+
+            var controlPoints = new List<Memory<PathControlPoint>>();
+            int startIndex = 0;
+            int endIndex = 0;
+            bool first = true;
+
+            while (++endIndex < pointSplit.Length)
+            {
+                // Keep incrementing endIndex while it's not the start of a new segment (indicated by having a type descriptor of length 1).
+                if (pointSplit[endIndex].Length > 1)
+                    continue;
+
+                // Multi-segmented sliders DON'T contain the end point as part of the current segment as it's assumed to be the start of the next segment.
+                // The start of the next segment is the index after the type descriptor.
+                string endPoint = endIndex < pointSplit.Length - 1 ? pointSplit[endIndex + 1] : null;
+
+                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), endPoint, first, offset));
+                startIndex = endIndex;
+                first = false;
+            }
+
+            if (endIndex > startIndex)
+                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), null, first, offset));
+
+            return mergePointsLists(controlPoints);
+        }
+
+        /// <summary>
+        /// Converts a given point list into a set of path segments.
+        /// </summary>
+        /// <param name="points">The point list.</param>
+        /// <param name="endPoint">Any extra endpoint to consider as part of the points. This will NOT be returned.</param>
+        /// <param name="first">Whether this is the first segment in the set. If <c>true</c> the first of the returned segments will contain a zero point.</param>
+        /// <param name="offset">The positional offset to apply to the control points.</param>
+        /// <returns>The set of points contained by <paramref name="points"/> as one or more segments of the path, prepended by an extra zero point if <paramref name="first"/> is <c>true</c>.</returns>
+        private IEnumerable<Memory<PathControlPoint>> convertPoints(ReadOnlyMemory<string> points, string endPoint, bool first, Vector2 offset)
+        {
+            PathType type = convertPathType(points.Span[0]);
+
+            int readOffset = first ? 1 : 0; // First control point is zero for the first segment.
+            int readablePoints = points.Length - 1; // Total points readable from the base point span.
+            int endPointLength = endPoint != null ? 1 : 0; // Extra length if an endpoint is given that lies outside the base point span.
+
+            var vertices = new PathControlPoint[readOffset + readablePoints + endPointLength];
+
+            // Fill any non-read points.
+            for (int i = 0; i < readOffset; i++)
+                vertices[i] = new PathControlPoint();
+
+            // Parse into control points.
+            for (int i = 1; i < points.Length; i++)
+                readPoint(points.Span[i], offset, out vertices[readOffset + i - 1]);
+
+            // If an endpoint is given, add it to the end.
+            if (endPoint != null)
+                readPoint(endPoint, offset, out vertices[^1]);
+
+            // Edge-case rules (to match stable).
+            if (type == PathType.PerfectCurve)
+            {
+                if (vertices.Length != 3)
+                    type = PathType.Bezier;
+                else if (isLinear(vertices))
+                {
+                    // osu-stable special-cased colinear perfect curves to a linear path
+                    type = PathType.Linear;
+                }
+            }
+
+            // The first control point must have a definite type.
+            vertices[0].Type.Value = type;
+
+            // A path can have multiple implicit segments of the same type if there are two sequential control points with the same position.
+            // To handle such cases, this code may return multiple path segments with the final control point in each segment having a non-null type.
+            // For the point string X|1:1|2:2|2:2|3:3, this code returns the segments:
+            // X: { (1,1), (2, 2) }
+            // X: { (3, 3) }
+            // Note: (2, 2) is not returned in the second segments, as it is implicit in the path.
+            int startIndex = 0;
+            int endIndex = 0;
+
+            while (++endIndex < vertices.Length - endPointLength)
+            {
+                if (vertices[endIndex].Position.Value != vertices[endIndex - 1].Position.Value)
+                    continue;
+
+                // Force a type on the last point, and return the current control point set as a segment.
+                vertices[endIndex - 1].Type.Value = type;
+                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+
+                // Skip the current control point - as it's the same as the one that's just been returned.
+                startIndex = endIndex + 1;
+            }
+
+            if (endIndex > startIndex)
+                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+
+            static void readPoint(string value, Vector2 startPos, out PathControlPoint point)
+            {
+                string[] vertexSplit = value.Split(':');
+
+                Vector2 pos = new Vector2((int)Parsing.ParseDouble(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE)) - startPos;
+                point = new PathControlPoint { Position = { Value = pos } };
+            }
+
+            static bool isLinear(PathControlPoint[] p) => Precision.AlmostEquals(0, (p[1].Position.Value.Y - p[0].Position.Value.Y) * (p[2].Position.Value.X - p[0].Position.Value.X)
+                                                                                    - (p[1].Position.Value.X - p[0].Position.Value.X) * (p[2].Position.Value.Y - p[0].Position.Value.Y));
+        }
+
+        private PathControlPoint[] mergePointsLists(List<Memory<PathControlPoint>> controlPointList)
+        {
+            int totalCount = 0;
+
+            foreach (var arr in controlPointList)
+                totalCount += arr.Length;
+
+            var mergedArray = new PathControlPoint[totalCount];
+            var mergedArrayMemory = mergedArray.AsMemory();
+            int copyIndex = 0;
+
+            foreach (var arr in controlPointList)
+            {
+                arr.CopyTo(mergedArrayMemory.Slice(copyIndex));
+                copyIndex += arr.Length;
+            }
+
+            return mergedArray;
+        }
+
         /// <summary>
         /// Creates a legacy Hit-type hit object.
         /// </summary>
@@ -274,12 +398,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="controlPoints">The slider control points.</param>
         /// <param name="length">The slider length.</param>
-        /// <param name="pathType">The slider curve type.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
-                                                  List<List<HitSampleInfo>> nodeSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
+                                                  List<IList<HitSampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
@@ -287,9 +410,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
-        /// <param name="endTime">The spinner end time.</param>
+        /// <param name="duration">The spinner duration.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime);
+        protected abstract HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double duration);
 
         /// <summary>
         /// Creates a legacy Hold-type hit object.
@@ -297,67 +420,33 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
-        /// <param name="endTime">The hold end time.</param>
-        protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime);
+        /// <param name="duration">The hold duration.</param>
+        protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration);
 
-        private List<HitSampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
+        private List<HitSampleInfo> convertSoundType(LegacyHitSoundType type, SampleBankInfo bankInfo)
         {
             // Todo: This should return the normal SampleInfos if the specified sample file isn't found, but that's a pretty edge-case scenario
             if (!string.IsNullOrEmpty(bankInfo.Filename))
             {
-                return new List<HitSampleInfo>
-                {
-                    new FileHitSampleInfo
-                    {
-                        Filename = bankInfo.Filename,
-                        Volume = bankInfo.Volume
-                    }
-                };
+                return new List<HitSampleInfo> { new FileHitSampleInfo(bankInfo.Filename, bankInfo.Volume) };
             }
 
             var soundTypes = new List<HitSampleInfo>
             {
-                new LegacyHitSampleInfo
-                {
-                    Bank = bankInfo.Normal,
-                    Name = HitSampleInfo.HIT_NORMAL,
-                    Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank
-                }
+                new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.Normal, bankInfo.Volume, bankInfo.CustomSampleBank,
+                    // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
+                    // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
+                    type != LegacyHitSoundType.None && !type.HasFlag(LegacyHitSoundType.Normal))
             };
 
-            if (type.HasFlag(LegacySoundType.Finish))
-            {
-                soundTypes.Add(new LegacyHitSampleInfo
-                {
-                    Bank = bankInfo.Add,
-                    Name = HitSampleInfo.HIT_FINISH,
-                    Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank
-                });
-            }
+            if (type.HasFlag(LegacyHitSoundType.Finish))
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, bankInfo.Add, bankInfo.Volume, bankInfo.CustomSampleBank));
 
-            if (type.HasFlag(LegacySoundType.Whistle))
-            {
-                soundTypes.Add(new LegacyHitSampleInfo
-                {
-                    Bank = bankInfo.Add,
-                    Name = HitSampleInfo.HIT_WHISTLE,
-                    Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank
-                });
-            }
+            if (type.HasFlag(LegacyHitSoundType.Whistle))
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_WHISTLE, bankInfo.Add, bankInfo.Volume, bankInfo.CustomSampleBank));
 
-            if (type.HasFlag(LegacySoundType.Clap))
-            {
-                soundTypes.Add(new LegacyHitSampleInfo
-                {
-                    Bank = bankInfo.Add,
-                    Name = HitSampleInfo.HIT_CLAP,
-                    Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank
-                });
-            }
+            if (type.HasFlag(LegacyHitSoundType.Clap))
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_CLAP, bankInfo.Add, bankInfo.Volume, bankInfo.CustomSampleBank));
 
             return soundTypes;
         }
@@ -375,37 +464,75 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
 
-        private class LegacyHitSampleInfo : HitSampleInfo
+#nullable enable
+
+        public class LegacyHitSampleInfo : HitSampleInfo, IEquatable<LegacyHitSampleInfo>
         {
-            public int CustomSampleBank
+            public readonly int CustomSampleBank;
+
+            /// <summary>
+            /// Whether this hit sample is layered.
+            /// </summary>
+            /// <remarks>
+            /// Layered hit samples are automatically added in all modes (except osu!mania), but can be disabled
+            /// using the <see cref="LegacySkinConfiguration.LegacySetting.LayeredHitSounds"/> skin config option.
+            /// </remarks>
+            public readonly bool IsLayered;
+
+            public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, int customSampleBank = 0, bool isLayered = false)
+                : base(name, bank, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume)
             {
-                set
-                {
-                    if (value > 1)
-                        Suffix = value.ToString();
-                }
+                CustomSampleBank = customSampleBank;
+                IsLayered = isLayered;
             }
+
+            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
+                => With(newName, newBank, newVolume);
+
+            public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default, Optional<int> newCustomSampleBank = default,
+                                                    Optional<bool> newIsLayered = default)
+                => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newCustomSampleBank.GetOr(CustomSampleBank), newIsLayered.GetOr(IsLayered));
+
+            public bool Equals(LegacyHitSampleInfo? other)
+                => base.Equals(other) && CustomSampleBank == other.CustomSampleBank && IsLayered == other.IsLayered;
+
+            public override bool Equals(object? obj)
+                => obj is LegacyHitSampleInfo other && Equals(other);
+
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
         }
 
-        private class FileHitSampleInfo : HitSampleInfo
+        private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
         {
-            public string Filename;
+            public readonly string Filename;
+
+            public FileHitSampleInfo(string filename, int volume)
+                // Force CSS=1 to make sure that the LegacyBeatmapSkin does not fall back to the user skin.
+                // Note that this does not change the lookup names, as they are overridden locally.
+                : base(string.Empty, customSampleBank: 1, volume: volume)
+            {
+                Filename = filename;
+            }
 
             public override IEnumerable<string> LookupNames => new[]
             {
                 Filename,
                 Path.ChangeExtension(Filename, null)
             };
+
+            public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default, Optional<int> newCustomSampleBank = default,
+                                                            Optional<bool> newIsLayered = default)
+                => new FileHitSampleInfo(Filename, newVolume.GetOr(Volume));
+
+            public bool Equals(FileHitSampleInfo? other)
+                => base.Equals(other) && Filename == other.Filename;
+
+            public override bool Equals(object? obj)
+                => obj is FileHitSampleInfo other && Equals(other);
+
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Filename);
         }
 
-        [Flags]
-        private enum LegacySoundType
-        {
-            None = 0,
-            Normal = 1,
-            Whistle = 2,
-            Finish = 4,
-            Clap = 8
-        }
+#nullable disable
     }
 }

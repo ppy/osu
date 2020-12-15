@@ -17,12 +17,11 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        public bool OnReleased(GlobalAction action)
+        public void OnReleased(GlobalAction action)
         {
-            if (action != GlobalAction.QuickExit) return false;
+            if (action != GlobalAction.QuickExit) return;
 
             AbortConfirm();
-            return true;
         }
     }
 }

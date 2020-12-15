@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays
 
         protected SettingsSectionsContainer SectionsContainer;
 
-        private SearchTextBox searchTextBox;
+        private SeekLimitedSearchTextBox searchTextBox;
 
         /// <summary>
         /// Provide a source for the toolbar height.
@@ -72,15 +73,15 @@ namespace osu.Game.Overlays
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(2, 1), // over-extend to the left for transitions
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                        Alpha = 0.6f,
+                        Colour = OsuColour.Gray(0.05f),
+                        Alpha = 1,
                     },
                     SectionsContainer = new SettingsSectionsContainer
                     {
                         Masking = true,
                         RelativeSizeAxes = Axes.Both,
                         ExpandableHeader = CreateHeader(),
-                        FixedHeader = searchTextBox = new SearchTextBox
+                        FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
                         {
                             RelativeSizeAxes = Axes.X,
                             Origin = Anchor.TopCentre,
@@ -91,7 +92,6 @@ namespace osu.Game.Overlays
                                 Top = 20,
                                 Bottom = 20
                             },
-                            Exit = Hide,
                         },
                         Footer = CreateFooter()
                     },
@@ -124,9 +124,9 @@ namespace osu.Game.Overlays
                 var button = new SidebarButton
                 {
                     Section = section,
-                    Action = s =>
+                    Action = () =>
                     {
-                        SectionsContainer.ScrollTo(s);
+                        SectionsContainer.ScrollTo(section);
                         Sidebar.State = ExpandedState.Contracted;
                     },
                 };
@@ -215,7 +215,7 @@ namespace osu.Game.Overlays
                 base.UpdateAfterChildren();
 
                 // no null check because the usage of this class is strict
-                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
+                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y;
             }
         }
     }

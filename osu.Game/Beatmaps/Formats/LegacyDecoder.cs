@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Legacy;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -14,6 +16,8 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class LegacyDecoder<T> : Decoder<T>
         where T : new()
     {
+        public const int LATEST_VERSION = 14;
+
         protected readonly int FormatVersion;
 
         protected LegacyDecoder(int version)
@@ -21,7 +25,7 @@ namespace osu.Game.Beatmaps.Formats
             FormatVersion = version;
         }
 
-        protected override void ParseStreamInto(StreamReader stream, T output)
+        protected override void ParseStreamInto(LineBufferedReader stream, T output)
         {
             Section section = Section.None;
 
@@ -32,14 +36,15 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
-                if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
+                if (line.StartsWith('[') && line.EndsWith(']'))
                 {
-                    if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
+                    if (!Enum.TryParse(line[1..^1], out section))
                     {
                         Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
                         section = Section.None;
                     }
 
+                    OnBeginNewSection(section);
                     continue;
                 }
 
@@ -56,6 +61,14 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
 
+        /// <summary>
+        /// Invoked when a new <see cref="Section"/> has been entered.
+        /// </summary>
+        /// <param name="section">The entered <see cref="Section"/>.</param>
+        protected virtual void OnBeginNewSection(Section section)
+        {
+        }
+
         protected virtual void ParseLine(T output, Section section, string line)
         {
             line = StripComments(line);
@@ -63,7 +76,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (section)
             {
                 case Section.Colours:
-                    handleColours(output, line);
+                    HandleColours(output, line);
                     return;
             }
         }
@@ -77,13 +90,11 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        private bool hasComboColours;
-
-        private void handleColours(T output, string line)
+        protected void HandleColours<TModel>(TModel output, string line)
         {
             var pair = SplitKeyVal(line);
 
-            bool isCombo = pair.Key.StartsWith(@"Combo");
+            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
 
             string[] split = pair.Value.Split(',');
 
@@ -94,7 +105,8 @@ namespace osu.Game.Beatmaps.Formats
 
             try
             {
-                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
+                byte alpha = split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
+                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
             }
             catch
             {
@@ -105,14 +117,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasComboColours tHasComboColours)) return;
 
-                if (!hasComboColours)
-                {
-                    // remove default colours.
-                    tHasComboColours.ComboColours.Clear();
-                    hasComboColours = true;
-                }
-
-                tHasComboColours.ComboColours.Add(colour);
+                tHasComboColours.AddComboColours(colour);
             }
             else
             {
@@ -124,7 +129,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
         {
-            var split = line.Trim().Split(new[] { separator }, 2);
+            var split = line.Split(separator, 2);
 
             return new KeyValuePair<string, string>
             (
@@ -132,6 +137,8 @@ namespace osu.Game.Beatmaps.Formats
                 split.Length > 1 ? split[1].Trim() : string.Empty
             );
         }
+
+        protected string CleanFilename(string path) => path.Trim('"').ToStandardisedPath();
 
         protected enum Section
         {
@@ -145,51 +152,29 @@ namespace osu.Game.Beatmaps.Formats
             Colours,
             HitObjects,
             Variables,
-            Fonts
+            Fonts,
+            CatchTheBeat,
+            Mania,
         }
 
-        internal enum LegacySampleBank
+        [Obsolete("Do not use unless you're a legacy ruleset and 100% sure.")]
+        public class LegacyDifficultyControlPoint : DifficultyControlPoint
         {
-            None = 0,
-            Normal = 1,
-            Soft = 2,
-            Drum = 3
+            /// <summary>
+            /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
+            /// DO NOT USE THIS UNLESS 100% SURE.
+            /// </summary>
+            public readonly float BpmMultiplier;
+
+            public LegacyDifficultyControlPoint(double beatLength)
+            {
+                SpeedMultiplierBindable.Precision = double.Epsilon;
+
+                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100f : 1;
+            }
         }
 
-        internal enum EventType
-        {
-            Background = 0,
-            Video = 1,
-            Break = 2,
-            Colour = 3,
-            Sprite = 4,
-            Sample = 5,
-            Animation = 6
-        }
-
-        internal enum LegacyOrigins
-        {
-            TopLeft,
-            Centre,
-            CentreLeft,
-            TopRight,
-            BottomCentre,
-            TopCentre,
-            Custom,
-            CentreRight,
-            BottomLeft,
-            BottomRight
-        }
-
-        internal enum StoryLayer
-        {
-            Background = 0,
-            Fail = 1,
-            Pass = 2,
-            Foreground = 3
-        }
-
-        internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
+        internal class LegacySampleControlPoint : SampleControlPoint
         {
             public int CustomSampleBank;
 
@@ -197,15 +182,16 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var baseInfo = base.ApplyTo(hitSampleInfo);
 
-                if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
-                    baseInfo.Suffix = CustomSampleBank.ToString();
+                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
+                    return legacy.With(newCustomSampleBank: CustomSampleBank);
 
                 return baseInfo;
             }
 
-            public bool Equals(LegacySampleControlPoint other)
-                => base.Equals(other)
-                   && CustomSampleBank == other?.CustomSampleBank;
+            public override bool IsRedundant(ControlPoint existing)
+                => base.IsRedundant(existing)
+                   && existing is LegacySampleControlPoint existingSample
+                   && CustomSampleBank == existingSample.CustomSampleBank;
         }
     }
 }
