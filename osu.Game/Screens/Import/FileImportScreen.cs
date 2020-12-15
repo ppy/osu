@@ -12,11 +12,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.Containers;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Import
 {
@@ -24,13 +23,9 @@ namespace osu.Game.Screens.Import
     {
         public override bool HideOverlaysOnEnter => true;
 
-        private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
-        private readonly IBindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
-
         private FileSelector fileSelector;
         private Container contentContainer;
         private TextFlowContainer currentFileText;
-        private OsuScrollContainer fileNameScroll;
 
         private TriangleButton importButton;
 
@@ -47,9 +42,6 @@ namespace osu.Game.Screens.Import
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage)
         {
-            storage.GetStorageForDirectory("imports");
-            var originalPath = storage.GetFullPath("imports", true);
-
             InternalChild = contentContainer = new Container
             {
                 Masking = true,
@@ -65,7 +57,7 @@ namespace osu.Game.Screens.Import
                         Colour = colours.GreySeafoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    fileSelector = new FileSelector(originalPath, game.HandledExtensions.ToArray())
+                    fileSelector = new FileSelector(validFileExtensions: game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.65f
@@ -87,7 +79,7 @@ namespace osu.Game.Screens.Import
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
-                                Child = fileNameScroll = new OsuScrollContainer
+                                Child = new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopCentre,
@@ -100,6 +92,11 @@ namespace osu.Game.Screens.Import
                                         Origin = Anchor.Centre,
                                         TextAnchor = Anchor.Centre
                                     },
+                                    ScrollContent =
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                    }
                                 },
                             },
                             importButton = new TriangleButton
@@ -111,25 +108,21 @@ namespace osu.Game.Screens.Import
                                 Height = button_height,
                                 Width = 0.9f,
                                 Margin = new MarginPadding { Vertical = button_vertical_margin },
-                                Action = () => startImport(currentFile.Value?.FullName)
+                                Action = () => startImport(fileSelector.CurrentFile.Value?.FullName)
                             }
                         }
                     }
                 }
             };
-            fileNameScroll.ScrollContent.Anchor = Anchor.Centre;
-            fileNameScroll.ScrollContent.Origin = Anchor.Centre;
 
-            currentFile.BindValueChanged(fileChanged, true);
-            currentDirectory.BindValueChanged(directoryChanged);
-
-            currentDirectory.BindTo(fileSelector.CurrentPath);
-            currentFile.BindTo(fileSelector.CurrentFile);
+            fileSelector.CurrentFile.BindValueChanged(fileChanged, true);
+            fileSelector.CurrentPath.BindValueChanged(directoryChanged);
         }
 
-        private void directoryChanged(ValueChangedEvent<DirectoryInfo> v)
+        private void directoryChanged(ValueChangedEvent<DirectoryInfo> _)
         {
-            currentFile.Value = null;
+            // this should probably be done by the selector itself, but let's do it here for now.
+            fileSelector.CurrentFile.Value = null;
         }
 
         private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
