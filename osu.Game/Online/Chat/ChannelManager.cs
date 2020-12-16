@@ -33,8 +33,8 @@ namespace osu.Game.Online.Chat
         private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
-        // Keeps a list of closed channels. More recently closed channels appear at higher indeces
-        private readonly BindableList<Channel> closedChannels = new BindableList<Channel>();
+        // Keeps a list of closed channel identifiers
+        private readonly BindableList<string> closedChannels = new BindableList<string>();
 
         // For efficiency purposes, this constant bounds the number of closed channels we store.
         // This number is somewhat arbitrary; future developers are free to modify it.
@@ -424,7 +424,7 @@ namespace osu.Game.Online.Chat
             }
 
             // insert at the end of the closedChannels list
-            closedChannels.Insert(closedChannels.Count, channel);
+            closedChannels.Insert(closedChannels.Count, channel.Name);
 
             if (channel.Joined.Value)
             {
@@ -445,13 +445,24 @@ namespace osu.Game.Online.Chat
                 return;
             }
 
-            Channel lastClosedChannel = closedChannels.Last();
+            string lastClosedChannelName = closedChannels.Last();
+            closedChannels.RemoveAt(closedChannels.Count - 1);
 
-            closedChannels.Remove(lastClosedChannel);
+            // types did not work with existing enumerable interfaces funcitons like Contains
+            for (int i = 0; i < joinedChannels.Count; i++)
+            {
+                // If the user already joined the channel, try the next
+                // channel in the list
+                if (joinedChannels[i].Name == lastClosedChannelName)
+                {
+                    JoinLastClosedChannel();
+                    return;
+                }
+            }
 
-            // If the user already joined the channel, try the next
-            // channel in the list
-            if (joinedChannels.IndexOf(lastClosedChannel) >= 0)
+            Channel lastClosedChannel = AvailableChannels.FirstOrDefault(c => c.Name == lastClosedChannelName);
+
+            if (lastClosedChannel == null)
             {
                 JoinLastClosedChannel();
             }
