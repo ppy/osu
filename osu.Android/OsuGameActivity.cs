@@ -11,6 +11,7 @@ using Android.OS;
 using Android.Provider;
 using Android.Views;
 using osu.Framework.Android;
+using osu.Game.Database;
 
 namespace osu.Android
 {
@@ -82,7 +83,7 @@ namespace osu.Android
             using (var stream = ContentResolver.OpenInputStream(uri))
                 await stream.CopyToAsync(copy);
 
-            await game.Import(copy, filename);
+            await game.Import(new ImportTask(copy, filename));
         }, TaskCreationOptions.LongRunning);
     }
 }
