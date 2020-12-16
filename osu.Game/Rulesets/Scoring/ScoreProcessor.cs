@@ -68,7 +68,12 @@ namespace osu.Game.Rulesets.Scoring
         private readonly double comboPortion;
 
         private int maxAchievableCombo;
-        private double maxBaseScore;
+
+        /// <summary>
+        /// The maximum achievable base score.
+        /// </summary>
+        public double MaxBaseScore { get; private set; }
+
         private double rollingMaxBaseScore;
         private double baseScore;
 
@@ -196,7 +201,7 @@ namespace osu.Game.Rulesets.Scoring
         private double getScore(ScoringMode mode)
         {
             return GetScore(mode, maxAchievableCombo,
-                maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
+                MaxBaseScore > 0 ? baseScore / MaxBaseScore : 0,
                 maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1,
                 scoreResultCounts);
         }
@@ -225,6 +230,34 @@ namespace osu.Game.Rulesets.Scoring
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
                     return getBonusScore(statistics) + (accuracyRatio * Math.Max(1, maxCombo) * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
             }
+        }
+
+        /// <summary>
+        /// Given a minimal set of inputs, return the computed score and accuracy for the tracked beatmap / mods combination.
+        /// </summary>
+        /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
+        /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
+        /// <param name="statistics">Statistics to be used for calculating accuracy, bonus score, etc.</param>
+        /// <returns>The computed score and accuracy for provided inputs.</returns>
+        public (double score, double accuracy) GetScoreAndAccuracy(ScoringMode mode, int maxCombo, Dictionary<HitResult, int> statistics)
+        {
+            // calculate base score from statistics pairs
+            int computedBaseScore = 0;
+
+            foreach (var pair in statistics)
+            {
+                if (!pair.Key.AffectsAccuracy())
+                    continue;
+
+                computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
+            }
+
+            double accuracy = MaxBaseScore > 0 ? computedBaseScore / MaxBaseScore : 0;
+            double comboRatio = maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1;
+
+            double score = GetScore(mode, maxAchievableCombo, accuracy, comboRatio, scoreResultCounts);
+
+            return (score, accuracy);
         }
 
         private double getBonusScore(Dictionary<HitResult, int> statistics)
@@ -266,7 +299,7 @@ namespace osu.Game.Rulesets.Scoring
             if (storeResults)
             {
                 maxAchievableCombo = HighestCombo.Value;
-                maxBaseScore = baseScore;
+                MaxBaseScore = baseScore;
             }
 
             baseScore = 0;
