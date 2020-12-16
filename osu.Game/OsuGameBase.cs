@@ -397,7 +397,7 @@ namespace osu.Game
 
         public virtual async Task Import(params ImportTask[] tasks)
         {
-            var extension = Path.GetExtension(tasks.First().Path)?.ToLowerInvariant();
+            var extension = Path.GetExtension(tasks.First().Path).ToLowerInvariant();
 
             foreach (var importer in fileImporters)
             {
