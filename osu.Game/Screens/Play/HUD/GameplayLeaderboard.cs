@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         /// <param name="currentScore">The bindable current score of the player.</param>
         /// <param name="user">The player.</param>
-        public void AddPlayer([NotNull] BindableDouble currentScore, [NotNull] User user)
+        public void AddPlayer([NotNull] IBindableNumber<double> currentScore, [NotNull] User user)
         {
             var scoreItem = addScore(currentScore.Value, user);
             currentScore.ValueChanged += s => scoreItem.TotalScore = s.NewValue;
