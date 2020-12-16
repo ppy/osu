@@ -593,7 +593,7 @@ namespace osu.Game.Screens.Select
             {
                 displayedRange = newDisplayRange;
                 // we need to know how much it has been since last Y update so that manual scrolling looks fine
-                double elapsed = timeSinceLastYUpdate - Clock.CurrentTime;
+                double elapsed = Clock.CurrentTime - timeSinceLastYUpdate;
 
                 if (visibleItems.Count > 0)
                 {
