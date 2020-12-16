@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -43,7 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 streamingClient,
                 lookupCache,
                 scoreProcessor = new OsuScoreProcessor(),
-                new MultiplayerGameplayLeaderboard(scoreProcessor)
+                new MultiplayerGameplayLeaderboard(scoreProcessor, streamingClient.PlayingUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

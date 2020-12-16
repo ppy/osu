@@ -16,13 +16,22 @@ namespace osu.Game.Screens.Play.HUD
     {
         private readonly ScoreProcessor scoreProcessor;
 
+        private readonly int[] userIds;
+
+        private readonly Dictionary<int, TrackedUserData> userScores = new Dictionary<int, TrackedUserData>();
+
         /// <summary>
         /// Construct a new leaderboard.
         /// </summary>
         /// <param name="scoreProcessor">A score processor instance to handle score calculation for scores of users in the match.</param>
-        public MultiplayerGameplayLeaderboard(ScoreProcessor scoreProcessor)
+        /// <param name="userIds">IDs of all users in this match.</param>
+        public MultiplayerGameplayLeaderboard(ScoreProcessor scoreProcessor, int[] userIds)
         {
+            // todo: this will eventually need to be created per user to support different mod combinations.
             this.scoreProcessor = scoreProcessor;
+
+            // todo: this will likely be passed in as User instances.
+            this.userIds = userIds;
         }
 
         [Resolved]
@@ -31,8 +40,6 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
 
-        private readonly Dictionary<int, TrackedUserData> userScores = new Dictionary<int, TrackedUserData>();
-
         private Bindable<ScoringMode> scoringMode;
 
         [BackgroundDependencyLoader]
@@ -40,9 +47,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             streamingClient.OnNewFrames += handleIncomingFrames;
 
-            foreach (var user in streamingClient.PlayingUsers)
+            foreach (var user in userIds)
             {
                 streamingClient.WatchUser(user);
+
+                // probably won't be required in the final implementation.
                 var resolvedUser = userLookupCache.GetUserAsync(user).Result;
 
                 var trackedUser = new TrackedUserData();
@@ -67,6 +76,21 @@ namespace osu.Game.Screens.Play.HUD
             {
                 trackedData.LastHeader = bundle.Header;
                 trackedData.UpdateScore(scoreProcessor, scoringMode.Value);
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (streamingClient != null)
+            {
+                foreach (var user in userIds)
+                {
+                    streamingClient.StopWatchingUser(user);
+                }
+
+                streamingClient.OnNewFrames -= handleIncomingFrames;
             }
         }
 
