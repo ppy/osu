@@ -5,7 +5,9 @@ using System;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Utils;
 
@@ -13,11 +15,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
-        public readonly Bindable<float> XBindable = new Bindable<float>();
+        public readonly Bindable<float> OriginalXBindable = new Bindable<float>();
+        public readonly Bindable<float> XOffsetBindable = new Bindable<float>();
 
         protected override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
+        protected override float SamplePlaybackPosition => HitObject.EffectiveX / CatchPlayfield.WIDTH;
 
         public int RandomSeed => HitObject?.RandomSeed ?? 0;
 
@@ -36,21 +39,21 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             base.OnApply();
 
-            XBindable.BindTo(HitObject.XBindable);
+            OriginalXBindable.BindTo(HitObject.OriginalXBindable);
+            XOffsetBindable.BindTo(HitObject.XOffsetBindable);
         }
 
         protected override void OnFree()
         {
             base.OnFree();
 
-            XBindable.UnbindFrom(HitObject.XBindable);
+            OriginalXBindable.UnbindFrom(HitObject.OriginalXBindable);
+            XOffsetBindable.UnbindFrom(HitObject.XOffsetBindable);
         }
 
         public Func<CatchHitObject, bool> CheckPosition;
 
-        public bool IsOnPlate;
-
-        public override bool RemoveWhenNotAlive => IsOnPlate;
+        protected override JudgementResult CreateResult(Judgement judgement) => new CatchJudgementResult(HitObject, judgement);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {

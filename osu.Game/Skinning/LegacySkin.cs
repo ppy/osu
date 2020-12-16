@@ -169,6 +169,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
 
+                case LegacyManiaSkinConfigurationLookups.ScorePosition:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ScorePosition));
+
                 case LegacyManiaSkinConfigurationLookups.LightPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.LightPosition));
 

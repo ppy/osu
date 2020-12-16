@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
     public class Pulp : Circle
     {
+        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
+
         public Pulp()
         {
             RelativePositionAxes = Axes.Both;
@@ -21,8 +23,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
             Blending = BlendingParameters.Additive;
             Colour = Color4.White.Opacity(0.9f);
         }
-
-        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
 
         protected override void LoadComplete()
         {
