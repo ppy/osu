@@ -395,14 +395,14 @@ namespace osu.Game
             }
         }
 
-        public virtual async Task Import(Stream stream, string filename)
+        public virtual async Task Import(params ImportTask[] tasks)
         {
-            var extension = Path.GetExtension(filename)?.ToLowerInvariant();
+            var extension = Path.GetExtension(tasks.First().Path)?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)
             {
                 if (importer.HandledExtensions.Contains(extension))
-                    await importer.Import(stream, Path.GetFileNameWithoutExtension(filename));
+                    await importer.Import(tasks);
             }
         }
 
