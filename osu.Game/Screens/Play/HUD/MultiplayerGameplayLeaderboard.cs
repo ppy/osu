@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 
@@ -24,8 +23,6 @@ namespace osu.Game.Screens.Play.HUD
         public MultiplayerGameplayLeaderboard(ScoreProcessor scoreProcessor)
         {
             this.scoreProcessor = scoreProcessor;
-
-            AddPlayer(new BindableDouble(), new GuestUser());
         }
 
         [Resolved]
