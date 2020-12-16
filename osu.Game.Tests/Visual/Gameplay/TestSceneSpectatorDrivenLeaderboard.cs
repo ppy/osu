@@ -9,12 +9,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Database;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Tests.Visual.Online;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -22,6 +24,9 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         [Cached(typeof(SpectatorStreamingClient))]
         private TestMultiplayerStreaming streamingClient = new TestMultiplayerStreaming(16);
+
+        [Cached(typeof(UserLookupCache))]
+        private UserLookupCache lookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
 
         // used just to show beatmap card for the time being.
         protected override bool UseOnlineAPI => true;
@@ -35,6 +40,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Children = new Drawable[]
             {
+                streamingClient,
+                lookupCache,
                 scoreProcessor = new OsuScoreProcessor(),
                 new MultiplayerGameplayLeaderboard(scoreProcessor)
                 {
