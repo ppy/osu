@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -90,7 +89,8 @@ namespace osu.Game.Screens.Play.HUD
                 if (LastHeader == null)
                     return;
 
-                (Score.Value, Accuracy.Value) = processor.GetScoreAndAccuracy(mode, LastHeader.MaxCombo, LastHeader.Statistics.ToDictionary(s => s.Result, s => s.Count));
+                (Score.Value, Accuracy.Value) = processor.GetScoreAndAccuracy(mode, LastHeader.MaxCombo, LastHeader.Statistics);
+
                 CurrentCombo.Value = LastHeader.Combo;
             }
         }
