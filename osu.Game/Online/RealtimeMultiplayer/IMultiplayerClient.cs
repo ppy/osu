@@ -32,7 +32,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// Signal that the host of the room has changed.
         /// </summary>
         /// <param name="userId">The user ID of the new host.</param>
-        Task HostChanged(long userId);
+        Task HostChanged(int userId);
 
         /// <summary>
         /// Signals that the settings for this room have changed.
@@ -45,7 +45,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// </summary>
         /// <param name="userId">The ID of the user performing a state change.</param>
         /// <param name="state">The new state of the user.</param>
-        Task UserStateChanged(long userId, MultiplayerUserState state);
+        Task UserStateChanged(int userId, MultiplayerUserState state);
 
         /// <summary>
         /// Signals that a match is to be started. This will *only* be sent to clients which are to begin loading at this point.
