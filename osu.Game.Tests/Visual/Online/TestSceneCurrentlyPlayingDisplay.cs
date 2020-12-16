@@ -69,8 +69,34 @@ namespace osu.Game.Tests.Visual.Online
 
         internal class TestUserLookupCache : UserLookupCache
         {
+            private static readonly string[] usernames =
+            {
+                "fieryrage",
+                "Kerensa",
+                "MillhioreF",
+                "Player01",
+                "smoogipoo",
+                "Ephemeral",
+                "BTMC",
+                "Cilvery",
+                "m980",
+                "HappyStick",
+                "LittleEndu",
+                "frenzibyte",
+                "Zallius",
+                "BanchoBot",
+                "rocketminer210",
+                "pishifat"
+            };
+
+            private int id;
+
             protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
-                => Task.FromResult(new User { Username = "peppy", Id = 2 });
+                => Task.FromResult(new User
+                {
+                    Id = id++,
+                    Username = usernames[id % usernames.Length],
+                });
         }
     }
 }
