@@ -447,7 +447,7 @@ namespace osu.Game.Online.Chat
 
             // This nested loop could be eliminated if a check was added so that
             // when the code opens a channel it removes from the closedChannel list.
-            // However, this would require adding an O(|closeChannels|) work operation 
+            // However, this would require adding an O(|closeChannels|) work operation
             // every time the user joins a channel, which would make joining a channel
             // slower. I wanted to centralize all major slowdowns so they
             // can only occur if the user actually decides to use this feature.
@@ -456,6 +456,7 @@ namespace osu.Game.Online.Chat
                 string lastClosedChannelName = closedChannels.Last();
                 closedChannels.RemoveAt(closedChannels.Count - 1);
                 bool alreadyJoined = false;
+
                 // If the user already joined the channel, do not
                 // try to join it
                 for (int j = 0; j < joinedChannels.Count; j++)
@@ -471,11 +472,7 @@ namespace osu.Game.Online.Chat
                 {
                     Channel lastClosedChannel = AvailableChannels.FirstOrDefault(c => c.Name == lastClosedChannelName);
 
-                    if (lastClosedChannel == null)
-                    {
-                        continue;
-                    }
-                    else
+                    if (lastClosedChannel != null)
                     {
                         JoinChannel(lastClosedChannel);
                         return;
@@ -483,8 +480,6 @@ namespace osu.Game.Online.Chat
                 }
             }
         }
-
-
 
         private long lastMessageId;
 
