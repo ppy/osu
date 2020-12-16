@@ -445,32 +445,46 @@ namespace osu.Game.Online.Chat
                 return;
             }
 
-            string lastClosedChannelName = closedChannels.Last();
-            closedChannels.RemoveAt(closedChannels.Count - 1);
-
-            // types did not work with existing enumerable interfaces funcitons like Contains
-            for (int i = 0; i < joinedChannels.Count; i++)
+            // This nested loop could be eliminated if a check was added so that
+            // when the code opens a channel it removes from the closedChannel list.
+            // However, this would require adding an O(|closeChannels|) work operation 
+            // every time the user joins a channel, which would make joining a channel
+            // slower. I wanted to centralize all major slowdowns so they
+            // can only occur if the user actually decides to use this feature.
+            for (int i = closedChannels.Count - 1; i >= 0; i--)
             {
-                // If the user already joined the channel, try the next
-                // channel in the list
-                if (joinedChannels[i].Name == lastClosedChannelName)
+                string lastClosedChannelName = closedChannels.Last();
+                closedChannels.RemoveAt(closedChannels.Count - 1);
+                bool alreadyJoined = false;
+                // If the user already joined the channel, do not
+                // try to join it
+                for (int j = 0; j < joinedChannels.Count; j++)
                 {
-                    JoinLastClosedChannel();
-                    return;
+                    if (joinedChannels[j].Name == lastClosedChannelName)
+                    {
+                        alreadyJoined = true;
+                        break;
+                    }
+                }
+
+                if (alreadyJoined == false)
+                {
+                    Channel lastClosedChannel = AvailableChannels.FirstOrDefault(c => c.Name == lastClosedChannelName);
+
+                    if (lastClosedChannel == null)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        JoinChannel(lastClosedChannel);
+                        return;
+                    }
                 }
             }
-
-            Channel lastClosedChannel = AvailableChannels.FirstOrDefault(c => c.Name == lastClosedChannelName);
-
-            if (lastClosedChannel == null)
-            {
-                JoinLastClosedChannel();
-            }
-            else
-            {
-                JoinChannel(lastClosedChannel);
-            }
         }
+
+
 
         private long lastMessageId;
 
