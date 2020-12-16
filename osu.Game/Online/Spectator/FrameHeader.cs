@@ -14,11 +14,25 @@ namespace osu.Game.Online.Spectator
     [Serializable]
     public class FrameHeader
     {
+        /// <summary>
+        /// The current combo of the score.
+        /// </summary>
         public int Combo { get; set; }
 
+        /// <summary>
+        /// The maximum combo achieved up to the current point in time.
+        /// </summary>
         public int MaxCombo { get; set; }
 
+        /// <summary>
+        /// Cumulative hit statistics.
+        /// </summary>
         public Dictionary<HitResult, int> Statistics { get; set; }
+
+        /// <summary>
+        /// The time at which this frame was received by the server.
+        /// </summary>
+        public DateTimeOffset ReceivedTime { get; set; }
 
         /// <summary>
         /// Construct header summary information from a point-in-time reference to a score which is actively being played.
@@ -34,11 +48,12 @@ namespace osu.Game.Online.Spectator
         }
 
         [JsonConstructor]
-        public FrameHeader(int combo, int maxCombo, Dictionary<HitResult, int> statistics)
+        public FrameHeader(int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
         {
             Combo = combo;
             MaxCombo = maxCombo;
             Statistics = statistics;
+            ReceivedTime = receivedTime;
         }
     }
 }
