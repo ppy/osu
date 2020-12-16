@@ -208,13 +208,6 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
 
-        private void pressControlW()
-        {
-            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
-            AddStep("Press W", () => InputManager.Key(Key.W));
-            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
-        }
-
         [Test]
         public void TestCtrlWShortcut()
         {
@@ -240,13 +233,6 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
 
-        private void pressControlT()
-        {
-            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
-            AddStep("Press T", () => InputManager.Key(Key.T));
-            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
-        }
-
         [Test]
         public void TestCtrlTShortcut()
         {
@@ -268,6 +254,20 @@ namespace osu.Game.Tests.Visual.Online
             InputManager.PressKey(Key.AltLeft);
             InputManager.Key(channelKey);
             InputManager.ReleaseKey(Key.AltLeft);
+        }
+
+        private void pressControlW()
+        {
+            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
+            AddStep("Press W", () => InputManager.Key(Key.W));
+            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
+        }
+
+        private void pressControlT()
+        {
+            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
+            AddStep("Press T", () => InputManager.Key(Key.T));
+            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
         }
 
         private void clickDrawable(Drawable d)
