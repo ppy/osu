@@ -21,16 +21,13 @@ using osu.Game.Tests.Visual.Online;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSpectatorDrivenLeaderboard : OsuTestScene
+    public class TestSceneMultiplayerGameplayLeaderboard : OsuTestScene
     {
         [Cached(typeof(SpectatorStreamingClient))]
         private TestMultiplayerStreaming streamingClient = new TestMultiplayerStreaming(16);
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
-
-        // used just to show beatmap card for the time being.
-        protected override bool UseOnlineAPI => true;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
