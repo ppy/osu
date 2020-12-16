@@ -96,11 +96,17 @@ namespace osu.Game.Screens.Play.HUD
 
         private class TrackedUserData
         {
-            public readonly BindableDouble Score = new BindableDouble();
+            public IBindableNumber<double> Score => score;
 
-            public readonly BindableDouble Accuracy = new BindableDouble();
+            private readonly BindableDouble score = new BindableDouble();
 
-            public readonly BindableInt CurrentCombo = new BindableInt();
+            public IBindableNumber<double> Accuracy => accuracy;
+
+            private readonly BindableDouble accuracy = new BindableDouble();
+
+            public IBindableNumber<int> CurrentCombo => currentCombo;
+
+            private readonly BindableInt currentCombo = new BindableInt();
 
             [CanBeNull]
             public FrameHeader LastHeader;
@@ -110,9 +116,9 @@ namespace osu.Game.Screens.Play.HUD
                 if (LastHeader == null)
                     return;
 
-                (Score.Value, Accuracy.Value) = processor.GetScoreAndAccuracy(mode, LastHeader.MaxCombo, LastHeader.Statistics);
+                (score.Value, accuracy.Value) = processor.GetScoreAndAccuracy(mode, LastHeader.MaxCombo, LastHeader.Statistics);
 
-                CurrentCombo.Value = LastHeader.Combo;
+                currentCombo.Value = LastHeader.Combo;
             }
         }
     }
