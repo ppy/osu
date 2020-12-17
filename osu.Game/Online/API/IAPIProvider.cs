@@ -16,6 +16,12 @@ namespace osu.Game.Online.API
         Bindable<User> LocalUser { get; }
 
         /// <summary>
+        /// The user's friends.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// </summary>
+        BindableList<User> Friends { get; }
+
+        /// <summary>
         /// The current user's activity.
         /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>

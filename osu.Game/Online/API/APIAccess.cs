@@ -41,6 +41,8 @@ namespace osu.Game.Online.API
 
         public Bindable<User> LocalUser { get; } = new Bindable<User>(createGuestUser());
 
+        public BindableList<User> Friends { get; } = new BindableList<User>();
+
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
@@ -142,6 +144,10 @@ namespace osu.Game.Online.API
                             LocalUser.Value.Status.Value = new UserStatusOnline();
 
                             failureCount = 0;
+
+                            var friendsReq = new GetFriendsRequest();
+                            friendsReq.Success += f => Friends.AddRange(f);
+                            handleRequest(friendsReq);
 
                             //we're connected!
                             state.Value = APIState.Online;
@@ -352,8 +358,12 @@ namespace osu.Game.Online.API
             password = null;
             authentication.Clear();
 
-            // Scheduled prior to state change such that the state changed event is invoked with the correct user present
-            Schedule(() => LocalUser.Value = createGuestUser());
+            // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
+            Schedule(() =>
+            {
+                LocalUser.Value = createGuestUser();
+                Friends.Clear();
+            });
 
             state.Value = APIState.Offline;
         }
