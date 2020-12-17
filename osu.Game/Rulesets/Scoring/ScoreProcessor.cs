@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The maximum achievable base score.
         /// </summary>
-        public double MaxBaseScore { get; private set; }
+        private double maxBaseScore;
 
         private double rollingMaxBaseScore;
         private double baseScore;
@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Scoring
         private double getScore(ScoringMode mode)
         {
             return GetScore(mode, maxAchievableCombo,
-                MaxBaseScore > 0 ? baseScore / MaxBaseScore : 0,
+                maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
                 maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1,
                 scoreResultCounts);
         }
@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Scoring
                 computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
             }
 
-            double accuracy = MaxBaseScore > 0 ? computedBaseScore / MaxBaseScore : 0;
+            double accuracy = maxBaseScore > 0 ? computedBaseScore / maxBaseScore : 0;
             double comboRatio = maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1;
 
             double score = GetScore(mode, maxAchievableCombo, accuracy, comboRatio, scoreResultCounts);
@@ -299,7 +299,7 @@ namespace osu.Game.Rulesets.Scoring
             if (storeResults)
             {
                 maxAchievableCombo = HighestCombo.Value;
-                MaxBaseScore = baseScore;
+                maxBaseScore = baseScore;
             }
 
             baseScore = 0;
