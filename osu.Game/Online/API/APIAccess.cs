@@ -146,11 +146,15 @@ namespace osu.Game.Online.API
                             failureCount = 0;
 
                             var friendsReq = new GetFriendsRequest();
-                            friendsReq.Success += f => Friends.AddRange(f);
-                            handleRequest(friendsReq);
+                            friendsReq.Success += f =>
+                            {
+                                Friends.AddRange(f);
 
-                            //we're connected!
-                            state.Value = APIState.Online;
+                                //we're connected!
+                                state.Value = APIState.Online;
+                            };
+
+                            handleRequest(friendsReq);
                         };
 
                         if (!handleRequest(userReq))
