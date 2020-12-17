@@ -740,47 +740,40 @@ namespace osu.Game.Screens.Select
 
             double elapsed = Clock.CurrentTime - timeSinceLastYUpdate;
 
-            foreach (CarouselItem item in root.Children)
+            foreach (CarouselBeatmapSet set in beatmapSets)
             {
-                switch (item)
-                {
-                    case CarouselBeatmapSet set:
-                    {
-                        // find the current Y position even for filtered sets. This looks better for when the set becomes visible again as it then needs a good direction to travel from
-                        set.ExpectedYPosition = timeSinceLastYUpdate == default ? currentY : DrawableCarouselBeatmapSet.YLerp(set.CarouselYPosition, set.ExpectedYPosition, elapsed);
-                        set.CarouselYPosition = currentY;
+                // find the current Y position even for filtered sets. This looks better for when the set becomes visible again as it then needs a good direction to travel from
+                set.ExpectedYPosition = timeSinceLastYUpdate == 0 ? currentY : DrawableCarouselBeatmapSet.YLerp(set.CarouselYPosition, set.ExpectedYPosition, elapsed);
+                set.CarouselYPosition = currentY;
 
-                        if (item.Filtered.Value)
+                if (set.Filtered.Value)
+                    continue;
+
+                visibleItems.Add(set);
+
+                if (set.State.Value == CarouselItemState.Selected)
+                {
+                    // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
+                    // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
+                    // then reapply the top semi-transparent area (because carousel's screen space starts below it)
+                    scrollTarget = currentY + DrawableCarouselBeatmapSet.HEIGHT - visibleHalfHeight + BleedTop;
+
+                    foreach (var b in set.Beatmaps)
+                    {
+                        if (!b.Visible)
                             continue;
 
-                        visibleItems.Add(set);
-
-                        if (item.State.Value == CarouselItemState.Selected)
+                        if (b.State.Value == CarouselItemState.Selected)
                         {
-                            // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
-                            // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
-                            // then reapply the top semi-transparent area (because carousel's screen space starts below it)
-                            scrollTarget = currentY + DrawableCarouselBeatmapSet.HEIGHT - visibleHalfHeight + BleedTop;
-
-                            foreach (var b in set.Beatmaps)
-                            {
-                                if (!b.Visible)
-                                    continue;
-
-                                if (b.State.Value == CarouselItemState.Selected)
-                                {
-                                    scrollTarget += b.TotalHeight / 2;
-                                    break;
-                                }
-
-                                scrollTarget += b.TotalHeight;
-                            }
+                            scrollTarget += b.TotalHeight / 2;
+                            break;
                         }
 
-                        currentY += set.TotalHeight + panel_padding;
-                        break;
+                        scrollTarget += b.TotalHeight;
                     }
                 }
+
+                currentY += set.TotalHeight + panel_padding;
             }
 
             // same as before, we remove BleedBottom because it's not in Scroll screenspace
