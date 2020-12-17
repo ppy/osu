@@ -747,8 +747,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 carousel = new TestBeatmapCarousel
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Clock = Clock
+                    RelativeSizeAxes = Axes.Both
                 };
 
                 carouselAdjust?.Invoke(carousel);

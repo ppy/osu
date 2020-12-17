@@ -426,7 +426,8 @@ namespace osu.Game.Screens.Select
             if (PendingFilter?.Completed == false)
             {
                 applyActiveCriteria(false);
-                Update();
+                if (IsLoaded) // Update requires Clock to be initialized
+                    Update();
             }
         }
 
