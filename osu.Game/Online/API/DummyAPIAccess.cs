@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Users;
 
@@ -17,6 +18,12 @@ namespace osu.Game.Online.API
             Username = @"Dummy",
             Id = 1001,
         });
+
+        public BindableList<User> Friends { get; } = new BindableList<User>(new User
+        {
+            Username = @"Dummy's friend",
+            Id = 2002,
+        }.Yield());
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
