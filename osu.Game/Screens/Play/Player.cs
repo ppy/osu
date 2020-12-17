@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -156,6 +157,7 @@ namespace osu.Game.Screens.Play
                 PrepareReplay();
         }
 
+        [CanBeNull]
         private Score recordingScore;
 
         /// <summary>
