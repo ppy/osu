@@ -24,9 +24,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             Add(leaderboard = new TestGameplayLeaderboard
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Origin = Anchor.TopCentre,
                 Scale = new Vector2(2),
-                RelativeSizeAxes = Axes.X,
             });
         }
 
@@ -39,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 playerScore.Value = 1222333;
             });
 
-            AddStep("add player user", () => leaderboard.AddPlayer(playerScore, new User { Username = "You" }));
+            AddStep("add player user", () => leaderboard.AddLocalUser(playerScore, new User { Username = "You" }));
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
         }
 
@@ -75,6 +74,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 return scoreItem != null && scoreItem.ScorePosition == expectedPosition;
             }
+
+            public void AddPlayer(BindableDouble totalScore, User user) =>
+                base.AddPlayer(totalScore, new BindableDouble(1f), new BindableInt(1), user, false);
+
+            public void AddLocalUser(BindableDouble totalScore, User user) =>
+                base.AddPlayer(totalScore, new BindableDouble(1f), new BindableInt(1), user, true);
         }
     }
 }
