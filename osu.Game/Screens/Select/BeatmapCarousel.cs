@@ -424,11 +424,7 @@ namespace osu.Game.Screens.Select
         public void FlushPendingFilterOperations()
         {
             if (PendingFilter?.Completed == false)
-            {
                 applyActiveCriteria(false);
-                if (IsLoaded) // Update requires Clock to be initialized
-                    Update();
-            }
         }
 
         public void Filter(FilterCriteria newCriteria, bool debounce = true)
@@ -594,7 +590,7 @@ namespace osu.Game.Screens.Select
             {
                 displayedRange = newDisplayRange;
                 // we need to know how much it has been since last Y update so that manual scrolling looks fine
-                double elapsed = Clock.CurrentTime - timeSinceLastYUpdate;
+                double elapsed = Clock.CurrentTime - timeOfLastYUpdate.GetValueOrDefault();
 
                 if (visibleItems.Count > 0)
                 {
@@ -623,9 +619,10 @@ namespace osu.Game.Screens.Select
                     {
                         var panel = setPool.Get(p => p.Item = item);
 
-                        panel.Depth = item.CarouselYPosition;
+                        panel.Depth = item.TargetYPosition;
                         // place the panel at current Y by accounting for the time the panel has spent not updated yet
-                        panel.Y = DrawableCarouselBeatmapSet.YLerp(item.CarouselYPosition, item.ExpectedYPosition, elapsed);
+                        // this is just the initial placement, the panel will continue to travel towards the target Y position by itself
+                        panel.Y = CarouselHelper.FindPanelYPosition(item.TargetYPosition, item.YPositionOnLastFilter, elapsed);
 
                         Scroll.Add(panel);
                     }
@@ -651,11 +648,11 @@ namespace osu.Game.Screens.Select
         private (int firstIndex, int lastIndex) getDisplayRange()
         {
             // Find index range of all items that should be on-screen
-            carouselBoundsItem.CarouselYPosition = visibleUpperBound - distance_offscreen_to_preload;
+            carouselBoundsItem.TargetYPosition = visibleUpperBound - distance_offscreen_to_preload;
             int firstIndex = visibleItems.BinarySearch(carouselBoundsItem);
             if (firstIndex < 0) firstIndex = ~firstIndex;
 
-            carouselBoundsItem.CarouselYPosition = visibleBottomBound + distance_offscreen_to_preload;
+            carouselBoundsItem.TargetYPosition = visibleBottomBound + distance_offscreen_to_preload;
             int lastIndex = visibleItems.BinarySearch(carouselBoundsItem);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
@@ -724,7 +721,7 @@ namespace osu.Game.Screens.Select
         }
 
         private const float panel_padding = 5;
-        private double timeSinceLastYUpdate;
+        private double? timeOfLastYUpdate;
 
         /// <summary>
         /// Computes the target Y positions for every item in the carousel.
@@ -739,13 +736,13 @@ namespace osu.Game.Screens.Select
 
             scrollTarget = null;
 
-            double elapsed = Clock.CurrentTime - timeSinceLastYUpdate;
+            double elapsed = Clock.CurrentTime - timeOfLastYUpdate.GetValueOrDefault();
 
             foreach (CarouselBeatmapSet set in beatmapSets)
             {
-                // find the current Y position even for filtered sets. This looks better for when the set becomes visible again as it then needs a good direction to travel from
-                set.ExpectedYPosition = timeSinceLastYUpdate == 0 ? currentY : DrawableCarouselBeatmapSet.YLerp(set.CarouselYPosition, set.ExpectedYPosition, elapsed);
-                set.CarouselYPosition = currentY;
+                // find the current Y position even for filtered sets. This looks better for when the set becomes visible again as it then already has a good direction to travel from
+                set.YPositionOnLastFilter = !timeOfLastYUpdate.HasValue ? currentY : CarouselHelper.FindPanelYPosition(set.TargetYPosition, set.YPositionOnLastFilter, elapsed);
+                set.TargetYPosition = currentY;
 
                 if (set.Filtered.Value)
                     continue;
@@ -789,7 +786,7 @@ namespace osu.Game.Screens.Select
             }
 
             itemsCache.Validate();
-            timeSinceLastYUpdate = Clock.CurrentTime;
+            timeOfLastYUpdate = Clock.CurrentTime;
         }
 
         private bool firstScroll = true;
@@ -821,9 +818,9 @@ namespace osu.Game.Screens.Select
                         Scroll.ScrollTo(scrollTarget.Value, false);
 
                         // because this is an immediate scroll, which is only done during filter changes, iterating over all beatmapsets is fine
-                        // scrollChange is added to ExpectedYPosition because we would expect all panels to be shifted by the scrolled amount
+                        // scrollChange is added to YPositionOnLastFilter because this last filter operation caused the scroll and thus the vertical offset change
                         foreach (var i in root.Children)
-                            i.ExpectedYPosition += scrollChange;
+                            i.YPositionOnLastFilter += scrollChange;
 
                         foreach (var i in Scroll.Children)
                             i.Y += scrollChange;

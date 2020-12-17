@@ -13,9 +13,12 @@ namespace osu.Game.Screens.Select.Carousel
         /// <summary>
         /// An externally defined value used to determine this item's vertical display offset relative to the carousel.
         /// </summary>
-        public float CarouselYPosition;
+        public float TargetYPosition;
 
-        public float ExpectedYPosition;
+        /// <summary>
+        /// An externally defined value that was this item's vertical display offset relative to the carousel last time a filter was applied.
+        /// </summary>
+        public float YPositionOnLastFilter;
 
         public readonly BindableBool Filtered = new BindableBool();
 
@@ -51,7 +54,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => ChildID.CompareTo(other.ChildID);
 
-        public int CompareTo(CarouselItem other) => CarouselYPosition.CompareTo(other.CarouselYPosition);
+        public int CompareTo(CarouselItem other) => TargetYPosition.CompareTo(other.TargetYPosition);
     }
 
     public enum CarouselItemState
