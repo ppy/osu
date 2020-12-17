@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
 {
+    [LongRunningLoad]
     public class MultiplayerGameplayLeaderboard : GameplayLeaderboard
     {
         private readonly ScoreProcessor scoreProcessor;
