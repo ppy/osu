@@ -9,6 +9,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Database;
 using osu.Game.Online.Spectator;
@@ -29,31 +31,48 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
 
-        [SetUp]
-        public void SetUp() => Schedule(() =>
+        private MultiplayerGameplayLeaderboard leaderboard;
+
+        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+
+        public TestSceneMultiplayerGameplayLeaderboard()
         {
-            OsuScoreProcessor scoreProcessor;
-
-            streamingClient.Start(Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
-
-            Children = new Drawable[]
+            base.Content.Children = new Drawable[]
             {
                 streamingClient,
                 lookupCache,
-                scoreProcessor = new OsuScoreProcessor(),
-                new MultiplayerGameplayLeaderboard(scoreProcessor, streamingClient.PlayingUsers.ToArray())
+                Content
+            };
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("create leaderboard", () =>
+            {
+                OsuScoreProcessor scoreProcessor;
+                Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
+
+                var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
+
+                streamingClient.Start(Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
+
+                Children = new Drawable[]
+                {
+                    scoreProcessor = new OsuScoreProcessor(),
+                };
+
+                scoreProcessor.ApplyBeatmap(playable);
+
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, streamingClient.PlayingUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
-            };
+                }, Add);
+            });
 
-            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
-
-            var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-
-            scoreProcessor.ApplyBeatmap(playable);
-        });
+            AddUntilStep("wait for load", () => leaderboard.IsLoaded);
+        }
 
         [Test]
         public void TestScoreUpdates()
