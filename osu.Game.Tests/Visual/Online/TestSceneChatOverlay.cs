@@ -220,15 +220,15 @@ namespace osu.Game.Tests.Visual.Online
             // Want to close channel 2
             AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
 
-            pressControlW();
+            AddStep("Press Ctrl + W", () => pressControlW());
             // Channel 2 should be closed
-            AddAssert("channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
-            AddAssert("channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+            AddAssert("Channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("Channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
 
             // Want to close channel 1
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
-            pressControlW();
+            AddStep("Press Ctrl + W", () => pressControlW());
             // Channel 1 and channel 2 should be closed
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
@@ -243,7 +243,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             // Want to join another channel
-            pressControlT();
+            AddStep("Press Ctrl + T", () => pressControlT());
             // Selector should be visible
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
@@ -258,16 +258,16 @@ namespace osu.Game.Tests.Visual.Online
 
         private void pressControlW()
         {
-            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
-            AddStep("Press W", () => InputManager.Key(Key.W));
-            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
+            InputManager.PressKey(Key.ControlLeft);
+            InputManager.Key(Key.W);
+            InputManager.ReleaseKey(Key.ControlLeft);
         }
 
         private void pressControlT()
         {
-            AddStep("Press and hold Control", () => InputManager.PressKey(Key.ControlLeft));
-            AddStep("Press T", () => InputManager.Key(Key.T));
-            AddStep("Release Control", () => InputManager.ReleaseKey(Key.ControlLeft));
+            InputManager.PressKey(Key.ControlLeft);
+            InputManager.Key(Key.T);
+            InputManager.ReleaseKey(Key.ControlLeft);
         }
 
         private void clickDrawable(Drawable d)
