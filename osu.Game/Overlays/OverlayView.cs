@@ -42,25 +42,29 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Create the API request for fetching data.
         /// </summary>
-        protected abstract APIRequest<T> CreateRequest();
+        protected virtual APIRequest<T> CreateRequest() => null;
 
         /// <summary>
         /// Fired when results arrive from the main API request.
         /// </summary>
         /// <param name="response"></param>
-        protected abstract void OnSuccess(T response);
+        protected virtual void OnSuccess(T response)
+        {
+        }
 
         /// <summary>
         /// Force a re-request for data from the API.
         /// </summary>
-        protected void PerformFetch()
+        protected virtual void PerformFetch()
         {
             request?.Cancel();
-
             request = CreateRequest();
-            request.Success += response => Schedule(() => OnSuccess(response));
 
-            API.Queue(request);
+            if (request != null)
+            {
+                request.Success += response => Schedule(() => OnSuccess(response));
+                API.Queue(request);
+            }
         }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
