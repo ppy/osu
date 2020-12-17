@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             if (mods.Any(m => m is OsuModNoFail))
-                multiplier *= 0.90;
+                multiplier *= Math.Max(0.90, 1.0 - 0.02 * countMiss);
 
             if (mods.Any(m => m is OsuModSpunOut))
                 multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
