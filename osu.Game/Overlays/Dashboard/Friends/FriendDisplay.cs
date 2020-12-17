@@ -9,8 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using osuTK;
 
@@ -143,11 +141,11 @@ namespace osu.Game.Overlays.Dashboard.Friends
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
         }
 
-        protected override APIRequest<List<User>> CreateRequest() => new GetFriendsRequest();
-
-        protected override void OnSuccess(List<User> response)
+        protected override void PerformFetch()
         {
-            Users = response;
+            base.PerformFetch();
+
+            Users = API.Friends.ToList();
         }
 
         private void recreatePanels()
