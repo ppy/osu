@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
 using osuTK.Graphics;
 
