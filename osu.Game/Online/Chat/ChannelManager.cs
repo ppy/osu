@@ -33,7 +33,6 @@ namespace osu.Game.Online.Chat
         private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
-
         /// <summary>
         /// Keeps a list of closed channel identifiers. Stores the channel ID for normal
         /// channels, or the user ID for PM channels
@@ -461,8 +460,9 @@ namespace osu.Game.Online.Chat
                 closedChannelIds.RemoveAt(closedChannelIds.Count - 1);
 
                 bool lookupCondition(Channel ch) =>
-                    ch.Type == ChannelType.PM ? ch.Users.Any(u => u.Id == lastClosedChannelId)
-                                              : ch.Id == lastClosedChannelId;
+                    ch.Type == ChannelType.PM 
+                        ? ch.Users.Any(u => u.Id == lastClosedChannelId)
+                        : ch.Id == lastClosedChannelId;
 
                 // If the user hasn't already joined the channel, try to join it
                 if (joinedChannels.FirstOrDefault(lookupCondition) == null)
@@ -480,6 +480,7 @@ namespace osu.Game.Online.Chat
                         req.Success += user => CurrentChannel.Value = JoinChannel(new Channel(user));
                         api.Queue(req);
                     }
+                    
                     return;
                 }
             }

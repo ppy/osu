@@ -219,8 +219,8 @@ namespace osu.Game.Tests.Visual.Online
 
             // Want to close channel 2
             AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Press Ctrl + W", pressControlW);
 
-            AddStep("Press Ctrl + W", () => pressControlW());
             // Channel 2 should be closed
             AddAssert("Channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
             AddAssert("Channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
@@ -228,7 +228,7 @@ namespace osu.Game.Tests.Visual.Online
             // Want to close channel 1
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
-            AddStep("Press Ctrl + W", () => pressControlW());
+            AddStep("Press Ctrl + W", pressControlW);
             // Channel 1 and channel 2 should be closed
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
@@ -243,7 +243,8 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             // Want to join another channel
-            AddStep("Press Ctrl + T", () => pressControlT());
+            AddStep("Press Ctrl + T", pressControlT);
+            
             // Selector should be visible
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
