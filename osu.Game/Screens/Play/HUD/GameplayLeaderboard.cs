@@ -15,8 +15,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public GameplayLeaderboard()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.Both;
 
             Direction = FillDirection.Vertical;
 
@@ -29,32 +28,44 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Adds a player to the leaderboard.
         /// </summary>
-        /// <param name="currentScore">The bindable current score of the player.</param>
+        /// <param name="totalScore">A bindable of the player's total score.</param>
+        /// <param name="accuracy">A bindable of the player's accuracy.</param>
+        /// <param name="combo">A bindable of the player's current combo.</param>
         /// <param name="user">The player.</param>
-        public void AddPlayer([NotNull] BindableDouble currentScore, [NotNull] User user)
+        public void AddPlayer([NotNull] IBindableNumber<double> totalScore,
+                              [NotNull] IBindableNumber<double> accuracy,
+                              [NotNull] IBindableNumber<int> combo,
+                              [NotNull] User user)
         {
-            var scoreItem = addScore(currentScore.Value, user);
-            currentScore.ValueChanged += s => scoreItem.TotalScore = s.NewValue;
+            AddPlayer(totalScore, accuracy, combo, user, false);
         }
 
-        private GameplayLeaderboardScore addScore(double totalScore, User user)
+        /// <summary>
+        /// Adds a player to the leaderboard.
+        /// </summary>
+        /// <param name="totalScore">A bindable of the player's total score.</param>
+        /// <param name="accuracy">A bindable of the player's accuracy.</param>
+        /// <param name="combo">A bindable of the player's current combo.</param>
+        /// <param name="user">The player.</param>
+        /// <param name="localUser">Whether the provided <paramref name="user"/> is the local user.</param>
+        protected void AddPlayer([NotNull] IBindableNumber<double> totalScore,
+                                 [NotNull] IBindableNumber<double> accuracy,
+                                 [NotNull] IBindableNumber<int> combo,
+                                 [NotNull] User user, bool localUser) => Schedule(() =>
         {
-            var scoreItem = new GameplayLeaderboardScore
+            Add(new GameplayLeaderboardScore(user, localUser)
             {
-                User = user,
-                TotalScore = totalScore,
-                OnScoreChange = updateScores,
-            };
+                TotalScore = { BindTarget = totalScore },
+                Accuracy = { BindTarget = accuracy },
+                Combo = { BindTarget = combo },
+            });
 
-            Add(scoreItem);
-            updateScores();
-
-            return scoreItem;
-        }
+            totalScore.BindValueChanged(_ => updateScores(), true);
+        });
 
         private void updateScores()
         {
-            var orderedByScore = this.OrderByDescending(i => i.TotalScore).ToList();
+            var orderedByScore = this.OrderByDescending(i => i.TotalScore.Value).ToList();
 
             for (int i = 0; i < Count; i++)
             {
