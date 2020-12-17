@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             double accuracy = maxBaseScore > 0 ? computedBaseScore / maxBaseScore : 0;
-            double comboRatio = maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1;
+            double comboRatio = maxAchievableCombo > 0 ? (double)maxCombo / maxAchievableCombo : 1;
 
             double score = GetScore(mode, maxAchievableCombo, accuracy, comboRatio, scoreResultCounts);
 
