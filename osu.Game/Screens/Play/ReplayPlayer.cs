@@ -37,7 +37,8 @@ namespace osu.Game.Screens.Play
             return Score;
         }
 
-        protected override Task<ScoreInfo> SubmitScore(Score score) => Task.FromResult(score.ScoreInfo);
+        // Don't re-import replay scores as they're already present in the database.
+        protected override Task ImportScore(Score score) => Task.CompletedTask;
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
 
