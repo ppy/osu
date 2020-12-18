@@ -3,10 +3,12 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Tests.Visual.RealtimeMultiplayer
 {
+    [HeadlessTest]
     public class TestSceneRealtimeRoomManager : MultiplayerTestScene
     {
         private TestRealtimeRoomContainer roomContainer;
