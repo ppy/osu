@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
@@ -26,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float panel_height = 35f;
 
-        private OsuSpriteText positionText, scoreText, accuracyText, comboText;
+        private OsuSpriteText positionText, scoreText, accuracyText, comboText, usernameText;
 
         public readonly BindableDouble TotalScore = new BindableDouble(1000000);
         public readonly BindableDouble Accuracy = new BindableDouble(1);
@@ -45,12 +43,16 @@ namespace osu.Game.Screens.Play.HUD
                     positionText.Text = $"#{scorePosition.Value.ToMetric(decimals: scorePosition < 100000 ? 1 : 0)}";
 
                 positionText.FadeTo(scorePosition.HasValue ? 1 : 0);
+                updateColour();
             }
         }
 
         public User User { get; }
 
         private readonly bool trackedPlayer;
+
+        private Container mainFillContainer;
+        private Box centralFill;
 
         /// <summary>
         /// Creates a new <see cref="GameplayLeaderboardScore"/>.
@@ -62,62 +64,93 @@ namespace osu.Game.Screens.Play.HUD
             User = user;
             this.trackedPlayer = trackedPlayer;
 
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.X;
+            Height = panel_height;
 
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        protected override void LoadComplete()
         {
-            const float panel_shear = 0.15f;
-            const float shear_width = panel_height * panel_shear;
+            base.LoadComplete();
 
-            Color4 panelColour, textColour;
-            float panelWidth;
+            updateColour();
+            FinishTransforms(true);
+        }
 
-            if (trackedPlayer)
+        private void updateColour()
+        {
+            if (scorePosition == 1)
             {
-                panelWidth = extended_width;
+                mainFillContainer.ResizeWidthTo(extended_width, 200, Easing.OutQuint);
                 panelColour = Color4Extensions.FromHex("7fcc33");
                 textColour = Color4.White;
             }
-            else if (api.Friends.Any(f => User.Equals(f)))
+            else if (trackedPlayer)
             {
-                panelWidth = extended_width;
+                mainFillContainer.ResizeWidthTo(extended_width, 200, Easing.OutQuint);
                 panelColour = Color4Extensions.FromHex("ffd966");
                 textColour = Color4Extensions.FromHex("2e576b");
             }
             else
             {
-                panelWidth = regular_width;
+                mainFillContainer.ResizeWidthTo(regular_width, 200, Easing.OutQuint);
                 panelColour = Color4Extensions.FromHex("3399cc");
                 textColour = Color4.White;
             }
+        }
+
+        private Color4 panelColour
+        {
+            set
+            {
+                mainFillContainer.FadeColour(value, 200, Easing.OutQuint);
+                centralFill.FadeColour(value, 200, Easing.OutQuint);
+            }
+        }
+
+        private Color4 textColour
+        {
+            set
+            {
+                scoreText.FadeColour(value, 200, Easing.OutQuint);
+                accuracyText.FadeColour(value, 200, Easing.OutQuint);
+                comboText.FadeColour(value, 200, Easing.OutQuint);
+                usernameText.FadeColour(value, 200, Easing.OutQuint);
+                positionText.FadeColour(value, 200, Easing.OutQuint);
+            }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            const float panel_shear = 0.15f;
+            const float shear_width = panel_height * panel_shear;
 
             InternalChildren = new Drawable[]
             {
-                new Container
+                mainFillContainer = new Container
                 {
+                    Width = regular_width,
+                    RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Masking = true,
                     CornerRadius = 5f,
                     Shear = new Vector2(panel_shear, 0f),
-                    Size = new Vector2(panelWidth, panel_height),
                     Child = new Box
                     {
                         Alpha = 0.5f,
                         RelativeSizeAxes = Axes.Both,
-                        Colour = panelColour,
                     }
                 },
                 new GridContainer
                 {
+                    Width = regular_width,
+                    RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Size = new Vector2(regular_width, panel_height),
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 35f),
@@ -133,7 +166,7 @@ namespace osu.Game.Screens.Play.HUD
                                 Padding = new MarginPadding { Right = shear_width / 2 },
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Colour = textColour,
+                                Colour = Color4.White,
                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.Bold),
                                 Shadow = false,
                             },
@@ -151,22 +184,22 @@ namespace osu.Game.Screens.Play.HUD
                                         RelativeSizeAxes = Axes.Both,
                                         Children = new[]
                                         {
-                                            new Box
+                                            centralFill = new Box
                                             {
                                                 Alpha = 0.5f,
                                                 RelativeSizeAxes = Axes.Both,
-                                                Colour = panelColour,
+                                                Colour = Color4Extensions.FromHex("3399cc"),
                                             },
                                         }
                                     },
-                                    new OsuSpriteText
+                                    usernameText = new OsuSpriteText
                                     {
                                         Padding = new MarginPadding { Left = shear_width },
                                         RelativeSizeAxes = Axes.X,
                                         Width = 0.8f,
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Colour = textColour,
+                                        Colour = Color4.White,
                                         Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
                                         Text = User.Username,
                                         Truncate = true,
@@ -180,41 +213,31 @@ namespace osu.Game.Screens.Play.HUD
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Colour = textColour,
+                                Colour = Color4.White,
                                 Children = new Drawable[]
                                 {
                                     scoreText = new OsuSpriteText
                                     {
-                                        Anchor = Anchor.TopLeft,
-                                        Origin = Anchor.TopLeft,
-                                        Spacing = new Vector2(0.5f, 0f),
-                                        Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
+                                        Spacing = new Vector2(-1f, 0f),
+                                        Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold, fixedWidth: true),
                                         Shadow = false,
                                     },
-                                    new Container
+                                    accuracyText = new OsuSpriteText
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
-                                        Children = new Drawable[]
-                                        {
-                                            accuracyText = new OsuSpriteText
-                                            {
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.CentreLeft,
-                                                Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                                                Shadow = false,
-                                            },
-                                            comboText = new OsuSpriteText
-                                            {
-                                                Anchor = Anchor.CentreRight,
-                                                Origin = Anchor.CentreRight,
-                                                Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                                                Shadow = false,
-                                            },
-                                        }
-                                    }
+                                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold, fixedWidth: true),
+                                        Spacing = new Vector2(-1f, 0f),
+                                        Shadow = false,
+                                    },
+                                    comboText = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.BottomRight,
+                                        Origin = Anchor.BottomRight,
+                                        Spacing = new Vector2(-1f, 0f),
+                                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold, fixedWidth: true),
+                                        Shadow = false,
+                                    },
                                 },
                             }
                         }
