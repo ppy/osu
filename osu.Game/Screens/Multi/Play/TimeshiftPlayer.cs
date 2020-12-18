@@ -105,16 +105,29 @@ namespace osu.Game.Screens.Multi.Play
 
         protected override async Task<ScoreInfo> SubmitScore(Score score)
         {
-            await base.SubmitScore(score);
-
             Debug.Assert(token != null);
 
+            bool completed = false;
             var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score.ScoreInfo);
-            request.Success += s => score.ScoreInfo.OnlineScoreID = s.ID;
-            request.Failure += e => Logger.Error(e, "Failed to submit score");
+
+            request.Success += s =>
+            {
+                score.ScoreInfo.OnlineScoreID = s.ID;
+                completed = true;
+            };
+
+            request.Failure += e =>
+            {
+                Logger.Error(e, "Failed to submit score");
+                completed = true;
+            };
+
             api.Queue(request);
 
-            return score.ScoreInfo;
+            while (!completed)
+                await Task.Delay(100);
+
+            return await base.SubmitScore(score);
         }
 
         protected override void Dispose(bool isDisposing)
