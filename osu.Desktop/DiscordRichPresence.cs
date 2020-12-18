@@ -26,7 +26,7 @@ namespace osu.Desktop
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        private Bindable<User> user;
+        private IBindable<User> user;
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();

@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Menu
             if (nextScreen != null)
                 LoadComponentAsync(nextScreen);
 
-            currentUser.BindTo(api.LocalUser);
+            ((IBindable<User>)currentUser).BindTo(api.LocalUser);
         }
 
         public override void OnEntering(IScreen last)
