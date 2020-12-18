@@ -51,7 +51,6 @@ using osu.Game.Screens.Select;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
-using osu.Game.Users;
 using System.IO;
 
 namespace osu.Game
@@ -976,7 +975,7 @@ namespace osu.Game
             if (newScreen is IOsuScreen newOsuScreen)
             {
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
-                ((IBindable<UserActivity>)API.Activity).BindTo(newOsuScreen.Activity);
+                API.Activity.BindTo(newOsuScreen.Activity);
 
                 MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 
