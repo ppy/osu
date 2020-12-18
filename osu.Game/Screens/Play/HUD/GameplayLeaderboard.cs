@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public GameplayLeaderboard()
         {
-            AutoSizeAxes = Axes.Both;
+            Width = GameplayLeaderboardScore.EXTENDED_WIDTH;
 
             Direction = FillDirection.Vertical;
 
@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Play.HUD
             var drawable = new GameplayLeaderboardScore(user, isTracked);
             base.Add(drawable);
             drawable.TotalScore.BindValueChanged(_ => Scheduler.AddOnce(sort), true);
+
+            Height = Count * (GameplayLeaderboardScore.PANEL_HEIGHT + Spacing.Y);
 
             return drawable;
         }
