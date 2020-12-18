@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -132,6 +133,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
 
-        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new ManiaReplayRecorder(replay);
+        protected override ReplayRecorder CreateReplayRecorder(Score score) => new ManiaReplayRecorder(score);
     }
 }
