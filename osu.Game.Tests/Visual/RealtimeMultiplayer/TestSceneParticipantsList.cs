@@ -92,5 +92,25 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
             AddUntilStep("first user crown hidden", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(0).ChildrenOfType<SpriteIcon>().First().Alpha == 0);
             AddUntilStep("second user crown visible", () => this.ChildrenOfType<ParticipantPanel>().ElementAt(1).ChildrenOfType<SpriteIcon>().First().Alpha == 1);
         }
+
+        [Test]
+        public void TestManyUsers()
+        {
+            AddStep("add many users", () =>
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    Client.AddUser(new User
+                    {
+                        Id = i,
+                        Username = $"User {i}",
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    });
+
+                    if (i % 2 == 0)
+                        Client.ChangeUserState(i, MultiplayerUserState.Ready);
+                }
+            });
+        }
     }
 }

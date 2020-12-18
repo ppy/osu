@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
                 Child = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    ScrollbarVisible = false,
                     Child = panels = new FillFlowContainer<ParticipantPanel>
                     {
                         RelativeSizeAxes = Axes.X,
