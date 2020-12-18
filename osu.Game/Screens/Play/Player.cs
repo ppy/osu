@@ -502,6 +502,7 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate completionProgressDelegate;
+        private Task<ScoreInfo> scoreSubmissionTask;
 
         private void updateCompletionState(ValueChangedEvent<bool> completionState)
         {
@@ -528,7 +529,8 @@ namespace osu.Game.Screens.Play
 
             if (!showResults) return;
 
-            SubmitScore(CreateScore()).ContinueWith(t => Schedule(() =>
+            scoreSubmissionTask ??= SubmitScore(CreateScore());
+            scoreSubmissionTask.ContinueWith(t => Schedule(() =>
             {
                 using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
                 {
