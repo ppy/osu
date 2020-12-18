@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -93,6 +92,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        private Container dragHandles;
         private FillFlowContainer buttons;
 
         public const float BORDER_RADIUS = 3;
@@ -151,6 +151,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             Alpha = 0
                         },
                     }
+                },
+                dragHandles = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    // ensures that the centres of all drag handles line up with the middle of the selection box border.
+                    Padding = new MarginPadding(BORDER_RADIUS / 2)
                 },
                 buttons = new FillFlowContainer
                 {
@@ -233,29 +239,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
         }
 
-        private void addDragHandle(Anchor anchor) => AddInternal(new SelectionBoxDragHandle
+        private void addDragHandle(Anchor anchor) => dragHandles.Add(new SelectionBoxDragHandle
         {
             Anchor = anchor,
-            X = dragCircleAdjustments[anchor].X,
-            Y = dragCircleAdjustments[anchor].Y,
             HandleDrag = e => OnScale?.Invoke(e.Delta, anchor),
             OperationStarted = operationStarted,
             OperationEnded = operationEnded
         });
-
-        /// <summary>
-        /// Adjust Drag circle to be centered on the center of the border instead of on the edge.
-        /// </summary>
-        private Dictionary<Anchor, Vector2> dragCircleAdjustments = new Dictionary<Anchor, Vector2>(){
-            {Anchor.TopLeft, new Vector2(BORDER_RADIUS / 2)},
-            {Anchor.CentreLeft, new Vector2(BORDER_RADIUS / 2, 0)},
-            {Anchor.BottomLeft, new Vector2(BORDER_RADIUS / 2, -BORDER_RADIUS / 2)},
-            {Anchor.TopCentre, new Vector2(0, BORDER_RADIUS / 2)},
-            {Anchor.BottomCentre, new Vector2(0, -BORDER_RADIUS / 2)},
-            {Anchor.TopRight, new Vector2(-BORDER_RADIUS / 2, BORDER_RADIUS / 2)},
-            {Anchor.CentreRight, new Vector2(-BORDER_RADIUS / 2, 0)},
-            {Anchor.BottomRight, new Vector2(-BORDER_RADIUS / 2)}
-        };
 
         private int activeOperations;
 
