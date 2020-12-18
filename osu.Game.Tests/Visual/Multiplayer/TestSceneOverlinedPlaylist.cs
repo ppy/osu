@@ -22,6 +22,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(500),
+                Items = { BindTarget = Room.Playlist }
             });
         }
 
