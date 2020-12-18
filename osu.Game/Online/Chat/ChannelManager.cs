@@ -459,10 +459,9 @@ namespace osu.Game.Online.Chat
                 long lastClosedChannelId = closedChannelIds.Last();
                 closedChannelIds.RemoveAt(closedChannelIds.Count - 1);
 
-                bool lookupCondition(Channel ch) =>
-                    ch.Type == ChannelType.PM 
-                        ? ch.Users.Any(u => u.Id == lastClosedChannelId)
-                        : ch.Id == lastClosedChannelId;
+                bool lookupCondition(Channel ch) => ch.Type == ChannelType.PM
+                    ? ch.Users.Any(u => u.Id == lastClosedChannelId)
+                    : ch.Id == lastClosedChannelId;
 
                 // If the user hasn't already joined the channel, try to join it
                 if (joinedChannels.FirstOrDefault(lookupCondition) == null)
@@ -480,7 +479,7 @@ namespace osu.Game.Online.Chat
                         req.Success += user => CurrentChannel.Value = JoinChannel(new Channel(user));
                         api.Queue(req);
                     }
-                    
+
                     return;
                 }
             }
