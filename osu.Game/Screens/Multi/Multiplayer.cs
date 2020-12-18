@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -30,7 +29,7 @@ using osuTK;
 namespace osu.Game.Screens.Multi
 {
     [Cached]
-    public class Multiplayer : OsuScreen
+    public abstract class Multiplayer : OsuScreen
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
@@ -46,6 +45,9 @@ namespace osu.Game.Screens.Multi
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
+        [Cached(Type = typeof(IRoomManager))]
+        protected IRoomManager RoomManager { get; private set; }
+
         [Cached]
         private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
 
@@ -54,9 +56,6 @@ namespace osu.Game.Screens.Multi
 
         [Resolved(CanBeNull = true)]
         private MusicController music { get; set; }
-
-        [Cached(Type = typeof(IRoomManager))]
-        private RoomManager roomManager;
 
         [Resolved]
         private OsuGameBase game { get; set; }
@@ -70,7 +69,7 @@ namespace osu.Game.Screens.Multi
         private readonly Drawable header;
         private readonly Drawable headerBackground;
 
-        public Multiplayer()
+        protected Multiplayer()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -82,7 +81,7 @@ namespace osu.Game.Screens.Multi
             InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     new Box
                     {
@@ -137,7 +136,7 @@ namespace osu.Game.Screens.Multi
                         Origin = Anchor.TopRight,
                         Action = () => CreateRoom()
                     },
-                    roomManager = new RoomManager()
+                    (Drawable)(RoomManager = CreateRoomManager())
                 }
             };
 
@@ -168,7 +167,7 @@ namespace osu.Game.Screens.Multi
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            isIdle.BindValueChanged(idle => updatePollingRate(idle.NewValue), true);
+            isIdle.BindValueChanged(idle => UpdatePollingRate(idle.NewValue), true);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -178,36 +177,7 @@ namespace osu.Game.Screens.Multi
             return dependencies;
         }
 
-        private void updatePollingRate(bool idle)
-        {
-            if (!this.IsCurrentScreen())
-            {
-                roomManager.TimeBetweenListingPolls = 0;
-                roomManager.TimeBetweenSelectionPolls = 0;
-            }
-            else
-            {
-                switch (screenStack.CurrentScreen)
-                {
-                    case LoungeSubScreen _:
-                        roomManager.TimeBetweenListingPolls = idle ? 120000 : 15000;
-                        roomManager.TimeBetweenSelectionPolls = idle ? 120000 : 15000;
-                        break;
-
-                    case MatchSubScreen _:
-                        roomManager.TimeBetweenListingPolls = 0;
-                        roomManager.TimeBetweenSelectionPolls = idle ? 30000 : 5000;
-                        break;
-
-                    default:
-                        roomManager.TimeBetweenListingPolls = 0;
-                        roomManager.TimeBetweenSelectionPolls = 0;
-                        break;
-                }
-            }
-
-            Logger.Log($"Polling adjusted (listing: {roomManager.TimeBetweenListingPolls}, selection: {roomManager.TimeBetweenSelectionPolls})");
-        }
+        protected abstract void UpdatePollingRate(bool isIdle);
 
         private void forcefullyExit()
         {
@@ -241,7 +211,7 @@ namespace osu.Game.Screens.Multi
 
             beginHandlingTrack();
 
-            updatePollingRate(isIdle.Value);
+            UpdatePollingRate(isIdle.Value);
         }
 
         public override void OnSuspending(IScreen next)
@@ -251,12 +221,12 @@ namespace osu.Game.Screens.Multi
 
             endHandlingTrack();
 
-            updatePollingRate(isIdle.Value);
+            UpdatePollingRate(isIdle.Value);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            roomManager.PartRoom();
+            RoomManager.PartRoom();
 
             waves.Hide();
 
@@ -344,11 +314,13 @@ namespace osu.Game.Screens.Multi
             if (newScreen is IOsuScreen newOsuScreen)
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
 
-            updatePollingRate(isIdle.Value);
+            UpdatePollingRate(isIdle.Value);
             createButton.FadeTo(newScreen is LoungeSubScreen ? 1 : 0, 200);
 
             updateTrack();
         }
+
+        protected IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
         private void updateTrack(ValueChangedEvent<WorkingBeatmap> _ = null)
         {
@@ -380,6 +352,8 @@ namespace osu.Game.Screens.Multi
                 track.RestartPoint = 0;
             }
         }
+
+        protected abstract IRoomManager CreateRoomManager();
 
         private class MultiplayerWaveContainer : WaveContainer
         {
