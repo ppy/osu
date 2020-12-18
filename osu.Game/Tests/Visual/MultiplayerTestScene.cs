@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Visual
     public abstract class MultiplayerTestScene : ScreenTestScene
     {
         [Cached]
-        private readonly Bindable<Room> currentRoom = new Bindable<Room>(new Room());
+        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
 
         protected Room Room => currentRoom.Value;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Room.CopyFrom(new Room());
+            currentRoom.Value = new Room();
         });
     }
 }
