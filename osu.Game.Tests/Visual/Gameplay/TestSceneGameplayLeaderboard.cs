@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -64,6 +65,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("is player position #1", () => leaderboard.CheckPositionByUsername("You", 1));
             AddAssert("is player 3 position #2", () => leaderboard.CheckPositionByUsername("Player 3", 2));
             AddAssert("is player 2 position #3", () => leaderboard.CheckPositionByUsername("Player 2", 3));
+        }
+
+        [Test]
+        public void TestRandomScores()
+        {
+            int playerNumber = 1;
+            AddRepeatStep("add player with random score", () => leaderboard.Add(createLeaderboardScore(new BindableDouble(RNG.Next(0, 5_000_000)), $"Player {playerNumber++}")), 10);
         }
 
         private static GameplayLeaderboardScore createLeaderboardScore(BindableDouble score, string username, bool localOrReplayPlayer = false)
