@@ -20,9 +20,9 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
     {
-        public const float EXTENDED_WIDTH = 235f;
+        public const float EXTENDED_WIDTH = 255f;
 
-        private const float regular_width = 215f;
+        private const float regular_width = 235f;
 
         public const float PANEL_HEIGHT = 35f;
 
