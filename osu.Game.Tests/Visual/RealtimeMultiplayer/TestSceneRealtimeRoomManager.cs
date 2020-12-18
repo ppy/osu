@@ -1,0 +1,105 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using NUnit.Framework;
+using osu.Framework.Graphics;
+using osu.Game.Online.Multiplayer;
+
+namespace osu.Game.Tests.Visual.RealtimeMultiplayer
+{
+    public class TestSceneRealtimeRoomManager : MultiplayerTestScene
+    {
+        private TestRealtimeRoomContainer roomContainer;
+        private TestRealtimeRoomManager roomManager => roomContainer.RoomManager;
+
+        [Test]
+        public void TestPollsInitially()
+        {
+            AddStep("create room manager with a few rooms", () =>
+            {
+                createRoomManager().With(d => d.OnLoadComplete += _ =>
+                {
+                    roomManager.CreateRoom(new Room { Name = { Value = "1" } });
+                    roomManager.PartRoom();
+                    roomManager.CreateRoom(new Room { Name = { Value = "2" } });
+                    roomManager.PartRoom();
+                    roomManager.ClearRooms();
+                });
+            });
+
+            AddAssert("manager polled for rooms", () => roomManager.Rooms.Count == 2);
+            AddAssert("initial rooms received", () => roomManager.InitialRoomsReceived.Value);
+        }
+
+        [Test]
+        public void TestRoomsClearedOnDisconnection()
+        {
+            AddStep("create room manager with a few rooms", () =>
+            {
+                createRoomManager().With(d => d.OnLoadComplete += _ =>
+                {
+                    roomManager.CreateRoom(new Room());
+                    roomManager.PartRoom();
+                    roomManager.CreateRoom(new Room());
+                    roomManager.PartRoom();
+                });
+            });
+
+            AddStep("disconnect", () => roomContainer.Client.Disconnect());
+
+            AddAssert("rooms cleared", () => roomManager.Rooms.Count == 0);
+            AddAssert("initial rooms not received", () => !roomManager.InitialRoomsReceived.Value);
+        }
+
+        [Test]
+        public void TestRoomsPolledOnReconnect()
+        {
+            AddStep("create room manager with a few rooms", () =>
+            {
+                createRoomManager().With(d => d.OnLoadComplete += _ =>
+                {
+                    roomManager.CreateRoom(new Room());
+                    roomManager.PartRoom();
+                    roomManager.CreateRoom(new Room());
+                    roomManager.PartRoom();
+                });
+            });
+
+            AddStep("disconnect", () => roomContainer.Client.Disconnect());
+            AddStep("connect", () => roomContainer.Client.Connect());
+
+            AddAssert("manager polled for rooms", () => roomManager.Rooms.Count == 2);
+            AddAssert("initial rooms received", () => roomManager.InitialRoomsReceived.Value);
+        }
+
+        [Test]
+        public void TestRoomsNotPolledWhenJoined()
+        {
+            AddStep("create room manager with a room", () =>
+            {
+                createRoomManager().With(d => d.OnLoadComplete += _ =>
+                {
+                    roomManager.CreateRoom(new Room());
+                    roomManager.ClearRooms();
+                });
+            });
+
+            AddAssert("manager not polled for rooms", () => roomManager.Rooms.Count == 0);
+            AddAssert("initial rooms not received", () => !roomManager.InitialRoomsReceived.Value);
+        }
+
+        private TestRealtimeRoomManager createRoomManager()
+        {
+            Child = roomContainer = new TestRealtimeRoomContainer
+            {
+                RoomManager =
+                {
+                    TimeBetweenListingPolls = { Value = 1 },
+                    TimeBetweenSelectionPolls = { Value = 1 }
+                }
+            };
+
+            return roomManager;
+        }
+    }
+}
