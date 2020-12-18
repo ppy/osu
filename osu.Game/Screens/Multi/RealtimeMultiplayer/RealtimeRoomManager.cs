@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
         private readonly Bindable<bool> allowPolling = new Bindable<bool>();
 
+        private ListingPollingComponent listingPollingComponent;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -38,6 +40,22 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         public override void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             => base.JoinRoom(room, r => joinMultiplayerRoom(r, onSuccess), onError);
+
+        public override void PartRoom()
+        {
+            if (JoinedRoom == null)
+                return;
+
+            var joinedRoom = JoinedRoom;
+
+            base.PartRoom();
+            multiplayerClient.LeaveRoom().Wait();
+
+            // Todo: This is not the way to do this. Basically when we're the only participant and the room closes, there's no way to know if this is actually the case.
+            RemoveRoom(joinedRoom);
+            // This is delayed one frame because upon exiting the match subscreen, multiplayer updates the polling rate and messes with polling.
+            Schedule(() => listingPollingComponent.PollImmediately());
+        }
 
         private void joinMultiplayerRoom(Room room, Action<Room> onSuccess = null)
         {
@@ -64,7 +82,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         protected override RoomPollingComponent[] CreatePollingComponents() => new RoomPollingComponent[]
         {
-            new RealtimeListingPollingComponent
+            listingPollingComponent = new RealtimeListingPollingComponent
             {
                 TimeBetweenPolls = { BindTarget = TimeBetweenListingPolls },
                 AllowPolling = { BindTarget = allowPolling }

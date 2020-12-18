@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Multi.Components
             api.Queue(currentJoinRoomRequest);
         }
 
-        public void PartRoom()
+        public virtual void PartRoom()
         {
             currentJoinRoomRequest?.Cancel();
 
@@ -156,6 +156,8 @@ namespace osu.Game.Screens.Multi.Components
 
             RoomsUpdated?.Invoke();
         }
+
+        protected void RemoveRoom(Room room) => rooms.Remove(room);
 
         protected void ClearRooms()
         {
