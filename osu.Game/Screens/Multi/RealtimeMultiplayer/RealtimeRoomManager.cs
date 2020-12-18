@@ -21,17 +21,16 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         public readonly Bindable<double> TimeBetweenListingPolls = new Bindable<double>();
         public readonly Bindable<double> TimeBetweenSelectionPolls = new Bindable<double>();
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
+        private readonly Bindable<bool> allowPolling = new Bindable<bool>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             isConnected.BindTo(multiplayerClient.IsConnected);
-            isConnected.BindValueChanged(connected => Schedule(() =>
-            {
-                if (!connected.NewValue)
-                    ClearRooms();
-            }));
+            isConnected.BindValueChanged(_ => Schedule(updatePolling), true);
+
+            updatePolling();
         }
 
         public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
@@ -54,17 +53,26 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             }, TaskContinuationOptions.NotOnRanToCompletion);
         }
 
+        private void updatePolling()
+        {
+            if (!isConnected.Value)
+                ClearRooms();
+
+            // Don't poll when not connected or when a room has been joined.
+            allowPolling.Value = isConnected.Value && JoinedRoom == null;
+        }
+
         protected override RoomPollingComponent[] CreatePollingComponents() => new RoomPollingComponent[]
         {
             new RealtimeListingPollingComponent
             {
                 TimeBetweenPolls = { BindTarget = TimeBetweenListingPolls },
-                AllowPolling = { BindTarget = isConnected }
+                AllowPolling = { BindTarget = allowPolling }
             },
             new RealtimeSelectionPollingComponent
             {
                 TimeBetweenPolls = { BindTarget = TimeBetweenSelectionPolls },
-                AllowPolling = { BindTarget = isConnected }
+                AllowPolling = { BindTarget = allowPolling }
             }
         };
 
