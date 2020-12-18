@@ -235,8 +235,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void addDragHandle(Anchor anchor) => AddInternal(new SelectionBoxDragHandle
         {
             Anchor = anchor,
-            Y = getAdjustmentToCenterCircleOnBorder(anchor).Y,
             X = getAdjustmentToCenterCircleOnBorder(anchor).X,
+            Y = getAdjustmentToCenterCircleOnBorder(anchor).Y,
             HandleDrag = e => OnScale?.Invoke(e.Delta, anchor),
             OperationStarted = operationStarted,
             OperationEnded = operationEnded
