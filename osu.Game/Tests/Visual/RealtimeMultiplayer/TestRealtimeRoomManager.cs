@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.RealtimeMultiplayer;
 
 namespace osu.Game.Tests.Visual.RealtimeMultiplayer
@@ -22,6 +24,9 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
         [Resolved]
         private OsuGameBase game { get; set; }
 
+        [Cached]
+        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>(new FilterCriteria());
+
         private readonly List<Room> rooms = new List<Room>();
 
         protected override void LoadComplete()
@@ -29,6 +34,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
             base.LoadComplete();
 
             int currentScoreId = 0;
+            int currentRoomId = 0;
 
             ((DummyAPIAccess)api).HandleRequest = req =>
             {
@@ -38,7 +44,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
                         var createdRoom = new APICreatedRoom();
 
                         createdRoom.CopyFrom(createRoomRequest.Room);
-                        createdRoom.RoomID.Value = 1;
+                        createdRoom.RoomID.Value ??= currentRoomId++;
 
                         rooms.Add(createdRoom);
                         createRoomRequest.TriggerSuccess(createdRoom);
@@ -102,6 +108,8 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
                 }
             };
         }
+
+        public new void ClearRooms() => base.ClearRooms();
 
         public new void Schedule(Action action) => base.Schedule(action);
     }
