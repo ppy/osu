@@ -269,6 +269,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 case Anchor.BottomLeft:
                     adjustment.X = BORDER_RADIUS / 2;
                     break;
+
                 case Anchor.TopRight:
                 case Anchor.CentreRight:
                 case Anchor.BottomRight:
@@ -283,6 +284,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 case Anchor.TopRight:
                     adjustment.Y = BORDER_RADIUS / 2;
                     break;
+
                 case Anchor.BottomLeft:
                 case Anchor.BottomCentre:
                 case Anchor.BottomRight:
