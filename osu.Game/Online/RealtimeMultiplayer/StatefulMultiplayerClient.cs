@@ -117,7 +117,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// Change the current <see cref="MultiplayerRoom"/> settings.
         /// </summary>
         /// <remarks>
-        /// A room must have been joined via <see cref="JoinRoom"/> for this to have any effect.
+        /// A room must be joined for this to have any effect.
         /// </remarks>
         /// <param name="name">The new room name, if any.</param>
         /// <param name="item">The new room playlist item, if any.</param>
