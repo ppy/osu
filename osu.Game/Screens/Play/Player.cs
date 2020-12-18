@@ -23,8 +23,10 @@ using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -781,8 +783,7 @@ namespace osu.Game.Screens.Play
             else
             {
                 score.ScoreInfo.User = api.LocalUser.Value;
-                if (recordingScore?.Replay.Frames.Count > 0)
-                    score.Replay = recordingScore.Replay;
+                score.Replay = new Replay { Frames = recordingScore?.Replay.Frames.ToList() ?? new List<ReplayFrame>() };
             }
 
             ScoreProcessor.PopulateScore(score.ScoreInfo);
