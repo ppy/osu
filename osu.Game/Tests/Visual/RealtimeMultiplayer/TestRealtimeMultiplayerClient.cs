@@ -16,10 +16,15 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
 {
     public class TestRealtimeMultiplayerClient : StatefulMultiplayerClient
     {
-        public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
+        public override IBindable<bool> IsConnected => isConnected;
+        private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        public void Connect() => isConnected.Value = true;
+
+        public void Disconnect() => isConnected.Value = false;
 
         public void AddUser(User user) => ((IMultiplayerClient)this).UserJoined(new MultiplayerRoomUser(user.Id) { User = user });
 
