@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -52,7 +53,23 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
                         break;
 
                     case GetRoomsRequest getRoomsRequest:
-                        getRoomsRequest.TriggerSuccess(rooms);
+                        var roomsWithoutParticipants = new List<Room>();
+
+                        foreach (var r in rooms)
+                        {
+                            var newRoom = new Room();
+
+                            newRoom.CopyFrom(r);
+                            newRoom.RecentParticipants.Clear();
+
+                            roomsWithoutParticipants.Add(newRoom);
+                        }
+
+                        getRoomsRequest.TriggerSuccess(roomsWithoutParticipants);
+                        break;
+
+                    case GetRoomRequest getRoomRequest:
+                        getRoomRequest.TriggerSuccess(rooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId));
                         break;
 
                     case GetBeatmapSetRequest getBeatmapSetRequest:
