@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
@@ -16,6 +17,22 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
     {
         [Resolved]
         private StatefulMultiplayerClient multiplayerClient { get; set; }
+
+        public readonly Bindable<double> TimeBetweenListingPolls = new Bindable<double>();
+        public readonly Bindable<double> TimeBetweenSelectionPolls = new Bindable<double>();
+        private readonly IBindable<bool> isConnected = new Bindable<bool>();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            isConnected.BindTo(multiplayerClient.IsConnected);
+            isConnected.BindValueChanged(connected => Schedule(() =>
+            {
+                if (!connected.NewValue)
+                    ClearRooms();
+            }));
+        }
 
         public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             => base.CreateRoom(room, r => joinMultiplayerRoom(r, onSuccess), onError);
@@ -39,7 +56,52 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         protected override RoomPollingComponent[] CreatePollingComponents() => new RoomPollingComponent[]
         {
-            new ListingPollingComponent()
+            new RealtimeListingPollingComponent
+            {
+                TimeBetweenPolls = { BindTarget = TimeBetweenListingPolls },
+                AllowPolling = { BindTarget = isConnected }
+            },
+            new RealtimeSelectionPollingComponent
+            {
+                TimeBetweenPolls = { BindTarget = TimeBetweenSelectionPolls },
+                AllowPolling = { BindTarget = isConnected }
+            }
         };
+
+        private class RealtimeListingPollingComponent : ListingPollingComponent
+        {
+            public readonly IBindable<bool> AllowPolling = new Bindable<bool>();
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                AllowPolling.BindValueChanged(_ =>
+                {
+                    if (IsLoaded)
+                        PollImmediately();
+                });
+            }
+
+            protected override Task Poll() => !AllowPolling.Value ? Task.CompletedTask : base.Poll();
+        }
+
+        private class RealtimeSelectionPollingComponent : SelectionPollingComponent
+        {
+            public readonly IBindable<bool> AllowPolling = new Bindable<bool>();
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                AllowPolling.BindValueChanged(_ =>
+                {
+                    if (IsLoaded)
+                        PollImmediately();
+                });
+            }
+
+            protected override Task Poll() => !AllowPolling.Value ? Task.CompletedTask : base.Poll();
+        }
     }
 }

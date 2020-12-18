@@ -157,6 +157,12 @@ namespace osu.Game.Screens.Multi.Components
             RoomsUpdated?.Invoke();
         }
 
+        protected void ClearRooms()
+        {
+            rooms.Clear();
+            InitialRoomsReceived.Value = false;
+        }
+
         /// <summary>
         /// Updates a local <see cref="Room"/> with a remote copy.
         /// </summary>
