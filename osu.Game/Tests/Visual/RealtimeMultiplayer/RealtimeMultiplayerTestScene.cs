@@ -44,10 +44,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
             RoomManager.Schedule(() => RoomManager.PartRoom());
 
             if (joinRoom)
-            {
-                Room.RoomID.Value = 1;
-                RoomManager.Schedule(() => RoomManager.JoinRoom(Room, null, null));
-            }
+                RoomManager.Schedule(() => RoomManager.CreateRoom(Room));
         });
     }
 }
