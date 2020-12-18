@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.Multi
 {
+    [Cached(typeof(IRoomManager))]
     public interface IRoomManager
     {
         /// <summary>
