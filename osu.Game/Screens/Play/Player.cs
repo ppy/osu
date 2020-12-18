@@ -536,7 +536,7 @@ namespace osu.Game.Screens.Play
                     {
                         // screen may be in the exiting transition phase.
                         if (this.IsCurrentScreen())
-                            GotoRanking(t.Result);
+                            this.Push(CreateResults(t.Result));
                     });
                 }
             }));
@@ -738,6 +738,10 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(next);
         }
 
+        /// <summary>
+        /// Creates the player's <see cref="Score"/>.
+        /// </summary>
+        /// <returns>The <see cref="Score"/>.</returns>
         protected virtual Score CreateScore()
         {
             var score = new Score
@@ -767,6 +771,11 @@ namespace osu.Game.Screens.Play
             return score;
         }
 
+        /// <summary>
+        /// Submits the player's <see cref="Score"/>.
+        /// </summary>
+        /// <param name="score">The <see cref="Score"/> to submit.</param>
+        /// <returns>The submitted score.</returns>
         protected virtual async Task<ScoreInfo> SubmitScore(Score score)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
@@ -784,9 +793,12 @@ namespace osu.Game.Screens.Play
             return await scoreManager.Import(score.ScoreInfo, replayReader);
         }
 
+        /// <summary>
+        /// Creates the <see cref="ResultsScreen"/> for a <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to be displayed in the results screen.</param>
+        /// <returns>The <see cref="ResultsScreen"/>.</returns>
         protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true);
-
-        protected virtual void GotoRanking(ScoreInfo score) => this.Push(CreateResults(score));
 
         private void fadeOut(bool instant = false)
         {
