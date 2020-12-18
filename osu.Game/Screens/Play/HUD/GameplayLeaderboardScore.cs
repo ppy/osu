@@ -19,10 +19,11 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
     {
-        private const float regular_width = 215f;
-        private const float extended_width = 235f;
+        public const float EXTENDED_WIDTH = 235f;
 
-        private const float panel_height = 35f;
+        private const float regular_width = 215f;
+
+        public const float PANEL_HEIGHT = 35f;
 
         private OsuSpriteText positionText, scoreText, accuracyText, comboText, usernameText;
 
@@ -67,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD
             User = user;
             this.trackedPlayer = trackedPlayer;
 
-            Size = new Vector2(extended_width, panel_height);
+            Size = new Vector2(EXTENDED_WIDTH, PANEL_HEIGHT);
         }
 
         protected override void LoadComplete()
@@ -84,13 +85,13 @@ namespace osu.Game.Screens.Play.HUD
         {
             if (scorePosition == 1)
             {
-                mainFillContainer.ResizeWidthTo(extended_width, transition_duration, Easing.OutElastic);
+                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
                 panelColour = Color4Extensions.FromHex("7fcc33");
                 textColour = Color4.White;
             }
             else if (trackedPlayer)
             {
-                mainFillContainer.ResizeWidthTo(extended_width, transition_duration, Easing.OutElastic);
+                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
                 panelColour = Color4Extensions.FromHex("ffd966");
                 textColour = Color4Extensions.FromHex("2e576b");
             }
@@ -127,7 +128,7 @@ namespace osu.Game.Screens.Play.HUD
         private void load()
         {
             const float panel_shear = 0.15f;
-            const float shear_width = panel_height * panel_shear;
+            const float shear_width = PANEL_HEIGHT * panel_shear;
 
             InternalChildren = new Drawable[]
             {
