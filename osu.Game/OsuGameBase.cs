@@ -403,7 +403,7 @@ namespace osu.Game
             }
         }
 
-        public async Task Import(Stream stream, string filename)
+        public virtual async Task Import(Stream stream, string filename)
         {
             var extension = Path.GetExtension(filename)?.ToLowerInvariant();
 
