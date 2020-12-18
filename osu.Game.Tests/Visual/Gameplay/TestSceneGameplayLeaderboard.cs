@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 playerScore.Value = 1222333;
             });
 
-            AddStep("add player user", () => leaderboard.AddLocalUser(playerScore, new User { Username = "You" }));
+            AddStep("add local player", () => leaderboard.Add(createLeaderboardScore(playerScore, "You", true)));
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
         }
 
@@ -48,8 +48,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             var player2Score = new BindableDouble(1234567);
             var player3Score = new BindableDouble(1111111);
 
-            AddStep("add player 2", () => leaderboard.AddPlayer(player2Score, new User { Username = "Player 2" }));
-            AddStep("add player 3", () => leaderboard.AddPlayer(player3Score, new User { Username = "Player 3" }));
+            AddStep("add player 2", () => leaderboard.Add(createLeaderboardScore(player2Score, "Player 2")));
+            AddStep("add player 3", () => leaderboard.Add(createLeaderboardScore(player3Score, "Player 3")));
 
             AddAssert("is player 2 position #1", () => leaderboard.CheckPositionByUsername("Player 2", 1));
             AddAssert("is player position #2", () => leaderboard.CheckPositionByUsername("You", 2));
@@ -66,6 +66,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("is player 2 position #3", () => leaderboard.CheckPositionByUsername("Player 2", 3));
         }
 
+        private static GameplayLeaderboardScore createLeaderboardScore(BindableDouble score, string username, bool localOrReplayPlayer = false)
+        {
+            return new GameplayLeaderboardScore(new User { Username = username }, localOrReplayPlayer)
+            {
+                TotalScore = { BindTarget = score },
+            };
+        }
+
         private class TestGameplayLeaderboard : GameplayLeaderboard
         {
             public bool CheckPositionByUsername(string username, int? expectedPosition)
@@ -74,12 +82,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 return scoreItem != null && scoreItem.ScorePosition == expectedPosition;
             }
-
-            public void AddPlayer(BindableDouble totalScore, User user) =>
-                base.AddPlayer(totalScore, new BindableDouble(1f), new BindableInt(1), user, false);
-
-            public void AddLocalUser(BindableDouble totalScore, User user) =>
-                base.AddPlayer(totalScore, new BindableDouble(1f), new BindableInt(1), user, true);
         }
     }
 }
