@@ -27,8 +27,9 @@ namespace osu.Game.Screens.Play.HUD
         private const float panel_height = 35f;
 
         private OsuSpriteText positionText, scoreText, accuracyText, comboText;
-        public readonly BindableDouble TotalScore = new BindableDouble();
-        public readonly BindableDouble Accuracy = new BindableDouble();
+
+        public readonly BindableDouble TotalScore = new BindableDouble(1000000);
+        public readonly BindableDouble Accuracy = new BindableDouble(1);
         public readonly BindableInt Combo = new BindableInt();
 
         private int? scorePosition;
