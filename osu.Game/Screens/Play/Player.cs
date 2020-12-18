@@ -537,13 +537,23 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    return await SubmitScore(score);
+                    await SubmitScore(score);
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(ex, "Score submission failed!");
-                    return score.ScoreInfo;
                 }
+
+                try
+                {
+                    await ImportScore(score);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Score import failed!");
+                }
+
+                return score.ScoreInfo;
             });
 
             using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
@@ -792,15 +802,15 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Submits the player's <see cref="Score"/>.
+        /// Imports the player's <see cref="Score"/> to the local database.
         /// </summary>
-        /// <param name="score">The <see cref="Score"/> to submit.</param>
-        /// <returns>The submitted score.</returns>
-        protected virtual async Task<ScoreInfo> SubmitScore(Score score)
+        /// <param name="score">The <see cref="Score"/> to import.</param>
+        /// <returns>The imported score.</returns>
+        protected virtual async Task ImportScore(Score score)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
             if (DrawableRuleset.ReplayScore != null)
-                return score.ScoreInfo;
+                return;
 
             LegacyByteArrayReader replayReader;
 
@@ -810,8 +820,15 @@ namespace osu.Game.Screens.Play
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
-            return await scoreManager.Import(score.ScoreInfo, replayReader);
+            await scoreManager.Import(score.ScoreInfo, replayReader);
         }
+
+        /// <summary>
+        /// Submits the player's <see cref="Score"/>.
+        /// </summary>
+        /// <param name="score">The <see cref="Score"/> to submit.</param>
+        /// <returns>The submitted score.</returns>
+        protected virtual Task SubmitScore(Score score) => Task.CompletedTask;
 
         /// <summary>
         /// Creates the <see cref="ResultsScreen"/> for a <see cref="ScoreInfo"/>.

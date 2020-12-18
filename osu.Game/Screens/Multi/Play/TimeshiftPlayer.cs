@@ -103,8 +103,10 @@ namespace osu.Game.Screens.Multi.Play
             return score;
         }
 
-        protected override async Task<ScoreInfo> SubmitScore(Score score)
+        protected override async Task SubmitScore(Score score)
         {
+            await base.SubmitScore(score);
+
             Debug.Assert(token != null);
 
             var tcs = new TaskCompletionSource<bool>();
@@ -124,8 +126,6 @@ namespace osu.Game.Screens.Multi.Play
 
             api.Queue(request);
             await tcs.Task;
-
-            return await base.SubmitScore(score);
         }
 
         protected override void Dispose(bool isDisposing)
