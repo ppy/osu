@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 playerScore.Value = 1222333;
             });
 
-            AddStep("add local player", () => leaderboard.Add(createLeaderboardScore(playerScore, "You", true)));
+            AddStep("add local player", () => createLeaderboardScore(playerScore, "You", true));
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
         }
 
@@ -49,8 +49,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             var player2Score = new BindableDouble(1234567);
             var player3Score = new BindableDouble(1111111);
 
-            AddStep("add player 2", () => leaderboard.Add(createLeaderboardScore(player2Score, "Player 2")));
-            AddStep("add player 3", () => leaderboard.Add(createLeaderboardScore(player3Score, "Player 3")));
+            AddStep("add player 2", () => createLeaderboardScore(player2Score, "Player 2"));
+            AddStep("add player 3", () => createLeaderboardScore(player3Score, "Player 3"));
 
             AddAssert("is player 2 position #1", () => leaderboard.CheckPositionByUsername("Player 2", 1));
             AddAssert("is player position #2", () => leaderboard.CheckPositionByUsername("You", 2));
@@ -71,15 +71,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestRandomScores()
         {
             int playerNumber = 1;
-            AddRepeatStep("add player with random score", () => leaderboard.Add(createLeaderboardScore(new BindableDouble(RNG.Next(0, 5_000_000)), $"Player {playerNumber++}")), 10);
+            AddRepeatStep("add player with random score", () => createLeaderboardScore(new BindableDouble(RNG.Next(0, 5_000_000)), $"Player {playerNumber++}"), 10);
         }
 
-        private static GameplayLeaderboardScore createLeaderboardScore(BindableDouble score, string username, bool localOrReplayPlayer = false)
+        private void createLeaderboardScore(BindableDouble score, string username, bool isTracked = false)
         {
-            return new GameplayLeaderboardScore(new User { Username = username }, localOrReplayPlayer)
-            {
-                TotalScore = { BindTarget = score },
-            };
+            var leaderboardScore = leaderboard.AddPlayer(new User { Username = username }, isTracked);
+            leaderboardScore.TotalScore.BindTo(score);
         }
 
         private class TestGameplayLeaderboard : GameplayLeaderboard
