@@ -531,28 +531,7 @@ namespace osu.Game.Screens.Play
                 completionProgressDelegate = Schedule(GotoRanking);
         }
 
-        protected virtual ScoreInfo CreateScore()
-        {
-            var score = new ScoreInfo
-            {
-                Beatmap = Beatmap.Value.BeatmapInfo,
-                Ruleset = rulesetInfo,
-                Mods = Mods.Value.ToArray(),
-            };
-
-            if (DrawableRuleset.ReplayScore != null)
-                score.User = DrawableRuleset.ReplayScore.ScoreInfo?.User ?? new GuestUser();
-            else
-                score.User = api.LocalUser.Value;
-
-            ScoreProcessor.PopulateScore(score);
-
-            return score;
-        }
-
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
-
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true);
 
         #region Fail Logic
 
@@ -748,6 +727,25 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(next);
         }
 
+        protected virtual ScoreInfo CreateScore()
+        {
+            var score = new ScoreInfo
+            {
+                Beatmap = Beatmap.Value.BeatmapInfo,
+                Ruleset = rulesetInfo,
+                Mods = Mods.Value.ToArray(),
+            };
+
+            if (DrawableRuleset.ReplayScore != null)
+                score.User = DrawableRuleset.ReplayScore.ScoreInfo?.User ?? new GuestUser();
+            else
+                score.User = api.LocalUser.Value;
+
+            ScoreProcessor.PopulateScore(score);
+
+            return score;
+        }
+
         protected virtual void GotoRanking()
         {
             if (DrawableRuleset.ReplayScore != null)
@@ -780,6 +778,8 @@ namespace osu.Game.Screens.Play
                                 this.Push(CreateResults(imported.Result));
                         }));
         }
+
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true);
 
         private void fadeOut(bool instant = false)
         {
