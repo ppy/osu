@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Multi.Components
             {
                 var rooms = new List<Room>(roomManager.Rooms);
 
-                int index = rooms.FindIndex(r => r.RoomID == result.RoomID);
+                int index = rooms.FindIndex(r => r.RoomID.Value == result.RoomID.Value);
                 if (index < 0)
                     return;
 
