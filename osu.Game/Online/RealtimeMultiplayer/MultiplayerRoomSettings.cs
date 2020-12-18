@@ -18,13 +18,20 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         public int RulesetID { get; set; }
 
+        public string BeatmapChecksum { get; set; } = string.Empty;
+
         public string Name { get; set; } = "Unnamed room";
 
         [NotNull]
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
-        public bool Equals(MultiplayerRoomSettings other) => BeatmapID == other.BeatmapID && Mods.SequenceEqual(other.Mods) && RulesetID == other.RulesetID && Name.Equals(other.Name, StringComparison.Ordinal);
+        public bool Equals(MultiplayerRoomSettings other)
+            => BeatmapID == other.BeatmapID
+               && BeatmapChecksum == other.BeatmapChecksum
+               && Mods.SequenceEqual(other.Mods)
+               && RulesetID == other.RulesetID
+               && Name.Equals(other.Name, StringComparison.Ordinal);
 
-        public override string ToString() => $"Name:{Name} Beatmap:{BeatmapID} Mods:{string.Join(',', Mods)} Ruleset:{RulesetID}";
+        public override string ToString() => $"Name:{Name} Beatmap:{BeatmapID} ({BeatmapChecksum}) Mods:{string.Join(',', Mods)} Ruleset:{RulesetID}";
     }
 }

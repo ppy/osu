@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -21,7 +22,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -157,6 +157,7 @@ namespace osu.Game.Screens.Play
                 PrepareReplay();
         }
 
+        [CanBeNull]
         private Score recordingScore;
 
         /// <summary>
@@ -164,7 +165,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual void PrepareReplay()
         {
-            DrawableRuleset.SetRecordTarget(recordingScore = new Score { Replay = new Replay() });
+            DrawableRuleset.SetRecordTarget(recordingScore = new Score());
 
             ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(recordingScore.ScoreInfo);
         }
