@@ -37,6 +37,9 @@ namespace osu.Game.Screens.Play.HUD
             get => scorePosition;
             set
             {
+                if (value == scorePosition)
+                    return;
+
                 scorePosition = value;
 
                 if (scorePosition.HasValue)
