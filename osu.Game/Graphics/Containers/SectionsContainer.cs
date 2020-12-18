@@ -134,12 +134,18 @@ namespace osu.Game.Graphics.Containers
             lastKnownScroll = float.NaN;
             headerHeight = float.NaN;
             footerHeight = float.NaN;
+
+            if (drawable == null)
+                return;
+
+            if (smallestSection == null || smallestSection.Height > drawable.Height)
+                smallestSection = drawable;
         }
 
         public void ScrollTo(Drawable section)
         {
             lastClickedSection = section;
-            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
+            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - scrollContainer.DisplayableContent * scroll_target_multiplier - (FixedHeader?.BoundingBox.Height ?? 0));
         }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
@@ -202,6 +208,11 @@ namespace osu.Game.Graphics.Containers
             selectMostVisible();
         }
 
+        // these multipliers act on scrollContainer.DisplayableContent
+        private const float scroll_target_multiplier = 0.2f;
+        private const float bottom_visibility_cutoff_multiplier = 0.66f;
+        private T smallestSection;
+
         /// <summary>
         /// Changes <see cref="SelectedSection"/> to currently most visible section
         /// </summary>
@@ -211,8 +222,13 @@ namespace osu.Game.Graphics.Containers
             if (scrollContainer.UserScrolling)
                 lastClickedSection = null;
 
-            // we are scrolled all the way to the bottom
-            // select the section user clicked for or the very last section
+            // If we are scrolled to the extremes we need to select the section user clicked for or the very first/last section
+            if (Precision.AlmostBigger(0, scrollContainer.Current))
+            {
+                SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
+                return;
+            }
+
             if (Precision.AlmostBigger(scrollContainer.Current, scrollContainer.ScrollableExtent))
             {
                 SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
@@ -234,11 +250,8 @@ namespace osu.Game.Graphics.Containers
             float bIndex = IndexOf(b);
             float aVisibleHeight = visibleHeight(a);
             float bVisibleHeight = visibleHeight(b);
-
-            // visibility requirement is lower (only 80%) for the section user clicked for
-            // this makes the section get selected sooner when scrolling upwards, to match it already getting selected sooner when scrolling downwards
-            bool aAllVisible = Precision.AlmostBigger(aVisibleHeight / a.Height, lastClickedSection == a ? 0.8f : 1.0f);
-            bool bAllVisible = Precision.AlmostBigger(bVisibleHeight / b.Height, lastClickedSection == b ? 0.8f : 1.0f);
+            bool aAllVisible = Precision.AlmostBigger(aVisibleHeight / a.Height, 1.0f);
+            bool bAllVisible = Precision.AlmostBigger(bVisibleHeight / b.Height, 1.0f);
 
             // if one is all visible while the other isn't
             if (aAllVisible != bAllVisible)
@@ -265,8 +278,14 @@ namespace osu.Game.Graphics.Containers
             float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
             float sectionPosition = scrollContainer.GetChildPosInContent(section) - scrollOffset;
 
-            float top = Math.Max(sectionPosition, currentScroll);
-            float bottom = Math.Min(sectionPosition + section.Height, currentScroll + scrollContainer.DisplayableContent);
+            // set top cutoff such that if the smallest section is above our target then the section at our target is more visible in every situation
+            // that is to say, top cutoff should be just above scroll target but not so much above that the smallest section could be 100% visible,
+            // hiding, or being more visible than, our actual target section when above it
+            float topCutoff = Math.Max(currentScroll, currentScroll + scrollContainer.DisplayableContent * scroll_target_multiplier - smallestSection.Height * 0.9f);
+            float bottomCutoff = currentScroll + scrollContainer.DisplayableContent * bottom_visibility_cutoff_multiplier;
+
+            float top = Math.Max(sectionPosition, topCutoff);
+            float bottom = Math.Min(sectionPosition + section.Height, bottomCutoff);
             return bottom - top;
         }
 

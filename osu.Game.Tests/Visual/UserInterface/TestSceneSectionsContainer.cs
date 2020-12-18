@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("add half", () => append(1 / 2.0f));
             AddStep("add full", () => append(1));
             AddSliderStep("set custom", 0.1f, 1.1f, 0.5f, i => custom = i);
-            AddStep("add custom", () => append(container.ChildSize.Y - header_height * custom));
+            AddStep("add custom", () => append(custom));
             AddStep("scroll to previous", () => container.ScrollTo(
                 container.Children.Reverse().SkipWhile(s => s != container.SelectedSection.Value).Skip(1).FirstOrDefault() ?? container.Children.First()
             ));
@@ -67,11 +67,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestCorrectSectionSelected()
         {
             const int sections_count = 11;
+            float[] alternating = { 0.07f, 0.33f, 0.16f, 0.33f };
             AddStep("clear", () => container.Clear());
             AddStep("fill with sections", () =>
             {
                 for (int i = 0; i < sections_count; i++)
-                    append((1 + i % 2) / 6.0f); // alternate between big and small sections
+                    append(alternating[i % alternating.Length]);
             });
 
             void step(int scrollIndex)
