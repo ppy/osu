@@ -2,11 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using JetBrains.Annotations;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -15,8 +12,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public GameplayLeaderboard()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.Both;
 
             Direction = FillDirection.Vertical;
 
@@ -26,35 +22,15 @@ namespace osu.Game.Screens.Play.HUD
             LayoutEasing = Easing.OutQuint;
         }
 
-        /// <summary>
-        /// Adds a player to the leaderboard.
-        /// </summary>
-        /// <param name="currentScore">The bindable current score of the player.</param>
-        /// <param name="user">The player.</param>
-        public void AddPlayer([NotNull] IBindableNumber<double> currentScore, [NotNull] User user)
+        public override void Add(GameplayLeaderboardScore drawable)
         {
-            var scoreItem = addScore(currentScore.Value, user);
-            currentScore.ValueChanged += s => scoreItem.TotalScore = s.NewValue;
-        }
-
-        private GameplayLeaderboardScore addScore(double totalScore, User user)
-        {
-            var scoreItem = new GameplayLeaderboardScore
-            {
-                User = user,
-                TotalScore = totalScore,
-                OnScoreChange = updateScores,
-            };
-
-            Add(scoreItem);
-            updateScores();
-
-            return scoreItem;
+            base.Add(drawable);
+            drawable?.TotalScore.BindValueChanged(_ => updateScores(), true);
         }
 
         private void updateScores()
         {
-            var orderedByScore = this.OrderByDescending(i => i.TotalScore).ToList();
+            var orderedByScore = this.OrderByDescending(i => i.TotalScore.Value).ToList();
 
             for (int i = 0; i < Count; i++)
             {
