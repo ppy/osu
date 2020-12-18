@@ -50,12 +50,17 @@ namespace osu.Game.Screens.Play.HUD
 
         public User User { get; }
 
-        private readonly bool localUser;
+        private readonly bool localOrReplayPlayer;
 
-        public GameplayLeaderboardScore(User user, bool localUser)
+        /// <summary>
+        /// Creates a new <see cref="GameplayLeaderboardScore"/>.
+        /// </summary>
+        /// <param name="user">The score's player.</param>
+        /// <param name="localOrReplayPlayer">Whether the player is the local user or a replay player.</param>
+        public GameplayLeaderboardScore(User user, bool localOrReplayPlayer)
         {
             User = user;
-            this.localUser = localUser;
+            this.localOrReplayPlayer = localOrReplayPlayer;
 
             AutoSizeAxes = Axes.Both;
 
@@ -72,7 +77,7 @@ namespace osu.Game.Screens.Play.HUD
             Color4 panelColour, textColour;
             float panelWidth;
 
-            if (localUser)
+            if (localOrReplayPlayer)
             {
                 panelWidth = extended_width;
                 panelColour = Color4Extensions.FromHex("7fcc33");
