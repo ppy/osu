@@ -16,6 +16,7 @@ using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
+
 {
     public class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
     {
@@ -24,6 +25,10 @@ namespace osu.Game.Screens.Play.HUD
         private const float regular_width = 215f;
 
         public const float PANEL_HEIGHT = 35f;
+
+        public const float SHEAR_WIDTH = PANEL_HEIGHT * panel_shear;
+
+        private const float panel_shear = 0.15f;
 
         private OsuSpriteText positionText, scoreText, accuracyText, comboText, usernameText;
 
@@ -127,9 +132,6 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float panel_shear = 0.15f;
-            const float shear_width = PANEL_HEIGHT * panel_shear;
-
             InternalChildren = new Drawable[]
             {
                 mainFillContainer = new Container
@@ -165,7 +167,7 @@ namespace osu.Game.Screens.Play.HUD
                         {
                             positionText = new OsuSpriteText
                             {
-                                Padding = new MarginPadding { Right = shear_width / 2 },
+                                Padding = new MarginPadding { Right = SHEAR_WIDTH / 2 },
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Colour = Color4.White,
@@ -174,7 +176,7 @@ namespace osu.Game.Screens.Play.HUD
                             },
                             new Container
                             {
-                                Padding = new MarginPadding { Horizontal = shear_width / 3 },
+                                Padding = new MarginPadding { Horizontal = SHEAR_WIDTH / 3 },
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
@@ -196,7 +198,7 @@ namespace osu.Game.Screens.Play.HUD
                                     },
                                     usernameText = new OsuSpriteText
                                     {
-                                        Padding = new MarginPadding { Left = shear_width },
+                                        Padding = new MarginPadding { Left = SHEAR_WIDTH },
                                         RelativeSizeAxes = Axes.X,
                                         Width = 0.8f,
                                         Anchor = Anchor.CentreLeft,
