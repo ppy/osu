@@ -22,7 +22,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// <param name="userId">The new user which is to become host.</param>
         /// <exception cref="NotHostException">A user other than the current host is attempting to transfer host.</exception>
         /// <exception cref="NotJoinedRoomException">If the user is not in a room.</exception>
-        Task TransferHost(long userId);
+        Task TransferHost(int userId);
 
         /// <summary>
         /// As the host, update the settings of the currently joined room.
