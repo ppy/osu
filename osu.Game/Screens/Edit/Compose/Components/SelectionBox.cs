@@ -257,6 +257,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Adjust Drag circle to be centered on the center of the border instead of on the edge.
         /// </summary>
         /// <param name="anchor">The part of the rectangle to be adjusted.</param>
+        /// <returns>A 2d vector on how much to adjust the drag circle</returns>
         private Vector2 getAdjustmentToCenterCircleOnBorder(Anchor anchor)
         {
             Vector2 adjustment = Vector2.Zero;
