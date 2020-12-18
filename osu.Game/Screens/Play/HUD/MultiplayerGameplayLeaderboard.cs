@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.Play.HUD
         private Bindable<ScoringMode> scoringMode;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, IAPIProvider api)
         {
             streamingClient.OnNewFrames += handleIncomingFrames;
 
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.Play.HUD
                 var trackedUser = new TrackedUserData();
 
                 userScores[user] = trackedUser;
-                AddPlayer(trackedUser.Score, resolvedUser);
+                Add(new GameplayLeaderboardScore(resolvedUser, resolvedUser.Id == api.LocalUser.Value.Id)); //trackedUser.Score, resolvedUser);
             }
 
             scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
