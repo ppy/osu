@@ -107,25 +107,23 @@ namespace osu.Game.Screens.Multi.Play
         {
             Debug.Assert(token != null);
 
-            bool completed = false;
+            var tcs = new TaskCompletionSource<bool>();
             var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score.ScoreInfo);
 
             request.Success += s =>
             {
                 score.ScoreInfo.OnlineScoreID = s.ID;
-                completed = true;
+                tcs.SetResult(true);
             };
 
             request.Failure += e =>
             {
                 Logger.Error(e, "Failed to submit score");
-                completed = true;
+                tcs.SetResult(false);
             };
 
             api.Queue(request);
-
-            while (!completed)
-                await Task.Delay(100);
+            await tcs.Task;
 
             return await base.SubmitScore(score);
         }
