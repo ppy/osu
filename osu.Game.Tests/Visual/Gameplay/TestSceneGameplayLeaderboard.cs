@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -24,9 +25,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             Add(leaderboard = new TestGameplayLeaderboard
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Origin = Anchor.TopCentre,
                 Scale = new Vector2(2),
-                RelativeSizeAxes = Axes.X,
             });
         }
 
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 playerScore.Value = 1222333;
             });
 
-            AddStep("add player user", () => leaderboard.AddPlayer(playerScore, new User { Username = "You" }));
+            AddStep("add local player", () => leaderboard.Add(createLeaderboardScore(playerScore, "You", true)));
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
         }
 
@@ -49,8 +49,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             var player2Score = new BindableDouble(1234567);
             var player3Score = new BindableDouble(1111111);
 
-            AddStep("add player 2", () => leaderboard.AddPlayer(player2Score, new User { Username = "Player 2" }));
-            AddStep("add player 3", () => leaderboard.AddPlayer(player3Score, new User { Username = "Player 3" }));
+            AddStep("add player 2", () => leaderboard.Add(createLeaderboardScore(player2Score, "Player 2")));
+            AddStep("add player 3", () => leaderboard.Add(createLeaderboardScore(player3Score, "Player 3")));
 
             AddAssert("is player 2 position #1", () => leaderboard.CheckPositionByUsername("Player 2", 1));
             AddAssert("is player position #2", () => leaderboard.CheckPositionByUsername("You", 2));
@@ -65,6 +65,21 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("is player position #1", () => leaderboard.CheckPositionByUsername("You", 1));
             AddAssert("is player 3 position #2", () => leaderboard.CheckPositionByUsername("Player 3", 2));
             AddAssert("is player 2 position #3", () => leaderboard.CheckPositionByUsername("Player 2", 3));
+        }
+
+        [Test]
+        public void TestRandomScores()
+        {
+            int playerNumber = 1;
+            AddRepeatStep("add player with random score", () => leaderboard.Add(createLeaderboardScore(new BindableDouble(RNG.Next(0, 5_000_000)), $"Player {playerNumber++}")), 10);
+        }
+
+        private static GameplayLeaderboardScore createLeaderboardScore(BindableDouble score, string username, bool localOrReplayPlayer = false)
+        {
+            return new GameplayLeaderboardScore(new User { Username = username }, localOrReplayPlayer)
+            {
+                TotalScore = { BindTarget = score },
+            };
         }
 
         private class TestGameplayLeaderboard : GameplayLeaderboard
