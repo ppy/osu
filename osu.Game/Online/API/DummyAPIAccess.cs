@@ -19,11 +19,7 @@ namespace osu.Game.Online.API
             Id = 1001,
         });
 
-        public BindableList<User> Friends { get; } = new BindableList<User>(new User
-        {
-            Username = @"Dummy's friend",
-            Id = 2002,
-        }.Yield());
+        public BindableList<User> Friends { get; } = new BindableList<User>();
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
@@ -93,5 +89,9 @@ namespace osu.Game.Online.API
         }
 
         public void SetState(APIState newState) => state.Value = newState;
+
+        IBindable<User> IAPIProvider.LocalUser => LocalUser;
+        IBindableList<User> IAPIProvider.Friends => Friends;
+        IBindable<UserActivity> IAPIProvider.Activity => Activity;
     }
 }

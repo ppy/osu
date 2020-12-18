@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Menu
 {
     internal class MenuLogoVisualisation : LogoVisualisation
     {
-        private Bindable<User> user;
+        private IBindable<User> user;
         private Bindable<Skin> skin;
 
         [BackgroundDependencyLoader]
