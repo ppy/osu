@@ -153,8 +153,7 @@ namespace osu.Game.Online.API
 
                         if (!handleRequest(userReq))
                         {
-                            if (State.Value == APIState.Connecting)
-                                state.Value = APIState.Failing;
+                            failConnectionProcess();
                             continue;
                         }
 
@@ -170,7 +169,11 @@ namespace osu.Game.Online.API
                         };
 
                         if (!handleRequest(friendsReq))
-                            state.Value = APIState.Failing;
+                        {
+                            failConnectionProcess();
+                            continue;
+                        }
+
                         // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
                         // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
                         // before actually going online.
@@ -202,6 +205,13 @@ namespace osu.Game.Online.API
                 }
 
                 Thread.Sleep(50);
+            }
+
+            void failConnectionProcess()
+            {
+                // if something went wrong during the connection process, we want to reset the state (but only if still connecting).
+                if (State.Value == APIState.Connecting)
+                    state.Value = APIState.Failing;
             }
         }
 
