@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;

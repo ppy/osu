@@ -59,7 +59,7 @@ namespace osu.Desktop
             try
             {
                 using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                    stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString()?.Split('"')[1].Replace("osu!.exe", "");
+                    stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
 
                 if (checkExists(stableInstallPath))
                     return stableInstallPath;
@@ -138,7 +138,7 @@ namespace osu.Desktop
                     break;
 
                 // SDL2 DesktopWindow
-                case DesktopWindow desktopWindow:
+                case SDL2DesktopWindow desktopWindow:
                     desktopWindow.CursorState |= CursorState.Hidden;
                     desktopWindow.SetIconFromStream(iconStream);
                     desktopWindow.Title = Name;

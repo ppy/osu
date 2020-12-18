@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK;

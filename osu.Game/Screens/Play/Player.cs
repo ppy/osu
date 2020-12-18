@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -21,7 +22,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -157,14 +157,17 @@ namespace osu.Game.Screens.Play
                 PrepareReplay();
         }
 
-        private Replay recordingReplay;
+        [CanBeNull]
+        private Score recordingScore;
 
         /// <summary>
         /// Run any recording / playback setup for replays.
         /// </summary>
         protected virtual void PrepareReplay()
         {
-            DrawableRuleset.SetRecordTarget(recordingReplay = new Replay());
+            DrawableRuleset.SetRecordTarget(recordingScore = new Score());
+
+            ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(recordingScore.ScoreInfo);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -339,7 +342,11 @@ namespace osu.Game.Screens.Play
                         AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                         IsCounting = false
                     },
-                    RequestSeek = GameplayClockContainer.Seek,
+                    RequestSeek = time =>
+                    {
+                        GameplayClockContainer.Seek(time);
+                        GameplayClockContainer.Start();
+                    },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
@@ -545,7 +552,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score);
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true);
 
         #region Fail Logic
 
@@ -754,9 +761,9 @@ namespace osu.Game.Screens.Play
 
             var score = new Score { ScoreInfo = CreateScore() };
 
-            if (recordingReplay?.Frames.Count > 0)
+            if (recordingScore?.Replay.Frames.Count > 0)
             {
-                score.Replay = recordingReplay;
+                score.Replay = recordingScore.Replay;
 
                 using (var stream = new MemoryStream())
                 {

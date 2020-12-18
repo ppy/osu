@@ -7,6 +7,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
+        protected DrawableSpinner DrawableSpinner => (DrawableSpinner)ParentHitObject;
+
         public DrawableSpinnerTick()
             : base(null)
         {
@@ -16,6 +18,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             : base(spinnerTick)
         {
         }
+
+        protected override double MaximumJudgementOffset => DrawableSpinner.HitObject.Duration;
 
         /// <summary>
         /// Apply a judgement result.

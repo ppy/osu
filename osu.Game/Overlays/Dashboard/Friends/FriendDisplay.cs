@@ -5,18 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendDisplay : OverlayView<List<User>>
+    public class FriendDisplay : CompositeDrawable
     {
         private List<User> users = new List<User>();
 
@@ -41,8 +41,16 @@ namespace osu.Game.Overlays.Dashboard.Friends
         private Container itemsPlaceholder;
         private LoadingLayer loading;
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private readonly IBindableList<User> apiFriends = new BindableList<User>();
+
+        public FriendDisplay()
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
         {
             InternalChild = new FillFlowContainer
             {
@@ -132,6 +140,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
             background.Colour = colourProvider.Background4;
             controlBackground.Colour = colourProvider.Background5;
+
+            apiFriends.BindTo(api.Friends);
+            apiFriends.BindCollectionChanged((_, __) => Schedule(() => Users = apiFriends.ToList()), true);
         }
 
         protected override void LoadComplete()
@@ -141,13 +152,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
             onlineStreamControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
-        }
-
-        protected override APIRequest<List<User>> CreateRequest() => new GetFriendsRequest();
-
-        protected override void OnSuccess(List<User> response)
-        {
-            Users = response;
         }
 
         private void recreatePanels()

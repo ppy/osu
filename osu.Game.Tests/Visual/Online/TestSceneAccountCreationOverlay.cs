@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         private readonly Container userPanelArea;
 
-        private Bindable<User> localUser;
+        private IBindable<User> localUser;
 
         public TestSceneAccountCreationOverlay()
         {

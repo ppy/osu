@@ -9,8 +9,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 {
     public class BananaShower : CatchHitObject, IHasDuration
     {
-        public override FruitVisualRepresentation VisualRepresentation => FruitVisualRepresentation.Banana;
-
         public override bool LastInCombo => true;
 
         public override Judgement CreateJudgement() => new IgnoreJudgement();

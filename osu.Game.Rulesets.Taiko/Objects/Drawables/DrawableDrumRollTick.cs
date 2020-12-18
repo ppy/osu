@@ -4,12 +4,12 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
+    public class DrawableDrumRollTick : DrawableTaikoStrongableHitObject<DrumRollTick, DrumRollTick.StrongNestedHit>
     {
         /// <summary>
         /// The hit type corresponding to the <see cref="TaikoAction"/> that the user pressed to hit this <see cref="DrawableDrumRollTick"/>.
@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
                 Filled = HitObject.FirstTick
             });
+
+        protected override double MaximumJudgementOffset => HitObject.HitWindow;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -59,12 +61,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return UpdateResult(true);
         }
 
-        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongNestedHit(DrumRollTick.StrongNestedHit hitObject) => new StrongNestedHit(hitObject, this);
 
         private class StrongNestedHit : DrawableStrongNestedHit
         {
-            public StrongNestedHit(StrongHitObject strong, DrawableDrumRollTick tick)
-                : base(strong, tick)
+            public StrongNestedHit(DrumRollTick.StrongNestedHit nestedHit, DrawableDrumRollTick tick)
+                : base(nestedHit, tick)
             {
             }
 

@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Catch.Replays
             float lastPosition = CatchPlayfield.CENTER_X;
             double lastTime = 0;
 
-            void moveToNext(CatchHitObject h)
+            void moveToNext(PalpableCatchHitObject h)
             {
-                float positionChange = Math.Abs(lastPosition - h.X);
+                float positionChange = Math.Abs(lastPosition - h.EffectiveX);
                 double timeAvailable = h.StartTime - lastTime;
 
                 // So we can either make it there without a dash or not.
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 // todo: get correct catcher size, based on difficulty CS.
                 const float catcher_width_half = CatcherArea.CATCHER_SIZE * 0.3f * 0.5f;
 
-                if (lastPosition - catcher_width_half < h.X && lastPosition + catcher_width_half > h.X)
+                if (lastPosition - catcher_width_half < h.EffectiveX && lastPosition + catcher_width_half > h.EffectiveX)
                 {
                     // we are already in the correct range.
                     lastTime = h.StartTime;
@@ -66,12 +66,12 @@ namespace osu.Game.Rulesets.Catch.Replays
 
                 if (impossibleJump)
                 {
-                    addFrame(h.StartTime, h.X);
+                    addFrame(h.StartTime, h.EffectiveX);
                 }
                 else if (h.HyperDash)
                 {
                     addFrame(h.StartTime - timeAvailable, lastPosition);
-                    addFrame(h.StartTime, h.X);
+                    addFrame(h.StartTime, h.EffectiveX);
                 }
                 else if (dashRequired)
                 {
@@ -80,44 +80,37 @@ namespace osu.Game.Rulesets.Catch.Replays
                     double timeWeNeedToSave = timeAtNormalSpeed - timeAvailable;
                     double timeAtDashSpeed = timeWeNeedToSave / 2;
 
-                    float midPosition = (float)Interpolation.Lerp(lastPosition, h.X, (float)timeAtDashSpeed / timeAvailable);
+                    float midPosition = (float)Interpolation.Lerp(lastPosition, h.EffectiveX, (float)timeAtDashSpeed / timeAvailable);
 
                     // dash movement
                     addFrame(h.StartTime - timeAvailable + 1, lastPosition, true);
                     addFrame(h.StartTime - timeAvailable + timeAtDashSpeed, midPosition);
-                    addFrame(h.StartTime, h.X);
+                    addFrame(h.StartTime, h.EffectiveX);
                 }
                 else
                 {
                     double timeBefore = positionChange / movement_speed;
 
                     addFrame(h.StartTime - timeBefore, lastPosition);
-                    addFrame(h.StartTime, h.X);
+                    addFrame(h.StartTime, h.EffectiveX);
                 }
 
                 lastTime = h.StartTime;
-                lastPosition = h.X;
+                lastPosition = h.EffectiveX;
             }
 
             foreach (var obj in Beatmap.HitObjects)
             {
-                switch (obj)
+                if (obj is PalpableCatchHitObject palpableObject)
                 {
-                    case Fruit _:
-                        moveToNext(obj);
-                        break;
+                    moveToNext(palpableObject);
                 }
 
                 foreach (var nestedObj in obj.NestedHitObjects.Cast<CatchHitObject>())
                 {
-                    switch (nestedObj)
+                    if (nestedObj is PalpableCatchHitObject palpableNestedObject)
                     {
-                        case Banana _:
-                        case TinyDroplet _:
-                        case Droplet _:
-                        case Fruit _:
-                            moveToNext(nestedObj);
-                            break;
+                        moveToNext(palpableNestedObject);
                     }
                 }
             }

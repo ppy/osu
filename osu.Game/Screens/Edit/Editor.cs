@@ -106,6 +106,12 @@ namespace osu.Game.Screens.Edit
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host, OsuConfigManager config)
         {
+            if (Beatmap.Value is DummyWorkingBeatmap)
+            {
+                isNewBeatmap = true;
+                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+            }
+
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
@@ -121,12 +127,6 @@ namespace osu.Game.Screens.Edit
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
-
-            if (Beatmap.Value is DummyWorkingBeatmap)
-            {
-                isNewBeatmap = true;
-                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
-            }
 
             try
             {
@@ -375,6 +375,9 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnScroll(ScrollEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+                return false;
+
             const double precision = 1;
 
             double scrollComponent = e.ScrollDelta.X + e.ScrollDelta.Y;

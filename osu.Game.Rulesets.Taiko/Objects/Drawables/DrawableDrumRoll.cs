@@ -8,18 +8,18 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK.Graphics;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRoll : DrawableTaikoHitObject<DrumRoll>
+    public class DrawableDrumRoll : DrawableTaikoStrongableHitObject<DrumRoll, DrumRoll.StrongNestedHit>
     {
         /// <summary>
         /// Number of rolling hits required to reach the dark/final colour.
@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Content.X = DrawHeight / 2;
         }
 
-        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongNestedHit(DrumRoll.StrongNestedHit hitObject) => new StrongNestedHit(hitObject, this);
 
         private void updateColour()
         {
@@ -164,8 +164,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private class StrongNestedHit : DrawableStrongNestedHit
         {
-            public StrongNestedHit(StrongHitObject strong, DrawableDrumRoll drumRoll)
-                : base(strong, drumRoll)
+            public StrongNestedHit(DrumRoll.StrongNestedHit nestedHit, DrawableDrumRoll drumRoll)
+                : base(nestedHit, drumRoll)
             {
             }
 
