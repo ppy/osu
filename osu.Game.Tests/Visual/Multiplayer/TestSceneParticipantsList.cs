@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -12,15 +11,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         protected override bool UseOnlineAPI => true;
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
-        {
-            Room = new Room { RoomID = { Value = 7 } };
-        });
-
         public TestSceneParticipantsList()
         {
             Add(new ParticipantsList { RelativeSizeAxes = Axes.Both });
         }
+
+        [SetUp]
+        public new void Setup() => Schedule(() =>
+        {
+            Room.RoomID.Value = 7;
+        });
     }
 }

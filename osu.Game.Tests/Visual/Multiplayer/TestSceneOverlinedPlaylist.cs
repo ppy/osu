@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Osu;
@@ -16,7 +17,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public TestSceneOverlinedPlaylist()
         {
-            Room = new Room { RoomID = { Value = 7 } };
+            Add(new DrawableRoomPlaylist(false, false)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(500),
+            });
+        }
+
+        [SetUp]
+        public new void Setup() => Schedule(() =>
+        {
+            Room.RoomID.Value = 7;
 
             for (int i = 0; i < 10; i++)
             {
@@ -27,13 +39,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 });
             }
-
-            Add(new DrawableRoomPlaylist(false, false)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(500),
-            });
-        }
+        });
     }
 }
