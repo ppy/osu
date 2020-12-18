@@ -244,7 +244,7 @@ namespace osu.Game.Tests.Visual.Online
 
             // Want to join another channel
             AddStep("Press Ctrl + T", pressControlT);
-            
+
             // Selector should be visible
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
