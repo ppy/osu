@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class GameplayLeaderboardScore : CompositeDrawable
+    public class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
     {
         private const float regular_width = 215f;
         private const float extended_width = 235f;
@@ -26,9 +26,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private OsuSpriteText positionText, scoreText, accuracyText, comboText, usernameText;
 
-        public readonly BindableDouble TotalScore = new BindableDouble(1000000);
-        public readonly BindableDouble Accuracy = new BindableDouble(1);
-        public readonly BindableInt Combo = new BindableInt();
+        public BindableDouble TotalScore { get; } = new BindableDouble();
+        public BindableDouble Accuracy { get; } = new BindableDouble(1);
+        public BindableInt Combo { get; } = new BindableInt();
 
         private int? scorePosition;
 
