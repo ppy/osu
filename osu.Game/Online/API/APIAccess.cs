@@ -145,16 +145,14 @@ namespace osu.Game.Online.API
 
                             failureCount = 0;
 
-                            var friendsReq = new GetFriendsRequest();
-                            friendsReq.Success += f =>
+                            fetchFriends(() =>
                             {
-                                Friends.AddRange(f);
-
                                 //we're connected!
                                 state.Value = APIState.Online;
-                            };
-
-                            handleRequest(friendsReq);
+                            }, () =>
+                            {
+                                state.Value = APIState.Failing;
+                            });
                         };
 
                         if (!handleRequest(userReq))
@@ -253,6 +251,19 @@ namespace osu.Game.Online.API
             }
 
             return null;
+        }
+
+        private void fetchFriends(Action onSuccess, Action onFail)
+        {
+            var friendsReq = new GetFriendsRequest();
+            friendsReq.Success += res =>
+            {
+                Friends.AddRange(res);
+                onSuccess?.Invoke();
+            };
+
+            if (!handleRequest(friendsReq))
+                onFail?.Invoke();
         }
 
         /// <summary>
