@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -235,12 +236,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void addDragHandle(Anchor anchor) => AddInternal(new SelectionBoxDragHandle
         {
             Anchor = anchor,
-            X = getAdjustmentToCenterCircleOnBorder(anchor).X,
-            Y = getAdjustmentToCenterCircleOnBorder(anchor).Y,
+            X = dragCircleAdjustments[anchor].X,
+            Y = dragCircleAdjustments[anchor].Y,
             HandleDrag = e => OnScale?.Invoke(e.Delta, anchor),
             OperationStarted = operationStarted,
             OperationEnded = operationEnded
         });
+
+        /// <summary>
+        /// Adjust Drag circle to be centered on the center of the border instead of on the edge.
+        /// </summary>
+        private Dictionary<Anchor, Vector2> dragCircleAdjustments = new Dictionary<Anchor, Vector2>(){
+            {Anchor.TopLeft, new Vector2(BORDER_RADIUS / 2)},
+            {Anchor.CentreLeft, new Vector2(BORDER_RADIUS / 2, 0)},
+            {Anchor.BottomLeft, new Vector2(BORDER_RADIUS / 2, -BORDER_RADIUS / 2)},
+            {Anchor.TopCentre, new Vector2(0, BORDER_RADIUS / 2)},
+            {Anchor.BottomCentre, new Vector2(0, -BORDER_RADIUS / 2)},
+            {Anchor.TopRight, new Vector2(-BORDER_RADIUS / 2, BORDER_RADIUS / 2)},
+            {Anchor.CentreRight, new Vector2(-BORDER_RADIUS / 2, 0)},
+            {Anchor.BottomRight, new Vector2(-BORDER_RADIUS / 2)}
+        };
 
         private int activeOperations;
 
@@ -251,48 +266,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float endAngle = MathF.Atan2(e.MousePosition.Y - DrawHeight / 2, e.MousePosition.X - DrawWidth / 2);
 
             return (endAngle - startAngle) * 180 / MathF.PI;
-        }
-
-        /// <summary>
-        /// Adjust Drag circle to be centered on the center of the border instead of on the edge.
-        /// </summary>
-        /// <param name="anchor">The part of the rectangle to be adjusted.</param>
-        /// <returns>A 2d vector on how much to adjust the drag circle</returns>
-        private Vector2 getAdjustmentToCenterCircleOnBorder(Anchor anchor)
-        {
-            Vector2 adjustment = Vector2.Zero;
-
-            switch (anchor)
-            {
-                case Anchor.TopLeft:
-                case Anchor.CentreLeft:
-                case Anchor.BottomLeft:
-                    adjustment.X = BORDER_RADIUS / 2;
-                    break;
-
-                case Anchor.TopRight:
-                case Anchor.CentreRight:
-                case Anchor.BottomRight:
-                    adjustment.X = -BORDER_RADIUS / 2;
-                    break;
-            }
-
-            switch (anchor)
-            {
-                case Anchor.TopLeft:
-                case Anchor.TopCentre:
-                case Anchor.TopRight:
-                    adjustment.Y = BORDER_RADIUS / 2;
-                    break;
-
-                case Anchor.BottomLeft:
-                case Anchor.BottomCentre:
-                case Anchor.BottomRight:
-                    adjustment.Y = -BORDER_RADIUS / 2;
-                    break;
-            }
-
-            return adjustment;
         }
 
         private void operationEnded()
