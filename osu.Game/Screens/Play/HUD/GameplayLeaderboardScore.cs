@@ -67,11 +67,7 @@ namespace osu.Game.Screens.Play.HUD
             User = user;
             this.trackedPlayer = trackedPlayer;
 
-            AutoSizeAxes = Axes.X;
-            Height = panel_height;
-
-            Anchor = Anchor.TopRight;
-            Origin = Anchor.TopRight;
+            Size = new Vector2(extended_width, panel_height);
         }
 
         protected override void LoadComplete()
@@ -82,23 +78,25 @@ namespace osu.Game.Screens.Play.HUD
             FinishTransforms(true);
         }
 
+        private const double transition_duration = 500;
+
         private void updateColour()
         {
             if (scorePosition == 1)
             {
-                mainFillContainer.ResizeWidthTo(extended_width, 200, Easing.OutQuint);
+                mainFillContainer.ResizeWidthTo(extended_width, transition_duration, Easing.OutElastic);
                 panelColour = Color4Extensions.FromHex("7fcc33");
                 textColour = Color4.White;
             }
             else if (trackedPlayer)
             {
-                mainFillContainer.ResizeWidthTo(extended_width, 200, Easing.OutQuint);
+                mainFillContainer.ResizeWidthTo(extended_width, transition_duration, Easing.OutElastic);
                 panelColour = Color4Extensions.FromHex("ffd966");
                 textColour = Color4Extensions.FromHex("2e576b");
             }
             else
             {
-                mainFillContainer.ResizeWidthTo(regular_width, 200, Easing.OutQuint);
+                mainFillContainer.ResizeWidthTo(regular_width, transition_duration, Easing.OutElastic);
                 panelColour = Color4Extensions.FromHex("3399cc");
                 textColour = Color4.White;
             }
@@ -108,8 +106,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             set
             {
-                mainFillContainer.FadeColour(value, 200, Easing.OutQuint);
-                centralFill.FadeColour(value, 200, Easing.OutQuint);
+                mainFillContainer.FadeColour(value, transition_duration, Easing.OutQuint);
+                centralFill.FadeColour(value, transition_duration, Easing.OutQuint);
             }
         }
 
