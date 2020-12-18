@@ -140,6 +140,7 @@ namespace osu.Game.Online.API
                         }
 
                         var userReq = new GetUserRequest();
+
                         userReq.Success += u =>
                         {
                             localUser.Value = u;
@@ -148,15 +149,6 @@ namespace osu.Game.Online.API
                             localUser.Value.Status.Value = new UserStatusOnline();
 
                             failureCount = 0;
-
-                            fetchFriends(() =>
-                            {
-                                //we're connected!
-                                state.Value = APIState.Online;
-                            }, () =>
-                            {
-                                state.Value = APIState.Failing;
-                            });
                         };
 
                         if (!handleRequest(userReq))
@@ -166,6 +158,19 @@ namespace osu.Game.Online.API
                             continue;
                         }
 
+                        // getting user's friends is considered part of the connection process.
+                        var friendsReq = new GetFriendsRequest();
+
+                        friendsReq.Success += res =>
+                        {
+                            friends.AddRange(res);
+
+                            //we're connected!
+                            state.Value = APIState.Online;
+                        };
+
+                        if (!handleRequest(friendsReq))
+                            state.Value = APIState.Failing;
                         // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
                         // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
                         // before actually going online.
@@ -255,19 +260,6 @@ namespace osu.Game.Online.API
             }
 
             return null;
-        }
-
-        private void fetchFriends(Action onSuccess, Action onFail)
-        {
-            var friendsReq = new GetFriendsRequest();
-            friendsReq.Success += res =>
-            {
-                Friends.AddRange(res);
-                onSuccess?.Invoke();
-            };
-
-            if (!handleRequest(friendsReq))
-                onFail?.Invoke();
         }
 
         /// <summary>
