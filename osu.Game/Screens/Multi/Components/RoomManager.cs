@@ -27,6 +27,8 @@ namespace osu.Game.Screens.Multi.Components
 
         public IBindableList<Room> Rooms => rooms;
 
+        protected Room JoinedRoom { get; private set; }
+
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
@@ -35,8 +37,6 @@ namespace osu.Game.Screens.Multi.Components
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        private Room joinedRoom;
 
         protected RoomManager()
         {
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Multi.Components
 
             req.Success += result =>
             {
-                joinedRoom = room;
+                JoinedRoom = room;
 
                 update(room, result);
                 addRoom(room);
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Multi.Components
 
             currentJoinRoomRequest.Success += () =>
             {
-                joinedRoom = room;
+                JoinedRoom = room;
                 onSuccess?.Invoke(room);
             };
 
@@ -111,11 +111,11 @@ namespace osu.Game.Screens.Multi.Components
         {
             currentJoinRoomRequest?.Cancel();
 
-            if (joinedRoom == null)
+            if (JoinedRoom == null)
                 return;
 
-            api.Queue(new PartRoomRequest(joinedRoom));
-            joinedRoom = null;
+            api.Queue(new PartRoomRequest(JoinedRoom));
+            JoinedRoom = null;
         }
 
         private readonly HashSet<int> ignoredRooms = new HashSet<int>();
