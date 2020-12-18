@@ -10,6 +10,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Scoring;
 using osu.Game.Storyboards;
 using osuTK;
 
@@ -117,7 +118,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            protected override void GotoRanking()
+            protected override void GotoRanking(ScoreInfo score)
             {
                 GotoRankingInvoked = true;
             }
