@@ -93,5 +93,9 @@ namespace osu.Game.Online.API
         }
 
         public void SetState(APIState newState) => state.Value = newState;
+
+        IBindable<User> IAPIProvider.LocalUser => LocalUser;
+        IBindableList<User> IAPIProvider.Friends => Friends;
+        IBindable<UserActivity> IAPIProvider.Activity => Activity;
     }
 }
