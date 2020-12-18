@@ -90,6 +90,52 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
             AddAssert("initial rooms not received", () => !roomManager.InitialRoomsReceived.Value);
         }
 
+        [Test]
+        public void TestMultiplayerRoomJoinedWhenCreated()
+        {
+            AddStep("create room manager with a room", () =>
+            {
+                createRoomManager().With(d => d.OnLoadComplete += _ =>
+                {
+                    roomManager.CreateRoom(new Room());
+                });
+            });
+
+            AddAssert("multiplayer room joined", () => roomContainer.Client.Room != null);
+        }
+
+        [Test]
+        public void TestMultiplayerRoomPartedWhenAPIRoomParted()
+        {
+            AddStep("create room manager with a room", () =>
+            {
+                createRoomManager().With(d => d.OnLoadComplete += _ =>
+                {
+                    roomManager.CreateRoom(new Room());
+                    roomManager.PartRoom();
+                });
+            });
+
+            AddAssert("multiplayer room parted", () => roomContainer.Client.Room == null);
+        }
+
+        [Test]
+        public void TestMultiplayerRoomPartedWhenAPIRoomJoined()
+        {
+            AddStep("create room manager with a room", () =>
+            {
+                createRoomManager().With(d => d.OnLoadComplete += _ =>
+                {
+                    var r = new Room();
+                    roomManager.CreateRoom(r);
+                    roomManager.PartRoom();
+                    roomManager.JoinRoom(r);
+                });
+            });
+
+            AddAssert("multiplayer room parted", () => roomContainer.Client.Room != null);
+        }
+
         private TestRealtimeRoomManager createRoomManager()
         {
             Child = roomContainer = new TestRealtimeRoomContainer
