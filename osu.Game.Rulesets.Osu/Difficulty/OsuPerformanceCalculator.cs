@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             if (mods.Any(m => m is OsuModNoFail))
-                multiplier *= 0.90;
+                multiplier *= Math.Max(0.90, 1.0 - 0.02 * countMiss);
 
             if (mods.Any(m => m is OsuModSpunOut))
                 multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
@@ -92,8 +92,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             aimValue *= lengthBonus;
 
-            // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            aimValue *= Math.Pow(0.97, countMiss);
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            if (countMiss > 0)
+                aimValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), countMiss);
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
@@ -138,8 +139,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
             speedValue *= lengthBonus;
 
-            // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            speedValue *= Math.Pow(0.97, countMiss);
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            if (countMiss > 0)
+                speedValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), Math.Pow(countMiss, .875));
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
@@ -154,10 +156,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
-            // Scale the speed value with accuracy _slightly_
-            speedValue *= 0.02 + accuracy;
-            // It is important to also consider accuracy difficulty when doing that
-            speedValue *= 0.96 + Math.Pow(Attributes.OverallDifficulty, 2) / 1600;
+            // Scale the speed value with accuracy and OD
+            speedValue *= (0.95 + Math.Pow(Attributes.OverallDifficulty, 2) / 750) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
+            // Scale the speed value with # of 50s to punish doubletapping.
+            speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
 
             return speedValue;
         }

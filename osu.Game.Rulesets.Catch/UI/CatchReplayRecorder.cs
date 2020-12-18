@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         private readonly CatchPlayfield playfield;
 
-        public CatchReplayRecorder(Replay target, CatchPlayfield playfield)
+        public CatchReplayRecorder(Score target, CatchPlayfield playfield)
             : base(target)
         {
             this.playfield = playfield;

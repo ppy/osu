@@ -21,6 +21,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Online.Spectator
@@ -51,6 +52,9 @@ namespace osu.Game.Online.Spectator
 
         [CanBeNull]
         private IBeatmap currentBeatmap;
+
+        [CanBeNull]
+        private Score currentScore;
 
         [Resolved]
         private IBindable<RulesetInfo> currentRuleset { get; set; }
@@ -203,7 +207,7 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        public void BeginPlaying(GameplayBeatmap beatmap)
+        public void BeginPlaying(GameplayBeatmap beatmap, Score score)
         {
             if (isPlaying)
                 throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
@@ -216,6 +220,8 @@ namespace osu.Game.Online.Spectator
             currentState.Mods = currentMods.Value.Select(m => new APIMod(m));
 
             currentBeatmap = beatmap.PlayableBeatmap;
+            currentScore = score;
+
             beginPlaying();
         }
 
@@ -308,7 +314,9 @@ namespace osu.Game.Online.Spectator
 
             pendingFrames.Clear();
 
-            SendFrames(new FrameDataBundle(frames));
+            Debug.Assert(currentScore != null);
+
+            SendFrames(new FrameDataBundle(currentScore.ScoreInfo, frames));
 
             lastSendTime = Time.Current;
         }
