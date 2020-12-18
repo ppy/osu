@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -22,13 +24,21 @@ namespace osu.Game.Screens.Play.HUD
             LayoutEasing = Easing.OutQuint;
         }
 
-        public override void Add(GameplayLeaderboardScore drawable)
+        public ILeaderboardScore AddPlayer(User user, bool isTracked)
         {
+            var drawable = new GameplayLeaderboardScore(user, isTracked);
             base.Add(drawable);
-            drawable?.TotalScore.BindValueChanged(_ => updateScores(), true);
+            drawable.TotalScore.BindValueChanged(_ => Scheduler.AddOnce(sort), true);
+
+            return drawable;
         }
 
-        private void updateScores()
+        public override void Add(GameplayLeaderboardScore drawable)
+        {
+            throw new InvalidOperationException($"Use {nameof(AddPlayer)} instead.");
+        }
+
+        private void sort()
         {
             var orderedByScore = this.OrderByDescending(i => i.TotalScore.Value).ToList();
 
