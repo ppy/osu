@@ -235,6 +235,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void addDragHandle(Anchor anchor) => AddInternal(new SelectionBoxDragHandle
         {
             Anchor = anchor,
+            Y = getAdjustmentToCenterCircleOnBorder(anchor).Y,
+            X = getAdjustmentToCenterCircleOnBorder(anchor).X,
             HandleDrag = e => OnScale?.Invoke(e.Delta, anchor),
             OperationStarted = operationStarted,
             OperationEnded = operationEnded
@@ -249,6 +251,45 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float endAngle = MathF.Atan2(e.MousePosition.Y - DrawHeight / 2, e.MousePosition.X - DrawWidth / 2);
 
             return (endAngle - startAngle) * 180 / MathF.PI;
+        }
+
+        /// <summary>
+        /// Adjust Drag circle to be centered on the center of the border instead of on the edge.
+        /// </summary>
+        /// <param name="anchor">The part of the rectangle to be adjusted.</param>
+        private Vector2 getAdjustmentToCenterCircleOnBorder(Anchor anchor)
+        {
+            Vector2 adjustment = Vector2.Zero;
+
+            switch (anchor)
+            {
+                case Anchor.TopLeft:
+                case Anchor.CentreLeft:
+                case Anchor.BottomLeft:
+                    adjustment.X = BORDER_RADIUS / 2;
+                    break;
+                case Anchor.TopRight:
+                case Anchor.CentreRight:
+                case Anchor.BottomRight:
+                    adjustment.X = -BORDER_RADIUS / 2;
+                    break;
+            }
+
+            switch (anchor)
+            {
+                case Anchor.TopLeft:
+                case Anchor.TopCentre:
+                case Anchor.TopRight:
+                    adjustment.Y = BORDER_RADIUS / 2;
+                    break;
+                case Anchor.BottomLeft:
+                case Anchor.BottomCentre:
+                case Anchor.BottomRight:
+                    adjustment.Y = -BORDER_RADIUS / 2;
+                    break;
+            }
+
+            return adjustment;
         }
 
         private void operationEnded()
