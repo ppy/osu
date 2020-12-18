@@ -45,12 +45,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait();
         }
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
-        {
-            Room = new Room();
-        });
-
         [SetUpSteps]
         public void SetupSteps()
         {

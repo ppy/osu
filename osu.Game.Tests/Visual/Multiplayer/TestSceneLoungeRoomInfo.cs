@@ -4,7 +4,6 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.RoomStatuses;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Users;
@@ -14,10 +13,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneLoungeRoomInfo : MultiplayerTestScene
     {
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room = new Room();
-
             Child = new RoomInfo
             {
                 Anchor = Anchor.Centre,
