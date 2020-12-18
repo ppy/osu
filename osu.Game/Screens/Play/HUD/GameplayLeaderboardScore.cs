@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -129,7 +130,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
@@ -195,19 +196,51 @@ namespace osu.Game.Screens.Play.HUD
                                             },
                                         }
                                     },
-                                    usernameText = new OsuSpriteText
+                                    new FillFlowContainer
                                     {
                                         Padding = new MarginPadding { Left = SHEAR_WIDTH },
-                                        RelativeSizeAxes = Axes.X,
-                                        Width = 0.8f,
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Colour = Color4.White,
-                                        Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                        Text = User.Username,
-                                        Truncate = true,
-                                        Shadow = false,
-                                    }
+                                        RelativeSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(4f, 0f),
+                                        Children = new Drawable[]
+                                        {
+                                            new CircularContainer
+                                            {
+                                                Masking = true,
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Size = new Vector2(25f),
+                                                Children = new Drawable[]
+                                                {
+                                                    new Box
+                                                    {
+                                                        Name = "Placeholder while avatar loads",
+                                                        Alpha = 0.3f,
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Colour = colours.Gray4,
+                                                    },
+                                                    new UpdateableAvatar(User)
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                    },
+                                                }
+                                            },
+                                            usernameText = new OsuSpriteText
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Width = 0.8f,
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Colour = Color4.White,
+                                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                                                Text = User.Username,
+                                                Truncate = true,
+                                                Shadow = false,
+                                            }
+                                        }
+                                    },
                                 }
                             },
                             new Container
