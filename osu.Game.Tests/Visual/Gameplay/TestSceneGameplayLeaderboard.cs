@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Add(leaderboard = new TestGameplayLeaderboard
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.TopCentre,
+                Origin = Anchor.Centre,
                 Scale = new Vector2(2),
             });
         }

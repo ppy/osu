@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public GameplayLeaderboard()
         {
-            AutoSizeAxes = Axes.Both;
+            Width = GameplayLeaderboardScore.EXTENDED_WIDTH + GameplayLeaderboardScore.SHEAR_WIDTH;
 
             Direction = FillDirection.Vertical;
 
@@ -26,9 +26,16 @@ namespace osu.Game.Screens.Play.HUD
 
         public ILeaderboardScore AddPlayer(User user, bool isTracked)
         {
-            var drawable = new GameplayLeaderboardScore(user, isTracked);
+            var drawable = new GameplayLeaderboardScore(user, isTracked)
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            };
+
             base.Add(drawable);
             drawable.TotalScore.BindValueChanged(_ => Scheduler.AddOnce(sort), true);
+
+            Height = Count * (GameplayLeaderboardScore.PANEL_HEIGHT + Spacing.Y);
 
             return drawable;
         }
