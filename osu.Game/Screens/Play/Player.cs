@@ -529,20 +529,37 @@ namespace osu.Game.Screens.Play
 
             if (!showResults) return;
 
-            scoreSubmissionTask ??= SubmitScore(CreateScore());
-            scoreSubmissionTask.ContinueWith(t => Schedule(() =>
+            scoreSubmissionTask ??= Task.Run(async () =>
             {
-                using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
+                var score = CreateScore();
+
+                try
                 {
-                    completionProgressDelegate = Schedule(() =>
-                    {
-                        // screen may be in the exiting transition phase.
-                        if (this.IsCurrentScreen())
-                            this.Push(CreateResults(t.Result));
-                    });
+                    return await SubmitScore(score);
                 }
-            }));
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Score submission failed!");
+                    return score.ScoreInfo;
+                }
+            });
+
+            using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
+                scheduleCompletion();
         }
+
+        private void scheduleCompletion() => completionProgressDelegate = Schedule(() =>
+        {
+            if (!scoreSubmissionTask.IsCompleted)
+            {
+                scheduleCompletion();
+                return;
+            }
+
+            // screen may be in the exiting transition phase.
+            if (this.IsCurrentScreen())
+                this.Push(CreateResults(scoreSubmissionTask.Result));
+        });
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
