@@ -16,7 +16,6 @@ using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
-
 {
     public class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
     {
