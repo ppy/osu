@@ -234,10 +234,11 @@ namespace osu.Game.Graphics.Containers
             float bIndex = IndexOf(b);
             float aVisibleHeight = visibleHeight(a);
             float bVisibleHeight = visibleHeight(b);
+
             // visibility requirement is lower (only 80%) for the section user clicked for
             // this makes the section get selected sooner when scrolling upwards, to match it already getting selected sooner when scrolling downwards
-            bool aAllVisible = Precision.AlmostBigger(aVisibleHeight / a.Height, lastClickedSection as T == a ? 0.8f : 1.0f);
-            bool bAllVisible = Precision.AlmostBigger(bVisibleHeight / b.Height, lastClickedSection as T == b ? 0.8f : 1.0f);
+            bool aAllVisible = Precision.AlmostBigger(aVisibleHeight / a.Height, lastClickedSection == a ? 0.8f : 1.0f);
+            bool bAllVisible = Precision.AlmostBigger(bVisibleHeight / b.Height, lastClickedSection == b ? 0.8f : 1.0f);
 
             // if one is all visible while the other isn't
             if (aAllVisible != bAllVisible)
