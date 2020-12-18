@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.Multi.Components
 {
     public class ReadyButton : TriangleButton
     {
