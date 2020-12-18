@@ -33,8 +33,11 @@ namespace osu.Game.Online.Chat
         private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
-        // Keeps a list of closed channels. More recently closed channels appear at higher indeces
-        private readonly BindableList<Channel> closedChannels = new BindableList<Channel>();
+        /// <summary>
+        /// Keeps a list of closed channel identifiers. Stores the channel ID for normal
+        /// channels, or the user ID for PM channels
+        /// </summary>
+        private readonly BindableList<long> closedChannelIds = new BindableList<long>();
 
         // For efficiency purposes, this constant bounds the number of closed channels we store.
         // This number is somewhat arbitrary; future developers are free to modify it.
@@ -418,13 +421,13 @@ namespace osu.Game.Online.Chat
 
             // Prevent the closedChannel list from exceeding the max size
             // by removing the oldest element
-            if (closedChannels.Count >= closed_channels_max_size)
+            if (closedChannelIds.Count >= closed_channels_max_size)
             {
-                closedChannels.RemoveAt(0);
+                closedChannelIds.RemoveAt(0);
             }
 
-            // insert at the end of the closedChannels list
-            closedChannels.Insert(closedChannels.Count, channel);
+            // For PM channels, we store the user ID; else, we store the channel id
+            closedChannelIds.Add(channel.Type == ChannelType.PM ? channel.Users.First().Id : channel.Id);
 
             if (channel.Joined.Value)
             {
@@ -440,24 +443,45 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public void JoinLastClosedChannel()
         {
-            if (closedChannels.Count <= 0)
+            if (closedChannelIds.Count <= 0)
             {
                 return;
             }
 
-            Channel lastClosedChannel = closedChannels.Last();
-
-            closedChannels.Remove(lastClosedChannel);
-
-            // If the user already joined the channel, try the next
-            // channel in the list
-            if (joinedChannels.IndexOf(lastClosedChannel) >= 0)
+            // This nested loop could be eliminated if a check was added so that
+            // when the code opens a channel it removes from the closedChannel list.
+            // However, this would require adding an O(|closeChannels|) work operation
+            // every time the user joins a channel, which would make joining a channel
+            // slower. I wanted to centralize all major slowdowns so they
+            // can only occur if the user actually decides to use this feature.
+            while (closedChannelIds.Count != 0)
             {
-                JoinLastClosedChannel();
-            }
-            else
-            {
-                JoinChannel(lastClosedChannel);
+                long lastClosedChannelId = closedChannelIds.Last();
+                closedChannelIds.RemoveAt(closedChannelIds.Count - 1);
+
+                bool lookupCondition(Channel ch) => ch.Type == ChannelType.PM
+                    ? ch.Users.Any(u => u.Id == lastClosedChannelId)
+                    : ch.Id == lastClosedChannelId;
+
+                // If the user hasn't already joined the channel, try to join it
+                if (joinedChannels.FirstOrDefault(lookupCondition) == null)
+                {
+                    Channel lastClosedChannel = AvailableChannels.FirstOrDefault(lookupCondition);
+
+                    if (lastClosedChannel != null)
+                    {
+                        CurrentChannel.Value = JoinChannel(lastClosedChannel);
+                    }
+                    else
+                    {
+                        // Try to get User to open PM chat
+                        var req = new GetUserRequest(lastClosedChannelId);
+                        req.Success += user => CurrentChannel.Value = JoinChannel(new Channel(user));
+                        api.Queue(req);
+                    }
+
+                    return;
+                }
             }
         }
 
