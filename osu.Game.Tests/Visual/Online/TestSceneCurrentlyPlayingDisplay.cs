@@ -89,13 +89,11 @@ namespace osu.Game.Tests.Visual.Online
                 "pishifat"
             };
 
-            private int id;
-
             protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
                 => Task.FromResult(new User
                 {
-                    Id = id++,
-                    Username = usernames[id % usernames.Length],
+                    Id = lookup++,
+                    Username = usernames[lookup % usernames.Length],
                 });
         }
     }
