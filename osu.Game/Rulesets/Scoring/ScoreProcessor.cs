@@ -201,8 +201,8 @@ namespace osu.Game.Rulesets.Scoring
         private double getScore(ScoringMode mode)
         {
             return GetScore(mode, maxAchievableCombo,
-                maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
-                maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1,
+                calculateAccuracyRatio(baseScore),
+                calculateComboRatio(HighestCombo.Value),
                 scoreResultCounts);
         }
 
@@ -252,13 +252,16 @@ namespace osu.Game.Rulesets.Scoring
                 computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
             }
 
-            double accuracy = maxBaseScore > 0 ? computedBaseScore / maxBaseScore : 0;
-            double comboRatio = maxAchievableCombo > 0 ? (double)maxCombo / maxAchievableCombo : 1;
+            double accuracy = calculateAccuracyRatio(computedBaseScore);
+            double comboRatio = calculateComboRatio(maxCombo);
 
             double score = GetScore(mode, maxAchievableCombo, accuracy, comboRatio, scoreResultCounts);
 
             return (score, accuracy);
         }
+
+        private double calculateAccuracyRatio(double baseScore) => maxBaseScore > 0 ? baseScore / maxBaseScore : 0;
+        private double calculateComboRatio(int maxCombo) => maxAchievableCombo > 0 ? (double)maxCombo / maxAchievableCombo : 1;
 
         private double getBonusScore(Dictionary<HitResult, int> statistics)
             => statistics.GetOrDefault(HitResult.SmallBonus) * Judgement.SMALL_BONUS_SCORE
