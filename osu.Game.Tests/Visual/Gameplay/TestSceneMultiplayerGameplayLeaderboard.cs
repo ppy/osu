@@ -116,12 +116,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         lastHeaders[userId] = header = new FrameHeader(new ScoreInfo
                         {
-                            Statistics = new Dictionary<HitResult, int>(new[]
+                            Statistics = new Dictionary<HitResult, int>
                             {
-                                new KeyValuePair<HitResult, int>(HitResult.Miss, 0),
-                                new KeyValuePair<HitResult, int>(HitResult.Meh, 0),
-                                new KeyValuePair<HitResult, int>(HitResult.Great, 0)
-                            })
+                                [HitResult.Miss] = 0,
+                                [HitResult.Meh] = 0,
+                                [HitResult.Great] = 0
+                            }
                         });
                     }
 
