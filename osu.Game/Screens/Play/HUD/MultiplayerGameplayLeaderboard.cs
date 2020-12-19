@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play.HUD
 
             public IBindableNumber<double> Accuracy => accuracy;
 
-            private readonly BindableDouble accuracy = new BindableDouble();
+            private readonly BindableDouble accuracy = new BindableDouble(1);
 
             public IBindableNumber<int> CurrentCombo => currentCombo;
 
