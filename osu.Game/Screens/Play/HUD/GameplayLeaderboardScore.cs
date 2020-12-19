@@ -75,59 +75,6 @@ namespace osu.Game.Screens.Play.HUD
             Size = new Vector2(EXTENDED_WIDTH, PANEL_HEIGHT);
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            updateColour();
-            FinishTransforms(true);
-        }
-
-        private const double transition_duration = 500;
-
-        private void updateColour()
-        {
-            if (scorePosition == 1)
-            {
-                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
-                panelColour = Color4Extensions.FromHex("7fcc33");
-                textColour = Color4.White;
-            }
-            else if (trackedPlayer)
-            {
-                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
-                panelColour = Color4Extensions.FromHex("ffd966");
-                textColour = Color4Extensions.FromHex("2e576b");
-            }
-            else
-            {
-                mainFillContainer.ResizeWidthTo(regular_width, transition_duration, Easing.OutElastic);
-                panelColour = Color4Extensions.FromHex("3399cc");
-                textColour = Color4.White;
-            }
-        }
-
-        private Color4 panelColour
-        {
-            set
-            {
-                mainFillContainer.FadeColour(value, transition_duration, Easing.OutQuint);
-                centralFill.FadeColour(value, transition_duration, Easing.OutQuint);
-            }
-        }
-
-        private Color4 textColour
-        {
-            set
-            {
-                scoreText.FadeColour(value, 200, Easing.OutQuint);
-                accuracyText.FadeColour(value, 200, Easing.OutQuint);
-                comboText.FadeColour(value, 200, Easing.OutQuint);
-                usernameText.FadeColour(value, 200, Easing.OutQuint);
-                positionText.FadeColour(value, 200, Easing.OutQuint);
-            }
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -283,6 +230,59 @@ namespace osu.Game.Screens.Play.HUD
             TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
             Accuracy.BindValueChanged(v => accuracyText.Text = v.NewValue.FormatAccuracy(), true);
             Combo.BindValueChanged(v => comboText.Text = $"{v.NewValue}x", true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateColour();
+            FinishTransforms(true);
+        }
+
+        private const double transition_duration = 500;
+
+        private void updateColour()
+        {
+            if (scorePosition == 1)
+            {
+                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
+                panelColour = Color4Extensions.FromHex("7fcc33");
+                textColour = Color4.White;
+            }
+            else if (trackedPlayer)
+            {
+                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
+                panelColour = Color4Extensions.FromHex("ffd966");
+                textColour = Color4Extensions.FromHex("2e576b");
+            }
+            else
+            {
+                mainFillContainer.ResizeWidthTo(regular_width, transition_duration, Easing.OutElastic);
+                panelColour = Color4Extensions.FromHex("3399cc");
+                textColour = Color4.White;
+            }
+        }
+
+        private Color4 panelColour
+        {
+            set
+            {
+                mainFillContainer.FadeColour(value, transition_duration, Easing.OutQuint);
+                centralFill.FadeColour(value, transition_duration, Easing.OutQuint);
+            }
+        }
+
+        private Color4 textColour
+        {
+            set
+            {
+                scoreText.FadeColour(value, 200, Easing.OutQuint);
+                accuracyText.FadeColour(value, 200, Easing.OutQuint);
+                comboText.FadeColour(value, 200, Easing.OutQuint);
+                usernameText.FadeColour(value, 200, Easing.OutQuint);
+                positionText.FadeColour(value, 200, Easing.OutQuint);
+            }
         }
     }
 }
