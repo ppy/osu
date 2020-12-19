@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Online
             protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
                 => Task.FromResult(new User
                 {
-                    Id = lookup++,
+                    Id = lookup,
                     Username = usernames[lookup % usernames.Length],
                 });
         }
