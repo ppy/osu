@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -49,7 +48,7 @@ namespace osu.Game.Screens.Play.HUD
                 scorePosition = value;
 
                 if (scorePosition.HasValue)
-                    positionText.Text = $"#{scorePosition.Value.ToMetric(decimals: scorePosition < 100000 ? 1 : 0)}";
+                    positionText.Text = $"#{scorePosition.Value.FormatRank()}";
 
                 positionText.FadeTo(scorePosition.HasValue ? 1 : 0);
                 updateColour();
