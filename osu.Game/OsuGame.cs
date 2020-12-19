@@ -51,7 +51,6 @@ using osu.Game.Screens.Select;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
-using osu.Game.Users;
 using osu.Game.Database;
 
 namespace osu.Game
