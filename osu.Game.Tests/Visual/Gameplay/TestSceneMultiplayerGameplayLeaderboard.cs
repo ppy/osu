@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 foreach (var userId in PlayingUsers)
                 {
-                    if (RNG.Next(0, 1) == 1)
+                    if (RNG.NextBool())
                         continue;
 
                     if (!lastHeaders.TryGetValue(userId, out var header))
