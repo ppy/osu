@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -19,9 +19,9 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class GameplayLeaderboardScore : CompositeDrawable, ILeaderboardScore
     {
-        public const float EXTENDED_WIDTH = 235f;
+        public const float EXTENDED_WIDTH = 255f;
 
-        private const float regular_width = 215f;
+        private const float regular_width = 235f;
 
         public const float PANEL_HEIGHT = 35f;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play.HUD
                 scorePosition = value;
 
                 if (scorePosition.HasValue)
-                    positionText.Text = $"#{scorePosition.Value.ToMetric(decimals: scorePosition < 100000 ? 1 : 0)}";
+                    positionText.Text = $"#{scorePosition.Value.FormatRank()}";
 
                 positionText.FadeTo(scorePosition.HasValue ? 1 : 0);
                 updateColour();
@@ -75,61 +75,8 @@ namespace osu.Game.Screens.Play.HUD
             Size = new Vector2(EXTENDED_WIDTH, PANEL_HEIGHT);
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            updateColour();
-            FinishTransforms(true);
-        }
-
-        private const double transition_duration = 500;
-
-        private void updateColour()
-        {
-            if (scorePosition == 1)
-            {
-                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
-                panelColour = Color4Extensions.FromHex("7fcc33");
-                textColour = Color4.White;
-            }
-            else if (trackedPlayer)
-            {
-                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
-                panelColour = Color4Extensions.FromHex("ffd966");
-                textColour = Color4Extensions.FromHex("2e576b");
-            }
-            else
-            {
-                mainFillContainer.ResizeWidthTo(regular_width, transition_duration, Easing.OutElastic);
-                panelColour = Color4Extensions.FromHex("3399cc");
-                textColour = Color4.White;
-            }
-        }
-
-        private Color4 panelColour
-        {
-            set
-            {
-                mainFillContainer.FadeColour(value, transition_duration, Easing.OutQuint);
-                centralFill.FadeColour(value, transition_duration, Easing.OutQuint);
-            }
-        }
-
-        private Color4 textColour
-        {
-            set
-            {
-                scoreText.FadeColour(value, 200, Easing.OutQuint);
-                accuracyText.FadeColour(value, 200, Easing.OutQuint);
-                comboText.FadeColour(value, 200, Easing.OutQuint);
-                usernameText.FadeColour(value, 200, Easing.OutQuint);
-                positionText.FadeColour(value, 200, Easing.OutQuint);
-            }
-        }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
@@ -195,19 +142,51 @@ namespace osu.Game.Screens.Play.HUD
                                             },
                                         }
                                     },
-                                    usernameText = new OsuSpriteText
+                                    new FillFlowContainer
                                     {
                                         Padding = new MarginPadding { Left = SHEAR_WIDTH },
-                                        RelativeSizeAxes = Axes.X,
-                                        Width = 0.8f,
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Colour = Color4.White,
-                                        Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                        Text = User.Username,
-                                        Truncate = true,
-                                        Shadow = false,
-                                    }
+                                        RelativeSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(4f, 0f),
+                                        Children = new Drawable[]
+                                        {
+                                            new CircularContainer
+                                            {
+                                                Masking = true,
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Size = new Vector2(25f),
+                                                Children = new Drawable[]
+                                                {
+                                                    new Box
+                                                    {
+                                                        Name = "Placeholder while avatar loads",
+                                                        Alpha = 0.3f,
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Colour = colours.Gray4,
+                                                    },
+                                                    new UpdateableAvatar(User)
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                    },
+                                                }
+                                            },
+                                            usernameText = new OsuSpriteText
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Width = 0.8f,
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Colour = Color4.White,
+                                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                                                Text = User.Username,
+                                                Truncate = true,
+                                                Shadow = false,
+                                            }
+                                        }
+                                    },
                                 }
                             },
                             new Container
@@ -251,6 +230,61 @@ namespace osu.Game.Screens.Play.HUD
             TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
             Accuracy.BindValueChanged(v => accuracyText.Text = v.NewValue.FormatAccuracy(), true);
             Combo.BindValueChanged(v => comboText.Text = $"{v.NewValue}x", true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateColour();
+            FinishTransforms(true);
+        }
+
+        private const double panel_transition_duration = 500;
+
+        private void updateColour()
+        {
+            if (scorePosition == 1)
+            {
+                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, panel_transition_duration, Easing.OutElastic);
+                panelColour = Color4Extensions.FromHex("7fcc33");
+                textColour = Color4.White;
+            }
+            else if (trackedPlayer)
+            {
+                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, panel_transition_duration, Easing.OutElastic);
+                panelColour = Color4Extensions.FromHex("ffd966");
+                textColour = Color4Extensions.FromHex("2e576b");
+            }
+            else
+            {
+                mainFillContainer.ResizeWidthTo(regular_width, panel_transition_duration, Easing.OutElastic);
+                panelColour = Color4Extensions.FromHex("3399cc");
+                textColour = Color4.White;
+            }
+        }
+
+        private Color4 panelColour
+        {
+            set
+            {
+                mainFillContainer.FadeColour(value, panel_transition_duration, Easing.OutQuint);
+                centralFill.FadeColour(value, panel_transition_duration, Easing.OutQuint);
+            }
+        }
+
+        private const double text_transition_duration = 200;
+
+        private Color4 textColour
+        {
+            set
+            {
+                scoreText.FadeColour(value, text_transition_duration, Easing.OutQuint);
+                accuracyText.FadeColour(value, text_transition_duration, Easing.OutQuint);
+                comboText.FadeColour(value, text_transition_duration, Easing.OutQuint);
+                usernameText.FadeColour(value, text_transition_duration, Easing.OutQuint);
+                positionText.FadeColour(value, text_transition_duration, Easing.OutQuint);
+            }
         }
     }
 }

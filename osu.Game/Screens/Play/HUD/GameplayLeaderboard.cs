@@ -24,6 +24,14 @@ namespace osu.Game.Screens.Play.HUD
             LayoutEasing = Easing.OutQuint;
         }
 
+        /// <summary>
+        /// Adds a player to the leaderboard.
+        /// </summary>
+        /// <param name="user">The player.</param>
+        /// <param name="isTracked">
+        /// Whether the player should be tracked on the leaderboard.
+        /// Set to <c>true</c> for the local player or a player whose replay is currently being played.
+        /// </param>
         public ILeaderboardScore AddPlayer(User user, bool isTracked)
         {
             var drawable = new GameplayLeaderboardScore(user, isTracked)
@@ -40,9 +48,9 @@ namespace osu.Game.Screens.Play.HUD
             return drawable;
         }
 
-        public override void Add(GameplayLeaderboardScore drawable)
+        public sealed override void Add(GameplayLeaderboardScore drawable)
         {
-            throw new InvalidOperationException($"Use {nameof(AddPlayer)} instead.");
+            throw new NotSupportedException($"Use {nameof(AddPlayer)} instead.");
         }
 
         private void sort()
