@@ -23,10 +23,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestRoomSettings settings;
 
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room = new Room();
-
             settings = new TestRoomSettings
             {
                 RelativeSizeAxes = Axes.Both,

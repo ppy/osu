@@ -976,7 +976,7 @@ namespace osu.Game
             if (newScreen is IOsuScreen newOsuScreen)
             {
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
-                ((IBindable<UserActivity>)API.Activity).BindTo(newOsuScreen.Activity);
+                API.Activity.BindTo(newOsuScreen.Activity);
 
                 MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 
