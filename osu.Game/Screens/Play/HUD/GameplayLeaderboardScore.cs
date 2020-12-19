@@ -240,25 +240,25 @@ namespace osu.Game.Screens.Play.HUD
             FinishTransforms(true);
         }
 
-        private const double transition_duration = 500;
+        private const double panel_transition_duration = 500;
 
         private void updateColour()
         {
             if (scorePosition == 1)
             {
-                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
+                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, panel_transition_duration, Easing.OutElastic);
                 panelColour = Color4Extensions.FromHex("7fcc33");
                 textColour = Color4.White;
             }
             else if (trackedPlayer)
             {
-                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, transition_duration, Easing.OutElastic);
+                mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, panel_transition_duration, Easing.OutElastic);
                 panelColour = Color4Extensions.FromHex("ffd966");
                 textColour = Color4Extensions.FromHex("2e576b");
             }
             else
             {
-                mainFillContainer.ResizeWidthTo(regular_width, transition_duration, Easing.OutElastic);
+                mainFillContainer.ResizeWidthTo(regular_width, panel_transition_duration, Easing.OutElastic);
                 panelColour = Color4Extensions.FromHex("3399cc");
                 textColour = Color4.White;
             }
@@ -268,8 +268,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             set
             {
-                mainFillContainer.FadeColour(value, transition_duration, Easing.OutQuint);
-                centralFill.FadeColour(value, transition_duration, Easing.OutQuint);
+                mainFillContainer.FadeColour(value, panel_transition_duration, Easing.OutQuint);
+                centralFill.FadeColour(value, panel_transition_duration, Easing.OutQuint);
             }
         }
 
