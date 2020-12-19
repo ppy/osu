@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.Multiplayer;
@@ -12,11 +13,7 @@ namespace osu.Game.Tests.Visual
         [Cached]
         private readonly Bindable<Room> currentRoom = new Bindable<Room>();
 
-        protected Room Room
-        {
-            get => currentRoom.Value;
-            set => currentRoom.Value = value;
-        }
+        protected Room Room => currentRoom.Value;
 
         private CachedModelDependencyContainer<Room> dependencies;
 
@@ -26,5 +23,11 @@ namespace osu.Game.Tests.Visual
             dependencies.Model.BindTo(currentRoom);
             return dependencies;
         }
+
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
+            currentRoom.Value = new Room();
+        });
     }
 }

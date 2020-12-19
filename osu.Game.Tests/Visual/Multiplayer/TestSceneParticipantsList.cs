@@ -3,24 +3,55 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneParticipantsList : MultiplayerTestScene
     {
-        protected override bool UseOnlineAPI => true;
-
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room = new Room { RoomID = { Value = 7 } };
+            Room.RoomID.Value = 7;
+
+            for (int i = 0; i < 50; i++)
+            {
+                Room.RecentParticipants.Add(new User
+                {
+                    Username = "peppy",
+                    Id = 2
+                });
+            }
         });
 
-        public TestSceneParticipantsList()
+        [Test]
+        public void TestHorizontalLayout()
         {
-            Add(new ParticipantsList { RelativeSizeAxes = Axes.Both });
+            AddStep("create component", () =>
+            {
+                Child = new ParticipantsDisplay(Direction.Horizontal)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.2f,
+                };
+            });
+        }
+
+        [Test]
+        public void TestVerticalLayout()
+        {
+            AddStep("create component", () =>
+            {
+                Child = new ParticipantsDisplay(Direction.Vertical)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.2f,
+                    Height = 0.2f,
+                };
+            });
         }
     }
 }
