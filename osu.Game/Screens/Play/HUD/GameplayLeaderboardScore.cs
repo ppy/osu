@@ -273,15 +273,17 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        private const double text_transition_duration = 200;
+
         private Color4 textColour
         {
             set
             {
-                scoreText.FadeColour(value, 200, Easing.OutQuint);
-                accuracyText.FadeColour(value, 200, Easing.OutQuint);
-                comboText.FadeColour(value, 200, Easing.OutQuint);
-                usernameText.FadeColour(value, 200, Easing.OutQuint);
-                positionText.FadeColour(value, 200, Easing.OutQuint);
+                scoreText.FadeColour(value, text_transition_duration, Easing.OutQuint);
+                accuracyText.FadeColour(value, text_transition_duration, Easing.OutQuint);
+                comboText.FadeColour(value, text_transition_duration, Easing.OutQuint);
+                usernameText.FadeColour(value, text_transition_duration, Easing.OutQuint);
+                positionText.FadeColour(value, text_transition_duration, Easing.OutQuint);
             }
         }
     }
