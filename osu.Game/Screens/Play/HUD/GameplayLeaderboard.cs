@@ -40,9 +40,9 @@ namespace osu.Game.Screens.Play.HUD
             return drawable;
         }
 
-        public override void Add(GameplayLeaderboardScore drawable)
+        public sealed override void Add(GameplayLeaderboardScore drawable)
         {
-            throw new InvalidOperationException($"Use {nameof(AddPlayer)} instead.");
+            throw new NotSupportedException($"Use {nameof(AddPlayer)} instead.");
         }
 
         private void sort()
