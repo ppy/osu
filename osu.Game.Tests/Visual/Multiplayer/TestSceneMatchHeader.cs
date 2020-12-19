@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Osu;
@@ -14,7 +15,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         public TestSceneMatchHeader()
         {
-            Room = new Room();
+            Child = new Header();
+        }
+
+        [SetUp]
+        public new void Setup() => Schedule(() =>
+        {
             Room.Playlist.Add(new PlaylistItem
             {
                 Beatmap =
@@ -41,8 +47,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             Room.Name.Value = "A very awesome room";
             Room.Host.Value = new User { Id = 2, Username = "peppy" };
-
-            Child = new Header();
-        }
+        });
     }
 }

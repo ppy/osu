@@ -39,9 +39,15 @@ namespace osu.Game.Online.API
 
         private string password;
 
-        public Bindable<User> LocalUser { get; } = new Bindable<User>(createGuestUser());
+        public IBindable<User> LocalUser => localUser;
+        public IBindableList<User> Friends => friends;
+        public IBindable<UserActivity> Activity => activity;
 
-        public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
+        private Bindable<User> localUser { get; } = new Bindable<User>(createGuestUser());
+
+        private BindableList<User> friends { get; } = new BindableList<User>();
+
+        private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
@@ -61,10 +67,10 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
-            LocalUser.BindValueChanged(u =>
+            localUser.BindValueChanged(u =>
             {
-                u.OldValue?.Activity.UnbindFrom(Activity);
-                u.NewValue.Activity.BindTo(Activity);
+                u.OldValue?.Activity.UnbindFrom(activity);
+                u.NewValue.Activity.BindTo(activity);
             }, true);
 
             var thread = new Thread(run)
@@ -134,23 +140,37 @@ namespace osu.Game.Online.API
                         }
 
                         var userReq = new GetUserRequest();
+
                         userReq.Success += u =>
                         {
-                            LocalUser.Value = u;
+                            localUser.Value = u;
 
                             // todo: save/pull from settings
-                            LocalUser.Value.Status.Value = new UserStatusOnline();
+                            localUser.Value.Status.Value = new UserStatusOnline();
 
                             failureCount = 0;
+                        };
+
+                        if (!handleRequest(userReq))
+                        {
+                            failConnectionProcess();
+                            continue;
+                        }
+
+                        // getting user's friends is considered part of the connection process.
+                        var friendsReq = new GetFriendsRequest();
+
+                        friendsReq.Success += res =>
+                        {
+                            friends.AddRange(res);
 
                             //we're connected!
                             state.Value = APIState.Online;
                         };
 
-                        if (!handleRequest(userReq))
+                        if (!handleRequest(friendsReq))
                         {
-                            if (State.Value == APIState.Connecting)
-                                state.Value = APIState.Failing;
+                            failConnectionProcess();
                             continue;
                         }
 
@@ -185,6 +205,13 @@ namespace osu.Game.Online.API
                 }
 
                 Thread.Sleep(50);
+            }
+
+            void failConnectionProcess()
+            {
+                // if something went wrong during the connection process, we want to reset the state (but only if still connecting).
+                if (State.Value == APIState.Connecting)
+                    state.Value = APIState.Failing;
             }
         }
 
@@ -322,7 +349,7 @@ namespace osu.Game.Online.API
             return true;
         }
 
-        public bool IsLoggedIn => LocalUser.Value.Id > 1;
+        public bool IsLoggedIn => localUser.Value.Id > 1;
 
         public void Queue(APIRequest request)
         {
@@ -352,8 +379,12 @@ namespace osu.Game.Online.API
             password = null;
             authentication.Clear();
 
-            // Scheduled prior to state change such that the state changed event is invoked with the correct user present
-            Schedule(() => LocalUser.Value = createGuestUser());
+            // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
+            Schedule(() =>
+            {
+                localUser.Value = createGuestUser();
+                friends.Clear();
+            });
 
             state.Value = APIState.Offline;
         }
