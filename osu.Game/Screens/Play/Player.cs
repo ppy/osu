@@ -806,11 +806,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="Score"/> to import.</param>
         /// <returns>The imported score.</returns>
-        protected virtual async Task ImportScore(Score score)
+        protected virtual Task ImportScore(Score score)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
             if (DrawableRuleset.ReplayScore != null)
-                return;
+                return Task.CompletedTask;
 
             LegacyByteArrayReader replayReader;
 
@@ -820,7 +820,7 @@ namespace osu.Game.Screens.Play
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
-            await scoreManager.Import(score.ScoreInfo, replayReader);
+            return scoreManager.Import(score.ScoreInfo, replayReader);
         }
 
         /// <summary>
