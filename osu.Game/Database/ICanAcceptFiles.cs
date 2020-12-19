@@ -20,6 +20,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Import the specified files from the given import tasks.
         /// </summary>
+        /// <param name="tasks">The import tasks from which the files should be imported.</param>
         Task Import(params ImportTask[] tasks);
 
         /// <summary>
