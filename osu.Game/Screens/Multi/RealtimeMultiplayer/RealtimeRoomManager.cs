@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             var joinedRoom = JoinedRoom;
 
             base.PartRoom();
-            multiplayerClient.LeaveRoom().Wait();
+            multiplayerClient.LeaveRoom();
 
             // Todo: This is not the way to do this. Basically when we're the only participant and the room closes, there's no way to know if this is actually the case.
             RemoveRoom(joinedRoom);
