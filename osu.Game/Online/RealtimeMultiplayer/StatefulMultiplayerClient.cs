@@ -71,7 +71,9 @@ namespace osu.Game.Online.RealtimeMultiplayer
         private RulesetStore rulesets { get; set; } = null!;
 
         private Room? apiRoom;
-        private int playlistItemId; // Todo: THIS IS SUPER TEMPORARY!!
+
+        // Todo: This is temporary, until the multiplayer server returns the item id on match start or otherwise.
+        private int playlistItemId;
 
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
