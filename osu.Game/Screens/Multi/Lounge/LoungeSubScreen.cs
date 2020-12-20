@@ -13,7 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Screens.Multi.Match;
+using osu.Game.Screens.Multi.Timeshift;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi.Lounge
@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
             selectedRoom.Value = room;
 
-            this.Push(new MatchSubScreen(room));
+            this.Push(new TimeshiftRoomSubScreen(room));
         }
 
         protected abstract FilterControl CreateFilterControl();
