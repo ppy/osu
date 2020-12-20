@@ -142,15 +142,17 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
             if (Room == null)
                 return;
 
+            const double fade_time = 50;
+
             if (User.State == MultiplayerUserState.Ready)
-                readyMark.FadeIn(50);
+                readyMark.FadeIn(fade_time);
             else
-                readyMark.FadeOut(50);
+                readyMark.FadeOut(fade_time);
 
             if (Room.Host?.Equals(User) == true)
-                crown.FadeIn(50);
+                crown.FadeIn(fade_time);
             else
-                crown.FadeOut(50);
+                crown.FadeOut(fade_time);
         }
 
         public MenuItem[] ContextMenuItems
