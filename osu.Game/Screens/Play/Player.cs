@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -22,8 +23,10 @@ using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -501,6 +504,7 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate completionProgressDelegate;
+        private Task<ScoreInfo> scoreSubmissionTask;
 
         private void updateCompletionState(ValueChangedEvent<bool> completionState)
         {
@@ -527,32 +531,49 @@ namespace osu.Game.Screens.Play
 
             if (!showResults) return;
 
-            using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
-                completionProgressDelegate = Schedule(GotoRanking);
-        }
-
-        protected virtual ScoreInfo CreateScore()
-        {
-            var score = new ScoreInfo
+            scoreSubmissionTask ??= Task.Run(async () =>
             {
-                Beatmap = Beatmap.Value.BeatmapInfo,
-                Ruleset = rulesetInfo,
-                Mods = Mods.Value.ToArray(),
-            };
+                var score = CreateScore();
 
-            if (DrawableRuleset.ReplayScore != null)
-                score.User = DrawableRuleset.ReplayScore.ScoreInfo?.User ?? new GuestUser();
-            else
-                score.User = api.LocalUser.Value;
+                try
+                {
+                    await SubmitScore(score);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Score submission failed!");
+                }
 
-            ScoreProcessor.PopulateScore(score);
+                try
+                {
+                    await ImportScore(score);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Score import failed!");
+                }
 
-            return score;
+                return score.ScoreInfo;
+            });
+
+            using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
+                scheduleCompletion();
         }
+
+        private void scheduleCompletion() => completionProgressDelegate = Schedule(() =>
+        {
+            if (!scoreSubmissionTask.IsCompleted)
+            {
+                scheduleCompletion();
+                return;
+            }
+
+            // screen may be in the exiting transition phase.
+            if (this.IsCurrentScreen())
+                this.Push(CreateResults(scoreSubmissionTask.Result));
+        });
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
-
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true);
 
         #region Fail Logic
 
@@ -748,38 +769,73 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(next);
         }
 
-        protected virtual void GotoRanking()
+        /// <summary>
+        /// Creates the player's <see cref="Score"/>.
+        /// </summary>
+        /// <returns>The <see cref="Score"/>.</returns>
+        protected virtual Score CreateScore()
         {
+            var score = new Score
+            {
+                ScoreInfo = new ScoreInfo
+                {
+                    Beatmap = Beatmap.Value.BeatmapInfo,
+                    Ruleset = rulesetInfo,
+                    Mods = Mods.Value.ToArray(),
+                }
+            };
+
             if (DrawableRuleset.ReplayScore != null)
             {
-                // if a replay is present, we likely don't want to import into the local database.
-                this.Push(CreateResults(CreateScore()));
-                return;
+                score.ScoreInfo.User = DrawableRuleset.ReplayScore.ScoreInfo?.User ?? new GuestUser();
+                score.Replay = DrawableRuleset.ReplayScore.Replay;
             }
-
-            LegacyByteArrayReader replayReader = null;
-
-            var score = new Score { ScoreInfo = CreateScore() };
-
-            if (recordingScore?.Replay.Frames.Count > 0)
+            else
             {
-                score.Replay = recordingScore.Replay;
-
-                using (var stream = new MemoryStream())
-                {
-                    new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
-                    replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
-                }
+                score.ScoreInfo.User = api.LocalUser.Value;
+                score.Replay = new Replay { Frames = recordingScore?.Replay.Frames.ToList() ?? new List<ReplayFrame>() };
             }
 
-            scoreManager.Import(score.ScoreInfo, replayReader)
-                        .ContinueWith(imported => Schedule(() =>
-                        {
-                            // screen may be in the exiting transition phase.
-                            if (this.IsCurrentScreen())
-                                this.Push(CreateResults(imported.Result));
-                        }));
+            ScoreProcessor.PopulateScore(score.ScoreInfo);
+
+            return score;
         }
+
+        /// <summary>
+        /// Imports the player's <see cref="Score"/> to the local database.
+        /// </summary>
+        /// <param name="score">The <see cref="Score"/> to import.</param>
+        /// <returns>The imported score.</returns>
+        protected virtual Task ImportScore(Score score)
+        {
+            // Replays are already populated and present in the game's database, so should not be re-imported.
+            if (DrawableRuleset.ReplayScore != null)
+                return Task.CompletedTask;
+
+            LegacyByteArrayReader replayReader;
+
+            using (var stream = new MemoryStream())
+            {
+                new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
+                replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+            }
+
+            return scoreManager.Import(score.ScoreInfo, replayReader);
+        }
+
+        /// <summary>
+        /// Submits the player's <see cref="Score"/>.
+        /// </summary>
+        /// <param name="score">The <see cref="Score"/> to submit.</param>
+        /// <returns>The submitted score.</returns>
+        protected virtual Task SubmitScore(Score score) => Task.CompletedTask;
+
+        /// <summary>
+        /// Creates the <see cref="ResultsScreen"/> for a <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to be displayed in the results screen.</param>
+        /// <returns>The <see cref="ResultsScreen"/>.</returns>
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true);
 
         private void fadeOut(bool instant = false)
         {
