@@ -54,9 +54,12 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             multiplayerClient.LeaveRoom().Wait();
 
             // Todo: This is not the way to do this. Basically when we're the only participant and the room closes, there's no way to know if this is actually the case.
-            RemoveRoom(joinedRoom);
             // This is delayed one frame because upon exiting the match subscreen, multiplayer updates the polling rate and messes with polling.
-            Schedule(() => listingPollingComponent.PollImmediately());
+            Schedule(() =>
+            {
+                RemoveRoom(joinedRoom);
+                listingPollingComponent.PollImmediately();
+            });
         }
 
         private void joinMultiplayerRoom(Room room, Action<Room> onSuccess = null)
