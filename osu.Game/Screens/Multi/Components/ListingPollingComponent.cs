@@ -25,8 +25,7 @@ namespace osu.Game.Screens.Multi.Components
         {
             currentFilter.BindValueChanged(_ =>
             {
-                InitialRoomsReceived.Value = false;
-
+                NotifyRoomsReceived(null);
                 if (IsLoaded)
                     PollImmediately();
             });
