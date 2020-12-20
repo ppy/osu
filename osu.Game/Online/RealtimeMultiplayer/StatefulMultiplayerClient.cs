@@ -79,7 +79,9 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// <param name="room">The API <see cref="Room"/>.</param>
         public async Task JoinRoom(Room room)
         {
-            Debug.Assert(Room == null);
+            if (Room != null)
+                throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
+
             Debug.Assert(room.RoomID.Value != null);
 
             apiRoom = room;
@@ -162,6 +164,9 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
         {
+            if (Room == null)
+                return Task.CompletedTask;
+
             Schedule(() =>
             {
                 if (Room == null)
@@ -194,6 +199,9 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         async Task IMultiplayerClient.UserJoined(MultiplayerRoomUser user)
         {
+            if (Room == null)
+                return;
+
             await PopulateUser(user);
 
             Schedule(() =>
@@ -209,6 +217,9 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user)
         {
+            if (Room == null)
+                return Task.CompletedTask;
+
             Schedule(() =>
             {
                 if (Room == null)
@@ -225,6 +236,9 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         Task IMultiplayerClient.HostChanged(int userId)
         {
+            if (Room == null)
+                return Task.CompletedTask;
+
             Schedule(() =>
             {
                 if (Room == null)
@@ -251,6 +265,9 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         Task IMultiplayerClient.UserStateChanged(int userId, MultiplayerUserState state)
         {
+            if (Room == null)
+                return Task.CompletedTask;
+
             Schedule(() =>
             {
                 if (Room == null)
@@ -269,6 +286,9 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         Task IMultiplayerClient.LoadRequested()
         {
+            if (Room == null)
+                return Task.CompletedTask;
+
             Schedule(() =>
             {
                 if (Room == null)
@@ -282,15 +302,15 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         Task IMultiplayerClient.MatchStarted()
         {
-            Debug.Assert(Room != null);
-            var players = Room.Users.Where(u => u.State == MultiplayerUserState.Playing).Select(u => u.UserID).ToList();
+            if (Room == null)
+                return Task.CompletedTask;
 
             Schedule(() =>
             {
                 if (Room == null)
                     return;
 
-                PlayingUsers.AddRange(players);
+                PlayingUsers.AddRange(Room.Users.Where(u => u.State == MultiplayerUserState.Playing).Select(u => u.UserID));
 
                 MatchStarted?.Invoke();
             });
@@ -300,6 +320,9 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         Task IMultiplayerClient.ResultsReady()
         {
+            if (Room == null)
+                return Task.CompletedTask;
+
             Schedule(() =>
             {
                 if (Room == null)
