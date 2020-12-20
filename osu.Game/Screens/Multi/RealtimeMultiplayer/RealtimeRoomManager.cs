@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -81,7 +82,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             allowPolling.Value = isConnected.Value && JoinedRoom.Value == null;
         }
 
-        protected override RoomPollingComponent[] CreatePollingComponents() => new RoomPollingComponent[]
+        protected override IEnumerable<RoomPollingComponent> CreatePollingComponents() => new RoomPollingComponent[]
         {
             listingPollingComponent = new RealtimeListingPollingComponent
             {

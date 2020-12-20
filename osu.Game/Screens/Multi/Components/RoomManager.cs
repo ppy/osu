@@ -125,8 +125,7 @@ namespace osu.Game.Screens.Multi.Components
         {
             if (received == null)
             {
-                rooms.Clear();
-                initialRoomsReceived.Value = false;
+                ClearRooms();
                 return;
             }
 
@@ -171,7 +170,7 @@ namespace osu.Game.Screens.Multi.Components
         protected void ClearRooms()
         {
             rooms.Clear();
-            InitialRoomsReceived.Value = false;
+            initialRoomsReceived.Value = false;
         }
 
         /// <summary>
