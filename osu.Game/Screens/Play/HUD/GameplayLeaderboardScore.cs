@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play.HUD
                                             usernameText = new OsuSpriteText
                                             {
                                                 RelativeSizeAxes = Axes.X,
-                                                Width = 0.8f,
+                                                Width = 0.6f,
                                                 Anchor = Anchor.CentreLeft,
                                                 Origin = Anchor.CentreLeft,
                                                 Colour = Color4.White,
