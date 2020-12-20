@@ -183,6 +183,6 @@ namespace osu.Game.Screens.Multi.Components
                 existing.CopyFrom(room);
         }
 
-        protected abstract RoomPollingComponent[] CreatePollingComponents();
+        protected abstract IEnumerable<RoomPollingComponent> CreatePollingComponents();
     }
 }
