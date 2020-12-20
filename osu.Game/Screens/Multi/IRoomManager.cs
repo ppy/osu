@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Multi
         /// <summary>
         /// Whether an initial listing of rooms has been received.
         /// </summary>
-        Bindable<bool> InitialRoomsReceived { get; }
+        IBindable<bool> InitialRoomsReceived { get; }
 
         /// <summary>
         /// All the active <see cref="Room"/>s.
