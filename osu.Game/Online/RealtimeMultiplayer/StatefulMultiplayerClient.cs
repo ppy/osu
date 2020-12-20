@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -140,20 +141,14 @@ namespace osu.Game.Online.RealtimeMultiplayer
                 RulesetID = Room.Settings.RulesetID
             };
 
-            var newSettings = new MultiplayerRoomSettings
+            ChangeSettings(new MultiplayerRoomSettings
             {
                 Name = name.GetOr(Room.Settings.Name),
                 BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
-                Mods = item.HasValue ? item.Value!.RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.Mods
-            };
-
-            // Make sure there would be a meaningful change in settings.
-            if (newSettings.Equals(Room.Settings))
-                return;
-
-            ChangeSettings(newSettings);
+                Mods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.Mods
+            });
         }
 
         public abstract Task TransferHost(int userId);
