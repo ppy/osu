@@ -10,11 +10,11 @@ namespace osu.Game.Online.Multiplayer
 {
     public class CreateRoomRequest : APIRequest<APICreatedRoom>
     {
-        private readonly Room room;
+        public readonly Room Room;
 
         public CreateRoomRequest(Room room)
         {
-            this.room = room;
+            Room = room;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -24,7 +24,7 @@ namespace osu.Game.Online.Multiplayer
             req.ContentType = "application/json";
             req.Method = HttpMethod.Post;
 
-            req.AddRaw(JsonConvert.SerializeObject(room));
+            req.AddRaw(JsonConvert.SerializeObject(Room));
 
             return req;
         }
