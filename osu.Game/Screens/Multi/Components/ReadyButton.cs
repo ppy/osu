@@ -11,27 +11,21 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.Multi.Components
 {
-    public class ReadyButton : TriangleButton
+    public abstract class ReadyButton : TriangleButton
     {
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
-        [Resolved(typeof(Room), nameof(Room.EndDate))]
-        private Bindable<DateTimeOffset> endDate { get; set; }
+        public new readonly BindableBool Enabled = new BindableBool();
 
         [Resolved]
-        private IBindable<WorkingBeatmap> gameBeatmap { get; set; }
+        protected IBindable<WorkingBeatmap> GameBeatmap { get; private set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
         private bool hasBeatmap;
-
-        public ReadyButton()
-        {
-            Text = "Start";
-        }
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
@@ -45,10 +39,6 @@ namespace osu.Game.Screens.Multi.Match.Components
             managerRemoved.BindValueChanged(beatmapRemoved);
 
             SelectedItem.BindValueChanged(item => updateSelectedItem(item.NewValue), true);
-
-            BackgroundColour = colours.Green;
-            Triangles.ColourDark = colours.Green;
-            Triangles.ColourLight = colours.GreenLight;
         }
 
         private void updateSelectedItem(PlaylistItem item)
@@ -94,15 +84,13 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private void updateEnabledState()
         {
-            if (gameBeatmap.Value == null || SelectedItem.Value == null)
+            if (GameBeatmap.Value == null || SelectedItem.Value == null)
             {
-                Enabled.Value = false;
+                base.Enabled.Value = false;
                 return;
             }
 
-            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < endDate.Value;
-
-            Enabled.Value = hasBeatmap && hasEnoughTime;
+            base.Enabled.Value = hasBeatmap && Enabled.Value;
         }
     }
 }
