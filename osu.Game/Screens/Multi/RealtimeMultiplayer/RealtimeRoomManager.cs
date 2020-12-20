@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -30,7 +31,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             base.LoadComplete();
 
             isConnected.BindTo(multiplayerClient.IsConnected);
-            isConnected.BindValueChanged(_ => Schedule(updatePolling), true);
+            isConnected.BindValueChanged(_ => Schedule(updatePolling));
+            JoinedRoom.BindValueChanged(_ => updatePolling());
 
             updatePolling();
         }
@@ -46,15 +48,18 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             if (JoinedRoom == null)
                 return;
 
-            var joinedRoom = JoinedRoom;
+            var joinedRoom = JoinedRoom.Value;
 
             base.PartRoom();
             multiplayerClient.LeaveRoom().Wait();
 
             // Todo: This is not the way to do this. Basically when we're the only participant and the room closes, there's no way to know if this is actually the case.
-            RemoveRoom(joinedRoom);
             // This is delayed one frame because upon exiting the match subscreen, multiplayer updates the polling rate and messes with polling.
-            Schedule(() => listingPollingComponent.PollImmediately());
+            Schedule(() =>
+            {
+                RemoveRoom(joinedRoom);
+                listingPollingComponent.PollImmediately();
+            });
         }
 
         private void joinMultiplayerRoom(Room room, Action<Room> onSuccess = null)
@@ -62,7 +67,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             Debug.Assert(room.RoomID.Value != null);
 
             var joinTask = multiplayerClient.JoinRoom(room);
-            joinTask.ContinueWith(_ => onSuccess?.Invoke(room));
+            joinTask.ContinueWith(_ => onSuccess?.Invoke(room), TaskContinuationOptions.OnlyOnRanToCompletion);
             joinTask.ContinueWith(t =>
             {
                 PartRoom();
@@ -77,10 +82,10 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                 ClearRooms();
 
             // Don't poll when not connected or when a room has been joined.
-            allowPolling.Value = isConnected.Value && JoinedRoom == null;
+            allowPolling.Value = isConnected.Value && JoinedRoom.Value == null;
         }
 
-        protected override RoomPollingComponent[] CreatePollingComponents() => new RoomPollingComponent[]
+        protected override IEnumerable<RoomPollingComponent> CreatePollingComponents() => new RoomPollingComponent[]
         {
             listingPollingComponent = new RealtimeListingPollingComponent
             {
@@ -102,8 +107,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             {
                 base.LoadComplete();
 
-                AllowPolling.BindValueChanged(_ =>
+                AllowPolling.BindValueChanged(allowPolling =>
                 {
+                    if (!allowPolling.NewValue)
+                        return;
+
                     if (IsLoaded)
                         PollImmediately();
                 });
@@ -120,8 +128,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             {
                 base.LoadComplete();
 
-                AllowPolling.BindValueChanged(_ =>
+                AllowPolling.BindValueChanged(allowPolling =>
                 {
+                    if (!allowPolling.NewValue)
+                        return;
+
                     if (IsLoaded)
                         PollImmediately();
                 });
