@@ -149,6 +149,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            NewResult += OnNewResult;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -208,7 +214,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
 
                 case DrawableTaikoHitObject taikoObject:
-                    h.OnNewResult += OnNewResult;
                     topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
                     base.Add(h);
                     break;
@@ -226,7 +231,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     return barLinePlayfield.Remove(barLine);
 
                 case DrawableTaikoHitObject _:
-                    h.OnNewResult -= OnNewResult;
                     // todo: consider tidying of proxied content if required.
                     return base.Remove(h);
 
