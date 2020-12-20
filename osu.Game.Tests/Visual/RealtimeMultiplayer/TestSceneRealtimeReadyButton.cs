@@ -97,6 +97,12 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
         [Test]
         public void TestBecomeHostWhileReady()
         {
+            AddStep("add host", () =>
+            {
+                Client.AddUser(new User { Id = 2, Username = "Another user" });
+                Client.TransferHost(2);
+            });
+
             addClickButtonStep();
             AddStep("make user host", () => Client.TransferHost(Client.Room?.Users[0].UserID ?? 0));
 
