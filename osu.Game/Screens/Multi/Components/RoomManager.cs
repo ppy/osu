@@ -23,11 +23,13 @@ namespace osu.Game.Screens.Multi.Components
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();
 
-        public Bindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>();
+        public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
+        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
         public IBindableList<Room> Rooms => rooms;
 
-        protected Room JoinedRoom { get; private set; }
+        protected IBindable<Room> JoinedRoom => joinedRoom;
+        private readonly Bindable<Room> joinedRoom = new Bindable<Room>();
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -44,7 +46,6 @@ namespace osu.Game.Screens.Multi.Components
 
             InternalChildren = CreatePollingComponents().Select(p =>
             {
-                p.InitialRoomsReceived.BindTo(InitialRoomsReceived);
                 p.RoomsReceived = onRoomsReceived;
                 return p;
             }).ToList();
@@ -64,7 +65,7 @@ namespace osu.Game.Screens.Multi.Components
 
             req.Success += result =>
             {
-                JoinedRoom = room;
+                joinedRoom.Value = room;
 
                 update(room, result);
                 addRoom(room);
@@ -93,7 +94,7 @@ namespace osu.Game.Screens.Multi.Components
 
             currentJoinRoomRequest.Success += () =>
             {
-                JoinedRoom = room;
+                joinedRoom.Value = room;
                 onSuccess?.Invoke(room);
             };
 
@@ -114,14 +115,20 @@ namespace osu.Game.Screens.Multi.Components
             if (JoinedRoom == null)
                 return;
 
-            api.Queue(new PartRoomRequest(JoinedRoom));
-            JoinedRoom = null;
+            api.Queue(new PartRoomRequest(joinedRoom.Value));
+            joinedRoom.Value = null;
         }
 
         private readonly HashSet<int> ignoredRooms = new HashSet<int>();
 
         private void onRoomsReceived(List<Room> received)
         {
+            if (received == null)
+            {
+                ClearRooms();
+                return;
+            }
+
             // Remove past matches
             foreach (var r in rooms.ToList())
             {
@@ -155,6 +162,7 @@ namespace osu.Game.Screens.Multi.Components
             }
 
             RoomsUpdated?.Invoke();
+            initialRoomsReceived.Value = true;
         }
 
         protected void RemoveRoom(Room room) => rooms.Remove(room);
@@ -162,7 +170,7 @@ namespace osu.Game.Screens.Multi.Components
         protected void ClearRooms()
         {
             rooms.Clear();
-            InitialRoomsReceived.Value = false;
+            initialRoomsReceived.Value = false;
         }
 
         /// <summary>
@@ -191,6 +199,6 @@ namespace osu.Game.Screens.Multi.Components
                 existing.CopyFrom(room);
         }
 
-        protected abstract RoomPollingComponent[] CreatePollingComponents();
+        protected abstract IEnumerable<RoomPollingComponent> CreatePollingComponents();
     }
 }

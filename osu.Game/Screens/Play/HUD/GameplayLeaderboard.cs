@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
-using JetBrains.Annotations;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Users;
@@ -15,8 +14,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public GameplayLeaderboard()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            Width = GameplayLeaderboardScore.EXTENDED_WIDTH + GameplayLeaderboardScore.SHEAR_WIDTH;
 
             Direction = FillDirection.Vertical;
 
@@ -29,32 +27,35 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Adds a player to the leaderboard.
         /// </summary>
-        /// <param name="currentScore">The bindable current score of the player.</param>
         /// <param name="user">The player.</param>
-        public void AddPlayer([NotNull] BindableDouble currentScore, [NotNull] User user)
+        /// <param name="isTracked">
+        /// Whether the player should be tracked on the leaderboard.
+        /// Set to <c>true</c> for the local player or a player whose replay is currently being played.
+        /// </param>
+        public ILeaderboardScore AddPlayer(User user, bool isTracked)
         {
-            var scoreItem = addScore(currentScore.Value, user);
-            currentScore.ValueChanged += s => scoreItem.TotalScore = s.NewValue;
-        }
-
-        private GameplayLeaderboardScore addScore(double totalScore, User user)
-        {
-            var scoreItem = new GameplayLeaderboardScore
+            var drawable = new GameplayLeaderboardScore(user, isTracked)
             {
-                User = user,
-                TotalScore = totalScore,
-                OnScoreChange = updateScores,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
             };
 
-            Add(scoreItem);
-            updateScores();
+            base.Add(drawable);
+            drawable.TotalScore.BindValueChanged(_ => Scheduler.AddOnce(sort), true);
 
-            return scoreItem;
+            Height = Count * (GameplayLeaderboardScore.PANEL_HEIGHT + Spacing.Y);
+
+            return drawable;
         }
 
-        private void updateScores()
+        public sealed override void Add(GameplayLeaderboardScore drawable)
         {
-            var orderedByScore = this.OrderByDescending(i => i.TotalScore).ToList();
+            throw new NotSupportedException($"Use {nameof(AddPlayer)} instead.");
+        }
+
+        private void sort()
+        {
+            var orderedByScore = this.OrderByDescending(i => i.TotalScore.Value).ToList();
 
             for (int i = 0; i < Count; i++)
             {
