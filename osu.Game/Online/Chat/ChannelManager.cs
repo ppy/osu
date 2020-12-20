@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Chat.Tabs;
@@ -34,10 +35,9 @@ namespace osu.Game.Online.Chat
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         /// <summary>
-        /// Keeps a list of closed channel identifiers. Stores the channel ID for normal
-        /// channels, or the user ID for PM channels
+        /// Keeps a stack of recently closed channels
         /// </summary>
-        private readonly BindableList<long> closedChannelIds = new BindableList<long>();
+        private readonly BindableList<ClosedChannel> closedChannels = new BindableList<ClosedChannel>();
 
         // For efficiency purposes, this constant bounds the number of closed channels we store.
         // This number is somewhat arbitrary; future developers are free to modify it.
@@ -61,6 +61,10 @@ namespace osu.Game.Online.Chat
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+
+        [Resolved]
+        private UserLookupCache users { get; set; }
 
         public readonly BindableBool HighPollRate = new BindableBool();
 
@@ -421,13 +425,15 @@ namespace osu.Game.Online.Chat
 
             // Prevent the closedChannel list from exceeding the max size
             // by removing the oldest element
-            if (closedChannelIds.Count >= closed_channels_max_size)
+            if (closedChannels.Count >= closed_channels_max_size)
             {
-                closedChannelIds.RemoveAt(0);
+                closedChannels.RemoveAt(0);
             }
 
             // For PM channels, we store the user ID; else, we store the channel id
-            closedChannelIds.Add(channel.Type == ChannelType.PM ? channel.Users.First().Id : channel.Id);
+            closedChannels.Add(channel.Type == ChannelType.PM
+                ? new ClosedChannel(ChannelType.PM, channel.Users.Single().Id)
+                : new ClosedChannel(channel.Type, channel.Id));
 
             if (channel.Joined.Value)
             {
@@ -443,41 +449,36 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public void JoinLastClosedChannel()
         {
-            if (closedChannelIds.Count <= 0)
-            {
-                return;
-            }
-
-            // This nested loop could be eliminated if a check was added so that
+            // This loop could be eliminated if a check was added so that
             // when the code opens a channel it removes from the closedChannel list.
             // However, this would require adding an O(|closeChannels|) work operation
             // every time the user joins a channel, which would make joining a channel
-            // slower. I wanted to centralize all major slowdowns so they
+            // slower. We wanted to centralize all major slowdowns so they
             // can only occur if the user actually decides to use this feature.
-            while (closedChannelIds.Count != 0)
+            while (closedChannels.Count > 0)
             {
-                long lastClosedChannelId = closedChannelIds.Last();
-                closedChannelIds.RemoveAt(closedChannelIds.Count - 1);
-
-                bool lookupCondition(Channel ch) => ch.Type == ChannelType.PM
-                    ? ch.Users.Any(u => u.Id == lastClosedChannelId)
-                    : ch.Id == lastClosedChannelId;
+                ClosedChannel lastClosedChannel = closedChannels.Last();
+                closedChannels.RemoveAt(closedChannels.Count - 1);
 
                 // If the user hasn't already joined the channel, try to join it
-                if (joinedChannels.FirstOrDefault(lookupCondition) == null)
+                if (joinedChannels.FirstOrDefault(lastClosedChannel.IsEqual) == null)
                 {
-                    Channel lastClosedChannel = AvailableChannels.FirstOrDefault(lookupCondition);
+                    Channel lastChannel = AvailableChannels.FirstOrDefault(lastClosedChannel.IsEqual);
 
-                    if (lastClosedChannel != null)
+                    if (lastChannel != null)
                     {
-                        CurrentChannel.Value = JoinChannel(lastClosedChannel);
+                        // Channel exists as an availaable channel, directly join it
+                        CurrentChannel.Value = JoinChannel(lastChannel);
                     }
-                    else
+                    else if (lastClosedChannel.Type == ChannelType.PM)
                     {
                         // Try to get User to open PM chat
-                        var req = new GetUserRequest(lastClosedChannelId);
-                        req.Success += user => CurrentChannel.Value = JoinChannel(new Channel(user));
-                        api.Queue(req);
+                        users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(u =>
+                        {
+                            if (u.Result == null) return;
+
+                            Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(u.Result)));
+                        });
                     }
 
                     return;
@@ -567,6 +568,30 @@ namespace osu.Game.Online.Chat
         public ChannelNotFoundException(string channelName)
             : base($"A channel with the name {channelName} could not be found.")
         {
+        }
+    }
+
+    /// <summary>
+    /// Class that stores information about a closed channel
+    /// </summary>
+    public class ClosedChannel
+    {
+        public ChannelType Type;
+        public long Id;
+
+        public ClosedChannel(ChannelType type, long id)
+        {
+            Type = type;
+            Id = id;
+        }
+
+        public bool IsEqual(Channel channel)
+        {
+            if (channel.Type != this.Type) return false;
+
+            return this.Type == ChannelType.PM
+                ? channel.Users.Single().Id == this.Id
+                : channel.Id == this.Id;
         }
     }
 }

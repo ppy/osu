@@ -34,6 +34,7 @@ namespace osu.Game.Tests.Visual.Online
         private Channel previousChannel => joinedChannels.ElementAt(joinedChannels.ToList().IndexOf(currentChannel) - 1);
         private Channel channel1 => channels[0];
         private Channel channel2 => channels[1];
+        private Channel channel3 => channels[2];
 
         public TestSceneChatOverlay()
         {
@@ -42,7 +43,8 @@ namespace osu.Game.Tests.Visual.Online
                                  {
                                      Name = $"Channel no. {index}",
                                      Topic = index == 3 ? null : $"We talk about the number {index} here",
-                                     Type = index % 2 == 0 ? ChannelType.PM : ChannelType.Temporary
+                                     Type = index % 2 == 0 ? ChannelType.PM : ChannelType.Temporary,
+                                     Id = index
                                  })
                                  .ToList();
         }
@@ -249,6 +251,51 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
 
+        [Test]
+        public void TestCtrlShiftTShortcut()
+        {
+            AddStep("Join 3 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+                channelManager.JoinChannel(channel3);
+            });
+
+            // Should do nothing
+            AddStep("Press Ctrl + Shift + T", pressControlShiftT);
+            AddAssert("All channels still open", () => channelManager.JoinedChannels.Count == 3);
+
+            // Close channel 1
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+            AddStep("Click normal close button", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
+            AddAssert("Channel 1 closed", () => !channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("Other channels still open", () => channelManager.JoinedChannels.Count == 2);
+
+            // Reopen channel 1
+            AddStep("Press Ctrl + Shift + T", pressControlShiftT);
+            AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
+            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
+
+            // Close two channels
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+            AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
+            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Close channel 2", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+            AddAssert("Only one channel open", () => channelManager.JoinedChannels.Count == 1);
+            AddAssert("Current channel is channel 3", () => currentChannel == channel3);
+
+            // Should first re-open channel 2
+            AddStep("Press Ctrl + Shift + T", pressControlShiftT);
+            AddAssert("Channel 1 still closed", () => !channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("Channel 2 now open", () => channelManager.JoinedChannels.Contains(channel2));
+            AddAssert("Current channel is channel 2", () => currentChannel == channel2);
+
+            // Should then re-open channel 1
+            AddStep("Press Ctrl + Shift + T", pressControlShiftT);
+            AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
+            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
+        }
+
         private void pressChannelHotkey(int number)
         {
             var channelKey = Key.Number0 + number;
@@ -268,6 +315,15 @@ namespace osu.Game.Tests.Visual.Online
         {
             InputManager.PressKey(Key.ControlLeft);
             InputManager.Key(Key.T);
+            InputManager.ReleaseKey(Key.ControlLeft);
+        }
+
+        private void pressControlShiftT()
+        {
+            InputManager.PressKey(Key.ControlLeft);
+            InputManager.PressKey(Key.ShiftLeft);
+            InputManager.Key(Key.T);
+            InputManager.ReleaseKey(Key.ShiftLeft);
             InputManager.ReleaseKey(Key.ControlLeft);
         }
 
