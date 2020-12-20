@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Multi.Timeshift
                         timeshiftManager.TimeBetweenSelectionPolls.Value = isIdle ? 120000 : 15000;
                         break;
 
-                    case MatchSubScreen _:
+                    case RoomSubScreen _:
                         timeshiftManager.TimeBetweenListingPolls.Value = 0;
                         timeshiftManager.TimeBetweenSelectionPolls.Value = isIdle ? 30000 : 5000;
                         break;

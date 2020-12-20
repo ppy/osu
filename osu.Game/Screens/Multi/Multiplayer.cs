@@ -308,7 +308,7 @@ namespace osu.Game.Screens.Multi
                     headerBackground.MoveToX(0, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
                     break;
 
-                case MatchSubScreen _:
+                case RoomSubScreen _:
                     header.ResizeHeightTo(135, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
                     headerBackground.MoveToX(-MultiplayerSubScreen.X_SHIFT, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
                     break;
@@ -330,7 +330,7 @@ namespace osu.Game.Screens.Multi
 
         private void updateTrack(ValueChangedEvent<WorkingBeatmap> _ = null)
         {
-            if (screenStack.CurrentScreen is MatchSubScreen)
+            if (screenStack.CurrentScreen is RoomSubScreen)
             {
                 var track = Beatmap.Value?.Track;
 
