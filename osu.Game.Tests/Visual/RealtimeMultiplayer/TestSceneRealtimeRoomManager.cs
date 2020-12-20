@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
         }
 
         [Test]
-        public void TestMultiplayerRoomPartedWhenAPIRoomJoined()
+        public void TestMultiplayerRoomJoinedWhenAPIRoomJoined()
         {
             AddStep("create room manager with a room", () =>
             {
@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
                 });
             });
 
-            AddAssert("multiplayer room parted", () => roomContainer.Client.Room != null);
+            AddAssert("multiplayer room joined", () => roomContainer.Client.Room != null);
         }
 
         private TestRealtimeRoomManager createRoomManager()
