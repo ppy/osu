@@ -147,6 +147,18 @@ namespace osu.Game.Rulesets.Taiko.UI
                 },
                 drumRollHitContainer.CreateProxy(),
             };
+
+            RegisterPool<Hit, DrawableHit>(50);
+            RegisterPool<Hit.StrongNestedHit, DrawableHit.StrongNestedHit>(50);
+
+            RegisterPool<DrumRoll, DrawableDrumRoll>(5);
+            RegisterPool<DrumRoll.StrongNestedHit, DrawableDrumRoll.StrongNestedHit>(5);
+
+            RegisterPool<DrumRollTick, DrawableDrumRollTick>(100);
+            RegisterPool<DrumRollTick.StrongNestedHit, DrawableDrumRollTick.StrongNestedHit>(100);
+
+            RegisterPool<Swell, DrawableSwell>(5);
+            RegisterPool<SwellTick, DrawableSwellTick>(100);
         }
 
         protected override void LoadComplete()
