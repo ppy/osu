@@ -15,6 +15,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.RoomStatuses;
 using osu.Game.Rulesets;
@@ -347,38 +348,36 @@ namespace osu.Game.Online.RealtimeMultiplayer
             });
 
             var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
-            req.Success += res =>
-            {
-                var beatmapSet = res.ToBeatmapSet(rulesets);
-
-                var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineBeatmapID == settings.BeatmapID);
-                beatmap.MD5Hash = settings.BeatmapChecksum;
-
-                var ruleset = rulesets.GetRuleset(settings.RulesetID).CreateInstance();
-                var mods = settings.Mods.Select(m => m.ToMod(ruleset));
-
-                PlaylistItem playlistItem = new PlaylistItem
-                {
-                    ID = playlistItemId,
-                    Beatmap = { Value = beatmap },
-                    Ruleset = { Value = ruleset.RulesetInfo },
-                };
-
-                playlistItem.RequiredMods.AddRange(mods);
-
-                Schedule(() =>
-                {
-                    if (Room == null || !Room.Settings.Equals(settings))
-                        return;
-
-                    Debug.Assert(apiRoom != null);
-
-                    apiRoom.Playlist.Clear(); // Clearing should be unnecessary, but here for sanity.
-                    apiRoom.Playlist.Add(playlistItem);
-                });
-            };
+            req.Success += res => updatePlaylist(settings, res);
 
             api.Queue(req);
+        }
+
+        private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet onlineSet)
+        {
+            if (Room == null || !Room.Settings.Equals(settings))
+                return;
+
+            Debug.Assert(apiRoom != null);
+
+            var beatmapSet = onlineSet.ToBeatmapSet(rulesets);
+            var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineBeatmapID == settings.BeatmapID);
+            beatmap.MD5Hash = settings.BeatmapChecksum;
+
+            var ruleset = rulesets.GetRuleset(settings.RulesetID).CreateInstance();
+            var mods = settings.Mods.Select(m => m.ToMod(ruleset));
+
+            PlaylistItem playlistItem = new PlaylistItem
+            {
+                ID = playlistItemId,
+                Beatmap = { Value = beatmap },
+                Ruleset = { Value = ruleset.RulesetInfo },
+            };
+
+            playlistItem.RequiredMods.AddRange(mods);
+
+            apiRoom.Playlist.Clear(); // Clearing should be unnecessary, but here for sanity.
+            apiRoom.Playlist.Add(playlistItem);
         }
     }
 }
