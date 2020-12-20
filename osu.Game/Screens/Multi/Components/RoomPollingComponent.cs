@@ -15,21 +15,10 @@ namespace osu.Game.Screens.Multi.Components
     {
         public Action<List<Room>> RoomsReceived;
 
-        /// <summary>
-        /// The time in milliseconds to wait between polls.
-        /// Setting to zero stops all polling.
-        /// </summary>
-        public new readonly Bindable<double> TimeBetweenPolls = new Bindable<double>();
-
         public readonly Bindable<bool> InitialRoomsReceived = new Bindable<bool>();
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
-
-        protected RoomPollingComponent()
-        {
-            TimeBetweenPolls.BindValueChanged(time => base.TimeBetweenPolls = time.NewValue);
-        }
 
         protected void NotifyRoomsReceived(List<Room> rooms)
         {
