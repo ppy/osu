@@ -242,7 +242,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
             {
-                multiplayer?.CreateRoom(Room.CreateCopy());
+                multiplayer?.OpenNewRoom(Room.CreateCopy());
             })
         };
     }
