@@ -328,7 +328,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
             if (Room == null)
                 return;
 
-            // Update a few instantaneously properties of the room.
+            // Update a few properties of the room instantaneously.
             Schedule(() =>
             {
                 if (Room == null)
