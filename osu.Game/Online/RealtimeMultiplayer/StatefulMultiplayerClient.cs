@@ -309,14 +309,12 @@ namespace osu.Game.Online.RealtimeMultiplayer
             if (Room == null)
                 return Task.CompletedTask;
 
-            var players = Room.Users.Where(u => u.State == MultiplayerUserState.Playing).Select(u => u.UserID).ToList();
-
             Schedule(() =>
             {
                 if (Room == null)
                     return;
 
-                PlayingUsers.AddRange(players);
+                PlayingUsers.AddRange(Room.Users.Where(u => u.State == MultiplayerUserState.Playing).Select(u => u.UserID));
 
                 MatchStarted?.Invoke();
             });
