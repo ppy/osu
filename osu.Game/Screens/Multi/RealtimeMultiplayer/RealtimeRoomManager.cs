@@ -30,7 +30,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             base.LoadComplete();
 
             isConnected.BindTo(multiplayerClient.IsConnected);
-            isConnected.BindValueChanged(_ => Schedule(updatePolling), true);
+            isConnected.BindValueChanged(_ => Schedule(updatePolling));
+            JoinedRoom.BindValueChanged(_ => updatePolling());
 
             updatePolling();
         }
@@ -46,7 +47,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             if (JoinedRoom == null)
                 return;
 
-            var joinedRoom = JoinedRoom;
+            var joinedRoom = JoinedRoom.Value;
 
             base.PartRoom();
             multiplayerClient.LeaveRoom().Wait();
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                 ClearRooms();
 
             // Don't poll when not connected or when a room has been joined.
-            allowPolling.Value = isConnected.Value && JoinedRoom == null;
+            allowPolling.Value = isConnected.Value && JoinedRoom.Value == null;
         }
 
         protected override RoomPollingComponent[] CreatePollingComponents() => new RoomPollingComponent[]
@@ -102,8 +103,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             {
                 base.LoadComplete();
 
-                AllowPolling.BindValueChanged(_ =>
+                AllowPolling.BindValueChanged(allowPolling =>
                 {
+                    if (!allowPolling.NewValue)
+                        return;
+
                     if (IsLoaded)
                         PollImmediately();
                 });
@@ -120,8 +124,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             {
                 base.LoadComplete();
 
-                AllowPolling.BindValueChanged(_ =>
+                AllowPolling.BindValueChanged(allowPolling =>
                 {
+                    if (!allowPolling.NewValue)
+                        return;
+
                     if (IsLoaded)
                         PollImmediately();
                 });
