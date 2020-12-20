@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
             private BeatmapSelectionControl initialBeatmapControl;
 
             [Resolved]
-            private RealtimeRoomManager manager { get; set; }
+            private IRoomManager manager { get; set; }
 
             [Resolved]
             private StatefulMultiplayerClient client { get; set; }
