@@ -69,8 +69,9 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                 case MultiplayerUserState.Ready:
                     if (Room?.Host?.Equals(localUser) == true)
                     {
-                        button.Text = "Let's go!";
-                        updateButtonColour(Room.Users.All(u => u.State == MultiplayerUserState.Ready));
+                        int countReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
+                        button.Text = $"Start match ({countReady} / {Room.Users.Count} ready)";
+                        updateButtonColour(true);
                     }
                     else
                     {
