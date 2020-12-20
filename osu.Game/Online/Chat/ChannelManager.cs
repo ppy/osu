@@ -62,7 +62,6 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private IAPIProvider api { get; set; }
 
-
         [Resolved]
         private UserLookupCache users { get; set; }
 
@@ -587,11 +586,11 @@ namespace osu.Game.Online.Chat
 
         public bool IsEqual(Channel channel)
         {
-            if (channel.Type != this.Type) return false;
+            if (channel.Type != Type) return false;
 
-            return this.Type == ChannelType.PM
-                ? channel.Users.Single().Id == this.Id
-                : channel.Id == this.Id;
+            return Type == ChannelType.PM
+                ? channel.Users.Single().Id == Id
+                : channel.Id == Id;
         }
     }
 }
