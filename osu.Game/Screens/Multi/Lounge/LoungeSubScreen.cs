@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
-        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
+        private readonly IBindable<bool> initialRoomsReceived = new Bindable<bool>();
 
         private Container content;
         private LoadingLayer loadingLayer;

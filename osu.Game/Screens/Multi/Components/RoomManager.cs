@@ -23,7 +23,8 @@ namespace osu.Game.Screens.Multi.Components
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();
 
-        public Bindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>();
+        public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
+        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
         public IBindableList<Room> Rooms => rooms;
 
@@ -45,7 +46,6 @@ namespace osu.Game.Screens.Multi.Components
 
             InternalChildren = CreatePollingComponents().Select(p =>
             {
-                p.InitialRoomsReceived.BindTo(InitialRoomsReceived);
                 p.RoomsReceived = onRoomsReceived;
                 return p;
             }).ToList();
@@ -123,6 +123,13 @@ namespace osu.Game.Screens.Multi.Components
 
         private void onRoomsReceived(List<Room> received)
         {
+            if (received == null)
+            {
+                rooms.Clear();
+                initialRoomsReceived.Value = false;
+                return;
+            }
+
             // Remove past matches
             foreach (var r in rooms.ToList())
             {
@@ -156,6 +163,7 @@ namespace osu.Game.Screens.Multi.Components
             }
 
             RoomsUpdated?.Invoke();
+            initialRoomsReceived.Value = true;
         }
 
         protected void RemoveRoom(Room room) => rooms.Remove(room);
@@ -192,6 +200,6 @@ namespace osu.Game.Screens.Multi.Components
                 existing.CopyFrom(room);
         }
 
-        protected abstract RoomPollingComponent[] CreatePollingComponents();
+        protected abstract IEnumerable<RoomPollingComponent> CreatePollingComponents();
     }
 }
