@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -13,29 +12,18 @@ namespace osu.Game.Screens.Multi.Components
 {
     public abstract class RoomPollingComponent : PollingComponent
     {
-        public Action<List<Room>> RoomsReceived;
-
         /// <summary>
-        /// The time in milliseconds to wait between polls.
-        /// Setting to zero stops all polling.
+        /// Invoked when any <see cref="Room"/>s have been received from the API.
+        /// <para>
+        /// Any <see cref="Room"/>s present locally but not returned by this event are to be removed from display.
+        /// If null, the display of local rooms is reset to an initial state.
+        /// </para>
         /// </summary>
-        public new readonly Bindable<double> TimeBetweenPolls = new Bindable<double>();
-
-        public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
-        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
+        public Action<List<Room>> RoomsReceived;
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        protected RoomPollingComponent()
-        {
-            TimeBetweenPolls.BindValueChanged(time => base.TimeBetweenPolls = time.NewValue);
-        }
-
-        protected void NotifyRoomsReceived(List<Room> rooms)
-        {
-            initialRoomsReceived.Value = true;
-            RoomsReceived?.Invoke(rooms);
-        }
+        protected void NotifyRoomsReceived(List<Room> rooms) => RoomsReceived?.Invoke(rooms);
     }
 }

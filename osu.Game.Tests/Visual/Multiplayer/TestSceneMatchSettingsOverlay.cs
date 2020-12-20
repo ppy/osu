@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 remove { }
             }
 
-            public Bindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
+            public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
 
             public IBindableList<Room> Rooms => null;
 

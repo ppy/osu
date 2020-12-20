@@ -106,14 +106,14 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
             return Task.CompletedTask;
         }
 
-        public override async Task StartMatch()
+        public override Task StartMatch()
         {
             Debug.Assert(Room != null);
 
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
-            await ((IMultiplayerClient)this).LoadRequested();
+            return ((IMultiplayerClient)this).LoadRequested();
         }
     }
 }
