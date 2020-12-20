@@ -21,8 +21,7 @@ namespace osu.Game.Screens.Multi.Components
         /// </summary>
         public new readonly Bindable<double> TimeBetweenPolls = new Bindable<double>();
 
-        public IBindable<bool> InitialRoomsReceived => initialRoomsReceived;
-        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
+        public readonly Bindable<bool> InitialRoomsReceived = new Bindable<bool>();
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
@@ -34,7 +33,7 @@ namespace osu.Game.Screens.Multi.Components
 
         protected void NotifyRoomsReceived(List<Room> rooms)
         {
-            initialRoomsReceived.Value = true;
+            InitialRoomsReceived.Value = true;
             RoomsReceived?.Invoke(rooms);
         }
     }
