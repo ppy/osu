@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Multi
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
 
-            screenStack.Push(loungeSubScreen = new LoungeSubScreen());
+            screenStack.Push(loungeSubScreen = CreateLounge());
         }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
@@ -360,6 +360,8 @@ namespace osu.Game.Screens.Multi
         }
 
         protected abstract RoomManager CreateRoomManager();
+
+        protected abstract LoungeSubScreen CreateLounge();
 
         private class MultiplayerWaveContainer : WaveContainer
         {

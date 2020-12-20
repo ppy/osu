@@ -45,5 +45,7 @@ namespace osu.Game.Screens.Multi.Timeshift
         }
 
         protected override RoomManager CreateRoomManager() => new TimeshiftRoomManager();
+
+        protected override LoungeSubScreen CreateLounge() => new TimeshiftLoungeSubScreen();
     }
 }
