@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsDropdown<T> : SettingsItem<T>
+    public abstract class SettingsDropdown<T> : SettingsItem<T>
     {
         protected new OsuDropdown<T> Control => (OsuDropdown<T>)base.Control;
 
