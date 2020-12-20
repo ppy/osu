@@ -354,14 +354,14 @@ namespace osu.Game.Online.RealtimeMultiplayer
                 var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineBeatmapID == settings.BeatmapID);
                 beatmap.MD5Hash = settings.BeatmapChecksum;
 
-                var ruleset = rulesets.GetRuleset(settings.RulesetID);
-                var mods = settings.Mods.Select(m => m.ToMod(ruleset.CreateInstance()));
+                var ruleset = rulesets.GetRuleset(settings.RulesetID).CreateInstance();
+                var mods = settings.Mods.Select(m => m.ToMod(ruleset));
 
                 PlaylistItem playlistItem = new PlaylistItem
                 {
                     ID = playlistItemId,
                     Beatmap = { Value = beatmap },
-                    Ruleset = { Value = ruleset },
+                    Ruleset = { Value = ruleset.RulesetInfo },
                 };
 
                 playlistItem.RequiredMods.AddRange(mods);
