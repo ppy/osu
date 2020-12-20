@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             Debug.Assert(room.RoomID.Value != null);
 
             var joinTask = multiplayerClient.JoinRoom(room);
-            joinTask.ContinueWith(_ => onSuccess?.Invoke(room));
+            joinTask.ContinueWith(_ => onSuccess?.Invoke(room), TaskContinuationOptions.OnlyOnRanToCompletion);
             joinTask.ContinueWith(t =>
             {
                 PartRoom();
