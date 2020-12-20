@@ -3,6 +3,7 @@
 
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Match;
 
@@ -43,6 +44,6 @@ namespace osu.Game.Screens.Multi.Timeshift
             Logger.Log($"Polling adjusted (listing: {timeshiftManager.TimeBetweenListingPolls.Value}, selection: {timeshiftManager.TimeBetweenSelectionPolls.Value})");
         }
 
-        protected override IRoomManager CreateRoomManager() => new TimeshiftRoomManager();
+        protected override RoomManager CreateRoomManager() => new TimeshiftRoomManager();
     }
 }
