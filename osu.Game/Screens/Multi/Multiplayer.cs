@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Multi
         private readonly IBindable<bool> isIdle = new BindableBool();
 
         [Cached(Type = typeof(IRoomManager))]
-        protected IRoomManager RoomManager { get; private set; }
+        protected RoomManager RoomManager { get; private set; }
 
         [Cached]
         private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Multi
             InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                Children = new Drawable[]
                 {
                     new Box
                     {
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Multi
                         Origin = Anchor.TopRight,
                         Action = () => CreateRoom()
                     },
-                    (Drawable)(RoomManager = CreateRoomManager())
+                    RoomManager = CreateRoomManager()
                 }
             };
 
@@ -353,7 +353,7 @@ namespace osu.Game.Screens.Multi
             }
         }
 
-        protected abstract IRoomManager CreateRoomManager();
+        protected abstract RoomManager CreateRoomManager();
 
         private class MultiplayerWaveContainer : WaveContainer
         {

@@ -24,8 +24,8 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
-using Humanizer;
 using osu.Game.Online.API;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -358,7 +358,7 @@ namespace osu.Game.Online.Leaderboards
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 20, italics: true),
-                    Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                    Text = rank == null ? "-" : rank.Value.FormatRank()
                 };
             }
 
