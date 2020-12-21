@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Online.Multiplayer.RoomStatuses;
 using osu.Game.Users;
@@ -40,15 +41,11 @@ namespace osu.Game.Online.Multiplayer
 
         // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
         [JsonProperty("category")]
-        private string categoryString
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        private RoomCategory category
         {
-            get => Category.Value.ToString().ToLower();
-            set
-            {
-                if (!Enum.TryParse<RoomCategory>(value, true, out var enumValue))
-                    enumValue = RoomCategory.Normal;
-                Category.Value = enumValue;
-            }
+            get => Category.Value;
+            set => Category.Value = value;
         }
 
         [Cached]
