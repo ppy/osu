@@ -40,7 +40,7 @@ namespace osu.Game.Online.Multiplayer
 
         [Cached]
         [JsonIgnore]
-        public readonly Bindable<TimeSpan> Duration = new Bindable<TimeSpan>(TimeSpan.FromMinutes(30));
+        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
 
         [Cached]
         [JsonIgnore]
@@ -78,16 +78,22 @@ namespace osu.Game.Online.Multiplayer
         }
 
         [JsonProperty("duration")]
-        private int duration
+        private int? duration
         {
-            get => (int)Duration.Value.TotalMinutes;
-            set => Duration.Value = TimeSpan.FromMinutes(value);
+            get => (int?)Duration.Value?.TotalMinutes;
+            set
+            {
+                if (value == null)
+                    Duration.Value = null;
+                else
+                    Duration.Value = TimeSpan.FromMinutes(value.Value);
+            }
         }
 
         // Only supports retrieval for now
         [Cached]
         [JsonProperty("ends_at")]
-        public readonly Bindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
+        public readonly Bindable<DateTimeOffset?> EndDate = new Bindable<DateTimeOffset?>();
 
         // Todo: Find a better way to do this (https://github.com/ppy/osu-framework/issues/1930)
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]

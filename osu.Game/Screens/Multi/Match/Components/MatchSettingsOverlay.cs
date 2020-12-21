@@ -325,7 +325,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
-                Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue, true);
+                Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
                 playlist.Items.BindTo(Playlist);
                 Playlist.BindCollectionChanged(onPlaylistChanged, true);
