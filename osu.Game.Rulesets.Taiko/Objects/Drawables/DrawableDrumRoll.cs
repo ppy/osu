@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            tickContainer.Clear();
+            tickContainer.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, fadeDuration);
         }
 
-        private class StrongNestedHit : DrawableStrongNestedHit
+        public class StrongNestedHit : DrawableStrongNestedHit
         {
             public new DrawableDrumRoll ParentHitObject => (DrawableDrumRoll)base.ParentHitObject;
 
