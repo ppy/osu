@@ -498,9 +498,9 @@ namespace osu.Game.Beatmaps
 
         TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
-        AudioManager IBeatmapResourceProvider.AudioManager => audioManager;
-        IResourceStore<byte[]> IBeatmapResourceProvider.Files => Files.Store;
-        IResourceStore<TextureUpload> IBeatmapResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+        AudioManager IStorageResourceProvider.AudioManager => audioManager;
+        IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
+        IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
 
         /// <summary>
         /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
