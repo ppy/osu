@@ -16,6 +16,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -28,8 +29,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Users;
 using osu.Game.Skinning;
+using osu.Game.Users;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Beatmaps
@@ -38,7 +39,7 @@ namespace osu.Game.Beatmaps
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IDisposable
+    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IDisposable, IBeatmapResourceProvider
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -71,6 +72,8 @@ namespace osu.Game.Beatmaps
         private readonly LargeTextureStore largeTextureStore;
         private readonly ITrackStore trackStore;
 
+        private readonly GameHost host;
+
         [CanBeNull]
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
 
@@ -80,6 +83,7 @@ namespace osu.Game.Beatmaps
         {
             this.rulesets = rulesets;
             this.audioManager = audioManager;
+            this.host = host;
 
             DefaultBeatmap = defaultBeatmap;
 
@@ -302,7 +306,7 @@ namespace osu.Game.Beatmaps
 
                 beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
-                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, largeTextureStore, trackStore, beatmapInfo, audioManager));
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
 
                 return working;
             }
@@ -491,6 +495,12 @@ namespace osu.Game.Beatmaps
         {
             onlineLookupQueue?.Dispose();
         }
+
+        TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
+        ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
+        AudioManager IBeatmapResourceProvider.AudioManager => audioManager;
+        IResourceStore<byte[]> IBeatmapResourceProvider.Files => Files.Store;
+        IResourceStore<TextureUpload> IBeatmapResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
 
         /// <summary>
         /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
