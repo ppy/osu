@@ -28,6 +28,9 @@ namespace osu.Game.Screens.Multi.Components
 
         public IBindableList<Room> Rooms => rooms;
 
+        protected IBindable<Room> JoinedRoom => joinedRoom;
+        private readonly Bindable<Room> joinedRoom = new Bindable<Room>();
+
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
@@ -36,8 +39,6 @@ namespace osu.Game.Screens.Multi.Components
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        private Room joinedRoom;
 
         protected RoomManager()
         {
@@ -64,7 +65,7 @@ namespace osu.Game.Screens.Multi.Components
 
             req.Success += result =>
             {
-                joinedRoom = room;
+                joinedRoom.Value = room;
 
                 update(room, result);
                 addRoom(room);
@@ -93,7 +94,7 @@ namespace osu.Game.Screens.Multi.Components
 
             currentJoinRoomRequest.Success += () =>
             {
-                joinedRoom = room;
+                joinedRoom.Value = room;
                 onSuccess?.Invoke(room);
             };
 
@@ -107,15 +108,15 @@ namespace osu.Game.Screens.Multi.Components
             api.Queue(currentJoinRoomRequest);
         }
 
-        public void PartRoom()
+        public virtual void PartRoom()
         {
             currentJoinRoomRequest?.Cancel();
 
-            if (joinedRoom == null)
+            if (JoinedRoom.Value == null)
                 return;
 
-            api.Queue(new PartRoomRequest(joinedRoom));
-            joinedRoom = null;
+            api.Queue(new PartRoomRequest(joinedRoom.Value));
+            joinedRoom.Value = null;
         }
 
         private readonly HashSet<int> ignoredRooms = new HashSet<int>();
@@ -124,8 +125,7 @@ namespace osu.Game.Screens.Multi.Components
         {
             if (received == null)
             {
-                rooms.Clear();
-                initialRoomsReceived.Value = false;
+                ClearRooms();
                 return;
             }
 
@@ -163,6 +163,14 @@ namespace osu.Game.Screens.Multi.Components
 
             RoomsUpdated?.Invoke();
             initialRoomsReceived.Value = true;
+        }
+
+        protected void RemoveRoom(Room room) => rooms.Remove(room);
+
+        protected void ClearRooms()
+        {
+            rooms.Clear();
+            initialRoomsReceived.Value = false;
         }
 
         /// <summary>
