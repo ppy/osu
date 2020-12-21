@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Platform;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
 
@@ -59,12 +60,12 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken)
+        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken, GameHost host)
         {
             if (clock != null)
                 Clock = clock;
 
-            dependencies.Cache(new TextureStore(new TextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
+            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
             {
