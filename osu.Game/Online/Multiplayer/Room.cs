@@ -35,8 +35,21 @@ namespace osu.Game.Online.Multiplayer
         public readonly Bindable<int> ChannelId = new Bindable<int>();
 
         [Cached]
-        [JsonProperty("category")]
+        [JsonIgnore]
         public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
+
+        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
+        [JsonProperty("category")]
+        private string categoryString
+        {
+            get => Category.Value.ToString().ToLower();
+            set
+            {
+                if (!Enum.TryParse<RoomCategory>(value, true, out var enumValue))
+                    enumValue = RoomCategory.Normal;
+                Category.Value = enumValue;
+            }
+        }
 
         [Cached]
         [JsonIgnore]
