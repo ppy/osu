@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Multi.Components
         {
             currentJoinRoomRequest?.Cancel();
 
-            if (JoinedRoom == null)
+            if (JoinedRoom.Value == null)
                 return;
 
             api.Queue(new PartRoomRequest(joinedRoom.Value));
