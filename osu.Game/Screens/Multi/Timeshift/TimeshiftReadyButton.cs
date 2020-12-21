@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Multi.Timeshift
     public class TimeshiftReadyButton : ReadyButton
     {
         [Resolved(typeof(Room), nameof(Room.EndDate))]
-        private Bindable<DateTimeOffset> endDate { get; set; }
+        private Bindable<DateTimeOffset?> endDate { get; set; }
 
         public TimeshiftReadyButton()
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Multi.Timeshift
         {
             base.Update();
 
-            Enabled.Value = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(GameBeatmap.Value.Track.Length) < endDate.Value;
+            Enabled.Value = endDate.Value != null && DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(GameBeatmap.Value.Track.Length) < endDate.Value;
         }
     }
 }
