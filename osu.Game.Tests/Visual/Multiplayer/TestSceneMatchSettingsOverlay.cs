@@ -23,10 +23,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestRoomSettings settings;
 
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room = new Room();
-
             settings = new TestRoomSettings
             {
                 RelativeSizeAxes = Axes.Both,
@@ -133,7 +131,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 remove { }
             }
 
-            public Bindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
+            public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
 
             public IBindableList<Room> Rooms => null;
 

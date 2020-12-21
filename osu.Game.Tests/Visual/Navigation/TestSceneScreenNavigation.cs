@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Screens.Multi.Timeshift;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Options;
@@ -107,14 +108,14 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitMultiWithEscape()
         {
-            PushAndConfirm(() => new Screens.Multi.Multiplayer());
+            PushAndConfirm(() => new TimeshiftMultiplayer());
             exitViaEscapeAndConfirm();
         }
 
         [Test]
         public void TestExitMultiWithBackButton()
         {
-            PushAndConfirm(() => new Screens.Multi.Multiplayer());
+            PushAndConfirm(() => new TimeshiftMultiplayer());
             exitViaBackButtonAndConfirm();
         }
 

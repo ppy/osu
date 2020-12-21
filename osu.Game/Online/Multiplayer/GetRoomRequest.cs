@@ -7,13 +7,13 @@ namespace osu.Game.Online.Multiplayer
 {
     public class GetRoomRequest : APIRequest<Room>
     {
-        private readonly int roomId;
+        public readonly int RoomId;
 
         public GetRoomRequest(int roomId)
         {
-            this.roomId = roomId;
+            RoomId = roomId;
         }
 
-        protected override string Target => $"rooms/{roomId}";
+        protected override string Target => $"rooms/{RoomId}";
     }
 }
