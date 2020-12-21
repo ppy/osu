@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddWaitStep("wait", 500);
+            AddWaitStep("wait", 10);
         }
     }
 }
