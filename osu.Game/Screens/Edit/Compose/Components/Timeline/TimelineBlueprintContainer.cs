@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Height = 0.4f;
+            Height = 0.6f;
 
             AddInternal(new Box
             {
