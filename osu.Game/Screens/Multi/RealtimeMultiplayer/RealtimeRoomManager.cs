@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         public override void PartRoom()
         {
-            if (JoinedRoom == null)
+            if (JoinedRoom.Value == null)
                 return;
 
             var joinedRoom = JoinedRoom.Value;
