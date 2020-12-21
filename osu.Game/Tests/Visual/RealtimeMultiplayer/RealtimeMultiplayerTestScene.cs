@@ -12,7 +12,7 @@ using osu.Game.Screens.Multi.RealtimeMultiplayer;
 
 namespace osu.Game.Tests.Visual.RealtimeMultiplayer
 {
-    public class RealtimeMultiplayerTestScene : MultiplayerTestScene
+    public abstract class RealtimeMultiplayerTestScene : MultiplayerTestScene
     {
         [Cached(typeof(StatefulMultiplayerClient))]
         public TestRealtimeMultiplayerClient Client { get; }
@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
 
         private readonly bool joinRoom;
 
-        public RealtimeMultiplayerTestScene(bool joinRoom = true)
+        protected RealtimeMultiplayerTestScene(bool joinRoom = true)
         {
             this.joinRoom = joinRoom;
             base.Content.Add(content = new TestRealtimeRoomContainer { RelativeSizeAxes = Axes.Both });
