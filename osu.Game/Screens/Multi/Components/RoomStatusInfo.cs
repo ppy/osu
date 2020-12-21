@@ -48,16 +48,23 @@ namespace osu.Game.Screens.Multi.Components
 
         private class EndDatePart : DrawableDate
         {
-            public readonly IBindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
+            public readonly IBindable<DateTimeOffset?> EndDate = new Bindable<DateTimeOffset?>();
 
             public EndDatePart()
                 : base(DateTimeOffset.UtcNow)
             {
-                EndDate.BindValueChanged(date => Date = date.NewValue);
+                EndDate.BindValueChanged(date =>
+                {
+                    // If null, set a very large future date to prevent unnecessary schedules.
+                    Date = date.NewValue ?? DateTimeOffset.Now.AddYears(1);
+                }, true);
             }
 
             protected override string Format()
             {
+                if (EndDate.Value == null)
+                    return string.Empty;
+
                 var diffToNow = Date.Subtract(DateTimeOffset.Now);
 
                 if (diffToNow.TotalSeconds < -5)
