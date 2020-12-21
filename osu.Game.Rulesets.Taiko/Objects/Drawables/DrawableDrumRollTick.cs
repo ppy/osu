@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override DrawableStrongNestedHit CreateStrongNestedHit(DrumRollTick.StrongNestedHit hitObject) => new StrongNestedHit(hitObject);
 
-        private class StrongNestedHit : DrawableStrongNestedHit
+        public class StrongNestedHit : DrawableStrongNestedHit
         {
             public new DrawableDrumRollTick ParentHitObject => (DrawableDrumRollTick)base.ParentHitObject;
 
