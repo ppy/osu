@@ -17,6 +17,8 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Multi;
+using osu.Game.Screens.Multi.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.Timeshift;
 using osu.Game.Screens.Select;
 
@@ -104,7 +106,7 @@ namespace osu.Game.Screens.Menu
                                 this.Push(new Editor());
                             },
                             OnSolo = onSolo,
-                            OnMulti = delegate { this.Push(new TimeshiftMultiplayer()); },
+                            OnMulti = realtime => this.Push(realtime ? (Multiplayer)new RealtimeMultiplayer() : new TimeshiftMultiplayer()),
                             OnExit = confirmAndExit,
                         }
                     }
@@ -136,7 +138,6 @@ namespace osu.Game.Screens.Menu
 
             buttons.OnSettings = () => settings?.ToggleVisibility();
             buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
-            buttons.OnChart = () => rankings?.ShowSpotlights();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
