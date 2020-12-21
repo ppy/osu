@@ -132,7 +132,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return new LegacyBeatmapSkin(BeatmapInfo, resources.Files, AudioManager);
+                    return new LegacyBeatmapSkin(BeatmapInfo, resources.Files, resources);
                 }
                 catch (Exception e)
                 {
