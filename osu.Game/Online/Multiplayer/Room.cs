@@ -77,15 +77,8 @@ namespace osu.Game.Online.Multiplayer
         public readonly BindableList<User> RecentParticipants = new BindableList<User>();
 
         [Cached]
-        public readonly Bindable<int> ParticipantCount = new Bindable<int>();
-
-        // todo: TEMPORARY
         [JsonProperty("participant_count")]
-        private int? participantCount
-        {
-            get => ParticipantCount.Value;
-            set => ParticipantCount.Value = value ?? 0;
-        }
+        public readonly Bindable<int> ParticipantCount = new Bindable<int>();
 
         [JsonProperty("duration")]
         private int? duration
@@ -149,7 +142,7 @@ namespace osu.Game.Online.Multiplayer
             ParticipantCount.Value = other.ParticipantCount.Value;
             EndDate.Value = other.EndDate.Value;
 
-            if (DateTimeOffset.Now >= EndDate.Value)
+            if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
             if (!Playlist.SequenceEqual(other.Playlist))
