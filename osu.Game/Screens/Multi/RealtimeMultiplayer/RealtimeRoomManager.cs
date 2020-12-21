@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             var joinedRoom = JoinedRoom.Value;
 
             base.PartRoom();
-            multiplayerClient.LeaveRoom().Wait();
+            multiplayerClient.LeaveRoom();
 
             // Todo: This is not the way to do this. Basically when we're the only participant and the room closes, there's no way to know if this is actually the case.
             // This is delayed one frame because upon exiting the match subscreen, multiplayer updates the polling rate and messes with polling.
