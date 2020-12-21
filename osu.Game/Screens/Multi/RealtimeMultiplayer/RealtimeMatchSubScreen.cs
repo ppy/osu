@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                         },
                         new Drawable[]
                         {
-                            new Footer { SelectedItem = { BindTarget = SelectedItem } }
+                            new RealtimeMatchFooter { SelectedItem = { BindTarget = SelectedItem } }
                         }
                     },
                     RowDimensions = new[]
