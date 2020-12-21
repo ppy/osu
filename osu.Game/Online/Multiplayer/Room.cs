@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Online.Multiplayer.RoomStatuses;
 using osu.Game.Users;
@@ -35,8 +36,17 @@ namespace osu.Game.Online.Multiplayer
         public readonly Bindable<int> ChannelId = new Bindable<int>();
 
         [Cached]
-        [JsonProperty("category")]
+        [JsonIgnore]
         public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
+
+        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
+        [JsonProperty("category")]
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        private RoomCategory category
+        {
+            get => Category.Value;
+            set => Category.Value = value;
+        }
 
         [Cached]
         [JsonIgnore]
