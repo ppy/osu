@@ -139,7 +139,7 @@ namespace osu.Game.Online.Multiplayer
             ParticipantCount.Value = other.ParticipantCount.Value;
             EndDate.Value = other.EndDate.Value;
 
-            if (DateTimeOffset.Now >= EndDate.Value)
+            if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
             if (!Playlist.SequenceEqual(other.Playlist))
