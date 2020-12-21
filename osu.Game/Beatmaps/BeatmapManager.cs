@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps
         private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;
         private readonly AudioManager audioManager;
-        private readonly TextureStore textureStore;
+        private readonly LargeTextureStore largeTextureStore;
         private readonly ITrackStore trackStore;
 
         [CanBeNull]
@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps
             if (performOnlineLookups)
                 onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
 
-            textureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
+            largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store));
             trackStore = audioManager.GetTrackStore(Files.Store);
         }
 
@@ -302,7 +302,7 @@ namespace osu.Game.Beatmaps
 
                 beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
-                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, textureStore, trackStore, beatmapInfo, audioManager));
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store, largeTextureStore, trackStore, beatmapInfo, audioManager));
 
                 return working;
             }
