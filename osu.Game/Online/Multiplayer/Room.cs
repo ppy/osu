@@ -67,15 +67,8 @@ namespace osu.Game.Online.Multiplayer
         public readonly BindableList<User> RecentParticipants = new BindableList<User>();
 
         [Cached]
-        public readonly Bindable<int> ParticipantCount = new Bindable<int>();
-
-        // todo: TEMPORARY
         [JsonProperty("participant_count")]
-        private int? participantCount
-        {
-            get => ParticipantCount.Value;
-            set => ParticipantCount.Value = value ?? 0;
-        }
+        public readonly Bindable<int> ParticipantCount = new Bindable<int>();
 
         [JsonProperty("duration")]
         private int? duration
