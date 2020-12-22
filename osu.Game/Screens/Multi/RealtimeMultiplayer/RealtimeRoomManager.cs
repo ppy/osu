@@ -38,10 +38,10 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         }
 
         public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            => base.CreateRoom(room, r => joinMultiplayerRoom(r, onSuccess), onError);
+            => base.CreateRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
 
         public override void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            => base.JoinRoom(room, r => joinMultiplayerRoom(r, onSuccess), onError);
+            => base.JoinRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
 
         public override void PartRoom()
         {
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             });
         }
 
-        private void joinMultiplayerRoom(Room room, Action<Room> onSuccess = null)
+        private void joinMultiplayerRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             Debug.Assert(room.RoomID.Value != null);
 
@@ -73,6 +73,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                 PartRoom();
                 if (t.Exception != null)
                     Logger.Error(t.Exception, "Failed to join multiplayer room.");
+                onError?.Invoke(t.Exception?.ToString() ?? string.Empty);
             }, TaskContinuationOptions.NotOnRanToCompletion);
         }
 
