@@ -68,7 +68,12 @@ namespace osu.Game.Rulesets.Scoring
         private readonly double comboPortion;
 
         private int maxAchievableCombo;
+
+        /// <summary>
+        /// The maximum achievable base score.
+        /// </summary>
         private double maxBaseScore;
+
         private double rollingMaxBaseScore;
         private double baseScore;
 
@@ -196,8 +201,8 @@ namespace osu.Game.Rulesets.Scoring
         private double getScore(ScoringMode mode)
         {
             return GetScore(mode, maxAchievableCombo,
-                maxBaseScore > 0 ? baseScore / maxBaseScore : 0,
-                maxAchievableCombo > 0 ? (double)HighestCombo.Value / maxAchievableCombo : 1,
+                calculateAccuracyRatio(baseScore),
+                calculateComboRatio(HighestCombo.Value),
                 scoreResultCounts);
         }
 
@@ -226,6 +231,37 @@ namespace osu.Game.Rulesets.Scoring
                     return getBonusScore(statistics) + (accuracyRatio * Math.Max(1, maxCombo) * 300) * (1 + Math.Max(0, (comboRatio * maxCombo) - 1) * scoreMultiplier / 25);
             }
         }
+
+        /// <summary>
+        /// Given a minimal set of inputs, return the computed score and accuracy for the tracked beatmap / mods combination.
+        /// </summary>
+        /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
+        /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
+        /// <param name="statistics">Statistics to be used for calculating accuracy, bonus score, etc.</param>
+        /// <returns>The computed score and accuracy for provided inputs.</returns>
+        public (double score, double accuracy) GetScoreAndAccuracy(ScoringMode mode, int maxCombo, Dictionary<HitResult, int> statistics)
+        {
+            // calculate base score from statistics pairs
+            int computedBaseScore = 0;
+
+            foreach (var pair in statistics)
+            {
+                if (!pair.Key.AffectsAccuracy())
+                    continue;
+
+                computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
+            }
+
+            double accuracy = calculateAccuracyRatio(computedBaseScore);
+            double comboRatio = calculateComboRatio(maxCombo);
+
+            double score = GetScore(mode, maxAchievableCombo, accuracy, comboRatio, scoreResultCounts);
+
+            return (score, accuracy);
+        }
+
+        private double calculateAccuracyRatio(double baseScore) => maxBaseScore > 0 ? baseScore / maxBaseScore : 0;
+        private double calculateComboRatio(int maxCombo) => maxAchievableCombo > 0 ? (double)maxCombo / maxAchievableCombo : 1;
 
         private double getBonusScore(Dictionary<HitResult, int> statistics)
             => statistics.GetOrDefault(HitResult.SmallBonus) * Judgement.SMALL_BONUS_SCORE

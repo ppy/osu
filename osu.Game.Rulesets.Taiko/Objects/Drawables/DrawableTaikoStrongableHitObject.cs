@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Allocation;
+using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
@@ -16,28 +16,38 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         where TObject : TaikoStrongableHitObject
         where TStrongNestedObject : StrongNestedHitObject
     {
-        private readonly Bindable<bool> isStrong;
+        private readonly Bindable<bool> isStrong = new BindableBool();
 
         private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
-        protected DrawableTaikoStrongableHitObject(TObject hitObject)
+        protected DrawableTaikoStrongableHitObject([CanBeNull] TObject hitObject)
             : base(hitObject)
         {
-            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
-
             AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void OnApply()
         {
+            isStrong.BindTo(HitObject.IsStrongBindable);
             isStrong.BindValueChanged(_ =>
             {
-                // will overwrite samples, should only be called on change.
+                // will overwrite samples, should only be called on subsequent changes
+                // after the initial application.
                 updateSamplesFromStrong();
 
                 RecreatePieces();
             });
+
+            base.OnApply();
+        }
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+
+            isStrong.UnbindFrom(HitObject.IsStrongBindable);
+            // ensure the next application does not accidentally overwrite samples.
+            isStrong.UnbindEvents();
         }
 
         private HitSampleInfo[] getStrongSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
@@ -86,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            strongHitContainer.Clear();
+            strongHitContainer.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
