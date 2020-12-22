@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
@@ -15,7 +14,6 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
-using osu.Game.Screens.Select;
 using osu.Game.Tests.Visual.Navigation;
 using osu.Game.Users;
 
@@ -23,9 +21,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneBeatmapRecommendations : OsuGameTestScene
     {
-        [Resolved]
-        private DifficultyRecommender recommender { get; set; }
-
         [SetUpSteps]
         public override void SetUpSteps()
         {
