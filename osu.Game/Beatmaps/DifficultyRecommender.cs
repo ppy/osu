@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         private int? requestedUserId;
 
-        private readonly Dictionary<RulesetInfo, double> recommendedStarDifficulty = new Dictionary<RulesetInfo, double>();
+        private readonly Dictionary<RulesetInfo, double> recommendedDifficultyMapping = new Dictionary<RulesetInfo, double>();
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
@@ -57,31 +57,27 @@ namespace osu.Game.Beatmaps
         [CanBeNull]
         public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
         {
-            if (!recommendedStarDifficulty.Any())
-                return null;
-
-            BeatmapInfo beatmap = null;
-
-            foreach (var r in getBestRulesetOrder())
+            foreach (var r in orderedRulesets)
             {
-                recommendedStarDifficulty.TryGetValue(r, out var stars);
+                if (!recommendedDifficultyMapping.TryGetValue(r, out var recommendation))
+                    continue;
 
-                beatmap = beatmaps.Where(b => b.Ruleset.Equals(r)).OrderBy(b =>
+                BeatmapInfo beatmap = beatmaps.Where(b => b.Ruleset.Equals(r)).OrderBy(b =>
                 {
-                    var difference = b.StarDifficulty - stars;
+                    var difference = b.StarDifficulty - recommendation;
                     return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
                 }).FirstOrDefault();
 
                 if (beatmap != null)
-                    break;
+                    return beatmap;
             }
 
-            return beatmap;
+            return null;
         }
 
         private void fetchRecommendedValues()
         {
-            if (recommendedStarDifficulty.Count > 0 && api.LocalUser.Value.Id == requestedUserId)
+            if (recommendedDifficultyMapping.Count > 0 && api.LocalUser.Value.Id == requestedUserId)
                 return;
 
             requestedUserId = api.LocalUser.Value.Id;
@@ -94,7 +90,7 @@ namespace osu.Game.Beatmaps
                 req.Success += result =>
                 {
                     // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-                    recommendedStarDifficulty[rulesetInfo] = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
+                    recommendedDifficultyMapping[rulesetInfo] = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
                 };
 
                 api.Queue(req);
@@ -102,29 +98,13 @@ namespace osu.Game.Beatmaps
         }
 
         /// <returns>
-        /// Rulesets ordered by highest recommended star difficulty, except currently selected ruleset first
+        /// Rulesets ordered descending by their respective recommended difficulties.
+        /// The currently selected ruleset will always be first.
         /// </returns>
-        private IEnumerable<RulesetInfo> getBestRulesetOrder()
-        {
-            IEnumerable<RulesetInfo> bestRulesetOrder = recommendedStarDifficulty.OrderByDescending(pair => pair.Value)
-                                                                                 .Select(pair => pair.Key);
-
-            List<RulesetInfo> orderedRulesets;
-
-            if (bestRulesetOrder.Contains(ruleset.Value))
-            {
-                orderedRulesets = bestRulesetOrder.ToList();
-                orderedRulesets.Remove(ruleset.Value);
-                orderedRulesets.Insert(0, ruleset.Value);
-            }
-            else
-            {
-                orderedRulesets = new List<RulesetInfo> { ruleset.Value };
-                orderedRulesets.AddRange(bestRulesetOrder);
-            }
-
-            return orderedRulesets;
-        }
+        private IEnumerable<RulesetInfo> orderedRulesets =>
+            recommendedDifficultyMapping
+                .OrderByDescending(pair => pair.Value).Select(pair => pair.Key).Where(r => !r.Equals(ruleset.Value))
+                .Prepend(ruleset.Value);
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
