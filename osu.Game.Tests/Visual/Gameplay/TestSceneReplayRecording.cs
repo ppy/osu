@@ -15,6 +15,7 @@ using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = new TestReplayRecorder(replay)
+                            Recorder = new TestReplayRecorder(new Score { Replay = replay })
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos)
                             },
@@ -206,7 +207,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
     internal class TestReplayRecorder : ReplayRecorder<TestAction>
     {
-        public TestReplayRecorder(Replay target)
+        public TestReplayRecorder(Score target)
             : base(target)
         {
         }

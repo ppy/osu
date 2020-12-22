@@ -12,6 +12,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
@@ -83,7 +84,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, null, ContextFactory));
 
-            beatmap = beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Result.Beatmaps[0];
+            beatmap = beatmapManager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).Result.Beatmaps[0];
 
             for (int i = 0; i < 50; i++)
             {

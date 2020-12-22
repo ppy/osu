@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,6 +18,7 @@ namespace osu.Game.Audio
         public SampleInfo(params string[] sampleNames)
         {
             this.sampleNames = sampleNames;
+            Array.Sort(sampleNames);
         }
 
         public IEnumerable<string> LookupNames => sampleNames;
@@ -25,7 +27,9 @@ namespace osu.Game.Audio
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(sampleNames, Volume);
+            return HashCode.Combine(
+                StructuralComparisons.StructuralEqualityComparer.GetHashCode(sampleNames),
+                Volume);
         }
 
         public bool Equals(SampleInfo other)

@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private PostBeatmapFavouriteRequest request;
         private LoadingLayer loading;
 
-        private readonly Bindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<User> localUser = new Bindable<User>();
 
         public string TooltipText
         {

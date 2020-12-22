@@ -461,7 +461,7 @@ namespace osu.Game.Screens.Edit
                 if (dialogOverlay == null || dialogOverlay.CurrentDialog is PromptForSaveDialog)
                 {
                     confirmExit();
-                    return false;
+                    return base.OnExiting(next);
                 }
 
                 if (isNewBeatmap || HasUnsavedChanges)

@@ -25,6 +25,7 @@ namespace osu.Game.Skinning
         LeftLineWidth,
         RightLineWidth,
         HitPosition,
+        ScorePosition,
         LightPosition,
         HitTargetImage,
         ShowJudgementLine,
