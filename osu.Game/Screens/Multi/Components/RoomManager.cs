@@ -82,6 +82,8 @@ namespace osu.Game.Screens.Multi.Components
             api.Queue(req);
         }
 
+        public virtual bool CanJoinRoom(Room room) => true;
+
         private JoinRoomRequest currentJoinRoomRequest;
 
         public virtual void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)

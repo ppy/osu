@@ -35,6 +35,12 @@ namespace osu.Game.Screens.Multi
         void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null);
 
         /// <summary>
+        /// Whether the provided <paramref name="room"/> can be joined.
+        /// </summary>
+        /// <param name="room">The <see cref="Room"/> to check for.</param>
+        bool CanJoinRoom(Room room);
+
+        /// <summary>
         /// Joins a <see cref="Room"/>.
         /// </summary>
         /// <param name="room">The <see cref="Room"/> to join. <see cref="Room.RoomID"/> must be populated.</param>
