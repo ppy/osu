@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
         public StateDisplay()
         {
             AutoSizeAxes = Axes.Both;
+            Alpha = 0;
         }
 
         private MultiplayerUserState status;
