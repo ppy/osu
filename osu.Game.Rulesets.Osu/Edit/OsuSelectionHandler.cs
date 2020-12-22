@@ -157,10 +157,16 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 foreach (var h in hitObjects)
                 {
-                    h.Position = new Vector2(
-                        quad.TopLeft.X + (h.X - quad.TopLeft.X) / quad.Width * (quad.Width + scale.X),
-                        quad.TopLeft.Y + (h.Y - quad.TopLeft.Y) / quad.Height * (quad.Height + scale.Y)
-                    );
+                    var newPosition = h.Position;
+
+                    // guard against no-ops and NaN.
+                    if (scale.X != 0 && quad.Width > 0)
+                        newPosition.X = quad.TopLeft.X + (h.X - quad.TopLeft.X) / quad.Width * (quad.Width + scale.X);
+
+                    if (scale.Y != 0 && quad.Height > 0)
+                        newPosition.Y = quad.TopLeft.Y + (h.Y - quad.TopLeft.Y) / quad.Height * (quad.Height + scale.Y);
+
+                    h.Position = newPosition;
                 }
             }
 
