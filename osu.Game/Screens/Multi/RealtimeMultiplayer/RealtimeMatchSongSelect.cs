@@ -5,6 +5,7 @@ using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
@@ -23,6 +24,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
+
+        public RealtimeMatchSongSelect()
+        {
+            Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+        }
 
         protected override bool OnStart()
         {
