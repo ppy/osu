@@ -99,6 +99,9 @@ namespace osu.Game
         [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
         protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
+        [Cached]
+        protected readonly DifficultyRecommender DifficultyRecommender = new DifficultyRecommender();
+
         /// <summary>
         /// Mods available for the current <see cref="Ruleset"/>.
         /// </summary>
@@ -116,9 +119,6 @@ namespace osu.Game
         public string VersionHash { get; private set; }
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
-
-        [Cached]
-        protected readonly DifficultyRecommender DifficultyRecommender = new DifficultyRecommender();
 
         public virtual string Version
         {
