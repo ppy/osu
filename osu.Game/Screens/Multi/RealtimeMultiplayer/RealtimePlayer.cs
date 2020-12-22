@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Scoring;
@@ -26,7 +28,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         private StatefulMultiplayerClient client { get; set; }
 
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
-        private bool started;
+        private readonly ManualResetEventSlim startedEvent = new ManualResetEventSlim();
 
         public RealtimePlayer(PlaylistItem playlistItem)
             : base(playlistItem, false)
@@ -43,11 +45,19 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             client.ResultsReady += onResultsReady;
             client.ChangeState(MultiplayerUserState.Loaded);
 
-            while (!started)
-                Thread.Sleep(100);
+            if (!startedEvent.Wait(TimeSpan.FromSeconds(30)))
+            {
+                Logger.Log("Failed to start the multiplayer match in time.", LoggingTarget.Runtime, LogLevel.Important);
+
+                Schedule(() =>
+                {
+                    ValidForResume = false;
+                    this.Exit();
+                });
+            }
         }
 
-        private void onMatchStarted() => started = true;
+        private void onMatchStarted() => startedEvent.Set();
 
         private void onResultsReady() => resultsReady.SetResult(true);
 
