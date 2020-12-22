@@ -42,7 +42,8 @@ namespace osu.Game.Screens.Menu
         public Action OnBeatmapListing;
         public Action OnSolo;
         public Action OnSettings;
-        public Action<bool> OnMulti;
+        public Action OnMultiplayer;
+        public Action OnTimeshift;
 
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
@@ -123,8 +124,8 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
         {
             buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), () => onMulti(true), 0, Key.M));
-            buttonsPlay.Add(new Button(@"timeshift", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), () => onMulti(false), 0, Key.L));
+            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
+            buttonsPlay.Add(new Button(@"timeshift", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onTimeshift, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(new Button(@"play", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
@@ -153,7 +154,7 @@ namespace osu.Game.Screens.Menu
             sampleBack = audio.Samples.Get(@"Menu/button-back-select");
         }
 
-        private void onMulti(bool realtime)
+        private void onMultiplayer()
         {
             if (!api.IsLoggedIn)
             {
@@ -171,7 +172,28 @@ namespace osu.Game.Screens.Menu
                 return;
             }
 
-            OnMulti?.Invoke(realtime);
+            OnMultiplayer?.Invoke();
+        }
+
+        private void onTimeshift()
+        {
+            if (!api.IsLoggedIn)
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = "You gotta be logged in to multi 'yo!",
+                    Icon = FontAwesome.Solid.Globe,
+                    Activated = () =>
+                    {
+                        loginOverlay?.Show();
+                        return true;
+                    }
+                });
+
+                return;
+            }
+
+            OnTimeshift?.Invoke();
         }
 
         private void updateIdleState(bool isIdle)
