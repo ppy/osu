@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.Multi.Timeshift;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
