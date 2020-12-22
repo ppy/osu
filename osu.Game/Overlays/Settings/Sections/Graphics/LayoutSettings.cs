@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -150,8 +151,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     resolutions.AddRange(display.NewValue.DisplayModes
                                                 .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
-                                                .OrderByDescending(m => m.Size.Width)
-                                                .ThenByDescending(m => m.Size.Height)
+                                                .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
                                                 .Select(m => m.Size)
                                                 .Distinct());
                 }
