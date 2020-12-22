@@ -18,6 +18,8 @@ namespace osu.Game.Online.API
             Id = 1001,
         });
 
+        public BindableList<User> Friends { get; } = new BindableList<User>();
+
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
         public string AccessToken => "token";
@@ -86,5 +88,9 @@ namespace osu.Game.Online.API
         }
 
         public void SetState(APIState newState) => state.Value = newState;
+
+        IBindable<User> IAPIProvider.LocalUser => LocalUser;
+        IBindableList<User> IAPIProvider.Friends => Friends;
+        IBindable<UserActivity> IAPIProvider.Activity => Activity;
     }
 }

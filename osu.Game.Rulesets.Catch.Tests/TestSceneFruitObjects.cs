@@ -3,11 +3,12 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
@@ -37,39 +38,50 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         private Drawable createDrawableFruit(int indexInBeatmap, bool hyperdash = false) =>
-            SetProperties(new DrawableFruit(new Fruit
+            new TestDrawableCatchHitObjectSpecimen(new DrawableFruit(new Fruit
             {
                 IndexInBeatmap = indexInBeatmap,
                 HyperDashBindable = { Value = hyperdash }
             }));
 
         private Drawable createDrawableBanana() =>
-            SetProperties(new DrawableBanana(new Banana()));
+            new TestDrawableCatchHitObjectSpecimen(new DrawableBanana(new Banana()));
 
         private Drawable createDrawableDroplet(bool hyperdash = false) =>
-            SetProperties(new DrawableDroplet(new Droplet
+            new TestDrawableCatchHitObjectSpecimen(new DrawableDroplet(new Droplet
             {
                 HyperDashBindable = { Value = hyperdash }
             }));
 
-        private Drawable createDrawableTinyDroplet() => SetProperties(new DrawableTinyDroplet(new TinyDroplet()));
+        private Drawable createDrawableTinyDroplet() => new TestDrawableCatchHitObjectSpecimen(new DrawableTinyDroplet(new TinyDroplet()));
+    }
 
-        protected virtual DrawableCatchHitObject SetProperties(DrawableCatchHitObject d)
+    public class TestDrawableCatchHitObjectSpecimen : CompositeDrawable
+    {
+        public readonly ManualClock ManualClock;
+
+        public TestDrawableCatchHitObjectSpecimen(DrawableCatchHitObject d)
         {
+            AutoSizeAxes = Axes.Both;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
+            ManualClock = new ManualClock();
+            Clock = new FramedClock(ManualClock);
+
             var hitObject = d.HitObject;
-            hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 0 });
-            hitObject.StartTime = 1000000000000;
+            hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
             hitObject.Scale = 1.5f;
+            hitObject.StartTime = 500;
 
             d.Anchor = Anchor.Centre;
-            d.RelativePositionAxes = Axes.None;
-            d.Position = Vector2.Zero;
             d.HitObjectApplied += _ =>
             {
                 d.LifetimeStart = double.NegativeInfinity;
                 d.LifetimeEnd = double.PositiveInfinity;
             };
-            return d;
+
+            InternalChild = d;
         }
     }
 }

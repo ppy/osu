@@ -51,7 +51,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
-using osu.Game.Users;
+using System.IO;
 
 namespace osu.Game
 {
@@ -439,6 +439,16 @@ namespace osu.Game
                         break;
                 }
             }, validScreens: new[] { typeof(PlaySongSelect) });
+        }
+
+        public override Task Import(Stream stream, string filename)
+        {
+            // encapsulate task as we don't want to begin the import process until in a ready state.
+            var importTask = new Task(async () => await base.Import(stream, filename));
+
+            waitForReady(() => this, _ => importTask.Start());
+
+            return importTask;
         }
 
         protected virtual Loader CreateLoader() => new Loader();
@@ -980,7 +990,7 @@ namespace osu.Game
             if (newScreen is IOsuScreen newOsuScreen)
             {
                 OverlayActivationMode.BindTo(newOsuScreen.OverlayActivationMode);
-                ((IBindable<UserActivity>)API.Activity).BindTo(newOsuScreen.Activity);
+                API.Activity.BindTo(newOsuScreen.Activity);
 
                 MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 

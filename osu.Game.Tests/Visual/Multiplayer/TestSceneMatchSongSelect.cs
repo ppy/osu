@@ -14,7 +14,6 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -93,12 +92,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("create song select", () => LoadScreen(songSelect = new TestMatchSongSelect()));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen());
         }
-
-        [SetUp]
-        public void Setup() => Schedule(() =>
-        {
-            Room = new Room();
-        });
 
         [Test]
         public void TestItemAddedIfEmptyOnStart()

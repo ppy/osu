@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -25,9 +26,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         private DragEvent lastDragEvent;
         private Bindable<HitObject> placement;
         private SelectionBlueprint placementBlueprint;
+
+        private readonly Box backgroundBox;
 
         public TimelineBlueprintContainer(HitObjectComposer composer)
             : base(composer)
@@ -36,9 +42,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Height = 0.4f;
+            Height = 0.6f;
 
-            AddInternal(new Box
+            AddInternal(backgroundBox = new Box
             {
                 Colour = Color4.Black,
                 RelativeSizeAxes = Axes.Both,
@@ -76,6 +82,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            backgroundBox.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            backgroundBox.FadeColour(Color4.Black, 600, Easing.OutQuint);
+            base.OnHoverLost(e);
+        }
 
         protected override void OnDrag(DragEvent e)
         {
