@@ -24,10 +24,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private RulesetStore rulesetStore { get; set; }
 
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room = new Room();
-
             Child = new MatchBeatmapDetailArea
             {
                 Anchor = Anchor.Centre,

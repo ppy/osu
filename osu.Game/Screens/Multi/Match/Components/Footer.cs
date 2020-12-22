@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens.Multi.Timeshift;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             InternalChildren = new[]
             {
                 background = new Box { RelativeSizeAxes = Axes.Both },
-                new ReadyButton
+                new TimeshiftReadyButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

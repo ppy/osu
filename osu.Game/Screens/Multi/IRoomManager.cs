@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.Multi
 {
+    [Cached(typeof(IRoomManager))]
     public interface IRoomManager
     {
         /// <summary>
@@ -17,7 +19,7 @@ namespace osu.Game.Screens.Multi
         /// <summary>
         /// Whether an initial listing of rooms has been received.
         /// </summary>
-        Bindable<bool> InitialRoomsReceived { get; }
+        IBindable<bool> InitialRoomsReceived { get; }
 
         /// <summary>
         /// All the active <see cref="Room"/>s.
