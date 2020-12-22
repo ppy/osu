@@ -57,11 +57,13 @@ namespace osu.Game.Screens.Ranking
         private APIRequest nextPageRequest;
 
         private readonly bool allowRetry;
+        private readonly bool allowWatchingReplay;
 
-        protected ResultsScreen(ScoreInfo score, bool allowRetry)
+        protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
             Score = score;
             this.allowRetry = allowRetry;
+            this.allowWatchingReplay = allowWatchingReplay;
 
             SelectedScore.Value = score;
         }
@@ -128,15 +130,7 @@ namespace osu.Game.Screens.Ranking
                                     Origin = Anchor.Centre,
                                     AutoSizeAxes = Axes.Both,
                                     Spacing = new Vector2(5),
-                                    Direction = FillDirection.Horizontal,
-                                    Children = new Drawable[]
-                                    {
-                                        new ReplayDownloadButton(null)
-                                        {
-                                            Score = { BindTarget = SelectedScore },
-                                            Width = 300
-                                        },
-                                    }
+                                    Direction = FillDirection.Horizontal
                                 }
                             }
                         }
@@ -155,6 +149,15 @@ namespace osu.Game.Screens.Ranking
                 bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
 
                 ScorePanelList.AddScore(Score, shouldFlair);
+            }
+
+            if (allowWatchingReplay)
+            {
+                buttons.Add(new ReplayDownloadButton(null)
+                {
+                    Score = { BindTarget = SelectedScore },
+                    Width = 300
+                });
             }
 
             if (player != null && allowRetry)

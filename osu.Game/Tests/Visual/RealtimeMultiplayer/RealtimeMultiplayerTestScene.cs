@@ -7,8 +7,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.RealtimeMultiplayer;
+using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Screens.Multi.RealtimeMultiplayer;
 
 namespace osu.Game.Tests.Visual.RealtimeMultiplayer
 {
@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
         [Cached(typeof(StatefulMultiplayerClient))]
         public TestRealtimeMultiplayerClient Client { get; }
 
-        [Cached(typeof(RealtimeRoomManager))]
+        [Cached(typeof(IRoomManager))]
         public TestRealtimeRoomManager RoomManager { get; }
 
         [Cached]

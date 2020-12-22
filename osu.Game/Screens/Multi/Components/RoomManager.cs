@@ -76,10 +76,7 @@ namespace osu.Game.Screens.Multi.Components
 
             req.Failure += exception =>
             {
-                if (req.Result != null)
-                    onError?.Invoke(req.Result.Error);
-                else
-                    Logger.Log($"Failed to create the room: {exception}", level: LogLevel.Important);
+                onError?.Invoke(req.Result?.Error ?? exception.Message);
             };
 
             api.Queue(req);
