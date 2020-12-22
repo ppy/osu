@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private TestCatcher catcher;
 
+        private IEnumerable<CaughtObject> stackedObjects => catcher.StackedObjects;
+        private IEnumerable<CaughtObject> droppedObjects => droppedObjectContainer.Children;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
@@ -177,9 +180,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("catch more fruits", () => attemptCatch(new Fruit(), 9));
             checkPlate(10);
             AddAssert("caught objects are stacked", () =>
-                catcher.CaughtObjects.All(obj => obj.Y <= 0) &&
-                catcher.CaughtObjects.Any(obj => obj.Y == 0) &&
-                catcher.CaughtObjects.Any(obj => obj.Y < -20));
+                stackedObjects.All(obj => obj.Y <= 0) &&
+                stackedObjects.Any(obj => obj.Y == 0) &&
+                stackedObjects.Any(obj => obj.Y < -20));
         }
 
         [Test]
@@ -187,15 +190,15 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             AddStep("catch tiny droplet", () => attemptCatch(new TinyDroplet()));
-            AddAssert("tiny droplet is exploded", () => catcher.CaughtObjects.Count() == 1 && droppedObjectContainer.Count == 1);
-            AddUntilStep("wait explosion", () => !droppedObjectContainer.Any());
+            AddAssert("tiny droplet is exploded", () => stackedObjects.Count() == 1 && droppedObjects.Count() == 1);
+            AddUntilStep("wait explosion", () => !droppedObjects.Any());
             AddStep("catch more fruits", () => attemptCatch(new Fruit(), 9));
             AddStep("explode", () => catcher.Explode());
-            AddAssert("fruits are exploded", () => !catcher.CaughtObjects.Any() && droppedObjectContainer.Count == 10);
-            AddUntilStep("wait explosion", () => !droppedObjectContainer.Any());
+            AddAssert("fruits are exploded", () => !stackedObjects.Any() && droppedObjects.Count() == 10);
+            AddUntilStep("wait explosion", () => !droppedObjects.Any());
             AddStep("catch fruits", () => attemptCatch(new Fruit(), 10));
             AddStep("drop", () => catcher.Drop());
-            AddAssert("fruits are dropped", () => !catcher.CaughtObjects.Any() && droppedObjectContainer.Count == 10);
+            AddAssert("fruits are dropped", () => !stackedObjects.Any() && droppedObjects.Count() == 10);
         }
 
         [Test]
@@ -216,7 +219,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddAssert("no hit lighting", () => !catcher.ChildrenOfType<HitExplosion>().Any());
         }
 
-        private void checkPlate(int count) => AddAssert($"{count} objects on the plate", () => catcher.CaughtObjects.Count() == count);
+        private void checkPlate(int count) => AddAssert($"{count} objects on the plate", () => stackedObjects.Count() == count);
 
         private void checkState(CatcherAnimationState state) => AddAssert($"catcher state is {state}", () => catcher.CurrentState == state);
 
@@ -275,7 +278,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public class TestCatcher : Catcher
         {
-            public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
+            public IEnumerable<CaughtObject> StackedObjects => CaughtObjectContainer.StackedObjectContainer;
 
             public TestCatcher(Container trailsTarget, Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty)
                 : base(trailsTarget, droppedObjectTarget, difficulty)

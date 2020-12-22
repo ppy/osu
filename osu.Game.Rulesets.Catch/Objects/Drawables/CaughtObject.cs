@@ -17,45 +17,34 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     [Cached(typeof(IHasCatchObjectState))]
     public abstract class CaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
-        public CatchObjectType ObjectType { get; private set; }
+        public CaughtObjectEntry Entry { get; private set; }
 
-        public double StartTime { get; private set; }
+        public CatchObjectType ObjectType => Entry.ObjectType;
+        public double StartTime => Entry.StartTime;
+        public Bindable<Color4> AccentColour => Entry.AccentColour;
+        public Bindable<bool> HyperDash => Entry.HyperDash;
+        public Vector2 DisplaySize => Entry.DisplaySize;
+        public float DisplayRotation => Entry.DisplayRotation;
 
-        public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
-
-        public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
-
-        public Vector2 DisplaySize => Size * Scale;
-
-        public float DisplayRotation => Rotation;
-
-        /// <summary>
-        /// Whether this hit object should stay on the catcher plate when the object is caught by the catcher.
-        /// </summary>
-        public virtual bool StaysOnPlate => true;
-
-        public override bool RemoveWhenNotAlive => true;
+        public override bool RemoveCompletedTransforms => false;
 
         protected CaughtObject(CatchSkinComponents skinComponent, Func<ISkinComponent, Drawable> defaultImplementation)
             : base(new CatchSkinComponent(skinComponent), defaultImplementation)
         {
+            Anchor = Anchor.TopCentre;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.None;
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
         }
 
-        /// <summary>
-        /// Copies the hit object visual state from another <see cref="IHasCatchObjectState"/> object.
-        /// </summary>
-        public virtual void CopyStateFrom(IHasCatchObjectState objectState)
+        public void Apply(CaughtObjectEntry entry)
         {
-            ObjectType = objectState.ObjectType;
-            StartTime = objectState.StartTime;
-            Scale = Vector2.Divide(objectState.DisplaySize, Size);
-            Rotation = objectState.DisplayRotation;
-            AccentColour.Value = objectState.AccentColour.Value;
-            HyperDash.Value = objectState.HyperDash.Value;
+            Entry = entry;
+
+            Position = entry.PositionInStack;
+            Scale = Vector2.Divide(Entry.DisplaySize, Size) * 0.5f;
+            Rotation = Entry.DisplayRotation;
         }
 
         protected override void FreeAfterUse()

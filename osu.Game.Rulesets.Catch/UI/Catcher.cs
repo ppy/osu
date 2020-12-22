@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,7 +10,6 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Judgements;
@@ -53,15 +51,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private CatcherTrailDisplay trails;
 
-        /// <summary>
-        /// Contains caught objects on the plate.
-        /// </summary>
-        private readonly Container<CaughtObject> caughtObjectContainer;
-
-        /// <summary>
-        /// Contains objects dropped from the plate.
-        /// </summary>
-        private readonly Container<CaughtObject> droppedObjectTarget;
+        protected readonly CaughtObjectContainer CaughtObjectContainer;
 
         public CatcherAnimationState CurrentState { get; private set; }
 
@@ -114,14 +104,9 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<HitExplosion> hitExplosionPool;
         private readonly Container<HitExplosion> hitExplosionContainer;
 
-        private readonly DrawablePool<CaughtFruit> caughtFruitPool;
-        private readonly DrawablePool<CaughtBanana> caughtBananaPool;
-        private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
-
         public Catcher([NotNull] Container trailsTarget, [NotNull] Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty = null)
         {
             this.trailsTarget = trailsTarget;
-            this.droppedObjectTarget = droppedObjectTarget;
 
             Origin = Anchor.TopCentre;
 
@@ -134,11 +119,7 @@ namespace osu.Game.Rulesets.Catch.UI
             InternalChildren = new Drawable[]
             {
                 hitExplosionPool = new DrawablePool<HitExplosion>(10),
-                caughtFruitPool = new DrawablePool<CaughtFruit>(50),
-                caughtBananaPool = new DrawablePool<CaughtBanana>(100),
-                // less capacity is needed compared to fruit because droplet is not stacked
-                caughtDropletPool = new DrawablePool<CaughtDroplet>(25),
-                caughtObjectContainer = new Container<CaughtObject>
+                CaughtObjectContainer = new CaughtObjectContainer(droppedObjectTarget)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
@@ -186,7 +167,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Creates proxied content to be displayed beneath hitobjects.
         /// </summary>
-        public Drawable CreateProxiedContent() => caughtObjectContainer.CreateProxy();
+        public Drawable CreateProxiedContent() => CaughtObjectContainer.StackedObjectContainer.CreateProxy();
 
         /// <summary>
         /// Calculates the scale of the catcher based off the provided beatmap difficulty.
@@ -235,9 +216,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (result.IsHit)
             {
-                var positionInStack = computePositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplaySize.X / 2);
+                var positionInStack = CaughtObjectContainer.GetPositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplaySize.X / 2);
 
-                placeCaughtObject(palpableObject, positionInStack);
+                addCaughtObject(palpableObject, Time.Current, positionInStack);
 
                 if (hitLighting.Value)
                     addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
@@ -279,10 +260,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
             }
 
+            if (catchResult.CaughtObjectEntry != null)
+                CaughtObjectContainer.Remove(catchResult.CaughtObjectEntry);
+
             double time = result.TimeAbsolute;
 
-            caughtObjectContainer.RemoveAll(d => d.StartTime >= time);
-            droppedObjectTarget.RemoveAll(d => d.StartTime >= time);
             hitExplosionContainer.RemoveAll(d => d.LifetimeStart >= time);
         }
 
@@ -369,12 +351,18 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Drop any fruit off the plate.
         /// </summary>
-        public void Drop() => clearPlate(DroppedObjectAnimation.Drop);
+        public void Drop()
+        {
+            CaughtObjectContainer.DropStackedObjects(applyDropTransforms);
+        }
 
         /// <summary>
         /// Explode all fruit off the plate.
         /// </summary>
-        public void Explode() => clearPlate(DroppedObjectAnimation.Explode);
+        public void Explode()
+        {
+            CaughtObjectContainer.DropStackedObjects(applyExplodeTransforms);
+        }
 
         private void runHyperDashStateTransition(bool hyperDashing)
         {
@@ -466,41 +454,6 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCatcher();
         }
 
-        private void placeCaughtObject(DrawablePalpableCatchHitObject drawableObject, Vector2 position)
-        {
-            var caughtObject = getCaughtObject(drawableObject.ObjectType);
-
-            if (caughtObject == null) return;
-
-            caughtObject.CopyStateFrom(drawableObject);
-            caughtObject.Anchor = Anchor.TopCentre;
-            caughtObject.Position = position;
-            caughtObject.Scale /= 2;
-
-            caughtObjectContainer.Add(caughtObject);
-
-            if (!caughtObject.StaysOnPlate)
-                removeFromPlate(caughtObject, DroppedObjectAnimation.Explode);
-        }
-
-        private Vector2 computePositionInStack(Vector2 position, float displayRadius)
-        {
-            const float radius_div_2 = CatchHitObject.OBJECT_RADIUS / 2;
-            const float allowance = 10;
-
-            while (caughtObjectContainer.Any(f => Vector2Extensions.Distance(f.Position, position) < (displayRadius + radius_div_2) / (allowance / 2)))
-            {
-                float diff = (displayRadius + radius_div_2) / allowance;
-
-                position.X += (RNG.NextSingle() - 0.5f) * diff * 2;
-                position.Y -= RNG.NextSingle() * diff;
-            }
-
-            position.X = Math.Clamp(position.X, -CatcherArea.CATCHER_SIZE / 2, CatcherArea.CATCHER_SIZE / 2);
-
-            return position;
-        }
-
         private void addLighting(CatchHitObject hitObject, float x, Color4 colour)
         {
             HitExplosion hitExplosion = hitExplosionPool.Get();
@@ -511,82 +464,39 @@ namespace osu.Game.Rulesets.Catch.UI
             hitExplosionContainer.Add(hitExplosion);
         }
 
-        private CaughtObject getCaughtObject(CatchObjectType type)
+        private void addCaughtObject(DrawablePalpableCatchHitObject hitObject, double time, Vector2 positionInStack)
         {
-            switch (type)
+            if (hitObject.HitObject is Droplet)
             {
-                case CatchObjectType.Fruit:
-                    return caughtFruitPool.Get();
-
-                case CatchObjectType.Banana:
-                    return caughtBananaPool.Get();
-
-                case CatchObjectType.Droplet:
-                    return caughtDropletPool.Get();
-
-                default:
-                    return null;
+                // droplet explodes immediately
+                var entry = new CaughtObjectEntry(CaughtObjectState.Dropped, positionInStack, hitObject)
+                {
+                    LifetimeStart = time,
+                    ApplyTransforms = applyExplodeTransforms
+                };
+                CaughtObjectContainer.Add(entry);
+            }
+            else
+            {
+                var entry = new CaughtObjectEntry(CaughtObjectState.Stacked, positionInStack, hitObject)
+                {
+                    LifetimeStart = time,
+                };
+                CaughtObjectContainer.Add(entry);
             }
         }
 
-        private CaughtObject getDroppedObject(CaughtObject caughtObject)
+        private void applyDropTransforms(CaughtObject d)
         {
-            var droppedObject = getCaughtObject(caughtObject.ObjectType);
-
-            droppedObject.CopyStateFrom(caughtObject);
-            droppedObject.Anchor = Anchor.TopLeft;
-            droppedObject.Position = caughtObjectContainer.ToSpaceOfOtherDrawable(caughtObject.DrawPosition, droppedObjectTarget);
-
-            return droppedObject;
+            d.MoveToY(d.Y + 75, 750, Easing.InSine);
+            d.FadeOut(750);
         }
 
-        private void clearPlate(DroppedObjectAnimation animation)
+        private void applyExplodeTransforms(CaughtObject d)
         {
-            var droppedObjects = caughtObjectContainer.Children.Select(getDroppedObject).ToArray();
-
-            caughtObjectContainer.Clear(false);
-
-            droppedObjectTarget.AddRange(droppedObjects);
-
-            foreach (var droppedObject in droppedObjects)
-                applyDropAnimation(droppedObject, animation);
-        }
-
-        private void removeFromPlate(CaughtObject caughtObject, DroppedObjectAnimation animation)
-        {
-            var droppedObject = getDroppedObject(caughtObject);
-
-            caughtObjectContainer.Remove(caughtObject);
-
-            droppedObjectTarget.Add(droppedObject);
-
-            applyDropAnimation(droppedObject, animation);
-        }
-
-        private void applyDropAnimation(Drawable d, DroppedObjectAnimation animation)
-        {
-            switch (animation)
-            {
-                case DroppedObjectAnimation.Drop:
-                    d.MoveToY(d.Y + 75, 750, Easing.InSine);
-                    d.FadeOut(750);
-                    break;
-
-                case DroppedObjectAnimation.Explode:
-                    var originalX = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtObjectContainer).X * Scale.X;
-                    d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
-                    d.MoveToX(d.X + originalX * 6, 1000);
-                    d.FadeOut(750);
-                    break;
-            }
-
-            d.Expire();
-        }
-
-        private enum DroppedObjectAnimation
-        {
-            Drop,
-            Explode
+            d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
+            d.MoveToX(d.X + d.Entry.PositionInStack.X * 6, 1000);
+            d.FadeOut(750);
         }
     }
 }
