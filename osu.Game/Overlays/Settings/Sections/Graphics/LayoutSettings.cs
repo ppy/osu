@@ -140,20 +140,20 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     windowModeDropdown.Hide();
             }, true);
 
-            windowModeDropdown.Current.ValueChanged += v => updateResolutionDropdown();
+            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
 
-            currentDisplay.BindValueChanged(v => Schedule(() =>
+            currentDisplay.BindValueChanged(display => Schedule(() =>
             {
                 resolutions.RemoveRange(1, resolutions.Count - 1);
 
-                if (v.NewValue != null)
+                if (display.NewValue != null)
                 {
-                    resolutions.AddRange(v.NewValue.DisplayModes
-                                          .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
-                                          .OrderByDescending(m => m.Size.Width)
-                                          .ThenByDescending(m => m.Size.Height)
-                                          .Select(m => m.Size)
-                                          .Distinct());
+                    resolutions.AddRange(display.NewValue.DisplayModes
+                                                .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
+                                                .OrderByDescending(m => m.Size.Width)
+                                                .ThenByDescending(m => m.Size.Height)
+                                                .Select(m => m.Size)
+                                                .Distinct());
                 }
 
                 updateResolutionDropdown();
