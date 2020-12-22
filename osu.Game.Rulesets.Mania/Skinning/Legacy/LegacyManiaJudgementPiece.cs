@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     animation.ScaleTo(1.2f).Then().ScaleTo(1, 100, Easing.Out);
 
                     animation.RotateTo(0);
-                    animation.RotateTo(RNG.NextSingle(-18, 18), 100, Easing.Out);
+                    animation.RotateTo(RNG.NextSingle(-5.73f, 5.73f), 100, Easing.Out);
                     break;
 
                 default:
