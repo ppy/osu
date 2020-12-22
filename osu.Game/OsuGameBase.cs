@@ -30,6 +30,7 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Resources;
@@ -78,6 +79,7 @@ namespace osu.Game
         protected IAPIProvider API;
 
         private SpectatorStreamingClient spectatorStreaming;
+        private StatefulMultiplayerClient multiplayerClient;
 
         protected MenuCursorContainer MenuCursorContainer;
 
@@ -211,6 +213,7 @@ namespace osu.Game
             dependencies.CacheAs(API ??= new APIAccess(LocalConfig));
 
             dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient());
+            dependencies.CacheAs(multiplayerClient = new RealtimeMultiplayerClient());
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
@@ -277,6 +280,7 @@ namespace osu.Game
             if (API is APIAccess apiAccess)
                 AddInternal(apiAccess);
             AddInternal(spectatorStreaming);
+            AddInternal(multiplayerClient);
 
             AddInternal(RulesetConfigCache);
 
