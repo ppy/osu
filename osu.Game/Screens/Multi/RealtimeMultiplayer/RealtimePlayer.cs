@@ -14,6 +14,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 {
+    // Todo: The "room" part of TimeshiftPlayer should be split out into an abstract player class to be inherited instead.
     public class RealtimePlayer : TimeshiftPlayer
     {
         protected override bool PauseOnFocusLost => false;
