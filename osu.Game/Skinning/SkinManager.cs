@@ -175,8 +175,12 @@ namespace osu.Game.Skinning
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
 
+        #region IResourceStorageProvider
+
         AudioManager IStorageResourceProvider.AudioManager => audio;
         IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+
+        #endregion
     }
 }

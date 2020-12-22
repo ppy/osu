@@ -123,9 +123,13 @@ namespace osu.Game.Tests.Beatmaps
         protected void AssertNoLookup(string name) => AddAssert($"\"{name}\" not looked up",
             () => !beatmapSkinResourceStore.PerformedLookups.Contains(name) && !userSkinResourceStore.PerformedLookups.Contains(name));
 
+        #region IResourceStorageProvider
+
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
+
+        #endregion
 
         private class SkinSourceDependencyContainer : IReadOnlyDependencyContainer
         {
