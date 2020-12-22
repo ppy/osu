@@ -59,9 +59,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             Children = new Drawable[]
             {
-                windowModeDropdown = new SettingsEnumDropdown<WindowMode>
+                windowModeDropdown = new SettingsDropdown<WindowMode>
                 {
                     LabelText = "Screen mode",
+                    ItemSource = windowModes,
                     Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
                 resolutionSettingsContainer = new Container
