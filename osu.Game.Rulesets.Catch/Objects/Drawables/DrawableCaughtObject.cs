@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public CatchObjectType ObjectType => Entry.ObjectType;
         public double StartTime => Entry.StartTime;
-        public Bindable<Color4> AccentColour => Entry.AccentColour;
-        public Bindable<bool> HyperDash => Entry.HyperDash;
+        public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
+        public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
         public Vector2 DisplaySize => Entry.DisplaySize;
         public float DisplayRotation => Entry.DisplayRotation;
 
@@ -41,6 +41,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             Entry = entry;
 
+            AccentColour.BindTo(Entry.AccentColour);
+            HyperDash.BindTo(Entry.HyperDash);
+
             Scale = Vector2.Divide(Entry.DisplaySize, Size) * 0.5f;
             Rotation = Entry.DisplayRotation;
         }
@@ -49,6 +52,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             ClearTransforms();
             Alpha = 1;
+
+            HyperDash.UnbindFrom(Entry.HyperDash);
+            AccentColour.UnbindFrom(Entry.AccentColour);
+
+            Entry = null;
 
             base.FreeAfterUse();
         }
