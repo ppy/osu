@@ -20,6 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Room.RecentParticipants.Add(new User
                 {
                     Username = "peppy",
+                    CurrentModeRank = 1234,
                     Id = 2
                 });
             }

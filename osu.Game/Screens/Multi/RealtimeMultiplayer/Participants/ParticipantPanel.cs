@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private ReadyMark readyMark;
+        private StateDisplay userStateDisplay;
         private SpriteIcon crown;
 
         public ParticipantPanel(MultiplayerRoomUser user)
@@ -122,12 +122,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
                                     }
                                 }
                             },
-                            readyMark = new ReadyMark
+                            userStateDisplay = new StateDisplay
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 Margin = new MarginPadding { Right = 10 },
-                                Alpha = 0
                             }
                         }
                     }
@@ -144,10 +143,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
 
             const double fade_time = 50;
 
-            if (User.State == MultiplayerUserState.Ready)
-                readyMark.FadeIn(fade_time);
-            else
-                readyMark.FadeOut(fade_time);
+            userStateDisplay.Status = User.State;
 
             if (Room.Host?.Equals(User) == true)
                 crown.FadeIn(fade_time);
