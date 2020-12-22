@@ -179,8 +179,12 @@ namespace osu.Game.Tests.Gameplay
             }
         }
 
+        #region IResourceStorageProvider
+
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
+
+        #endregion
     }
 }

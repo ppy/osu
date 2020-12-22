@@ -496,11 +496,15 @@ namespace osu.Game.Beatmaps
             onlineLookupQueue?.Dispose();
         }
 
+        #region IResourceStorageProvider
+
         TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
         IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+
+        #endregion
 
         /// <summary>
         /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.

@@ -152,9 +152,13 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap CreateBeatmapForSkinProvider() => CreateWorkingBeatmap(Ruleset.Value).GetPlayableBeatmap(Ruleset.Value);
 
+        #region IResourceStorageProvider
+
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+
+        #endregion
 
         private class OutlineBox : CompositeDrawable
         {
