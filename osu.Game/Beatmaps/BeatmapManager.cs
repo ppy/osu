@@ -72,6 +72,7 @@ namespace osu.Game.Beatmaps
         private readonly LargeTextureStore largeTextureStore;
         private readonly ITrackStore trackStore;
 
+        [CanBeNull]
         private readonly GameHost host;
 
         [CanBeNull]
@@ -502,7 +503,7 @@ namespace osu.Game.Beatmaps
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
         IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
-        IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+        IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
 
         #endregion
 
