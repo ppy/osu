@@ -216,7 +216,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (result.IsHit)
             {
-                var positionInStack = CaughtObjectContainer.GetPositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplaySize.X / 2);
+                var catchPosition = new Vector2((palpableObject.X - X) * Scale.X, 0);
+                var objectRadius = palpableObject.DisplaySize.X / 2;
+                var positionInStack = CaughtObjectContainer.GetPositionInStack(catchPosition, objectRadius);
 
                 addCaughtObject(palpableObject, Time.Current, positionInStack);
 
@@ -494,8 +496,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void applyExplodeTransforms(DrawableCaughtObject d)
         {
+            var xMovement = d.Entry.PositionInStack.X * Scale.X * 6;
             d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
-            d.MoveToX(d.X + d.Entry.PositionInStack.X * 6, 1000);
+            d.MoveToX(d.X + xMovement, 1000);
             d.FadeOut(750);
         }
     }

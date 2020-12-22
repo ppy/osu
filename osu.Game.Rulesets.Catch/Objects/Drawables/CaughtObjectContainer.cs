@@ -124,15 +124,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             var drawable = getPooledDrawable(entry.ObjectType);
             drawable.Apply(entry);
 
-            if (entry.ApplyTransforms != null)
-            {
-                using (drawable.BeginAbsoluteSequence(entry.LifetimeStart))
-                {
-                    entry.ApplyTransforms(drawable);
-                    entry.LifetimeEnd = drawable.LatestTransformEndTime;
-                }
-            }
-
             addDrawable(entry, drawable);
         }
 
@@ -165,9 +156,24 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         private void addDrawable(CaughtObjectEntry entry, DrawableCaughtObject drawable)
         {
             if (entry.State == CaughtObjectState.Stacked)
+            {
+                drawable.Position = entry.PositionInStack;
                 StackedObjectContainer.Add(drawable);
+            }
             else
+            {
+                drawable.Position = StackedObjectContainer.ToSpaceOfOtherDrawable(entry.PositionInStack, droppedObjectTarget);
                 droppedObjectTarget.Add(drawable);
+            }
+
+            if (entry.ApplyTransforms != null)
+            {
+                using (drawable.BeginAbsoluteSequence(entry.LifetimeStart))
+                {
+                    entry.ApplyTransforms(drawable);
+                    entry.LifetimeEnd = drawable.LatestTransformEndTime;
+                }
+            }
 
             drawableMap[entry] = drawable;
         }

@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         protected DrawableCaughtObject(CatchSkinComponents skinComponent, Func<ISkinComponent, Drawable> defaultImplementation)
             : base(new CatchSkinComponent(skinComponent), defaultImplementation)
         {
-            Anchor = Anchor.TopCentre;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.None;
@@ -42,7 +41,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             Entry = entry;
 
-            Position = entry.PositionInStack;
             Scale = Vector2.Divide(Entry.DisplaySize, Size) * 0.5f;
             Rotation = Entry.DisplayRotation;
         }
