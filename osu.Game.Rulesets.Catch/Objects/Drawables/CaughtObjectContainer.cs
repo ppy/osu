@@ -130,7 +130,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         private void entryBecameAlive(LifetimeEntry lifetimeEntry)
         {
             var entry = (CaughtObjectEntry)lifetimeEntry;
-            Console.WriteLine($"{nameof(entryBecameAlive)} at {Clock.CurrentTime}: {entry.State} {entry.ObjectType} {entry.StartTime}");
 
             if (entry.State == CaughtObjectState.Stacked)
                 aliveStackedObjects.Add(entry);
@@ -144,7 +143,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         private void entryBecameDead(LifetimeEntry lifetimeEntry)
         {
             var entry = (CaughtObjectEntry)lifetimeEntry;
-            Console.WriteLine($"{nameof(entryBecameDead)} at {Clock.CurrentTime}: {entry.State} {entry.ObjectType} {entry.StartTime}");
 
             if (entry.State == CaughtObjectState.Stacked)
                 aliveStackedObjects.Remove(entry);
