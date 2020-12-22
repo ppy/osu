@@ -66,8 +66,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 windowModeDropdown = new SettingsDropdown<WindowMode>
                 {
                     LabelText = "Screen mode",
-                    Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                     ItemSource = windowModes,
+                    Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
                 resolutionDropdown = new ResolutionSettingsDropdown
                 {
