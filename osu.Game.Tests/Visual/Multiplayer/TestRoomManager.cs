@@ -24,6 +24,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => Rooms.Add(room);
 
+        public bool CanJoinRoom(Room room) => true;
+
         public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
         }
