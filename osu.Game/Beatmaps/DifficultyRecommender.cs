@@ -9,13 +9,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A class which will recommend the most suitable difficulty for the local user from a beatmap set.
+    /// This requires the user to be logged in, as it sources from the user's online profile.
+    /// </summary>
     public class DifficultyRecommender : Component
     {
         [Resolved]

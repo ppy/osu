@@ -81,6 +81,9 @@ namespace osu.Game
         private BeatmapSetOverlay beatmapSetOverlay;
 
         [Cached]
+        private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
+
+        [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
         protected SentryLogger SentryLogger;
@@ -374,7 +377,7 @@ namespace osu.Game
                     beatmaps = databasedSet.Beatmaps;
 
                 // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
-                var selection = DifficultyRecommender.GetRecommendedBeatmap(beatmaps)
+                var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
                                 ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
                                 ?? beatmaps.First();
 
@@ -638,6 +641,8 @@ namespace osu.Game
                 PostNotification = n => notifications.Post(n),
                 GetStableStorage = GetStorageForStableInstall
             }, Add, true);
+
+            loadComponentSingleFile(difficultyRecommender, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
