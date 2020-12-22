@@ -220,7 +220,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 var objectRadius = palpableObject.DisplaySize.X / 2;
                 var positionInStack = CaughtObjectContainer.GetPositionInStack(catchPosition, objectRadius);
 
-                addCaughtObject(palpableObject, Time.Current, positionInStack);
+                var caughtObjectEntry = createCaughtObjectEntry(palpableObject, Time.Current, positionInStack);
+                catchResult.CaughtObjectEntry = caughtObjectEntry;
+                CaughtObjectContainer.Add(caughtObjectEntry);
 
                 if (hitLighting.Value)
                     addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
@@ -466,26 +468,22 @@ namespace osu.Game.Rulesets.Catch.UI
             hitExplosionContainer.Add(hitExplosion);
         }
 
-        private void addCaughtObject(DrawablePalpableCatchHitObject hitObject, double time, Vector2 positionInStack)
+        private CaughtObjectEntry createCaughtObjectEntry(DrawablePalpableCatchHitObject hitObject, double time, Vector2 positionInStack)
         {
             if (hitObject.HitObject is Droplet)
             {
                 // droplet explodes immediately
-                var entry = new CaughtObjectEntry(CaughtObjectState.Dropped, positionInStack, hitObject)
+                return new CaughtObjectEntry(CaughtObjectState.Dropped, positionInStack, hitObject)
                 {
                     LifetimeStart = time,
                     ApplyTransforms = applyExplodeTransforms
                 };
-                CaughtObjectContainer.Add(entry);
             }
-            else
+
+            return new CaughtObjectEntry(CaughtObjectState.Stacked, positionInStack, hitObject)
             {
-                var entry = new CaughtObjectEntry(CaughtObjectState.Stacked, positionInStack, hitObject)
-                {
-                    LifetimeStart = time,
-                };
-                CaughtObjectContainer.Add(entry);
-            }
+                LifetimeStart = time,
+            };
         }
 
         private void applyDropTransforms(DrawableCaughtObject d)
