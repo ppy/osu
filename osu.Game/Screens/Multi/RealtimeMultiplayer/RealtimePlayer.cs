@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -33,6 +34,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
         private readonly ManualResetEventSlim startedEvent = new ManualResetEventSlim();
 
+        [CanBeNull]
         private MultiplayerGameplayLeaderboard leaderboard;
 
         public RealtimePlayer(PlaylistItem playlistItem)
@@ -72,6 +74,13 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         protected override void Update()
         {
             base.Update();
+            adjustLeaderboardPosition();
+        }
+
+        private void adjustLeaderboardPosition()
+        {
+            if (leaderboard == null)
+                return;
 
             const float padding = 44; // enough margin to avoid the hit error display.
 
