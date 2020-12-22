@@ -29,12 +29,12 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        private Container<CaughtObject> droppedObjectContainer;
+        private Container<DrawableCaughtObject> droppedObjectContainer;
 
         private TestCatcher catcher;
 
-        private IEnumerable<CaughtObject> stackedObjects => catcher.StackedObjects;
-        private IEnumerable<CaughtObject> droppedObjects => droppedObjectContainer.Children;
+        private IEnumerable<DrawableCaughtObject> stackedObjects => catcher.StackedObjects;
+        private IEnumerable<DrawableCaughtObject> droppedObjects => droppedObjectContainer.Children;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
 
             var trailContainer = new Container();
-            droppedObjectContainer = new Container<CaughtObject>();
+            droppedObjectContainer = new Container<DrawableCaughtObject>();
             catcher = new TestCatcher(trailContainer, droppedObjectContainer, difficulty);
 
             Child = new Container
@@ -278,9 +278,9 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public class TestCatcher : Catcher
         {
-            public IEnumerable<CaughtObject> StackedObjects => CaughtObjectContainer.StackedObjectContainer;
+            public IEnumerable<DrawableCaughtObject> StackedObjects => CaughtObjectContainer.StackedObjectContainer;
 
-            public TestCatcher(Container trailsTarget, Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty)
+            public TestCatcher(Container trailsTarget, Container<DrawableCaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty)
                 : base(trailsTarget, droppedObjectTarget, difficulty)
             {
             }

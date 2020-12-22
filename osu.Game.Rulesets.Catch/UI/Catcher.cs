@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<HitExplosion> hitExplosionPool;
         private readonly Container<HitExplosion> hitExplosionContainer;
 
-        public Catcher([NotNull] Container trailsTarget, [NotNull] Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] Container trailsTarget, [NotNull] Container<DrawableCaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty = null)
         {
             this.trailsTarget = trailsTarget;
 
@@ -486,13 +486,13 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private void applyDropTransforms(CaughtObject d)
+        private void applyDropTransforms(DrawableCaughtObject d)
         {
             d.MoveToY(d.Y + 75, 750, Easing.InSine);
             d.FadeOut(750);
         }
 
-        private void applyExplodeTransforms(CaughtObject d)
+        private void applyExplodeTransforms(DrawableCaughtObject d)
         {
             d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
             d.MoveToX(d.X + d.Entry.PositionInStack.X * 6, 1000);

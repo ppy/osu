@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             SetContents(() =>
             {
-                var droppedObjectContainer = new Container<CaughtObject>
+                var droppedObjectContainer = new Container<DrawableCaughtObject>
                 {
                     RelativeSizeAxes = Axes.Both
                 };
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
+            public TestCatcherArea(Container<DrawableCaughtObject> droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
                 : base(droppedObjectContainer, beatmapDifficulty)
             {
             }

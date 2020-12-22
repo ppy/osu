@@ -8,9 +8,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     /// <summary>
     /// Represents a <see cref="Banana"/> caught by the catcher.
     /// </summary>
-    public class CaughtBanana : CaughtObject
+    public class DrawableCaughtBanana : DrawableCaughtObject
     {
-        public CaughtBanana()
+        public DrawableCaughtBanana()
             : base(CatchSkinComponents.Banana, _ => new BananaPiece())
         {
         }

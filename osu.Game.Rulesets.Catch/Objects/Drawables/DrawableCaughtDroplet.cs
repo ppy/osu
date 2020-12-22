@@ -8,9 +8,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     /// <summary>
     /// Represents a <see cref="Droplet"/> caught by the catcher.
     /// </summary>
-    public class CaughtDroplet : CaughtObject
+    public class DrawableCaughtDroplet : DrawableCaughtObject
     {
-        public CaughtDroplet()
+        public DrawableCaughtDroplet()
             : base(CatchSkinComponents.Droplet, _ => new DropletPiece())
         {
         }

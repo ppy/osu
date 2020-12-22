@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public Bindable<FruitVisualRepresentation> VisualRepresentation { get; } = new Bindable<FruitVisualRepresentation>();
 
-        public Action<CaughtObject> ApplyTransforms;
+        public Action<DrawableCaughtObject> ApplyTransforms;
 
         public CaughtObjectEntry(CaughtObjectState state, Vector2 positionInStack, IHasCatchObjectState source)
         {

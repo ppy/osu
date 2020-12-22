@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     /// Represents a <see cref="PalpableCatchHitObject"/> caught by the catcher.
     /// </summary>
     [Cached(typeof(IHasCatchObjectState))]
-    public abstract class CaughtObject : SkinnableDrawable, IHasCatchObjectState
+    public abstract class DrawableCaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
         public CaughtObjectEntry Entry { get; private set; }
 
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public override bool RemoveCompletedTransforms => false;
 
-        protected CaughtObject(CatchSkinComponents skinComponent, Func<ISkinComponent, Drawable> defaultImplementation)
+        protected DrawableCaughtObject(CatchSkinComponents skinComponent, Func<ISkinComponent, Drawable> defaultImplementation)
             : base(new CatchSkinComponent(skinComponent), defaultImplementation)
         {
             Anchor = Anchor.TopCentre;

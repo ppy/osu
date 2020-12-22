@@ -16,32 +16,32 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class CaughtObjectContainer : CompositeDrawable
     {
-        public Container<CaughtObject> StackedObjectContainer { get; }
+        public Container<DrawableCaughtObject> StackedObjectContainer { get; }
 
-        private readonly Container<CaughtObject> droppedObjectTarget;
+        private readonly Container<DrawableCaughtObject> droppedObjectTarget;
 
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
 
-        private readonly Dictionary<LifetimeEntry, CaughtObject> drawableMap = new Dictionary<LifetimeEntry, CaughtObject>();
+        private readonly Dictionary<LifetimeEntry, DrawableCaughtObject> drawableMap = new Dictionary<LifetimeEntry, DrawableCaughtObject>();
 
         private readonly HashSet<CaughtObjectEntry> aliveStackedObjects = new HashSet<CaughtObjectEntry>();
         private readonly Dictionary<CaughtObjectEntry, CaughtObjectEntry> dropEntryMap = new Dictionary<CaughtObjectEntry, CaughtObjectEntry>();
 
-        private readonly DrawablePool<CaughtFruit> caughtFruitPool;
-        private readonly DrawablePool<CaughtBanana> caughtBananaPool;
-        private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
+        private readonly DrawablePool<DrawableCaughtFruit> caughtFruitPool;
+        private readonly DrawablePool<DrawableCaughtBanana> caughtBananaPool;
+        private readonly DrawablePool<DrawableCaughtDroplet> caughtDropletPool;
 
-        public CaughtObjectContainer(Container<CaughtObject> droppedObjectTarget)
+        public CaughtObjectContainer(Container<DrawableCaughtObject> droppedObjectTarget)
         {
             this.droppedObjectTarget = droppedObjectTarget;
 
             InternalChildren = new Drawable[]
             {
-                caughtFruitPool = new DrawablePool<CaughtFruit>(50),
-                caughtBananaPool = new DrawablePool<CaughtBanana>(100),
+                caughtFruitPool = new DrawablePool<DrawableCaughtFruit>(50),
+                caughtBananaPool = new DrawablePool<DrawableCaughtBanana>(100),
                 // less capacity is needed compared to fruit because droplet is not stacked
-                caughtDropletPool = new DrawablePool<CaughtDroplet>(25),
-                StackedObjectContainer = new Container<CaughtObject>()
+                caughtDropletPool = new DrawablePool<DrawableCaughtDroplet>(25),
+                StackedObjectContainer = new Container<DrawableCaughtObject>()
             };
 
             lifetimeManager.EntryBecameAlive += entryBecameAlive;
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             return position;
         }
 
-        public void DropStackedObjects(Action<CaughtObject> applyTransforms)
+        public void DropStackedObjects(Action<DrawableCaughtObject> applyTransforms)
         {
             dropStackedObjects(Clock.CurrentTime, applyTransforms);
         }
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             removeDrawable(entry);
         }
 
-        private void dropStackedObjects(double time, Action<CaughtObject> applyTransforms)
+        private void dropStackedObjects(double time, Action<DrawableCaughtObject> applyTransforms)
         {
             foreach (var entry in aliveStackedObjects)
             {
@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             aliveStackedObjects.Clear();
         }
 
-        private void addDrawable(CaughtObjectEntry entry, CaughtObject drawable)
+        private void addDrawable(CaughtObjectEntry entry, DrawableCaughtObject drawable)
         {
             if (entry.State == CaughtObjectState.Stacked)
                 StackedObjectContainer.Add(drawable);
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         private void removeDrawable(CaughtObjectEntry entry)
         {
-            if (!drawableMap.TryGetValue(entry, out CaughtObject drawable))
+            if (!drawableMap.TryGetValue(entry, out DrawableCaughtObject drawable))
                 return;
 
             if (entry.State == CaughtObjectState.Stacked)
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             drawableMap.Remove(entry);
         }
 
-        private CaughtObject getPooledDrawable(CatchObjectType type)
+        private DrawableCaughtObject getPooledDrawable(CatchObjectType type)
         {
             switch (type)
             {
