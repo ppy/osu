@@ -18,6 +18,7 @@ using osu.Game.Screens.Multi.Ranking;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
+using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
 
 namespace osu.Game.Screens.Multi.Timeshift
 {
@@ -175,7 +176,7 @@ namespace osu.Game.Screens.Multi.Timeshift
                         },
                         new Drawable[]
                         {
-                            new Match.Components.Footer
+                            new Footer
                             {
                                 OnStart = onStart,
                                 SelectedItem = { BindTarget = SelectedItem }
@@ -188,7 +189,7 @@ namespace osu.Game.Screens.Multi.Timeshift
                         new Dimension(GridSizeMode.AutoSize),
                     }
                 },
-                settingsOverlay = new MatchSettingsOverlay
+                settingsOverlay = new TimeshiftMatchSettingsOverlay
                 {
                     RelativeSizeAxes = Axes.Both,
                     EditPlaylist = () => this.Push(new MatchSongSelect()),
