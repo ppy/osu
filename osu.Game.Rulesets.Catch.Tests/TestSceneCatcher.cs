@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         private TestCatcher catcher;
 
         private IEnumerable<DrawableCaughtObject> stackedObjects => catcher.StackedObjects;
-        private IEnumerable<DrawableCaughtObject> droppedObjects => droppedObjectContainer.Children;
+        private IEnumerable<DrawableCaughtObject> droppedObjects => droppedObjectContainer;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -59,6 +59,22 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
         });
+
+        [Test]
+        public void TestCaughtObjectReverted()
+        {
+            DrawableCatchHitObject drawableObject = null;
+            JudgementResult result = null;
+            AddStep("catch fruit", () =>
+            {
+                attemptCatch(new Fruit(), out drawableObject, out result);
+            });
+            AddStep("revert result", () =>
+            {
+                catcher.OnRevertResult(drawableObject, result);
+            });
+            checkPlate(0);
+        }
 
         [Test]
         public void TestCatcherHyperStateReverted()
@@ -219,7 +235,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddAssert("no hit lighting", () => !catcher.ChildrenOfType<HitExplosion>().Any());
         }
 
-        private void checkPlate(int count) => AddAssert($"{count} objects on the plate", () => stackedObjects.Count() == count);
+        private void checkPlate(int count) => AddAssert($"{count} objects on the plate", () => stackedObjects.Count() == count && stackedObjects.All(d => d.IsPresent));
 
         private void checkState(CatcherAnimationState state) => AddAssert($"catcher state is {state}", () => catcher.CurrentState == state);
 
