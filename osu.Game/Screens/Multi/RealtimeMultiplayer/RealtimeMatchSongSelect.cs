@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Threading;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Screens.Select;
@@ -26,9 +28,17 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
 
+        private LoadingLayer loadingLayer;
+
         public RealtimeMatchSongSelect()
         {
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(loadingLayer = new LoadingLayer(Carousel));
         }
 
         protected override bool OnStart()
@@ -45,13 +55,20 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
             if (client.Room != null)
             {
-                client.ChangeSettings(item: item).ContinueWith(t => Schedule(() =>
+                loadingLayer.Show();
+
+                client.ChangeSettings(item: item).ContinueWith(t =>
                 {
-                    if (t.IsCompletedSuccessfully)
-                        this.Exit();
-                    else
-                        Logger.Log($"Could not use current beatmap ({t.Exception?.Message})", level: LogLevel.Important);
-                }));
+                    return Schedule(() =>
+                    {
+                        loadingLayer.Hide();
+
+                        if (t.IsCompletedSuccessfully)
+                            this.Exit();
+                        else
+                            Logger.Log($"Could not use current beatmap ({t.Exception?.Message})", level: LogLevel.Important);
+                    });
+                });
             }
             else
             {
