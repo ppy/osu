@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
@@ -19,10 +20,11 @@ namespace osu.Game.Beatmaps
         [ExcludeFromDynamicCompile]
         private class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
+            [NotNull]
             private readonly IBeatmapResourceProvider resources;
 
-            public BeatmapManagerWorkingBeatmap(BeatmapInfo beatmapInfo, IBeatmapResourceProvider resources)
-                : base(beatmapInfo, resources?.AudioManager)
+            public BeatmapManagerWorkingBeatmap(BeatmapInfo beatmapInfo, [NotNull] IBeatmapResourceProvider resources)
+                : base(beatmapInfo, resources.AudioManager)
             {
                 this.resources = resources;
             }
