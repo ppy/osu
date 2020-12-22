@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Multi
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Action = () => CreateRoom()
+                        Action = () => OpenNewRoom()
                     },
                     RoomManager = CreateRoomManager()
                 }
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Multi
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
 
-            screenStack.Push(loungeSubScreen = new LoungeSubScreen());
+            screenStack.Push(loungeSubScreen = CreateLounge());
         }
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
@@ -264,10 +264,16 @@ namespace osu.Game.Screens.Multi
         }
 
         /// <summary>
-        /// Create a new room.
+        /// Creates and opens the newly-created room.
         /// </summary>
         /// <param name="room">An optional template to use when creating the room.</param>
-        public void CreateRoom(Room room = null) => loungeSubScreen.Open(room ?? new Room { Name = { Value = $"{api.LocalUser}'s awesome room" } });
+        public void OpenNewRoom(Room room = null) => loungeSubScreen.Open(room ?? CreateNewRoom());
+
+        /// <summary>
+        /// Creates a new room.
+        /// </summary>
+        /// <returns>The created <see cref="Room"/>.</returns>
+        protected virtual Room CreateNewRoom() => new Room { Name = { Value = $"{api.LocalUser}'s awesome room" } };
 
         private void beginHandlingTrack()
         {
@@ -302,7 +308,7 @@ namespace osu.Game.Screens.Multi
                     headerBackground.MoveToX(0, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
                     break;
 
-                case MatchSubScreen _:
+                case RoomSubScreen _:
                     header.ResizeHeightTo(135, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
                     headerBackground.MoveToX(-MultiplayerSubScreen.X_SHIFT, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
                     break;
@@ -324,7 +330,7 @@ namespace osu.Game.Screens.Multi
 
         private void updateTrack(ValueChangedEvent<WorkingBeatmap> _ = null)
         {
-            if (screenStack.CurrentScreen is MatchSubScreen)
+            if (screenStack.CurrentScreen is RoomSubScreen)
             {
                 var track = Beatmap.Value?.Track;
 
@@ -354,6 +360,8 @@ namespace osu.Game.Screens.Multi
         }
 
         protected abstract RoomManager CreateRoomManager();
+
+        protected abstract LoungeSubScreen CreateLounge();
 
         private class MultiplayerWaveContainer : WaveContainer
         {

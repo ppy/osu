@@ -1,19 +1,32 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
-using osu.Game.Screens.Multi.Match;
 
-namespace osu.Game.Screens.Multi.Timeshift
+namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 {
-    public class TimeshiftMultiplayer : Multiplayer
+    public class RealtimeMultiplayer : Multiplayer
     {
+        [Resolved]
+        private StatefulMultiplayerClient client { get; set; }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            if (client.Room != null)
+                client.ChangeState(MultiplayerUserState.Idle);
+        }
+
         protected override void UpdatePollingRate(bool isIdle)
         {
-            var timeshiftManager = (TimeshiftRoomManager)RoomManager;
+            var timeshiftManager = (RealtimeRoomManager)RoomManager;
 
             if (!this.IsCurrentScreen())
             {
@@ -29,11 +42,7 @@ namespace osu.Game.Screens.Multi.Timeshift
                         timeshiftManager.TimeBetweenSelectionPolls.Value = isIdle ? 120000 : 15000;
                         break;
 
-                    case RoomSubScreen _:
-                        timeshiftManager.TimeBetweenListingPolls.Value = 0;
-                        timeshiftManager.TimeBetweenSelectionPolls.Value = isIdle ? 30000 : 5000;
-                        break;
-
+                    // Don't poll inside the match or anywhere else.
                     default:
                         timeshiftManager.TimeBetweenListingPolls.Value = 0;
                         timeshiftManager.TimeBetweenSelectionPolls.Value = 0;
@@ -44,8 +53,15 @@ namespace osu.Game.Screens.Multi.Timeshift
             Logger.Log($"Polling adjusted (listing: {timeshiftManager.TimeBetweenListingPolls.Value}, selection: {timeshiftManager.TimeBetweenSelectionPolls.Value})");
         }
 
-        protected override RoomManager CreateRoomManager() => new TimeshiftRoomManager();
+        protected override Room CreateNewRoom()
+        {
+            var room = base.CreateNewRoom();
+            room.Category.Value = RoomCategory.Realtime;
+            return room;
+        }
 
-        protected override LoungeSubScreen CreateLounge() => new TimeshiftLoungeSubScreen();
+        protected override RoomManager CreateRoomManager() => new RealtimeRoomManager();
+
+        protected override LoungeSubScreen CreateLounge() => new RealtimeLoungeSubScreen();
     }
 }
