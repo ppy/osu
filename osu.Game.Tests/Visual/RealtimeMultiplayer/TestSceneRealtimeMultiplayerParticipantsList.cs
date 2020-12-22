@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.RealtimeMultiplayer
 {
-    public class TestSceneParticipantsList : RealtimeMultiplayerTestScene
+    public class TestSceneRealtimeMultiplayerParticipantsList : RealtimeMultiplayerTestScene
     {
         [SetUp]
         public new void Setup() => Schedule(() =>
