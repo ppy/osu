@@ -8,8 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
@@ -31,6 +31,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         private readonly DrawablePool<DrawableCaughtBanana> caughtBananaPool;
         private readonly DrawablePool<DrawableCaughtDroplet> caughtDropletPool;
 
+        /// <summary>
+        /// The randomness used to compute position in stack.
+        /// It is incremented for each <see cref="Add"/> call and decremented for each <see cref="Remove"/> call to make a replay consistent.
+        /// </summary>
+        private int randomSeed = 1;
+
         public CaughtObjectContainer(Container<DrawableCaughtObject> droppedObjectTarget)
         {
             this.droppedObjectTarget = droppedObjectTarget;
@@ -50,6 +56,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public void Add(CaughtObjectEntry entry)
         {
+            randomSeed++;
+
             lifetimeManager.AddEntry(entry);
 
             if (entry.State != CaughtObjectState.Stacked) return;
@@ -70,6 +78,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public void Remove(CaughtObjectEntry entry)
         {
+            randomSeed--;
+
             lifetimeManager.RemoveEntry(entry);
             removeDrawable(entry);
 
@@ -88,12 +98,16 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             const float radius_div_2 = CatchHitObject.OBJECT_RADIUS / 2;
             const float allowance = 10;
 
+            int iteration = 0;
+
             while (aliveStackedObjects.Any(f => Vector2Extensions.Distance(f.PositionInStack, position) < (displayRadius + radius_div_2) / (allowance / 2)))
             {
                 float diff = (displayRadius + radius_div_2) / allowance;
 
-                position.X += (RNG.NextSingle() - 0.5f) * diff * 2;
-                position.Y -= RNG.NextSingle() * diff;
+                position.X += (StatelessRNG.NextSingle(randomSeed, iteration + 2) - 0.5f) * diff * 2;
+                position.Y -= StatelessRNG.NextSingle(randomSeed, iteration * 2 + 1) * diff;
+
+                iteration++;
             }
 
             position.X = Math.Clamp(position.X, -CatcherArea.CATCHER_SIZE / 2, CatcherArea.CATCHER_SIZE / 2);
