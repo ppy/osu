@@ -67,13 +67,13 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             Debug.Assert(room.RoomID.Value != null);
 
             var joinTask = multiplayerClient.JoinRoom(room);
-            joinTask.ContinueWith(_ => onSuccess?.Invoke(room), TaskContinuationOptions.OnlyOnRanToCompletion);
+            joinTask.ContinueWith(_ => Schedule(() => onSuccess?.Invoke(room)), TaskContinuationOptions.OnlyOnRanToCompletion);
             joinTask.ContinueWith(t =>
             {
                 PartRoom();
                 if (t.Exception != null)
                     Logger.Error(t.Exception, "Failed to join multiplayer room.");
-                onError?.Invoke(t.Exception?.ToString() ?? string.Empty);
+                Schedule(() => onError?.Invoke(t.Exception?.ToString() ?? string.Empty));
             }, TaskContinuationOptions.NotOnRanToCompletion);
         }
 
