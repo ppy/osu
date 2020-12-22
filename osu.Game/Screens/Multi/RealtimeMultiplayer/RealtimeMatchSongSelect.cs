@@ -6,6 +6,7 @@ using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
@@ -43,14 +44,22 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
             if (client.Room != null)
-                client.ChangeSettings(item: item);
+            {
+                client.ChangeSettings(item: item).ContinueWith(t => Schedule(() =>
+                {
+                    if (t.IsCompletedSuccessfully)
+                        this.Exit();
+                    else
+                        Logger.Log($"Could not use current beatmap ({t.Exception?.Message})", level: LogLevel.Important);
+                }));
+            }
             else
             {
                 playlist.Clear();
                 playlist.Add(item);
+                this.Exit();
             }
 
-            this.Exit();
             return true;
         }
 

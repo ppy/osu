@@ -127,10 +127,10 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// </remarks>
         /// <param name="name">The new room name, if any.</param>
         /// <param name="item">The new room playlist item, if any.</param>
-        public void ChangeSettings(Optional<string> name = default, Optional<PlaylistItem> item = default)
+        public Task ChangeSettings(Optional<string> name = default, Optional<PlaylistItem> item = default)
         {
             if (Room == null)
-                return;
+                throw new InvalidOperationException("Must be joined to a match to change settings.");
 
             // A dummy playlist item filled with the current room settings (except mods).
             var existingPlaylistItem = new PlaylistItem
@@ -146,7 +146,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
                 RulesetID = Room.Settings.RulesetID
             };
 
-            ChangeSettings(new MultiplayerRoomSettings
+            return ChangeSettings(new MultiplayerRoomSettings
             {
                 Name = name.GetOr(Room.Settings.Name),
                 BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
