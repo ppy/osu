@@ -109,14 +109,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
-        private class TestRoomSettings : MatchSettingsOverlay
+        private class TestRoomSettings : TimeshiftMatchSettingsOverlay
         {
-            public TriangleButton ApplyButton => Settings.ApplyButton;
+            public TriangleButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 
-            public OsuTextBox NameField => Settings.NameField;
-            public OsuDropdown<TimeSpan> DurationField => Settings.DurationField;
+            public OsuTextBox NameField => ((MatchSettings)Settings).NameField;
+            public OsuDropdown<TimeSpan> DurationField => ((MatchSettings)Settings).DurationField;
 
-            public OsuSpriteText ErrorText => Settings.ErrorText;
+            public OsuSpriteText ErrorText => ((MatchSettings)Settings).ErrorText;
         }
 
         private class TestRoomManager : IRoomManager

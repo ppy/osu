@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create room", () =>
             {
-                InputManager.MoveMouseTo(match.ChildrenOfType<MatchSettingsOverlay.CreateRoomButton>().Single());
+                InputManager.MoveMouseTo(match.ChildrenOfType<TimeshiftMatchSettingsOverlay.CreateRoomButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 

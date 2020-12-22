@@ -19,38 +19,20 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Multi.Match.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
 {
-    public class RealtimeMatchSettingsOverlay : FocusedOverlayContainer
+    public class RealtimeMatchSettingsOverlay : MatchSettingsOverlay
     {
-        private const float transition_duration = 350;
-        private const float field_padding = 45;
-
-        protected MatchSettings Settings { get; private set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            Masking = true;
-
             Child = Settings = new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
                 SettingsApplied = Hide
             };
-        }
-
-        protected override void PopIn()
-        {
-            Settings.MoveToY(0, transition_duration, Easing.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            Settings.MoveToY(-1, transition_duration, Easing.InSine);
         }
 
         protected class MatchSettings : MultiplayerComposite
@@ -143,7 +125,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
                                                             {
                                                                 new SectionContainer
                                                                 {
-                                                                    Padding = new MarginPadding { Right = field_padding / 2 },
+                                                                    Padding = new MarginPadding { Right = FIELD_PADDING / 2 },
                                                                     Children = new[]
                                                                     {
                                                                         new Section("Room name")
@@ -192,7 +174,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
                                                                 {
                                                                     Anchor = Anchor.TopRight,
                                                                     Origin = Anchor.TopRight,
-                                                                    Padding = new MarginPadding { Left = field_padding / 2 },
+                                                                    Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
                                                                     Children = new[]
                                                                     {
                                                                         new Section("Max participants")
@@ -344,77 +326,6 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
                 ErrorText.FadeIn(50);
 
                 loadingLayer.Hide();
-            }
-        }
-
-        private class SettingsTextBox : OsuTextBox
-        {
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                BackgroundUnfocused = Color4.Black;
-                BackgroundFocused = Color4.Black;
-            }
-        }
-
-        private class SettingsNumberTextBox : SettingsTextBox
-        {
-            protected override bool CanAddCharacter(char character) => char.IsNumber(character);
-        }
-
-        private class SettingsPasswordTextBox : OsuPasswordTextBox
-        {
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                BackgroundUnfocused = Color4.Black;
-                BackgroundFocused = Color4.Black;
-            }
-        }
-
-        private class SectionContainer : FillFlowContainer<Section>
-        {
-            public SectionContainer()
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Width = 0.5f;
-                Direction = FillDirection.Vertical;
-                Spacing = new Vector2(field_padding);
-            }
-        }
-
-        private class Section : Container
-        {
-            private readonly Container content;
-
-            protected override Container<Drawable> Content => content;
-
-            public Section(string title)
-            {
-                AutoSizeAxes = Axes.Y;
-                RelativeSizeAxes = Axes.X;
-
-                InternalChild = new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(5),
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
-                            Text = title.ToUpper(),
-                        },
-                        content = new Container
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                        },
-                    },
-                };
             }
         }
 
