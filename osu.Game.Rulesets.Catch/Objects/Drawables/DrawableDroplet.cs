@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableDroplet : DrawablePalpableCatchHitObject
     {
+        public override CatchObjectType ObjectType => CatchObjectType.Droplet;
+
         public DrawableDroplet()
             : this(null)
         {

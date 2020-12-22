@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableFruit : DrawablePalpableCatchHitObject, IHasFruitState
     {
+        public override CatchObjectType ObjectType => CatchObjectType.Fruit;
+
         public Bindable<FruitVisualRepresentation> VisualRepresentation { get; } = new Bindable<FruitVisualRepresentation>();
 
         public DrawableFruit()

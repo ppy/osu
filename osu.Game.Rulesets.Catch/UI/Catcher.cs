@@ -279,9 +279,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
             }
 
-            caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
+            double time = result.TimeAbsolute;
+
+            caughtObjectContainer.RemoveAll(d => d.StartTime >= time);
+            droppedObjectTarget.RemoveAll(d => d.StartTime >= time);
+            hitExplosionContainer.RemoveAll(d => d.LifetimeStart >= time);
         }
 
         /// <summary>
@@ -466,7 +468,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void placeCaughtObject(DrawablePalpableCatchHitObject drawableObject, Vector2 position)
         {
-            var caughtObject = getCaughtObject(drawableObject.HitObject);
+            var caughtObject = getCaughtObject(drawableObject.ObjectType);
 
             if (caughtObject == null) return;
 
@@ -502,24 +504,24 @@ namespace osu.Game.Rulesets.Catch.UI
         private void addLighting(CatchHitObject hitObject, float x, Color4 colour)
         {
             HitExplosion hitExplosion = hitExplosionPool.Get();
-            hitExplosion.HitObject = hitObject;
+            hitExplosion.LifetimeStart = hitObject.StartTime;
             hitExplosion.X = x;
             hitExplosion.Scale = new Vector2(hitObject.Scale);
             hitExplosion.ObjectColour = colour;
             hitExplosionContainer.Add(hitExplosion);
         }
 
-        private CaughtObject getCaughtObject(PalpableCatchHitObject source)
+        private CaughtObject getCaughtObject(CatchObjectType type)
         {
-            switch (source)
+            switch (type)
             {
-                case Fruit _:
+                case CatchObjectType.Fruit:
                     return caughtFruitPool.Get();
 
-                case Banana _:
+                case CatchObjectType.Banana:
                     return caughtBananaPool.Get();
 
-                case Droplet _:
+                case CatchObjectType.Droplet:
                     return caughtDropletPool.Get();
 
                 default:
@@ -529,7 +531,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private CaughtObject getDroppedObject(CaughtObject caughtObject)
         {
-            var droppedObject = getCaughtObject(caughtObject.HitObject);
+            var droppedObject = getCaughtObject(caughtObject.ObjectType);
 
             droppedObject.CopyStateFrom(caughtObject);
             droppedObject.Anchor = Anchor.TopLeft;

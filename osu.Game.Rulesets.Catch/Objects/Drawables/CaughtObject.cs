@@ -17,8 +17,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     [Cached(typeof(IHasCatchObjectState))]
     public abstract class CaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
-        public PalpableCatchHitObject HitObject { get; private set; }
+        public CatchObjectType ObjectType { get; private set; }
+
+        public double StartTime { get; private set; }
+
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
+
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
 
         public Vector2 DisplaySize => Size * Scale;
@@ -46,7 +50,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// </summary>
         public virtual void CopyStateFrom(IHasCatchObjectState objectState)
         {
-            HitObject = objectState.HitObject;
+            ObjectType = objectState.ObjectType;
+            StartTime = objectState.StartTime;
             Scale = Vector2.Divide(objectState.DisplaySize, Size);
             Rotation = objectState.DisplayRotation;
             AccentColour.Value = objectState.AccentColour.Value;
