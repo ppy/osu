@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -20,6 +21,8 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
+        private Drawable lastClickedSection;
+        private T smallestSection;
 
         public Drawable ExpandableHeader
         {
@@ -131,10 +134,21 @@ namespace osu.Game.Graphics.Containers
             lastKnownScroll = float.NaN;
             headerHeight = float.NaN;
             footerHeight = float.NaN;
+
+            if (drawable == null)
+                return;
+
+            if (smallestSection == null || smallestSection.Height > drawable.Height)
+                smallestSection = drawable;
         }
 
-        public void ScrollTo(Drawable section) =>
-            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
+        private const float scroll_target_multiplier = 0.2f;
+
+        public void ScrollTo(Drawable section)
+        {
+            lastClickedSection = section;
+            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - scrollContainer.DisplayableContent * scroll_target_multiplier - (FixedHeader?.BoundingBox.Height ?? 0));
+        }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
@@ -183,6 +197,10 @@ namespace osu.Game.Graphics.Containers
             {
                 lastKnownScroll = currentScroll;
 
+                // reset last clicked section because user started scrolling themselves
+                if (scrollContainer.UserScrolling)
+                    lastClickedSection = null;
+
                 if (ExpandableHeader != null && FixedHeader != null)
                 {
                     float offset = Math.Min(ExpandableHeader.LayoutSize.Y, currentScroll);
@@ -194,18 +212,27 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
-                float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
+                // scroll offset is our fixed header height if we have it plus 20% of content height
+                // plus 5% to fix floating point errors and to not have a section instantly unselect when scrolling upwards
+                // but the 5% can't be bigger than our smallest section height, otherwise it won't get selected correctly
+                float sectionOrContent = Math.Min(smallestSection?.Height / 2.0f ?? 0, scrollContainer.DisplayableContent * 0.05f);
+                float scrollOffset = (FixedHeader?.LayoutSize.Y ?? 0) + scrollContainer.DisplayableContent * scroll_target_multiplier + sectionOrContent;
                 Func<T, float> diff = section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset;
 
-                if (scrollContainer.IsScrolledToEnd())
+                if (Precision.AlmostBigger(0, scrollContainer.Current))
                 {
-                    SelectedSection.Value = Children.LastOrDefault();
+                    SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
+                    return;
                 }
-                else
+
+                if (Precision.AlmostBigger(scrollContainer.Current, scrollContainer.ScrollableExtent))
                 {
-                    SelectedSection.Value = Children.TakeWhile(section => diff(section) <= 0).LastOrDefault()
-                                            ?? Children.FirstOrDefault();
+                    SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
+                    return;
                 }
+
+                SelectedSection.Value = Children.TakeWhile(section => diff(section) <= 0).LastOrDefault()
+                                        ?? Children.FirstOrDefault();
             }
         }
 
