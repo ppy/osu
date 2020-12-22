@@ -58,7 +58,7 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources, string filename)
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string filename)
             : base(skin)
         {
             using (var stream = storage?.GetStream(filename))
