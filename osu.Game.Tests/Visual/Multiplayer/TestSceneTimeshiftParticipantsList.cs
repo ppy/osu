@@ -8,7 +8,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneParticipantsList : MultiplayerTestScene
+    public class TestSceneTimeshiftParticipantsList : MultiplayerTestScene
     {
         [SetUp]
         public new void Setup() => Schedule(() =>
@@ -20,6 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Room.RecentParticipants.Add(new User
                 {
                     Username = "peppy",
+                    CurrentModeRank = 1234,
                     Id = 2
                 });
             }

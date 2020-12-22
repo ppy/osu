@@ -15,7 +15,7 @@ using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.RealtimeMultiplayer
+namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
 {
     public class RealtimeReadyButton : RealtimeRoomComposite
     {
