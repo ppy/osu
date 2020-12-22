@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -99,6 +100,8 @@ namespace osu.Game.Online.RealtimeMultiplayer
                 {
                     try
                     {
+                        Debug.Assert(connection != null);
+
                         // reconnect on any failure
                         await connection.StartAsync();
                         Logger.Log("Multiplayer client connected!", LoggingTarget.Network);
