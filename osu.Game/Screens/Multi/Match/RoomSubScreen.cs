@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Multi.Match
@@ -22,6 +23,9 @@ namespace osu.Game.Screens.Multi.Match
 
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         protected BindableList<PlaylistItem> Playlist { get; private set; }
+
+        [Resolved]
+        private MusicController music { get; set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -61,6 +65,30 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            if (this.IsCurrentScreen())
+                applyTrackLooping();
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            music?.EnsurePlayingSomething();
+            applyTrackLooping();
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            cancelTrackLooping();
+            base.OnSuspending(next);
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            music?.EnsurePlayingSomething();
+            applyTrackLooping();
         }
 
         public override bool OnExiting(IScreen next)
@@ -68,7 +96,31 @@ namespace osu.Game.Screens.Multi.Match
             RoomManager?.PartRoom();
             Mods.Value = Array.Empty<Mod>();
 
+            cancelTrackLooping();
+
             return base.OnExiting(next);
+        }
+
+        private void applyTrackLooping()
+        {
+            var track = Beatmap.Value?.Track;
+
+            if (track != null)
+            {
+                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+                track.Looping = true;
+            }
+        }
+
+        private void cancelTrackLooping()
+        {
+            var track = Beatmap?.Value?.Track;
+
+            if (track != null)
+            {
+                track.Looping = false;
+                track.RestartPoint = 0;
+            }
         }
     }
 }
