@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     });
 
-                    Client.ChangeUserState(i, (MultiplayerUserState)RNG.Next(0, (int)MultiplayerUserState.Results));
+                    Client.ChangeUserState(i, (MultiplayerUserState)RNG.Next(0, (int)MultiplayerUserState.Results + 1));
                 }
             });
         }
