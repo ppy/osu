@@ -4,17 +4,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A class which will recommend the most suitable difficulty for the local user from a beatmap set.
+    /// This requires the user to be logged in, as it sources from the user's online profile.
+    /// </summary>
     public class DifficultyRecommender : Component
     {
         [Resolved]
@@ -26,7 +30,12 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private Bindable<RulesetInfo> ruleset { get; set; }
 
-        private readonly Dictionary<RulesetInfo, double> recommendedStarDifficulty = new Dictionary<RulesetInfo, double>();
+        /// <summary>
+        /// The user for which the last requests were run.
+        /// </summary>
+        private int? requestedUserId;
+
+        private readonly Dictionary<RulesetInfo, double> recommendedDifficultyMapping = new Dictionary<RulesetInfo, double>();
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
@@ -45,42 +54,64 @@ namespace osu.Game.Screens.Select
         /// </remarks>
         /// <param name="beatmaps">A collection of beatmaps to select a difficulty from.</param>
         /// <returns>The recommended difficulty, or null if a recommendation could not be provided.</returns>
+        [CanBeNull]
         public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
         {
-            if (recommendedStarDifficulty.TryGetValue(ruleset.Value, out var stars))
+            foreach (var r in orderedRulesets)
             {
-                return beatmaps.OrderBy(b =>
+                if (!recommendedDifficultyMapping.TryGetValue(r, out var recommendation))
+                    continue;
+
+                BeatmapInfo beatmap = beatmaps.Where(b => b.Ruleset.Equals(r)).OrderBy(b =>
                 {
-                    var difference = b.StarDifficulty - stars;
+                    var difference = b.StarDifficulty - recommendation;
                     return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
                 }).FirstOrDefault();
+
+                if (beatmap != null)
+                    return beatmap;
             }
 
             return null;
         }
 
-        private void calculateRecommendedDifficulties()
+        private void fetchRecommendedValues()
         {
-            rulesets.AvailableRulesets.ForEach(rulesetInfo =>
+            if (recommendedDifficultyMapping.Count > 0 && api.LocalUser.Value.Id == requestedUserId)
+                return;
+
+            requestedUserId = api.LocalUser.Value.Id;
+
+            // only query API for built-in rulesets
+            rulesets.AvailableRulesets.Where(ruleset => ruleset.ID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID).ForEach(rulesetInfo =>
             {
                 var req = new GetUserRequest(api.LocalUser.Value.Id, rulesetInfo);
 
                 req.Success += result =>
                 {
                     // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-                    recommendedStarDifficulty[rulesetInfo] = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
+                    recommendedDifficultyMapping[rulesetInfo] = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
                 };
 
                 api.Queue(req);
             });
         }
 
+        /// <returns>
+        /// Rulesets ordered descending by their respective recommended difficulties.
+        /// The currently selected ruleset will always be first.
+        /// </returns>
+        private IEnumerable<RulesetInfo> orderedRulesets =>
+            recommendedDifficultyMapping
+                .OrderByDescending(pair => pair.Value).Select(pair => pair.Key).Where(r => !r.Equals(ruleset.Value))
+                .Prepend(ruleset.Value);
+
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             switch (state.NewValue)
             {
                 case APIState.Online:
-                    calculateRecommendedDifficulties();
+                    fetchRecommendedValues();
                     break;
             }
         });
