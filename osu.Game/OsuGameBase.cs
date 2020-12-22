@@ -36,7 +36,6 @@ using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
@@ -98,9 +97,6 @@ namespace osu.Game
         [Cached]
         [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
         protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
-        [Cached]
-        protected readonly DifficultyRecommender DifficultyRecommender = new DifficultyRecommender();
 
         /// <summary>
         /// Mods available for the current <see cref="Ruleset"/>.
@@ -305,8 +301,6 @@ namespace osu.Game
 
             AddInternal(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
-
-            Add(DifficultyRecommender);
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }
