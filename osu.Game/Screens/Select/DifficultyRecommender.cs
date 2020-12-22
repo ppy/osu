@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -47,6 +48,7 @@ namespace osu.Game.Screens.Select
         /// </remarks>
         /// <param name="beatmaps">A collection of beatmaps to select a difficulty from.</param>
         /// <returns>The recommended difficulty, or null if a recommendation could not be provided.</returns>
+        [CanBeNull]
         public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
         {
             if (!recommendedStarDifficulty.Any())
