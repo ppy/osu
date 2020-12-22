@@ -22,21 +22,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new DrawableRoom(new Room
                     {
-                        Name = { Value = "Room 1" },
+                        Name = { Value = "Open - ending in 1 day" },
                         Status = { Value = new RoomStatusOpen() },
                         EndDate = { Value = DateTimeOffset.Now.AddDays(1) }
                     }) { MatchingFilter = true },
                     new DrawableRoom(new Room
                     {
-                        Name = { Value = "Room 2" },
+                        Name = { Value = "Playing - ending in 1 day" },
                         Status = { Value = new RoomStatusPlaying() },
                         EndDate = { Value = DateTimeOffset.Now.AddDays(1) }
                     }) { MatchingFilter = true },
                     new DrawableRoom(new Room
                     {
-                        Name = { Value = "Room 3" },
+                        Name = { Value = "Ended" },
                         Status = { Value = new RoomStatusEnded() },
                         EndDate = { Value = DateTimeOffset.Now }
+                    }) { MatchingFilter = true },
+                    new DrawableRoom(new Room
+                    {
+                        Name = { Value = "Open (realtime)" },
+                        Status = { Value = new RoomStatusOpen() },
+                        Category = { Value = RoomCategory.Realtime }
                     }) { MatchingFilter = true },
                 }
             };
