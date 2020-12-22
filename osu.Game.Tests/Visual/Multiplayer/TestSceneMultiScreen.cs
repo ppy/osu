@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Overlays;
+using osu.Game.Screens.Multi.Timeshift;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public TestSceneMultiScreen()
         {
-            Screens.Multi.Multiplayer multi = new Screens.Multi.Multiplayer();
+            var multi = new TimeshiftMultiplayer();
 
             AddStep("show", () => LoadScreen(multi));
             AddUntilStep("wait for loaded", () => multi.IsLoaded);

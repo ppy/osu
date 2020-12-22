@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Framework.Input;
@@ -64,22 +63,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo);
 
-        public override DrawableHitObject<TaikoHitObject> CreateDrawableRepresentation(TaikoHitObject h)
-        {
-            switch (h)
-            {
-                case Hit hit:
-                    return new DrawableHit(hit);
-
-                case DrumRoll drumRoll:
-                    return new DrawableDrumRoll(drumRoll);
-
-                case Swell swell:
-                    return new DrawableSwell(swell);
-            }
-
-            return null;
-        }
+        public override DrawableHitObject<TaikoHitObject> CreateDrawableRepresentation(TaikoHitObject h) => null;
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
 
