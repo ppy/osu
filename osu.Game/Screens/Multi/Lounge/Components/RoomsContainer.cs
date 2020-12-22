@@ -115,7 +115,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     {
                         if (room == selectedRoom.Value)
                         {
-                            joinSelected();
+                            if (roomManager.CanJoinRoom(room))
+                                joinSelected();
+
                             return;
                         }
 
